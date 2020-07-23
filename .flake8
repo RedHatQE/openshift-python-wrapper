@@ -77,8 +77,5 @@ fcfn_exclude_functions =
     datetime,
     intersection
 
-[flake8:local-plugins]
-extension =
-    FCFN = flake8_plugins.FunctionCallForceNames:FunctionCallForceNames
-paths =
-    .
+enable-extensions =
+    FCFN,
