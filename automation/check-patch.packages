@@ -1,9 +1,0 @@
-docker
-gcc
-git
-make
-openshift-clients
-python3-devel
-python3-pip
-python3-setuptools
-wget
