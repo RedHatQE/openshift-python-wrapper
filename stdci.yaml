@@ -1,7 +1,0 @@
----
-distro: el7
-sub-stages:
-  - check
-
-reporting:
-  style: stdci
