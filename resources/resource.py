@@ -246,6 +246,7 @@ class Resource(object):
         DEGRADED = "Degraded"
         PROGRESSING = "Progressing"
         RECONCILE_COMPLETE = "ReconcileComplete"
+        READY = "Ready"
 
         class Status:
             TRUE = "True"
