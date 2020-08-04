@@ -27,5 +27,5 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [
-          "git+https://gitlab.cee.redhat.com/myakove/flake8-python-plugins.git"
+          "git+https://gitlab.cee.redhat.com/cnv-qe/flake8-python-plugins.git"
         ]
