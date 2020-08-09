@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
 import logging
 
 import xmltodict
@@ -17,46 +16,7 @@ LOGGER = logging.getLogger(__name__)
 API_GROUP = "kubevirt.io"
 
 
-class AnsibleLoginAnnotationsMixin(object):
-    """A mixin class that enhances the object.metadata.annotations
-       with login credentials stored in Ansible variables.
-
-       This allows seamless console connection in tests as both
-       Console and Ansible inventory/connection plugins know how
-       to extract this information.
-    """
-
-    def _store_login_information(self, username, password):
-        self._username = username
-        self._password = password
-
-    def _add_login_annotation(self, vmi):
-        """Enhance VMI object with the proper metadata. Call this method
-           from to_dict with vmi set to the dict that represents VMI.
-           The provided vmi is modified in place!
-
-           This method does nothing when no credentials were provided.
-        """
-
-        login_annotation = {}
-
-        if self._username:
-            login_annotation["ansible_user"] = self._username
-
-        if self._password:
-            login_annotation["ansible_ssh_pass"] = self._password
-
-        if login_annotation:
-            # cloud images defaults
-            login_annotation["ansible_become"] = True
-            login_annotation["ansible_become_method"] = "sudo"
-
-            vmi.setdefault("metadata", {})
-            vmi["metadata"].setdefault("annotations", {})
-            vmi["metadata"]["annotations"]["ansible"] = json.dumps(login_annotation)
-
-
-class VirtualMachine(NamespacedResource, AnsibleLoginAnnotationsMixin):
+class VirtualMachine(NamespacedResource):
     """
     Virtual Machine object, inherited from Resource.
     Implements actions start / stop / status / wait for VM status / is running
@@ -189,7 +149,7 @@ class VirtualMachine(NamespacedResource, AnsibleLoginAnnotationsMixin):
         return self.instance.status["ready"]
 
 
-class VirtualMachineInstance(NamespacedResource, AnsibleLoginAnnotationsMixin):
+class VirtualMachineInstance(NamespacedResource):
     """
     Virtual Machine Instance object, inherited from Resource.
     """

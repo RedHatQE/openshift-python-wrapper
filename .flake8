@@ -6,7 +6,6 @@ exclude =
     .git,
     .yml,
     Pipfile.*,
-    ansible/*,
     docs/*,
     .cache/*
 
