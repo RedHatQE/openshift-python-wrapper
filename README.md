@@ -5,7 +5,7 @@ With support for RedHat Container Virtualization.
 ## Installation
 From source:
 ```bash
-git clone https://gitlab.cee.redhat.com/myakove/ocp-python-wrapper.git
+git clone https://gitlab.cee.redhat.com/cnv-qe/ocp-python-wrapper.git
 cd ocp-python-wrapper
 python setup.py install --user
 ```
