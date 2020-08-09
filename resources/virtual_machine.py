@@ -171,7 +171,6 @@ class VirtualMachineInstance(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
-        self._add_login_annotation(vmi=res)
         return res
 
     def pause(self, timeout=TIMEOUT, wait=False):
