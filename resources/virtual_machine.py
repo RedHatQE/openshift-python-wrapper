@@ -30,7 +30,6 @@ class VirtualMachine(NamespacedResource):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
-        self._store_login_information(username=username, password=password)
 
     @property
     def _subresource_api_url(self):
@@ -43,7 +42,6 @@ class VirtualMachine(NamespacedResource):
     def to_dict(self):
         res = super().to_dict()
         res["spec"] = {"template": {"spec": {}}}
-        self._add_login_annotation(vmi=res["spec"]["template"])
         return res
 
     def start(self, timeout=TIMEOUT, wait=False):
@@ -162,7 +160,6 @@ class VirtualMachineInstance(NamespacedResource):
 
     def __init__(self, name, namespace, client=None, username=None, password=None):
         super().__init__(name=name, namespace=namespace, client=client)
-        self._store_login_information(username=username, password=password)
 
     @property
     def _subresource_api_url(self):
