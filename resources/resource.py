@@ -9,12 +9,7 @@ import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import NotFoundError
-from resources.utils import (
-    NudgeTimers,
-    TimeoutExpiredError,
-    TimeoutSampler,
-    nudge_delete,
-)
+from resources.utils import TimeoutExpiredError, TimeoutSampler
 from urllib3.exceptions import ProtocolError
 
 
@@ -521,48 +516,6 @@ class Resource(object):
         LOGGER.info(f"Create {self.kind} {self.name}")
         if wait and res:
             return self.wait()
-        return res
-
-    @classmethod
-    def delete_from_dict(cls, dyn_client, data, namespace=None, wait=False):
-        """
-        Delete resource represented by the passed data
-
-        Args:
-            dyn_client (DynamicClient): Open connection to remote cluster.
-            data (dict): Dict representation of resource payload.
-            namespace (str): Namespace of the resource unless specified in the supplied yaml.
-            wait (bool) : True to wait for resource till deleted.
-
-        Returns:
-            True if delete succeeded, False otherwise.
-        """
-
-        def _exists(name, namespace):
-            try:
-                return client.get(name=name, namespace=namespace)
-            except NotFoundError:
-                return
-
-        def _sampler(name, namespace, force=False):
-            samples = TimeoutSampler(
-                timeout=TIMEOUT, sleep=1, func=_exists, name=name, namespace=namespace
-            )
-            timers = NudgeTimers()
-            for sample in samples:
-                if force:
-                    nudge_delete(name=name, timers=timers)
-                if not sample:
-                    return
-
-        kind = data["kind"]
-        name = data["metadata"]["name"]
-        namespace = data["metadata"].get("namespace", namespace)
-        client = dyn_client.resources.get(api_version=data["apiVersion"], kind=kind)
-        LOGGER.info(f"Delete {data['kind']} {name}")
-        res = client.delete(name=name, namespace=namespace)
-        if wait and res:
-            return _sampler(name, namespace, force=kind == "Namespace")
         return res
 
     def delete(self, wait=False):
