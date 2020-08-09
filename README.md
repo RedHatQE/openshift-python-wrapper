@@ -9,3 +9,9 @@ git clone https://gitlab.cee.redhat.com/myakove/ocp-python-wrapper.git
 cd ocp-python-wrapper
 python setup.py install --user
 ```
+
+## Code check
+We use pre-commit for code check.
+```bash
+pre-commit install
+```
