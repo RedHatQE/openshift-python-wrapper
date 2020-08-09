@@ -24,9 +24,7 @@ class VirtualMachine(NamespacedResource):
 
     api_group = API_GROUP
 
-    def __init__(
-        self, name, namespace, client=None, username=None, password=None, teardown=True
-    ):
+    def __init__(self, name, namespace, client=None, teardown=True):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
@@ -129,12 +127,7 @@ class VirtualMachine(NamespacedResource):
         Returns:
             VirtualMachineInstance: VMI
         """
-        return VirtualMachineInstance(
-            name=self.name,
-            namespace=self.namespace,
-            username=self._username,
-            password=self._password,
-        )
+        return VirtualMachineInstance(name=self.name, namespace=self.namespace,)
 
     def ready(self):
         """
@@ -158,7 +151,7 @@ class VirtualMachineInstance(NamespacedResource):
         RUNNING = "Running"
         SCHEDULING = "Scheduling"
 
-    def __init__(self, name, namespace, client=None, username=None, password=None):
+    def __init__(self, name, namespace, client=None):
         super().__init__(name=name, namespace=namespace, client=client)
 
     @property
