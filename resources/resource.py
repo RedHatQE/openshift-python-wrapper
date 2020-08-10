@@ -275,22 +275,11 @@ class Resource(object):
                 )
                 raise
         if not self.api_version:
-            self._get_api_version()
+            self.api_version = _get_api_version(
+                dyn_client=self.client, api_group=self.api_group, kind=self.kind
+            )
 
         self.teardown = teardown
-
-    def _get_api_version(self):
-        res = _find_supported_resource(
-            dyn_client=self.client, api_group=self.api_group, kind=self.kind
-        )
-        if not res:
-            LOGGER.error(f"Couldn't find {self.kind} in {self.api_group} api group")
-            raise NotImplementedError(
-                f"Couldn't find {self.kind} in {self.api_group} api group"
-            )
-        self.api_version = _get_api_version(
-            dyn_client=self.client, api_group=self.api_group, kind=self.kind
-        )
 
     @classproperty
     def kind(cls):  # noqa: N805
