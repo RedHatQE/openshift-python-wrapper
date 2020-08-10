@@ -106,10 +106,6 @@ class DataVolume(NamespacedResource):
     def importer_pod(self):
         return self._get_pod_startswith("importer")
 
-    @property
-    def upload_target_pod(self):
-        return self._get_pod_startswith("cdi-upload")
-
     def __init__(
         self,
         name,
