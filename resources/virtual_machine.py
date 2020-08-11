@@ -88,7 +88,7 @@ class VirtualMachine(NamespacedResource):
             headers=self.client.configuration.api_key,
         )
         if wait:
-            self.wait_for_status(timeout=timeout, status=False)
+            self.wait_for_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted()
 
     def wait_for_status(self, status, timeout=TIMEOUT):
@@ -96,7 +96,7 @@ class VirtualMachine(NamespacedResource):
         Wait for resource to be in status
 
         Args:
-            status (bool): Expected status.
+            status: Expected status: True for a running VM, None for a stopped VM.
             timeout (int): Time to wait for the resource.
 
         Raises:
@@ -113,7 +113,9 @@ class VirtualMachine(NamespacedResource):
         )
         for sample in samples:
             if sample.items:
-                if sample.items[0].spec.running == status:
+                # VM with runStrategy does not have spec.running attribute
+                # VM status should be taken from spec.status.ready
+                if self.ready() == status:
                     return
 
     def get_interfaces(self):
@@ -134,7 +136,7 @@ class VirtualMachine(NamespacedResource):
         Get VM status
 
         Returns:
-            bool: True if Running else False
+            True if Running else None
         """
         LOGGER.info(f"Check if {self.kind} {self.name} is ready")
         return self.instance.status["ready"]
