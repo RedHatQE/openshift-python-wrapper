@@ -18,9 +18,9 @@ import sphinx_bootstrap_theme
 
 # -- Project information -----------------------------------------------------
 
-project = "cnv-tests"
-copyright = "2019, cnv-test"  # noqa: A001
-author = "cnv-test"
+project = "OCP Python Wrapper"
+copyright = "2020 OCP Python Wrapper"  # noqa: A001
+author = "myakove"
 
 sys.path.insert(0, os.path.abspath("../.."))
 sys.path.insert(0, os.path.abspath("."))
