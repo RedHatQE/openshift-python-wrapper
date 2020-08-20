@@ -80,7 +80,9 @@ class DataVolume(NamespacedResource):
 
     def wait(self, timeout=600):
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        assert self.pvc.bound()
+        self.pvc.wait_for_status(
+            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
+        )
 
     @property
     def pvc(self):
