@@ -139,7 +139,7 @@ class VirtualMachine(NamespacedResource):
             True if Running else None
         """
         LOGGER.info(f"Check if {self.kind} {self.name} is ready")
-        return self.instance.status["ready"]
+        return self.instance.status["ready"] if self.instance.status else None
 
 
 class VirtualMachineInstance(NamespacedResource):
