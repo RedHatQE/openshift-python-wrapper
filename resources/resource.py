@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import os
 import re
@@ -627,6 +628,31 @@ class Resource(object):
                     for cond in sample_conditions:
                         if cond.type == condition and cond.status == status:
                             return
+
+    def api_request(self, method, action, url, **params):
+        """
+        Handle API requests to resource.
+
+        Args:
+            method (str): Request method (GET/PUT etc.).
+            action (str): Action to perform (stop/start/guestosinfo etc.).
+            url (str): URL of resource.
+
+        Returns:
+           data(dict): response data
+
+        """
+        response = self.client.client.request(
+            method=method,
+            url=f"{url}/{action}",
+            headers=self.client.configuration.api_key,
+            **params,
+        )
+
+        try:
+            return json.loads(response.data)
+        except json.decoder.JSONDecodeError:
+            return response.data
 
 
 class NamespacedResource(Resource):
