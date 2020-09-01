@@ -247,7 +247,7 @@ class Resource(object):
             TRUE = "True"
             FALSE = "False"
 
-    def __init__(self, name, client=None, teardown=True):
+    def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
         """
         Create a API resource
 
@@ -280,6 +280,7 @@ class Resource(object):
             )
 
         self.teardown = teardown
+        self.timeout = timeout
 
     @classproperty
     def kind(cls):  # noqa: N805
@@ -320,7 +321,7 @@ class Resource(object):
 
         data = self.to_dict()
         LOGGER.info(f"Deleting {data}")
-        self.delete(wait=True)
+        self.delete(wait=True, timeout=self.timeout)
 
     def api(self, **kwargs):
         """
@@ -507,7 +508,7 @@ class Resource(object):
             return self.wait()
         return res
 
-    def delete(self, wait=False):
+    def delete(self, wait=False, timeout=TIMEOUT):
         resource_list = self.api()
         try:
             res = resource_list.delete(name=self.name, namespace=self.namespace)
@@ -516,7 +517,7 @@ class Resource(object):
 
         LOGGER.info(f"Delete {self.kind} {self.name}")
         if wait and res:
-            return self.wait_deleted()
+            return self.wait_deleted(timeout=timeout)
         return res
 
     @property
@@ -634,8 +635,8 @@ class NamespacedResource(Resource):
     Namespaced object, inherited from Resource.
     """
 
-    def __init__(self, name, namespace, client=None, teardown=True):
-        super().__init__(name=name, client=client, teardown=teardown)
+    def __init__(self, name, namespace, client=None, teardown=True, timeout=TIMEOUT):
+        super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
         self.namespace = namespace
 
     @classmethod

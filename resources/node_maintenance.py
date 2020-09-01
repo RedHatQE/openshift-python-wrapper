@@ -1,4 +1,4 @@
-from .resource import Resource
+from .resource import TIMEOUT, Resource
 
 
 class NodeMaintenance(Resource):
@@ -11,8 +11,10 @@ class NodeMaintenance(Resource):
     class Status(Resource.Status):
         RUNNING = "Running"
 
-    def __init__(self, name, node=None, reason="TEST Reason", teardown=True):
-        super().__init__(name=name, teardown=teardown)
+    def __init__(
+        self, name, node=None, reason="TEST Reason", teardown=True, timeout=TIMEOUT
+    ):
+        super().__init__(name=name, teardown=teardown, timeout=timeout)
         self.node = node
         self.reason = reason
 
