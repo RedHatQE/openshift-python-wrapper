@@ -37,28 +37,23 @@ class VirtualMachine(NamespacedResource):
             f"namespaces/{self.namespace}/virtualmachines/{self.name}"
         )
 
+    def api_request(self, method, action, **params):
+        return super().api_request(
+            method=method, action=action, url=self._subresource_api_url, **params
+        )
+
     def to_dict(self):
         res = super().to_dict()
         res["spec"] = {"template": {"spec": {}}}
         return res
 
     def start(self, timeout=TIMEOUT, wait=False):
-        self.client.client.request(
-            "PUT",
-            f"{self._subresource_api_url}/start",
-            headers=self.client.configuration.api_key,
-        )
+        self.api_request(method="PUT", action="start")
         if wait:
             return self.wait_for_status(timeout=timeout, status=True)
 
-    def restart(
-        self, timeout=TIMEOUT, wait=False,
-    ):
-        self.client.client.request(
-            "PUT",
-            f"{self._subresource_api_url}/restart",
-            headers=self.client.configuration.api_key,
-        )
+    def restart(self, timeout=TIMEOUT, wait=False):
+        self.api_request(method="PUT", action="restart")
         if wait:
             self._wait_for_restart_status(timeout=timeout)
             return self.vmi.wait_until_running(timeout=timeout, stop_status="dummy")
@@ -82,11 +77,7 @@ class VirtualMachine(NamespacedResource):
         )
 
     def stop(self, timeout=TIMEOUT, wait=False):
-        self.client.client.request(
-            "PUT",
-            f"{self._subresource_api_url}/stop",
-            headers=self.client.configuration.api_key,
-        )
+        self.api_request(method="PUT", action="stop")
         if wait:
             self.wait_for_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted()
@@ -164,25 +155,22 @@ class VirtualMachineInstance(NamespacedResource):
             f"namespaces/{self.namespace}/virtualmachineinstances/{self.name}"
         )
 
+    def api_request(self, method, action, **params):
+        return super().api_request(
+            method=method, action=action, url=self._subresource_api_url, **params
+        )
+
     def to_dict(self):
         res = super().to_dict()
         return res
 
     def pause(self, timeout=TIMEOUT, wait=False):
-        self.client.client.request(
-            "PUT",
-            f"{self._subresource_api_url}/pause",
-            headers=self.client.configuration.api_key,
-        )
+        self.api_request(method="PUT", action="pause")
         if wait:
             return self.wait_for_pause_status(pause=True, timeout=timeout)
 
     def unpause(self, timeout=TIMEOUT, wait=False):
-        self.client.client.request(
-            "PUT",
-            f"{self._subresource_api_url}/unpause",
-            headers=self.client.configuration.api_key,
-        )
+        self.api_request(method="PUT", action="unpause")
         if wait:
             return self.wait_for_pause_status(pause=False, timeout=timeout)
 
@@ -339,11 +327,19 @@ class VirtualMachineInstance(NamespacedResource):
 
     @property
     def guest_os_info(self):
-        return self.instance.status.guestOSInfo
+        return self.api_request(method="GET", action="guestosinfo")
+
+    @property
+    def guest_fs_info(self):
+        return self.api_request(method="GET", action="filesystemlist")
+
+    @property
+    def guest_user_info(self):
+        return self.api_request(method="GET", action="userlist")
 
     @property
     def os_version(self):
-        vmi_os_version = self.guest_os_info.get("version", {})
+        vmi_os_version = self.instance.status.guestOSInfo.get("version", {})
         if not vmi_os_version:
             LOGGER.warning(
                 "Guest agent is not installed on the VM; OS version is not available."
