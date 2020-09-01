@@ -8,11 +8,11 @@ class Subscription(NamespacedResource):
         self,
         name,
         namespace,
-        source,
-        source_namespace,
-        install_plan_approval,
-        channel,
-        starting_csv,
+        source=None,
+        source_namespace=None,
+        install_plan_approval=None,
+        channel=None,
+        starting_csv=None,
         teardown=False,
     ):
         super().__init__(name=name, namespace=namespace, teardown=teardown)
