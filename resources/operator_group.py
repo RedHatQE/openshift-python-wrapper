@@ -9,7 +9,7 @@ class OperatorGroup(NamespacedResource):
     ):
         """
         Args:
-            targetNamespaces(list): namespaces in which to generate required RBAC access for its member Operators.
+            target_namespaces(list): namespaces in which to generate required RBAC access for its member Operators.
         """
         super().__init__(name=name, namespace=namespace, teardown=teardown)
         self.target_namespaces = target_namespaces
