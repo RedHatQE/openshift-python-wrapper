@@ -301,7 +301,7 @@ class Resource(object):
         return self._base_body()
 
     def __enter__(self):
-        self.create(wait=True)
+        self.create()
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
