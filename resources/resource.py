@@ -301,11 +301,7 @@ class Resource(object):
         return self._base_body()
 
     def __enter__(self):
-        data = self.to_dict()
-        LOGGER.info(f"Posting {data}")
-        self.create_from_dict(
-            dyn_client=self.client, data=data, namespace=self.namespace
-        )
+        self.create(wait=True)
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
@@ -457,24 +453,6 @@ class Resource(object):
                 LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
-    @classmethod
-    def create_from_dict(cls, dyn_client, data, namespace=None):
-        """
-        Create resource from given yaml file.
-
-        Args:
-            dyn_client (DynamicClient): Open connection to remote cluster.
-            data (dict): Dict representing the resource.
-            namespace (str): Namespace of the resource unless specified in the supplied yaml.
-        """
-        client = dyn_client.resources.get(
-            api_version=data["apiVersion"], kind=data["kind"]
-        )
-        LOGGER.info(f"Create {data['kind']} {data['metadata']['name']}")
-        return client.create(
-            body=data, namespace=data["metadata"].get("namespace", namespace)
-        )
-
     def create(self, body=None, wait=False):
         """
         Create resource.
@@ -502,9 +480,10 @@ class Resource(object):
                 ValueMismatch(f"{api_version} != {self.api_version}")
 
             data.update(body)
-        res = self.api().create(body=data, namespace=self.namespace)
 
+        LOGGER.info(f"Posting {data}")
         LOGGER.info(f"Create {self.kind} {self.name}")
+        res = self.api().create(body=data, namespace=self.namespace)
         if wait and res:
             return self.wait()
         return res
