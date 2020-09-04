@@ -356,6 +356,9 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
+        if self.name == "node-gather-unprivileged":
+            import ipdb;ipdb.set_trace()
+
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
             timeout=timeout,
