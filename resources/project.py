@@ -31,10 +31,5 @@ class ProjectRequest(Resource):
 
     api_group = API_GROUP
 
-    def __exit__(self, exception_type, exception_value, traceback):
-        if not self.teardown:
-            return
-        self.clean_up()
-
     def clean_up(self):
         Project(name=self.name).delete(wait=True)
