@@ -106,7 +106,7 @@ class VirtualMachine(NamespacedResource):
             if sample.items:
                 # VM with runStrategy does not have spec.running attribute
                 # VM status should be taken from spec.status.ready
-                if self.ready() == status:
+                if self.ready == status:
                     return
 
     def get_interfaces(self):
@@ -122,6 +122,7 @@ class VirtualMachine(NamespacedResource):
         """
         return VirtualMachineInstance(name=self.name, namespace=self.namespace,)
 
+    @property
     def ready(self):
         """
         Get VM status
@@ -129,7 +130,6 @@ class VirtualMachine(NamespacedResource):
         Returns:
             True if Running else None
         """
-        LOGGER.info(f"Check if {self.kind} {self.name} is ready")
         return self.instance.status["ready"] if self.instance.status else None
 
 
