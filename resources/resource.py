@@ -305,6 +305,7 @@ class Resource(object):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
+        import ipdb;ipdb.set_trace()
         if not self.teardown:
             return
         self.clean_up()
