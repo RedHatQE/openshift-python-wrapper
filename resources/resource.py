@@ -301,11 +301,10 @@ class Resource(object):
         return self._base_body()
 
     def __enter__(self):
-        self.create(wait=True)
+        self.create()
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        import ipdb;ipdb.set_trace()
         if not self.teardown:
             return
         self.clean_up()
@@ -356,9 +355,6 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
-        if self.name == "node-gather-unprivileged":
-            import ipdb;ipdb.set_trace()
-
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
             timeout=timeout,
