@@ -125,20 +125,31 @@ def nudge_delete(name, timers):
 def ignore_ssl_exceptions(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        import ipdb;ipdb.set_trace()
-        sampler = TimeoutSampler(
-            timeout=60,
-            sleep=2,
-            exceptions=urllib3.exceptions.ProtocolError,
-            func=func,
-            *args,
-            **kwargs,
-        )
-        try:
-            for sample in sampler:
-                if sample:
-                    return sample
-        except TimeoutExpiredError:
-            LOGGER.error("SSL ProtocolError")
+        timeout = 60
+        sleep = 2
+        while timeout > 0:
+            try:
+                func(*args, **kwargs)
+            except urllib3.exceptions.ProtocolError:
+                time.sleep(sleep)
+                timeout = timeout - sleep
+
+
+
+        # import ipdb;ipdb.set_trace()
+        # sampler = TimeoutSampler(
+        #     timeout=60,
+        #     sleep=2,
+        #     exceptions=urllib3.exceptions.ProtocolError,
+        #     func=func,
+        #     *args,
+        #     **kwargs,
+        # )
+        # try:
+        #     for sample in sampler:
+        #         if sample:
+        #             return sample
+        # except TimeoutExpiredError:
+        #     LOGGER.error("SSL ProtocolError")
 
     return inner
