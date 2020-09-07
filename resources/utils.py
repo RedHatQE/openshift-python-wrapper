@@ -126,16 +126,24 @@ def ignore_ssl_exceptions(func):
         timeout = 6
         sleep = 2
         res = None
+        ex = None
         while timeout > 0:
             try:
                 res = func(*args, **kwargs)
                 timeout = 0
-            except urllib3.exceptions.ProtocolError:
+            except urllib3.exceptions.ProtocolError as ex:
+                ex = ex
+                import ipdb
+
+                ipdb.set_trace()
                 LOGGER.warning("SSL ProtocolError")
                 time.sleep(sleep)
                 timeout = timeout - sleep
 
         if not res:
+            import ipdb
+
+            ipdb.set_trace()
             raise urllib3.exceptions.ProtocolError
 
     return inner
