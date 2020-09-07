@@ -123,7 +123,7 @@ def nudge_delete(name, timers):
 
 
 def ignore_ssl_exceptions(func):
-    @wraps(func)
+    # @wraps(func)
     def inner(*args, **kwargs):
         timeout = 60
         sleep = 2
