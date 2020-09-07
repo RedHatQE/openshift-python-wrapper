@@ -505,7 +505,7 @@ class Resource(object):
         Raises:
             ValueMismatch: When body value doesn't match class value
         """
-        # raise urllib3.exceptions.ProtocolError
+        raise urllib3.exceptions.ProtocolError("XXXXXXXXXXXXX")
 
         data = self.to_dict()
         if body:
