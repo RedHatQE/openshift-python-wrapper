@@ -34,7 +34,7 @@ class TimeoutSampler(object):
     """
 
     def __init__(
-        self, func, timeout=60, sleep=2, exceptions=None, *func_args, **func_kwargs
+        self, timeout, sleep, func, exceptions=None, *func_args, **func_kwargs
     ):
         self.timeout = timeout
         self.sleep = sleep
