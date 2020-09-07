@@ -44,7 +44,7 @@ class CDIConfig(Resource):
             f"Wait for {self.kind} {self.name} to ensure current URL == uploadProxyURL"
         )
         samples = TimeoutSampler(
-            timeout=timeout,
+            sampler_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,

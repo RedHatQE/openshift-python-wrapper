@@ -96,7 +96,7 @@ class VirtualMachine(NamespacedResource):
             f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
         )
         samples = TimeoutSampler(
-            timeout=timeout,
+            sampler_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -249,7 +249,7 @@ class VirtualMachineInstance(NamespacedResource):
     def wait_for_domstate_pause_status(self, pause, timeout=TIMEOUT):
         pause_status = "paused" if pause else "running"
         samples = TimeoutSampler(
-            timeout=timeout,
+            sampler_timeout=timeout,
             sleep=1,
             exceptions=(ProtocolError),
             func=self.get_domstate,
@@ -260,7 +260,7 @@ class VirtualMachineInstance(NamespacedResource):
 
     def wait_for_vmi_condition_pause_status(self, pause, timeout=TIMEOUT):
         samples = TimeoutSampler(
-            timeout=timeout,
+            sampler_timeout=timeout,
             sleep=1,
             exceptions=(ProtocolError),
             func=self.get_vmi_active_condition,
