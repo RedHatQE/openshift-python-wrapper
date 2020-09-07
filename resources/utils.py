@@ -123,8 +123,10 @@ def nudge_delete(name, timers):
 
 
 def ignore_ssl_exceptions(func):
+    import ipdb;ipdb.set_trace()
     # @wraps(func)
     def inner(*args, **kwargs):
+        import ipdb;ipdb.set_trace()
         timeout = 60
         sleep = 2
         while timeout > 0:
