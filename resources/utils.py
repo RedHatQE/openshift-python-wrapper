@@ -135,6 +135,7 @@ def ignore_ssl_exceptions(func):
                 time.sleep(sleep)
                 timeout = timeout - sleep
 
-        raise urllib3.exceptions.ProtocolError(res)
+        if not res:
+            raise urllib3.exceptions.ProtocolError
 
     return inner
