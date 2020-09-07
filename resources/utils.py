@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import time
+from functools import wraps
 
 import urllib3
 
@@ -122,9 +123,15 @@ def nudge_delete(name, timers):
 
 
 def ignore_ssl_exceptions(func):
-    def inner():
+    # @wraps(func)
+    def inner(*args, **kwargs):
         sampler = TimeoutSampler(
-            timeout=60, sleep=2, exceptions=urllib3.exceptions.ProtocolError, func=func,
+            timeout=60,
+            sleep=2,
+            exceptions=urllib3.exceptions.ProtocolError,
+            func=func,
+            *args,
+            **kwargs,
         )
         try:
             for sample in sampler:
