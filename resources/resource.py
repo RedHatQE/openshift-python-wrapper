@@ -505,6 +505,11 @@ class Resource(object):
         Raises:
             ValueMismatch: When body value doesn't match class value
         """
+        idx = 30
+        while idx > 0:
+            idx = idx - 5
+            raise urllib3.exceptions.ProtocolError
+
         data = self.to_dict()
         if body:
             kind = body["kind"]
