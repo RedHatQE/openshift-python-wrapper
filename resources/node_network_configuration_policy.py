@@ -121,7 +121,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def apply(self):
         resource = self.to_dict()
         samples = TimeoutSampler(
-            sampler_timeout=3,
+            timeout=3,
             sleep=1,
             exceptions=ConflictError,
             func=self.update,
@@ -277,7 +277,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_conditions()
 
-        samples = TimeoutSampler(sampler_timeout=30, sleep=1, func=self.status)
+        samples = TimeoutSampler(timeout=30, sleep=1, func=self.status)
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESS:
@@ -295,7 +295,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def wait_for_conditions(self):
         samples = TimeoutSampler(
-            sampler_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
+            timeout=30, sleep=1, func=lambda: self.instance.status.conditions
         )
         for sample in samples:
             if sample:

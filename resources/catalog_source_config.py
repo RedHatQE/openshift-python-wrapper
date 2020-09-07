@@ -55,7 +55,7 @@ class CatalogSourceConfig(NamespacedResource):
             TimeoutExpiredError: If CatalogSourceConfig in not in desire status.
         """
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,

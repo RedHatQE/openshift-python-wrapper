@@ -34,7 +34,7 @@ class TimeoutSampler(object):
     """
 
     def __init__(
-        self, sleep, func, sampler_timeout=2, exceptions=None, *func_args, **func_kwargs
+        self, sampler_timeout, sleep, func, exceptions=None, *func_args, **func_kwargs
     ):
         self.timeout = sampler_timeout
         self.sleep = sleep
@@ -127,7 +127,7 @@ def ignore_ssl_exceptions(func):
     def inner(*args, **kwargs):
         import ipdb;ipdb.set_trace()
         sampler = TimeoutSampler(
-            # sampler_timeout=60,
+            sampler_timeout=60,
             sleep=2,
             exceptions=urllib3.exceptions.ProtocolError,
             func=func,

@@ -30,7 +30,7 @@ class DaemonSet(NamespacedResource):
         """
         LOGGER.info(f"Wait for {self.kind} {self.name} to deploy all desired pods")
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,

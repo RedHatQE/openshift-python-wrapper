@@ -45,7 +45,7 @@ class Deployment(NamespacedResource):
         """
         LOGGER.info(f"Wait for {self.kind} {self.name} to update replicas")
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -72,7 +72,7 @@ class Deployment(NamespacedResource):
             f"Wait for {self.kind} {self.name} to ensure availableReplicas == replicas"
         )
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,

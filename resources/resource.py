@@ -394,7 +394,7 @@ class Resource(object):
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=(ProtocolError, NotFoundError),
             func=lambda: self.exists,
@@ -442,9 +442,7 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        samples = TimeoutSampler(
-            sampler_timeout=timeout, sleep=1, func=lambda: self.exists
-        )
+        samples = TimeoutSampler(timeout=timeout, sleep=1, func=lambda: self.exists)
         for sample in samples:
             self.nudge_delete()
             if not sample:
@@ -465,7 +463,7 @@ class Resource(object):
         stop_status = stop_status if stop_status else self.Status.FAILED
         LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -630,7 +628,7 @@ class Resource(object):
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
         samples = TimeoutSampler(
-            sampler_timeout=timeout,
+            timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
