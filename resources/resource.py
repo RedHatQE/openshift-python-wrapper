@@ -10,7 +10,7 @@ import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import NotFoundError
-from resources.utils import TimeoutExpiredError, TimeoutSampler
+from resources.utils import TimeoutExpiredError, TimeoutSampler, ignore_ssl_exceptions
 from urllib3.exceptions import ProtocolError
 
 
@@ -490,6 +490,7 @@ class Resource(object):
                 LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
+    @ignore_ssl_exceptions
     def create(self, body=None, wait=False):
         """
         Create resource.
