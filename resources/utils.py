@@ -2,6 +2,8 @@ import logging
 import subprocess
 import time
 
+import urllib3
+
 
 _DELETE_NUDGE_DELAY = 30
 _DELETE_NUDGE_INTERVAL = 5
@@ -117,3 +119,18 @@ def nudge_delete(name, timers):
         # deliberately ignore all errors since an intermittent nudge
         # failure is not the end of the world
         LOGGER.info(f"Error happened while nudging namespace {name}: {e}")
+
+
+def ignore_ssl_exceptions(func):
+    def inner():
+        sampler = TimeoutSampler(
+            timeout=60, sleep=2, exceptions=urllib3.exceptions.ProtocolError, func=func,
+        )
+        try:
+            for sample in sampler:
+                if sample:
+                    return sample
+        except TimeoutExpiredError:
+            LOGGER.error("SSL ProtocolError")
+
+    return inner
