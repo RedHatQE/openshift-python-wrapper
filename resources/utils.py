@@ -123,19 +123,18 @@ def nudge_delete(name, timers):
 
 def ignore_ssl_exceptions(func):
     def inner(*args, **kwargs):
-        timeout = 60
+        timeout = 6
         sleep = 2
-        ex = None
+        res = None
         while timeout > 0:
             try:
-                func(*args, **kwargs)
+                res = func(*args, **kwargs)
                 timeout = 0
-            except urllib3.exceptions.ProtocolError as ex:
-                ex = ex
+            except urllib3.exceptions.ProtocolError:
                 LOGGER.warning("SSL ProtocolError")
                 time.sleep(sleep)
                 timeout = timeout - sleep
 
-        raise urllib3.exceptions.ProtocolError(ex)
+        raise urllib3.exceptions.ProtocolError(res)
 
     return inner
