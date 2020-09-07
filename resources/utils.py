@@ -125,6 +125,7 @@ def nudge_delete(name, timers):
 def ignore_ssl_exceptions(func):
     # @wraps(func)
     def inner(*args, **kwargs):
+        import ipdb;ipdb.set_trace()
         sampler = TimeoutSampler(
             sampler_timeout=60,
             sleep=2,
