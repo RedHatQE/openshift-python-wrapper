@@ -131,8 +131,8 @@ def ignore_ssl_exceptions(func):
             sleep=2,
             exceptions=urllib3.exceptions.ProtocolError,
             func=func,
-            # *args,
-            # **kwargs,
+            *args,
+            **kwargs,
         )
         try:
             for sample in sampler:
