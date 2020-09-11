@@ -6,4 +6,4 @@ class APIService(Resource):
     APIService object.
     """
 
-    api_group = "apiregistration.k8s.io"
+    api_group = Resource.ApiGroup.APIREGISTRATION_K8S_IO

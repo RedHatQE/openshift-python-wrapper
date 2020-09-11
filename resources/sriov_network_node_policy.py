@@ -6,7 +6,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
     SriovNetworkNodePolicy object.
     """
 
-    api_group = "sriovnetwork.openshift.io"
+    api_group = NamespacedResource.ApiGroup.SRIOVNETWORK_OPENSHIFT_IO
 
     def __init__(
         self,

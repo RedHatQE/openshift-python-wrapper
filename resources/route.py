@@ -12,7 +12,7 @@ class Route(NamespacedResource):
     OpenShift Route object.
     """
 
-    api_group = "route.openshift.io"
+    api_group = NamespacedResource.ApiGroup.ROUTE_OPENSHIFT_IO
 
     def __init__(
         self, name, namespace, service=None, destination_ca_cert=None, teardown=True

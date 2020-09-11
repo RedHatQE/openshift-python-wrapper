@@ -6,4 +6,4 @@ class SecurityContextConstraints(Resource):
     Security Context Constraints object.
     """
 
-    api_group = "security.openshift.io"
+    api_group = Resource.ApiGroup.SECURITY_OPENSHIFT_IO

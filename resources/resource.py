@@ -248,6 +248,38 @@ class Resource(object):
             TRUE = "True"
             FALSE = "False"
 
+    class ApiGroup:
+        SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
+        SRIOVNETWORK_OPENSHIFT_IO = "sriovnetwork.openshift.io"
+        CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
+        UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
+        APPS = "apps"
+        OPERATORS_COREOS_COM = "operators.coreos.com"
+        CONFIG_OPENSHIFT_IO = "config.openshift.io"
+        RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
+        NMSTATE_IO = "nmstate.io"
+        APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
+        APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
+        HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
+        HCO_KUBEVIRT_IO = "hco.kubevirt.io"
+        IMAGE_OPENSHIFT_IO = "image.openshift.io"
+        KUBEVIRT_IO = "kubevirt.io"
+        MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
+        NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
+            "networkaddonsoperator.network.kubevirt.io"
+        )
+        K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
+        NETWORKING_K8S_IO = "networking.k8s.io"
+
+        ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
+        NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
+        PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
+        ROUTE_OPENSHIFT_IO = "route.openshift.io"
+        SECURITY_OPENSHIFT_IO = "security.openshift.io"
+        STORAGE_K8S_IO = "storage.k8s.io"
+        TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
+        V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
+
     def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
         """
         Create a API resource

@@ -6,7 +6,7 @@ class NetworkAttachmentDefinition(NamespacedResource):
     NetworkAttachmentDefinition object.
     """
 
-    api_group = "k8s.cni.cncf.io"
+    api_group = NamespacedResource.ApiGroup.K8S_CNI_CNCF_IO
     resource_name = None
 
     def wait_for_status(

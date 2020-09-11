@@ -9,7 +9,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class CatalogSourceConfig(NamespacedResource):
-    api_group = "operators.coreos.com"
+    api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
         self,

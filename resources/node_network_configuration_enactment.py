@@ -3,7 +3,7 @@ from resources.resource import Resource
 
 class NodeNetworkConfigurationEnactment(Resource):
 
-    api_group = "nmstate.io"
+    api_group = Resource.ApiGroup.NMSTATE_IO
 
     class ConditionType:
         FAILING = "Failing"
