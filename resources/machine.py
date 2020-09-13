@@ -1,0 +1,34 @@
+from .resource import NamespacedResource
+
+
+class Machine(NamespacedResource):
+    """
+    Machine object.
+    """
+
+    api_group = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
+
+    def __init__(self, name, namespace):
+        super().__init__(name=name, namespace=namespace)
+
+    @property
+    def cluster_name(self):
+        return self.instance.metadata.labels["machine.openshift.io/cluster-api-cluster"]
+
+    @property
+    def machine_role(self):
+        return self.instance.metadata.labels[
+            "machine.openshift.io/cluster-api-machine-role"
+        ]
+
+    @property
+    def machine_type(self):
+        return self.instance.metadata.labels[
+            "machine.openshift.io/cluster-api-machine-type"
+        ]
+
+    @property
+    def machineset_name(self):
+        return self.instance.metadata.labels[
+            "machine.openshift.io/cluster-api-machineset"
+        ]

@@ -1,0 +1,52 @@
+from .resource import NamespacedResource
+
+
+class MachineHealthCheck(NamespacedResource):
+    """
+    MachineHealthCheck object.
+    """
+
+    api_group = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
+
+    def __init__(
+        self,
+        name,
+        namespace,
+        cluster_name,
+        machineset_name,
+        machine_role="worker",
+        machine_type="worker",
+        node_startup_timeout="120m",
+        max_unhealthy=2,
+        reboot_strategy=False,
+    ):
+        super().__init__(name=name, namespace=namespace)
+        self.cluster_name = cluster_name
+        self.machineset_name = machineset_name
+        self.machine_role = machine_role
+        self.machine_type = machine_type
+        self.node_startup_timeout = node_startup_timeout
+        self.max_unhealthy = max_unhealthy
+        self.reboot_strategy = reboot_strategy
+
+    def to_dict(self):
+        res = super().to_dict()
+        if self.reboot_strategy:
+            res["metadata"]["annotations"] = {
+                "machine.openshift.io/remediation-strategy": "external-baremetal"
+            }
+        res.setdefault("spec", {})
+        res["spec"]["nodeStartupTimeout"] = self.node_startup_timeout
+        res["spec"]["maxUnhealthy"] = self.max_unhealthy
+        res["spec"].setdefault("selector", {})
+        res["spec"]["selector"]["matchLabels"] = {
+            "machine.openshift.io/cluster-api-cluster": self.cluster_name,
+            "machine.openshift.io/cluster-api-machine-role": self.machine_role,
+            "machine.openshift.io/cluster-api-machine-type": self.machine_type,
+            "machine.openshift.io/cluster-api-machineset": self.machineset_name,
+        }
+        res["spec"]["unhealthyConditions"] = [
+            {"type": "Ready", "timeout": "300s", "status": "False"},
+            {"type": "Ready", "timeout": "300s", "status": "Unknown"},
+        ]
+        return res
