@@ -6,7 +6,7 @@ class NodeMaintenance(Resource):
     Node Maintenance object, inherited from Resource.
     """
 
-    api_group = "nodemaintenance.kubevirt.io"
+    api_group = Resource.ApiGroup.NODEMAINTENANCE_KUBEVIRT_IO
 
     class Status(Resource.Status):
         RUNNING = "Running"

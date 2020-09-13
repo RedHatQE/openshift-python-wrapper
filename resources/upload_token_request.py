@@ -13,7 +13,7 @@ class UploadTokenRequest(NamespacedResource):
     OpenShift UploadTokenRequest object.
     """
 
-    api_group = "upload.cdi.kubevirt.io"
+    api_group = NamespacedResource.ApiGroup.UPLOAD_CDI_KUBEVIRT_IO
 
     def __init__(self, name, namespace, pvc_name=None, teardown=True):
         super().__init__(name=name, namespace=namespace, teardown=teardown)

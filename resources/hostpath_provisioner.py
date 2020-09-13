@@ -8,7 +8,7 @@ class HostPathProvisioner(Resource):
     HostPathProvisioner Custom Resource Object.
     """
 
-    api_group = "hostpathprovisioner.kubevirt.io"
+    api_group = Resource.ApiGroup.HOSTPATHPROVISIONER_KUBEVIRT_IO
 
     class Name:
         HOSTPATH_PROVISIONER = "hostpath-provisioner"

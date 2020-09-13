@@ -2,4 +2,4 @@ from resources.resource import Resource
 
 
 class ClusterVersion(Resource):
-    api_group = "config.openshift.io"
+    api_group = Resource.ApiGroup.CONFIG_OPENSHIFT_IO

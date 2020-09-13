@@ -6,4 +6,4 @@ class ValidatingWebhookConfiguration(Resource):
     ValidatingWebhookConfiguration object.
     """
 
-    api_group = "admissionregistration.k8s.io"
+    api_group = Resource.ApiGroup.ADMISSIONREGISTRATION_K8S_IO

@@ -8,7 +8,7 @@ class StorageClass(Resource):
     StorageClass object.
     """
 
-    api_group = "storage.k8s.io"
+    api_group = Resource.ApiGroup.STORAGE_K8S_IO
 
     class Types:
         """

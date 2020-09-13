@@ -15,7 +15,7 @@ TIMEOUT = 120
 
 class NodeNetworkState(Resource):
 
-    api_group = "nmstate.io"
+    api_group = Resource.ApiGroup.NMSTATE_IO
 
     def __init__(self, name, teardown=True):
         super().__init__(name=name, teardown=teardown)

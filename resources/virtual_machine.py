@@ -13,7 +13,6 @@ from .resource import TIMEOUT, NamespacedResource
 
 
 LOGGER = logging.getLogger(__name__)
-API_GROUP = "kubevirt.io"
 
 
 class VirtualMachine(NamespacedResource):
@@ -22,7 +21,7 @@ class VirtualMachine(NamespacedResource):
     Implements actions start / stop / status / wait for VM status / is running
     """
 
-    api_group = API_GROUP
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(self, name, namespace, client=None, teardown=True):
         super().__init__(
@@ -140,7 +139,7 @@ class VirtualMachineInstance(NamespacedResource):
     Virtual Machine Instance object, inherited from Resource.
     """
 
-    api_group = API_GROUP
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     class Status(NamespacedResource.Status):
         RUNNING = "Running"
@@ -358,7 +357,7 @@ class VirtualMachineInstance(NamespacedResource):
 
 
 class VirtualMachineInstanceMigration(NamespacedResource):
-    api_group = API_GROUP
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(self, name, namespace, vmi=None, client=None, teardown=True):
         super().__init__(
@@ -381,7 +380,7 @@ class VirtualMachineInstancePreset(NamespacedResource):
     VirtualMachineInstancePreset object.
     """
 
-    api_group = API_GROUP
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
 
 class VirtualMachineInstanceReplicaSet(NamespacedResource):
@@ -389,4 +388,4 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
     VirtualMachineInstancePreset object.
     """
 
-    api_group = API_GROUP
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO

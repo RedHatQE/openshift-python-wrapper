@@ -2,7 +2,7 @@ from resources.resource import NamespacedResource
 
 
 class OperatorGroup(NamespacedResource):
-    api_group = "operators.coreos.com"
+    api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
         self, name, namespace, target_namespaces, teardown=False,

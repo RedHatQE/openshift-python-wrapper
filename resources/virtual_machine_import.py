@@ -34,7 +34,7 @@ class VirtualMachineImport(NamespacedResource):
     Virtual Machine Import object, inherited from NamespacedResource.
     """
 
-    api_group = "v2v.kubevirt.io"
+    api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
     class Condition(NamespacedResource.Condition):
         SUCCEEDED = "Succeeded"
