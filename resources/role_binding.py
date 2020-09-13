@@ -3,15 +3,12 @@
 from .resource import NamespacedResource
 
 
-API_GROUP = "rbac.authorization.k8s.io"
-
-
 class RoleBinding(NamespacedResource):
     """
     RoleBinding object
     """
 
-    api_group = API_GROUP
+    api_group = NamespacedResource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
 
     def __init__(
         self,

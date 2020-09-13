@@ -8,7 +8,7 @@ class ClusterRole(Resource):
     ClusterRole object
     """
 
-    api_group = "rbac.authorization.k8s.io"
+    api_group = Resource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
 
     def __init__(
         self,

@@ -16,7 +16,7 @@ class NNCPConfigurationFailed(Exception):
 
 class NodeNetworkConfigurationPolicy(Resource):
 
-    api_group = "nmstate.io"
+    api_group = Resource.ApiGroup.NMSTATE_IO
 
     class Interface:
         class State:

@@ -14,7 +14,7 @@ class DataVolume(NamespacedResource):
     DataVolume object.
     """
 
-    api_group = "cdi.kubevirt.io"
+    api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     class Status(NamespacedResource.Status):
         BLANK = "Blank"

@@ -8,4 +8,4 @@ class Role(NamespacedResource):
     Role object.
     """
 
-    api_group = "rbac.authorization.k8s.io"
+    api_group = NamespacedResource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO

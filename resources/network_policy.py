@@ -6,4 +6,4 @@ class NetworkPolicy(NamespacedResource):
     NetworkPolicy object.
     """
 
-    api_group = "networking.k8s.io"
+    api_group = NamespacedResource.ApiGroup.NETWORKING_K8S_IO

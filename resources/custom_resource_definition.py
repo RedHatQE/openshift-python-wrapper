@@ -2,4 +2,4 @@ from .resource import Resource
 
 
 class CustomResourceDefinition(Resource):
-    api_group = "apiextensions.k8s.io"
+    api_group = Resource.ApiGroup.APIEXTENSIONS_K8S_IO

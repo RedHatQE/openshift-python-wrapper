@@ -4,7 +4,7 @@ from .resource import NamespacedResource
 
 
 class Template(NamespacedResource):
-    api_group = "template.openshift.io"
+    api_group = NamespacedResource.ApiGroup.TEMPLATE_OPENSHIFT_IO
     singular_name = "template"
 
     class Labels:

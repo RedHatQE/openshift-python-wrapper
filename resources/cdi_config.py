@@ -16,7 +16,7 @@ class CDIConfig(Resource):
     CDIConfig object.
     """
 
-    api_group = "cdi.kubevirt.io"
+    api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
     @property
     def scratch_space_storage_class_from_spec(self):
