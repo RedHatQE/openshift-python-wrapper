@@ -19,8 +19,9 @@ class MachineHealthCheck(NamespacedResource):
         node_startup_timeout="120m",
         max_unhealthy=2,
         reboot_strategy=False,
+        teardown=True,
     ):
-        super().__init__(name=name, namespace=namespace)
+        super().__init__(name=name, namespace=namespace, teardown=teardown)
         self.cluster_name = cluster_name
         self.machineset_name = machineset_name
         self.machine_role = machine_role
@@ -33,17 +34,17 @@ class MachineHealthCheck(NamespacedResource):
         res = super().to_dict()
         if self.reboot_strategy:
             res["metadata"]["annotations"] = {
-                "machine.openshift.io/remediation-strategy": "external-baremetal"
+                f"{self.api_group}/remediation-strategy": "external-baremetal"
             }
         res.setdefault("spec", {})
         res["spec"]["nodeStartupTimeout"] = self.node_startup_timeout
         res["spec"]["maxUnhealthy"] = self.max_unhealthy
         res["spec"].setdefault("selector", {})
         res["spec"]["selector"]["matchLabels"] = {
-            "machine.openshift.io/cluster-api-cluster": self.cluster_name,
-            "machine.openshift.io/cluster-api-machine-role": self.machine_role,
-            "machine.openshift.io/cluster-api-machine-type": self.machine_type,
-            "machine.openshift.io/cluster-api-machineset": self.machineset_name,
+            f"{self.api_group}/cluster-api-cluster": self.cluster_name,
+            f"{self.api_group}/cluster-api-machine-role": self.machine_role,
+            f"{self.api_group}/cluster-api-machine-type": self.machine_type,
+            f"{self.api_group}/cluster-api-machineset": self.machineset_name,
         }
         res["spec"]["unhealthyConditions"] = [
             {"type": "Ready", "timeout": "300s", "status": "False"},
