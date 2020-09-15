@@ -17,7 +17,8 @@ class MachineHealthCheck(NamespacedResource):
         machine_role="worker",
         machine_type="worker",
         node_startup_timeout="120m",
-        max_unhealthy=2,
+        max_unhealthy=2,  # can also be a persentage, for e.g. "40%"
+        unhealthy_timeout="300s",
         reboot_strategy=False,
         teardown=True,
     ):
@@ -28,6 +29,7 @@ class MachineHealthCheck(NamespacedResource):
         self.machine_type = machine_type
         self.node_startup_timeout = node_startup_timeout
         self.max_unhealthy = max_unhealthy
+        self.unhealthy_timeout = unhealthy_timeout
         self.reboot_strategy = reboot_strategy
 
     def to_dict(self):
@@ -47,7 +49,7 @@ class MachineHealthCheck(NamespacedResource):
             f"{self.api_group}/cluster-api-machineset": self.machineset_name,
         }
         res["spec"]["unhealthyConditions"] = [
-            {"type": "Ready", "timeout": "300s", "status": "False"},
-            {"type": "Ready", "timeout": "300s", "status": "Unknown"},
+            {"type": "Ready", "timeout": self.unhealthy_timeout, "status": "False"},
+            {"type": "Ready", "timeout": self.unhealthy_timeout, "status": "Unknown"},
         ]
         return res
