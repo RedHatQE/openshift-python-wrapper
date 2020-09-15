@@ -49,7 +49,15 @@ class MachineHealthCheck(NamespacedResource):
             f"{self.api_group}/cluster-api-machineset": self.machineset_name,
         }
         res["spec"]["unhealthyConditions"] = [
-            {"type": "Ready", "timeout": self.unhealthy_timeout, "status": "False"},
-            {"type": "Ready", "timeout": self.unhealthy_timeout, "status": "Unknown"},
+            {
+                "type": self.Condition.READY,
+                "timeout": self.unhealthy_timeout,
+                "status": self.Condition.Status.FALSE,
+            },
+            {
+                "type": self.Condition.READY,
+                "timeout": self.unhealthy_timeout,
+                "status": self.Condition.Status.Unknown,
+            },
         ]
         return res

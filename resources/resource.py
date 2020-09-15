@@ -247,6 +247,7 @@ class Resource(object):
         class Status:
             TRUE = "True"
             FALSE = "False"
+            UNKNOWN = "Unknown"
 
     class ApiGroup:
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
