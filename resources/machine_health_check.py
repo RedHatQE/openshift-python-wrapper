@@ -57,7 +57,7 @@ class MachineHealthCheck(NamespacedResource):
             {
                 "type": self.Condition.READY,
                 "timeout": self.unhealthy_timeout,
-                "status": self.Condition.Status.Unknown,
+                "status": self.Condition.Status.UNKNOWN,
             },
         ]
         return res
