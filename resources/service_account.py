@@ -6,4 +6,4 @@ class ServiceAccount(NamespacedResource):
     Service Account object
     """
 
-    api_version = "v1"
+    api_version = NamespacedResource.ApiVersion.V1

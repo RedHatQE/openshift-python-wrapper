@@ -8,7 +8,7 @@ class PersistentVolume(Resource):
     PersistentVolume object
     """
 
-    api_version = "v1"
+    api_version = Resource.ApiVersion.V1
 
     @property
     def max_available_pvs(self):

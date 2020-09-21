@@ -271,6 +271,7 @@ class Resource(object):
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
         OPERATORS_COREOS_COM = "operators.coreos.com"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
+        PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
@@ -280,6 +281,9 @@ class Resource(object):
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
+
+    class ApiVersion:
+        V1 = "v1"
 
     def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
         """

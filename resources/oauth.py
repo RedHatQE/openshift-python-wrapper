@@ -6,4 +6,4 @@ class OAuth(Resource):
     OAuth object.
     """
 
-    api_version = "v1"
+    api_version = Resource.ApiVersion.V1
