@@ -104,7 +104,7 @@ class VirtualMachineImport(NamespacedResource):
         resource_mapping_namespace=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name, namespace=namespace, client=client, teardown=teardown, timeout=300
         )
         self.vm_id = vm_id
         self.vm_name = vm_name
