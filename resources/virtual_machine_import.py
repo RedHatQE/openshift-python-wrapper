@@ -231,6 +231,7 @@ class OvirtMappings:
         self.storage_mappings = storage_mappings
 
 
+##
 class ResourceMappingItem:
     def __init__(
         self,
@@ -246,6 +247,7 @@ class ResourceMappingItem:
         self.source_id = source_id
         self.target_type = target_type
 
+
 class ResourceMapping(NamespacedResource):
     """
     ResourceMapping object.
@@ -254,10 +256,7 @@ class ResourceMapping(NamespacedResource):
     api_version = "v2v.kubevirt.io/v1alpha1"
 
     def __init__(
-            self,
-            name,
-            namespace,
-            ovirt,
+        self, name, namespace, ovirt,
     ):
         super().__init__(name=name, namespace=namespace, teardown=True)
         self.ovirt = ovirt
@@ -267,8 +266,14 @@ class ResourceMapping(NamespacedResource):
         ovirt = res.setdefault("spec", {}).setdefault("ovirt", {})
         if self.ovirt:
             if self.ovirt.network_mappings:
-                ovirt.setdefault("networkMappings", _map_mappings(mappings=self.ovirt.network_mappings))
+                ovirt.setdefault(
+                    "networkMappings",
+                    _map_mappings(mappings=self.ovirt.network_mappings),
+                )
             if self.ovirt.storage_mappings:
-                ovirt.setdefault("storageMappings", _map_mappings(mappings=self.ovirt.storage_mappings))
+                ovirt.setdefault(
+                    "storageMappings",
+                    _map_mappings(mappings=self.ovirt.storage_mappings),
+                )
 
         return res
