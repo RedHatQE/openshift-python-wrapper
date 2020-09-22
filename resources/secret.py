@@ -6,7 +6,7 @@ class Secret(NamespacedResource):
     Secret object.
     """
 
-    api_version = "v1"
+    api_version = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,

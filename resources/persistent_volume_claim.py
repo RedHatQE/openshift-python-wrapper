@@ -13,7 +13,7 @@ class PersistentVolumeClaim(NamespacedResource):
     PersistentVolumeClaim object
     """
 
-    api_version = "v1"
+    api_version = NamespacedResource.ApiVersion.V1
 
     class Status(NamespacedResource.Status):
         BOUND = "Bound"

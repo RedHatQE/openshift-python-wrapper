@@ -6,7 +6,7 @@ class ConfigMap(NamespacedResource):
     Configmap object
     """
 
-    api_version = "v1"
+    api_version = NamespacedResource.ApiVersion.V1
 
     def __init__(self, name, namespace, data=None, teardown=True):
         super().__init__(name=name, namespace=namespace, teardown=teardown)

@@ -1,5 +1,7 @@
 import logging
 
+from .resource import Resource
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -9,7 +11,7 @@ class Event:
     Allow read and remove K8s events.
     """
 
-    api_version = "v1"
+    api_version = Resource.ApiVersion.V1
 
     @classmethod
     def get(
