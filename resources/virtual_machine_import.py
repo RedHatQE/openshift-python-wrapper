@@ -222,58 +222,43 @@ class VirtualMachineImport(NamespacedResource):
             raise
 
 
-class OvirtMappings:
-    def __init__(
-        self, disk_mappings=None, network_mappings=None, storage_mappings=None
-    ):
-        self.disk_mappings = disk_mappings
-        self.network_mappings = network_mappings
-        self.storage_mappings = storage_mappings
-
-
-##
-class ResourceMappingItem:
-    def __init__(
-        self,
-        target_name,
-        target_namespace=None,
-        target_type=None,
-        source_name=None,
-        source_id=None,
-    ):
-        self.target_name = target_name
-        self.target_namespace = target_namespace
-        self.source_name = source_name
-        self.source_id = source_id
-        self.target_type = target_type
-
-
 class ResourceMapping(NamespacedResource):
     """
     ResourceMapping object.
     """
 
-    api_version = "v2v.kubevirt.io/v1alpha1"
+    api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
     def __init__(
-        self, name, namespace, ovirt,
+        self, name, namespace, ovirt_mapping=None, vmware_mapping=None, teardown=True
     ):
-        super().__init__(name=name, namespace=namespace, teardown=True)
-        self.ovirt = ovirt
+        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        self.ovirt_mapping = ovirt_mapping
+        self.vmware_mapping = vmware_mapping
 
     def to_dict(self):
         res = super()._base_body()
-        ovirt = res.setdefault("spec", {}).setdefault("ovirt", {})
-        if self.ovirt:
-            if self.ovirt.network_mappings:
-                ovirt.setdefault(
-                    "networkMappings",
-                    _map_mappings(mappings=self.ovirt.network_mappings),
-                )
-            if self.ovirt.storage_mappings:
+        if self.ovirt_mapping:
+            ovirt = res.setdefault("spec", {}).setdefault("ovirt", {})
+            ovirt.setdefault(
+                "networkMappings",
+                _map_mappings(mappings=self.ovirt_mapping.network_mappings),
+            )
+            if self.ovirt_mapping.storage_mappings:
                 ovirt.setdefault(
                     "storageMappings",
-                    _map_mappings(mappings=self.ovirt.storage_mappings),
+                    _map_mappings(mappings=self.ovirt_mapping.storage_mappings),
+                )
+        if self.vmware_mapping:
+            vmware = res.setdefault("spec", {}).setdefault("vmware", {})
+            vmware.setdefault(
+                "networkMappings",
+                _map_mappings(mappings=self.ovirt_mapping.network_mappings),
+            )
+            if self.ovirt.storage_mappings:
+                vmware.setdefault(
+                    "storageMappings",
+                    _map_mappings(mappings=self.ovirt_mapping.storage_mappings),
                 )
 
         return res
