@@ -762,28 +762,32 @@ class ResourceEditor(object):
         """Returns the patches dict provided in the constructor"""
         return self._patches
 
-    def update(self):
+    def update(self, backup_resources=False):
         """Prepares backup dicts (where necessary) and applies patches"""
         # prepare update dicts and backups
         LOGGER.info("ResourceEdit: Backing up old data")
 
         resource_to_patch = []
-
-        for resource, update in self._patches.items():
-            # prepare backup
-            backup = self._create_backup(
-                original=resource.instance.to_dict(), patch=update
-            )
-
-            # no need to back up if no changes have been made
-            if backup:
-                resource_to_patch.append(resource)
-                self._backups[resource] = backup
-            else:
-                LOGGER.info(
-                    f"ResourceEdit: no diff found in patch for "
-                    f"{resource.name} -- skipping"
+        if backup_resources:
+            for resource, update in self._patches.items():
+                # prepare backup
+                backup = self._create_backup(
+                    original=resource.instance.to_dict(), patch=update
                 )
+
+                # no need to back up if no changes have been made
+                if backup:
+                    resource_to_patch.append(resource)
+                    self._backups[resource] = backup
+                else:
+                    LOGGER.info(
+                        f"ResourceEdit: no diff found in patch for "
+                        f"{resource.name} -- skipping"
+                    )
+            if not resource_to_patch:
+                return
+        else:
+            resource_to_patch = self._patches
 
         patches_to_apply = {
             resource: self._patches[resource] for resource in resource_to_patch
@@ -796,7 +800,7 @@ class ResourceEditor(object):
         self._apply_patches(patches=self._backups, action_text="Restoring")
 
     def __enter__(self):
-        self.update()
+        self.update(backup_resources=True)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
