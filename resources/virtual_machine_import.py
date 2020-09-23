@@ -229,36 +229,23 @@ class ResourceMapping(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
-    def __init__(
-        self, name, namespace, ovirt_mapping=None, vmware_mapping=None, teardown=True
-    ):
+    def __init__(self, name, namespace, mapping, teardown=True):
         super().__init__(name=name, namespace=namespace, teardown=teardown)
-        self.ovirt_mapping = ovirt_mapping
-        self.vmware_mapping = vmware_mapping
+        self.mapping = mapping
 
     def to_dict(self):
         res = super()._base_body()
-        if self.ovirt_mapping:
-            ovirt = res.setdefault("spec", {}).setdefault("ovirt", {})
-            ovirt.setdefault(
-                "networkMappings",
-                _map_mappings(mappings=self.ovirt_mapping.network_mappings),
-            )
-            if self.ovirt_mapping.storage_mappings:
-                ovirt.setdefault(
-                    "storageMappings",
-                    _map_mappings(mappings=self.ovirt_mapping.storage_mappings),
+        for provider in self.mapping:
+            res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
+            if self.mapping[provider].network_mappings:
+                res_provider_section.setdefault(
+                    "networkMappings",
+                    _map_mappings(mappings=self.mapping[provider].network_mappings),
                 )
-        if self.vmware_mapping:
-            vmware = res.setdefault("spec", {}).setdefault("vmware", {})
-            vmware.setdefault(
-                "networkMappings",
-                _map_mappings(mappings=self.ovirt_mapping.network_mappings),
-            )
-            if self.ovirt.storage_mappings:
-                vmware.setdefault(
+            if self.mapping[provider].storage_mappings:
+                res_provider_section.setdefault(
                     "storageMappings",
-                    _map_mappings(mappings=self.ovirt_mapping.storage_mappings),
+                    _map_mappings(mappings=self.mapping[provider].storage_mappings),
                 )
 
         return res
