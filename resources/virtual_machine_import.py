@@ -222,26 +222,28 @@ class VirtualMachineImport(NamespacedResource):
             raise
 
 
-class OvirtMappings:
-    def __init__(
-        self, disk_mappings=None, network_mappings=None, storage_mappings=None
-    ):
-        self.disk_mappings = disk_mappings
-        self.network_mappings = network_mappings
-        self.storage_mappings = storage_mappings
+class ResourceMapping(NamespacedResource):
+    """
+    ResourceMapping object.
+    """
 
+    api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
-class ResourceMappingItem:
-    def __init__(
-        self,
-        target_name,
-        target_namespace=None,
-        target_type=None,
-        source_name=None,
-        source_id=None,
-    ):
-        self.target_name = target_name
-        self.target_namespace = target_namespace
-        self.source_name = source_name
-        self.source_id = source_id
-        self.target_type = target_type
+    def __init__(self, name, namespace, mapping, teardown=True):
+        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        self.mapping = mapping
+
+    def to_dict(self):
+        res = super()._base_body()
+        for provider, mapping in self.mapping.items():
+            res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
+            if mapping.network_mappings is not None:
+                res_provider_section.setdefault(
+                    "networkMappings", _map_mappings(mappings=mapping.network_mappings),
+                )
+            if mapping.storage_mappings is not None:
+                res_provider_section.setdefault(
+                    "storageMappings", _map_mappings(mappings=mapping.storage_mappings),
+                )
+
+        return res
