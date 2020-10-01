@@ -22,3 +22,9 @@ class Node(Resource):
                 and stat["status"] == self.Condition.Status.TRUE
             ]
         )
+
+    @property
+    def machine_name(self):
+        return self.instance.metadata.annotations["machine.openshift.io/machine"].split(
+            "/"
+        )[1]
