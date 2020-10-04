@@ -25,6 +25,6 @@ class Node(Resource):
 
     @property
     def machine_name(self):
-        return self.instance.metadata.annotations["machine.openshift.io/machine"].split(
-            "/"
-        )[1]
+        return self.instance.metadata.annotations[
+            f"{self.ApiGroup.MACHINE_OPENSHIFT_IO}/machine"
+        ].split("/")[-1]
