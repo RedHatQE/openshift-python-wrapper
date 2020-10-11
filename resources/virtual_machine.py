@@ -23,9 +23,13 @@ class VirtualMachine(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
-    def __init__(self, name, namespace, client=None, teardown=True):
+    def __init__(self, name, namespace, client=None, teardown=True, timeout=300):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            timeout=timeout,
         )
 
     @property
