@@ -99,7 +99,8 @@ def _collect_data(resource_object, dyn_client=None):
         if dyn_client
         else DynamicClient(kubernetes.config.new_client_from_config())
     )
-    directory = _prepare_collect_data_directory(resource_object=resource_object)
+    directory = os.environ.get("TEST_DIR_LOG")
+    # directory = _prepare_collect_data_directory(resource_object=resource_object)
     _collect_instance_data(directory=directory, resource_object=resource_object)
     _collect_virt_launcher_data(
         dyn_client=dyn_client, directory=directory, resource_object=resource_object
