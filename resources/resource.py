@@ -1,9 +1,7 @@
-import datetime
 import json
 import logging
 import os
 import re
-import shutil
 from distutils.version import Version
 
 import kubernetes
@@ -17,26 +15,6 @@ from urllib3.exceptions import ProtocolError
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
 MAX_SUPPORTED_API_VERSION = "v1"
-
-
-def _prepare_collect_data_directory(resource_object):
-    dump_dir = "tests-collected-info"
-    if not os.path.isdir(dump_dir):
-        # pytest fixture create the directory, if it is not exists we probably not called from pytest.
-        return
-
-    directory = os.path.join(
-        dump_dir,
-        f"{'NamespaceResources/Namespaces' if resource_object.namespace else 'NotNamespaceResources'}",
-        f"{resource_object.namespace if resource_object.namespace else ''}",
-        resource_object.kind,
-        f"{datetime.datetime.now().strftime('%H:%M:%S')}-{resource_object.name}",
-    )
-    if os.path.exists(directory):
-        shutil.rmtree(directory, ignore_errors=True)
-
-    os.makedirs(directory)
-    return directory
 
 
 def _collect_instance_data(directory, resource_object):
@@ -97,7 +75,7 @@ def _collect_data(resource_object, dyn_client=None):
         if dyn_client
         else DynamicClient(kubernetes.config.new_client_from_config())
     )
-    directory = _prepare_collect_data_directory(resource_object=resource_object)
+    directory = os.environ.get("TEST_DIR_LOG")
     _collect_instance_data(directory=directory, resource_object=resource_object)
     _collect_virt_launcher_data(
         dyn_client=dyn_client, directory=directory, resource_object=resource_object
@@ -415,7 +393,7 @@ class Resource(object):
             TimeoutExpiredError: If resource still exists.
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
-        return self._client_wait_deleted(timeout)
+        return self._client_wait_deleted(timeout=timeout)
 
     def nudge_delete(self):
         """
