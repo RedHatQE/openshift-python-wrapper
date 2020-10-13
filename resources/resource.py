@@ -21,12 +21,14 @@ MAX_SUPPORTED_API_VERSION = "v1"
 
 def _prepare_collect_data_directory(resource_object):
     dump_dir = "tests-collected-info"
+    test_dir_log = os.environ.get("TEST_DIR_LOG")
     if not os.path.isdir(dump_dir):
         # pytest fixture create the directory, if it is not exists we probably not called from pytest.
         return
 
     directory = os.path.join(
         dump_dir,
+        test_dir_log,
         f"{'NamespaceResources/Namespaces' if resource_object.namespace else 'NotNamespaceResources'}",
         f"{resource_object.namespace if resource_object.namespace else ''}",
         resource_object.kind,
@@ -415,7 +417,7 @@ class Resource(object):
             TimeoutExpiredError: If resource still exists.
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
-        return self._client_wait_deleted(timeout)
+        return self._client_wait_deleted(timeout=timeout)
 
     def nudge_delete(self):
         """

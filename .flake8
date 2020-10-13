@@ -34,6 +34,8 @@ fcfn_exclude_functions =
     extend,
     sleep,
     check_output,
+    sub_resource_level,
+    func,
 
 enable-extensions =
     FCFN,
