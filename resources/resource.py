@@ -19,28 +19,6 @@ TIMEOUT = 240
 MAX_SUPPORTED_API_VERSION = "v1"
 
 
-def _prepare_collect_data_directory(resource_object):
-    dump_dir = "tests-collected-info"
-    test_dir_log = os.environ.get("TEST_DIR_LOG")
-    if not os.path.isdir(dump_dir):
-        # pytest fixture create the directory, if it is not exists we probably not called from pytest.
-        return
-
-    directory = os.path.join(
-        dump_dir,
-        test_dir_log,
-        f"{'NamespaceResources/Namespaces' if resource_object.namespace else 'NotNamespaceResources'}",
-        f"{resource_object.namespace if resource_object.namespace else ''}",
-        resource_object.kind,
-        f"{datetime.datetime.now().strftime('%H:%M:%S')}-{resource_object.name}",
-    )
-    if os.path.exists(directory):
-        shutil.rmtree(directory, ignore_errors=True)
-
-    os.makedirs(directory)
-    return directory
-
-
 def _collect_instance_data(directory, resource_object):
     with open(os.path.join(directory, f"{resource_object.name}.yaml"), "w") as fd:
         fd.write(resource_object.instance.to_str())
@@ -100,7 +78,9 @@ def _collect_data(resource_object, dyn_client=None):
         else DynamicClient(kubernetes.config.new_client_from_config())
     )
     directory = os.environ.get("TEST_DIR_LOG")
-    # directory = _prepare_collect_data_directory(resource_object=resource_object)
+    import ipdb
+
+    ipdb.set_trace()
     _collect_instance_data(directory=directory, resource_object=resource_object)
     _collect_virt_launcher_data(
         dyn_client=dyn_client, directory=directory, resource_object=resource_object
