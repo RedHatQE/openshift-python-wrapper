@@ -1,9 +1,7 @@
-import datetime
 import json
 import logging
 import os
 import re
-import shutil
 from distutils.version import Version
 
 import kubernetes
@@ -78,9 +76,6 @@ def _collect_data(resource_object, dyn_client=None):
         else DynamicClient(kubernetes.config.new_client_from_config())
     )
     directory = os.environ.get("TEST_DIR_LOG")
-    import ipdb
-
-    ipdb.set_trace()
     _collect_instance_data(directory=directory, resource_object=resource_object)
     _collect_virt_launcher_data(
         dyn_client=dyn_client, directory=directory, resource_object=resource_object
