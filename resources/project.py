@@ -28,5 +28,5 @@ class ProjectRequest(Resource):
 
     api_group = Resource.ApiGroup.PROJECT_OPENSHIFT_IO
 
-    def clean_up(self):
-        Project(name=self.name).delete(wait=True)
+    def clean_up(self, client=None):
+        Project(client=client or self.client, name=self.name).delete(wait=True)

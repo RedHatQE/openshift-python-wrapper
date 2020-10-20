@@ -48,14 +48,9 @@ class PersistentVolumeClaim(NamespacedResource):
         hostpath_node=None,
         teardown=True,
         client=None,
-        override_client=True,
     ):
         super().__init__(
-            client=client,
-            name=name,
-            namespace=namespace,
-            teardown=teardown,
-            override_client=override_client,
+            client=client, name=name, namespace=namespace, teardown=teardown,
         )
         self.accessmodes = accessmodes
         self.volume_mode = volume_mode

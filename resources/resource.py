@@ -265,7 +265,7 @@ class Resource(object):
         V1 = "v1"
 
     def __init__(
-        self, name, client=None, teardown=True, timeout=TIMEOUT, override_client=True
+        self, name, client=None, teardown=True, timeout=TIMEOUT,
     ):
         """
         Create an API resource
@@ -275,7 +275,6 @@ class Resource(object):
             client (DynamicClient): Client user to use.
             teardown (bool): Execute cleanup when using with context manager.
             timeout (int): Time to wait for delete in cleanup.
-            override_client (bool): Use 'new_client_from_config' (admin) instead of self.client.
         """
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
@@ -284,8 +283,7 @@ class Resource(object):
         self.namespace = None
         self.name = name
         self.client = client
-        self.override_client = override_client
-        if not self.client or self.override_client:
+        if not self.client:
             try:
                 self.client = DynamicClient(
                     client=kubernetes.config.new_client_from_config()
@@ -664,20 +662,10 @@ class NamespacedResource(Resource):
     """
 
     def __init__(
-        self,
-        name,
-        namespace,
-        client=None,
-        teardown=True,
-        timeout=TIMEOUT,
-        override_client=True,
+        self, name, namespace, client=None, teardown=True, timeout=TIMEOUT,
     ):
         super().__init__(
-            name=name,
-            client=client,
-            teardown=teardown,
-            timeout=timeout,
-            override_client=override_client,
+            name=name, client=client, teardown=teardown, timeout=timeout,
         )
         self.namespace = namespace
 

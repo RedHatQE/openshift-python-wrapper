@@ -120,9 +120,12 @@ class VirtualMachineImport(NamespacedResource):
         self.resource_mapping_name = resource_mapping_name
         self.resource_mapping_namespace = resource_mapping_namespace
 
-    @property
-    def vm(self):
-        return VirtualMachine(name=self.target_vm_name, namespace=self.namespace)
+    def vm(self, client=None):
+        return VirtualMachine(
+            client=client or self.client,
+            name=self.target_vm_name,
+            namespace=self.namespace,
+        )
 
     def to_dict(self):
         res = super().to_dict()

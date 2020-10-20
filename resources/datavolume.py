@@ -83,14 +83,9 @@ class DataVolume(NamespacedResource):
         source_pvc=None,
         source_namespace=None,
         teardown=True,
-        override_client=True,
     ):
         super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            override_client=override_client,
+            name=name, namespace=namespace, client=client, teardown=teardown,
         )
         self.source = source
         self.url = url
@@ -116,30 +111,24 @@ class DataVolume(NamespacedResource):
         bool: True if DataVolume and its PVC are gone, False if timeout reached.
         """
         super().wait_deleted(timeout=timeout)
-        return self.pvc.wait_deleted(timeout=timeout)
+        return self.pvc().wait_deleted(timeout=timeout)
 
     def wait(self, timeout=600):
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        self.pvc.wait_for_status(
+        self.pvc().wait_for_status(
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
         )
 
-    @property
-    def pvc(self):
+    def pvc(self, client=None):
         return PersistentVolumeClaim(
-            client=self.client,
-            name=self.name,
-            namespace=self.namespace,
-            override_client=self.override_client,
+            client=client or self.client, name=self.name, namespace=self.namespace,
         )
 
-    @property
-    def scratch_pvc(self):
+    def scratch_pvc(self, client=None):
         return PersistentVolumeClaim(
-            client=self.client,
+            client=client or self.client,
             name=f"{self.name}-scratch",
             namespace=self.namespace,
-            override_client=self.override_client,
         )
 
     def to_dict(self):

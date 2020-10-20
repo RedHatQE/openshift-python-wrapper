@@ -114,14 +114,16 @@ class VirtualMachine(NamespacedResource):
         return self.instance.spec.template.spec.domain.devices.interfaces
 
     @property
-    def vmi(self):
+    def vmi(self, client=None):
         """
         Get VMI
 
         Returns:
             VirtualMachineInstance: VMI
         """
-        return VirtualMachineInstance(name=self.name, namespace=self.namespace,)
+        return VirtualMachineInstance(
+            client=client or self.client, name=self.name, namespace=self.namespace,
+        )
 
     @property
     def ready(self):
@@ -179,11 +181,10 @@ class VirtualMachineInstance(NamespacedResource):
     def interfaces(self):
         return self.instance.status.interfaces
 
-    @property
-    def virt_launcher_pod(self):
+    def virt_launcher_pod(self, client=None):
         pods = list(
             Pod.get(
-                dyn_client=self.client,
+                dyn_client=client or self.client,
                 namespace=self.namespace,
                 label_selector=f"kubevirt.io=virt-launcher,kubevirt.io/created-by={self.instance.metadata.uid}",
             )
@@ -273,29 +274,28 @@ class VirtualMachineInstance(NamespacedResource):
             if not (pause and sample.get("reason")):
                 return
 
-    @property
-    def node(self):
+    def node(self, client=None):
         """
         Get the node name where the VM is running
 
         Returns:
             Node: Node
         """
-        return Node(name=self.instance.status.nodeName)
+        return Node(client=client or self.client, name=self.instance.status.nodeName)
 
-    def get_xml(self):
+    def get_xml(self, client=None):
         """
         Get virtual machine instance XML
 
         Returns:
             xml_output(string): VMI XML in the multi-line string
         """
-        return self.virt_launcher_pod.execute(
+        return self.virt_launcher_pod(client=client or self.client).execute(
             command=["virsh", "dumpxml", f"{self.namespace}_{self.name}"],
             container="compute",
         )
 
-    def get_domstate(self):
+    def get_domstate(self, client=None):
         """
         Get virtual machine instance Status.
 
@@ -305,7 +305,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: VMI Status as string
         """
-        return self.virt_launcher_pod.execute(
+        return self.virt_launcher_pod(client=client or self.client).execute(
             command=["virsh", "domstate", f"{self.namespace}_{self.name}"],
             container="compute",
         )
@@ -324,7 +324,7 @@ class VirtualMachineInstance(NamespacedResource):
     def xml_dict(self):
         """ Get virtual machine instance XML as dict """
 
-        return xmltodict.parse(self.get_xml(), process_namespaces=True)
+        return xmltodict.parse(xml_input=self.get_xml(), process_namespaces=True)
 
     @property
     def guest_os_info(self):

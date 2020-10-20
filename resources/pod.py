@@ -39,15 +39,9 @@ class Pod(NamespacedResource):
         RUNNING = "Running"
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
 
-    def __init__(
-        self, name, namespace, client=None, teardown=True, override_client=True
-    ):
+    def __init__(self, name, namespace, client=None, teardown=True):
         super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            override_client=override_client,
+            name=name, namespace=namespace, client=client, teardown=teardown,
         )
         self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 
@@ -142,11 +136,7 @@ class Pod(NamespacedResource):
         Returns:
             Node: Node
         """
-        return Node(
-            client=self.client,
-            name=self.instance.spec.nodeName,
-            override_client=self.override_client,
-        )
+        return Node(client=self.client, name=self.instance.spec.nodeName,)
 
     @property
     def ip(self):
