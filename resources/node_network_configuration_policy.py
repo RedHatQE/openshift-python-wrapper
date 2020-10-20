@@ -75,7 +75,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_selector = node_selector
         if self.node_selector:
             for pod in self.worker_pods:
-                if pod.node.name == node_selector:
+                if pod.node().name == node_selector:
                     self.worker_pods = [pod]
                     self._node_selector = {"kubernetes.io/hostname": self.node_selector}
                     break
@@ -141,7 +141,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                         command=["cat", f"/sys/class/net/{port}/mtu"]
                     ).strip()
                     LOGGER.info(
-                        f"Backup MTU: {pod.node.name} interface {port} MTU is {mtu}"
+                        f"Backup MTU: {pod.node().name} interface {port} MTU is {mtu}"
                     )
                     self.mtu_dict[port] = mtu
 
@@ -213,17 +213,17 @@ class NodeNetworkConfigurationPolicy(Resource):
     def validate_create(self):
         for pod in self.worker_pods:
             for bridge in self.ifaces:
-                node_network_state = NodeNetworkState(name=pod.node.name)
+                node_network_state = NodeNetworkState(name=pod.node().name)
                 node_network_state.wait_until_up(name=bridge["name"])
 
     def _ipv4_state_backup(self):
         # Backup current state of dhcp for the interfaces which arent veth or current bridge
         for pod in self.worker_pods:
-            node_network_state = NodeNetworkState(name=pod.node.name)
-            self.ipv4_iface_state[pod.node.name] = {}
+            node_network_state = NodeNetworkState(name=pod.node().name)
+            self.ipv4_iface_state[pod.node().name] = {}
             for interface in node_network_state.instance.status.currentState.interfaces:
                 if interface["name"] in self.ports:
-                    self.ipv4_iface_state[pod.node.name].update(
+                    self.ipv4_iface_state[pod.node().name].update(
                         {
                             interface["name"]: {
                                 k: interface["ipv4"][k] for k in ("dhcp", "enabled")
@@ -239,8 +239,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             if self._ipv4_dhcp:
                 temp_ipv4_iface_state = {}
                 for pod in self.worker_pods:
-                    node_network_state = NodeNetworkState(name=pod.node.name)
-                    temp_ipv4_iface_state[pod.node.name] = {}
+                    node_network_state = NodeNetworkState(name=pod.node().name)
+                    temp_ipv4_iface_state[pod.node().name] = {}
                     # Find which interfaces got changed (of those that are connected to bridge)
                     for (
                         interface
@@ -248,13 +248,15 @@ class NodeNetworkConfigurationPolicy(Resource):
                         if interface["name"] in self.ports:
                             x = {k: interface["ipv4"][k] for k in ("dhcp", "enabled")}
                             if (
-                                self.ipv4_iface_state[pod.node.name][interface["name"]]
+                                self.ipv4_iface_state[pod.node().name][
+                                    interface["name"]
+                                ]
                                 != x
                             ):
-                                temp_ipv4_iface_state[pod.node.name].update(
+                                temp_ipv4_iface_state[pod.node().name].update(
                                     {
                                         interface["name"]: self.ipv4_iface_state[
-                                            pod.node.name
+                                            pod.node().name
                                         ][interface["name"]]
                                     }
                                 )

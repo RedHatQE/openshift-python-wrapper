@@ -128,15 +128,14 @@ class Pod(NamespacedResource):
             name=self.name, namespace=self.namespace, **kwargs
         )
 
-    @property
-    def node(self):
+    def node(self, client=None):
         """
         Get the node name where the Pod is running
 
         Returns:
             Node: Node
         """
-        return Node(client=self.client, name=self.instance.spec.nodeName,)
+        return Node(client=client or self.client, name=self.instance.spec.nodeName,)
 
     @property
     def ip(self):

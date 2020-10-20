@@ -55,23 +55,23 @@ class VirtualMachine(NamespacedResource):
         self.api_request(method="PUT", action="restart")
         if wait:
             self._wait_for_restart_status(timeout=timeout)
-            return self.vmi.wait_until_running(timeout=timeout, stop_status="dummy")
+            return self.vmi().wait_until_running(timeout=timeout, stop_status="dummy")
 
     def _wait_for_restart_status(self, timeout=TIMEOUT):
         # stop_status="dummy" used to ignore FAILED/SUCCEEDED status during vmi restart
         # Note: if a VM + PCV has terminationGracePeriodSeconds > 0,
         # intermediate status will be SUCCEEDED instead of FAILED
-        if self.vmi.instance.spec.get("terminationGracePeriodSeconds", 0) > 0 and any(
+        if self.vmi().instance.spec.get("terminationGracePeriodSeconds", 0) > 0 and any(
             [
                 "persistentVolumeClaim" in volume.keys()
-                for volume in self.vmi.instance.spec.volumes
+                for volume in self.vmi().instance.spec.volumes
             ]
         ):
             intermediate_status = self.Status.SUCCEEDED
         else:
             intermediate_status = self.Status.FAILED
 
-        self.vmi.wait_for_status(
+        self.vmi().wait_for_status(
             status=intermediate_status, stop_status="dummy", timeout=timeout
         )
 
@@ -79,7 +79,7 @@ class VirtualMachine(NamespacedResource):
         self.api_request(method="PUT", action="stop")
         if wait:
             self.wait_for_status(timeout=timeout, status=None)
-            return self.vmi.wait_deleted()
+            return self.vmi().wait_deleted()
 
     def wait_for_status(self, status, timeout=TIMEOUT):
         """
@@ -113,7 +113,6 @@ class VirtualMachine(NamespacedResource):
     def get_interfaces(self):
         return self.instance.spec.template.spec.domain.devices.interfaces
 
-    @property
     def vmi(self, client=None):
         """
         Get VMI
@@ -201,7 +200,9 @@ class VirtualMachineInstance(NamespacedResource):
 
         raise ResourceNotFoundError
 
-    def wait_until_running(self, timeout=TIMEOUT, logs=True, stop_status=None):
+    def wait_until_running(
+        self, timeout=TIMEOUT, logs=True, stop_status=None, client=None
+    ):
         """
         Wait until VMI is running
 
@@ -209,6 +210,7 @@ class VirtualMachineInstance(NamespacedResource):
             timeout (int): Time to wait for VMI.
             logs (bool): True to extract logs from the VMI pod and from the VMI.
             stop_status (str): Status which should stop the wait and failed.
+            client (DynamicClient): Client to use for virt_launcher_pod.
 
         Raises:
             TimeoutExpiredError: If VMI failed to run.
@@ -221,7 +223,7 @@ class VirtualMachineInstance(NamespacedResource):
             if not logs:
                 raise
 
-            virt_pod = self.virt_launcher_pod
+            virt_pod = self.virt_launcher_pod(client=client or self.client)
             if virt_pod:
                 LOGGER.debug(f"{virt_pod.name} *****LOGS*****")
                 LOGGER.debug(virt_pod.log(container="compute"))

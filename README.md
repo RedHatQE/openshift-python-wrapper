@@ -61,7 +61,7 @@ for pod in Pod.get(dyn_client=client, label_selector="label_example=example")):
 ```
 We can also get the name of the Node that the ``pod`` is running on:
 ```python
-pod.node.name
+pod.node().name
 ```
 ### VM
 Start:
