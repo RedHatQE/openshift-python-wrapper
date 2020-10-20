@@ -65,6 +65,46 @@ class DataVolume(NamespacedResource):
         class Status(Resource.Condition.Status):
             UNKNOWN = "Unknown"
 
+    def __init__(
+        self,
+        name,
+        namespace,
+        source=None,
+        size=None,
+        storage_class=None,
+        url=None,
+        content_type=ContentType.KUBEVIRT,
+        access_modes=AccessMode.RWO,
+        cert_configmap=None,
+        secret=None,
+        client=None,
+        volume_mode=VolumeMode.FILE,
+        hostpath_node=None,
+        source_pvc=None,
+        source_namespace=None,
+        teardown=True,
+        override_client=True,
+    ):
+        super().__init__(
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            override_client=override_client,
+        )
+        self.source = source
+        self.url = url
+        self.cert_configmap = cert_configmap
+        self.secret = secret
+        self.content_type = content_type
+        self.size = size
+        self.access_modes = access_modes
+        self.storage_class = storage_class
+        self.volume_mode = volume_mode
+        self.hostpath_node = hostpath_node
+        self.source_pvc = source_pvc
+        self.source_namespace = source_namespace
+
     def wait_deleted(self, timeout=TIMEOUT):
         """
         Wait until DataVolume and the PVC created by it are deleted
@@ -86,48 +126,21 @@ class DataVolume(NamespacedResource):
 
     @property
     def pvc(self):
-        return PersistentVolumeClaim(name=self.name, namespace=self.namespace)
+        return PersistentVolumeClaim(
+            client=self.client,
+            name=self.name,
+            namespace=self.namespace,
+            override_client=self.override_client,
+        )
 
     @property
     def scratch_pvc(self):
         return PersistentVolumeClaim(
-            name=f"{self.name}-scratch", namespace=self.namespace
+            client=self.client,
+            name=f"{self.name}-scratch",
+            namespace=self.namespace,
+            override_client=self.override_client,
         )
-
-    def __init__(
-        self,
-        name,
-        namespace,
-        source=None,
-        size=None,
-        storage_class=None,
-        url=None,
-        content_type=ContentType.KUBEVIRT,
-        access_modes=AccessMode.RWO,
-        cert_configmap=None,
-        secret=None,
-        client=None,
-        volume_mode=VolumeMode.FILE,
-        hostpath_node=None,
-        source_pvc=None,
-        source_namespace=None,
-        teardown=True,
-    ):
-        super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
-        )
-        self.source = source
-        self.url = url
-        self.cert_configmap = cert_configmap
-        self.secret = secret
-        self.content_type = content_type
-        self.size = size
-        self.access_modes = access_modes
-        self.storage_class = storage_class
-        self.volume_mode = volume_mode
-        self.hostpath_node = hostpath_node
-        self.source_pvc = source_pvc
-        self.source_namespace = source_namespace
 
     def to_dict(self):
         res = super()._base_body()
