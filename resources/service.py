@@ -9,3 +9,7 @@ class Service(NamespacedResource):
     """
 
     api_version = NamespacedResource.ApiVersion.V1
+
+    class Type:
+        CLUSTER_IP = "ClusterIP"
+        NODE_PORT = "NodePort"
