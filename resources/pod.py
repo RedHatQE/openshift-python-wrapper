@@ -70,7 +70,7 @@ class Pod(NamespacedResource):
         Raises:
             ExecOnPodError: If the command failed.
         """
-        LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
+        LOGGER.info(f"Execute {command} on {self.name} ({self.node().name})")
         resp = kubernetes.stream.stream(
             func=self._kube_api.connect_get_namespaced_pod_exec,
             name=self.name,

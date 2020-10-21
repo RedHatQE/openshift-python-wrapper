@@ -207,7 +207,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def wait_for_interface_deleted(self):
         for pod in self.worker_pods:
             for iface in self.ifaces:
-                node_network_state = NodeNetworkState(name=pod.node.name)
+                node_network_state = NodeNetworkState(name=pod.node().name)
                 node_network_state.wait_until_deleted(name=iface["name"])
 
     def validate_create(self):
