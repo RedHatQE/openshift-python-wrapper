@@ -285,9 +285,7 @@ class Resource(object):
         self.client = client
         if not self.client:
             try:
-                self.client = DynamicClient(
-                    client=kubernetes.config.new_client_from_config()
-                )
+                self.client = self._get_client()
             except (
                 kubernetes.config.ConfigException,
                 urllib3.exceptions.MaxRetryError,
@@ -303,6 +301,10 @@ class Resource(object):
 
         self.teardown = teardown
         self.timeout = timeout
+
+    @staticmethod
+    def _get_client():
+        return DynamicClient(client=kubernetes.config.new_client_from_config())
 
     @classproperty
     def kind(cls):  # noqa: N805
@@ -426,11 +428,17 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
+        # Use admin client.
+        # When client is not admin we got ForbiddenError if the resource already deleted.
+        old_client = self.client
+        self.client = self._get_client()
         samples = TimeoutSampler(timeout=timeout, sleep=1, func=lambda: self.exists)
         for sample in samples:
-            self.nudge_delete()
             if not sample:
+                self.client = old_client
                 return
+
+            self.nudge_delete()
 
     def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None):
         """
@@ -510,9 +518,10 @@ class Resource(object):
         return res
 
     def delete(self, wait=False, timeout=TIMEOUT):
-        _resource = self.api()
         try:
-            res = self.client.delete(resource=_resource, name=self.name)
+            res = self.client.delete(
+                resource=self.api(), name=self.name, namespace=self.namespace
+            )
         except NotFoundError:
             return False
 
