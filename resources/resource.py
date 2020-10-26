@@ -264,6 +264,7 @@ class Resource(object):
 
     class ApiVersion:
         V1 = "v1"
+        V1BETA1 = "v1beta1"
 
     def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
         """
