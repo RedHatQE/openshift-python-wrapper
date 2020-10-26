@@ -21,6 +21,12 @@ class VirtualMachine(NamespacedResource):
     Implements actions start / stop / status / wait for VM status / is running
     """
 
+    class RunStrategy:
+        MANUAL = "Manual"
+        HALTED = "Halted"
+        ALWAYS = "Always"
+        RERUNONFAILURE = "RerunOnFailure"
+
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(self, name, namespace, client=None, teardown=True):

@@ -38,6 +38,7 @@ class Pod(NamespacedResource):
     class Status(NamespacedResource.Status):
         RUNNING = "Running"
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
+        COMPLETED = "Completed"
 
     def __init__(self, name, namespace, client=None, teardown=True):
         super().__init__(

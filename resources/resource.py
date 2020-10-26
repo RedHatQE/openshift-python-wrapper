@@ -254,6 +254,7 @@ class Resource(object):
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
+        SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
         SRIOVNETWORK_OPENSHIFT_IO = "sriovnetwork.openshift.io"
         SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
         STORAGE_K8S_IO = "storage.k8s.io"
