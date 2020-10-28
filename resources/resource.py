@@ -344,7 +344,7 @@ class Resource(object):
         LOGGER.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.timeout)
 
-    def api(self, **kwargs):
+    def api(self, client=None, **kwargs):
         """
         Get resource API
 
@@ -363,9 +363,10 @@ class Resource(object):
         Returns:
             Resource: Resource object.
         """
+        client = client or self.client
         if self.singular_name:
             kwargs["singular_name"] = self.singular_name
-        return self.client.resources.get(
+        return client.resources.get(
             api_version=self.api_version, kind=self.kind, **kwargs
         )
 
@@ -441,7 +442,7 @@ class Resource(object):
 
             self.nudge_delete()
 
-    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None):
+    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None, client=None):
         """
         Wait for resource to be in status
 
@@ -459,7 +460,7 @@ class Resource(object):
             timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api(client=client).get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -585,15 +586,14 @@ class Resource(object):
         ):
             yield cls(name=resource_field.metadata.name)
 
-    @property
-    def instance(self):
+    def instance(self, client=None):
         """
         Get resource instance
 
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api().get(name=self.name)
+        return self.api(client=client or self.client).get(name=self.name)
 
     @property
     def labels(self):

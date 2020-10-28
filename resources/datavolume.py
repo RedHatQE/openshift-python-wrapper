@@ -115,9 +115,14 @@ class DataVolume(NamespacedResource):
         return self.pvc(client=client).wait_deleted(timeout=timeout)
 
     def wait(self, timeout=600, client=None):
-        self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        self.pvc(client=client).wait_for_status(
-            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
+        self.wait_for_status(
+            status=self.Status.SUCCEEDED, timeout=timeout, client=client or self.client
+        )
+        pvc = self.pvc(client=client)
+        pvc.wait_for_status(
+            status=PersistentVolumeClaim.Status.BOUND,
+            timeout=timeout,
+            client=client or self.client,
         )
 
     def pvc(self, client=None):
