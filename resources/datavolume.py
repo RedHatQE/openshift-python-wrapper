@@ -100,22 +100,23 @@ class DataVolume(NamespacedResource):
         self.source_pvc = source_pvc
         self.source_namespace = source_namespace
 
-    def wait_deleted(self, timeout=TIMEOUT):
+    def wait_deleted(self, timeout=TIMEOUT, client=None):
         """
         Wait until DataVolume and the PVC created by it are deleted
 
         Args:
-        timeout (int):  Time to wait for the DataVolume and PVC to be deleted.
+            timeout (int):  Time to wait for the DataVolume and PVC to be deleted.
+            client (DynamicClient): Client to get the DV PVC.
 
         Returns:
-        bool: True if DataVolume and its PVC are gone, False if timeout reached.
+            bool: True if DataVolume and its PVC are gone, False if timeout reached.
         """
         super().wait_deleted(timeout=timeout)
-        return self.pvc().wait_deleted(timeout=timeout)
+        return self.pvc(client=client).wait_deleted(timeout=timeout)
 
-    def wait(self, timeout=600):
+    def wait(self, timeout=600, client=None):
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        self.pvc().wait_for_status(
+        self.pvc(client=client).wait_for_status(
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
         )
 
