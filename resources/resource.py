@@ -339,6 +339,18 @@ class Resource(object):
         LOGGER.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.timeout)
 
+    @classmethod
+    def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
+        if not cls.api_version:
+            cls.api_version = _get_api_version(
+                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
+            )
+
+        get_kwargs = {"singular_name": singular_name} if singular_name else {}
+        return dyn_client.resources.get(
+            kind=cls.kind, api_version=cls.api_version, **get_kwargs
+        ).get(*args, **kwargs)
+
     def api(self, **kwargs):
         """
         Get resource API
@@ -558,20 +570,14 @@ class Resource(object):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        if not cls.api_version:
-            cls.api_version = _get_api_version(
-                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
-            )
-
-        get_kwargs = {"singular_name": singular_name} if singular_name else {}
-        for resource_field in (
-            dyn_client.resources.get(
-                kind=cls.kind, api_version=cls.api_version, **get_kwargs
-            )
-            .get(*args, **kwargs)
-            .items
-        ):
-            yield cls(name=resource_field.metadata.name)
+        _resources = cls._prepare_resources(
+            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
+        )
+        try:
+            for resource_field in _resources.items:
+                yield cls(name=resource_field.metadata.name,)
+        except TypeError:
+            yield cls(name=_resources.metadata.name,)
 
     @property
     def instance(self):
@@ -676,22 +682,18 @@ class NamespacedResource(Resource):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        if not cls.api_version:
-            cls.api_version = _get_api_version(
-                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
-            )
-
-        get_kwargs = {"singular_name": singular_name} if singular_name else {}
-        for resource_field in (
-            dyn_client.resources.get(
-                kind=cls.kind, api_version=cls.api_version, **get_kwargs
-            )
-            .get(*args, **kwargs)
-            .items
-        ):
+        _resources = cls._prepare_resources(
+            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
+        )
+        try:
+            for resource_field in _resources.items:
+                yield cls(
+                    name=resource_field.metadata.name,
+                    namespace=resource_field.metadata.namespace,
+                )
+        except TypeError:
             yield cls(
-                name=resource_field.metadata.name,
-                namespace=resource_field.metadata.namespace,
+                name=_resources.metadata.name, namespace=_resources.metadata.namespace,
             )
 
     @property
