@@ -13,6 +13,8 @@ class Subscription(NamespacedResource):
         install_plan_approval=None,
         channel=None,
         starting_csv=None,
+        node_selector=None,
+        tolerations=None,
         teardown=False,
     ):
         super().__init__(name=name, namespace=namespace, teardown=teardown)
@@ -21,6 +23,8 @@ class Subscription(NamespacedResource):
         self.channel = channel
         self.install_plan_approval = install_plan_approval
         self.starting_csv = starting_csv
+        self.node_selector = node_selector
+        self.tolerations = tolerations
 
     def to_dict(self):
         res = super()._base_body()
@@ -36,5 +40,15 @@ class Subscription(NamespacedResource):
                 }
             }
         )
+
+        if self.node_selector:
+            res["spec"].setdefault("config", {}).setdefault("nodeSelector", {}).update(
+                self.node_selector
+            )
+
+        if self.tolerations:
+            res["spec"].setdefault("config", {}).setdefault("tolerations", []).append(
+                self.tolerations
+            )
 
         return res
