@@ -54,12 +54,15 @@ def _collect_virt_launcher_data(dyn_client, directory, resource_object):
 
 def _collect_data_volume_data(dyn_client, directory, resource_object):
     if resource_object.kind == "DataVolume":
-        for pod in dyn_client.resources.get(kind="DataVolume").get().items:
+        cdi_worker_prefixes = ("importer", "cdi-upload")
+        for pod in dyn_client.resources.get(kind="Pod").get().items:
             pod_name = pod.metadata.name
             pod_instance = dyn_client.resources.get(
                 api_version=pod.apiVersion, kind=pod.kind
             ).get(name=pod_name, namespace=pod.metadata.namespace)
-            if pod_name.startswith("cdi-importer"):
+            if pod_name.startswith(cdi_worker_prefixes) or pod_name.endswith(
+                "source-pod"
+            ):
                 with open(os.path.join(directory, f"{pod_name}.log"), "w") as fd:
                     fd.write(
                         _collect_pod_logs(dyn_client=dyn_client, resource_item=pod)
