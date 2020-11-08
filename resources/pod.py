@@ -126,7 +126,7 @@ class Pod(NamespacedResource):
             str: Pod logs.
         """
         return self._kube_api.read_namespaced_pod_log(
-            self.name, self.namespace, **kwargs
+            name=self.name, namespace=self.namespace, **kwargs
         )
 
     @property
