@@ -60,26 +60,8 @@ class VirtualMachine(NamespacedResource):
     def restart(self, timeout=TIMEOUT, wait=False):
         self.api_request(method="PUT", action="restart")
         if wait:
-            self._wait_for_restart_status(timeout=timeout)
+            self.vmi.virt_launcher_pod.wait_deleted()
             return self.vmi.wait_until_running(timeout=timeout, stop_status="dummy")
-
-    def _wait_for_restart_status(self, timeout=TIMEOUT):
-        # stop_status="dummy" used to ignore FAILED/SUCCEEDED status during vmi restart
-        # Note: if a VM + PCV has terminationGracePeriodSeconds > 0,
-        # intermediate status will be SUCCEEDED instead of FAILED
-        if self.vmi.instance.spec.get("terminationGracePeriodSeconds", 0) > 0 and any(
-            [
-                "persistentVolumeClaim" in volume.keys()
-                for volume in self.vmi.instance.spec.volumes
-            ]
-        ):
-            intermediate_status = self.Status.SUCCEEDED
-        else:
-            intermediate_status = self.Status.FAILED
-
-        self.vmi.wait_for_status(
-            status=intermediate_status, stop_status="dummy", timeout=timeout
-        )
 
     def stop(self, timeout=TIMEOUT, wait=False):
         self.api_request(method="PUT", action="stop")
@@ -330,7 +312,7 @@ class VirtualMachineInstance(NamespacedResource):
     def xml_dict(self):
         """ Get virtual machine instance XML as dict """
 
-        return xmltodict.parse(self.get_xml(), process_namespaces=True)
+        return xmltodict.parse(xml_input=self.get_xml(), process_namespaces=True)
 
     @property
     def guest_os_info(self):
