@@ -709,6 +709,13 @@ class NamespacedResource(Resource):
         """
         return self.api().get(name=self.name, namespace=self.namespace)
 
+    def _base_body(self):
+        return {
+            "apiVersion": self.api_version,
+            "kind": self.kind,
+            "metadata": {"name": self.name, "namespace": self.namespace},
+        }
+
 
 class ResourceEditor(object):
     def __init__(self, patches):
