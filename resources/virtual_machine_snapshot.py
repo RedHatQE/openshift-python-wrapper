@@ -19,8 +19,10 @@ class VirtualMachineSnapshot(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.SNAPSHOT_KUBEVIRT_IO
 
-    def __init__(self, name, namespace, vm_name, teardown=True):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+    def __init__(self, name, namespace, vm_name, client=None, teardown=True):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.vm_name = vm_name
 
     def to_dict(self):
