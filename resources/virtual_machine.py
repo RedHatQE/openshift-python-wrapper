@@ -287,7 +287,12 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             Node: Node
         """
-        return Node(name=self.instance.status.nodeName)
+        samples = TimeoutSampler(
+            timeout=TIMEOUT, sleep=1, func=lambda: self.instance.status.nodeName,
+        )
+        for sample in samples:
+            if sample:
+                return Node(name=self.instance.status.nodeName)
 
     def get_xml(self):
         """
