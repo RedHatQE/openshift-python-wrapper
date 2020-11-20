@@ -242,6 +242,7 @@ class Resource(object):
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
         KUBEVIRT_IO = "kubevirt.io"
+        LITMUS_IO = "litmuschaos.io"
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
