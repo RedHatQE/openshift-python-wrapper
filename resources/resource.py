@@ -775,7 +775,7 @@ class ResourceEditor(object):
                     resource_to_patch.append(resource)
                     self._backups[resource] = backup
                 else:
-                    LOGGER.info(
+                    LOGGER.warning(
                         f"ResourceEdit: no diff found in patch for "
                         f"{resource.name} -- skipping"
                     )
