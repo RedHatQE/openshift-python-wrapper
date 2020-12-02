@@ -90,7 +90,6 @@ def nudge_delete(name):
         # kube client is deficient so we have to use curl to kill stuck
         # finalizers
         subprocess.check_output(["./scripts/clean-namespace.sh", name])
-        # timers.last_nudge = time.time()
     except subprocess.CalledProcessError as exp:
         # deliberately ignore all errors since an intermittent nudge
         # failure is not the end of the world
