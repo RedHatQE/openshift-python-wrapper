@@ -23,7 +23,8 @@ class Template(NamespacedResource):
         SMALL = "small"
         TINY = "tiny"
 
-    def process(self, **kwargs):
+    def process(self, client=None, **kwargs):
+        client = client or self.client
         instance_dict = self.instance.to_dict()
         params = instance_dict["parameters"]
         # filling the template parameters with given kwargs
@@ -45,7 +46,7 @@ class Template(NamespacedResource):
         ] = instance_dict["metadata"]["name"]
         r = json.dumps(instance_dict)
         body = json.loads(r)
-        response = self.client.request(
+        response = client.request(
             method="Post",
             path="/apis/template.openshift.io/v1/namespaces/openshift/processedtemplates",
             body=body,
