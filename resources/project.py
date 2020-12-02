@@ -1,4 +1,4 @@
-from resources.utils import NudgeTimers, nudge_delete
+from resources.utils import nudge_delete
 
 from .resource import Resource
 
@@ -15,8 +15,7 @@ class Project(Resource):
         ACTIVE = "Active"
 
     def nudge_delete(self):
-        timers = NudgeTimers()
-        nudge_delete(name=self.name, timers=timers)
+        nudge_delete(name=self.name)
 
 
 class ProjectRequest(Resource):

@@ -441,10 +441,12 @@ class Resource(object):
             TimeoutExpiredError: If resource still exists.
         """
         samples = TimeoutSampler(timeout=timeout, sleep=1, func=lambda: self.exists)
-        for sample in samples:
+        try:
+            for sample in samples:
+                if not sample:
+                    return
+        except TimeoutExpiredError:
             self.nudge_delete()
-            if not sample:
-                return
 
     def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None):
         """
