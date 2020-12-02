@@ -581,9 +581,9 @@ class Resource(object):
         )
         try:
             for resource_field in _resources.items:
-                yield cls(name=resource_field.metadata.name,)
+                yield cls(client=dyn_client, name=resource_field.metadata.name)
         except TypeError:
-            yield cls(name=_resources.metadata.name,)
+            yield cls(client=dyn_client, name=_resources.metadata.name)
 
     @property
     def instance(self):
