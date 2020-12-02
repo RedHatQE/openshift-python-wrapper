@@ -694,12 +694,15 @@ class NamespacedResource(Resource):
         try:
             for resource_field in _resources.items:
                 yield cls(
+                    client=dyn_client,
                     name=resource_field.metadata.name,
                     namespace=resource_field.metadata.namespace,
                 )
         except TypeError:
             yield cls(
-                name=_resources.metadata.name, namespace=_resources.metadata.namespace,
+                client=dyn_client,
+                name=_resources.metadata.name,
+                namespace=_resources.metadata.namespace,
             )
 
     @property
