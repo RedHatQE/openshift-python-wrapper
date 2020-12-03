@@ -2,11 +2,10 @@ import logging
 import subprocess
 import time
 
+import openshift
 import urllib3
 
 
-_DELETE_NUDGE_DELAY = 30
-_DELETE_NUDGE_INTERVAL = 5
 LOGGER = logging.getLogger(__name__)
 
 
@@ -85,43 +84,22 @@ class TimeoutWatch:
         raise TimeoutExpiredError(self.timeout)
 
 
-class NudgeTimers:
-    """
-    A holder for two values needed to time deletion of an object properly.
-    """
-
-    def __init__(self):
-        self.nudge_start_time = time.time()
-        self.last_nudge = 0
-
-
 # TODO: remove the nudge when the underlying issue with namespaces stuck in
 # Terminating state is fixed.
 # Upstream bug: https://github.com/kubernetes/kubernetes/issues/60807
-def nudge_delete(name, timers):
-    # remember the time of the first delete attempt
-    if not timers.nudge_start_time:
-        timers.nudge_start_time = time.time()
-    # delay active nudging in hope regular delete procedure will succeed
-    current_time = time.time()
-    if current_time - _DELETE_NUDGE_DELAY < timers.nudge_start_time:
-        return
-    # don't nudge more often than once in 5 seconds
-    if timers.last_nudge + _DELETE_NUDGE_INTERVAL > current_time:
-        return
+def nudge_delete(name):
     LOGGER.info(f"Nudging namespace {name} while waiting for it to delete")
     try:
         # kube client is deficient so we have to use curl to kill stuck
         # finalizers
         subprocess.check_output(["./scripts/clean-namespace.sh", name])
-        timers.last_nudge = time.time()
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError as exp:
         # deliberately ignore all errors since an intermittent nudge
         # failure is not the end of the world
-        LOGGER.info(f"Error happened while nudging namespace {name}: {e}")
+        LOGGER.info(f"Error happened while nudging namespace {name}: {exp}")
 
 
-def ignore_ssl_exceptions(func):
+def retry_on_exceptions(func):
     def inner(*args, **kwargs):
         timeout = 60
         sleep = 2
@@ -136,6 +114,12 @@ def ignore_ssl_exceptions(func):
                 LOGGER.warning("SSL ProtocolError")
                 time.sleep(sleep)
                 timeout = timeout - sleep
+            except openshift.dynamic.exceptions.InternalServerError as ex:
+                if "etcdserver: leader changed" in ex:
+                    exception = ex
+                    LOGGER.warning("SSL ProtocolError")
+                    time.sleep(sleep)
+                    timeout = timeout - sleep
 
         if not res:
             raise urllib3.exceptions.ProtocolError(exception)

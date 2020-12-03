@@ -1,42 +1,20 @@
-import datetime
 import json
 import logging
 import os
 import re
-import shutil
 from distutils.version import Version
 
 import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import NotFoundError
-from resources.utils import TimeoutExpiredError, TimeoutSampler, ignore_ssl_exceptions
+from resources.utils import TimeoutExpiredError, TimeoutSampler, retry_on_exceptions
 from urllib3.exceptions import ProtocolError
 
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
 MAX_SUPPORTED_API_VERSION = "v1"
-
-
-def _prepare_collect_data_directory(resource_object):
-    dump_dir = "tests-collected-info"
-    if not os.path.isdir(dump_dir):
-        # pytest fixture create the directory, if it is not exists we probably not called from pytest.
-        return
-
-    directory = os.path.join(
-        dump_dir,
-        f"{'NamespaceResources/Namespaces' if resource_object.namespace else 'NotNamespaceResources'}",
-        f"{resource_object.namespace if resource_object.namespace else ''}",
-        resource_object.kind,
-        f"{datetime.datetime.now().strftime('%H:%M:%S')}-{resource_object.name}",
-    )
-    if os.path.exists(directory):
-        shutil.rmtree(directory, ignore_errors=True)
-
-    os.makedirs(directory)
-    return directory
 
 
 def _collect_instance_data(directory, resource_object):
@@ -76,12 +54,15 @@ def _collect_virt_launcher_data(dyn_client, directory, resource_object):
 
 def _collect_data_volume_data(dyn_client, directory, resource_object):
     if resource_object.kind == "DataVolume":
-        for pod in dyn_client.resources.get(kind="DataVolume").get().items:
+        cdi_worker_prefixes = ("importer", "cdi-upload")
+        for pod in dyn_client.resources.get(kind="Pod").get().items:
             pod_name = pod.metadata.name
             pod_instance = dyn_client.resources.get(
                 api_version=pod.apiVersion, kind=pod.kind
             ).get(name=pod_name, namespace=pod.metadata.namespace)
-            if pod_name.startswith("cdi-importer"):
+            if pod_name.startswith(cdi_worker_prefixes) or pod_name.endswith(
+                "source-pod"
+            ):
                 with open(os.path.join(directory, f"{pod_name}.log"), "w") as fd:
                     fd.write(
                         _collect_pod_logs(dyn_client=dyn_client, resource_item=pod)
@@ -97,7 +78,7 @@ def _collect_data(resource_object, dyn_client=None):
         if dyn_client
         else DynamicClient(kubernetes.config.new_client_from_config())
     )
-    directory = _prepare_collect_data_directory(resource_object=resource_object)
+    directory = os.environ.get("TEST_DIR_LOG")
     _collect_instance_data(directory=directory, resource_object=resource_object)
     _collect_virt_launcher_data(
         dyn_client=dyn_client, directory=directory, resource_object=resource_object
@@ -261,6 +242,7 @@ class Resource(object):
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
         KUBEVIRT_IO = "kubevirt.io"
+        LITMUS_IO = "litmuschaos.io"
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
@@ -276,6 +258,7 @@ class Resource(object):
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
+        SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
         SRIOVNETWORK_OPENSHIFT_IO = "sriovnetwork.openshift.io"
         SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
         STORAGE_K8S_IO = "storage.k8s.io"
@@ -285,6 +268,8 @@ class Resource(object):
 
     class ApiVersion:
         V1 = "v1"
+        V1BETA1 = "v1beta1"
+        V1ALPHA1 = "v1alpha1"
 
     def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
         """
@@ -358,6 +343,18 @@ class Resource(object):
         LOGGER.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.timeout)
 
+    @classmethod
+    def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
+        if not cls.api_version:
+            cls.api_version = _get_api_version(
+                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
+            )
+
+        get_kwargs = {"singular_name": singular_name} if singular_name else {}
+        return dyn_client.resources.get(
+            kind=cls.kind, api_version=cls.api_version, **get_kwargs
+        ).get(*args, **kwargs)
+
     def api(self, **kwargs):
         """
         Get resource API
@@ -415,7 +412,7 @@ class Resource(object):
             TimeoutExpiredError: If resource still exists.
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
-        return self._client_wait_deleted(timeout)
+        return self._client_wait_deleted(timeout=timeout)
 
     def nudge_delete(self):
         """
@@ -444,10 +441,12 @@ class Resource(object):
             TimeoutExpiredError: If resource still exists.
         """
         samples = TimeoutSampler(timeout=timeout, sleep=1, func=lambda: self.exists)
-        for sample in samples:
+        try:
+            for sample in samples:
+                if not sample:
+                    return
+        except TimeoutExpiredError:
             self.nudge_delete()
-            if not sample:
-                return
 
     def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None):
         """
@@ -491,7 +490,7 @@ class Resource(object):
                 LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
-    @ignore_ssl_exceptions
+    @retry_on_exceptions
     def create(self, body=None, wait=False):
         """
         Create resource.
@@ -578,20 +577,14 @@ class Resource(object):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        if not cls.api_version:
-            cls.api_version = _get_api_version(
-                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
-            )
-
-        get_kwargs = {"singular_name": singular_name} if singular_name else {}
-        for resource_field in (
-            dyn_client.resources.get(
-                kind=cls.kind, api_version=cls.api_version, **get_kwargs
-            )
-            .get(*args, **kwargs)
-            .items
-        ):
-            yield cls(name=resource_field.metadata.name)
+        _resources = cls._prepare_resources(
+            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
+        )
+        try:
+            for resource_field in _resources.items:
+                yield cls(client=dyn_client, name=resource_field.metadata.name)
+        except TypeError:
+            yield cls(client=dyn_client, name=_resources.metadata.name)
 
     @property
     def instance(self):
@@ -684,6 +677,7 @@ class NamespacedResource(Resource):
         self.namespace = namespace
 
     @classmethod
+    @retry_on_exceptions
     def get(cls, dyn_client, singular_name=None, *args, **kwargs):
         """
         Get resources
@@ -696,22 +690,21 @@ class NamespacedResource(Resource):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        if not cls.api_version:
-            cls.api_version = _get_api_version(
-                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
-            )
-
-        get_kwargs = {"singular_name": singular_name} if singular_name else {}
-        for resource_field in (
-            dyn_client.resources.get(
-                kind=cls.kind, api_version=cls.api_version, **get_kwargs
-            )
-            .get(*args, **kwargs)
-            .items
-        ):
+        _resources = cls._prepare_resources(
+            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
+        )
+        try:
+            for resource_field in _resources.items:
+                yield cls(
+                    client=dyn_client,
+                    name=resource_field.metadata.name,
+                    namespace=resource_field.metadata.namespace,
+                )
+        except TypeError:
             yield cls(
-                name=resource_field.metadata.name,
-                namespace=resource_field.metadata.namespace,
+                client=dyn_client,
+                name=_resources.metadata.name,
+                namespace=_resources.metadata.namespace,
             )
 
     @property
@@ -723,6 +716,13 @@ class NamespacedResource(Resource):
             openshift.dynamic.client.ResourceInstance
         """
         return self.api().get(name=self.name, namespace=self.namespace)
+
+    def _base_body(self):
+        return {
+            "apiVersion": self.api_version,
+            "kind": self.kind,
+            "metadata": {"name": self.name, "namespace": self.namespace},
+        }
 
 
 class ResourceEditor(object):
@@ -782,7 +782,7 @@ class ResourceEditor(object):
                     resource_to_patch.append(resource)
                     self._backups[resource] = backup
                 else:
-                    LOGGER.info(
+                    LOGGER.warning(
                         f"ResourceEdit: no diff found in patch for "
                         f"{resource.name} -- skipping"
                     )

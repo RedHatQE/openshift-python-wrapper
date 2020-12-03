@@ -90,6 +90,7 @@ class VirtualMachineImport(NamespacedResource):
         name,
         namespace,
         provider_credentials_secret_name,
+        provider_type,
         provider_credentials_secret_namespace=None,
         client=None,
         teardown=True,
@@ -99,7 +100,7 @@ class VirtualMachineImport(NamespacedResource):
         cluster_name=None,
         target_vm_name=None,
         start_vm=False,
-        ovirt_mappings=None,
+        provider_mappings=None,
         resource_mapping_name=None,
         resource_mapping_namespace=None,
     ):
@@ -116,9 +117,10 @@ class VirtualMachineImport(NamespacedResource):
         self.provider_credentials_secret_namespace = (
             provider_credentials_secret_namespace
         )
-        self.ovirt_mappings = ovirt_mappings
+        self.provider_mappings = provider_mappings
         self.resource_mapping_name = resource_mapping_name
         self.resource_mapping_namespace = resource_mapping_namespace
+        self.provider_type = provider_type
 
     @property
     def vm(self):
@@ -147,9 +149,10 @@ class VirtualMachineImport(NamespacedResource):
         if self.start_vm is not None:
             spec["startVm"] = self.start_vm
 
-        ovirt = spec.setdefault("source", {}).setdefault("ovirt", {})
-
-        vm = ovirt.setdefault("vm", {})
+        provider_source = spec.setdefault("source", {}).setdefault(
+            self.provider_type, {}
+        )
+        vm = provider_source.setdefault("vm", {})
         if self.vm_id:
             vm["id"] = self.vm_id
         if self.vm_name:
@@ -160,18 +163,28 @@ class VirtualMachineImport(NamespacedResource):
         if self.cluster_name:
             vm.setdefault("cluster", {})["name"] = self.cluster_name
 
-        if self.ovirt_mappings:
-            if self.ovirt_mappings.disk_mappings:
-                mappings = _map_mappings(mappings=self.ovirt_mappings.disk_mappings)
-                ovirt.setdefault("mappings", {}).setdefault("diskMappings", mappings)
+        if self.provider_mappings:
+            if self.provider_mappings.disk_mappings:
+                mappings = _map_mappings(mappings=self.provider_mappings.disk_mappings)
+                provider_source.setdefault("mappings", {}).setdefault(
+                    "diskMappings", mappings
+                )
 
-            if self.ovirt_mappings.network_mappings:
-                mappings = _map_mappings(mappings=self.ovirt_mappings.network_mappings)
-                ovirt.setdefault("mappings", {}).setdefault("networkMappings", mappings)
+            if self.provider_mappings.network_mappings:
+                mappings = _map_mappings(
+                    mappings=self.provider_mappings.network_mappings
+                )
+                provider_source.setdefault("mappings", {}).setdefault(
+                    "networkMappings", mappings
+                )
 
-            if self.ovirt_mappings.storage_mappings:
-                mappings = _map_mappings(mappings=self.ovirt_mappings.storage_mappings)
-                ovirt.setdefault("mappings", {}).setdefault("storageMappings", mappings)
+            if self.provider_mappings.storage_mappings:
+                mappings = _map_mappings(
+                    mappings=self.provider_mappings.storage_mappings
+                )
+                provider_source.setdefault("mappings", {}).setdefault(
+                    "storageMappings", mappings
+                )
 
         return res
 
@@ -222,26 +235,28 @@ class VirtualMachineImport(NamespacedResource):
             raise
 
 
-class OvirtMappings:
-    def __init__(
-        self, disk_mappings=None, network_mappings=None, storage_mappings=None
-    ):
-        self.disk_mappings = disk_mappings
-        self.network_mappings = network_mappings
-        self.storage_mappings = storage_mappings
+class ResourceMapping(NamespacedResource):
+    """
+    ResourceMapping object.
+    """
 
+    api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
-class ResourceMappingItem:
-    def __init__(
-        self,
-        target_name,
-        target_namespace=None,
-        target_type=None,
-        source_name=None,
-        source_id=None,
-    ):
-        self.target_name = target_name
-        self.target_namespace = target_namespace
-        self.source_name = source_name
-        self.source_id = source_id
-        self.target_type = target_type
+    def __init__(self, name, namespace, mapping, teardown=True):
+        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        self.mapping = mapping
+
+    def to_dict(self):
+        res = super()._base_body()
+        for provider, mapping in self.mapping.items():
+            res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
+            if mapping.network_mappings is not None:
+                res_provider_section.setdefault(
+                    "networkMappings", _map_mappings(mappings=mapping.network_mappings),
+                )
+            if mapping.storage_mappings is not None:
+                res_provider_section.setdefault(
+                    "storageMappings", _map_mappings(mappings=mapping.storage_mappings),
+                )
+
+        return res

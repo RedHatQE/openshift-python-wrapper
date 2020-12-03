@@ -38,6 +38,7 @@ class Pod(NamespacedResource):
     class Status(NamespacedResource.Status):
         RUNNING = "Running"
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
+        COMPLETED = "Completed"
 
     def __init__(self, name, namespace, client=None, teardown=True):
         super().__init__(
@@ -125,7 +126,7 @@ class Pod(NamespacedResource):
             str: Pod logs.
         """
         return self._kube_api.read_namespaced_pod_log(
-            self.name, self.namespace, **kwargs
+            name=self.name, namespace=self.namespace, **kwargs
         )
 
     @property
