@@ -13,12 +13,14 @@ class ClusterRole(Resource):
     def __init__(
         self,
         name,
+        client=None,
         api_groups=None,
         permissions_to_resources=None,
         verbs=None,
         teardown=True,
     ):
         super().__init__(name=name, teardown=teardown)
+        self.client = client or self.client
         self.api_groups = api_groups
         self.permissions_to_resources = permissions_to_resources
         self.verbs = verbs
