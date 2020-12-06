@@ -18,7 +18,9 @@ class Subscription(NamespacedResource):
         tolerations=None,
         teardown=False,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            client=client, name=name, namespace=namespace, teardown=teardown
+        )
         self.client = client or self.client
         self.source = source
         self.source_namespace = source_namespace
