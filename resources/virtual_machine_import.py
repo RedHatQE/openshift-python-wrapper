@@ -242,7 +242,7 @@ class ResourceMapping(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
-    def __init__(self, name, namespace, mapping, teardown=True, client=None):
+    def __init__(self, name, namespace, mapping, client=None, teardown=True):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
