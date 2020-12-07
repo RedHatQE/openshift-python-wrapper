@@ -19,8 +19,7 @@ class ClusterRole(Resource):
         verbs=None,
         teardown=True,
     ):
-        super().__init__(name=name, teardown=teardown)
-        self.client = client or self.client
+        super().__init__(client=client, name=name, teardown=teardown)
         self.api_groups = api_groups
         self.permissions_to_resources = permissions_to_resources
         self.verbs = verbs
