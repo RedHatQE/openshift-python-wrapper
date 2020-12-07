@@ -18,6 +18,13 @@ class DaemonSet(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.APPS
 
+    def __init__(
+        self, name, namespace, client=None, teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+
     def wait_until_deployed(self, timeout=TIMEOUT):
         """
         Wait until all Pods are deployed and ready.

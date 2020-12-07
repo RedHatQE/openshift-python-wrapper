@@ -6,3 +6,10 @@ class InstallPlan(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         COMPLETE = "Complete"
+
+    def __init__(
+        self, name, namespace, client=None, teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )

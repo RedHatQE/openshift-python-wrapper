@@ -14,11 +14,10 @@ TIMEOUT = 120
 
 
 class NodeNetworkState(Resource):
-
     api_group = Resource.ApiGroup.NMSTATE_IO
 
-    def __init__(self, name, teardown=True):
-        super().__init__(name=name, teardown=teardown)
+    def __init__(self, name, client=None, teardown=True):
+        super().__init__(name=name, client=client, teardown=teardown)
         status = self.instance.to_dict()["status"]
         if "desiredState" in status:
             self.desired_state = status["desiredState"]

@@ -18,6 +18,11 @@ class CDIConfig(Resource):
 
     api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
+    def __init__(
+        self, name, client=None, teardown=True,
+    ):
+        super().__init__(name=name, client=client, teardown=teardown)
+
     @property
     def scratch_space_storage_class_from_spec(self):
         return self.instance.spec.scratchSpaceStorageClass
