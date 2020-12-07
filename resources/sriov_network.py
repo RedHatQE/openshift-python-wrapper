@@ -13,11 +13,11 @@ class SriovNetwork(NamespacedResource):
         name,
         policy_namespace,
         network_namespace,
+        client=None,
         resource_name=None,
         vlan=None,
         ipam=None,
         teardown=True,
-        client=None,
     ):
         self.policy_namespace = policy_namespace
         super().__init__(

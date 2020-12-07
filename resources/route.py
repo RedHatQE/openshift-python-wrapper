@@ -18,10 +18,10 @@ class Route(NamespacedResource):
         self,
         name,
         namespace,
+        client=None,
         service=None,
         destination_ca_cert=None,
         teardown=True,
-        client=None,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown

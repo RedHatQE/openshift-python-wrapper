@@ -12,8 +12,8 @@ class OperatorSource(NamespacedResource):
         display_name,
         publisher,
         secret,
-        teardown=True,
         client=None,
+        teardown=True,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown

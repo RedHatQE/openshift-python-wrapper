@@ -37,6 +37,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def __init__(
         self,
         name,
+        client=None,
         worker_pods=None,
         node_selector=None,
         teardown=True,
@@ -47,7 +48,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         ipv4_addresses=None,
         ipv6_enable=False,
         node_active_nics=None,
-        client=None,
     ):
         """
         ipv4_addresses should be sent in this format:

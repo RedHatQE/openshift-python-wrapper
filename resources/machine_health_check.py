@@ -14,6 +14,7 @@ class MachineHealthCheck(NamespacedResource):
         namespace,
         cluster_name,
         machineset_name,
+        client=None,
         machine_role="worker",
         machine_type="worker",
         node_startup_timeout="120m",
@@ -21,7 +22,6 @@ class MachineHealthCheck(NamespacedResource):
         unhealthy_timeout="300s",
         reboot_strategy=False,
         teardown=True,
-        client=None,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown

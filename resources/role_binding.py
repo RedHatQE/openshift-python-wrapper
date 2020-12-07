@@ -14,6 +14,7 @@ class RoleBinding(NamespacedResource):
         self,
         name,
         namespace,
+        client=None,
         subjects_kind=None,
         subjects_name=None,
         subjects_namespace=None,
@@ -21,7 +22,6 @@ class RoleBinding(NamespacedResource):
         role_ref_kind=None,
         role_ref_name=None,
         teardown=True,
-        client=None,
     ):
 
         super().__init__(

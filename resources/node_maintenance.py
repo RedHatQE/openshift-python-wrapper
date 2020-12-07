@@ -14,11 +14,11 @@ class NodeMaintenance(Resource):
     def __init__(
         self,
         name,
+        client=None,
         node=None,
         reason="TEST Reason",
         teardown=True,
         timeout=TIMEOUT,
-        client=None,
     ):
         super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
         self.node = node

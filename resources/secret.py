@@ -12,13 +12,13 @@ class Secret(NamespacedResource):
         self,
         name,
         namespace,
+        client=None,
         accesskeyid=None,
         secretkey=None,
         htpasswd=None,
         teardown=True,
         data_dict=None,
         string_data=None,
-        client=None,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
