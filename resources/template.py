@@ -39,13 +39,8 @@ class Template(NamespacedResource):
         instance_dict["objects"][0]["metadata"]["labels"][
             "vm.kubevirt.io/template.namespace"
         ] = instance_dict["metadata"]["namespace"]
-        # TODO: remove after fix - https://bugzilla.redhat.com/show_bug.cgi?id=1816518 - template
-        # name needs to be updated
-        instance_dict["objects"][0]["metadata"]["labels"][
-            "vm.kubevirt.io/template"
-        ] = instance_dict["metadata"]["name"]
-        r = json.dumps(instance_dict)
-        body = json.loads(r)
+        instance_json = json.dumps(instance_dict)
+        body = json.loads(instance_json)
         response = client.request(
             method="Post",
             path="/apis/template.openshift.io/v1/namespaces/openshift/processedtemplates",
