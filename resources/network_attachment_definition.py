@@ -9,6 +9,13 @@ class NetworkAttachmentDefinition(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.K8S_CNI_CNCF_IO
     resource_name = None
 
+    def __init__(
+        self, name, namespace, client=None, teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+
     def wait_for_status(
         self, status, timeout=None, label_selector=None, resource_version=None
     ):

@@ -20,9 +20,12 @@ class SriovNetworkNodePolicy(NamespacedResource):
         mtu=None,
         node_selector=None,
         teardown=True,
+        client=None,
     ):
         self.policy_namespace = policy_namespace
-        super().__init__(name=name, namespace=policy_namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=policy_namespace, client=client, teardown=teardown
+        )
         self.pf_names = pf_names
         self.root_devices = root_devices
         self.num_vfs = num_vfs

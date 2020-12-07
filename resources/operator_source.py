@@ -13,8 +13,11 @@ class OperatorSource(NamespacedResource):
         publisher,
         secret,
         teardown=True,
+        client=None,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.registry_namespace = registry_namespace
         self.display_name = display_name
         self.publisher = publisher

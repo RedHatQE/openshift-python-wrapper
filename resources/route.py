@@ -15,9 +15,17 @@ class Route(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.ROUTE_OPENSHIFT_IO
 
     def __init__(
-        self, name, namespace, service=None, destination_ca_cert=None, teardown=True
+        self,
+        name,
+        namespace,
+        service=None,
+        destination_ca_cert=None,
+        teardown=True,
+        client=None,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.service = service
         self.destination_ca_cert = destination_ca_cert
 

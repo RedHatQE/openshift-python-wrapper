@@ -21,9 +21,12 @@ class RoleBinding(NamespacedResource):
         role_ref_kind=None,
         role_ref_name=None,
         teardown=True,
+        client=None,
     ):
 
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.subjects_kind = subjects_kind
         self.subjects_name = subjects_name
         self.subjects_namespace = subjects_namespace

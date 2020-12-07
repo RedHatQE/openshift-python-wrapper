@@ -15,8 +15,10 @@ class UploadTokenRequest(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.UPLOAD_CDI_KUBEVIRT_IO
 
-    def __init__(self, name, namespace, pvc_name=None, teardown=True):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+    def __init__(self, name, namespace, pvc_name=None, teardown=True, client=None):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.pvc_name = pvc_name
 
     def to_dict(self):
