@@ -1,104 +1,166 @@
-# ocp-python-wrapper
-A python wrapper for https://github.com/openshift/openshift-restclient-python.
-With support for RedHat Container Virtualization.
+[![Build Status](https://travis-ci.com/kubevirt/hyperconverged-cluster-operator.svg?branch=master)](https://travis-ci.com/kubevirt/hyperconverged-cluster-operator)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kubevirt/hyperconverged-cluster-operator)](https://goreportcard.com/report/github.com/kubevirt/hyperconverged-cluster-operator)
+[![Coverage Status](https://coveralls.io/repos/github/kubevirt/hyperconverged-cluster-operator/badge.svg?branch=master&service=github)](https://coveralls.io/github/kubevirt/hyperconverged-cluster-operator?branch=master)
 
-## Installation
-From source:
+# Hyperconverged Cluster Operator
+
+A unified operator deploying and controlling [KubeVirt](https://github.com/kubevirt/kubevirt) and several adjacent operators:
+
+- [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
+- [Scheduling, Scale and Performance](https://github.com/kubevirt/kubevirt-ssp-operator)
+- [Cluster Network Addons](https://github.com/kubevirt/cluster-network-addons-operator)
+- [Node Maintenance](https://github.com/kubevirt/node-maintenance-operator)
+
+This operator is typically installed from the Operator Lifecycle Manager (OLM),
+and creates operator CustomResources (CRs) for its underlying operators as can be seen in the diagram below.
+Use it to obtain an opinionated deployment of KubeVirt and its helper operators.
+
+![](images/HCO-design.jpg)
+
+## Installing HCO using kustomize (Openshift OLM Only)
+To install the default community HyperConverged Cluster Operator, along with its underlying components, run:
 ```bash
-git clone https://gitlab.cee.redhat.com/cnv-qe/ocp-python-wrapper.git
-cd ocp-python-wrapper
-python setup.py install --user
-```
+$ curl -L https://api.github.com/repos/kubevirt/hyperconverged-cluster-operator/tarball/master | \
+tar --strip-components=1 -xvzf - kubevirt-hyperconverged-cluster-operator-*/deploy/kustomize
 
-## Examples
-### Client
-```python
-client = DynamicClient(client=kubernetes.config.new_client_from_config())
+$ ./deploy/kustomize/deploy_kustomize.sh
 ```
-The examples given below are relevant to all resources. For simplicity we will use the resource - Namespace.
-### Import
-Import Namespace:
-```python
-from resources.namespace import Namespace
-```
-### Create
-Create a Namespace:
-```python
-ns = Namespace(name="namespace-example-1")
-ns.create()
-```
-Will return ``True`` if creation succeeded.
+The deployment is completed when HCO custom resource reports its condition as `Available`.
 
-We can also use the ``with`` statement which ensures automatic clean-up of the code executed:
-```python
-with Namespace(name="namespace-example-2") as ns:
-    yield ns
-```
-``teardown=False`` -  Disables clean-up after execution.
-### Wait
-Wait for Namespace to be in status ``Active``:
-```python
-ns.wait_for_status(status=Namespace.Status.ACTIVE, timeout=120)
-```
-Will raise a ``TimeoutExpiredError`` if Namespace is not in the desired status.
-### Delete
-Delete the Namespace
-```python
-ns.delete()
-```
-Will return ``False`` if not found.
-### Exists
-Checks if Namespace exists on the server:
-```python
-ns.exists
-```
-Will return ``None`` if not found.
-### Get
-Query to get Pods (resource) in the connected cluster with label of ``label_example=example``. Returns a ``generator`` of the resource - ``pod``
-```python
-for pod in Pod.get(dyn_client=client, label_selector="label_example=example")):
-    pod.log()
-```
-We can also get the name of the Node that the ``pod`` is running on:
-```python
-pod.node.name
-```
-### VM
-Start:
-```python
-with VirtualMachine(
-    name="vm-example",
-    namespace="namespace-example",
-    node_selector="worker-node-example",
-) as vm:
-    vm.start()
-```
-Stop:
-```python
-vm.stop()
-```
-Restart:
-```python
-vm.restart()
-```
-Get VMI:
-```python
-test_vmi = vm.vmi
-```
-After having a VMI, we can wait until VMI is in running state:
-```python
-test_vmi.wait_until_running()
-```
-Will raise ``TimeoutExpiredError`` if VMI failed to run.
+For more explanation and advanced options for HCO deployment using kustomize, refer to [kustomize deployment documentation](deploy/kustomize/README.md).
 
-Then, we can get the Pod that is in Running state and execute a command on it:
-```python
-command_output = test_vmi.virt_launcher_pod.execute(command="command-example")
-```
-If no Pod was found, will raise ``ResourceNotFoundError``.
+## Installing Unreleased Bundles Using Marketplace
+The hyperconverged cluster operator will publish the lastest bundles to [quay/kubevirt-hyperconvered/hco-operatohub](https://quay.io/application/kubevirt-hyperconverged/hco-operatorhub)
+before publishing to operatorhub.io.
 
-## Code check
-We use pre-commit for code check.
+Make the unreleased bundles available in Marketplace by adding the app registry:
 ```bash
-pre-commit install
+# Remove the hco-bundle from the community-operators sources
+$ kubectl get operatorsource -n openshift-marketplace community-operators -o yaml | sed "s/hco-operatorhub,//" | kubectl apply -f -
+
+# Add the unreleases bundle source
+$ curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/tools/quay-registry.sh | bash -s $QUAY_USERNAME $QUAY_PASSWORD
+```
+
+## Using the HCO without OLM or Marketplace
+
+Run the following script to apply the HCO operator:
+
+```bash
+$ curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
+```
+
+## Developer Workflow
+If you want to make changes to the HCO, here's how you can test your changes
+through [OLM](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/doc/install/install.md#installing-olm).
+
+Build the HCO container using the Makefile recipes `make container-build` and
+`make container-push` with vars `IMAGE_REGISTRY`, `REGISTRY_NAMESPACE`, and `CONTAINER_TAG`
+to direct it's location.
+
+To use the HCO's container, we'll use a registry image to serve metadata to OLM.
+Build and push the HCO's registry image.
+```bash
+# e.g. quay.io, docker.io
+export IMAGE_REGISTRY=<image_registry>
+export REGISTRY_NAMESPACE=<container_org>
+export CONTAINER_TAG=example
+
+# builds the registry image and pushes it to
+# $IMAGE_REGISTRY/$REGISTRY_NAMESPACE/hco-container-registry:$CONTAINER_TAG
+make bundleRegistry
+```
+
+Create the namespace for the HCO.
+```bash
+kubectl create ns kubevirt-hyperconverged
+```
+
+Create an OperatorGroup.
+```bash
+cat <<EOF | kubectl create -f -
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: hco-operatorgroup
+  namespace: kubevirt-hyperconverged
+spec:
+  targetNamespaces:
+  - "kubevirt-hyperconverged"
+EOF
+```
+
+Create a CatalogSource and a Subscription.
+
+> If OLM Operator and Catalog Operator run in a namespace different than `openshift-marketplace`, replace `openshift-marketplace` with it in the CatalogSource and Subscription below.
+
+```bash
+cat <<EOF | kubectl create -f -
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: hco-catalogsource
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: $IMAGE_REGISTRY/$REGISTRY_NAMESPACE/hco-container-registry:$CONTAINER_TAG
+  displayName: KubeVirt HyperConverged
+  publisher: Red Hat
+EOF
+```
+
+```bash
+cat <<EOF | kubectl create -f -
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: hco-subscription
+  namespace: kubevirt-hyperconverged
+spec:
+  channel: "1.2.0"
+  name: kubevirt-hyperconverged
+  source: hco-catalogsource
+  sourceNamespace: openshift-marketplace
+EOF
+```
+
+Create an HCO CustomResource, which creates the KubeVirt CR, launching KubeVirt,
+CDI, Network-addons, VM import and SSP.
+```bash
+kubectl create -f deploy/hco.cr.yaml -n kubevirt-hyperconverged
+```
+
+## Create a Cluster & Launch the HCO
+1. Choose the provider
+```bash
+#For k8s cluster:
+$ export KUBEVIRT_PROVIDER="k8s-1.17"
+```
+```bash
+#For okd cluster:
+$ export KUBEVIRT_PROVIDER="okd-4.1"
+```
+2. Navigate to the project's directory
+```bash
+$ cd <path>/hyperconverged-cluster-operator
+```
+3. Remove an old cluster
+```bash
+$ make cluster-down
+```
+4. Create a new cluster
+```bash
+$ make cluster-up
+```
+5. Clean previous HCO deployment and re-deploy HCO \
+   (When making a change, execute only this command - no need to repeat steps 1-3)
+```bash
+$ make cluster-sync
+```
+### Command-Line Tool
+Use `./cluster/kubectl.sh` as the command-line tool.
+
+For example:
+```bash
+$ ./cluster/kubectl.sh get pods --all-namespaces
 ```

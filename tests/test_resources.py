@@ -1,0 +1,25 @@
+import kubernetes
+import pytest
+from openshift.dynamic import DynamicClient
+from resources.namespace import Namespace
+from resources.pod import Pod
+
+
+@pytest.fixture(scope="session")
+def client():
+    return DynamicClient(client=kubernetes.config.new_client_from_config())
+
+
+@pytest.fixture(scope="session")
+def namespace():
+    with Namespace(name="namespace-for-tests") as ns:
+        yield ns
+
+
+def test_get(client):
+    Pod.get(dyn_client=client)
+
+
+def test_create():
+    with Namespace(name="test-namespace"):
+        pass

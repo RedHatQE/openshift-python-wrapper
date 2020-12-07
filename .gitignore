@@ -115,3 +115,7 @@ docs/source/rst
 
 # IntelliJ project folder
 .idea/
+
+# General
+_hyperconverged-cluster-operator/
+local-cluster/kubevirtci/
