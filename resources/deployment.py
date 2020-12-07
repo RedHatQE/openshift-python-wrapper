@@ -17,6 +17,13 @@ class Deployment(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.APPS
 
+    def __init__(
+        self, name, namespace, client=None, teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+
     def scale_replicas(self, replica_count=int):
         """
         Update replicas in deployment.
