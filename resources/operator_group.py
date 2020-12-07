@@ -5,13 +5,15 @@ class OperatorGroup(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
-        self, name, namespace, target_namespaces, teardown=False,
+        self, name, namespace, target_namespaces, teardown=False, client=None,
     ):
         """
         Args:
             target_namespaces(list): namespaces in which to generate required RBAC access for its member Operators.
         """
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.target_namespaces = target_namespaces
 
     def to_dict(self):

@@ -13,13 +13,16 @@ class CatalogSource(NamespacedResource):
         self,
         name,
         namespace,
+        client=None,
         source_type=None,
         image=None,
         display_name=None,
         publisher=None,
         teardown=True,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.source_type = source_type
         self.image = image
         self.display_name = display_name

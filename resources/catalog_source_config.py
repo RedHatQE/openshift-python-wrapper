@@ -20,9 +20,12 @@ class CatalogSourceConfig(NamespacedResource):
         packages,
         cs_display_name,
         cs_publisher,
+        client=None,
         teardown=True,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.source = source
         self.target_namespace = target_namespace
         self.packages = packages

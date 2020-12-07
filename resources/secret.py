@@ -12,6 +12,7 @@ class Secret(NamespacedResource):
         self,
         name,
         namespace,
+        client=None,
         accesskeyid=None,
         secretkey=None,
         htpasswd=None,
@@ -19,7 +20,9 @@ class Secret(NamespacedResource):
         data_dict=None,
         string_data=None,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.accesskeyid = accesskeyid
         self.secretkey = secretkey
         self.htpasswd = htpasswd
