@@ -1,9 +1,7 @@
 import logging
 
-from urllib3.exceptions import ProtocolError
-
-from .resource import NamespacedResource
-from .utils import TimeoutExpiredError, TimeoutSampler
+from .resource import NamespacedResource, Resource
+from .utils import wait_for_mtv_resource_status
 
 
 LOGGER = logging.getLogger(__name__)
@@ -22,19 +20,23 @@ class Provider(NamespacedResource):
         class MESSAGE:
             PROVIDER_READY = "The provider is ready."
 
-        class STATUS:
-            TRUE = "True"
-
-        class TYPE:
-            READY = "Ready"
-
-    api_version = f"{NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO}/{NamespacedResource.ApiVersion.V1ALPHA1}"
+    api_group = Resource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     def __init__(
-        self, name, namespace, type, url, secret_name, secret_namespace, teardown=True
+        self,
+        name,
+        namespace,
+        provider_type,
+        url,
+        secret_name,
+        secret_namespace,
+        teardown=True,
+        client=None,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
-        self.type = type
+        super().__init__(
+            name=name, namespace=namespace, teardown=teardown, client=client
+        )
+        self.provider_type = provider_type
         self.url = url
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
@@ -44,7 +46,7 @@ class Provider(NamespacedResource):
         res.update(
             {
                 "spec": {
-                    "type": self.type,
+                    "type": self.provider_type,
                     "url": self.url,
                     "secret": {
                         "name": self.secret_name,
@@ -60,54 +62,17 @@ class Provider(NamespacedResource):
         self,
         timeout=600,
         condition_message=StatusConditions.MESSAGE.PROVIDER_READY,
-        condition_status=StatusConditions.STATUS.TRUE,
-        condition_type=StatusConditions.TYPE.READY,
+        condition_status=Resource.Condition.Status.TRUE,
+        condition_type=Resource.Condition.READY,
         condition_reason=None,
         condition_category=None,
     ):
-        LOGGER.info(
-            f"Wait for {self.kind} {self.name} condition to be {condition_type}"
-        )
-        samples = TimeoutSampler(
+        wait_for_mtv_resource_status(
+            mtv_resource=self,
             timeout=timeout,
-            sleep=1,
-            exceptions=ProtocolError,
-            func=self.api().get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+            condition_message=condition_message,
+            condition_status=condition_status,
+            condition_type=condition_type,
+            condition_reason=condition_reason,
+            condition_category=condition_category,
         )
-        last_condition = None
-        try:
-            for sample in samples:
-                if sample.items:
-                    sample_status = sample.items[0].status
-                    if sample_status:
-                        current_conditions = sample_status.conditions
-                        for condition in current_conditions:
-                            last_condition = condition
-                            if (
-                                (condition.type == condition_type)
-                                and (condition.status == condition_status)
-                                and (condition.message == condition_message)
-                                and (
-                                    condition.condition_reason == condition_reason
-                                    or condition_reason is None
-                                )
-                                and (
-                                    condition.category == condition_category
-                                    or condition_category is None
-                                )
-                            ):
-                                LOGGER.info(
-                                    f"Status Conditions of {self.kind} {self.name} meet the requirements: {condition}"
-                                )
-                                return
-                            else:
-                                LOGGER.info(
-                                    f"Current Status Conditions of {self.kind} {self.name} : {condition}"
-                                )
-        except TimeoutExpiredError:
-            LOGGER.info(
-                f"Last Status Conditions of {self.kind} {self.name} were: {last_condition}"
-            )
-            raise
