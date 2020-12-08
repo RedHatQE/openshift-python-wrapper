@@ -117,5 +117,4 @@ docs/source/rst
 .idea/
 
 # General
-_hyperconverged-cluster-operator/
-local-cluster/kubevirtci/
+local-cluster/_hco/
