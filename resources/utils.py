@@ -154,4 +154,5 @@ def wait_for_mtv_resource_status(
         LOGGER.error(
             f"Last Status Conditions of {mtv_resource.kind} {mtv_resource.name} were: {last_condition}"
         )
+
         raise
