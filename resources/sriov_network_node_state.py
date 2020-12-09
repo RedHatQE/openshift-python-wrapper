@@ -8,9 +8,9 @@ class SriovNetworkNodeState(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.SRIOVNETWORK_OPENSHIFT_IO
 
-    def __init__(self, name, policy_namespace, client=None, teardown=True):
+    def __init__(self, name, namespace, client=None, teardown=True):
         super().__init__(
-            name=name, namespace=policy_namespace, client=client, teardown=teardown
+            name=name, namespace=namespace, client=client, teardown=teardown
         )
 
     @property
