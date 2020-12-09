@@ -17,9 +17,6 @@ def generate_yaml_from_template(**kwargs):
     """
     Generate JSON from yaml file_
 
-    Args:
-        file_ (str): Yaml file
-
     Keyword Args:
         name (str):
         image (str):
