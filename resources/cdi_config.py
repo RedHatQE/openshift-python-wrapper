@@ -2,8 +2,9 @@
 
 import logging
 
-from resources.utils import TimeoutSampler
 from urllib3.exceptions import ProtocolError
+
+from resources.utils import TimeoutSampler
 
 from .resource import TIMEOUT, Resource
 
@@ -19,7 +20,10 @@ class CDIConfig(Resource):
     api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
-        self, name, client=None, teardown=True,
+        self,
+        name,
+        client=None,
+        teardown=True,
     ):
         super().__init__(name=name, client=client, teardown=teardown)
 

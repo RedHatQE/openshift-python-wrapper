@@ -22,7 +22,11 @@ class Namespace(Resource):
         ACTIVE = "Active"
 
     def __init__(
-        self, name, client=None, teardown=True, label=None,
+        self,
+        name,
+        client=None,
+        teardown=True,
+        label=None,
     ):
         super().__init__(name=name, client=client, teardown=teardown)
         self.label = label

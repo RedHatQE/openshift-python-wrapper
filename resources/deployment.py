@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from resources.utils import TimeoutSampler
 from urllib3.exceptions import ProtocolError
+
+from resources.utils import TimeoutSampler
 
 from .resource import TIMEOUT, NamespacedResource
 
@@ -18,7 +19,11 @@ class Deployment(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.APPS
 
     def __init__(
-        self, name, namespace, client=None, teardown=True,
+        self,
+        name,
+        namespace,
+        client=None,
+        teardown=True,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown

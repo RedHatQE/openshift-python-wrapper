@@ -8,8 +8,9 @@ import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import NotFoundError
-from resources.utils import TimeoutExpiredError, TimeoutSampler
 from urllib3.exceptions import ProtocolError
+
+from resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
 LOGGER = logging.getLogger(__name__)
@@ -755,7 +756,7 @@ class ResourceEditor(object):
     @property
     def backups(self):
         """Returns a dict {<Resource object>: <backup_as_dict>}
-        The backup dict kept for each resource edited """
+        The backup dict kept for each resource edited"""
         return self._backups
 
     @property

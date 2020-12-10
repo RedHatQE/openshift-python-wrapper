@@ -254,11 +254,13 @@ class ResourceMapping(NamespacedResource):
             res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
             if mapping.network_mappings is not None:
                 res_provider_section.setdefault(
-                    "networkMappings", _map_mappings(mappings=mapping.network_mappings),
+                    "networkMappings",
+                    _map_mappings(mappings=mapping.network_mappings),
                 )
             if mapping.storage_mappings is not None:
                 res_provider_section.setdefault(
-                    "storageMappings", _map_mappings(mappings=mapping.storage_mappings),
+                    "storageMappings",
+                    _map_mappings(mappings=mapping.storage_mappings),
                 )
 
         return res

@@ -2,6 +2,7 @@ import logging
 import time
 
 from openshift.dynamic.exceptions import ConflictError
+
 from resources.utils import TimeoutSampler
 
 from .resource import Resource

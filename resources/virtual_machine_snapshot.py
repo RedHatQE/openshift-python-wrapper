@@ -2,9 +2,10 @@
 
 import logging
 
+from urllib3.exceptions import ProtocolError
+
 from resources.utils import TimeoutSampler
 from resources.virtual_machine import VirtualMachine
-from urllib3.exceptions import ProtocolError
 
 from .resource import TIMEOUT, NamespacedResource
 

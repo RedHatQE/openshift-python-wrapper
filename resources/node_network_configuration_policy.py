@@ -1,6 +1,7 @@
 import logging
 
 from openshift.dynamic.exceptions import ConflictError
+
 from resources.utils import TimeoutExpiredError, TimeoutSampler
 
 from .node_network_state import NodeNetworkState
