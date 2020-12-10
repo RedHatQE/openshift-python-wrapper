@@ -115,3 +115,6 @@ docs/source/rst
 
 # IntelliJ project folder
 .idea/
+
+# General
+local-cluster/_hco/

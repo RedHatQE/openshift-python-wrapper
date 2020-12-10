@@ -29,10 +29,13 @@ class VirtualMachine(NamespacedResource):
         ALWAYS = "Always"
         RERUNONFAILURE = "RerunOnFailure"
 
-    def __init__(self, name, namespace, client=None, teardown=True):
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
+
+    def __init__(self, name, namespace, client=None, body=None, teardown=True):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
+        self.body = body
 
     @property
     def _subresource_api_url(self):
@@ -49,7 +52,8 @@ class VirtualMachine(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
-        res["spec"] = {"template": {"spec": {}}}
+        body_spec = self.body.get("spec")
+        res["spec"] = body_spec or {"template": {"spec": {}}}
         return res
 
     def start(self, timeout=TIMEOUT, wait=False):

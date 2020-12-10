@@ -1,0 +1,38 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  creationTimestamp: null
+  labels:
+    kubevirt.io/vm: {{ name }}
+  name: {{ name }}
+spec:
+  running: false
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      domain:
+        cpu:
+          cores: 1
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          interfaces:
+          - masquerade: {}
+            name: default
+        machine:
+          type: ""
+        resources:
+          requests:
+            memory: 1024Mi
+      networks:
+      - name: default
+        pod: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - containerDisk:
+          image: quay.io/openshift-cnv/qe-cnv-tests-fedora:33
+        name: containerdisk
+status: {}
