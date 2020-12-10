@@ -11,15 +11,17 @@ class SriovNetwork(NamespacedResource):
     def __init__(
         self,
         name,
-        policy_namespace,
+        namespace,
         network_namespace,
+        client=None,
         resource_name=None,
         vlan=None,
         ipam=None,
         teardown=True,
     ):
-        self.policy_namespace = policy_namespace
-        super().__init__(name=name, namespace=policy_namespace, teardown=teardown)
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
         self.network_namespace = network_namespace
         self.resource_name = resource_name
         self.vlan = vlan

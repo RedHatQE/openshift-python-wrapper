@@ -12,9 +12,15 @@ class NodeMaintenance(Resource):
         RUNNING = "Running"
 
     def __init__(
-        self, name, node=None, reason="TEST Reason", teardown=True, timeout=TIMEOUT
+        self,
+        name,
+        client=None,
+        node=None,
+        reason="TEST Reason",
+        teardown=True,
+        timeout=TIMEOUT,
     ):
-        super().__init__(name=name, teardown=teardown, timeout=timeout)
+        super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
         self.node = node
         self.reason = reason
 

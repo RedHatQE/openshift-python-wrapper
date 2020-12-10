@@ -21,6 +21,8 @@ class VirtualMachine(NamespacedResource):
     Implements actions start / stop / status / wait for VM status / is running
     """
 
+    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
+
     class RunStrategy:
         MANUAL = "Manual"
         HALTED = "Halted"
@@ -372,6 +374,13 @@ class VirtualMachineInstancePreset(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
+    def __init__(
+        self, name, namespace, client=None, teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+
 
 class VirtualMachineInstanceReplicaSet(NamespacedResource):
     """
@@ -379,3 +388,10 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
     """
 
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
+
+    def __init__(
+        self, name, namespace, client=None, teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )

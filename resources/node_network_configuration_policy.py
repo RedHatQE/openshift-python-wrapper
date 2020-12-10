@@ -15,7 +15,6 @@ class NNCPConfigurationFailed(Exception):
 
 
 class NodeNetworkConfigurationPolicy(Resource):
-
     api_group = Resource.ApiGroup.NMSTATE_IO
 
     class Interface:
@@ -38,6 +37,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def __init__(
         self,
         name,
+        client=None,
         worker_pods=None,
         node_selector=None,
         teardown=True,
@@ -58,7 +58,7 @@ class NodeNetworkConfigurationPolicy(Resource):
          {"ip": "10.4.5.6", "prefix-length": 24},
          {"ip": "10.7.8.9", "prefix-length": 23}]
         """
-        super().__init__(name=name, teardown=teardown)
+        super().__init__(name=name, client=client, teardown=teardown)
         self.desired_state = {"interfaces": []}
         self.worker_pods = worker_pods
         self.mtu = mtu
