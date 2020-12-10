@@ -11,7 +11,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
     def __init__(
         self,
         name,
-        policy_namespace,
+        namespace,
         pf_names,
         root_devices,
         num_vfs,
@@ -22,9 +22,8 @@ class SriovNetworkNodePolicy(NamespacedResource):
         node_selector=None,
         teardown=True,
     ):
-        self.policy_namespace = policy_namespace
         super().__init__(
-            name=name, namespace=policy_namespace, client=client, teardown=teardown
+            name=name, namespace=namespace, client=client, teardown=teardown
         )
         self.pf_names = pf_names
         self.root_devices = root_devices
