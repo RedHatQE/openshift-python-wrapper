@@ -5,7 +5,12 @@ class OperatorGroup(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
-        self, name, namespace, target_namespaces, teardown=False, client=None,
+        self,
+        name,
+        namespace,
+        target_namespaces,
+        teardown=False,
+        client=None,
     ):
         """
         Args:
