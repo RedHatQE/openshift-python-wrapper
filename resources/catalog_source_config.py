@@ -1,8 +1,9 @@
 import logging
 
+from urllib3.exceptions import ProtocolError
+
 from resources.resource import NamespacedResource
 from resources.utils import TimeoutExpiredError, TimeoutSampler
-from urllib3.exceptions import ProtocolError
 
 
 LOGGER = logging.getLogger(__name__)

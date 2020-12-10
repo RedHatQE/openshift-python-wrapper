@@ -4,8 +4,9 @@ import logging
 
 import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
-from resources.utils import TimeoutExpiredError, TimeoutSampler
 from urllib3.exceptions import ProtocolError
+
+from resources.utils import TimeoutExpiredError, TimeoutSampler
 
 from .node import Node
 from .pod import Pod
@@ -113,7 +114,10 @@ class VirtualMachine(NamespacedResource):
         Returns:
             VirtualMachineInstance: VMI
         """
-        return VirtualMachineInstance(name=self.name, namespace=self.namespace,)
+        return VirtualMachineInstance(
+            name=self.name,
+            namespace=self.namespace,
+        )
 
     @property
     def ready(self):
@@ -303,8 +307,8 @@ class VirtualMachineInstance(NamespacedResource):
         )
 
     def get_vmi_active_condition(self):
-        """ A VMI may have multiple conditions; the active one it the one with
-        'lastTransitionTime' """
+        """A VMI may have multiple conditions; the active one it the one with
+        'lastTransitionTime'"""
         return {
             k: v
             for condition in self.instance.status.conditions
@@ -375,7 +379,11 @@ class VirtualMachineInstancePreset(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(
-        self, name, namespace, client=None, teardown=True,
+        self,
+        name,
+        namespace,
+        client=None,
+        teardown=True,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
@@ -390,7 +398,11 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(
-        self, name, namespace, client=None, teardown=True,
+        self,
+        name,
+        namespace,
+        client=None,
+        teardown=True,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown

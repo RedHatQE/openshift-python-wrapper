@@ -11,6 +11,9 @@ class NodeNetworkConfigurationEnactment(Resource):
         MATCHING = "Matching"
 
     def __init__(
-        self, name, client=None, teardown=True,
+        self,
+        name,
+        client=None,
+        teardown=True,
     ):
         super().__init__(name=name, client=client, teardown=teardown)
