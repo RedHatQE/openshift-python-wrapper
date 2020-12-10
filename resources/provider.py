@@ -12,11 +12,12 @@ LOGGER = logging.getLogger(__name__)
 class Provider(NamespacedResource):
     """
     Provider object.
+    Used to define A Source Or Destination Provider Such as Vsphere and OCP.
     """
 
     class StatusConditions:
         class CATEGORY:
-            REQUIERED = "Required"
+            REQUIRED = "Required"
 
         class MESSAGE:
             PROVIDER_READY = "The provider is ready."
@@ -27,7 +28,7 @@ class Provider(NamespacedResource):
         class TYPE:
             READY = "Ready"
 
-    api_version = f"{NamespacedResource.ApiGroup.VIRT_KONVEYOR_IO}/{NamespacedResource.ApiVersion.V1ALPHA1}"
+    api_version = f"{NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO}/{NamespacedResource.ApiVersion.V1ALPHA1}"
 
     def __init__(
         self, name, namespace, type, url, secret_name, secret_namespace, teardown=True
@@ -77,7 +78,6 @@ class Provider(NamespacedResource):
         )
         last_condition = None
         try:
-            raise TimeoutExpiredError
             for sample in samples:
                 if sample.items:
                     sample_status = sample.items[0].status
@@ -99,7 +99,7 @@ class Provider(NamespacedResource):
                                 )
                             ):
                                 LOGGER.info(
-                                    f"Status Conditions of {self.kind} {self.name} meet the requierments: {condition}"
+                                    f"Status Conditions of {self.kind} {self.name} meet the requirements: {condition}"
                                 )
                                 return
                             else:
