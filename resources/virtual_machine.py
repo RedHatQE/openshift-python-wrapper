@@ -53,7 +53,7 @@ class VirtualMachine(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
-        body_spec = self.body.get("spec")
+        body_spec = self.body.get("spec") if self.body else None
         res["spec"] = body_spec or {"template": {"spec": {}}}
         return res
 
