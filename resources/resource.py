@@ -839,7 +839,7 @@ class ResourceEditor(object):
                     original=original[key], patch=value
                 )
 
-                if key_diff:
+                if key_diff is not None:
                     diff_dict[key] = key_diff
 
             return diff_dict
