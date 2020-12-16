@@ -102,6 +102,7 @@ def _find_supported_resource(dyn_client, api_group, kind):
 
 
 def _get_api_version(dyn_client, api_group, kind):
+    # Returns api_group/api_version
     res = _find_supported_resource(
         dyn_client=dyn_client, api_group=api_group, kind=kind
     )
