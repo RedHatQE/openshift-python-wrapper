@@ -54,7 +54,7 @@ class Template(NamespacedResource):
         body = json.loads(instance_json)
         response = client.request(
             method="Post",
-            path="/apis/template.openshift.io/v1/namespaces/openshift/processedtemplates",
+            path=f"/apis/{self.api_version}/namespaces/openshift/processedtemplates",
             body=body,
         )
         return response.to_dict()["objects"]
