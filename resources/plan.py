@@ -12,9 +12,7 @@ LOGGER = logging.getLogger(__name__)
 class Plan(NamespacedResource):
     """
     Plan Resource
-    q:q
-    :qq
-    MTV CRDs:
+    Please refer to MTV CRDs:
     https://github.com/konveyor/forklift-controller/blob/master/config/crds/forklift_v1alpha1_plan.yaml
     """
 
