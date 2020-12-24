@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 class Migration(NamespacedResource):
     """
     Migration object.
-    Used to Initiate and hold Status of a Test Plan Run
+    Used to Initiate and Hold the Status of a Migration Plan Run
     """
 
     api_version = f"{NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO}/{NamespacedResource.ApiVersion.V1ALPHA1}"
@@ -38,6 +38,8 @@ class Migration(NamespacedResource):
         super().__init__(name=name, namespace=namespace, teardown=teardown)
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace
+
+    api_version = f"{NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO}/{NamespacedResource.ApiVersion.V1ALPHA1}"
 
     def to_dict(self):
         res = super()._base_body()
