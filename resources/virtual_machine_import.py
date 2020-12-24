@@ -25,6 +25,10 @@ def _map_mappings(mappings):
             mapping_dict.setdefault("source", {})["id"] = mapping.source_id
         if mapping.source_name:
             mapping_dict.setdefault("source", {})["name"] = mapping.source_name
+        if mapping.target_access_modes:
+            mapping_dict["accessMode"] = mapping.target_access_modes
+        if mapping.target_volume_mode:
+            mapping_dict["volumeMode"] = mapping.target_volume_mode
         mappings_list.append(mapping_dict)
     return mappings_list
 
