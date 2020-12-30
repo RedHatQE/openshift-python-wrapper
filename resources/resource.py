@@ -232,6 +232,13 @@ class Resource(object):
             FALSE = "False"
             UNKNOWN = "Unknown"
 
+    class MTVStatusConditions:
+        class CATEGORY:
+            REQUIRED = "Required"
+
+        class MESSAGE:
+            PROVIDER_READY = "The provider is ready."
+
     class ApiGroup:
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
         APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"

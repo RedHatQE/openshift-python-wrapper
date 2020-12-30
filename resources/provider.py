@@ -13,13 +13,6 @@ class Provider(NamespacedResource):
     Used to define A Source Or Destination Provider Such as Vsphere and OCP.
     """
 
-    class StatusConditions:
-        class CATEGORY:
-            REQUIRED = "Required"
-
-        class MESSAGE:
-            PROVIDER_READY = "The provider is ready."
-
     api_group = Resource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     def __init__(
@@ -61,7 +54,7 @@ class Provider(NamespacedResource):
     def wait_for_status(
         self,
         timeout=600,
-        condition_message=StatusConditions.MESSAGE.PROVIDER_READY,
+        condition_message=Resource.MTVStatusConditions.MESSAGE.PROVIDER_READY,
         condition_status=Resource.Condition.Status.TRUE,
         condition_type=Resource.Condition.READY,
         condition_reason=None,
