@@ -233,10 +233,10 @@ class Resource(object):
             UNKNOWN = "Unknown"
 
     class MTVStatusConditions:
-        class CATEGORY:
+        class Category:
             REQUIRED = "Required"
 
-        class MESSAGE:
+        class Message:
             PROVIDER_READY = "The provider is ready."
 
     class ApiGroup:

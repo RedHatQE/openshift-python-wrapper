@@ -144,10 +144,6 @@ def wait_for_mtv_resource_status(
                                 or condition_category is None
                             )
                         ):
-                            LOGGER.info(
-                                f"Status Conditions of {mtv_resource.kind} {mtv_resource.name} "
-                                f"meet the requirements: {condition}"
-                            )
                             return
 
     except TimeoutExpiredError:

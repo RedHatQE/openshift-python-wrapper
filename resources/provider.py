@@ -13,7 +13,7 @@ class Provider(NamespacedResource):
     Used to define A Source Or Destination Provider Such as Vsphere and OCP.
     """
 
-    api_group = Resource.ApiGroup.FORKLIFT_KONVEYOR_IO
+    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     def __init__(
         self,
@@ -23,11 +23,11 @@ class Provider(NamespacedResource):
         url,
         secret_name,
         secret_namespace,
-        teardown=True,
         client=None,
+        teardown=True,
     ):
         super().__init__(
-            name=name, namespace=namespace, teardown=teardown, client=client
+            name=name, namespace=namespace, client=client, teardown=teardown
         )
         self.provider_type = provider_type
         self.url = url
@@ -54,7 +54,7 @@ class Provider(NamespacedResource):
     def wait_for_status(
         self,
         timeout=600,
-        condition_message=Resource.MTVStatusConditions.MESSAGE.PROVIDER_READY,
+        condition_message=Resource.MTVStatusConditions.Message.PROVIDER_READY,
         condition_status=Resource.Condition.Status.TRUE,
         condition_type=Resource.Condition.READY,
         condition_reason=None,
