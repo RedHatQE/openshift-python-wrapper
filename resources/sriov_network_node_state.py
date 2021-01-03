@@ -1,4 +1,11 @@
+import logging
+
+from resources.utils import TimeoutExpiredError, TimeoutSampler
+
 from .resource import NamespacedResource
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class SriovNetworkNodeState(NamespacedResource):
@@ -28,3 +35,17 @@ class SriovNetworkNodeState(NamespacedResource):
     @staticmethod
     def totalvfs(iface):
         return iface.totalvfs
+
+    def wait_for_status_sync(self, wanted_status, timeout=1000):
+        LOGGER.info(f"Wait for {self.kind} {self.name} status to be {wanted_status}")
+        try:
+            for sample in TimeoutSampler(
+                timeout=timeout, sleep=3, func=lambda: self.instance.status.syncStatus
+            ):
+                if sample == wanted_status:
+                    return
+        except TimeoutExpiredError:
+            LOGGER.error(
+                f"after {timeout} seconds, {self.name} status is {self.instance.status.syncStatus}"
+            )
+            raise
