@@ -54,7 +54,7 @@ class Provider(NamespacedResource):
     def wait_for_status(
         self,
         timeout=600,
-        condition_message=Resource.MTVStatusConditions.Message.PROVIDER_READY,
+        condition_message=Resource.Message.PROVIDER_READY,
         condition_status=Resource.Condition.Status.TRUE,
         condition_type=Resource.Condition.READY,
         condition_reason=None,
