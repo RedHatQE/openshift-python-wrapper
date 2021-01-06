@@ -111,6 +111,7 @@ class DataVolume(NamespacedResource):
         hostpath_node=None,
         source_pvc=None,
         source_namespace=None,
+        multus_annotation=None,
         teardown=True,
     ):
         super().__init__(
@@ -128,6 +129,7 @@ class DataVolume(NamespacedResource):
         self.hostpath_node = hostpath_node
         self.source_pvc = source_pvc
         self.source_namespace = source_namespace
+        self.multus_annotation = multus_annotation
 
     def to_dict(self):
         res = super()._base_body()
@@ -157,9 +159,13 @@ class DataVolume(NamespacedResource):
         if self.source == "upload" or self.source == "blank":
             res["spec"]["source"][self.source] = {}
         if self.hostpath_node:
-            res["metadata"]["annotations"] = {
-                "kubevirt.io/provisionOnNode": self.hostpath_node
-            }
+            res["metadata"].setdefault("annotations", {}).update(
+                {"kubevirt.io/provisionOnNode": self.hostpath_node}
+            )
+        if self.multus_annotation:
+            res["metadata"].setdefault("annotations", {}).update(
+                {"k8s.v1.cni.cncf.io/networks": self.multus_annotation}
+            )
         if self.source == "pvc":
             res["spec"]["source"]["pvc"] = {
                 "name": self.source_pvc or "dv-source",
