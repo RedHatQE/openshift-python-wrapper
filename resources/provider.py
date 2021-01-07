@@ -1,6 +1,6 @@
 import logging
 
-from .resource import NamespacedResource, Resource
+from .resource import NamespacedResource
 from .utils import wait_for_mtv_resource_status
 
 
@@ -54,9 +54,9 @@ class Provider(NamespacedResource):
     def wait_for_status(
         self,
         timeout=600,
-        condition_message=Resource.Message.PROVIDER_READY,
-        condition_status=Resource.Condition.Status.TRUE,
-        condition_type=Resource.Condition.READY,
+        condition_message=NamespacedResource.Message.PROVIDER_READY,
+        condition_status=NamespacedResource.Condition.Status.TRUE,
+        condition_type=NamespacedResource.Condition.READY,
         condition_reason=None,
         condition_category=None,
     ):
