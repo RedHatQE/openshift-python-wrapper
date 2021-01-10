@@ -37,6 +37,11 @@ class StorageClass(Resource):
         Immediate = "Immediate"
         WaitForFirstConsumer = "WaitForFirstConsumer"
 
+    class Annotations:
+        IS_DEFAULT_CLASS = (
+            f"{Resource.ApiGroup.STORAGECLASS_KUBERNETES_IO}/is-default-class"
+        )
+
     def __init__(
         self,
         name,
