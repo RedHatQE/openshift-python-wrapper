@@ -574,6 +574,7 @@ class Resource(object):
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
+        LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
         self.api().replace(
             body=resource_dict,
             name=self.name,
