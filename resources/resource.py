@@ -741,7 +741,7 @@ class NamespacedResource(Resource):
 
 
 class ResourceEditor(object):
-    def __init__(self, patches):
+    def __init__(self, patches, action="update", user_backups=None):
         """
         Args:
             patches (dict): {<Resource object>: <yaml patch as dict>}
@@ -766,6 +766,8 @@ class ResourceEditor(object):
         """
 
         self._patches = patches
+        self.action = action
+        self.user_backups = user_backups
         self._backups = {}
 
     @property
@@ -786,23 +788,29 @@ class ResourceEditor(object):
 
         resource_to_patch = []
         if backup_resources:
-            for resource, update in self._patches.items():
-                # prepare backup
-                backup = self._create_backup(
-                    original=resource.instance.to_dict(), patch=update
-                )
+            if self.user_backups:
+                resource_to_patch = self._patches
+                self._backups = self.user_backups
 
-                # no need to back up if no changes have been made
-                if backup:
-                    resource_to_patch.append(resource)
-                    self._backups[resource] = backup
-                else:
-                    LOGGER.warning(
-                        f"ResourceEdit: no diff found in patch for "
-                        f"{resource.name} -- skipping"
+            else:
+                for resource, update in self._patches.items():
+                    # prepare backup
+                    backup = self._create_backup(
+                        original=resource.instance.to_dict(),
+                        patch=update,
                     )
-            if not resource_to_patch:
-                return
+
+                    # no need to back up if no changes have been made
+                    if backup:
+                        resource_to_patch.append(resource)
+                        self._backups[resource] = backup
+                    else:
+                        LOGGER.warning(
+                            f"ResourceEdit: no diff found in patch for "
+                            f"{resource.name} -- skipping"
+                        )
+                if not resource_to_patch:
+                    return
         else:
             resource_to_patch = self._patches
 
@@ -811,10 +819,14 @@ class ResourceEditor(object):
         }
 
         # apply changes
-        self._apply_patches(patches=patches_to_apply, action_text="Updating")
+        self._apply_patches(
+            patches=patches_to_apply, action_text="Updating", action=self.action
+        )
 
     def restore(self):
-        self._apply_patches(patches=self._backups, action_text="Restoring")
+        self._apply_patches(
+            patches=self._backups, action_text="Restoring", action=self.action
+        )
 
     def __enter__(self):
         self.update(backup_resources=True)
@@ -868,7 +880,7 @@ class ResourceEditor(object):
             return None
 
     @staticmethod
-    def _apply_patches(patches, action_text):
+    def _apply_patches(patches, action_text, action):
         """
         Updates provided Resource objects with provided yaml patches
 
@@ -893,4 +905,15 @@ class ResourceEditor(object):
             if "name" not in patch["metadata"]:
                 patch["metadata"]["name"] = resource.name
 
-            resource.update(patch)  # update the resource
+            if action == "update":
+                resource.update(resource_dict=patch)  # update the resource
+
+            if action == "replace":
+                if patch.get("metadata", {}).get("resourceVersion"):
+                    patch["metadata"][
+                        "resourceVersion"
+                    ] = resource.instance.metadata.resourceVersion
+
+                resource.update_replace(
+                    resource_dict=patch
+                )  # replace the resource metadata
