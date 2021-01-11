@@ -266,6 +266,7 @@ class Resource(object):
         SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
         STORAGE_K8S_IO = "storage.k8s.io"
         STORAGECLASS_KUBERNETES_IO = "storageclass.kubernetes.io"
+        TEMPLATE_KUBEVIRT_IO = "template.kubevirt.io"
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"

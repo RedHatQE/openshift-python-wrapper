@@ -8,7 +8,7 @@ class Template(NamespacedResource):
     singular_name = "template"
 
     class Labels:
-        BASE = f"{NamespacedResource.ApiGroup.TEMPLATE_OPENSHIFT_IO}/type=base"
+        BASE = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/type=base"
         FLAVOR = "flavor.template.kubevirt.io"
         OS = "os.template.kubevirt.io"
         WORKLOAD = "workload.template.kubevirt.io"
@@ -25,11 +25,13 @@ class Template(NamespacedResource):
         TINY = "tiny"
 
     class Annotations:
-        DEPRECATED = f"{NamespacedResource.ApiGroup.TEMPLATE_OPENSHIFT_IO}/deprecated"
-        PROVIDER = f"{NamespacedResource.ApiGroup.TEMPLATE_OPENSHIFT_IO}/provider"
-        PROVIDER_SUPPORT_LEVEL = f"{NamespacedResource.ApiGroup.TEMPLATE_OPENSHIFT_IO}/provider-support-level"
+        DEPRECATED = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/deprecated"
+        PROVIDER = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider"
+        PROVIDER_SUPPORT_LEVEL = (
+            f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-support-level"
+        )
         PROVIDER_URL = (
-            f"{NamespacedResource.ApiGroup.TEMPLATE_OPENSHIFT_IO}/provider-url"
+            f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-url"
         )
 
     def __init__(
