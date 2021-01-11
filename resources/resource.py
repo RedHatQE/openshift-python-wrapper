@@ -569,6 +569,18 @@ class Resource(object):
             content_type="application/merge-patch+json",
         )
 
+    def update_replace(self, resource_dict):
+        """
+        Replace resource metadata.
+        Use this to remove existing field. (update() will only update existing fields)
+        """
+        LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
+        self.api().replace(
+            body=resource_dict,
+            name=self.name,
+            namespace=self.namespace,
+        )
+
     @classmethod
     def get(cls, dyn_client, singular_name=None, *args, **kwargs):
         """
