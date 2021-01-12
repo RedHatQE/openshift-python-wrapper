@@ -6,4 +6,4 @@ class VMImportConfig(Resource):
     Virtual Machine Import Configs object.
     """
 
-    api_version = Resource.ApiVersion.V1
+    api_group = Resource.ApiGroup.V2V_KUBEVIRT_IO
