@@ -18,6 +18,7 @@ class StorageClass(Resource):
         LOCAL_BLOCK = "local-block"
         HOSTPATH = "hostpath-provisioner"
         CEPH_RBD = "ocs-storagecluster-ceph-rbd"
+        NFS = "nfs"
 
     class Provisioner:
         HOSTPATH = "kubevirt.io/hostpath-provisioner"
