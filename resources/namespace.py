@@ -1,8 +1,7 @@
 import logging
 
+from resources.resource import Resource
 from resources.utils import nudge_delete
-
-from .resource import Resource
 
 
 LOGGER = logging.getLogger(__name__)

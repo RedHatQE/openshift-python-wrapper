@@ -1,6 +1,5 @@
+from resources.resource import Resource
 from resources.utils import nudge_delete
-
-from .resource import Resource
 
 
 class Project(Resource):

@@ -3,9 +3,8 @@ import time
 
 from openshift.dynamic.exceptions import ConflictError
 
+from resources.resource import Resource
 from resources.utils import TimeoutSampler
-
-from .resource import Resource
 
 
 LOGGER = logging.getLogger(__name__)

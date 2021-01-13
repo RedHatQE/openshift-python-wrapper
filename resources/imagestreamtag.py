@@ -1,4 +1,4 @@
-from .resource import NamespacedResource
+from resources.resource import NamespacedResource
 
 
 class ImageStreamTag(NamespacedResource):
