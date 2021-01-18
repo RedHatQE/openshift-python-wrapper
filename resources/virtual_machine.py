@@ -38,6 +38,10 @@ class VirtualMachine(NamespacedResource):
         )
         self.body = body
 
+    def __exit__(self, exception_type, exception_value, traceback):
+        super().__exit__(exception_type, exception_value, traceback)
+        self.vmi.delete(wait=True, timeout=self.timeout)
+
     @property
     def _subresource_api_url(self):
         return (
