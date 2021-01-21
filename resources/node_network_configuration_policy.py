@@ -314,8 +314,9 @@ class NodeNetworkConfigurationPolicy(Resource):
             if all(
                 [
                     True
-                    for i in nnce.instance.status.conditions
-                    if i.get("type") == "Failing" and i.get("status") == "True"
+                    for _nnce in nnce.instance.status.conditions
+                    if _nnce.get("type") == Resource.Status.FAILED
+                    and _nnce.get("status") == Resource.Condition.Status.TRUE
                 ]
             ):
                 yield nnce
