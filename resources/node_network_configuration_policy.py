@@ -2,6 +2,9 @@ import logging
 
 from openshift.dynamic.exceptions import ConflictError
 
+from resources.node_network_configuration_enactment import (
+    NodeNetworkConfigurationEnactment,
+)
 from resources.utils import TimeoutExpiredError, TimeoutSampler
 
 from .node_network_state import NodeNetworkState
@@ -286,6 +289,10 @@ class NodeNetworkConfigurationPolicy(Resource):
                     return sample
 
                 if sample == self.Conditions.Reason.FAILED:
+                    for failed_nnce in self._get_failed_nnce():
+                        nnce_dict = failed_nnce.instance.to_dict()
+                        LOGGER.error(f"NNCE {nnce_dict['name']}: {nnce_dict}")
+
                     raise NNCPConfigurationFailed(
                         f"Reason: {self.Conditions.Reason.FAILED}"
                     )
@@ -301,3 +308,15 @@ class NodeNetworkConfigurationPolicy(Resource):
         for sample in samples:
             if sample:
                 return
+
+    def _get_failed_nnce(self):
+        for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):
+            if all(
+                [
+                    True
+                    for _nnce in nnce.instance.status.conditions
+                    if _nnce.get("type") == Resource.Status.FAILED
+                    and _nnce.get("status") == Resource.Condition.Status.TRUE
+                ]
+            ):
+                yield nnce
