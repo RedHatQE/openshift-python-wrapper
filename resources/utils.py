@@ -36,28 +36,27 @@ class TimeoutSampler(object):
         self.func = func
         self.func_args = func_args
         self.func_kwargs = func_kwargs
-        self.start_time = None
-        self.last_sample_time = None
         self.exception = exceptions if exceptions else Exception
 
     def __iter__(self):
-        caught_exception = None
-        if self.start_time is None:
-            self.start_time = time.time()
+        last_exception_log = ""
+        timeout_watch = TimeoutWatch(timeout=self.timeout)
+        func_log = (
+            f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
+        )
         while True:
-            self.last_sample_time = time.time()
             try:
                 yield self.func(*self.func_args, **self.func_kwargs)
-            except self.exception as e:
-                caught_exception = e
-                pass
+            except self.exception as exp:
+                last_exception_log = f"Last exception: {exp.__class__.__name__}: {exp}"
 
-            if self.timeout < (time.time() - self.start_time):
-                raise TimeoutExpiredError(
-                    f"{self.timeout} {caught_exception}"
-                    if caught_exception
-                    else self.timeout
+            _ = timeout_watch.remaining_time(
+                log="{timeout}\n{func_log}\n{last_exception_log}".format(
+                    timeout=self.timeout,
+                    func_log=func_log,
+                    last_exception_log=last_exception_log,
                 )
+            )
             time.sleep(self.sleep)
 
 
@@ -71,14 +70,14 @@ class TimeoutWatch:
         self.timeout = timeout
         self.start_time = time.time()
 
-    def remaining_time(self):
+    def remaining_time(self, log=None):
         """
         Return the remaining part of timeout since the object was created.
         """
         new_timeout = self.start_time + self.timeout - time.time()
         if new_timeout > 0:
             return new_timeout
-        raise TimeoutExpiredError(self.timeout)
+        raise TimeoutExpiredError(log or self.timeout)
 
 
 # TODO: remove the nudge when the underlying issue with namespaces stuck in
