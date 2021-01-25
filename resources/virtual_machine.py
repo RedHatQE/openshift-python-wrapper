@@ -6,11 +6,10 @@ import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
 from urllib3.exceptions import ProtocolError
 
+from resources.node import Node
+from resources.pod import Pod
+from resources.resource import TIMEOUT, NamespacedResource
 from resources.utils import TimeoutExpiredError, TimeoutSampler
-
-from .node import Node
-from .pod import Pod
-from .resource import TIMEOUT, NamespacedResource
 
 
 LOGGER = logging.getLogger(__name__)

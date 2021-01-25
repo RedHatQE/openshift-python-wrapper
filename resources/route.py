@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from .resource import NamespacedResource
+from resources.resource import NamespacedResource
 
 
 LOGGER = logging.getLogger(__name__)

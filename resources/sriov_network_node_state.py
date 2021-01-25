@@ -1,8 +1,7 @@
 import logging
 
+from resources.resource import NamespacedResource
 from resources.utils import TimeoutExpiredError, TimeoutSampler
-
-from .resource import NamespacedResource
 
 
 LOGGER = logging.getLogger(__name__)

@@ -3,9 +3,9 @@ import logging
 
 import kubernetes
 
-from . import utils
-from .node import Node
-from .resource import NamespacedResource
+from resources.node import Node
+from resources.resource import NamespacedResource
+from resources.utils import TimeoutWatch
 
 
 LOGGER = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class Pod(NamespacedResource):
             _preload_content=False,
         )
 
-        timeout_watch = utils.TimeoutWatch(timeout=timeout)
+        timeout_watch = TimeoutWatch(timeout=timeout)
         while resp.is_open():
             resp.run_forever(timeout=2)
             try:
