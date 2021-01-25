@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .resource import Resource
+from resources.resource import Resource
 
 
 class ClusterRole(Resource):

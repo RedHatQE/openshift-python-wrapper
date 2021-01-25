@@ -1,4 +1,4 @@
-from .resource import Resource
+from resources.resource import Resource
 
 
 class OperatorHub(Resource):

@@ -5,10 +5,9 @@ from openshift.dynamic.exceptions import ConflictError
 from resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
 )
+from resources.node_network_state import NodeNetworkState
+from resources.resource import Resource
 from resources.utils import TimeoutExpiredError, TimeoutSampler
-
-from .node_network_state import NodeNetworkState
-from .resource import Resource
 
 
 LOGGER = logging.getLogger(__name__)

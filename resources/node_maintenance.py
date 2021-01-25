@@ -1,4 +1,4 @@
-from .resource import TIMEOUT, Resource
+from resources.resource import TIMEOUT, Resource
 
 
 class NodeMaintenance(Resource):

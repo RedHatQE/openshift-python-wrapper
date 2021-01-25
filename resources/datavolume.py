@@ -2,8 +2,8 @@
 
 import logging
 
-from .persistent_volume_claim import PersistentVolumeClaim
-from .resource import TIMEOUT, NamespacedResource, Resource
+from resources.persistent_volume_claim import PersistentVolumeClaim
+from resources.resource import TIMEOUT, NamespacedResource, Resource
 
 
 LOGGER = logging.getLogger(__name__)

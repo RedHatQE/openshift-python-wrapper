@@ -1,6 +1,6 @@
 import logging
 
-from .resource import Resource
+from resources.resource import Resource
 
 
 LOGGER = logging.getLogger(__name__)

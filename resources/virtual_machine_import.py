@@ -5,9 +5,9 @@ import logging
 
 from urllib3.exceptions import ProtocolError
 
-from .resource import NamespacedResource
-from .utils import TimeoutExpiredError, TimeoutSampler
-from .virtual_machine import VirtualMachine
+from resources.resource import NamespacedResource
+from resources.utils import TimeoutExpiredError, TimeoutSampler
+from resources.virtual_machine import VirtualMachine
 
 
 LOGGER = logging.getLogger(__name__)

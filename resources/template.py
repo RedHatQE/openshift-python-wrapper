@@ -1,6 +1,6 @@
 import json
 
-from .resource import NamespacedResource
+from resources.resource import NamespacedResource
 
 
 class Template(NamespacedResource):

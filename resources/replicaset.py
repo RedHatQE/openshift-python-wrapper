@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .resource import NamespacedResource
+from resources.resource import NamespacedResource
 
 
 class ReplicaSet(NamespacedResource):

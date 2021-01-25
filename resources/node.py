@@ -1,4 +1,4 @@
-from .resource import NamespacedResource, Resource
+from resources.resource import NamespacedResource, Resource
 
 
 class Node(Resource):
