@@ -55,11 +55,9 @@ class VirtualMachineSnapshot(NamespacedResource):
             timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+            func=lambda: self.instance.get("status", {}).get("readyToUse", None)
+            == status,
         )
         for sample in samples:
-            if sample.items:
-                if self.instance.get("status", {}).get("readyToUse", None) == status:
-                    return
+            if sample:
+                return

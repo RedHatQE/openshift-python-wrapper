@@ -30,7 +30,7 @@ class Subscription(NamespacedResource):
         self.tolerations = tolerations
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {

@@ -60,11 +60,9 @@ class VirtualMachineRestore(NamespacedResource):
             timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+            func=lambda: self.instance.get("status", {}).get("complete", None)
+            == status,
         )
         for sample in samples:
-            if sample.items:
-                if self.instance.get("status", {}).get("complete", None) == status:
-                    return
+            if sample:
+                return

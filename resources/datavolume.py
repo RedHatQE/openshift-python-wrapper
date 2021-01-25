@@ -132,7 +132,7 @@ class DataVolume(NamespacedResource):
         self.multus_annotation = multus_annotation
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {

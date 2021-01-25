@@ -35,6 +35,7 @@ class StorageClass(Resource):
         since CNV-2.2, hpp supports for "WaitForFirstConsumer".
         """
 
+        # TODO: Rename to Uppercase
         Immediate = "Immediate"
         WaitForFirstConsumer = "WaitForFirstConsumer"
 

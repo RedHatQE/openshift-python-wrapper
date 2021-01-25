@@ -739,6 +739,9 @@ class NamespacedResource(Resource):
             "metadata": {"name": self.name, "namespace": self.namespace},
         }
 
+    def to_dict(self):
+        return self._base_body()
+
 
 class ResourceEditor(object):
     def __init__(self, patches, action="update", user_backups=None):

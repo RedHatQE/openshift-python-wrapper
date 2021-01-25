@@ -99,7 +99,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update({"spec": {"desiredState": self.desired_state}})
         if self._node_selector:
             res["spec"]["nodeSelector"] = self._node_selector

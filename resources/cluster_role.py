@@ -25,7 +25,7 @@ class ClusterRole(Resource):
         self.verbs = verbs
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         rules = {}
         if self.api_groups:
             rules["apiGroups"] = self.api_groups
