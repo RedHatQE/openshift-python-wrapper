@@ -12,14 +12,6 @@ class Node(Resource):
         READY = "Ready"
         SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
 
-    def __init__(
-        self,
-        name,
-        client=None,
-        teardown=True,
-    ):
-        super().__init__(name=name, client=client, teardown=teardown)
-
     @property
     def kubelet_ready(self):
         return any(

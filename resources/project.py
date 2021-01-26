@@ -13,14 +13,6 @@ class Project(Resource):
     class Status(Resource.Status):
         ACTIVE = "Active"
 
-    def __init__(
-        self,
-        name,
-        client=None,
-        teardown=True,
-    ):
-        super().__init__(name=name, client=client, teardown=teardown)
-
     def nudge_delete(self):
         nudge_delete(name=self.name)
 
