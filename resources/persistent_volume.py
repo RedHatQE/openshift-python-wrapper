@@ -10,14 +10,6 @@ class PersistentVolume(Resource):
 
     api_version = Resource.ApiVersion.V1
 
-    def __init__(
-        self,
-        name,
-        client=None,
-        teardown=True,
-    ):
-        super().__init__(name=name, client=client, teardown=teardown)
-
     @property
     def max_available_pvs(self):
         """

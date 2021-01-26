@@ -43,11 +43,3 @@ class StorageClass(Resource):
         IS_DEFAULT_CLASS = (
             f"{Resource.ApiGroup.STORAGECLASS_KUBERNETES_IO}/is-default-class"
         )
-
-    def __init__(
-        self,
-        name,
-        client=None,
-        teardown=True,
-    ):
-        super().__init__(name=name, client=client, teardown=teardown)

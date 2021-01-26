@@ -34,17 +34,6 @@ class Template(NamespacedResource):
             f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-url"
         )
 
-    def __init__(
-        self,
-        name,
-        namespace,
-        client=None,
-        teardown=True,
-    ):
-        super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
-        )
-
     def process(self, client=None, **kwargs):
         client = client or self.client
         instance_dict = self.instance.to_dict()
