@@ -233,12 +233,10 @@ class VirtualMachineImport(NamespacedResource):
                                 LOGGER.info(msg)
                                 return
         except TimeoutExpiredError:
-            msg = (
+            raise TimeoutExpiredError(
                 f"Last condition of {self.kind} {self.name} {last_condition.type} was "
                 f"{last_condition.status} ({last_condition.reason}: {last_condition.message})"
             )
-            LOGGER.error(msg)
-            raise
 
 
 class ResourceMapping(NamespacedResource):
