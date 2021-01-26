@@ -133,7 +133,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         for _sample in samples:
             return
 
-    def __enter__(self):
+    def deploy(self):
         if self._ipv4_dhcp:
             self._ipv4_state_backup()
 
