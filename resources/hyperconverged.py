@@ -20,7 +20,7 @@ class HyperConverged(NamespacedResource):
         self.workloads = workloads
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
 
         if self.infra:
             res.setdefault("spec", {}).setdefault("infra", {}).update(self.infra)

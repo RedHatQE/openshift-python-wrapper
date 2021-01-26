@@ -128,7 +128,9 @@ class VirtualMachineImport(NamespacedResource):
 
     @property
     def vm(self):
-        return VirtualMachine(name=self.target_vm_name, namespace=self.namespace)
+        return VirtualMachine(
+            name=self.target_vm_name, namespace=self.namespace, client=self.client
+        )
 
     def to_dict(self):
         res = super().to_dict()
@@ -253,7 +255,7 @@ class ResourceMapping(NamespacedResource):
         self.mapping = mapping
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         for provider, mapping in self.mapping.items():
             res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
             if mapping.network_mappings is not None:

@@ -44,44 +44,18 @@ class Deployment(NamespacedResource):
         LOGGER.info(f"Set deployment replicas: {replica_count}")
         return self.update(resource_dict=body)
 
-    def wait_until_no_replicas(self, timeout=TIMEOUT):
+    def wait_for_replicas(self, deployed=True, timeout=TIMEOUT):
         """
         Wait until all replicas are updated.
 
         Args:
-            timeout (int): Time to wait for the deployment.
-
-        Returns:
-            bool: True if availableReplicas is not found.
-        """
-        LOGGER.info(f"Wait for {self.kind} {self.name} to update replicas")
-        samples = TimeoutSampler(
-            timeout=timeout,
-            sleep=1,
-            exceptions=ProtocolError,
-            func=self.api().get,
-            field_selector=f"metadata.name=={self.name}",
-        )
-        for sample in samples:
-            if sample.items:
-                status = sample.items[0].status
-                available_replicas = status.availableReplicas
-                if not available_replicas:
-                    return
-
-    def wait_until_avail_replicas(self, timeout=TIMEOUT):
-        """
-        Wait until all replicas are updated.
-
-        Args:
+            deployed (bool): True for replicas deployed, False for no replicas.
             timeout (int): Time to wait for the deployment.
 
         Raises:
             TimeoutExpiredError: If not availableReplicas is equal to replicas.
         """
-        LOGGER.info(
-            f"Wait for {self.kind} {self.name} to ensure availableReplicas == replicas"
-        )
+        LOGGER.info(f"Wait for {self.kind} {self.name} to be deployed: {deployed}")
         samples = TimeoutSampler(
             timeout=timeout,
             sleep=1,
@@ -92,7 +66,9 @@ class Deployment(NamespacedResource):
         for sample in samples:
             if sample.items:
                 status = sample.items[0].status
-                available_replicas = status.availableReplicas
-                replicas = status.replicas
-                if replicas == available_replicas:
-                    return
+                if deployed:
+                    if status.replicas == status.availableReplicas:
+                        return
+                else:
+                    if not status.availableReplicas:
+                        return

@@ -30,7 +30,7 @@ class Secret(NamespacedResource):
         self.string_data = string_data
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         if self.accesskeyid:
             res.update(
                 {"data": {"accessKeyId": self.accesskeyid, "secretKey": self.secretkey}}

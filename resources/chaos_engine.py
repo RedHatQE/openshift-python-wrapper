@@ -9,6 +9,7 @@ class ChaosEngine(NamespacedResource):
     api_version = NamespacedResource.ApiVersion.V1ALPHA1
 
     class EngineStatus:
+        # TODO: Rename to Uppercase
         Initialized = "initialized"
         Completed = "completed"
         Stopped = "stopped"

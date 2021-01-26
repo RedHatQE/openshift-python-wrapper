@@ -24,7 +24,7 @@ class OperatorSource(NamespacedResource):
         self.secret = secret
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {

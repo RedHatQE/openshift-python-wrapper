@@ -22,6 +22,6 @@ class OperatorGroup(NamespacedResource):
         self.target_namespaces = target_namespaces
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update({"spec": {"targetNamespaces": self.target_namespaces}})
         return res
