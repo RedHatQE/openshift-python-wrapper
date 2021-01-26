@@ -8,6 +8,11 @@ class Machine(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
 
+    def __init__(self, name, namespace, teardown=False, client=None):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+
     @property
     def cluster_name(self):
         return self.instance.metadata.labels[f"{self.api_group}/cluster-api-cluster"]
