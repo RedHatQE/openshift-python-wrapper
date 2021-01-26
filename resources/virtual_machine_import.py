@@ -236,7 +236,7 @@ class VirtualMachineImport(NamespacedResource):
                 f"{last_condition.status} ({last_condition.reason}: {last_condition.message})"
             )
             LOGGER.error(msg)
-            raise
+            raise TimeoutExpiredError(msg)
 
 
 class ResourceMapping(NamespacedResource):
