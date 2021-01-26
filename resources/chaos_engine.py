@@ -14,9 +14,6 @@ class ChaosEngine(NamespacedResource):
         Completed = "completed"
         Stopped = "stopped"
 
-    def __init__(self, name, namespace, client=None):
-        super().__init__(name=name, namespace=namespace, client=client)
-
     @property
     def engine_status(self):
         return self.instance.status["engineStatus"]
