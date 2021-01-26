@@ -133,7 +133,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         for _sample in samples:
             return
 
-    def __enter__(self):
+    def deploy(self):
         if self._ipv4_dhcp:
             self._ipv4_state_backup()
 
@@ -148,7 +148,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
                     self.mtu_dict[port] = mtu
 
-        super().__enter__()
+        self.create()
 
         try:
             self.wait_for_status_success()
