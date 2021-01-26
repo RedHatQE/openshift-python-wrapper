@@ -15,6 +15,6 @@ class ConfigMap(NamespacedResource):
         self.data = data
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.setdefault("data", {}).update(self.data)
         return res

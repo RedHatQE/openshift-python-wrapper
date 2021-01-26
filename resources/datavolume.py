@@ -65,35 +65,6 @@ class DataVolume(NamespacedResource):
         class Status(Resource.Condition.Status):
             UNKNOWN = "Unknown"
 
-    def wait_deleted(self, timeout=TIMEOUT):
-        """
-        Wait until DataVolume and the PVC created by it are deleted
-
-        Args:
-        timeout (int):  Time to wait for the DataVolume and PVC to be deleted.
-
-        Returns:
-        bool: True if DataVolume and its PVC are gone, False if timeout reached.
-        """
-        super().wait_deleted(timeout=timeout)
-        return self.pvc.wait_deleted(timeout=timeout)
-
-    def wait(self, timeout=600):
-        self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        self.pvc.wait_for_status(
-            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
-        )
-
-    @property
-    def pvc(self):
-        return PersistentVolumeClaim(name=self.name, namespace=self.namespace)
-
-    @property
-    def scratch_pvc(self):
-        return PersistentVolumeClaim(
-            name=f"{self.name}-scratch", namespace=self.namespace
-        )
-
     def __init__(
         self,
         name,
@@ -132,7 +103,7 @@ class DataVolume(NamespacedResource):
         self.multus_annotation = multus_annotation
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {
@@ -173,3 +144,36 @@ class DataVolume(NamespacedResource):
             }
 
         return res
+
+    def wait_deleted(self, timeout=TIMEOUT):
+        """
+        Wait until DataVolume and the PVC created by it are deleted
+
+        Args:
+        timeout (int):  Time to wait for the DataVolume and PVC to be deleted.
+
+        Returns:
+        bool: True if DataVolume and its PVC are gone, False if timeout reached.
+        """
+        super().wait_deleted(timeout=timeout)
+        return self.pvc.wait_deleted(timeout=timeout)
+
+    def wait(self, timeout=600):
+        self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
+        self.pvc.wait_for_status(
+            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
+        )
+
+    @property
+    def pvc(self):
+        return PersistentVolumeClaim(
+            name=self.name, namespace=self.namespace, client=self.client
+        )
+
+    @property
+    def scratch_pvc(self):
+        return PersistentVolumeClaim(
+            name=f"{self.name}-scratch",
+            namespace=self.namespace,
+            client=self.client,
+        )

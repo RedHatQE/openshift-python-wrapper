@@ -333,9 +333,8 @@ class Resource(object):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        if not self.teardown:
-            return
-        self.clean_up()
+        if self.teardown:
+            self.clean_up()
 
     def clean_up(self):
         if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
@@ -738,6 +737,9 @@ class NamespacedResource(Resource):
             "kind": self.kind,
             "metadata": {"name": self.name, "namespace": self.namespace},
         }
+
+    def to_dict(self):
+        return self._base_body()
 
 
 class ResourceEditor(object):

@@ -38,7 +38,7 @@ class NodeNetworkState(Resource):
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {

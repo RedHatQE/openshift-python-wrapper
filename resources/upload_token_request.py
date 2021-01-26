@@ -22,6 +22,6 @@ class UploadTokenRequest(NamespacedResource):
         self.pvc_name = pvc_name
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update({"spec": {"pvcName": self.pvc_name}})
         return res

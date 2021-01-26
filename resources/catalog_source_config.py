@@ -34,7 +34,7 @@ class CatalogSourceConfig(NamespacedResource):
         self.cs_publisher = cs_publisher
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {

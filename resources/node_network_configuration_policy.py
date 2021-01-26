@@ -98,7 +98,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update({"spec": {"desiredState": self.desired_state}})
         if self._node_selector:
             res["spec"]["nodeSelector"] = self._node_selector
@@ -158,11 +158,6 @@ class NodeNetworkConfigurationPolicy(Resource):
             LOGGER.error(e)
             self.clean_up()
             raise
-
-    def __exit__(self, exception_type, exception_value, traceback):
-        if not self.teardown:
-            return
-        self.clean_up()
 
     @property
     def ipv4_dhcp(self):
