@@ -333,9 +333,8 @@ class Resource(object):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        if not self.teardown:
-            return
-        self.clean_up()
+        if self.teardown:
+            self.clean_up()
 
     def clean_up(self):
         if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":

@@ -159,11 +159,6 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.clean_up()
             raise
 
-    def __exit__(self, exception_type, exception_value, traceback):
-        if not self.teardown:
-            return
-        self.clean_up()
-
     @property
     def ipv4_dhcp(self):
         return self._ipv4_dhcp
