@@ -148,7 +148,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
                     self.mtu_dict[port] = mtu
 
-        super().__enter__()
+        self.create()
 
         try:
             self.wait_for_status_success()
