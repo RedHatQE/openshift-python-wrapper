@@ -329,12 +329,15 @@ class Resource(object):
         return self._base_body()
 
     def __enter__(self):
-        self.create()
-        return self
+        return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
         if self.teardown:
             self.clean_up()
+
+    def deploy(self):
+        self.create()
+        return self
 
     def clean_up(self):
         if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
