@@ -332,23 +332,23 @@ class Resource(object):
         return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
-        if self.teardown:
-            self.clean_up()
+        self.clean_up()
 
     def deploy(self):
         self.create()
         return self
 
     def clean_up(self):
-        if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
-            try:
-                _collect_data(resource_object=self)
-            except Exception as exception_:
-                LOGGER.warning(exception_)
+        if self.teardown:
+            if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
+                try:
+                    _collect_data(resource_object=self)
+                except Exception as exception_:
+                    LOGGER.warning(exception_)
 
-        data = self.to_dict()
-        LOGGER.info(f"Deleting {data}")
-        self.delete(wait=True, timeout=self.timeout)
+            data = self.to_dict()
+            LOGGER.info(f"Deleting {data}")
+            self.delete(wait=True, timeout=self.timeout)
 
     @classmethod
     def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
