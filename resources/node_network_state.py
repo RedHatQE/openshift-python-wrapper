@@ -10,7 +10,7 @@ from resources.utils import TimeoutSampler
 LOGGER = logging.getLogger(__name__)
 
 SLEEP = 1
-TIMEOUT = 120
+TIMEOUT = 240
 
 
 class NodeNetworkState(Resource):

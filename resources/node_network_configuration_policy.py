@@ -196,6 +196,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 continue
             try:
                 self._absent_interface()
+                self.wait_for_status_success()
                 self.wait_for_interface_deleted()
             except TimeoutExpiredError as e:
                 LOGGER.error(e)
