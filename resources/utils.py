@@ -49,7 +49,7 @@ class TimeoutSampler:
         )
         while True:
             try:
-                self.elapsed_time = timeout_watch.remaining_time()
+                self.elapsed_time = self.timeout - timeout_watch.remaining_time()
                 yield self.func(*self.func_args, **self.func_kwargs)
                 self.elapsed_time = None
 
