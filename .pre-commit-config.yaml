@@ -35,4 +35,3 @@ repos:
           "git+https://gitlab.cee.redhat.com/cnv-qe/flake8-python-plugins.git",
           "pep8-naming"
         ]
-        args: ["--extend-ignore=N805"]
