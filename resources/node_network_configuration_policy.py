@@ -275,7 +275,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_conditions()
 
-        samples = TimeoutSampler(timeout=240, sleep=1, func=self.status)
+        samples = TimeoutSampler(timeout=480, sleep=1, func=self.status)
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESS:
