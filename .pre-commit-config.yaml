@@ -2,18 +2,23 @@ default_language_version:
     python: python3
 
 repos:
+  - repo: https://github.com/hadialqattan/pycln
+    rev: ""
+    hooks:
+      - id: pycln
+
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.6.4
+    rev: ""
     hooks:
       - id: isort
 
-  - repo: https://github.com/ambv/black
-    rev: 20.8b1
+  - repo: https://github.com/psf/black
+    rev: ""
     hooks:
     - id: black
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.3.0
+    rev: ""
     hooks:
     - id: check-merge-conflict
     - id: debug-statements
@@ -23,9 +28,10 @@ repos:
     - id: check-builtin-literals
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 3.8.4
+    rev: ""
     hooks:
       - id: flake8
         additional_dependencies: [
-          "git+https://gitlab.cee.redhat.com/cnv-qe/flake8-python-plugins.git"
+          "git+https://gitlab.cee.redhat.com/cnv-qe/flake8-python-plugins.git",
+          "pep8-naming"
         ]
