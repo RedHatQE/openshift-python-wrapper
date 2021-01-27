@@ -44,9 +44,18 @@ class TimeoutSampler(object):
         func_log = (
             f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
         )
+        LOGGER.info(
+            f"Waiting for {self.timeout} seconds, retry every {self.sleep} seconds"
+        )
         while True:
             try:
-                yield self.func(*self.func_args, **self.func_kwargs)
+                res = self.func(*self.func_args, **self.func_kwargs)
+                if res:
+                    LOGGER.info(
+                        "Operation took: "
+                        f"{self.timeout - timeout_watch.remaining_time(raise_on_timeout=False)} seconds"
+                    )
+                    yield res
             except self.exception as exp:
                 last_exception_log = f"Last exception: {exp.__class__.__name__}: {exp}"
 
@@ -70,14 +79,16 @@ class TimeoutWatch:
         self.timeout = timeout
         self.start_time = time.time()
 
-    def remaining_time(self, log=None):
+    def remaining_time(self, log=None, raise_on_timeout=True):
         """
         Return the remaining part of timeout since the object was created.
         """
         new_timeout = self.start_time + self.timeout - time.time()
         if new_timeout > 0:
             return new_timeout
-        raise TimeoutExpiredError(log or self.timeout)
+
+        if raise_on_timeout:
+            raise TimeoutExpiredError(log or self.timeout)
 
 
 # TODO: remove the nudge when the underlying issue with namespaces stuck in
