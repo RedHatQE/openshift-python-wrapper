@@ -308,6 +308,12 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def _get_failed_nnce(self):
         for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):
+            try:
+                nnce.wait_for_conditions()
+            except TimeoutExpiredError:
+                LOGGER.error(f"Failed to get NNCE {nnce.name} status")
+                continue
+
             if all(
                 [
                     True
