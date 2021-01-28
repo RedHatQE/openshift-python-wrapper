@@ -286,7 +286,9 @@ class NodeNetworkConfigurationPolicy(Resource):
                 if sample == self.Conditions.Reason.FAILED:
                     for failed_nnce in self._get_failed_nnce():
                         nnce_dict = failed_nnce.instance.to_dict()
-                        LOGGER.error(f"NNCE {nnce_dict['name']}: {nnce_dict}")
+                        LOGGER.error(
+                            f"NNCE {nnce_dict['metadata']['name']}: {nnce_dict}"
+                        )
 
                     raise NNCPConfigurationFailed(
                         f"Reason: {self.Conditions.Reason.FAILED}"
