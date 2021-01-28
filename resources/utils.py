@@ -15,7 +15,7 @@ class TimeoutExpiredError(Exception):
         return f"Timed Out: {self.value}"
 
 
-class TimeoutSampler(object):
+class TimeoutSampler:
     """
     Samples the function output.
 
@@ -37,27 +37,38 @@ class TimeoutSampler(object):
         self.func_args = func_args
         self.func_kwargs = func_kwargs
         self.exception = exceptions if exceptions else Exception
+        self.elapsed_time = None
 
     def __iter__(self):
-        last_exception_log = ""
         timeout_watch = TimeoutWatch(timeout=self.timeout)
         func_log = (
             f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
         )
+        LOGGER.info(
+            f"Waiting for {self.timeout} seconds, retry every {self.sleep} seconds"
+        )
         while True:
             try:
+                self.elapsed_time = self.timeout - timeout_watch.remaining_time()
                 yield self.func(*self.func_args, **self.func_kwargs)
+                self.elapsed_time = None
+
             except self.exception as exp:
+                self.elapsed_time = None
                 last_exception_log = f"Last exception: {exp.__class__.__name__}: {exp}"
 
-            _ = timeout_watch.remaining_time(
-                log="{timeout}\n{func_log}\n{last_exception_log}".format(
-                    timeout=self.timeout,
-                    func_log=func_log,
-                    last_exception_log=last_exception_log,
+                _ = timeout_watch.remaining_time(
+                    log="{timeout}\n{func_log}\n{last_exception_log}".format(
+                        timeout=self.timeout,
+                        func_log=func_log,
+                        last_exception_log=last_exception_log,
+                    )
                 )
-            )
-            time.sleep(self.sleep)
+                time.sleep(self.sleep)
+
+            finally:
+                if self.elapsed_time:
+                    LOGGER.info(f"Elapsed time: {self.elapsed_time}")
 
 
 class TimeoutWatch:
@@ -77,6 +88,7 @@ class TimeoutWatch:
         new_timeout = self.start_time + self.timeout - time.time()
         if new_timeout > 0:
             return new_timeout
+
         raise TimeoutExpiredError(log or self.timeout)
 
 
