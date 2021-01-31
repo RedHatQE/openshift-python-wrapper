@@ -83,6 +83,7 @@ class DataVolume(NamespacedResource):
         source_pvc=None,
         source_namespace=None,
         multus_annotation=None,
+        bind_immediate_annotation=None,
         teardown=True,
     ):
         super().__init__(
@@ -101,6 +102,7 @@ class DataVolume(NamespacedResource):
         self.source_pvc = source_pvc
         self.source_namespace = source_namespace
         self.multus_annotation = multus_annotation
+        self.bind_immediate_annotation = bind_immediate_annotation
 
     def to_dict(self):
         res = super().to_dict()
@@ -136,6 +138,12 @@ class DataVolume(NamespacedResource):
         if self.multus_annotation:
             res["metadata"].setdefault("annotations", {}).update(
                 {"k8s.v1.cni.cncf.io/networks": self.multus_annotation}
+            )
+        if self.bind_immediate_annotation:
+            res["metadata"].setdefault("annotations", {}).update(
+                {
+                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
+                }
             )
         if self.source == "pvc":
             res["spec"]["source"]["pvc"] = {
