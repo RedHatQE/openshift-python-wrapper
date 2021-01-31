@@ -244,6 +244,7 @@ class Resource(object):
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
+        K8S_V1_CNI_CNCF_IO = "k8s.v1.cni.cncf.io"
         KUBEVIRT_IO = "kubevirt.io"
         LITMUS_IO = "litmuschaos.io"
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"

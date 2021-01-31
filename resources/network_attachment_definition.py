@@ -18,7 +18,7 @@ class NetworkAttachmentDefinition(NamespacedResource):
         res = super().to_dict()
         if self.resource_name is not None:
             res["metadata"]["annotations"] = {
-                "k8s.v1.cni.cncf.io/resourceName": self.resource_name
+                f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
             }
         res["spec"] = {}
         return res

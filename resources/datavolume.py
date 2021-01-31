@@ -133,11 +133,15 @@ class DataVolume(NamespacedResource):
             res["spec"]["source"][self.source] = {}
         if self.hostpath_node:
             res["metadata"].setdefault("annotations", {}).update(
-                {"kubevirt.io/provisionOnNode": self.hostpath_node}
+                {
+                    f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": self.hostpath_node
+                }
             )
         if self.multus_annotation:
             res["metadata"].setdefault("annotations", {}).update(
-                {"k8s.v1.cni.cncf.io/networks": self.multus_annotation}
+                {
+                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": self.multus_annotation
+                }
             )
         if self.bind_immediate_annotation:
             res["metadata"].setdefault("annotations", {}).update(
