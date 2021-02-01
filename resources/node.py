@@ -28,3 +28,9 @@ class Node(Resource):
         return self.instance.metadata.annotations[
             f"{self.ApiGroup.MACHINE_OPENSHIFT_IO}/machine"
         ].split("/")[-1]
+
+    @property
+    def internal_ip(self):
+        for addr in self.instance.status.addresses:
+            if addr.type == "InternalIP":
+                return addr.address
