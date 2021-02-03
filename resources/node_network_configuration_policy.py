@@ -120,8 +120,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         return res
 
-    def apply(self):
-        resource = self.to_dict()
+    def apply(self, resource):
         samples = TimeoutSampler(
             timeout=3,
             sleep=1,
@@ -172,7 +171,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self.iface["ipv4"] = {"dhcp": True, "enabled": True}
 
             self.set_interface(interface=self.iface)
-            self.apply()
+            self.apply(resource=self._resource_dict_for_cleanup())
 
     def clean_up(self):
         if self.mtu:
@@ -208,7 +207,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 iface_name = iface["name"]
                 node_network_state = NodeNetworkState(name=pod.node.name)
                 iface_dict = node_network_state.get_interface(name=iface_name)
-                if iface_dict["type"] == "ethernet":
+                if iface_dict.get("type") == "ethernet":
                     LOGGER.info(f"{iface_name} is type ethernet, skipping.")
                     continue
 
@@ -270,7 +269,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     interface = {"name": iface_name, "ipv4": ipv4}
                     self.set_interface(interface=interface)
 
-        self.apply()
+        self.apply(resource=self._resource_dict_for_cleanup())
 
     def status(self):
         for condition in self.instance.status.conditions:
@@ -328,3 +327,9 @@ class NodeNetworkConfigurationPolicy(Resource):
                 ]
             ):
                 yield nnce
+
+    def _resource_dict_for_cleanup(self):
+        resource_dict = self.to_dict()
+        desired_state = {"interfaces": self.ifaces}
+        resource_dict.update({"spec": {"desiredState": desired_state}})
+        return resource_dict
