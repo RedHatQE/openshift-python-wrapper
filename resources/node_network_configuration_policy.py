@@ -120,7 +120,8 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         return res
 
-    def apply(self, resource):
+    def apply(self, resource=None):
+        resource = resource if resource else super().to_dict()
         samples = TimeoutSampler(
             timeout=3,
             sleep=1,
