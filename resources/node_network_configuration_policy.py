@@ -88,11 +88,10 @@ class NodeNetworkConfigurationPolicy(Resource):
     def set_interface(self, interface):
         # First drop the interface if it's already in the list
         interfaces = [
-            i
-            for i in self.desired_state["interfaces"]
-            if not (i["name"] == interface["name"])
+            iface
+            for iface in self.desired_state["interfaces"]
+            if not (iface["name"] == interface["name"])
         ]
-
         # Add the interface
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
@@ -116,7 +115,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.iface["ipv6"] = {"enabled": self.ipv6_enable}
 
         self.set_interface(interface=self.iface)
-        if self.iface not in self.ifaces:
+        if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
             self.ifaces.append(self.iface)
 
         return res
@@ -206,8 +205,14 @@ class NodeNetworkConfigurationPolicy(Resource):
     def wait_for_interface_deleted(self):
         for pod in self.worker_pods:
             for iface in self.ifaces:
+                iface_name = iface["name"]
                 node_network_state = NodeNetworkState(name=pod.node.name)
-                node_network_state.wait_until_deleted(name=iface["name"])
+                iface_dict = node_network_state.get_interface(name=iface_name)
+                if iface_dict["type"] == "ethernet":
+                    LOGGER.info(f"{iface_name} is type ethernet, skipping.")
+                    continue
+
+                node_network_state.wait_until_deleted(name=iface_name)
 
     def validate_create(self):
         for pod in self.worker_pods:
