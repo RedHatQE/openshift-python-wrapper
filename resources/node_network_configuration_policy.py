@@ -51,6 +51,8 @@ class NodeNetworkConfigurationPolicy(Resource):
         ipv4_addresses=None,
         ipv6_enable=False,
         node_active_nics=None,
+        dns_resolver=None,
+        routes=None,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -76,12 +78,15 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.ipv6_enable = ipv6_enable
         self.ipv4_iface_state = {}
         self.node_selector = node_selector
+        self.dns_resolver = dns_resolver
+        self.routes = routes
         if self.node_selector:
-            for pod in self.worker_pods:
-                if pod.node.name == node_selector:
-                    self.worker_pods = [pod]
-                    self._node_selector = {"kubernetes.io/hostname": self.node_selector}
-                    break
+            self._node_selector = {"kubernetes.io/hostname": self.node_selector}
+            if self.worker_pods:
+                for pod in self.worker_pods:
+                    if pod.node.name == node_selector:
+                        self.worker_pods = [pod]
+                        break
         else:
             self._node_selector = {"node-role.kubernetes.io/worker": ""}
 
@@ -98,25 +103,36 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def to_dict(self):
         res = super().to_dict()
-        res.update({"spec": {"desiredState": self.desired_state}})
+        if self.dns_resolver or self.routes or self.iface:
+            res.setdefault("spec", {}).setdefault("desiredState", {})
+
         if self._node_selector:
-            res["spec"]["nodeSelector"] = self._node_selector
+            res.setdefault("spec", {}).setdefault("nodeSelector", self._node_selector)
 
-        """
-        It's the responsibility of the caller to verify the desired configuration they send.
-        For example: "ipv4.dhcp.enabled: false" without specifying any static IP address is a valid desired state and
-        therefore not blocked in the code, but nmstate would reject it. Such configuration might be used for negative
-        tests.
-        """
-        self.iface["ipv4"] = {"enabled": self.ipv4_enable, "dhcp": self.ipv4_dhcp}
-        if self.ipv4_addresses:
-            self.iface["ipv4"]["address"] = self.ipv4_addresses
+        if self.dns_resolver:
+            res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
 
-        self.iface["ipv6"] = {"enabled": self.ipv6_enable}
+        if self.routes:
+            res["spec"]["desiredState"]["routes"] = self.routes
 
-        self.set_interface(interface=self.iface)
-        if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
-            self.ifaces.append(self.iface)
+        if self.iface:
+            res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
+
+            """
+            It's the responsibility of the caller to verify the desired configuration they send.
+            For example: "ipv4.dhcp.enabled: false" without specifying any static IP address
+            is a valid desired state and therefore not blocked in the code, but nmstate would
+            reject it. Such configuration might be used for negative tests.
+            """
+            self.iface["ipv4"] = {"enabled": self.ipv4_enable, "dhcp": self.ipv4_dhcp}
+            if self.ipv4_addresses:
+                self.iface["ipv4"]["address"] = self.ipv4_addresses
+
+            self.iface["ipv6"] = {"enabled": self.ipv6_enable}
+
+            self.set_interface(interface=self.iface)
+            if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
+                self.ifaces.append(self.iface)
 
         return res
 
@@ -197,7 +213,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self._absent_interface()
                 self.wait_for_status_success()
                 self.wait_for_interface_deleted()
-            except TimeoutExpiredError as e:
+            except Exception as e:
                 LOGGER.error(e)
 
         self.delete()
@@ -333,4 +349,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         resource_dict = self.to_dict()
         desired_state = {"interfaces": self.ifaces}
         resource_dict.update({"spec": {"desiredState": desired_state}})
+        if self.routes:
+            resource_dict["spec"]["desiredState"]["routes"] = None
+
         return resource_dict
