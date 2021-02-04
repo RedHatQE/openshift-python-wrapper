@@ -20,12 +20,6 @@ class NNCPConfigurationFailed(Exception):
 class NodeNetworkConfigurationPolicy(Resource):
     api_group = Resource.ApiGroup.NMSTATE_IO
 
-    class Interface:
-        class State:
-            UP = "up"
-            DOWN = "down"
-            ABSENT = "absent"
-
     class Conditions:
         class Type:
             FAILING = "Failing"
@@ -188,7 +182,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self.iface["ipv4"] = {"dhcp": True, "enabled": True}
 
             self.set_interface(interface=self.iface)
-            self.apply(resource=self._resource_dict_for_cleanup())
+            self.apply()
 
     def clean_up(self):
         if self.mtu:
@@ -318,14 +312,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error("Unable to configure NNCP for node")
             raise
-
-    def wait_for_conditions(self):
-        samples = TimeoutSampler(
-            timeout=30, sleep=1, func=lambda: self.instance.status.conditions
-        )
-        for sample in samples:
-            if sample:
-                return
 
     def _get_failed_nnce(self):
         for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):

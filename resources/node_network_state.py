@@ -67,7 +67,7 @@ class NodeNetworkState(Resource):
     def wait_until_up(self, name):
         def _find_up_interface():
             iface = self.get_interface(name=name)
-            if iface.get("state") == "up":
+            if iface.get("state") == self.Interface.State.UP:
                 return iface
 
             return None
