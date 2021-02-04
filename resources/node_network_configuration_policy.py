@@ -116,8 +116,6 @@ class NodeNetworkConfigurationPolicy(Resource):
             res["spec"]["desiredState"]["routes"] = self.routes
 
         if self.iface:
-            res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
-
             """
             It's the responsibility of the caller to verify the desired configuration they send.
             For example: "ipv4.dhcp.enabled: false" without specifying any static IP address
@@ -133,6 +131,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.set_interface(interface=self.iface)
             if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
                 self.ifaces.append(self.iface)
+
+            res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
 
         return res
 
