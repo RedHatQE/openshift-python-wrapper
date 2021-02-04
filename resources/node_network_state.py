@@ -66,9 +66,10 @@ class NodeNetworkState(Resource):
 
     def wait_until_up(self, name):
         def _find_up_interface():
-            for interface in self.interfaces:
-                if interface["name"] == name and interface["state"] == "up":
-                    return interface
+            iface = self.get_interface(name=name)
+            if iface.get("state") == self.Interface.State.UP:
+                return iface
+
             return None
 
         LOGGER.info(f"Checking if interface {name} is up -- {self.name}")
@@ -78,15 +79,9 @@ class NodeNetworkState(Resource):
                 return
 
     def wait_until_deleted(self, name):
-        def _find_deleted_interface():
-            for interface in self.interfaces:
-                if interface["name"] == name:
-                    return interface
-            return None
-
         LOGGER.info(f"Checking if interface {name} is deleted -- {self.name}")
         samples = TimeoutSampler(
-            timeout=TIMEOUT, sleep=SLEEP, func=_find_deleted_interface
+            timeout=TIMEOUT, sleep=SLEEP, func=self.get_interface, name=name
         )
         for sample in samples:
             if not sample:
@@ -106,3 +101,9 @@ class NodeNetworkState(Resource):
                 addresses = interface["ipv4"]["address"]
                 if addresses:
                     return interface["ipv4"]["address"][0]["ip"]
+
+    def get_interface(self, name):
+        for interface in self.interfaces:
+            if interface["name"] == name:
+                return interface
+        return {}
