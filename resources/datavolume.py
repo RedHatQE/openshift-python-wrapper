@@ -18,7 +18,6 @@ class DataVolume(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         BLANK = "Blank"
-        PENDING = "Pending"
         PVC_BOUND = "PVCBound"
         IMPORT_SCHEDULED = "ImportScheduled"
         ClONE_SCHEDULED = "CloneScheduled"
