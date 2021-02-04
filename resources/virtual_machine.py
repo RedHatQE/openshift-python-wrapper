@@ -139,6 +139,7 @@ class VirtualMachineInstance(NamespacedResource):
     class Status(NamespacedResource.Status):
         RUNNING = "Running"
         SCHEDULING = "Scheduling"
+        PENDING = "Pending"
 
     def __init__(self, name, namespace, client=None):
         super().__init__(name=name, namespace=namespace, client=client)
