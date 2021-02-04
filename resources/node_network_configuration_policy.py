@@ -75,14 +75,18 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.dns_resolver = dns_resolver
         self.routes = routes
         if self.node_selector:
-            self._node_selector = {"kubernetes.io/hostname": self.node_selector}
+            self._node_selector = {
+                f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
+            }
             if self.worker_pods:
                 for pod in self.worker_pods:
                     if pod.node.name == node_selector:
                         self.worker_pods = [pod]
                         break
         else:
-            self._node_selector = {"node-role.kubernetes.io/worker": ""}
+            self._node_selector = {
+                f"node-role.{self.ApiGroup.KUBERNETES_IO}/worker": ""
+            }
 
     def set_interface(self, interface):
         # First drop the interface if it's already in the list

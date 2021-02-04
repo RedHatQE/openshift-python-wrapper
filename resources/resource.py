@@ -251,6 +251,7 @@ class Resource(object):
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
         K8S_V1_CNI_CNCF_IO = "k8s.v1.cni.cncf.io"
+        KUBERNETES_IO = "kubernetes.io"
         KUBEVIRT_IO = "kubevirt.io"
         LITMUS_IO = "litmuschaos.io"
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
