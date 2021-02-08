@@ -83,6 +83,7 @@ class DataVolume(NamespacedResource):
         source_namespace=None,
         multus_annotation=None,
         bind_immediate_annotation=None,
+        preallocation=None,
         teardown=True,
     ):
         super().__init__(
@@ -102,6 +103,7 @@ class DataVolume(NamespacedResource):
         self.source_namespace = source_namespace
         self.multus_annotation = multus_annotation
         self.bind_immediate_annotation = bind_immediate_annotation
+        self.preallocation = preallocation
 
     def to_dict(self):
         res = super().to_dict()
@@ -153,6 +155,8 @@ class DataVolume(NamespacedResource):
                 "name": self.source_pvc or "dv-source",
                 "namespace": self.source_namespace or self.namespace,
             }
+        if self.preallocation is not None:
+            res["spec"]["preallocation"] = self.preallocation
 
         return res
 
