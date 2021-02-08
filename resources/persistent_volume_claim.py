@@ -17,7 +17,6 @@ class PersistentVolumeClaim(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         BOUND = "Bound"
-        PENDING = "Pending"
         TERMINATING = "Terminating"
 
     class AccessMode:
