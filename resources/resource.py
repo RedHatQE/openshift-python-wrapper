@@ -388,12 +388,13 @@ class Resource(object):
             api_version=self.api_version, kind=self.kind, **kwargs
         )
 
-    def wait(self, timeout=TIMEOUT):
+    def wait(self, timeout=TIMEOUT, sleep=1):
         """
         Wait for resource
 
         Args:
             timeout (int): Time to wait for the resource.
+            sleep (int): Time to wait between retries
 
         Raises:
             TimeoutExpiredError: If resource not exists.
@@ -401,7 +402,7 @@ class Resource(object):
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
             timeout=timeout,
-            sleep=1,
+            sleep=sleep,
             exceptions=(ProtocolError, NotFoundError),
             func=lambda: self.exists,
         )
@@ -456,7 +457,7 @@ class Resource(object):
         except TimeoutExpiredError:
             self.nudge_delete()
 
-    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None):
+    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None, sleep=1):
         """
         Wait for resource to be in status
 
@@ -472,7 +473,7 @@ class Resource(object):
         LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
             timeout=timeout,
-            sleep=1,
+            sleep=sleep,
             exceptions=ProtocolError,
             func=self.api().get,
             field_selector=f"metadata.name=={self.name}",

@@ -73,7 +73,7 @@ class VirtualMachine(NamespacedResource):
             self.wait_for_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted()
 
-    def wait_for_status(self, status, timeout=TIMEOUT):
+    def wait_for_status(self, status, timeout=TIMEOUT, sleep=1):
         """
         Wait for resource to be in status
 
@@ -89,7 +89,7 @@ class VirtualMachine(NamespacedResource):
         )
         samples = TimeoutSampler(
             timeout=timeout,
-            sleep=1,
+            sleep=sleep,
             exceptions=ProtocolError,
             func=self.api().get,
             field_selector=f"metadata.name=={self.name}",
