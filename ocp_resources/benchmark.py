@@ -1,0 +1,99 @@
+import logging
+
+from openshift.dynamic.exceptions import NotFoundError
+
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils import TimeoutSampler
+
+
+LOGGER = logging.getLogger(__name__)
+
+API_TIMEOUT = 30
+TIMEOUT = 300
+LOOP_SLEEP_TIME_SEC = 1
+
+
+class Benchmark(NamespacedResource):
+    """
+    Benchmark resource
+    Defined by https://github.com/cloud-bulldozer/benchmark-operator
+
+    The benchmark-operator monitors the `my-ripsaw` namespace for `Benchmark` resources.
+    When a new `Benchmark` is created, the benchmark-operator creates and starts the pods or VMs necessary,
+    and triggers the benchmark run.
+    """
+
+    api_group = NamespacedResource.ApiGroup.RIPSAW_CLOUDBULLDOZER_IO
+
+    class Status:
+        NONE = None  # None state is valid for newly created benchmark resources
+
+    class Workload:
+        class Kind:
+            VM = "vm"
+            POD = "pod"
+
+    def _wait_for_instance_key(self, parent, key):
+        """
+        Wait for key to exist in parent attribute of instance
+
+        Args:
+            parent (str): An attribute of self.instance that should contain key
+            key (str): A dictionary entry within parent
+
+        Returns:
+            Value of key if found, otherwise None
+        """
+        samples = TimeoutSampler(
+            wait_timeout=API_TIMEOUT,
+            sleep=LOOP_SLEEP_TIME_SEC,
+            func=lambda: getattr(self.instance, parent, None),
+            exceptions=NotFoundError,
+        )
+        for sample in samples:
+            if sample:
+                return sample.get(key)
+
+    @property
+    def uuid(self):
+        """
+        Return UUID string from resource instance
+        """
+        return self._wait_for_instance_key(parent="status", key="uuid")
+
+    @property
+    def suuid(self):
+        """
+        Return (short)UUID string from resource instance
+        """
+        return self._wait_for_instance_key(parent="status", key="suuid")
+
+    @property
+    def workload_kind(self):
+        """
+        Retrieve the value of spec.workload.args.kind
+
+        Not all Benchmarks have a 'kind' defined, this was added for vms. The default is 'pod'
+
+        Returns:
+            string value representing workload kind
+
+        """
+        return self.workload_arg(arg="kind", default="pod")
+
+    def workload_arg(self, arg, default=None):
+        """
+        Retrieve the value of spec.workload.args[arg]
+
+        To provide a similar usage as .get(), a default can be defined if needed.
+
+        Args:
+            arg (str): Argument to retrieve from spec.workload.args
+            default (any): Default value to return if arg is not found in workload args
+        Returns:
+            value of workload arg or default if does not exist
+        """
+        workload = self._wait_for_instance_key(parent="spec", key="workload")
+        if workload:
+            return workload.get("args", {}).get(arg, default)
+        return default
