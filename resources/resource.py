@@ -219,6 +219,7 @@ class Resource(object):
         DELETING = "Deleting"
         DEPLOYED = "Deployed"
         PENDING = "Pending"
+        COMPLETED = "Completed"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
