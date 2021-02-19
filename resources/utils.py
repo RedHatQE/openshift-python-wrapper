@@ -40,6 +40,7 @@ class TimeoutSampler:
         self.elapsed_time = None
 
     def __iter__(self):
+        last_exception_log = None
         timeout_watch = TimeoutWatch(timeout=self.timeout)
         func_log = (
             f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
@@ -56,7 +57,11 @@ class TimeoutSampler:
 
             except self.exception as exp:
                 self.elapsed_time = None
-                last_exception_log = f"Last exception: {exp.__class__.__name__}: {exp}"
+                exp_name = exp.__class__.__name__
+                #  timeout_watch.remaining_time() (line 54) raise TimeoutExpiredError.
+                #  TimeoutExpiredError shouldn't be the last exception for log.
+                if exp_name != TimeoutExpiredError.__name__:
+                    last_exception_log = f"Last exception: {exp_name}: {exp}"
 
                 _ = timeout_watch.remaining_time(
                     log="{timeout}\n{func_log}\n{last_exception_log}".format(
