@@ -50,7 +50,7 @@ class Migration(NamespacedResource):
         )
         return res
 
-    def wait_for_ready(self, timeout=None):
+    def wait_for_ready(self, timeout=600):
         wait_for_mtv_resource_status(
             mtv_resource=self,
             timeout=timeout,
