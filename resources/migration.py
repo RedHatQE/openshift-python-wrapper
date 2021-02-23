@@ -50,24 +50,11 @@ class Migration(NamespacedResource):
         )
         return res
 
-    def wait_for_done(self):
-        self.wait_for_status()
-
-    def wait_for_status(
-        self,
-        timeout=600,
-        condition_message=StatusConditions.MESSAGE.READY,
-        condition_status=NamespacedResource.Condition.Status.TRUE,
-        condition_type=NamespacedResource.Condition.READY,
-        condition_reason=None,
-        condition_category=None,
-    ):
+    def wait_for_ready(self, timeout=None):
         wait_for_mtv_resource_status(
             mtv_resource=self,
             timeout=timeout,
-            condition_message=condition_message,
-            condition_status=condition_status,
-            condition_type=condition_type,
-            condition_reason=condition_reason,
-            condition_category=condition_category,
+            condition_message=self.StatusConditions.MESSAGE.READY,
+            condition_status=NamespacedResource.Condition.Status.TRUE,
+            condition_type=NamespacedResource.Condition.READY,
         )

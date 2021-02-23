@@ -143,8 +143,6 @@ def wait_for_mtv_resource_status(
                     current_conditions = sample_status.conditions
                     for condition in current_conditions:
                         last_condition = condition
-                        if True:
-                            return
                         if (
                             condition.type == condition_type
                             and condition.status == condition_status

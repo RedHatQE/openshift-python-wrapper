@@ -16,7 +16,12 @@ class Plan(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     class StatusCondition:
-        READY = "The migration plan is ready."
+        class Message:
+            READY = "The migration plan is ready."
+            SUCCEEDED = "The plan execution has SUCCEEDED."
+
+        class Type:
+            SUCCEEDED = "Succeeded"
 
     def __init__(
         self,
@@ -28,6 +33,7 @@ class Plan(NamespacedResource):
         source_provider_namespace,
         migration_map,
         vms,
+        target_namespace=None,
         client=None,
         teardown=True,
     ):
@@ -40,6 +46,7 @@ class Plan(NamespacedResource):
         self.destination_provider_namespace = destination_provider_namespace
         self.migration_map = migration_map
         self.vms = vms
+        self.target_namespace = target_namespace
 
     def to_dict(self):
         res = super()._base_body()
@@ -48,6 +55,7 @@ class Plan(NamespacedResource):
                 "spec": {
                     "map": self.migration_map,
                     "vms": self.vms,
+                    "targetNamespace": self.target_namespace,
                     "provider": {
                         "source": {
                             "name": self.source_provider_name,
@@ -63,24 +71,20 @@ class Plan(NamespacedResource):
         )
         return res
 
-    def wait_for_done(self):
-        self.wait_for_status()
-
-    def wait_for_status(
-        self,
-        timeout=600,
-        condition_message=StatusCondition.READY,
-        condition_status=NamespacedResource.Condition.Status.TRUE,
-        condition_type=NamespacedResource.Condition.READY,
-        condition_reason=None,
-        condition_category=None,
-    ):
+    def wait_for_ready(self, timeout=600):
         wait_for_mtv_resource_status(
             mtv_resource=self,
             timeout=timeout,
-            condition_message=condition_message,
-            condition_status=condition_status,
-            condition_type=condition_type,
-            condition_reason=condition_reason,
-            condition_category=condition_category,
+            condition_message=self.StatusCondition.Message.READY,
+            condition_status=NamespacedResource.Condition.Status.TRUE,
+            condition_type=NamespacedResource.Condition.READY,
+        )
+
+    def wait_for_succeeded(self, timeout=600):
+        wait_for_mtv_resource_status(
+            mtv_resource=self,
+            timeout=timeout,
+            condition_message=self.StatusCondition.Message.SUCCEEDED,
+            condition_status=NamespacedResource.Condition.Status.TRUE,
+            condition_type=self.StatusCondition.Type.SUCCEEDED,
         )
