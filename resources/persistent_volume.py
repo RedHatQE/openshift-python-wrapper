@@ -10,6 +10,9 @@ class PersistentVolume(Resource):
 
     api_version = Resource.ApiVersion.V1
 
+    class Status(Resource.Status):
+        RELEASED = "Released"
+
     @property
     def max_available_pvs(self):
         """
