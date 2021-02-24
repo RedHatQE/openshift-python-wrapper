@@ -7,7 +7,7 @@ from distutils.version import Version
 import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import NotFoundError
+from openshift.dynamic.exceptions import InternalServerError, NotFoundError
 from urllib3.exceptions import ProtocolError
 
 from resources.utils import TimeoutExpiredError, TimeoutSampler
@@ -595,6 +595,18 @@ class Resource(object):
             namespace=self.namespace,
         )
 
+    @staticmethod
+    def _retry_etcd_changed(func):
+        sampler = TimeoutSampler(
+            timeout=10,
+            sleep=1,
+            func=func,
+            exceptions=InternalServerError,
+            exec_msg="etcdserver: leader changed",
+        )
+        for sample in sampler:
+            return sample
+
     @classmethod
     def get(cls, dyn_client, singular_name=None, *args, **kwargs):
         """
@@ -607,14 +619,18 @@ class Resource(object):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        _resources = cls._prepare_resources(
-            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
-        )
-        try:
-            for resource_field in _resources.items:
-                yield cls(client=dyn_client, name=resource_field.metadata.name)
-        except TypeError:
-            yield cls(client=dyn_client, name=_resources.metadata.name)
+
+        def _get():
+            _resources = cls._prepare_resources(
+                dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
+            )
+            try:
+                for resource_field in _resources.items:
+                    yield cls(client=dyn_client, name=resource_field.metadata.name)
+            except TypeError:
+                yield cls(client=dyn_client, name=_resources.metadata.name)
+
+        return Resource._retry_etcd_changed(func=_get)
 
     @property
     def instance(self):
@@ -624,7 +640,11 @@ class Resource(object):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api().get(name=self.name)
+
+        def _instance():
+            return self.api().get(name=self.name)
+
+        return self._retry_etcd_changed(func=_instance)
 
     @property
     def labels(self):
