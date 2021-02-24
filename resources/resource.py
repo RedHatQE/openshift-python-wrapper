@@ -602,7 +602,7 @@ class Resource(object):
             sleep=1,
             func=func,
             exceptions=InternalServerError,
-            exec_msg="etcdserver: leader changed",
+            exceptions_msg="etcdserver: leader changed",
         )
         for sample in sampler:
             return sample

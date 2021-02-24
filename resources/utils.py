@@ -34,7 +34,7 @@ class TimeoutSampler:
         sleep,
         func,
         exceptions=None,
-        exec_msg=None,
+        exceptions_msg=None,
         *func_args,
         **func_kwargs,
     ):
@@ -45,7 +45,7 @@ class TimeoutSampler:
         self.func_kwargs = func_kwargs
         self.exception = exceptions if exceptions else Exception
         self.elapsed_time = None
-        self.exec_msg = exec_msg
+        self.exceptions_msg = exceptions_msg
 
     def __iter__(self):
         last_exception_log = None
@@ -78,12 +78,12 @@ class TimeoutSampler:
                     last_exception_log=last_exception_log,
                 )
 
-                if self.exec_msg:
-                    if self.exec_msg not in str(exp):
+                if self.exceptions_msg:
+                    if self.exceptions_msg not in str(exp):
                         LOGGER.error(log)
                         raise
                     else:
-                        LOGGER.warning(f"{self.exec_msg}: Retrying")
+                        LOGGER.warning(f"{self.exceptions_msg}: Retrying")
 
                 self.elapsed_time = None
                 timeout_watch.remaining_time(log=log)
