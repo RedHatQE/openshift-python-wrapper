@@ -36,6 +36,7 @@ fcfn_exclude_functions =
     check_output,
     sub_resource_level,
     func,
+    error,
 
 enable-extensions =
     FCFN,

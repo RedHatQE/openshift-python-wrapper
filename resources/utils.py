@@ -35,6 +35,7 @@ class TimeoutSampler:
         func,
         exceptions=None,
         exceptions_msg=None,
+        print_log=True,
         *func_args,
         **func_kwargs,
     ):
@@ -46,52 +47,62 @@ class TimeoutSampler:
         self.exception = exceptions if exceptions else Exception
         self.elapsed_time = None
         self.exceptions_msg = exceptions_msg
+        self.print_log = print_log
+        self.last_exception_log = None
 
-    def __iter__(self):
-        last_exception_log = None
-        timeout_watch = TimeoutWatch(timeout=self.timeout)
-        func_log = (
+    def _func_log(self):
+        return (
             f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
         )
-        LOGGER.info(
-            f"Waiting for {self.timeout} seconds, retry every {self.sleep} seconds"
-        )
+
+    def __iter__(self):
+        timeout_watch = TimeoutWatch(timeout=self.timeout)
+        if self.print_log:
+            LOGGER.info(
+                f"Waiting for {self.timeout} seconds, retry every {self.sleep} seconds"
+            )
+
         while True:
             try:
                 self.elapsed_time = self.timeout - timeout_watch.remaining_time(
-                    log=func_log
+                    log=self._func_log if self.print_log else None
                 )
                 yield self.func(*self.func_args, **self.func_kwargs)
                 self.elapsed_time = None
                 time.sleep(self.sleep)
 
             except self.exception as exp:
-                exp_name = exp.__class__.__name__
-                #  timeout_watch.remaining_time() (line 54) raise TimeoutExpiredError.
-                #  TimeoutExpiredError shouldn't be the last exception for log.
-                if exp_name != TimeoutExpiredError.__name__:
-                    last_exception_log = f"Last exception: {exp_name}: {exp}"
-
-                log = "{timeout}\n{func_log}\n{last_exception_log}".format(
-                    timeout=self.timeout,
-                    func_log=func_log,
-                    last_exception_log=last_exception_log,
-                )
-
-                if self.exceptions_msg:
-                    if self.exceptions_msg not in str(exp):
-                        LOGGER.error(log)
-                        raise
-                    else:
-                        LOGGER.warning(f"{self.exceptions_msg}: Retrying")
-
+                log = self._process_execution(exp=exp)
                 self.elapsed_time = None
                 timeout_watch.remaining_time(log=log)
+
                 time.sleep(self.sleep)
 
             finally:
-                if self.elapsed_time:
+                if self.elapsed_time and self.print_log:
                     LOGGER.info(f"Elapsed time: {self.elapsed_time}")
+
+    def _process_execution(self, exp):
+        exp_name = exp.__class__.__name__
+        #  timeout_watch.remaining_time() (line 67) raise TimeoutExpiredError.
+        #  TimeoutExpiredError shouldn't be the last exception for log.
+        if exp_name != TimeoutExpiredError.__name__:
+            self.last_exception_log = f"Last exception: {exp_name}: {exp}"
+
+        log = "{timeout}\n{func_log}\n{last_exception_log}".format(
+            timeout=self.timeout,
+            func_log=self._func_log,
+            last_exception_log=self.last_exception_log,
+        )
+
+        if self.exceptions_msg:
+            if self.exceptions_msg not in str(exp):
+                LOGGER.error(log)
+                raise
+            else:
+                LOGGER.warning(f"{self.exceptions_msg}: Retrying")
+
+        return log
 
 
 class TimeoutWatch:
