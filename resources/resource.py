@@ -411,7 +411,7 @@ class Resource(object):
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=sleep,
             exceptions=(ProtocolError, NotFoundError),
             func=lambda: self.exists,
@@ -459,7 +459,9 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        samples = TimeoutSampler(timeout=timeout, sleep=1, func=lambda: self.exists)
+        samples = TimeoutSampler(
+            wait_timeout=timeout, sleep=1, func=lambda: self.exists
+        )
         try:
             for sample in samples:
                 if not sample:
@@ -482,7 +484,7 @@ class Resource(object):
         stop_status = stop_status if stop_status else self.Status.FAILED
         LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=sleep,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -598,7 +600,7 @@ class Resource(object):
     @staticmethod
     def _retry_etcd_changed(func):
         sampler = TimeoutSampler(
-            timeout=10,
+            wait_timeout=10,
             sleep=1,
             func=func,
             exceptions=InternalServerError,
@@ -673,7 +675,7 @@ class Resource(object):
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -719,7 +721,7 @@ class Resource(object):
 
     def wait_for_conditions(self):
         samples = TimeoutSampler(
-            timeout=30, sleep=1, func=lambda: self.instance.status.conditions
+            wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
         )
         for sample in samples:
             if sample:

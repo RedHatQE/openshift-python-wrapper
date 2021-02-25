@@ -34,7 +34,9 @@ class SriovNetworkNodeState(NamespacedResource):
         LOGGER.info(f"Wait for {self.kind} {self.name} status to be {wanted_status}")
         try:
             for sample in TimeoutSampler(
-                timeout=timeout, sleep=3, func=lambda: self.instance.status.syncStatus
+                wait_timeout=timeout,
+                sleep=3,
+                func=lambda: self.instance.status.syncStatus,
             ):
                 if sample == wanted_status:
                     return

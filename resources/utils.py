@@ -30,7 +30,7 @@ class TimeoutSampler:
 
     def __init__(
         self,
-        timeout,
+        wait_timeout,
         sleep,
         func,
         exceptions=None,
@@ -39,7 +39,7 @@ class TimeoutSampler:
         *func_args,
         **func_kwargs,
     ):
-        self.timeout = timeout
+        self.wait_timeout = wait_timeout
         self.sleep = sleep
         self.func = func
         self.func_args = func_args
@@ -56,15 +56,15 @@ class TimeoutSampler:
         )
 
     def __iter__(self):
-        timeout_watch = TimeoutWatch(timeout=self.timeout)
+        timeout_watch = TimeoutWatch(timeout=self.wait_timeout)
         if self.print_log:
             LOGGER.info(
-                f"Waiting for {self.timeout} seconds, retry every {self.sleep} seconds"
+                f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
             )
 
         while True:
             try:
-                self.elapsed_time = self.timeout - timeout_watch.remaining_time(
+                self.elapsed_time = self.wait_timeout - timeout_watch.remaining_time(
                     log=self._func_log if self.print_log else None
                 )
                 yield self.func(*self.func_args, **self.func_kwargs)
@@ -90,7 +90,7 @@ class TimeoutSampler:
             self.last_exception_log = f"Last exception: {exp_name}: {exp}"
 
         log = "{timeout}\n{func_log}\n{last_exception_log}".format(
-            timeout=self.timeout,
+            timeout=self.wait_timeout,
             func_log=self._func_log,
             last_exception_log=self.last_exception_log,
         )
