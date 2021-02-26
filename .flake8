@@ -16,7 +16,6 @@ fcfn_exclude_functions =
     get,
     appens,
     next,
-    info,
     setdefault,
     dumps,
     request,
@@ -36,7 +35,7 @@ fcfn_exclude_functions =
     check_output,
     sub_resource_level,
     func,
-    error,
+    LOGGER,
 
 enable-extensions =
     FCFN,
