@@ -72,7 +72,7 @@ class Pod(NamespacedResource):
         """
         LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
         resp = kubernetes.stream.stream(
-            func=self._kube_api.connect_get_namespaced_pod_exec,
+            api_method=self._kube_api.connect_get_namespaced_pod_exec,
             name=self.name,
             namespace=self.namespace,
             command=command,
