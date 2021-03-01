@@ -11,7 +11,15 @@ class Provider(NamespacedResource):
     """
     Provider object.
     Used to define A Source Or Destination Provider Such as Vsphere and OCP.
+    https://github.com/konveyor/forklift-controller/tree/main/config/crds
     """
+
+    class ProviderTypes:
+        VSPHERE = "vsphere"
+
+    class StatusConditions:
+        class MESSAGE:
+            READY = "The provider is ready."
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
@@ -51,21 +59,11 @@ class Provider(NamespacedResource):
 
         return res
 
-    def wait_for_status(
-        self,
-        timeout=600,
-        condition_message=NamespacedResource.Message.PROVIDER_READY,
-        condition_status=NamespacedResource.Condition.Status.TRUE,
-        condition_type=NamespacedResource.Condition.READY,
-        condition_reason=None,
-        condition_category=None,
-    ):
+    def wait_for_ready(self, timeout=600):
         wait_for_mtv_resource_status(
             mtv_resource=self,
             timeout=timeout,
-            condition_message=condition_message,
-            condition_status=condition_status,
-            condition_type=condition_type,
-            condition_reason=condition_reason,
-            condition_category=condition_category,
+            condition_message=self.StatusConditions.MESSAGE.READY,
+            condition_status=NamespacedResource.Condition.Status.TRUE,
+            condition_type=NamespacedResource.Condition.READY,
         )
