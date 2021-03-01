@@ -56,7 +56,7 @@ class VirtualMachineRestore(NamespacedResource):
         )
 
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=lambda: self.instance.get("status", {}).get("complete", None)

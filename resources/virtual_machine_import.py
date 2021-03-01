@@ -205,7 +205,7 @@ class VirtualMachineImport(NamespacedResource):
             f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}"
         )
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,

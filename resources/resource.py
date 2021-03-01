@@ -7,7 +7,7 @@ from distutils.version import Version
 import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import NotFoundError
+from openshift.dynamic.exceptions import InternalServerError, NotFoundError
 from urllib3.exceptions import ProtocolError
 
 from resources.utils import TimeoutExpiredError, TimeoutSampler
@@ -411,7 +411,7 @@ class Resource(object):
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=sleep,
             exceptions=(ProtocolError, NotFoundError),
             func=lambda: self.exists,
@@ -459,7 +459,9 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        samples = TimeoutSampler(timeout=timeout, sleep=1, func=lambda: self.exists)
+        samples = TimeoutSampler(
+            wait_timeout=timeout, sleep=1, func=lambda: self.exists
+        )
         try:
             for sample in samples:
                 if not sample:
@@ -482,7 +484,7 @@ class Resource(object):
         stop_status = stop_status if stop_status else self.Status.FAILED
         LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=sleep,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -595,6 +597,19 @@ class Resource(object):
             namespace=self.namespace,
         )
 
+    @staticmethod
+    def _retry_etcd_changed(func):
+        sampler = TimeoutSampler(
+            wait_timeout=10,
+            sleep=1,
+            func=func,
+            exceptions=InternalServerError,
+            exceptions_msg="etcdserver: leader changed",
+            print_log=False,
+        )
+        for sample in sampler:
+            return sample
+
     @classmethod
     def get(cls, dyn_client, singular_name=None, *args, **kwargs):
         """
@@ -607,14 +622,18 @@ class Resource(object):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        _resources = cls._prepare_resources(
-            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
-        )
-        try:
-            for resource_field in _resources.items:
-                yield cls(client=dyn_client, name=resource_field.metadata.name)
-        except TypeError:
-            yield cls(client=dyn_client, name=_resources.metadata.name)
+
+        def _get():
+            _resources = cls._prepare_resources(
+                dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
+            )
+            try:
+                for resource_field in _resources.items:
+                    yield cls(client=dyn_client, name=resource_field.metadata.name)
+            except TypeError:
+                yield cls(client=dyn_client, name=_resources.metadata.name)
+
+        return Resource._retry_etcd_changed(func=_get)
 
     @property
     def instance(self):
@@ -624,7 +643,11 @@ class Resource(object):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api().get(name=self.name)
+
+        def _instance():
+            return self.api().get(name=self.name)
+
+        return self._retry_etcd_changed(func=_instance)
 
     @property
     def labels(self):
@@ -652,7 +675,7 @@ class Resource(object):
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -698,7 +721,7 @@ class Resource(object):
 
     def wait_for_conditions(self):
         samples = TimeoutSampler(
-            timeout=30, sleep=1, func=lambda: self.instance.status.conditions
+            wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
         )
         for sample in samples:
             if sample:

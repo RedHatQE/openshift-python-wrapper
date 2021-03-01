@@ -46,7 +46,7 @@ class Deployment(NamespacedResource):
         """
         LOGGER.info(f"Wait for {self.kind} {self.name} to be deployed: {deployed}")
         samples = TimeoutSampler(
-            timeout=timeout,
+            wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
             func=self.api().get,
