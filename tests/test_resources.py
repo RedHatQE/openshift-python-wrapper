@@ -2,9 +2,9 @@ import kubernetes
 import pytest
 from openshift.dynamic import DynamicClient
 
-from resources.namespace import Namespace
-from resources.pod import Pod
-from resources.virtual_machine import VirtualMachine
+from ocp_resources.namespace import Namespace
+from ocp_resources.pod import Pod
+from ocp_resources.virtual_machine import VirtualMachine
 from tests.utils import generate_yaml_from_template
 
 
