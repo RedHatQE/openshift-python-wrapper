@@ -48,33 +48,31 @@ class TimeoutSampler:
         self.elapsed_time = None
         self.exceptions_msg = exceptions_msg
         self.print_log = print_log
-        self.last_exception_log = None
 
+    @property
     def _func_log(self):
         return (
             f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
         )
 
     def __iter__(self):
+        last_exp = None
         timeout_watch = TimeoutWatch(timeout=self.wait_timeout)
         if self.print_log:
             LOGGER.info(
                 f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
             )
 
-        while True:
+        while timeout_watch.remaining_time() > 0:
             try:
-                self.elapsed_time = self.wait_timeout - timeout_watch.remaining_time(
-                    log=self._func_log if self.print_log else None
-                )
+                self.elapsed_time = self.wait_timeout - timeout_watch.remaining_time()
                 yield self.func(*self.func_args, **self.func_kwargs)
                 self.elapsed_time = None
                 time.sleep(self.sleep)
 
             except self.exception as exp:
-                log = self._process_execution(exp=exp)
+                last_exp = exp
                 self.elapsed_time = None
-                timeout_watch.remaining_time(log=log)
 
                 time.sleep(self.sleep)
 
@@ -82,23 +80,24 @@ class TimeoutSampler:
                 if self.elapsed_time and self.print_log:
                     LOGGER.info(f"Elapsed time: {self.elapsed_time}")
 
-    def _process_execution(self, exp):
-        exp_name = exp.__class__.__name__
-        #  timeout_watch.remaining_time() (line 67) raise TimeoutExpiredError.
-        #  TimeoutExpiredError shouldn't be the last exception for log.
+        raise TimeoutExpiredError(self._process_execution(exp=last_exp))
+
+    def _process_execution(self, exp=None):
+        last_exception_log = None
+        exp_name = exp.__class__.__name__ if exp else "N/A"
         if exp_name != TimeoutExpiredError.__name__:
-            self.last_exception_log = f"Last exception: {exp_name}: {exp}"
+            last_exception_log = f"Last exception: {exp_name}: {exp}"
 
         log = "{timeout}\n{func_log}\n{last_exception_log}".format(
             timeout=self.wait_timeout,
             func_log=self._func_log,
-            last_exception_log=self.last_exception_log,
+            last_exception_log=last_exception_log,
         )
 
         if self.exceptions_msg:
             if self.exceptions_msg not in str(exp):
                 LOGGER.error(log)
-                raise
+                raise exp
             else:
                 LOGGER.warning(f"{self.exceptions_msg}: Retrying")
 
@@ -119,11 +118,7 @@ class TimeoutWatch:
         """
         Return the remaining part of timeout since the object was created.
         """
-        new_timeout = self.start_time + self.timeout - time.time()
-        if new_timeout > 0:
-            return new_timeout
-
-        raise TimeoutExpiredError(log or self.timeout)
+        return self.start_time + self.timeout - time.time()
 
 
 # TODO: remove the nudge when the underlying issue with namespaces stuck in
