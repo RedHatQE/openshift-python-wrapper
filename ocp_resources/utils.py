@@ -44,7 +44,7 @@ class TimeoutSampler:
         self.func = func
         self.func_args = func_args
         self.func_kwargs = func_kwargs
-        self.exception = exceptions if exceptions else Exception
+        self.exception = exceptions or Exception
         self.elapsed_time = None
         self.exceptions_msg = exceptions_msg
         self.print_log = print_log
