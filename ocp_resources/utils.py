@@ -83,10 +83,8 @@ class TimeoutSampler:
         raise TimeoutExpiredError(self._process_execution(exp=last_exp))
 
     def _process_execution(self, exp=None):
-        last_exception_log = None
         exp_name = exp.__class__.__name__ if exp else "N/A"
-        if exp_name != TimeoutExpiredError.__name__:
-            last_exception_log = f"Last exception: {exp_name}: {exp}"
+        last_exception_log = f"Last exception: {exp_name}: {exp}"
 
         log = "{timeout}\n{func_log}\n{last_exception_log}".format(
             timeout=self.wait_timeout,
