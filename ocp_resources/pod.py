@@ -70,6 +70,8 @@ class Pod(NamespacedResource):
         Raises:
             ExecOnPodError: If the command failed.
         """
+        error_channel = {}
+        stream_closed_error = "stream resp is closed"
         LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
         resp = kubernetes.stream.stream(
             api_method=self._kube_api.connect_get_namespaced_pod_exec,
@@ -94,13 +96,16 @@ class Pod(NamespacedResource):
                 break
             except json.decoder.JSONDecodeError:
                 # Check remaining time, in order to throw exception
-                # if reamining time reached zero
-                _ = timeout_watch.remaining_time()
+                # if remaining time reached zero
+                if timeout_watch.remaining_time() <= 0:
+                    raise ExecOnPodError(
+                        command=command, rc=-1, out="", err=stream_closed_error
+                    )
 
         rcstring = error_channel.get("status")
         if rcstring is None:
             raise ExecOnPodError(
-                command=command, rc=-1, out="", err="stream resp is closed"
+                command=command, rc=-1, out="", err=stream_closed_error
             )
 
         stdout = resp.read_stdout(timeout=5)
