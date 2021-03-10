@@ -6,7 +6,7 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 LOGGER = logging.getLogger(__name__)
 
 
-def _wait_for_resource_status(
+def wait_for_resource_status(
     mtv_resource,
     condition_status,
     condition_type,
