@@ -107,6 +107,8 @@ class VirtualMachineImport(NamespacedResource):
         provider_mappings=None,
         resource_mapping_name=None,
         resource_mapping_namespace=None,
+        warm=False,
+        finalize_date=None,
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
@@ -125,6 +127,8 @@ class VirtualMachineImport(NamespacedResource):
         self.resource_mapping_name = resource_mapping_name
         self.resource_mapping_namespace = resource_mapping_namespace
         self.provider_type = provider_type
+        self.warm = warm
+        self.finalize_date = finalize_date
 
     @property
     def vm(self):
@@ -154,6 +158,13 @@ class VirtualMachineImport(NamespacedResource):
 
         if self.start_vm is not None:
             spec["startVm"] = self.start_vm
+
+        if self.warm:
+            spec["warm"] = self.warm
+        if self.finalize_date:
+            spec["finalizeDate"] = self.finalize_date.strftime(
+                format="%Y-%m-%dT%H:%M:%SZ"
+            )
 
         provider_source = spec.setdefault("source", {}).setdefault(
             self.provider_type, {}
