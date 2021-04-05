@@ -234,6 +234,14 @@ class Resource(object):
             FALSE = "False"
             UNKNOWN = "Unknown"
 
+        class Phase:
+            INSTALL_READY = "InstallReady"
+            SUCCEEDED = "Succeeded"
+
+        class Reason:
+            ALL_REQUIREMENTS_MET = "AllRequirementsMet"
+            INSTALL_SUCCEEDED = "InstallSucceeded"
+
     class Interface:
         class State:
             UP = "up"
