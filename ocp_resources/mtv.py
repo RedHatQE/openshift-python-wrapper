@@ -84,3 +84,66 @@ class MTV(abc.ABC, NamespacedResource):
                 msg=f"Last Status Conditions of {self.kind} {self.name} were: {last_condition}"
             )
             raise
+
+
+class Provider(MTV):
+    """
+    Provider object.
+    Used to define A Source Or A Destination Provider Such as Vsphere and OpenShift Virtualization.
+    """
+
+    class StatusConditions:
+        class CATEGORY:
+            REQUIRED = "Required"
+
+        class MESSAGE:
+            READY = "The provider is ready."
+
+    class ProviderType:
+        VSPHERE = "vsphere"
+
+    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
+
+    def __init__(
+        self,
+        name,
+        namespace,
+        provider_type,
+        url,
+        secret_name,
+        secret_namespace,
+        type,
+        client=None,
+        teardown=True,
+    ):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+        self.provider_type = provider_type
+        self.url = url
+        self.secret_name = secret_name
+        self.secret_namespace = secret_namespace
+        self.type = type
+
+    def to_dict(self):
+        res = super()._base_body()
+        res.update(
+            {
+                "spec": {
+                    "type": self.type,
+                    "url": self.url,
+                    "secret": {
+                        "name": self.secret_name,
+                        "namespace": self.secret_namespace,
+                    },
+                }
+            }
+        )
+
+        return res
+
+    def wait_for_ready(self):
+        self.wait_for_resource_status(
+            condition_message=Provider.StatusConditions.MESSAGE.READY,
+            condition_status=NamespacedResource.Condition.Status.TRUE,
+        )
