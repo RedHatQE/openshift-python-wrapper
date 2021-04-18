@@ -1,19 +1,13 @@
 import abc
 
-from ocp_resources import resource
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import LOGGER, TimeoutExpiredError, TimeoutSampler
 
 
-class MTV(abc.ABC, NamespacedResource):
+class MTV(abc.ABC):
     """
     Abstract Class for all Migration ToolKit For Virtualization Resources.
     """
-
-    # the super returns this MTV class name and not the inheriting runtime class as required.
-    @resource.classproperty
-    def kind(cls):
-        return cls.__name__
 
     def __init__(self, name, namespace, client, teardown=600):
         super().__init__(
@@ -86,7 +80,7 @@ class MTV(abc.ABC, NamespacedResource):
             raise
 
 
-class Provider(MTV):
+class Provider(MTV, NamespacedResource):
     """
     Provider object.
     Used to define A Source Or A Destination Provider Such as Vsphere and OpenShift Virtualization.
@@ -112,7 +106,6 @@ class Provider(MTV):
         url,
         secret_name,
         secret_namespace,
-        type,
         client=None,
         teardown=True,
     ):
@@ -123,14 +116,13 @@ class Provider(MTV):
         self.url = url
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
-        self.type = type
 
     def to_dict(self):
         res = super()._base_body()
         res.update(
             {
                 "spec": {
-                    "type": self.type,
+                    "type": self.provider_type,
                     "url": self.url,
                     "secret": {
                         "name": self.secret_name,
