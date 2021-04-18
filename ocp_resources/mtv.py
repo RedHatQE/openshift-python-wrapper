@@ -60,7 +60,10 @@ class MTV(abc.ABC, NamespacedResource):
                                     condition.type == condition_type
                                     or condition_type is None
                                 )
-                                and condition.status == condition_status
+                                and (
+                                    condition.status == condition_status
+                                    or condition.status is None
+                                )
                                 and (
                                     condition.message == condition_message
                                     or condition_message is None
