@@ -20,7 +20,7 @@ class MTV(abc.ABC, NamespacedResource):
             name=name, namespace=namespace, client=client, teardown=teardown
         )
 
-    def _wait_for_resource_status(
+    def wait_for_resource_status(
         self,
         condition_status=None,
         condition_type=None,
