@@ -1,4 +1,4 @@
-rom ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import LOGGER, TimeoutExpiredError, TimeoutSampler
 
 
@@ -56,7 +56,8 @@ class MTV:
                 if current_conditions:
                     for condition in current_conditions:
                         last_condition = condition
-                        if (condition_status  in [condition.status, "any"]
+                        if (
+                            condition_status in [condition.status, "any"]
                             and condition_type in [condition.type, "any"]
                             and condition_message in [condition.message, "any"]
                             and condition_reason in [condition.reason, "any"]
@@ -69,6 +70,7 @@ class MTV:
                 msg=f"Last Status Conditions of {self.kind} {self.name} were: {last_condition}"
             )
             raise
+
 
 class Provider(NamespacedResource, MTV):
     """
