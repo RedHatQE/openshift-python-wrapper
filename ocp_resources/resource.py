@@ -255,6 +255,7 @@ class Resource(object):
         APPS = "apps"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
+        FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
