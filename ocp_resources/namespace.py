@@ -1,7 +1,7 @@
 import logging
 
 from ocp_resources.resource import Resource
-from ocp_resources.utils import nudge_delete
+from ocp_resources.utils import TimeoutExpiredError, nudge_delete
 
 
 LOGGER = logging.getLogger(__name__)
@@ -36,8 +36,15 @@ class Namespace(Resource):
             res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
         return res
 
-    # TODO: remove the nudge when the underlying issue with namespaces stuck in
-    # Terminating state is fixed.
-    # Upstream bug: https://github.com/kubernetes/kubernetes/issues/60807
-    def nudge_delete(self):
-        nudge_delete(name=self.name)
+    def client_wait_deleted(self, timeout):
+        """
+        client-side Wait until resource is deleted
+
+        Args:
+            timeout (int): Time to wait for the resource.
+
+        """
+        try:
+            super().client_wait_deleted(timeout=timeout)
+        except TimeoutExpiredError:
+            nudge_delete(name=self.name)

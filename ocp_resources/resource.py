@@ -440,13 +440,7 @@ class Resource(object):
             TimeoutExpiredError: If resource still exists.
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
-        return self._client_wait_deleted(timeout=timeout)
-
-    def nudge_delete(self):
-        """
-        Resource specific "nudge delete" action that may help the resource to
-        complete its cleanup. Needed by some resources.
-        """
+        return self.client_wait_deleted(timeout=timeout)
 
     @property
     def exists(self):
@@ -458,7 +452,7 @@ class Resource(object):
         except NotFoundError:
             return None
 
-    def _client_wait_deleted(self, timeout):
+    def client_wait_deleted(self, timeout):
         """
         client-side Wait until resource is deleted
 
@@ -471,12 +465,9 @@ class Resource(object):
         samples = TimeoutSampler(
             wait_timeout=timeout, sleep=1, func=lambda: self.exists
         )
-        try:
-            for sample in samples:
-                if not sample:
-                    return
-        except TimeoutExpiredError:
-            self.nudge_delete()
+        for sample in samples:
+            if not sample:
+                return
 
     def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None, sleep=1):
         """
