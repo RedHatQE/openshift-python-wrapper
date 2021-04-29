@@ -5,7 +5,7 @@ import logging
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.resource import TIMEOUT, NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import get_sample
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -50,13 +50,9 @@ class VirtualMachineSnapshot(NamespacedResource):
             f"Wait for {self.kind} {self.name} status to be {'' if status else 'not '}ready to use"
         )
 
-        samples = TimeoutSampler(
+        get_sample(
             wait_timeout=timeout,
-            sleep=1,
             exceptions=ProtocolError,
             func=lambda: self.instance.get("status", {}).get("readyToUse", None)
             == status,
         )
-        for sample in samples:
-            if sample:
-                return

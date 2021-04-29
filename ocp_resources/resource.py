@@ -10,7 +10,7 @@ from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import InternalServerError, NotFoundError
 from urllib3.exceptions import ProtocolError
 
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, get_sample
 
 
 LOGGER = logging.getLogger(__name__)
@@ -419,15 +419,12 @@ class Resource(object):
             TimeoutExpiredError: If resource not exists.
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
-        samples = TimeoutSampler(
+        get_sample(
             wait_timeout=timeout,
             sleep=sleep,
             exceptions=(ProtocolError, NotFoundError),
             func=lambda: self.exists,
         )
-        for sample in samples:
-            if sample:
-                return
 
     def wait_deleted(self, timeout=TIMEOUT):
         """
@@ -720,12 +717,7 @@ class Resource(object):
             return response.data
 
     def wait_for_conditions(self):
-        samples = TimeoutSampler(
-            wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
-        )
-        for sample in samples:
-            if sample:
-                return
+        get_sample(wait_timeout=30, func=lambda: self.instance.status.conditions)
 
 
 class NamespacedResource(Resource):

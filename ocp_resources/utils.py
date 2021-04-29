@@ -133,3 +133,45 @@ def nudge_delete(name):
         # failure is not the end of the world
         LOGGER.error(f"Error happened while nudging namespace {name}: {exp}")
         raise
+
+
+def get_sample(
+    func,
+    wait_timeout=20,
+    sleep=1,
+    exceptions=None,
+    exceptions_msg=None,
+    exceptions_iter=None,
+    print_log=True,
+    *args,
+    **kwargs,
+):
+    """
+    TimeoutSampler wrapper, returns first sample that equates to True.
+
+    Args:
+        func (function): to be wrapped by TimeoutSampler
+        wait_timeout (int): Time in seconds to wait for func to return a value equating to True
+        sleep (int): Time in seconds between calls to func
+        exceptions (tuple): Tuple containing all retry exceptions to pass to TimeoutSampler
+        exceptions_msg (str): String to match exception against
+        exceptions_iter (tuple): Tuple containing tuples of (exception, exceptoin_msg)
+        print_log (bool): Print elapsed time to log
+
+    Returns:
+        First sample that equates to True
+
+    """
+    for sample in TimeoutSampler(
+        wait_timeout=wait_timeout,
+        sleep=sleep,
+        func=func,
+        *args,
+        exceptions=exceptions,
+        exceptions_msg=exceptions_msg,
+        exceptions_iter=exceptions_iter,
+        print_log=print_log,
+        **kwargs,
+    ):
+        if sample:
+            return sample

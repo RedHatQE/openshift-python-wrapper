@@ -4,7 +4,7 @@ import time
 from openshift.dynamic.exceptions import ConflictError
 
 from ocp_resources.resource import Resource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import TimeoutSampler, get_sample
 
 
 LOGGER = logging.getLogger(__name__)
@@ -73,12 +73,7 @@ class NodeNetworkState(Resource):
             return None
 
         LOGGER.info(f"Checking if interface {name} is up -- {self.name}")
-        samples = TimeoutSampler(
-            wait_timeout=TIMEOUT, sleep=SLEEP, func=_find_up_interface
-        )
-        for sample in samples:
-            if sample:
-                return
+        get_sample(wait_timeout=TIMEOUT, sleep=SLEEP, func=_find_up_interface)
 
     def wait_until_deleted(self, name):
         LOGGER.info(f"Checking if interface {name} is deleted -- {self.name}")

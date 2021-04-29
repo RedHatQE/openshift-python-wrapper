@@ -6,7 +6,7 @@ import logging
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.resource import TIMEOUT, NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import get_sample
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -55,13 +55,9 @@ class VirtualMachineRestore(NamespacedResource):
             f"Wait for {self.kind} {self.name} status to be complete = {status}"
         )
 
-        samples = TimeoutSampler(
+        get_sample(
             wait_timeout=timeout,
-            sleep=1,
             exceptions=ProtocolError,
             func=lambda: self.instance.get("status", {}).get("complete", None)
             == status,
         )
-        for sample in samples:
-            if sample:
-                return
