@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import time
+from warnings import warn
 
 
 LOGGER = logging.getLogger(__name__)
@@ -26,6 +27,25 @@ class TimeoutSampler:
     Yielding the output allows you to handle every value as you wish.
 
     Feel free to set the instance variables.
+
+    exceptions_dict should be in the following format:
+    {
+        exception0: [exception0_msg0],
+        exception1: [
+            exception1_msg0,
+            exception1_msg1
+        ],
+        exception2: []
+    }
+
+    Args:
+        wait_timeout (int): Time in seconds to wait for func to return a value equating to True
+        sleep (int): Time in seconds between calls to func
+        func (function): to be wrapped by TimeoutSampler
+        exceptions (tuple): Deprecated: Tuple containing all retry exceptions to pass to TimeoutSampler
+        exceptions_msg (str): Deprecated: String to match exception against
+        exceptions_dict (dict): Definition for exception handling
+        print_log (bool): Print elapsed time to log
     """
 
     def __init__(
@@ -33,8 +53,9 @@ class TimeoutSampler:
         wait_timeout,
         sleep,
         func,
-        exceptions=None,
-        exceptions_msg=None,
+        exceptions=None,  # Deprecated
+        exceptions_msg=None,  # Deprecated
+        exceptions_dict=None,
         print_log=True,
         *func_args,
         **func_kwargs,
@@ -44,10 +65,53 @@ class TimeoutSampler:
         self.func = func
         self.func_args = func_args
         self.func_kwargs = func_kwargs
-        self.exception = exceptions or Exception
         self.elapsed_time = None
-        self.exceptions_msg = exceptions_msg
         self.print_log = print_log
+
+        self.exceptions_dict = {}
+        self.exception = None  # TODO: Set when exceptions arg removed
+        self.exceptions_msg = None  # TODO: Remove when exceptions_msg arg removed
+        self._pre_process_exceptions(
+            exceptions=exceptions,
+            exceptions_msg=exceptions_msg,
+            exceptions_dict=exceptions_dict,
+        )
+
+    def _pre_process_exceptions(self, exceptions, exceptions_msg, exceptions_dict):
+        """
+        Process exception input for use within _process_execution()
+
+        TODO: Deprecation: This method should be removed when the 'exceptions' argument is removed from __init__
+
+        Validate exception inputs:
+            exceptions
+            exceptions_msg
+            exceptions_dict
+        """
+
+        if exceptions_dict and (exceptions or exceptions_msg):
+            raise ValueError(
+                "Must specify either exceptions_dict or exceptions/exception_msg, not both"
+            )
+
+        elif exceptions or exceptions_msg:
+            warn(
+                "TimeoutSampler() exception and exception_msg are now deprecated. "
+                "Please update to use exceptions_dict by 2021-MM-DD",
+                DeprecationWarning,
+            )
+
+        if exceptions_dict:
+            self.exceptions_dict.update(exceptions_dict)
+            self.exception = tuple(self.exceptions_dict.keys())
+
+        elif exceptions is None:
+            self.exceptions_dict[Exception] = []
+            self.exception = (Exception,)
+
+        else:
+            self.exception = exceptions
+            self.exceptions_msg = exceptions_msg
 
     @property
     def _func_log(self):
@@ -68,6 +132,7 @@ class TimeoutSampler:
                 self.elapsed_time = self.wait_timeout - timeout_watch.remaining_time()
                 yield self.func(*self.func_args, **self.func_kwargs)
                 self.elapsed_time = None
+
                 time.sleep(self.sleep)
 
             except self.exception as exp:
@@ -82,22 +147,37 @@ class TimeoutSampler:
 
         raise TimeoutExpiredError(self._process_execution(exp=last_exp))
 
-    def _process_execution(self, exp=None):
-        exp_name = exp.__class__.__name__ if exp else "N/A"
-        last_exception_log = f"Last exception: {exp_name}: {exp}"
+    @staticmethod
+    def _check_exp_msgs(msgs, _exp, log):
+        for msg in msgs:
+            if msg in str(_exp):
+                return
 
+        LOGGER.error(log)
+        raise _exp
+
+    def _process_execution(self, exp=None):
+        if exp and hasattr(exp, "__name__"):
+            # Exceptions that inherit from Exception
+            exp_name = exp.__name__
+        elif exp:
+            # Exceptions that inherit from object eg: AttributeError
+            exp_name = exp.__class__.__name__
+        else:
+            exp_name = "N/A"
+
+        last_exception_log = f"Last exception: {exp_name}: {exp}"
         log = "{timeout}\n{func_log}\n{last_exception_log}".format(
             timeout=self.wait_timeout,
             func_log=self._func_log,
             last_exception_log=last_exception_log,
         )
 
-        if self.exceptions_msg:
-            if self.exceptions_msg not in str(exp):
-                LOGGER.error(log)
-                raise exp
-            else:
-                LOGGER.warning(f"{self.exceptions_msg}: Retrying")
+        if exp in self.exceptions_dict:
+            self._check_exp_msgs(msgs=self.exceptions_dict[exp], _exp=exp, log=log)
+        elif self.exceptions_msg:
+            # TODO: Remove this elif when exceptions_msg is no longer an input
+            self._check_exp_msgs(msgs=[self.exceptions_msg], _exp=exp, log=log)
 
         return log
 

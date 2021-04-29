@@ -7,11 +7,22 @@ from distutils.version import Version
 import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import InternalServerError, NotFoundError
+from openshift.dynamic.exceptions import (
+    InternalServerError,
+    NotFoundError,
+    ServerTimeoutError,
+)
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
+
+DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
+    ConnectionAbortedError: None,
+    ConnectionResetError: None,
+    InternalServerError: ["etcdserver: leader changed"],
+    ServerTimeoutError: None,
+}
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
@@ -601,13 +612,12 @@ class Resource(object):
         self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_etcd_changed(func):
+    def _retry_cluster_exceptions(func):
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions=InternalServerError,
-            exceptions_msg="etcdserver: leader changed",
+            exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             print_log=False,
         )
         for sample in sampler:
@@ -636,7 +646,7 @@ class Resource(object):
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource._retry_etcd_changed(func=_get)
+        return Resource._retry_cluster_exceptions(func=_get)
 
     @property
     def instance(self):
@@ -650,7 +660,7 @@ class Resource(object):
         def _instance():
             return self.api().get(name=self.name)
 
-        return self._retry_etcd_changed(func=_instance)
+        return self._retry_cluster_exceptions(func=_instance)
 
     @property
     def labels(self):
