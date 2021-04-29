@@ -2,6 +2,8 @@ import logging
 import subprocess
 import time
 
+from urllib3.exceptions import MaxRetryError
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +28,9 @@ class TimeoutSampler:
     Yielding the output allows you to handle every value as you wish.
 
     Feel free to set the instance variables.
+
+    MaxRetryError handling can be enabled by setting max_retry_enabled=True
+      - will rate-limit sleep time as necessary.
     """
 
     def __init__(
@@ -36,6 +41,7 @@ class TimeoutSampler:
         exceptions=None,
         exceptions_msg=None,
         print_log=True,
+        max_retry_enabled=False,
         *func_args,
         **func_kwargs,
     ):
@@ -48,6 +54,8 @@ class TimeoutSampler:
         self.elapsed_time = None
         self.exceptions_msg = exceptions_msg
         self.print_log = print_log
+        self.max_retry_enabled = max_retry_enabled
+        self.max_retry_sleep_multiplier = 2.0
 
     @property
     def _func_log(self):
@@ -63,16 +71,26 @@ class TimeoutSampler:
                 f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
             )
 
+        max_retry_count = 0
         while timeout_watch.remaining_time() > 0:
             try:
                 self.elapsed_time = self.wait_timeout - timeout_watch.remaining_time()
                 yield self.func(*self.func_args, **self.func_kwargs)
                 self.elapsed_time = None
+
+                if max_retry_count:
+                    max_retry_count -= 1
+                    self.sleep = float(self.sleep) / self.max_retry_sleep_multiplier
+
                 time.sleep(self.sleep)
 
             except self.exception as exp:
                 last_exp = exp
                 self.elapsed_time = None
+
+                if isinstance(exp, MaxRetryError) and self.max_retry_enabled:
+                    max_retry_count += 1
+                    self.sleep = float(self.sleep) * self.max_retry_sleep_multiplier
 
                 time.sleep(self.sleep)
 
