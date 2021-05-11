@@ -61,7 +61,9 @@ class MTV:
         try:
             for sample in samples:
                 current_conditions = (
-                    sample.items[0].status.get("conditions") if sample.items else []
+                    sample.items[0].status.get("conditions")
+                    if sample.items and sample.items[0].status
+                    else []
                 )
                 for condition in current_conditions:
                     last_condition = condition
@@ -69,17 +71,19 @@ class MTV:
                         condition_status == condition.status
                         and condition_type == condition.type
                     ):
-                        if condition_message and condition_message == condition.message:
-                            if condition_type and condition_type == condition.type:
+                        if (
+                            condition_message == condition.message
+                            or condition_status is None
+                        ):
+                            if (
+                                condition.reason == condition.reason
+                                or condition.reason is None
+                            ):
                                 if (
-                                    condition_reason
-                                    and condition.reason == condition.reason
+                                    condition_category == condition.category
+                                    or condition_category is None
                                 ):
-                                    if (
-                                        condition_category
-                                        and condition.reason == condition.category
-                                    ):
-                                        return
+                                    return
 
         except TimeoutExpiredError:
             LOGGER.error(
