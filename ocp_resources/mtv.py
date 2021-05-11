@@ -9,7 +9,11 @@ LOGGER = logging.getLogger(__name__)
 def _get_status_condition_log_message(**status_condition):
     log_msg = "Waiting For: \n"
     for status_condition_name, status_condition in status_condition.items():
-        log_msg += f"{f'{status_condition_name}->{status_condition} ' if status_condition else ''}\n"
+        log_msg += (
+            f"{status_condition_name}->{status_condition} \n"
+            if status_condition
+            else ""
+        )
 
     return log_msg
 
@@ -57,28 +61,25 @@ class MTV:
         try:
             for sample in samples:
                 current_conditions = (
-                    sample.items[0].status.get("conditions") if sample.items else None
+                    sample.items[0].status.get("conditions") if sample.items else []
                 )
-                if current_conditions:
-                    for condition in current_conditions:
-                        last_condition = condition
-                        if (
-                            condition_status == condition.status
-                            and condition_type == condition.type
-                            and (
-                                condition_message == condition.message
-                                or condition_message is None
-                            )
-                            and (
-                                condition_reason == condition.reason
-                                or condition_reason is None
-                            )
-                            and (
-                                condition_category == condition.category
-                                or condition_category is None
-                            )
-                        ):
-                            return
+                for condition in current_conditions:
+                    last_condition = condition
+                    if (
+                        condition_status == condition.status
+                        and condition_type == condition.type
+                    ):
+                        if condition_message and condition_message == condition.message:
+                            if condition_type and condition_type == condition.type:
+                                if (
+                                    condition_reason
+                                    and condition.reason == condition.reason
+                                ):
+                                    if (
+                                        condition_category
+                                        and condition.reason == condition.category
+                                    ):
+                                        return
 
         except TimeoutExpiredError:
             LOGGER.error(
