@@ -847,9 +847,9 @@ class ResourceEditor(object):
                         original=resource.instance.to_dict(),
                         patch=update,
                     )
-
                     # no need to back up if no changes have been made
-                    if backup:
+                    # if action is 'replace' we need to update even if no backup (replace update can be empty )
+                    if backup or self.action == "replace":
                         resource_to_patch.append(resource)
                         self._backups[resource] = backup
                     else:
@@ -957,10 +957,16 @@ class ResourceEditor(object):
                 resource.update(resource_dict=patch)  # update the resource
 
             if action == "replace":
-                if patch.get("metadata", {}).get("resourceVersion"):
-                    patch["metadata"][
-                        "resourceVersion"
-                    ] = resource.instance.metadata.resourceVersion
+                if "metadata" not in patch:
+                    patch["metadata"] = {}
+
+                patch["metadata"]["name"] = resource.name
+                patch["metadata"]["namespace"] = resource.namespace
+                patch["metadata"][
+                    "resourceVersion"
+                ] = resource.instance.metadata.resourceVersion
+                patch["kind"] = resource.kind
+                patch["apiVersion"] = resource.api_version
 
                 resource.update_replace(
                     resource_dict=patch
