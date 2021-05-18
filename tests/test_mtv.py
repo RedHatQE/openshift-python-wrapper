@@ -4,7 +4,7 @@ from openshift.dynamic import DynamicClient
 
 from ocp_resources.migration import Migration
 from ocp_resources.Plan import Plan
-from ocp_resources.Provider import Provider
+from ocp_resources.provider import Provider
 
 
 class PlanVirtualMachineItem:

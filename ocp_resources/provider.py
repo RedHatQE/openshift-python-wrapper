@@ -4,8 +4,7 @@ from ocp_resources.resource import NamespacedResource
 
 class Provider(NamespacedResource, MTV):
     """
-    Provider object.
-    Used to define A Source Or A Destination Provider Such as Vsphere and OpenShift Virtualization.
+    Migration Toolkit For Virtualization (MTV) Provider object.
     """
 
     class StatusConditions:

@@ -4,11 +4,15 @@ from ocp_resources.resource import NamespacedResource
 
 class Migration(NamespacedResource, MTV):
     """
-    Migration object.
-    Used to Initiate and Hold the Status of a Migration Plan Run
+    Migration Toolkit For Virtualization (MTV) object.
+
+    Args:
+        plan_name (str): mtv plan CR name.
+        plan_namespace (str): mtv plan CR namespace.
+
     """
 
-    api_version = "forklift.konveyor.io"
+    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     class StatusConditions:
         class CATEGORY:
@@ -16,7 +20,7 @@ class Migration(NamespacedResource, MTV):
 
         class MESSAGE:
             MIGRATION_READY = "The migration is ready."
-            MIGRATION_RUNNING = "The migration id RUNNING"
+            MIGRATION_RUNNING = "The migration is RUNNING"
             MIGRATION_SUCCEEDED = "The migration has SUCCEEDED."
 
         class STATUS:
@@ -32,10 +36,8 @@ class Migration(NamespacedResource, MTV):
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace
 
-    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
-
     def to_dict(self):
-        res = super()._base_body()
+        res = super().to_dict()
         res.update(
             {
                 "spec": {
