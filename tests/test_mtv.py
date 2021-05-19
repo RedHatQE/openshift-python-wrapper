@@ -7,32 +7,28 @@ from ocp_resources.plan import Plan
 from ocp_resources.provider import Provider
 
 
-class PlanVirtualMachineItem:
-    def __init__(self, vm_name=None, vm_id=None):
-        self.vm_name = vm_name
-        self.vm_id = vm_id
-
-
 @pytest.fixture(scope="session")
 def client():
     return DynamicClient(client=kubernetes.config.new_client_from_config())
 
 
-# def test_plan(client):
-#     with Plan(
-#         name="p",
-#         namespace="openshift-mtv",
-#         source_provider_name="s",
-#         source_provider_namespace="openshift-mtv",
-#         destination_provider_name="host",
-#         destination_provider_namespace="openshift-mtv",
-#         storage_map_name="node-05",
-#         storage_map_namespace="openshift-mtv",
-#         network_map_name="node-05",
-#         network_map_namespace="openshift-mtv"
-#
-#
-#     ) as plan:
+def test_provider(client):
+
+    with Provider(
+        name="provider-name",
+        namespace="openshift-mtv",
+        provider_type=Provider.ProviderType.VSPHERE,
+        client=client,
+        secret_name="node-05",
+        secret_namespace="node-05",
+        teardown=False,
+    ) as p:
+        p.wait_for_condition_ready()
+
+    p = next(
+        Provider.get(dyn_client=client, name="provider-name", namespace="openshift-mtv")
+    )
+    p.delete()
 
 
 def test_migration(client):
@@ -58,7 +54,7 @@ def test_migration(client):
             storage_map_namespace="openshift-mtv",
             network_map_name="node-05",
             network_map_namespace="openshift-mtv",
-            vms=[PlanVirtualMachineItem(vm_id="vm-333")],
+            vms=None,
         ) as plan:
             plan.wait_for_condition_ready()
             with Migration(
@@ -68,7 +64,3 @@ def test_migration(client):
                 plan_namespace="openshift-mtv",
             ) as m:
                 m.wait_for_condition_succeeded()
-                pass
-
-    #     pass
-    #
