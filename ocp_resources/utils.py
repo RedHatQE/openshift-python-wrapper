@@ -17,15 +17,40 @@ class TimeoutExpiredError(Exception):
 
 class TimeoutSampler:
     """
-    Samples the function output.
+    Samples a given function's return value.
 
-    This is a generator object that at first yields the output of function
-    `func`. After the yield, it either raises instance of `TimeoutExpiredError` or
-    sleeps `sleep` seconds.
+    This is a generator object first immediately yields the return value of the function `func` when iterated by
+    the caller. The caller may handle the func's return value as it wishes.
 
-    Yielding the output allows you to handle every value as you wish.
+    If it keep iterating, the generator will sleep before the next yield until it reaches timeout and throws a
+    TimeoutExpiredError exception.
+    You may think of it as an enhanced generator, because the list of values it generates (yields) is not finite and not
+    determined until the yield statement, and the caller might not have to always reach timeout, but simply break when
+    it has the data it expects.
+    Also note that the TimeoutSampler uses TimeoutWatch, so you may reach timeout after any time of yields, depending
+    on how long the caller continues its processing before resuming the generator run.
 
-    Feel free to set the instance variables.
+    Args:
+        wait_timeout (int): the max time (seconds) to call the func
+        sleep (int): sleep time (seconds) between yield intervals
+        func: the function to be invoked upon each yield
+        exceptions: expected exception to ignore when running the generator code; if none provided (default), using
+            Exception
+        exceptions_msg: expected exception message; if an exception is caught, but exceptions_msg could not be found in
+            the exception's expression (str), the exception (that was caught) is re-raised after recording the error.
+            There is no effect if not provided (default).
+        pring_log (bool): toggle to record timer-related info logs. Defauly: True.
+        func_args: function func's args
+        func_kwargs: function func's kwargs
+
+    Yields:
+        the return value of the function func
+
+    Raises:
+        TimeoutExpiredError: when reaching the wait_timeout.
+        <Exception>: any exception that is not expected, if provided.
+            The exception can be raised by func's code or if exceptions_msg is provided and not found (see the logic in
+            the exceptions_msg arg docstring).
     """
 
     def __init__(
