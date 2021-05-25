@@ -19,27 +19,22 @@ class TimeoutSampler:
     """
     Samples a given function's return value.
 
-    This is a generator object first immediately yields the return value of the function `func` when iterated by
-    the caller. The caller may handle the func's return value as it wishes.
+    This is a generator object that yields the return value of the function `func` when iterated by the caller.
+    The caller may handle the func's return value as it wishes.
 
     If it keep iterating, the generator will sleep before the next yield until it reaches timeout and throws a
     TimeoutExpiredError exception.
-    You may think of it as an enhanced generator, because the list of values it generates (yields) is not finite and not
-    determined until the yield statement, and the caller might not have to always reach timeout, but simply break when
-    it has the data it expects.
-    Also note that the TimeoutSampler uses TimeoutWatch, so you may reach timeout after any time of yields, depending
-    on how long the caller continues its processing before resuming the generator run.
 
     Args:
-        wait_timeout (int): the max time (seconds) to call the func
-        sleep (int): sleep time (seconds) between yield intervals
+        wait_timeout (int)
+        sleep (int)
         func: the function to be invoked upon each yield
         exceptions: expected exception to ignore when running the generator code; if none provided (default), using
             Exception
         exceptions_msg: expected exception message; if an exception is caught, but exceptions_msg could not be found in
             the exception's expression (str), the exception (that was caught) is re-raised after recording the error.
             There is no effect if not provided (default).
-        pring_log (bool): toggle to record timer-related info logs. Defauly: True.
+        print_log (bool): toggle to record timer-related info logs. Default: True.
         func_args: function func's args
         func_kwargs: function func's kwargs
 
