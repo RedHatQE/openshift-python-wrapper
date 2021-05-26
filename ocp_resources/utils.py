@@ -17,33 +17,30 @@ class TimeoutExpiredError(Exception):
 
 class TimeoutSampler:
     """
-    Samples a given function's return value.
+    Yield a given function's return value upon each iteration over the object.
 
-    This is a generator object that yields the return value of the function `func` when iterated by the caller.
-    The caller may handle the func's return value as it wishes.
-
-    If it keep iterating, the generator will sleep before the next yield until it reaches timeout and throws a
-    TimeoutExpiredError exception.
+    Before each following iteration (the next yield) over the TimeSampler object, the generator sleeps until it reaches
+    timeout and throws a TimeoutExpiredError exception.
 
     Args:
         wait_timeout (int)
         sleep (int)
-        func: the function to be invoked upon each yield
-        exceptions: expected exception to ignore when running the generator code; if none provided (default), using
-            Exception
+        func (callable): the function to be invoked upon each yield
+        exceptions (BaseException or derived classes): expected exception to ignore when running the generator code;
+            Default: Exception.
         exceptions_msg: expected exception message; if an exception is caught, but exceptions_msg could not be found in
             the exception's expression (str), the exception (that was caught) is re-raised after recording the error.
-            There is no effect if not provided (default).
+            There is no effect if not provided (default: None).
         print_log (bool): toggle to record timer-related info logs. Default: True.
-        func_args: function func's args
-        func_kwargs: function func's kwargs
+        func_args: function func's *args
+        func_kwargs: function func's **kwargs
 
     Yields:
         the return value of the function func
 
     Raises:
         TimeoutExpiredError: when reaching the wait_timeout.
-        <Exception>: any exception that is not expected, if provided.
+        <Exception>: any exception which is not self.exception.
             The exception can be raised by func's code or if exceptions_msg is provided and not found (see the logic in
             the exceptions_msg arg docstring).
     """
