@@ -17,7 +17,7 @@ class TimeoutExpiredError(Exception):
 
 class TimeoutSampler:
     """
-    Yield a given function's return value upon each iteration over the object.
+    Yields a given function's return value.
 
     Before each following iteration (the next yield) over the TimeSampler object, the generator sleeps until it reaches
     timeout and throws a TimeoutExpiredError exception.
@@ -26,14 +26,15 @@ class TimeoutSampler:
         wait_timeout (int)
         sleep (int)
         func (callable): the function to be invoked upon each yield
-        exceptions (BaseException or derived classes): expected exception to ignore when running the generator code;
+        exceptions (a single BaseException or derived classes or a tuple with multiple exceptions): expected exception
+            to ignore when running the generator code;
             Default: Exception.
-        exceptions_msg: expected exception message; if an exception is caught, but exceptions_msg could not be found in
-            the exception's expression (str), the exception (that was caught) is re-raised after recording the error.
-            There is no effect if not provided (default: None).
+        exceptions_msg: expected exception(s) message; if an exception is caught, but exceptions_msg could not be found
+            in the exception's expression (str), the exception (that was caught) is re-raised after recording the error.
+            Default: None.
         print_log (bool): toggle to record timer-related info logs. Default: True.
-        func_args: function func's *args
-        func_kwargs: function func's **kwargs
+        func_args: function *args
+        func_kwargs: function **kwargs
 
     Yields:
         the return value of the function func
