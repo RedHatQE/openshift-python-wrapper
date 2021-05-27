@@ -1,9 +1,9 @@
 from ocp_resources.resource import Resource
 
 
-class ConsoleQuickStarts(Resource):
+class ConsoleQuickStart(Resource):
     """
-    ConsoleQuickStarts object.
+    ConsoleQuickStart object.
     """
 
     api_group = Resource.ApiGroup.CONSOLE_OPENSHIFT_IO
