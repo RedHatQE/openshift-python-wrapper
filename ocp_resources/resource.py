@@ -833,11 +833,10 @@ class ResourceEditor(object):
 
     def update(self, backup_resources=False):
         """Prepares backup dicts (where necessary) and applies patches"""
-        # prepare update dicts and backups
-        LOGGER.info("ResourceEdit: Backing up old data")
-
         resource_to_patch = []
         if backup_resources:
+            # prepare update dicts and backups
+            LOGGER.info("ResourceEdit: Backing up old data")
             if self.user_backups:
                 resource_to_patch = self._patches
                 self._backups = self.user_backups
