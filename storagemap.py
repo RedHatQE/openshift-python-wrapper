@@ -1,5 +1,6 @@
-from ocp_resources.resource import NamespacedResource
 from ocp_resources.mtv import MTV
+from ocp_resources.resource import NamespacedResource
+
 
 class StorageMap(NamespacedResource, MTV):
     """
@@ -21,19 +22,12 @@ class StorageMap(NamespacedResource, MTV):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
-        self.map=map
-        self.provider=provider
+        self.map = map
+        self.provider = provider
 
     def to_dict(self):
         res = super().to_dict()
-        res.update(
-            {
-                "spec": {
-                    "map": self.map,
-                    "provider": self.provider
-                }
-            }
-        )
+        res.update({"spec": {"map": self.map, "provider": self.provider}})
 
         return res
 

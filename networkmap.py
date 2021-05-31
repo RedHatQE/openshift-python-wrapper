@@ -14,24 +14,16 @@ class NetworkMap(NamespacedResource, MTV):
         source_provider_namespace=None,
         destiation_provider_name=None,
         destination_provider_namespace=None,
-
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
-        self.map=map
-        self.provider=provider
+        self.map = map
+        self.provider = provider
 
     def to_dict(self):
         res = super().to_dict()
-        res.update(
-            {
-                "spec": {
-                    "map": self.map,
-                    "provider": self.provider
-                }
-            }
-        )
+        res.update({"spec": {"map": self.map, "provider": self.provider}})
 
         return res
 
