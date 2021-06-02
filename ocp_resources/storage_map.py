@@ -1,5 +1,7 @@
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.mtv import MTV
+from ocp_resources.network_map import NetworkMap
+
 
 class StorageMap(NamespacedResource, MTV):
     """
