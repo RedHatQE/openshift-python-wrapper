@@ -195,6 +195,20 @@ class VirtualMachineInstance(NamespacedResource):
 
         raise ResourceNotFoundError
 
+    @property
+    def virt_handler_pod(self):
+        pods = list(
+            Pod.get(
+                dyn_client=self.client,
+                label_selector="kubevirt.io=virt-handler",
+            )
+        )
+        for pod in pods:
+            if pod.instance["spec"]["nodeName"] == self.instance.status.nodeName:
+                return pod
+
+        raise ResourceNotFoundError
+
     def wait_until_running(self, timeout=TIMEOUT, logs=True, stop_status=None):
         """
         Wait until VMI is running
