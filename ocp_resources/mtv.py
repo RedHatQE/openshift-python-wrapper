@@ -27,6 +27,16 @@ class MTV:
         if self.__class__.__name__ == "MTV":
             raise TypeError("MTV is not a Resource.Please Use one of it's successors.")
 
+    class StatusCondition:
+        class Message:
+            NETWORK_MAP_READY = "The network map is ready."
+
+        class Status:
+            TRUE = "True"
+
+        class Type:
+            READY = "Ready"
+
     def wait_for_resource_status(
         self,
         condition_status,
