@@ -274,6 +274,7 @@ class Resource(object):
         NETWORKING_K8S_IO = "networking.k8s.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
+        OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
         OPERATORS_COREOS_COM = "operators.coreos.com"
         OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
@@ -593,11 +594,7 @@ class Resource(object):
         Use this to remove existing field. (update() will only update existing fields)
         """
         LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
-        self.api().replace(
-            body=resource_dict,
-            name=self.name,
-            namespace=self.namespace,
-        )
+        self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
     def _retry_etcd_changed(func):
@@ -846,8 +843,7 @@ class ResourceEditor(object):
                 for resource, update in self._patches.items():
                     # prepare backup
                     backup = self._create_backup(
-                        original=resource.instance.to_dict(),
-                        patch=update,
+                        original=resource.instance.to_dict(), patch=update
                     )
                     # no need to back up if no changes have been made
                     # if action is 'replace' we need to update even if no backup (replace update can be empty )
