@@ -181,7 +181,9 @@ class DataVolume(NamespacedResource):
 
     @property
     def pvc(self):
-        return PersistentVolumeClaim(name=self.name, namespace=self.namespace)
+        return PersistentVolumeClaim(
+            client=self.client, name=self.name, namespace=self.namespace
+        )
 
     @property
     def scratch_pvc(self):

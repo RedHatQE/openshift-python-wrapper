@@ -114,6 +114,7 @@ class VirtualMachine(NamespacedResource):
             VirtualMachineInstance: VMI
         """
         return VirtualMachineInstance(
+            client=self.client,
             name=self.name,
             namespace=self.namespace,
         )
@@ -199,6 +200,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_handler_pod(self):
         pods = list(
             Pod.get(
+                client=self.client,
                 dyn_client=self.client,
                 label_selector="kubevirt.io=virt-handler",
             )
@@ -290,7 +292,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             Node: Node
         """
-        return Node(name=self.instance.status.nodeName)
+        return Node(client=self.client, name=self.instance.status.nodeName)
 
     def get_xml(self):
         """
