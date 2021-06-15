@@ -307,7 +307,10 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             Node: Node
         """
-        return Node(client=self.privileged_client, name=self.instance.status.nodeName)
+        return Node(
+            client=self.privileged_client or self.client,
+            name=self.instance.status.nodeName,
+        )
 
     def get_xml(self):
         """

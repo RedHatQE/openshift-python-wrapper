@@ -147,7 +147,10 @@ class Pod(NamespacedResource):
         Returns:
             Node: Node
         """
-        return Node(client=self.privileged_client, name=self.instance.spec.nodeName)
+        return Node(
+            client=self.privileged_client or self.client,
+            name=self.instance.spec.nodeName,
+        )
 
     @property
     def ip(self):
