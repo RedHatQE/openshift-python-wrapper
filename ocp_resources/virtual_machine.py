@@ -127,7 +127,7 @@ class VirtualMachine(NamespacedResource):
             client=self.client,
             name=self.name,
             namespace=self.namespace,
-            privileged_client=self.privileged_client,
+            privileged_client=self.privileged_client or self.client,
         )
 
     @property
@@ -195,7 +195,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_launcher_pod(self):
         pods = list(
             Pod.get(
-                dyn_client=self.privileged_client,
+                dyn_client=self.privileged_client or self.client,
                 namespace=self.namespace,
                 label_selector=f"kubevirt.io=virt-launcher,kubevirt.io/created-by={self.instance.metadata.uid}",
             )
@@ -216,7 +216,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_handler_pod(self):
         pods = list(
             Pod.get(
-                dyn_client=self.privileged_client,
+                dyn_client=self.privileged_client or self.client,
                 label_selector="kubevirt.io=virt-handler",
             )
         )
