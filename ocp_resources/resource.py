@@ -709,7 +709,8 @@ class Resource(object):
            data(dict): response data
 
         """
-        response = self.client.client.request(
+        client = self.privileged_client or self.client
+        response = client.client.request(
             method=method,
             url=f"{url}/{action}",
             headers=self.client.configuration.api_key,
