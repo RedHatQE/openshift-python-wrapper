@@ -841,10 +841,26 @@ class ResourceEditor(object):
 
             else:
                 for resource, update in self._patches.items():
+                    namespace = None
                     # prepare backup
+                    try:
+                        original_resource_dict = resource.instance.to_dict()
+                    except NotFoundError:
+                        # Some resource cannot be found by name.
+                        # happens in 'ServiceMonitor' resource.
+                        original_resource_dict = list(
+                            resource.get(
+                                dyn_client=resource.client,
+                                field_selector=f"metadata.name={resource.name}",
+                            )
+                        )[0].to_dict()
+                        namespace = update.get("metadata", {}).get("namespace")
+
                     backup = self._create_backup(
-                        original=resource.instance.to_dict(), patch=update
+                        original=original_resource_dict, patch=update
                     )
+                    # Add namespace to metadata for restore.
+                    backup["metadata"]["namespace"] = namespace
                     # no need to back up if no changes have been made
                     # if action is 'replace' we need to update even if no backup (replace update can be empty )
                     if backup or self.action == "replace":
