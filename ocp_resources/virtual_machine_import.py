@@ -141,7 +141,7 @@ class VirtualMachineImport(NamespacedResource):
             name=self.target_vm_name,
             namespace=self.namespace,
             client=self.client,
-            privileged_client=self.privileged_client,
+            privileged_client=self.privileged_client or self.client,
         )
 
     def to_dict(self):
