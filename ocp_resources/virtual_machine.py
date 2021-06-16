@@ -29,11 +29,21 @@ class VirtualMachine(NamespacedResource):
         ALWAYS = "Always"
         RERUNONFAILURE = "RerunOnFailure"
 
-    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
-
-    def __init__(self, name, namespace, client=None, body=None, teardown=True):
+    def __init__(
+        self,
+        name,
+        namespace,
+        client=None,
+        body=None,
+        teardown=True,
+        privileged_client=None,
+    ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            privileged_client=privileged_client,
         )
         self.body = body
 
@@ -117,6 +127,7 @@ class VirtualMachine(NamespacedResource):
             client=self.client,
             name=self.name,
             namespace=self.namespace,
+            privileged_client=self.privileged_client or self.client,
         )
 
     @property
@@ -141,8 +152,13 @@ class VirtualMachineInstance(NamespacedResource):
         RUNNING = "Running"
         SCHEDULING = "Scheduling"
 
-    def __init__(self, name, namespace, client=None):
-        super().__init__(name=name, namespace=namespace, client=client)
+    def __init__(self, name, namespace, client=None, privileged_client=None):
+        super().__init__(
+            name=name,
+            namespace=namespace,
+            client=client,
+            privileged_client=privileged_client,
+        )
 
     @property
     def _subresource_api_url(self):
@@ -179,7 +195,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_launcher_pod(self):
         pods = list(
             Pod.get(
-                dyn_client=self.client,
+                dyn_client=self.privileged_client or self.client,
                 namespace=self.namespace,
                 label_selector=f"kubevirt.io=virt-launcher,kubevirt.io/created-by={self.instance.metadata.uid}",
             )
@@ -200,8 +216,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_handler_pod(self):
         pods = list(
             Pod.get(
-                client=self.client,
-                dyn_client=self.client,
+                dyn_client=self.privileged_client or self.client,
                 label_selector="kubevirt.io=virt-handler",
             )
         )
@@ -292,7 +307,10 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             Node: Node
         """
-        return Node(client=self.client, name=self.instance.status.nodeName)
+        return Node(
+            client=self.privileged_client or self.client,
+            name=self.instance.status.nodeName,
+        )
 
     def get_xml(self):
         """

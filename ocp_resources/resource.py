@@ -299,7 +299,9 @@ class Resource(object):
         V1BETA1 = "v1beta1"
         V1ALPHA1 = "v1alpha1"
 
-    def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
+    def __init__(
+        self, name, client=None, teardown=True, timeout=TIMEOUT, privileged_client=None
+    ):
         """
         Create a API resource
 
@@ -313,6 +315,7 @@ class Resource(object):
         self.namespace = None
         self.name = name
         self.client = client
+        self.privileged_client = privileged_client
         if not self.client:
             try:
                 self.client = DynamicClient(
@@ -706,7 +709,8 @@ class Resource(object):
            data(dict): response data
 
         """
-        response = self.client.client.request(
+        client = self.privileged_client or self.client
+        response = client.client.request(
             method=method,
             url=f"{url}/{action}",
             headers=self.client.configuration.api_key,
@@ -732,8 +736,22 @@ class NamespacedResource(Resource):
     Namespaced object, inherited from Resource.
     """
 
-    def __init__(self, name, namespace, client=None, teardown=True, timeout=TIMEOUT):
-        super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
+    def __init__(
+        self,
+        name,
+        namespace,
+        client=None,
+        teardown=True,
+        timeout=TIMEOUT,
+        privileged_client=None,
+    ):
+        super().__init__(
+            name=name,
+            client=client,
+            teardown=teardown,
+            timeout=timeout,
+            privileged_client=privileged_client,
+        )
         self.namespace = namespace
 
     @classmethod
