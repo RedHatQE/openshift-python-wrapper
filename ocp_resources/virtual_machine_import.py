@@ -109,9 +109,14 @@ class VirtualMachineImport(NamespacedResource):
         resource_mapping_namespace=None,
         warm=False,
         finalize_date=None,
+        privileged_client=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            privileged_client=privileged_client,
         )
         self.vm_id = vm_id
         self.vm_name = vm_name
@@ -133,7 +138,10 @@ class VirtualMachineImport(NamespacedResource):
     @property
     def vm(self):
         return VirtualMachine(
-            name=self.target_vm_name, namespace=self.namespace, client=self.client
+            name=self.target_vm_name,
+            namespace=self.namespace,
+            client=self.client,
+            privileged_client=self.privileged_client,
         )
 
     def to_dict(self):
