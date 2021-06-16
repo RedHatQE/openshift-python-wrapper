@@ -1,4 +1,5 @@
 import logging
+import re
 
 from openshift.dynamic.exceptions import ConflictError
 
@@ -143,7 +144,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             func=self.update,
             resource_dict=resource,
         )
-        for _sample in samples:
+        LOGGER.info(f"Applying {resource}")
+        for _ in samples:
             return
 
     def deploy(self):
@@ -305,9 +307,14 @@ class NodeNetworkConfigurationPolicy(Resource):
                 if sample == self.Conditions.Reason.FAILED:
                     for failed_nnce in self._get_failed_nnce():
                         nnce_dict = failed_nnce.instance.to_dict()
-                        LOGGER.error(
-                            f"NNCE {nnce_dict['metadata']['name']}: {nnce_dict}"
-                        )
+                        for cond in nnce_dict["status"]["conditions"]:
+                            error = re.findall(
+                                r"libnmstate.error.*", cond.get("message", "")
+                            )
+                            if error:
+                                LOGGER.error(
+                                    f"NNCE {nnce_dict['metadata']['name']}: {error[0]}"
+                                )
 
                     raise NNCPConfigurationFailed(
                         f"Reason: {self.Conditions.Reason.FAILED}"
@@ -325,15 +332,12 @@ class NodeNetworkConfigurationPolicy(Resource):
                 LOGGER.error(f"Failed to get NNCE {nnce.name} status")
                 continue
 
-            if all(
-                [
-                    True
-                    for _nnce in nnce.instance.status.conditions
-                    if _nnce.get("type") == Resource.Status.FAILED
-                    and _nnce.get("status") == Resource.Condition.Status.TRUE
-                ]
-            ):
-                yield nnce
+            for nnce_cond in nnce.instance.status.conditions:
+                if (
+                    nnce_cond.type == "Failing"
+                    and nnce_cond.status == Resource.Condition.Status.TRUE
+                ):
+                    yield nnce
 
     def _resource_dict_for_cleanup(self):
         resource_dict = self.to_dict()
