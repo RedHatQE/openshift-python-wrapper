@@ -85,9 +85,14 @@ class DataVolume(NamespacedResource):
         bind_immediate_annotation=None,
         preallocation=None,
         teardown=True,
+        privileged_client=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            privileged_client=privileged_client,
         )
         self.source = source
         self.url = url
@@ -182,7 +187,9 @@ class DataVolume(NamespacedResource):
     @property
     def pvc(self):
         return PersistentVolumeClaim(
-            client=self.client, name=self.name, namespace=self.namespace
+            client=self.privileged_client or self.client,
+            name=self.name,
+            namespace=self.namespace,
         )
 
     @property
