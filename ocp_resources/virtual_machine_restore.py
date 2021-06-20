@@ -21,7 +21,7 @@ class VirtualMachineRestore(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.SNAPSHOT_KUBEVIRT_IO
 
     def __init__(
-        self, name, namespace, vm_name, snapshot_name, client=None, teardown=True
+        self, name, namespace, vm_name=None, snapshot_name=None, client=None, teardown=True
     ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
@@ -36,8 +36,10 @@ class VirtualMachineRestore(NamespacedResource):
             "apiGroup"
         ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
         spec["target"]["kind"] = VirtualMachine.kind
-        spec["target"]["name"] = self.vm_name
-        spec["virtualMachineSnapshotName"] = self.snapshot_name
+        if self.snapshot_name:
+            spec["virtualMachineSnapshotName"] = self.snapshot_name
+        if self.vm_name:
+            spec["target"]["name"] = self.vm_name
         return res
 
     def wait_complete(self, status=True, timeout=TIMEOUT):

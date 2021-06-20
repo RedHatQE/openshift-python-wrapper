@@ -19,7 +19,7 @@ class VirtualMachineSnapshot(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.SNAPSHOT_KUBEVIRT_IO
 
-    def __init__(self, name, namespace, vm_name, client=None, teardown=True):
+    def __init__(self, name, namespace, vm_name=None, client=None, teardown=True):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
@@ -32,7 +32,8 @@ class VirtualMachineSnapshot(NamespacedResource):
             "apiGroup"
         ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
         spec["source"]["kind"] = VirtualMachine.kind
-        spec["source"]["name"] = self.vm_name
+        if self.vm_name:
+            spec["source"]["name"] = self.vm_name
         return res
 
     def wait_ready_to_use(self, status=True, timeout=TIMEOUT):
