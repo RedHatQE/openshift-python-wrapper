@@ -9,7 +9,7 @@ class OperatorGroup(NamespacedResource):
         name,
         namespace,
         target_namespaces,
-        teardown=False,
+        teardown=True,
         client=None,
     ):
         """
