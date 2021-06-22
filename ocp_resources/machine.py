@@ -8,7 +8,7 @@ class Machine(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
 
-    def __init__(self, name, namespace, teardown=False, client=None):
+    def __init__(self, name, namespace, teardown=True, client=None):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
