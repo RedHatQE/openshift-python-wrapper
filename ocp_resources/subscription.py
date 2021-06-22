@@ -16,7 +16,7 @@ class Subscription(NamespacedResource):
         starting_csv=None,
         node_selector=None,
         tolerations=None,
-        teardown=False,
+        teardown=True,
     ):
         super().__init__(
             client=client, name=name, namespace=namespace, teardown=teardown
