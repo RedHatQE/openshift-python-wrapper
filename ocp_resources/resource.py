@@ -226,6 +226,7 @@ class Resource(object):
         AVAILABLE = "Available"
         DEGRADED = "Degraded"
         PROGRESSING = "Progressing"
+        CREATED = "Created"
         RECONCILE_COMPLETE = "ReconcileComplete"
         READY = "Ready"
 
