@@ -30,6 +30,7 @@ class MTV:
     class StatusCondition:
         class Message:
             NETWORK_MAP_READY = "The network map is ready."
+            STORAGE_MAP_READY = "The storage map is ready."
 
         class Status:
             TRUE = "True"

@@ -1,5 +1,4 @@
 from ocp_resources.mtv import MTV
-from ocp_resources.network_map import NetworkMap
 from ocp_resources.resource import NamespacedResource
 
 
@@ -8,26 +7,56 @@ from ocp_resources.resource import NamespacedResource
 
 class StorageMap(NamespacedResource, MTV):
     """
-    Migration Toolkit For Virtualization (MTV) storagemap wrapper.
+    Migration Toolkit For Virtualization (MTV) StorageMap Resource.
     """
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
-    def __init__(self, name, namespace, map=None, provider=None):
+    def __init__(
+        self,
+        name,
+        namespace,
+        mapping=None,
+        source_provider_name=None,
+        source_provider_namespace=None,
+        destination_provider_name=None,
+        destination_provider_namespace=None,
+        client=None,
+        teardown=True,
+    ):
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
-        self.map = map
-        self.provider = provider
+        self.mapping = mapping
+        self.source_provider_name = source_provider_name
+        self.source_provider_namespace = source_provider_namespace
+        self.destination_provider_name = destination_provider_name
+        self.destination_provider_namespace = destination_provider_namespace
 
     def to_dict(self):
         res = super().to_dict()
-        res.update({"spec": {"map": self.map, "provider": self.provider}})
-
+        res.update(
+            {
+                "spec": {
+                    "map": self.mapping,
+                    "provider": {
+                        "source": {
+                            "name": self.source_provider_name,
+                            "namespace": self.source_provider_namespace,
+                        },
+                        "destination": {
+                            "name": self.destination_provider_name,
+                            "namespace": self.destination_provider_namespace,
+                        },
+                    },
+                }
+            }
+        )
         return res
 
     def wait_for_condition_ready(self):
         self.wait_for_resource_status(
-            condition_status=NamespacedResource.Condition.Status.TRUE,
-            condition_type=NamespacedResource.Condition.READY,
+            condition_message=self.StatusCondition.Message.STORAGE_MAP_READY,
+            condition_status=self.StatusCondition.Status.TRUE,
+            condition_type=self.StatusCondition.Type.READY,
         )
