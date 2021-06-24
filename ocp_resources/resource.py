@@ -878,8 +878,10 @@ class ResourceEditor(object):
                     backup = self._create_backup(
                         original=original_resource_dict, patch=update
                     )
-                    # Add namespace to metadata for restore.
-                    backup["metadata"]["namespace"] = namespace
+                    if namespace:
+                        # Add namespace to metadata for restore.
+                        backup["metadata"]["namespace"] = namespace
+
                     # no need to back up if no changes have been made
                     # if action is 'replace' we need to update even if no backup (replace update can be empty )
                     if backup or self.action == "replace":
