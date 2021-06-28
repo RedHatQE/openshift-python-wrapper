@@ -36,13 +36,11 @@ class TimeoutSampler:
         exceptions=None,
         exceptions_msg=None,
         print_log=True,
-        *func_args,
         **func_kwargs,
     ):
         self.wait_timeout = wait_timeout
         self.sleep = sleep
         self.func = func
-        self.func_args = func_args
         self.func_kwargs = func_kwargs
         self.exception = exceptions or Exception
         self.elapsed_time = None
@@ -51,9 +49,7 @@ class TimeoutSampler:
 
     @property
     def _func_log(self):
-        return (
-            f"Function: {self.func} Args: {self.func_args} Kwargs: {self.func_kwargs}"
-        )
+        return f"Function: {self.func} Kwargs: {self.func_kwargs}"
 
     def __iter__(self):
         last_exp = None
@@ -66,7 +62,7 @@ class TimeoutSampler:
         while timeout_watch.remaining_time() > 0:
             try:
                 self.elapsed_time = self.wait_timeout - timeout_watch.remaining_time()
-                yield self.func(*self.func_args, **self.func_kwargs)
+                yield self.func(**self.func_kwargs)
                 self.elapsed_time = None
                 time.sleep(self.sleep)
 
