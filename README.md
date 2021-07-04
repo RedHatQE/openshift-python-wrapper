@@ -1,12 +1,13 @@
-# ocp-python-wrapper
+# openshift-python-wrapper
 A python wrapper for https://github.com/openshift/openshift-restclient-python.
-With support for RedHat Container Virtualization.
+
+With support for RedHat Container Virtualization. (Openshift Virtualization) https://www.openshift.com/learn/topics/virtualization/
 
 ## Installation
 From source:
 ```bash
-git clone https://gitlab.cee.redhat.com/cnv-qe/ocp-python-wrapper.git
-cd ocp-python-wrapper
+git clone https://github.com/RedHatQE/openshift-python-wrapper.git
+cd openshift-python-wrapper
 python setup.py install --user
 ```
 
