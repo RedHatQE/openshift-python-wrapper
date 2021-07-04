@@ -32,6 +32,6 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [
-          "git+https://gitlab.cee.redhat.com/cnv-qe/flake8-python-plugins.git",
+          "git+https://github.com/RedHatQE/flake8-plugins.git",
           "pep8-naming"
         ]
