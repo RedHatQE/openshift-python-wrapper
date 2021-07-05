@@ -10,7 +10,19 @@ git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
 python setup.py install --user
 ```
+From pypi:
+```bash
+pip install openshift-python-wrapper
+```
 
+## Bump a version number
+* Create a PR
+* Update setup.cfg:
+  Update version (for example: 1.5 -> 1.6) and 
+  download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.4.tar.gz)
+* Merge the PR
+* Bump the version via github
+  
 ## Examples
 ### Client
 ```python
