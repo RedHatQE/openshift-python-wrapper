@@ -1,6 +1,6 @@
 name: 'Auto Assign'
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, ready_for_review]
 
 jobs:
@@ -10,4 +10,3 @@ jobs:
       - uses: kentaro-m/auto-assign-action@v1.2.0
         with:
           configuration-path: ".github/reviewers-auto-assign.yml" # Only needed if you use something other than .github/auto_assign.yml
-          repo-token: ${{ secrets.REPO_TOKEN }}
