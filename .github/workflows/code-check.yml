@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: Code check
 
 on:
   push:
@@ -28,6 +28,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install tox
-    - name: tox
+    - name: Run tox
       run: |
        tox -e code-check
