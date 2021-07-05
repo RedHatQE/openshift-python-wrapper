@@ -8,6 +8,8 @@ setup(
     name="openshift-python-wrapper",
     license="apache-2.0",
     description="Wrapper around https://github.com/openshift/openshift-restclient-python",
+    long_description="file: README.md",
+    long_description_content_type="text/markdown",
     author="Meni Yakove, Ruth Netser",
     author_email="myakove@redhat.com",
     url="https://github.com/RedHatQE/openshift-python-wrapper",
