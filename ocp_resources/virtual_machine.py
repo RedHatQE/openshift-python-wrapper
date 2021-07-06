@@ -292,6 +292,15 @@ class VirtualMachineInstance(NamespacedResource):
             func=self.get_vmi_active_condition,
         )
         for sample in samples:
+            # VM in state change
+            # We have commanded a [un]pause condition via the API but the CR has not been updated yet to match.
+            # 'reason' may not exist yet
+            # or
+            # 'reason' may still exist after unpause if the CR has not been updated before we perform this check
+            if (pause and not sample.get("reason")) or (
+                sample.get("reason") == "PausedByUser" and not pause
+            ):
+                continue
             # Paused VM
             if pause and sample["reason"] == "PausedByUser":
                 return
