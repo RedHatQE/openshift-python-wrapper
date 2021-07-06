@@ -30,4 +30,4 @@ jobs:
         python -m pip install tox
     - name: Run tox
       run: |
-       tox -e code-check
+       tox -e code-check,unittests
