@@ -1,0 +1,17 @@
+name: Pr size labeler
+
+on: [pull_request]
+
+jobs:
+  size-labeler:
+    runs-on: ubuntu-latest
+    name: 'Label the PR'
+    steps:
+      - name: Pull request size labelling
+        uses: alexromer0/pull-request-labeler@2.1.1
+        with:
+          GITHUB_TOKEN: ${{secrets.REPO_TOKEN}}
+          xs_limit: '50'
+          sm_limit: '100'
+          md_limit: '300'
+          lg_limit: '600'
