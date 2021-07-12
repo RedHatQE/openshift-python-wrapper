@@ -13,8 +13,7 @@ class Migration(NamespacedResource, MTV):
 
     """
 
-    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
-
+    
     def __init__(self, name, namespace, plan_name, plan_namespace, cut_over=None, teardown=True):
         super().__init__(name=name, namespace=namespace, teardown=teardown)
         self.plan_name = plan_name
