@@ -29,6 +29,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             MATCHING = "Matching"
 
         class Reason:
+            CONFIGURING = "ConfigurationProgressing"
             SUCCESS = "SuccessfullyConfigured"
             FAILED = "FailedToConfigure"
 
