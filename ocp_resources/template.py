@@ -15,7 +15,7 @@ class Template(NamespacedResource):
 
     class Workload:
         DESKTOP = "desktop"
-        HIGH_PERFORMANCE = "highperformance"
+        HIGHPERFORMANCE = "highperformance"
         SERVER = "server"
 
     class Flavor:
