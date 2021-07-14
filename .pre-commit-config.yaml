@@ -23,7 +23,7 @@ repos:
     - id: check-merge-conflict
     - id: debug-statements
     - id: trailing-whitespace
-      args: [--markdown-linebreak-ext=md]
+      args: [--markdown-linebreak-ext=md] # Do not process Markdown files.
     - id: end-of-file-fixer
     - id: check-ast
     - id: check-builtin-literals
