@@ -19,27 +19,27 @@ class TimeoutSampler:
     """
     Yields a given function's return value.
 
-    Before each following iteration (the next yield) over the TimeSampler object, the generator sleeps until it reaches
-    timeout and throws a TimeoutExpiredError exception.
+    Before each following iteration (the next yield) over the TimeSampler object, the generator sleeps for a given
+    sleep interval (seconds). This cycle will be repeated as the caller continues iterating the TimeoutSampler.
+    When the defined timeout expires, a TimeoutExpiredError exception is thrown.
 
     Args:
-        wait_timeout (int)
-        sleep (int)
-        func (callable): the function to be invoked upon each yield
-        exceptions (a single BaseException or derived classes or a tuple with multiple exceptions): expected exception
-            to ignore when running the generator code;
-            Default: Exception.
-        exceptions_msg: expected exception(s) message; if an exception is caught, but exceptions_msg could not be found
-            in the exception's expression (str), the exception (that was caught) is re-raised after recording the error.
-            Default: None.
-        print_log (bool): toggle to record timer-related info logs. Default: True.
-        func_kwargs: function **kwargs
+        wait_timeout (int): total timeout (seconds)
+        sleep (int): interval time to wait between each iteration (seconds)
+        func (function): the function to be invoked upon each yield
+        exceptions (Exception or tuple, default Exception): expected exception(s) to ignore when running the generator
+            code
+        exceptions_msg (str, default None): expected exception(s) message; if an exception is caught, but exceptions_msg
+            could not be found in the exception's expression (str), the exception (that was caught) is re-raised after
+            recording the error.
+        print_log (bool, default True): toggle to record timer-related info logs.
+        func_kwargs (dict): function **kwargs
 
     Yields:
         the return value of the function func
 
     Raises:
-        TimeoutExpiredError: when reaching the wait_timeout.
+        TimeoutExpiredError (Exception): when reaching the wait_timeout.
         <Exception>: any exception which is not self.exception.
             The exception can be raised by func's code or if exceptions_msg is provided and not found (see the logic in
             the exceptions_msg arg docstring).
