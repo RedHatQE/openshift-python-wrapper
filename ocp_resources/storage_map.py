@@ -27,6 +27,8 @@ class StorageMap(NamespacedResource, MTV):
 
     """
 
+    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
+
     def __init__(
         self,
         name,
