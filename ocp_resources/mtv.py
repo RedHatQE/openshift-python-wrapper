@@ -55,7 +55,7 @@ class MTV:
         condition_message=None,
         condition_reason=None,
         condition_category=None,
-        wait_timeout=600,
+        wait_timeout=1,
     ):
         """
         Wait for MTV Resource Status Conditions.
@@ -108,6 +108,6 @@ class MTV:
 
         except TimeoutExpiredError:
             LOGGER.error(
-                msg=f"Last Status Conditions of {self.kind} {self.name} were: {last_condition}"
+                msg=f"Last Status Condition of {self.kind} {self.name} was: {last_condition}"
             )
             raise
