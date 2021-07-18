@@ -30,8 +30,6 @@ class MTV:
 
     """
 
-    api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
-
     def __init__(self):
         if self.__class__.__name__ == "MTV":
             raise TypeError("MTV is not a Resource.Please Use one of it's successors.")
