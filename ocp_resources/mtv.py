@@ -55,7 +55,7 @@ class MTV:
         condition_message=None,
         condition_reason=None,
         condition_category=None,
-        wait_timeout=1,
+        wait_timeout=600,
     ):
         """
         Wait for MTV Resource Status Conditions.
