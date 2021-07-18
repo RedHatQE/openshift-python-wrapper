@@ -1,8 +1,6 @@
 from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
-# Release Me.... Release Me...
-
 
 class Plan(NamespacedResource, MTV):
     """
@@ -17,8 +15,9 @@ class Plan(NamespacedResource, MTV):
         storage_map_namespace (str): MTV StorageMap CR namespace.
         network_map_name (str): MTV NetworkMap CR name.
         network_map_namespace (str): MTV NetworkMap CR CR namespace.
-        virtual_machines_list (list): A List of dicts, each contain the name Or id of the source Virtual Machines to migrate.
-            Example: [ { "id": "vm-id-x" }, { "name": "vm-name-x" } ]
+        virtual_machines_list (list): A List of dicts, each contain
+                                      the Name Or Id of the source Virtual Machines to migrate.
+                                      Example: [ { "id": "vm-id-x" }, { "name": "vm-name-x" } ]
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
     """
 
