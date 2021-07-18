@@ -1,31 +1,31 @@
 from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
+
 class StorageMap(NamespacedResource, MTV):
     """
     Migration Toolkit For Virtualization (MTV) StorageMap object.
-    
+
     Args:
         source_provider_name (str): MTV Source Provider CR name.
         source_provider_namespace (str): MTV Source Provider CR namespace.
         destination_provider_name (str): MTV Destination Provider CR name.
-        destination_provider_namespace (str): MTV Destination Provider CR namespace.        
+        destination_provider_namespace (str): MTV Destination Provider CR namespace.
         mapping (dict): Storage Resources Mapping
             Exaple:
                 [ { "destination" : { "storageClass": "nfs",
                                       "accessMode": " ReadWriteMany",
                                       "volumeMode": "Filesystem" },
                     "source" : { "id": "datastore-11" }},
-                    
+
                   { "destination" : { "storageClass": "hss",
                                       "accessMode": " ReadWriteMany",
                                       "volumeMode": "Block" },
-                    "source" : { "name": "MyDatastore" }},                                        
-                     
-                ]            
+                    "source" : { "name": "MyDatastore" }},
+
+                ]
 
     """
-
 
     def __init__(
         self,

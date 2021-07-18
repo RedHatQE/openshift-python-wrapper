@@ -7,7 +7,6 @@ class Provider(NamespacedResource, MTV):
     Migration Toolkit For Virtualization (MTV) Provider object.
     """
 
-    
     def __init__(
         self,
         name,

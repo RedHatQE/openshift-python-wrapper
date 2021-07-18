@@ -1,6 +1,6 @@
 import logging
-from ocp_resources.resource import NamespacedResource
 
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -27,9 +27,9 @@ class MTV:
         Migration,
         StorageMap,
         NetworkMap,
-        
+
     """
-    
+
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     def __init__(self):
