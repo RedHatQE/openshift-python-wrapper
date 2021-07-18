@@ -1,6 +1,5 @@
 import logging
 
-from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
