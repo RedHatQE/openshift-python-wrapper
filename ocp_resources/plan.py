@@ -21,7 +21,6 @@ class Plan(NamespacedResource, MTV):
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
     """
 
-
     def __init__(
         self,
         name,
@@ -53,15 +52,17 @@ class Plan(NamespacedResource, MTV):
         self.network_map_namespace = network_map_namespace
         self.virtual_machines_list = virtual_machines_list
         self.warm_migration = warm_migration
-        self.target_namespace=target_namespace
+        self.target_namespace = target_namespace
 
     def to_dict(self):
         res = super().to_dict()
         res.update(
             {
                 "spec": {
-                    "warm" : self.warm_migration,
-                    "targetNamespace" : self.target_namespace if self.target_namespace else self.namespace,
+                    "warm": self.warm_migration,
+                    "targetNamespace": self.target_namespace
+                    if self.target_namespace
+                    else self.namespace,
                     "map": {
                         "storage": {
                             "name": self.storage_map_name,
@@ -99,5 +100,5 @@ class Plan(NamespacedResource, MTV):
         self.wait_for_resource_status(
             condition_message=self.ConditionMessage.PLAN_SUCCEEDED,
             condition_status=self.Condition.Status.TRUE,
-            condition_type=self.Status.SUCCEEDED
+            condition_type=self.Status.SUCCEEDED,
         )

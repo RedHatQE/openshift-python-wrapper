@@ -18,12 +18,11 @@ class NetworkMap(NamespacedResource, MTV):
 
                   { "destination" : { "name": "nad_cr_name",
                                       "namespace": "nad_cr_namespace",
-                                      "type": "multus"},                                      
+                                      "type": "multus"},
                     "source" : { "name": "VM Netowrk" }},
 
                 ]
     """
-
 
     def __init__(
         self,

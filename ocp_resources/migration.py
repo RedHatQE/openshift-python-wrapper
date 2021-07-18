@@ -13,20 +13,20 @@ class Migration(NamespacedResource, MTV):
 
     """
 
-    
-    def __init__(self, name, namespace, plan_name, plan_namespace, cut_over=None, teardown=True):
+    def __init__(
+        self, name, namespace, plan_name, plan_namespace, cut_over=None, teardown=True
+    ):
         super().__init__(name=name, namespace=namespace, teardown=teardown)
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace
         self.cut_over = cut_over
-
 
     def to_dict(self):
         res = super().to_dict()
         res.update(
             {
                 "spec": {
-                    "plan": {"name": self.plan_name, "namespace": self.plan_namespace }
+                    "plan": {"name": self.plan_name, "namespace": self.plan_namespace}
                 }
             }
         )
