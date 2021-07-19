@@ -54,7 +54,7 @@ class Plan(NamespacedResource, MTV):
         self.network_map_namespace = network_map_namespace
         self.virtual_machines_list = virtual_machines_list
         self.warm_migration = warm_migration
-        self.target_namespace = target_namespace
+        self.target_namespace = target_namespace or self.namespace
 
     def to_dict(self):
         res = super().to_dict()
@@ -62,9 +62,7 @@ class Plan(NamespacedResource, MTV):
             {
                 "spec": {
                     "warm": self.warm_migration,
-                    "targetNamespace": self.target_namespace
-                    if self.target_namespace
-                    else self.namespace,
+                    "targetNamespace": self.target_namespace,
                     "map": {
                         "storage": {
                             "name": self.storage_map_name,
