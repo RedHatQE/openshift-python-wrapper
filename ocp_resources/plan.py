@@ -5,7 +5,6 @@ from ocp_resources.resource import NamespacedResource
 class Plan(NamespacedResource, MTV):
     """
     Migration Tool for Virtualization (MTV) Plan Resource.
-
     Args:
         source_provider_name (str): MTV Source Provider CR name.
         source_provider_namespace (str): MTV Source Provider CR namespace.
