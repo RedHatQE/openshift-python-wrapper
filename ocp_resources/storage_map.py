@@ -12,7 +12,7 @@ class StorageMap(NamespacedResource, MTV):
         destination_provider_name (str): MTV Destination Provider CR name.
         destination_provider_namespace (str): MTV Destination Provider CR namespace.
         mapping (dict): Storage Resources Mapping
-            Exaple:
+            Example:
                 [ { "destination" : { "storageClass": "nfs",
                                       "accessMode": " ReadWriteMany",
                                       "volumeMode": "Filesystem" },
