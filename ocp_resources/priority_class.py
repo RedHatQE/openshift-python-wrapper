@@ -37,4 +37,4 @@ class PriorityClass(Resource):
             res["description"] = self.description
         if self.preemption_policy:
             res["preemptionPolicy"] = self.preemption_policy
-        return res    
+        return res
