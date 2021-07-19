@@ -47,7 +47,7 @@ class Provider(NamespacedResource, MTV):
 
     def wait_for_condition_ready(self):
         self.wait_for_resource_status(
-            condition_message=MTV.StatusCondition.Message.PROVIDER_READY,
+            condition_message=self.ConditionMessage.PROVIDER_READY,
             condition_status=NamespacedResource.Condition.Status.TRUE,
             condition_type=NamespacedResource.Condition.READY,
         )

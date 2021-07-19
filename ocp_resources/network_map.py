@@ -19,7 +19,7 @@ class NetworkMap(NamespacedResource, MTV):
                   { "destination" : { "name": "nad_cr_name",
                                       "namespace": "nad_cr_namespace",
                                       "type": "multus"},
-                    "source" : { "name": "VM Netowrk" }},
+                    "source" : { "name": "VM Network" }},
 
                 ]
     """
