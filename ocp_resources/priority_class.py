@@ -30,7 +30,8 @@ class PriorityClass(Resource):
 
     def to_dict(self):
         res = super().to_dict()
-        res.update({"value": self.value})
+        if self.value:
+            res["value"] = self.value
         if self.global_default:
             res["globalDefault"] = self.global_default
         if self.description:
