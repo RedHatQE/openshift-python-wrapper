@@ -21,11 +21,11 @@ def _get_status_condition_log_message(**status_condition):
 class MTV:
     """
     Abstract Class for all Migration ToolKit For Virtualization (MTV) Resources:
-        Provider,
-        Plan,
-        Migration,
-        StorageMap,
-        NetworkMap,
+        Provider
+        Plan
+        Migration
+        StorageMap
+        NetworkMap
 
     """
 
@@ -97,8 +97,8 @@ class MTV:
                             or condition_message is None
                         ):
                             if (
-                                condition.reason == condition.reason
-                                or condition.reason is None
+                                condition_reason == condition.reason
+                                or condition_reason is None
                             ):
                                 if (
                                     condition_category == condition.category
