@@ -97,8 +97,8 @@ class MTV:
                             or condition_message is None
                         ):
                             if (
-                                condition.reason == condition.reason
-                                or condition.reason is None
+                                condition_reason == condition.reason
+                                or condition_reason is None
                             ):
                                 if (
                                     condition_category == condition.category
