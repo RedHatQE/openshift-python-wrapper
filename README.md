@@ -22,6 +22,12 @@ pip install openshift-python-wrapper --user
 * Merge the PR
 * Bump the version via github
 
+## changelog
+Changelog is generated using [github-changelog-generator](https://github.com/github-changelog-generator/github-changelog-generator)
+```bash
+github_changelog_generator -u RedHatQE -p openshift-python-wrapper -t <TOKEN>
+```
+
 ## Examples
 ### Client
 ```python
