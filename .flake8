@@ -37,6 +37,7 @@ fcfn_exclude_functions =
     func,
     LOGGER,
     findall,
+    raises,
 
 enable-extensions =
     FCFN,

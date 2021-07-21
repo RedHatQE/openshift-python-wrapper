@@ -31,3 +31,4 @@ jobs:
     - name: Run tox
       run: |
        tox -e code-check
+       tox -e unittests
