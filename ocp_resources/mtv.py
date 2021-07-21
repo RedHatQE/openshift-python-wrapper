@@ -88,23 +88,13 @@ class MTV:
                 )
                 for condition in current_conditions:
                     last_condition = condition
-                    if (
-                        condition_status == condition.status
-                        and condition_type == condition.type
-                    ):
-                        if (
-                            condition_message == condition.message
-                            or condition_message is None
-                        ):
-                            if (
-                                condition_reason == condition.reason
-                                or condition_reason is None
-                            ):
-                                if (
-                                    condition_category == condition.category
-                                    or condition_category is None
-                                ):
-                                    return
+                    valid_status_type = condition_status == condition.status and condition_type == condition.type
+                    valid_message =  condition_message == condition.message or condition_message is None
+                    valid_reason = condition_reason == condition.reason or condition_reason is None
+                    valid_category = condition_category == condition.category or condition_category is None
+                    if all(valid_status_type, valid_message, valid_reason, valid_category):
+                        return
+
 
         except TimeoutExpiredError:
             LOGGER.error(
