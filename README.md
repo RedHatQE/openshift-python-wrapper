@@ -19,6 +19,7 @@ pip install openshift-python-wrapper --user
 * Update setup.cfg:
   Update version (for example: 1.5 -> 1.6) and
   download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.6.tar.gz)
+* Generate CHANGELOG.md [how-to](#changelog)
 * Merge the PR
 * Bump the version via github
 
