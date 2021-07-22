@@ -30,7 +30,7 @@ class MTV:
 
     def __init__(self):
         if self.__class__.__name__ == "MTV":
-            raise TypeError("MTV is not a Resource. Please Use one of its successors.")
+            raise TypeError("MTV is not a Resource. Please Use one of it's successors.")
 
     class ConditionMessage:
         PROVIDER_READY = "The provider is ready."
