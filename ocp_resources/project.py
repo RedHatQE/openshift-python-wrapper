@@ -1,4 +1,4 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import TIMEOUT, Resource
 from ocp_resources.utils import TimeoutExpiredError, nudge_delete
 
 
@@ -28,21 +28,18 @@ class ProjectRequest(Resource):
         name,
         client=None,
         teardown=True,
+        timeout=TIMEOUT,
     ):
-        super().__init__(name=name, client=client, teardown=teardown)
+        super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
 
     def clean_up(self):
         Project(name=self.name).delete(wait=True)
 
-    def client_wait_deleted(self, timeout):
+    def client_wait_deleted(self):
         """
         client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
         """
         try:
-            super().client_wait_deleted(timeout=timeout)
+            super().client_wait_deleted()
         except TimeoutExpiredError:
             nudge_delete(name=self.name)

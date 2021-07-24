@@ -375,7 +375,7 @@ class Resource(object):
 
         data = self.to_dict()
         LOGGER.info(f"Deleting {data}")
-        self.delete(wait=True, timeout=self.timeout)
+        self.delete(wait=True)
 
     @classmethod
     def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
@@ -414,12 +414,11 @@ class Resource(object):
             api_version=self.api_version, kind=self.kind, **kwargs
         )
 
-    def wait(self, timeout=TIMEOUT, sleep=1):
+    def wait(self, sleep=1):
         """
         Wait for resource
 
         Args:
-            timeout (int): Time to wait for the resource.
             sleep (int): Time to wait between retries
 
         Raises:
@@ -427,7 +426,7 @@ class Resource(object):
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
-            wait_timeout=timeout,
+            wait_timeout=self.timeout,
             sleep=sleep,
             exceptions=(ProtocolError, NotFoundError),
             func=lambda: self.exists,
@@ -436,18 +435,15 @@ class Resource(object):
             if sample:
                 return
 
-    def wait_deleted(self, timeout=TIMEOUT):
+    def wait_deleted(self):
         """
         Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
 
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
         LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
-        return self.client_wait_deleted(timeout=timeout)
+        return self.client_wait_deleted()
 
     @property
     def exists(self):
@@ -459,30 +455,26 @@ class Resource(object):
         except NotFoundError:
             return None
 
-    def client_wait_deleted(self, timeout):
+    def client_wait_deleted(self):
         """
         client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
 
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
         samples = TimeoutSampler(
-            wait_timeout=timeout, sleep=1, func=lambda: self.exists
+            wait_timeout=self.timeout, sleep=1, func=lambda: self.exists
         )
         for sample in samples:
             if not sample:
                 return
 
-    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None, sleep=1):
+    def wait_for_status(self, status, stop_status=None, sleep=1):
         """
         Wait for resource to be in status
 
         Args:
             status (str): Expected status.
-            timeout (int): Time to wait for the resource.
             stop_status (str): Status which should stop the wait and failed.
 
         Raises:
@@ -491,7 +483,7 @@ class Resource(object):
         stop_status = stop_status if stop_status else self.Status.FAILED
         LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
-            wait_timeout=timeout,
+            wait_timeout=self.timeout,
             sleep=sleep,
             exceptions=ProtocolError,
             func=self.api().get,
@@ -553,7 +545,7 @@ class Resource(object):
             return self.wait()
         return res
 
-    def delete(self, wait=False, timeout=TIMEOUT):
+    def delete(self, wait=False):
         resource_list = self.api()
         try:
             res = resource_list.delete(name=self.name, namespace=self.namespace)
@@ -562,7 +554,7 @@ class Resource(object):
 
         LOGGER.info(f"Delete {self.kind} {self.name}")
         if wait and res:
-            return self.wait_deleted(timeout=timeout)
+            return self.wait_deleted()
         return res
 
     @property

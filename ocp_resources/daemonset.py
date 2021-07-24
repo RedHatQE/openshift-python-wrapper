@@ -48,13 +48,12 @@ class DaemonSet(NamespacedResource):
                 ):
                     return
 
-    def delete(self, wait=False, timeout=TIMEOUT):
+    def delete(self, wait=False):
         """
         Delete Daemonset
 
         Args:
             wait (bool): True to wait for Daemonset to be deleted.
-            timeout (int): Time to wait for resource deletion
 
         Returns:
             bool: True if delete succeeded, False otherwise.
@@ -70,5 +69,5 @@ class DaemonSet(NamespacedResource):
 
         LOGGER.info(f"Delete {self.name}")
         if wait and res:
-            return self.wait_deleted(timeout=timeout)
+            return self.wait_deleted()
         return res
