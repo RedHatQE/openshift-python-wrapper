@@ -39,8 +39,8 @@ class TimeoutSampler:
         the return value of the function func
 
     Raises:
-        TimeoutExpiredError (Exception): when reaching the wait_timeout.
-        <Exception>: any exception which is not self.exception.
+        TimeoutExpiredError (Exception): when reaching the wait_timeout
+        <Exception>: any exception which was not purposely ignored
             The exception can be raised by func's code or if exceptions_msg is provided and not found (see the logic in
             the exceptions_msg arg docstring).
     """
