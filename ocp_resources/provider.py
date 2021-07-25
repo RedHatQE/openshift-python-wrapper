@@ -2,7 +2,7 @@ from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
 
-class Provider(NamespacedResource, MTV):
+class Provider(MTV):
     """
     Migration Toolkit For Virtualization (MTV) Provider object.
     """
@@ -27,6 +27,7 @@ class Provider(NamespacedResource, MTV):
         self.url = url
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
+        self.condition_message_ready = self.ConditionMessage.PROVIDER_READY
 
     def to_dict(self):
         res = super().to_dict()
@@ -44,10 +45,3 @@ class Provider(NamespacedResource, MTV):
         )
 
         return res
-
-    def wait_for_condition_ready(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.PROVIDER_READY,
-            condition_status=NamespacedResource.Condition.Status.TRUE,
-            condition_type=NamespacedResource.Condition.READY,
-        )

@@ -1,5 +1,6 @@
 import logging
 
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -18,7 +19,7 @@ def _get_status_condition_log_message(**status_condition):
     return log_msg
 
 
-class MTV:
+class MTV(NamespacedResource):
     """
     Abstract Class for all Migration ToolKit For Virtualization (MTV) Resources:
         Provider
@@ -28,7 +29,19 @@ class MTV:
         NetworkMap
     """
 
-    def __init__(self):
+    def __init__(self, name, namespace, client=None, teardown=True):
+        super().__init__(
+            name=name, namespace=namespace, client=client, teardown=teardown
+        )
+        self.condition_message_ready = None
+        self.condition_message_succeeded = None
+        self.condition_category_succeeded = None
+        self.mapping = None
+        self.source_provider_name = None
+        self.source_provider_namespace = None
+        self.destination_provider_name = None
+        self.destination_provider_namespace = None
+
         if self.__class__.__name__ == "MTV":
             raise TypeError("MTV is not a Resource.Please Use one of its successors.")
 
@@ -46,6 +59,16 @@ class MTV:
         VSPHERE = "vsphere"
         OPENSHIFT = "openshift"
         RHV = "ovirt"
+
+    class StatusConditions:
+        PROVIDER_READY = "The provider is ready."
+        NETWORK_MAP_READY = "The network map is ready."
+        STORAGE_MAP_READY = "The storage map is ready."
+        PLAN_READY = "The migration plan is ready."
+        PLAN_SUCCEEDED = "The plan execution has SUCCEEDED."
+        MIGRATION_READY = "The migration is ready."
+        MIGRATION_RUNNING = "The migration is RUNNING"
+        MIGRATION_SUCCEEDED = "The migration has SUCCEEDED."
 
     def wait_for_resource_status(
         self,
@@ -112,3 +135,36 @@ class MTV:
                 msg=f"Last Status Condition of {self.kind} {self.name} was: {last_condition}"
             )
             raise
+
+    def wait_for_condition_ready(self):
+        self.wait_for_resource_status(
+            condition_message=self.condition_message_ready,
+            condition_status=self.StatusConditions.Status.TRUE,
+            condition_type=self.StatusConditions.Type.READY,
+        )
+
+    def wait_for_condition_succeeded(self):
+        self.wait_for_resource_status(
+            condition_type=self.Status.SUCCEEDED,
+            condition_message=self.condition_message_succeeded,
+            condition_category=self.condition_category_succeeded,
+            condition_status=self.StatusConditions.STATUS.TRUE,
+        )
+
+    @property
+    def map_to_dict(self):
+        return {
+            "spec": {
+                "map": self.mapping,
+                "provider": {
+                    "source": {
+                        "name": self.source_provider_name,
+                        "namespace": self.source_provider_namespace,
+                    },
+                    "destination": {
+                        "name": self.destination_provider_name,
+                        "namespace": self.destination_provider_namespace,
+                    },
+                },
+            }
+        }
