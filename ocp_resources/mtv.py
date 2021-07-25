@@ -43,7 +43,7 @@ class MTV(NamespacedResource):
         self.destination_provider_namespace = None
 
         if self.__class__.__name__ == "MTV":
-            raise TypeError("MTV is not a Resource.Please Use one of its successors.")
+            raise TypeError("MTV is not a Resource. Please Use one of its successors.")
 
     class ConditionMessage:
         PROVIDER_READY = "The provider is ready."
@@ -60,15 +60,8 @@ class MTV(NamespacedResource):
         OPENSHIFT = "openshift"
         RHV = "ovirt"
 
-    class StatusConditions:
-        PROVIDER_READY = "The provider is ready."
-        NETWORK_MAP_READY = "The network map is ready."
-        STORAGE_MAP_READY = "The storage map is ready."
-        PLAN_READY = "The migration plan is ready."
-        PLAN_SUCCEEDED = "The plan execution has SUCCEEDED."
-        MIGRATION_READY = "The migration is ready."
-        MIGRATION_RUNNING = "The migration is RUNNING"
-        MIGRATION_SUCCEEDED = "The migration has SUCCEEDED."
+    class Category:
+        REQUIRED = "required"
 
     def wait_for_resource_status(
         self,
@@ -139,8 +132,8 @@ class MTV(NamespacedResource):
     def wait_for_condition_ready(self):
         self.wait_for_resource_status(
             condition_message=self.condition_message_ready,
-            condition_status=self.StatusConditions.Status.TRUE,
-            condition_type=self.StatusConditions.Type.READY,
+            condition_status=self.Condition.Status.TRUE,
+            condition_type=self.Condition.READY,
         )
 
     def wait_for_condition_succeeded(self):
@@ -148,7 +141,7 @@ class MTV(NamespacedResource):
             condition_type=self.Status.SUCCEEDED,
             condition_message=self.condition_message_succeeded,
             condition_category=self.condition_category_succeeded,
-            condition_status=self.StatusConditions.STATUS.TRUE,
+            condition_status=self.Condition.Status.TRUE,
         )
 
     @property
