@@ -32,7 +32,6 @@ class Migration(NamespacedResource, MTV):
         self.plan_namespace = plan_namespace
         self.cut_over = cut_over
         self.condition_message_succeeded = self.ConditionMessage.MIGRATION_SUCCEEDED
-        self.condition_category_succeeded = self.Category.REQUIRED
 
     def to_dict(self):
         res = super().to_dict()
