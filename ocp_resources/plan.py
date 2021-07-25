@@ -2,7 +2,7 @@ from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
 
-class Plan(MTV):
+class Plan(NamespacedResource, MTV):
     """
     Migration Tool for Virtualization (MTV) Plan Resource.
 

@@ -2,7 +2,7 @@ from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
 
-class Provider(MTV):
+class Provider(NamespacedResource, MTV):
     """
     Migration Toolkit For Virtualization (MTV) Provider object.
     """

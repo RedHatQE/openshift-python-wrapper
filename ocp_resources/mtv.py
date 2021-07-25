@@ -1,6 +1,5 @@
 import logging
 
-from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -19,7 +18,7 @@ def _get_status_condition_log_message(**status_condition):
     return log_msg
 
 
-class MTV(NamespacedResource):
+class MTV:
     """
     Abstract Class for all Migration ToolKit For Virtualization (MTV) Resources:
         Provider
@@ -29,10 +28,14 @@ class MTV(NamespacedResource):
         NetworkMap
     """
 
-    def __init__(self, name, namespace, client=None, teardown=True):
-        super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
-        )
+    def __init__(self):
+        self.api = None
+        self.name = None
+        self.namespace = None
+        self.kind = None
+        self.Condition = None
+        self.Status = None
+
         self.condition_message_ready = None
         self.condition_message_succeeded = None
         self.condition_category_succeeded = None
