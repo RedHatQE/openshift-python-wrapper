@@ -282,6 +282,7 @@ class Resource(object):
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
+        RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
