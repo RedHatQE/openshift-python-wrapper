@@ -2,7 +2,7 @@ from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
 
-class Migration(MTV):
+class Migration(NamespacedResource, MTV):
     """
     Migration Toolkit For Virtualization (MTV) Migration object.
 
