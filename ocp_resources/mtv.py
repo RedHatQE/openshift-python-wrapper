@@ -38,7 +38,6 @@ class MTV:
 
         self.condition_message_ready = None
         self.condition_message_succeeded = None
-        self.condition_category_succeeded = None
         self.mapping = None
         self.source_provider_name = None
         self.source_provider_namespace = None
@@ -62,9 +61,6 @@ class MTV:
         VSPHERE = "vsphere"
         OPENSHIFT = "openshift"
         RHV = "ovirt"
-
-    class Category:
-        REQUIRED = "required"
 
     def wait_for_resource_status(
         self,
@@ -143,7 +139,6 @@ class MTV:
         self.wait_for_resource_status(
             condition_type=self.Status.SUCCEEDED,
             condition_message=self.condition_message_succeeded,
-            condition_category=self.condition_category_succeeded,
             condition_status=self.Condition.Status.TRUE,
         )
 
