@@ -29,6 +29,12 @@ Changelog is generated using [github-changelog-generator](https://github.com/git
 github_changelog_generator -u RedHatQE -p openshift-python-wrapper -t <TOKEN>
 ```
 
+## docs
+Docs are generated using [pdoc](https://github.com/pdoc3/pdoc)
+```bash
+pdoc --html  ocp_resources --force
+```
+
 ## Examples
 ### Client
 ```python
