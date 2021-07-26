@@ -1,12 +1,28 @@
 # Changelog
 
-## [Unreleased](https://github.com/RedHatQE/openshift-python-wrapper/tree/HEAD)
+## [v1.5.3](https://github.com/RedHatQE/openshift-python-wrapper/tree/v1.5.3) (2021-07-26)
 
-[Full Changelog](https://github.com/RedHatQE/openshift-python-wrapper/compare/v1.5.2...HEAD)
+[Full Changelog](https://github.com/RedHatQE/openshift-python-wrapper/compare/v1.5.2...v1.5.3)
 
 **Merged pull requests:**
 
+- README: Update changelog section [\#64](https://github.com/RedHatQE/openshift-python-wrapper/pull/64) ([myakove](https://github.com/myakove))
+- bump version to 1.5.3 [\#63](https://github.com/RedHatQE/openshift-python-wrapper/pull/63) ([myakove](https://github.com/myakove))
+- Add release note to PR template [\#62](https://github.com/RedHatQE/openshift-python-wrapper/pull/62) ([rnetser](https://github.com/rnetser))
+- Create issue/RFE report templates [\#61](https://github.com/RedHatQE/openshift-python-wrapper/pull/61) ([myakove](https://github.com/myakove))
+- add timeout arg to ProjectRequest.\_\_init\_\_ [\#58](https://github.com/RedHatQE/openshift-python-wrapper/pull/58) ([ibesso-rh](https://github.com/ibesso-rh))
+- Mtv [\#57](https://github.com/RedHatQE/openshift-python-wrapper/pull/57) ([myakove](https://github.com/myakove))
+- Add OWNERS file [\#54](https://github.com/RedHatQE/openshift-python-wrapper/pull/54) ([myakove](https://github.com/myakove))
+- Add CHANGELOG.md [\#52](https://github.com/RedHatQE/openshift-python-wrapper/pull/52) ([myakove](https://github.com/myakove))
+- Storage: update priority class [\#51](https://github.com/RedHatQE/openshift-python-wrapper/pull/51) ([dalia-frank](https://github.com/dalia-frank))
+- Migration ToolKit For Virtualization Provider Resource Handler [\#50](https://github.com/RedHatQE/openshift-python-wrapper/pull/50) ([amastbau](https://github.com/amastbau))
+- Migration ToolKit For Virtualization Migration Resource Handler [\#49](https://github.com/RedHatQE/openshift-python-wrapper/pull/49) ([amastbau](https://github.com/amastbau))
+- Migration ToolKit For Virtualization NetworkMap Resource Handler [\#48](https://github.com/RedHatQE/openshift-python-wrapper/pull/48) ([amastbau](https://github.com/amastbau))
+- Migration ToolKit For Virtualization StorageMap Resource Handler [\#47](https://github.com/RedHatQE/openshift-python-wrapper/pull/47) ([amastbau](https://github.com/amastbau))
+- Migration ToolKit For Virtualization Plan Resource Handler [\#46](https://github.com/RedHatQE/openshift-python-wrapper/pull/46) ([amastbau](https://github.com/amastbau))
+- Migration ToolKit For Virtualization Common Module  [\#45](https://github.com/RedHatQE/openshift-python-wrapper/pull/45) ([amastbau](https://github.com/amastbau))
 - Readme add pypi link [\#42](https://github.com/RedHatQE/openshift-python-wrapper/pull/42) ([myakove](https://github.com/myakove))
+- Add Benchmark resource [\#25](https://github.com/RedHatQE/openshift-python-wrapper/pull/25) ([sarahbx](https://github.com/sarahbx))
 - Allow vmi pause state change timeout to include initial CRD state [\#23](https://github.com/RedHatQE/openshift-python-wrapper/pull/23) ([sarahbx](https://github.com/sarahbx))
 
 ## [v1.5.2](https://github.com/RedHatQE/openshift-python-wrapper/tree/v1.5.2) (2021-07-14)
