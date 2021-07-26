@@ -46,32 +46,9 @@ class NetworkMap(NamespacedResource, MTV):
         self.source_provider_namespace = source_provider_namespace
         self.destination_provider_name = destination_provider_name
         self.destination_provider_namespace = destination_provider_namespace
+        self.condition_message_ready = self.ConditionMessage.NETWORK_MAP_READY
 
     def to_dict(self):
         res = super().to_dict()
-        res.update(
-            {
-                "spec": {
-                    "map": self.mapping,
-                    "provider": {
-                        "source": {
-                            "name": self.source_provider_name,
-                            "namespace": self.source_provider_namespace,
-                        },
-                        "destination": {
-                            "name": self.destination_provider_name,
-                            "namespace": self.destination_provider_namespace,
-                        },
-                    },
-                }
-            }
-        )
-
+        res.update(self.map_to_dict)
         return res
-
-    def wait_for_condition_ready(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.NETWORK_MAP_READY,
-            condition_status=self.StatusCondition.Status.TRUE,
-            condition_type=self.StatusCondition.Type.READY,
-        )
