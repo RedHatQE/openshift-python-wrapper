@@ -55,6 +55,8 @@ class Plan(NamespacedResource, MTV):
         self.virtual_machines_list = virtual_machines_list
         self.warm_migration = warm_migration
         self.target_namespace = target_namespace or self.namespace
+        self.condition_message_ready = self.ConditionMessage.PLAN_READY
+        self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
 
     def to_dict(self):
         res = super().to_dict()
@@ -88,17 +90,3 @@ class Plan(NamespacedResource, MTV):
             }
         )
         return res
-
-    def wait_for_condition_ready(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.PLAN_READY,
-            condition_status=self.Condition.Status.TRUE,
-            condition_type=self.Condition.READY,
-        )
-
-    def wait_for_condition_successfully(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.PLAN_SUCCEEDED,
-            condition_status=self.Condition.Status.TRUE,
-            condition_type=self.Status.SUCCEEDED,
-        )
