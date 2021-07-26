@@ -18,6 +18,7 @@ setup(
         "netaddr",
         "paramiko",
         "pbr",
+        "pdoc3",
     ],
     python_requires=">=3.6",
 )
