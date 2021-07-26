@@ -56,7 +56,7 @@ class Plan(NamespacedResource, MTV):
         self.warm_migration = warm_migration
         self.target_namespace = target_namespace or self.namespace
         self.condition_message_ready = self.ConditionMessage.PLAN_READY
-        self.condition_category_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
+        self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
 
     def to_dict(self):
         res = super().to_dict()
