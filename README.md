@@ -36,6 +36,10 @@ Docs are generated using [pdoc](https://github.com/pdoc3/pdoc)
 pdoc --html  -o docs ocp_resources --force
 ```
 
+## PR dependency
+For PR dependency we use [dpulls](https://www.dpulls.com/)  
+To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR description.
+
 ## Examples
 ### Client
 ```python
