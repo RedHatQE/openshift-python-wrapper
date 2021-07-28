@@ -35,7 +35,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def __init__(
         self,
-        name,
+        name=None,
         client=None,
         worker_pods=None,
         node_selector=None,
@@ -49,6 +49,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         node_active_nics=None,
         dns_resolver=None,
         routes=None,
+        yaml_file=None,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -59,7 +60,9 @@ class NodeNetworkConfigurationPolicy(Resource):
          {"ip": "10.4.5.6", "prefix-length": 24},
          {"ip": "10.7.8.9", "prefix-length": 23}]
         """
-        super().__init__(name=name, client=client, teardown=teardown)
+        super().__init__(
+            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+        )
         self.desired_state = {"interfaces": []}
         self.worker_pods = worker_pods
         self.mtu = mtu
@@ -103,6 +106,9 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.dns_resolver or self.routes or self.iface:
             res.setdefault("spec", {}).setdefault("desiredState", {})
 

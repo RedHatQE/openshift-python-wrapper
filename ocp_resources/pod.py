@@ -40,7 +40,13 @@ class Pod(NamespacedResource):
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
 
     def __init__(
-        self, name, namespace, client=None, teardown=True, privileged_client=None
+        self,
+        name=None,
+        namespace=None,
+        client=None,
+        teardown=True,
+        privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -48,6 +54,7 @@ class Pod(NamespacedResource):
             client=client,
             teardown=teardown,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 
