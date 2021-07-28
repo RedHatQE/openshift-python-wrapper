@@ -17,16 +17,21 @@ class Migration(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         plan_name=None,
         plan_namespace=None,
         cut_over=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace
@@ -35,6 +40,9 @@ class Migration(NamespacedResource, MTV):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {

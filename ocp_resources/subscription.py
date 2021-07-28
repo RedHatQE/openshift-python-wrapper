@@ -6,8 +6,8 @@ class Subscription(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         source=None,
         source_namespace=None,
@@ -17,9 +17,14 @@ class Subscription(NamespacedResource):
         node_selector=None,
         tolerations=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            client=client, name=name, namespace=namespace, teardown=teardown
+            client=client,
+            name=name,
+            namespace=namespace,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.source = source
         self.source_namespace = source_namespace
@@ -31,6 +36,9 @@ class Subscription(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {

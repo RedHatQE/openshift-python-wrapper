@@ -10,10 +10,10 @@ class MachineHealthCheck(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
-        cluster_name,
-        machineset_name,
+        name=None,
+        namespace=None,
+        cluster_name=None,
+        machineset_name=None,
         client=None,
         machine_role="worker",
         machine_type="worker",
@@ -22,9 +22,14 @@ class MachineHealthCheck(NamespacedResource):
         unhealthy_timeout="300s",
         reboot_strategy=False,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.cluster_name = cluster_name
         self.machineset_name = machineset_name
@@ -37,6 +42,9 @@ class MachineHealthCheck(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.reboot_strategy:
             res["metadata"]["annotations"] = {
                 f"{self.api_group}/remediation-strategy": "external-baremetal"

@@ -66,8 +66,8 @@ class DataVolume(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         source=None,
         size=None,
         storage_class=None,
@@ -86,6 +86,7 @@ class DataVolume(NamespacedResource):
         preallocation=None,
         teardown=True,
         privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -93,6 +94,7 @@ class DataVolume(NamespacedResource):
             client=client,
             teardown=teardown,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self.source = source
         self.url = url
@@ -112,6 +114,9 @@ class DataVolume(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {

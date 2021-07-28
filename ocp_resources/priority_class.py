@@ -10,18 +10,20 @@ class PriorityClass(Resource):
 
     def __init__(
         self,
-        name,
-        client,
+        name=None,
+        client=None,
         teardown=True,
         value=None,
         global_default=False,
         description=None,
         preemption_policy=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
             client=client,
             teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.value = value
         self.global_default = global_default
@@ -30,6 +32,9 @@ class PriorityClass(Resource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.value:
             res["value"] = self.value
         if self.global_default:
