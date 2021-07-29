@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from ocp_resources.resource import TIMEOUT, Resource
+from ocp_resources.utils import TimeoutExpiredError, nudge_delete
 
 
 class Project(Resource):
@@ -64,7 +65,10 @@ class ProjectRequest(Resource):
             timeout (int): Time to wait for the resource.
 
         &#34;&#34;&#34;
-        super().client_wait_deleted(timeout=timeout)</code></pre>
+        try:
+            super().client_wait_deleted(timeout=timeout)
+        except TimeoutExpiredError:
+            nudge_delete(name=self.name)</code></pre>
 </details>
 </section>
 <section>
@@ -184,7 +188,10 @@ full access to user who originated this request</p>
             timeout (int): Time to wait for the resource.
 
         &#34;&#34;&#34;
-        super().client_wait_deleted(timeout=timeout)</code></pre>
+        try:
+            super().client_wait_deleted(timeout=timeout)
+        except TimeoutExpiredError:
+            nudge_delete(name=self.name)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -234,7 +241,10 @@ full access to user who originated this request</p>
         timeout (int): Time to wait for the resource.
 
     &#34;&#34;&#34;
-    super().client_wait_deleted(timeout=timeout)</code></pre>
+    try:
+        super().client_wait_deleted(timeout=timeout)
+    except TimeoutExpiredError:
+        nudge_delete(name=self.name)</code></pre>
 </details>
 </dd>
 </dl>
