@@ -29,7 +29,6 @@
 <pre><code class="python">import logging
 
 from ocp_resources.resource import Resource
-from ocp_resources.utils import TimeoutExpiredError, nudge_delete
 
 
 LOGGER = logging.getLogger(__name__)
@@ -72,10 +71,7 @@ class Namespace(Resource):
             timeout (int): Time to wait for the resource.
 
         &#34;&#34;&#34;
-        try:
-            super().client_wait_deleted(timeout=timeout)
-        except TimeoutExpiredError:
-            nudge_delete(name=self.name)</code></pre>
+        super().client_wait_deleted(timeout=timeout)</code></pre>
 </details>
 </section>
 <section>
@@ -137,10 +133,7 @@ class Namespace(Resource):
             timeout (int): Time to wait for the resource.
 
         &#34;&#34;&#34;
-        try:
-            super().client_wait_deleted(timeout=timeout)
-        except TimeoutExpiredError:
-            nudge_delete(name=self.name)</code></pre>
+        super().client_wait_deleted(timeout=timeout)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -181,10 +174,7 @@ class Namespace(Resource):
         timeout (int): Time to wait for the resource.
 
     &#34;&#34;&#34;
-    try:
-        super().client_wait_deleted(timeout=timeout)
-    except TimeoutExpiredError:
-        nudge_delete(name=self.name)</code></pre>
+    super().client_wait_deleted(timeout=timeout)</code></pre>
 </details>
 </dd>
 </dl>
