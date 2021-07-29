@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import logging
+import subprocess
 import time
 
 
@@ -139,7 +140,23 @@ class TimeoutWatch:
         &#34;&#34;&#34;
         Return the remaining part of timeout since the object was created.
         &#34;&#34;&#34;
-        return self.start_time + self.timeout - time.time()</code></pre>
+        return self.start_time + self.timeout - time.time()
+
+
+# TODO: remove the nudge when the underlying issue with namespaces stuck in
+# Terminating state is fixed.
+# Upstream bug: https://github.com/kubernetes/kubernetes/issues/60807
+def nudge_delete(name):
+    LOGGER.info(f&#34;Nudging namespace {name} while waiting for it to delete&#34;)
+    try:
+        # kube client is deficient so we have to use curl to kill stuck
+        # finalizers
+        subprocess.check_output([&#34;./scripts/clean-namespace.sh&#34;, name])
+    except subprocess.CalledProcessError as exp:
+        # deliberately ignore all errors since an intermittent nudge
+        # failure is not the end of the world
+        LOGGER.error(f&#34;Error happened while nudging namespace {name}: {exp}&#34;)
+        raise</code></pre>
 </details>
 </section>
 <section>
@@ -147,6 +164,31 @@ class TimeoutWatch:
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ocp_resources.utils.nudge_delete"><code class="name flex">
+<span>def <span class="ident">nudge_delete</span></span>(<span>name)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nudge_delete(name):
+    LOGGER.info(f&#34;Nudging namespace {name} while waiting for it to delete&#34;)
+    try:
+        # kube client is deficient so we have to use curl to kill stuck
+        # finalizers
+        subprocess.check_output([&#34;./scripts/clean-namespace.sh&#34;, name])
+    except subprocess.CalledProcessError as exp:
+        # deliberately ignore all errors since an intermittent nudge
+        # failure is not the end of the world
+        LOGGER.error(f&#34;Error happened while nudging namespace {name}: {exp}&#34;)
+        raise</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
@@ -332,6 +374,11 @@ of a given interval</p></div>
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="ocp_resources" href="index.html">ocp_resources</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ocp_resources.utils.nudge_delete" href="#ocp_resources.utils.nudge_delete">nudge_delete</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
