@@ -1,5 +1,4 @@
 import logging
-import subprocess
 import time
 
 
@@ -113,19 +112,3 @@ class TimeoutWatch:
         Return the remaining part of timeout since the object was created.
         """
         return self.start_time + self.timeout - time.time()
-
-
-# TODO: remove the nudge when the underlying issue with namespaces stuck in
-# Terminating state is fixed.
-# Upstream bug: https://github.com/kubernetes/kubernetes/issues/60807
-def nudge_delete(name):
-    LOGGER.info(f"Nudging namespace {name} while waiting for it to delete")
-    try:
-        # kube client is deficient so we have to use curl to kill stuck
-        # finalizers
-        subprocess.check_output(["./scripts/clean-namespace.sh", name])
-    except subprocess.CalledProcessError as exp:
-        # deliberately ignore all errors since an intermittent nudge
-        # failure is not the end of the world
-        LOGGER.error(f"Error happened while nudging namespace {name}: {exp}")
-        raise
