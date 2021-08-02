@@ -1,5 +1,10 @@
 # Changelog
 
+## vv1.5.5 (02/08/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.4 (02/08/2021)
 - [**closed**] Remove nudge_delete workaround [#75](https://github.com/RedHatQE/openshift-python-wrapper/issues/75)
 - [**enhancement**] Resource from YAML file [#71](https://github.com/RedHatQE/openshift-python-wrapper/issues/71)
