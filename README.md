@@ -15,29 +15,13 @@ From pypi:
 pip install openshift-python-wrapper --user
 ```
 
-## Release new versioning
+## Release new version
 ### requirements:
 * gh [github cli] (https://github.com/cli/cli/releases/)
 * export GREN_GITHUB_TOKEN=<TOKEN>
 ### usage:
 ```bash
 ./release.sh v1.5.5
-```
-
-* Update setup.cfg:
-  Update version (for example: 1.5.0 -> 1.5.1) and
-  download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.5.1.tar.gz)
-* Create branch for the version (v1.5.1)
-* Create a new release in [Github](https://github.com/RedHatQE/openshift-python-wrapper/releases) (v1.5.1)
-* Generate release notes for the new version [how-to](#changelog and release notes)
-* Generate CHANGELOG.md [how-to](#changelog and release notes)
-
-
-## changelog and release notes
-Changelog is generated using [gren](https://github.com/github-tools/github-release-notes)
-```bash
-gren changelog --override
-gren release --override
 ```
 
 ## docs
