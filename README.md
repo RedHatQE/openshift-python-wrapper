@@ -15,7 +15,15 @@ From pypi:
 pip install openshift-python-wrapper --user
 ```
 
-## Bump a version number
+## Release new versioning
+### requirements:
+* gh [github cli] (https://github.com/cli/cli/releases/)
+* export GREN_GITHUB_TOKEN=<TOKEN>
+### usage:
+```bash
+./release.sh v1.5.5
+```
+
 * Update setup.cfg:
   Update version (for example: 1.5.0 -> 1.5.1) and
   download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.5.1.tar.gz)
