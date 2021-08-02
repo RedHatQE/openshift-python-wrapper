@@ -1,11 +1,11 @@
 # Changelog
 
-## v1.5.6 (02/08/2021)
+## v1.5.7 (02/08/2021)
 *No changelog for this release.*
 
 ---
 
-## vv1.5.5 (02/08/2021)
+## v1.5.6 (02/08/2021)
 *No changelog for this release.*
 
 ---
