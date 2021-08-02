@@ -3,7 +3,7 @@
 # Usage: ./release.sh v1.5.5
 
 SETUP_CFG="setup.cfg"
-VERSION="v$1"
+VERSION="$1"
 OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 
 # Update setup.cfg with the new version and push to master
