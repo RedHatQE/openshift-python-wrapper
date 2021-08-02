@@ -2,6 +2,15 @@ default_language_version:
     python: python3
 
 repos:
+  - repo: https://github.com/myint/autoflake
+    rev: "v1.4"
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+
   - repo: https://github.com/hadialqattan/pycln
     rev: "0.0.1-beta.1"
     hooks:
