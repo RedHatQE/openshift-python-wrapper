@@ -16,6 +16,9 @@ class NetworkAttachmentDefinition(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.resource_name is not None:
             res["metadata"]["annotations"] = {
                 f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name

@@ -31,12 +31,13 @@ class VirtualMachine(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         body=None,
         teardown=True,
         privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -44,6 +45,7 @@ class VirtualMachine(NamespacedResource):
             client=client,
             teardown=teardown,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self.body = body
 
@@ -62,6 +64,9 @@ class VirtualMachine(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         body_spec = self.body.get("spec") if self.body else None
         res["spec"] = body_spec or {"template": {"spec": {}}}
         return res
@@ -152,12 +157,20 @@ class VirtualMachineInstance(NamespacedResource):
         RUNNING = "Running"
         SCHEDULING = "Scheduling"
 
-    def __init__(self, name, namespace, client=None, privileged_client=None):
+    def __init__(
+        self,
+        name=None,
+        namespace=None,
+        client=None,
+        privileged_client=None,
+        yaml_file=None,
+    ):
         super().__init__(
             name=name,
             namespace=namespace,
             client=client,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
 
     @property
@@ -172,10 +185,6 @@ class VirtualMachineInstance(NamespacedResource):
         return super().api_request(
             method=method, action=action, url=self._subresource_api_url, **params
         )
-
-    def to_dict(self):
-        res = super().to_dict()
-        return res
 
     def pause(self, timeout=TIMEOUT, wait=False):
         self.api_request(method="PUT", action="pause")
@@ -397,18 +406,32 @@ class VirtualMachineInstance(NamespacedResource):
 class VirtualMachineInstanceMigration(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
-    def __init__(self, name, namespace, vmi=None, client=None, teardown=True):
+    def __init__(
+        self,
+        name=None,
+        namespace=None,
+        vmi=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
+    ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self._vmi = vmi
 
     def to_dict(self):
         # When creating VirtualMachineInstanceMigration vmi is mandatory but when calling get()
         # we cannot pass vmi.
-        assert self._vmi, "vmi is mandatory for create"
-
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
+        assert self._vmi, "vmi is mandatory for create"
         res["spec"] = {"vmiName": self._vmi.name}
         return res
 
@@ -422,13 +445,18 @@ class VirtualMachineInstancePreset(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
 
 
@@ -440,12 +468,12 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(
-        self,
-        name,
-        namespace,
-        client=None,
-        teardown=True,
+        self, name=None, namespace=None, client=None, teardown=True, yaml_file=None
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )

@@ -6,6 +6,7 @@ from distutils.version import Version
 
 import kubernetes
 import urllib3
+import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import InternalServerError, NotFoundError
 from urllib3.exceptions import ProtocolError
@@ -301,7 +302,13 @@ class Resource(object):
         V1ALPHA1 = "v1alpha1"
 
     def __init__(
-        self, name, client=None, teardown=True, timeout=TIMEOUT, privileged_client=None
+        self,
+        name=None,
+        client=None,
+        teardown=True,
+        timeout=TIMEOUT,
+        privileged_client=None,
+        yaml_file=None,
     ):
         """
         Create a API resource
@@ -317,6 +324,11 @@ class Resource(object):
         self.name = name
         self.client = client
         self.privileged_client = privileged_client
+        self.yaml_file = yaml_file
+        self.resource_dict = None  # Filled in case yaml_file is not None
+        if not (self.name or self.yaml_file):
+            raise ValueError("name or yaml file is required")
+
         if not self.client:
             try:
                 self.client = DynamicClient(
@@ -343,6 +355,18 @@ class Resource(object):
         return sub_resource_level(cls, NamespacedResource, Resource)
 
     def _base_body(self):
+        """
+        Generate resource dict from yaml if self.yaml_file else return base resource dict.
+
+        Returns:
+            dict: Resource dict.
+        """
+        if self.yaml_file:
+            with open(self.yaml_file, "r") as stream:
+                self.resource_dict = yaml.safe_load(stream=stream.read())
+                self.name = self.resource_dict["metadata"]["name"]
+                return self.resource_dict
+
         return {
             "apiVersion": self.api_version,
             "kind": self.kind,
@@ -739,12 +763,13 @@ class NamespacedResource(Resource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         teardown=True,
         timeout=TIMEOUT,
         privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -752,8 +777,11 @@ class NamespacedResource(Resource):
             teardown=teardown,
             timeout=timeout,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self.namespace = namespace
+        if not (self.name and self.namespace) and not self.yaml_file:
+            raise ValueError("name and namespace or yaml file is required")
 
     @classmethod
     def get(cls, dyn_client, singular_name=None, *args, **kwargs):
@@ -796,11 +824,19 @@ class NamespacedResource(Resource):
         return self.api().get(name=self.name, namespace=self.namespace)
 
     def _base_body(self):
-        return {
-            "apiVersion": self.api_version,
-            "kind": self.kind,
-            "metadata": {"name": self.name, "namespace": self.namespace},
-        }
+        res = super(NamespacedResource, self)._base_body()
+        if self.yaml_file:
+            self.namespace = self.resource_dict["metadata"].get(
+                "namespace", self.namespace
+            )
+
+        if not self.namespace:
+            raise ValueError("Namespace must be passed or specified in the YAML file.")
+
+        if not self.yaml_file:
+            res["metadata"]["namespace"] = self.namespace
+
+        return res
 
     def to_dict(self):
         return self._base_body()

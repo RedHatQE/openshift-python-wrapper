@@ -22,8 +22,16 @@ class ProjectRequest(Resource):
 
     api_group = Resource.ApiGroup.PROJECT_OPENSHIFT_IO
 
-    def __init__(self, name, client=None, teardown=True, timeout=TIMEOUT):
-        super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
+    def __init__(
+        self, name=None, client=None, teardown=True, timeout=TIMEOUT, yaml_file=None
+    ):
+        super().__init__(
+            name=name,
+            client=client,
+            teardown=teardown,
+            timeout=timeout,
+            yaml_file=yaml_file,
+        )
 
     def clean_up(self):
         Project(name=self.name).delete(wait=True)

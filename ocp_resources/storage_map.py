@@ -31,8 +31,8 @@ class StorageMap(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         source_provider_name=None,
         source_provider_namespace=None,
         destination_provider_name=None,
@@ -40,9 +40,14 @@ class StorageMap(NamespacedResource, MTV):
         mapping=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.mapping = mapping
         self.source_provider_name = source_provider_name
@@ -53,5 +58,8 @@ class StorageMap(NamespacedResource, MTV):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(self.map_to_dict)
         return res
