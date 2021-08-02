@@ -16,18 +16,20 @@ pip install openshift-python-wrapper --user
 ```
 
 ## Bump a version number
-* Create a PR
 * Update setup.cfg:
-  Update version (for example: 1.5 -> 1.6) and
-  download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.6.tar.gz)
-* Generate CHANGELOG.md [how-to](#changelog)
-* Merge the PR
-* Bump the version via github
+  Update version (for example: 1.5.0 -> 1.5.1) and
+  download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.5.1.tar.gz)
+* Create branch for the version (v1.5.1)
+* Create a new release in [Github](https://github.com/RedHatQE/openshift-python-wrapper/releases) (v1.5.1)
+* Generate release notes for the new version [how-to](#changelog and release notes)
+* Generate CHANGELOG.md [how-to](#changelog and release notes)
 
-## changelog
-Changelog is generated using [github-changelog-generator](https://github.com/github-changelog-generator/github-changelog-generator)
+
+## changelog and release notes
+Changelog is generated using [gren](https://github.com/github-tools/github-release-notes)
 ```bash
-github_changelog_generator -u RedHatQE -p openshift-python-wrapper -t <TOKEN>
+gren changelog --override
+gren release --override
 ```
 
 ## docs
