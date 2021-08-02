@@ -123,7 +123,7 @@ class VirtualMachine(NamespacedResource):
         Get VMI
 
         Returns:
-            ocp_resources.virtual_machine_instance.VirtualMachineInstance: VMI
+            VirtualMachineInstance: VMI
         """
         return VirtualMachineInstance(
             client=self.client,
