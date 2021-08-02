@@ -15,7 +15,7 @@ git push origin master
 gh release create $VERSION
 
 # Generate release notes
-gren release --override
+gren release -D prs,issues,commits --override
 
 # Generate and push CHANGELOG.md
 gren changelog --override
