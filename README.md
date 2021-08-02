@@ -18,7 +18,7 @@ pip install openshift-python-wrapper --user
 ## Release new version
 ### requirements:
 * gh [github cli] (https://github.com/cli/cli/releases/)
-* export GREN_GITHUB_TOKEN=<TOKEN>
+* export GREN_GITHUB_TOKEN=< TOKEN >
 ### usage:
 ```bash
 ./release.sh v1.5.5
