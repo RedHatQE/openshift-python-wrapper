@@ -38,8 +38,8 @@ class PersistentVolumeClaim(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         storage_class=None,
         accessmodes=None,
@@ -47,9 +47,14 @@ class PersistentVolumeClaim(NamespacedResource):
         size=None,
         hostpath_node=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.accessmodes = accessmodes
         self.volume_mode = volume_mode
@@ -59,6 +64,9 @@ class PersistentVolumeClaim(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {

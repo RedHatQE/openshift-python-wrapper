@@ -21,16 +21,30 @@ class VirtualMachineRestore(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.SNAPSHOT_KUBEVIRT_IO
 
     def __init__(
-        self, name, namespace, vm_name, snapshot_name, client=None, teardown=True
+        self,
+        name=None,
+        namespace=None,
+        vm_name=None,
+        snapshot_name=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.vm_name = vm_name
         self.snapshot_name = snapshot_name
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         spec = res.setdefault("spec", {})
         spec.setdefault("target", {})[
             "apiGroup"

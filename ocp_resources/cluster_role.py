@@ -12,20 +12,26 @@ class ClusterRole(Resource):
 
     def __init__(
         self,
-        name,
+        name=None,
         client=None,
         api_groups=None,
         permissions_to_resources=None,
         verbs=None,
         teardown=True,
+        yaml_file=None,
     ):
-        super().__init__(client=client, name=name, teardown=teardown)
+        super().__init__(
+            client=client, name=name, teardown=teardown, yaml_file=yaml_file
+        )
         self.api_groups = api_groups
         self.permissions_to_resources = permissions_to_resources
         self.verbs = verbs
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         rules = {}
         if self.api_groups:
             rules["apiGroups"] = self.api_groups
