@@ -17,3 +17,4 @@ jobs:
         # pass user input as arguments
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
+          reviewers: myakove,rnetser
