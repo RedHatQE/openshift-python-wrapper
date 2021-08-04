@@ -8,3 +8,9 @@ addAssignees: false
 reviewers:
   - myakove
   - rnetser
+
+filterLabels:
+  exclude:
+    - wip
+
+addAssignees: author
