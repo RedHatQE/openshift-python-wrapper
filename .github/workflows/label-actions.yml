@@ -17,6 +17,6 @@ jobs:
     steps:
       - uses: dessant/label-actions@v2
         with:
-          github-token: ${{ secret.CNV_QE_BOT_TOKEN }}
+          github-token: ${{ secrets.CNV_QE_BOT_TOKEN }}
           config-path: '.github/label-actions-config.yml'
           process-only: ''
