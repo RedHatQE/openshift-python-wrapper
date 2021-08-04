@@ -1,0 +1,15 @@
+# https://github.com/marketplace/actions/label-actions
+
+hold:
+  comment: >
+    The thread has been temporarily locked.
+  lock: true
+  lock-reason: 'on hold'
+  prs:
+    label: 'on hold'
+
+unhold:
+  # Unlock the thread
+  unlock: true
+  prs:
+    unlabel: 'on hold'
