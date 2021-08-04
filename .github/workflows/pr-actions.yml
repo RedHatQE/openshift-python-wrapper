@@ -1,0 +1,19 @@
+name: PR Actions
+on:
+  pull_request_target:
+  issue_comment:
+
+jobs:
+  pr_actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run Action
+        # we can give directory path that contains action.yaml or repo address in username/repository_name@version format
+        # in our case it would be nashmaniac/create-issue-action@v1.0 where v1.0 is the version of action
+        # for now we will give directory path. The directory must contain action.yaml
+        uses: myakove/set-labels@master
+        # pass user input as arguments
+        with:
+          token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
