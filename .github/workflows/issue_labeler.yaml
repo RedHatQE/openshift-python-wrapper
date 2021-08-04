@@ -10,5 +10,5 @@ jobs:
      - name: Label issues
        uses: andymckay/labeler@master
        if: startsWith(${{ github.event.comment.body }}, '/')
-        with:
-          add-labels: ${{ github.event.comment.body }}
+       with:
+         add-labels: ${{ github.event.comment.body }}
