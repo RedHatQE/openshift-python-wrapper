@@ -23,3 +23,8 @@ jobs:
           token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
           reviewers: myakove,rnetser
           action: size_label_prs
+      - name: Remove Verified Label
+          uses: myakove/set-labels@master
+          with:
+            token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
+            action: remove_verified_label
