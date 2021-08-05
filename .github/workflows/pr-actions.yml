@@ -1,15 +1,13 @@
 name: PR Actions
-on:
-  pull_request_target:
-  issue_comment:
+on: [pull_request_target, pull_request]
 
 jobs:
-  pr_actions:
+  initial_assignments:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run Action
+      - name: Assign Reviewers
         # we can give directory path that contains action.yaml or repo address in username/repository_name@version format
         # in our case it would be nashmaniac/create-issue-action@v1.0 where v1.0 is the version of action
         # for now we will give directory path. The directory must contain action.yaml
@@ -17,4 +15,11 @@ jobs:
         # pass user input as arguments
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
+          reviewers: myakove,rnetser,AdiZav
+          action: add_reviewers
+      - name: Assign Size Labels
+        uses: myakove/set-labels@master
+        with:
+          token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
           reviewers: myakove,rnetser
+          action: size_label_prs
