@@ -18,6 +18,13 @@ pip install openshift-python-wrapper --user
 ## Release new version
 ### requirements:
 * gh [github cli](https://github.com/cli/cli/releases/)
+```bash
+gh auth login # Follow login instructions
+```
+* [npm](https://docs.npmjs.com/about-npm)
+```bash
+sudo npm install github-release-notes -g
+```
 * export GREN_GITHUB_TOKEN=< TOKEN >
 ### usage:
 ```bash
