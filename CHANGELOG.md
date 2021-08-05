@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.10 (05/08/2021)
+- [**size/XS**] [CI] Update pre-commit pycln rev tag [#90](https://github.com/RedHatQE/openshift-python-wrapper/pull/90)
+- [**Verified**][**approved**][**size/XS**] CDI resource is not Namespace resource [#82](https://github.com/RedHatQE/openshift-python-wrapper/pull/82)
+- [**Verified**][**approved**][**release-note-none**][**size/XL**] Move classes from virtual_machine.py to own files. [#79](https://github.com/RedHatQE/openshift-python-wrapper/pull/79)
+- [**Verified**][**approved**][**release-note-none**][**size/XS**] Add ApiGroup VM_KUBEVIRT_IO [#80](https://github.com/RedHatQE/openshift-python-wrapper/pull/80)
+
+---
+
 ## v1.5.9 (02/08/2021)
 *No changelog for this release.*
 
