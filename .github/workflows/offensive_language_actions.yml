@@ -1,0 +1,14 @@
+name: Block Offensive Language
+on: pull_request_target
+
+jobs:
+  offensive_language_actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run Action
+        uses: ./
+        with:
+          token: ${{secrets.REPO_TOKEN}}
+          action: block_offensive_lanague
