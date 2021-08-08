@@ -15,7 +15,7 @@ jobs:
         # pass user input as arguments
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
-          reviewers: myakove,rnetser,AdiZav
+          reviewers: myakove,rnetser
           action: add_reviewers
       - name: Assign Size Labels
         uses: myakove/set-labels@master
