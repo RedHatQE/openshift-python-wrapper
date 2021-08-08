@@ -10,5 +10,5 @@ jobs:
       - name: Label issue
         uses: myakove/set-labels@master
         with:
-          token: ${{secrets.CNV_QE_BOT_TOKEN}} # default token in GitHub Workflow
+          token: ${{secrets.CNV_QE_BOT_TOKEN}}
           action: labels_by_user_input
