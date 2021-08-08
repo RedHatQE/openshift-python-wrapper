@@ -11,4 +11,4 @@ jobs:
         uses: myakove/set-labels@master
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
-          action: block_offensive_lanague
+          action: block_offensive_language
