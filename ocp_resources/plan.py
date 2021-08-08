@@ -79,8 +79,8 @@ class Plan(NamespacedResource, MTV):
                             "namespace": self.storage_map_namespace,
                         },
                         "network": {
-                            "name": self.storage_map_name,
-                            "namespace": self.storage_map_namespace,
+                            "name": self.network_map_name,
+                            "namespace": self.network_map_namespace,
                         },
                     },
                     "vms": self.virtual_machines_list,
