@@ -10,5 +10,5 @@ jobs:
       - name: Run Action
         uses: myakove/set-labels@master
         with:
-          token: ${{secrets.REPO_TOKEN}}
+          token: ${{secrets.CNV_QE_BOT_TOKEN}}
           action: block_offensive_lanague
