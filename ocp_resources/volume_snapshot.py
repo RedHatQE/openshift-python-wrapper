@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import NamespacedResource, Resource
 
 
 class VolumeSnapshot(NamespacedResource):
@@ -9,9 +9,9 @@ class VolumeSnapshot(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.SNAPSHOT_STORAGE_K8S_IO
 
 
-class VolumeSnapshotClass(NamespacedResource):
+class VolumeSnapshotClass(Resource):
     """
     VolumeSnapshotClass object.
     """
 
-    api_group = NamespacedResource.ApiGroup.SNAPSHOT_STORAGE_K8S_IO
+    api_group = Resource.ApiGroup.SNAPSHOT_STORAGE_K8S_IO
