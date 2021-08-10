@@ -3,7 +3,7 @@ from ocp_resources.resource import Resource
 
 class Infrastructure(Resource):
     """
-    ImageStreamTag object.
+    Infrastructure object.
     """
 
     api_group = Resource.ApiGroup.CONFIG_OPENSHIFT_IO
