@@ -26,3 +26,4 @@ git push -f origin master
 git checkout -b $VERSION
 git push origin $VERSION
 git checkout master
+git pull origin master
