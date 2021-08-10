@@ -8,6 +8,11 @@ class Infrastructure(Resource):
 
     api_group = Resource.ApiGroup.CONFIG_OPENSHIFT_IO
 
+    class Type:
+        BARE_METAL = "BareMetal"
+        AWS = "AWS"
+        OPENSTACK = "OpenStack"
+
     @property
     def platform(self):
         return self.instance.status.platformStatus.type
