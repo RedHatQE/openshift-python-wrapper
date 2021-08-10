@@ -20,7 +20,7 @@ gren release -D prs --override
 # Generate and push CHANGELOG.md
 gren changelog --override
 git commit -a -m"Update changelog for version $VERSION"
-git push origin master
+git push -f origin master
 
 # Create branch for the new release
 git checkout -b $VERSION
