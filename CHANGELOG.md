@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.13 (10/08/2021)
+- [**Verified**][**size/XS**] Add Infrastructure resource [#100](https://github.com/RedHatQE/openshift-python-wrapper/pull/100)
+
+---
+
 ## v1.5.12 (10/08/2021)
 - [**size/XS**] Update changelog for version v1.5.11 [#99](https://github.com/RedHatQE/openshift-python-wrapper/pull/99)
 
