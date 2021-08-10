@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.11 (10/08/2021)
+- [**Verified**][**size/XS**] Split VolumeSnapshot, VolumeSnaphshotClass [#96](https://github.com/RedHatQE/openshift-python-wrapper/pull/96)
+- [**Verified**][**size/XS**] VolumeSnapshotClass resource is not namespaced [#95](https://github.com/RedHatQE/openshift-python-wrapper/pull/95)
+- [**Verified**][**size/XS**] Fixing network section in Plan resource [#94](https://github.com/RedHatQE/openshift-python-wrapper/pull/94)
+- [**size/XS**] Update readme [#92](https://github.com/RedHatQE/openshift-python-wrapper/pull/92)
+
+---
+
 ## v1.5.10 (05/08/2021)
 - [**size/XS**] [CI] Update pre-commit pycln rev tag [#90](https://github.com/RedHatQE/openshift-python-wrapper/pull/90)
 - [**Verified**][**approved**][**size/XS**] CDI resource is not Namespace resource [#82](https://github.com/RedHatQE/openshift-python-wrapper/pull/82)
