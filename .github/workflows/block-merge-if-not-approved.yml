@@ -1,5 +1,11 @@
 name: Block merge if not approved
-on: [pull_request_review, pull_request_target]
+on:
+  pull_request_target:
+  workflow_run:
+    workflows:
+      - Dummy pull_request_review workflow
+    types:
+      - requested
 
 jobs:
   block_pr_if_not_approved:
