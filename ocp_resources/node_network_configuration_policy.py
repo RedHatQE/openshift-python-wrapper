@@ -32,6 +32,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             CONFIGURING = "ConfigurationProgressing"
             SUCCESS = "SuccessfullyConfigured"
             FAILED = "FailedToConfigure"
+            NO_MATCHING_NODE = "NoMatchingNode"
 
     def __init__(
         self,
@@ -310,6 +311,11 @@ class NodeNetworkConfigurationPolicy(Resource):
                 if sample == self.Conditions.Reason.SUCCESS:
                     LOGGER.info("NNCP configured Successfully")
                     return sample
+
+                if sample == self.Conditions.Reason.NO_MATCHING_NODE:
+                    raise NNCPConfigurationFailed(
+                        f"Reason: {self.Conditions.Reason.NO_MATCHING_NODE}"
+                    )
 
                 if sample == self.Conditions.Reason.FAILED:
                     for failed_nnce in self._get_failed_nnce():
