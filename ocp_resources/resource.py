@@ -224,13 +224,13 @@ class Resource(object):
     singular_name = None
 
     class Label:
-        NAME = "app.kubernetes.io/name"
-        INSTANCE = "app.kubernetes.io/instance"
-        VERSION = "app.kubernetes.io/version"
-        COMPONENT = "app.kubernetes.io/component"
-        PART_OF = "app.kubernetes.io/part-of"
-        MANAGED_BY = "app.kubernetes.io/managed-by"
-        CREATED_BY = "app.kubernetes.io/created-by"
+        NAME = "name"
+        INSTANCE = "instance"
+        VERSION = "version"
+        COMPONENT = "component"
+        PART_OF = "part-of"
+        MANAGED_BY = "managed-by"
+        CREATED_BY = "created-by"
 
     class Status:
         SUCCEEDED = "Succeeded"
@@ -272,6 +272,7 @@ class Resource(object):
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
         APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
+        APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
