@@ -7,20 +7,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Remove Merge Checks
+        uses: myakove/set-labels@master
+        with:
+          token: ${{secrets.CNV_QE_BOT_TOKEN}}
+          action: remove_merge_checks
+
       - name: Assign Reviewers
         uses: myakove/set-labels@master
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
           reviewers: myakove,rnetser
           action: add_reviewers
+
       - name: Assign Size Labels
         uses: myakove/set-labels@master
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
           reviewers: myakove,rnetser
           action: size_label_prs
-      - name: Remove Verified Label
-        uses: myakove/set-labels@master
-        with:
-          token: ${{secrets.CNV_QE_BOT_TOKEN}}
-          action: remove_verified_label
