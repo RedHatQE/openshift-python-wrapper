@@ -223,6 +223,15 @@ class Resource(object):
     api_version = None
     singular_name = None
 
+    class Label:
+        NAME = "app.kubernetes.io/name"
+        INSTANCE = "app.kubernetes.io/instance"
+        VERSION = "app.kubernetes.io/version"
+        COMPONENT = "app.kubernetes.io/component"
+        PART_OF = "app.kubernetes.io/part-of"
+        MANAGED_BY = "app.kubernetes.io/managed-by"
+        CREATED_BY = "app.kubernetes.io/created-by"
+
     class Status:
         SUCCEEDED = "Succeeded"
         FAILED = "Failed"
