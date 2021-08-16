@@ -223,15 +223,6 @@ class Resource(object):
     api_version = None
     singular_name = None
 
-    class Label:
-        NAME = "name"
-        INSTANCE = "instance"
-        VERSION = "version"
-        COMPONENT = "component"
-        PART_OF = "part-of"
-        MANAGED_BY = "managed-by"
-        CREATED_BY = "created-by"
-
     class Status:
         SUCCEEDED = "Succeeded"
         FAILED = "Failed"
