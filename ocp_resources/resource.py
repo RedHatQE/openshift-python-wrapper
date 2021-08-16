@@ -279,6 +279,7 @@ class Resource(object):
         LITMUS_IO = "litmuschaos.io"
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
+        MAISTRA_IO = "maistra.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
             "networkaddonsoperator.network.kubevirt.io"
