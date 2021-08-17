@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.16 (17/08/2021)
+
+---
+
 ## v1.5.15 (11/08/2021)
 - [**closed**] TimeoutSampler exceptions arg deprecation for Resource get() retry [#24](https://github.com/RedHatQE/openshift-python-wrapper/pull/24)
 
