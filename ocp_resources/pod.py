@@ -68,7 +68,7 @@ class Pod(NamespacedResource):
         """
         return self.instance.spec.containers
 
-    def execute(self, command, timeout=60, container=None):
+    def execute(self, command, timeout=60, container=None, ignore_rc=False):
         """
         Run command on Pod
 
@@ -76,6 +76,7 @@ class Pod(NamespacedResource):
             command (list): Command to run.
             timeout (int): Time to wait for the command.
             container (str): Container name where to exec the command.
+            ignore_rc (bool): If True ignore error rc from the shell and return out.
 
         Returns:
             str: Command output.
@@ -124,7 +125,7 @@ class Pod(NamespacedResource):
         stdout = resp.read_stdout(timeout=5)
         stderr = resp.read_stderr(timeout=5)
 
-        if rcstring == "Success":
+        if rcstring == "Success" or ignore_rc:
             return stdout
 
         returncode = [
