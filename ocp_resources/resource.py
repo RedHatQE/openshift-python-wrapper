@@ -263,6 +263,7 @@ class Resource(object):
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
         APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
+        APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
