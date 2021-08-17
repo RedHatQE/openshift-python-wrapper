@@ -284,6 +284,7 @@ class Resource(object):
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
             "networkaddonsoperator.network.kubevirt.io"
         )
+        NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
@@ -313,6 +314,7 @@ class Resource(object):
         V1 = "v1"
         V1BETA1 = "v1beta1"
         V1ALPHA1 = "v1alpha1"
+        V1ALPHA3 = "v1alpha3"
 
     def __init__(
         self,
