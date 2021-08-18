@@ -11,7 +11,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Run Action
-        uses: myakove/set-labels@master
+        uses: myakove/pr-workflows@master
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
           action: block_offensive_language
