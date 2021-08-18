@@ -8,7 +8,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Label issue
-        uses: myakove/set-labels@master
+        uses: myakove/pr-workflows@master
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
           action: labels_by_user_input
