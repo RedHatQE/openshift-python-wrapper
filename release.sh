@@ -9,6 +9,12 @@ REMOTE_ORIGIN=$(grep -A3 '\[remote "origin"\]' .git/config)
 
 if [[ $REMOTE_ORIGIN != *"github.com:RedHatQE/openshift-python-wrapper"* ]]; then
   echo "This script shouldn't run from forked repo!"
+  exit 1
+fi
+
+if [[ -z "${GREN_GITHUB_TOKEN}" ]]; then
+  echo "GREN_GITHUB_TOKEN is undefined"
+  exit 1
 fi
 
 # Update setup.cfg with the new version and push to master
