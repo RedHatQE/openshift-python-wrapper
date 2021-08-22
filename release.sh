@@ -24,9 +24,9 @@ if [[ -z "${GREN_GITHUB_TOKEN}" ]]; then
 fi
 
 # Create branch for the new release
-git checkout $BASE_SOURCE_BRANCH
+git checkout origin/$BASE_SOURCE_BRANCH
 if [[ $? ]]; then
-  echo "Source branch $BASE_SOURCE_BRANCH does not exist"
+  echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
   exit 1
 fi
 
