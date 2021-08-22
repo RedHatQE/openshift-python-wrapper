@@ -19,7 +19,7 @@ jobs:
 #        with:
 #          ref: ${{ github.event.release.sha }}
       - run: |
-          git checkout ${$GITHUB_SHA}
+          git checkout "$GITHUB_SHA"
           python -m pip install build --user
           python -m build --sdist --outdir dist/
 
