@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.3.24 (22/08/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.23 (22/08/2021)
 *No changelog for this release.*
 
@@ -143,11 +148,3 @@
 
 ## v1.5.12 (10/08/2021)
 - [**size/XS**] Update changelog for version v1.5.11 [#99](https://github.com/RedHatQE/openshift-python-wrapper/pull/99)
-
----
-
-## v1.5.11 (10/08/2021)
-- [**Verified**][**size/XS**] Split VolumeSnapshot, VolumeSnaphshotClass [#96](https://github.com/RedHatQE/openshift-python-wrapper/pull/96)
-- [**Verified**][**size/XS**] VolumeSnapshotClass resource is not namespaced [#95](https://github.com/RedHatQE/openshift-python-wrapper/pull/95)
-- [**Verified**][**size/XS**] Fixing network section in Plan resource [#94](https://github.com/RedHatQE/openshift-python-wrapper/pull/94)
-- [**size/XS**] Update readme [#92](https://github.com/RedHatQE/openshift-python-wrapper/pull/92)
