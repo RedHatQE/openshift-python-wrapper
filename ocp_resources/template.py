@@ -34,6 +34,11 @@ class Template(NamespacedResource):
             f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-url"
         )
 
+    class VMAnnotations:
+        OS = f"{NamespacedResource.ApiGroup.VM_KUBEVIRT_IO}/os"
+        FLAVOR = f"{NamespacedResource.ApiGroup.VM_KUBEVIRT_IO}/flavor"
+        WORKLOAD = f"{NamespacedResource.ApiGroup.VM_KUBEVIRT_IO}/workload"
+
     def process(self, client=None, **kwargs):
         client = client or self.client
         instance_dict = self.instance.to_dict()
