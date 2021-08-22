@@ -25,13 +25,17 @@ if [[ -z "${GREN_GITHUB_TOKEN}" ]]; then
 fi
 
 # Create branch for the new release
-git checkout origin/$BASE_SOURCE_BRANCH
+#git checkout origin/$BASE_SOURCE_BRANCH
+#if [[ $? != 0 ]]; then
+#  echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
+#  exit 1
+#fi
+
+git checkout -b $TARGET_BRANCH origin/$BASE_SOURCE_BRANCH
 if [[ $? != 0 ]]; then
   echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
   exit 1
 fi
-
-git checkout -b $TARGET_BRANCH
 OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 
 # Update setup.cfg with the new version and push to $TARGET_BRANCH
