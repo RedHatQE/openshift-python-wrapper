@@ -48,7 +48,7 @@ jobs:
         run: echo $ref
 
       - name: Checkout version
-        run: git checkout ${{ github.event.release.head.sha }}
+        run: git checkout ${{ github.event.release.github_sha }}
 
       - name: Install pypa/build
         run: >-
