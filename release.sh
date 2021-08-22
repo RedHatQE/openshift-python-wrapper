@@ -5,7 +5,6 @@
 SETUP_CFG="setup.cfg"
 BASE_SOURCE_BRANCH="$1"
 VERSION="$2"
-OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 REMOTE_ORIGIN=$(grep -A3 '\[remote "origin"\]' .git/config)
 if [[ $BASE_SOURCE_BRANCH != "master" ]]; then
   TARGET_BRANCH="branch-$VERSION"
@@ -31,7 +30,8 @@ if [[ $? != 0 ]]; then
   exit 1
 fi
 
-#git checkout -b $TARGET_BRANCH
+# git checkout -b $TARGET_BRANCH
+OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 
 # Update setup.cfg with the new version and push to $TARGET_BRANCH
 sed -i s/$OLD_VERSION/$VERSION/g $SETUP_CFG
