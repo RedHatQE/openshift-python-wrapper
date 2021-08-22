@@ -15,6 +15,9 @@ jobs:
         with:
           python-version: 3.7
 
+      - name: echo version
+        run: echo ${{ github.event.release.head.sha }}
+
       - name: Checkout version
         run: git checkout ${{ github.event.release.head.sha }}
 
