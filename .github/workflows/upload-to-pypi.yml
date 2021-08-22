@@ -1,3 +1,5 @@
+name: Upload Python distributions to PyPI
+
 on:
   release:
     types: [created]
