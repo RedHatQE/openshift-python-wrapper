@@ -15,8 +15,38 @@ jobs:
         with:
           python-version: 3.7
 
-      - name: echo version
-        run: echo ${{ github.event.release.head.sha }}
+      - name: echo version1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          run: echo ref
+
+      - name: echo version2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          run: echo $ref
+
+
+      - name: echo version3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          run: echo ${{ ref }}
+
+      - name: echo version4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+        run: echo ${{ ref }}
+
+      - name: echo version5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+        run: echo ref
+
+
+      - name: echo version6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+        run: echo $
+
 
       - name: Checkout version
         run: git checkout ${{ github.event.release.head.sha }}
