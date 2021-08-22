@@ -17,5 +17,5 @@ jobs:
         uses: myakove/pr-workflows@master
         with:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
-          action: block_offensive_language
+          action: upload_to_pypi
           pypi_token: ${{ secrets.PYPI_API_TOKEN }}
