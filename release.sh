@@ -26,27 +26,28 @@ fi
 
 # Create branch for the new release
 git checkout origin/$BASE_SOURCE_BRANCH
-if [[ $? ]]; then
-  echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
-  exit 1
-fi
-
-git checkout -b $TARGET_BRANCH
-
-# Update setup.cfg with the new version and push to $TARGET_BRANCH
-sed -i s/$OLD_VERSION/$VERSION/g $SETUP_CFG
-git commit -a -m"Update version: $TARGET_BRANCH"
-git push origin $TARGET_BRANCH
-
-# Create release on Github
-gh release create $VERSION
-
-# Generate release notes
-gren release -D prs --override
-
-# Generate and push CHANGELOG.md
-gren changelog --override
-git commit -a -m"Update changelog for version $VERSION"
-git push -f origin $TARGET_BRANCH
-
-git pull origin $TARGET_BRANCH
+echo  $?
+#if [[ $? ]]; then
+#  echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
+#  exit 1
+#fi
+#
+#git checkout -b $TARGET_BRANCH
+#
+## Update setup.cfg with the new version and push to $TARGET_BRANCH
+#sed -i s/$OLD_VERSION/$VERSION/g $SETUP_CFG
+#git commit -a -m"Update version: $TARGET_BRANCH"
+#git push origin $TARGET_BRANCH
+#
+## Create release on Github
+#gh release create $VERSION
+#
+## Generate release notes
+#gren release -D prs --override
+#
+## Generate and push CHANGELOG.md
+#gren changelog --override
+#git commit -a -m"Update changelog for version $VERSION"
+#git push -f origin $TARGET_BRANCH
+#
+#git pull origin $TARGET_BRANCH
