@@ -18,8 +18,8 @@ jobs:
         with:
           python-version: 3.7
 
-      -name: create from 1.5.3.4
-       run: cat setup.cfg
+      - name: create from 1.5.3.4
+        run: cat setup.cfg
 
       - name: Install pypa/build
         run: >-
