@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.3.11 (22/08/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.10 (22/08/2021)
 *No changelog for this release.*
 
@@ -145,7 +150,3 @@
 ---
 
 ## test github action > push to pypi (05/07/2021)
-
----
-
-## First release (04/07/2021)
