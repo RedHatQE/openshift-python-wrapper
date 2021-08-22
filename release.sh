@@ -9,6 +9,7 @@ OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 REMOTE_ORIGIN=$(grep -A3 '\[remote "origin"\]' .git/config)
 if [[ $BASE_SOURCE_BRANCH != "master" ]]; then
   TARGET_BRANCH="branch-$VERSION"
+
 else
   TARGET_BRANCH="master"
 fi
