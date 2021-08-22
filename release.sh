@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage: ./release.sh master v1.5.3
+# Run from master branch
 
 SETUP_CFG="setup.cfg"
 BASE_SOURCE_BRANCH="$1"
@@ -49,3 +50,4 @@ git commit -a -m"Update changelog for version $VERSION"
 git push -f origin $TARGET_BRANCH
 
 git pull origin $TARGET_BRANCH
+git checkout master
