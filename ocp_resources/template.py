@@ -1,6 +1,6 @@
 import json
 
-from ocp_resources.resource import NamespacedResource, Resource
+from ocp_resources.resource import NamespacedResource
 
 
 class Template(NamespacedResource):
@@ -35,9 +35,9 @@ class Template(NamespacedResource):
         )
 
     class VMAnnotations:
-        OS = f"{Resource.ApiGroup.VM_KUBEVIRT_IO}/os"
-        FLAVOR = f"{Resource.ApiGroup.VM_KUBEVIRT_IO}/flavor"
-        WORKLOAD = f"{Resource.ApiGroup.VM_KUBEVIRT_IO}/workload"
+        OS = f"{NamespacedResource.ApiGroup.VM_KUBEVIRT_IO}/os"
+        FLAVOR = f"{NamespacedResource.ApiGroup.VM_KUBEVIRT_IO}/flavor"
+        WORKLOAD = f"{NamespacedResource.ApiGroup.VM_KUBEVIRT_IO}/workload"
 
     def process(self, client=None, **kwargs):
         client = client or self.client
