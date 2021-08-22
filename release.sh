@@ -5,6 +5,7 @@
 SETUP_CFG="setup.cfg"
 BASE_SOURCE_BRANCH="$1"
 VERSION="$2"
+STRIPPED_VERSION=$(echo $VERSION | sed 's/v//g')
 REMOTE_ORIGIN=$(grep -A3 '\[remote "origin"\]' .git/config)
 if [[ $BASE_SOURCE_BRANCH != "master" ]]; then
   TARGET_BRANCH="branch-$VERSION"
@@ -34,7 +35,7 @@ fi
 OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 
 # Update setup.cfg with the new version and push to $TARGET_BRANCH
-sed -i s/$OLD_VERSION/$VERSION/g $SETUP_CFG
+sed -i s/$OLD_VERSION/$STRIPPED_VERSION/g $SETUP_CFG
 #git commit -a -m"Update version: $TARGET_BRANCH"
 #git push origin $TARGET_BRANCH
 #
