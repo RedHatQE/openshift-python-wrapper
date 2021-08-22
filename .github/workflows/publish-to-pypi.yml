@@ -16,9 +16,10 @@ jobs:
           python-version: 3.7
 
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.release.sha }}
+#        with:
+#          ref: ${{ github.event.release.sha }}
       - run: |
+          git checkout ${$GITHUB_SHA}
           python -m pip install build --user
           python -m build --sdist --outdir dist/
 
