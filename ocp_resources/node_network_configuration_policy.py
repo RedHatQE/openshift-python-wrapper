@@ -148,7 +148,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         samples = TimeoutSampler(
             wait_timeout=3,
             sleep=1,
-            exceptions=ConflictError,
+            exceptions_dict={ConflictError: []},
             func=self.update,
             resource_dict=resource,
         )
