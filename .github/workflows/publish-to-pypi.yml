@@ -22,34 +22,34 @@ jobs:
 
       - name: echo version2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.release.github_sha }}
           run: echo $ref
 
 
       - name: echo version3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.release.github_sha }}
           run: echo ${{ ref }}
 
       - name: echo version4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.release.github_sha }}
         run: echo ${{ ref }}
 
       - name: echo version5
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.release.github_sha }}
         run: echo ref
 
 
       - name: echo version6
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-        run: echo $
+          ref: ${{ github.event.release.github_sha }}
+        run: echo $ref
 
 
       - name: Checkout version
-        run: git checkout ${{ github.event.release.head.sha }}
+        run: git checkout ${{ github.event.release.github_sha }}
 
       - name: Install pypa/build
         run: >-
