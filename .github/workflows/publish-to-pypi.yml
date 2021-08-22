@@ -16,7 +16,7 @@ jobs:
           python-version: 3.7
 
       - name: Checkout version
-        run: git checkout ${{ github.event.release.github_sha }}
+        run: git checkout ${{ env.GITHUB_SHA }}
 
       - name: Install pypa/build
         run: >-
