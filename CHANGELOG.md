@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.3.45 (23/08/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.44 (23/08/2021)
 *No changelog for this release.*
 
@@ -141,9 +146,4 @@
 ---
 
 ## v1.5.3.16 (22/08/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.3.15 (22/08/2021)
 *No changelog for this release.*
