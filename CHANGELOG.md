@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.3.31 (22/08/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.30 (22/08/2021)
 *No changelog for this release.*
 
@@ -142,10 +147,3 @@
 
 ## v1.5.3.2 (22/08/2021)
 *No changelog for this release.*
-
----
-
-## v1.5.3.1 (22/08/2021)
-- [**Approve**] Annot 1 5 3 1 [#116](https://github.com/RedHatQE/openshift-python-wrapper/pull/116)
-- [**Verified**][**size/XS**][**Approve**] Add VirtualService resource for Service Mesh usage. [#112](https://github.com/RedHatQE/openshift-python-wrapper/pull/112)
-- [**Verified**][**size/XS**][**Approve**] Add DestinationRule resource for Service Mesh usage. [#110](https://github.com/RedHatQE/openshift-python-wrapper/pull/110)
