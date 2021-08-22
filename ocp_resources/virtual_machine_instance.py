@@ -2,8 +2,8 @@ import logging
 
 import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
-from urllib3.exceptions import ProtocolError
 
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import TIMEOUT, NamespacedResource
@@ -152,7 +152,7 @@ class VirtualMachineInstance(NamespacedResource):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=(ProtocolError),
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.get_domstate,
         )
         for sample in samples:
@@ -163,7 +163,7 @@ class VirtualMachineInstance(NamespacedResource):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=(ProtocolError),
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.get_vmi_active_condition,
         )
         for sample in samples:
