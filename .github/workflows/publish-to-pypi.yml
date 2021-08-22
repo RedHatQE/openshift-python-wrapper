@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: 3.7
 
-      -name: create from master
+      - name: create from master
         run: cat setup.cfg
 
       - name: Install pypa/build
