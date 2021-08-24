@@ -10,7 +10,7 @@ STRIPPED_VERSION=$(echo $VERSION | sed 's/v//g')
 REMOTE_ORIGIN=$(grep -A3 '\[remote "origin"\]' .git/config)
 MASTER_BRANCH="master"
 
-if [[ $BASE_SOURCE_BRANCH != $MASTER_BRANCH ]]; then
+if [[ $BASE_SOURCE_BRANCH != "$MASTER_BRANCH" ]]; then
   TARGET_BRANCH="branch-$VERSION"
 
 else
@@ -27,13 +27,13 @@ if [[ -z "${GREN_GITHUB_TOKEN}" ]]; then
   exit 1
 fi
 
-if [[ `git branch --show-current` != $MASTER_BRANCH ]]; then
+if [[ `git branch --show-current` != "$MASTER_BRANCH" ]]; then
   echo "Script must be executed from master branch"
   exit 1
 fi
 
 # Create branch for the new release
-if [[ $TARGET_BRANCH != $MASTER_BRANCH ]]; then
+if [[ $TARGET_BRANCH != "$MASTER_BRANCH" ]]; then
   git checkout -b $TARGET_BRANCH origin/$BASE_SOURCE_BRANCH
   if [[ $? != 0 ]]; then
     echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
