@@ -975,17 +975,17 @@ class ResourceEditor(object):
         """Recursively turns any ResourceField objects into dicts to avoid issues caused by appending lists, etc."""
         if issubclass(type(res), ResourceField):
             return ResourceEditor._dictify_resourcefield(res=dict(res.items()))
-        elif type(res) == dict:
+        elif isinstance(res, dict):
             return {
                 ResourceEditor._dictify_resourcefield(
                     res=key
                 ): ResourceEditor._dictify_resourcefield(res=value)
                 for key, value in res.items()
             }
-        elif type(res) == list:
+        elif isinstance(res, list):
             return [ResourceEditor._dictify_resourcefield(res=x) for x in res]
-        else:
-            return res
+
+        return res
 
     @staticmethod
     def _create_backup(original, patch):
