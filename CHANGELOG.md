@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.5.18 (24/08/2021)
+- [**size/XS**] Revert "Add VirtualService resource for Service Mesh usage." [#119](https://github.com/RedHatQE/openshift-python-wrapper/pull/119)
+- [**Verified**][**size/L**][**Approve**] add machineset resource implementation [#97](https://github.com/RedHatQE/openshift-python-wrapper/pull/97)
+
+---
+
+## v1.5.3.50 (23/08/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.17 (17/08/2021)
 *No changelog for this release.*
 
