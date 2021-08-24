@@ -32,14 +32,15 @@ if [[ `git branch --show-current` != $MASTER_BRANCH ]]; then
   exit 1
 fi
 
-
 # Create branch for the new release
-if [[ $TARGET_BRANCH != $MASTER_BRANCH ]]
-git checkout -b $TARGET_BRANCH origin/$BASE_SOURCE_BRANCH
-if [[ $? != 0 ]]; then
-  echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
-  exit 1
+if [[ $TARGET_BRANCH != $MASTER_BRANCH ]]; then
+  git checkout -b $TARGET_BRANCH origin/$BASE_SOURCE_BRANCH
+  if [[ $? != 0 ]]; then
+    echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
+    exit 1
+  fi
 fi
+
 OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 
 # Update setup.cfg with the new version and push to $TARGET_BRANCH
