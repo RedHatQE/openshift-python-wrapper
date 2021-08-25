@@ -230,6 +230,7 @@ class Resource(object):
         DEPLOYED = "Deployed"
         PENDING = "Pending"
         COMPLETED = "Completed"
+        RUNNING = "Running"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
