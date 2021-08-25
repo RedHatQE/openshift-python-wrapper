@@ -26,6 +26,9 @@ class VirtualMachine(NamespacedResource):
         ALWAYS = "Always"
         RERUNONFAILURE = "RerunOnFailure"
 
+    class Status(NamespacedResource.Status):
+        STARTING = "Starting"
+
     def __init__(
         self,
         name=None,

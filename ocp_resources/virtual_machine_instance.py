@@ -21,7 +21,6 @@ class VirtualMachineInstance(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     class Status(NamespacedResource.Status):
-        RUNNING = "Running"
         SCHEDULING = "Scheduling"
 
     def __init__(
