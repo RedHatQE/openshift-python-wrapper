@@ -8,9 +8,6 @@ class NodeMaintenance(Resource):
 
     api_group = Resource.ApiGroup.NODEMAINTENANCE_KUBEVIRT_IO
 
-    class Status(Resource.Status):
-        RUNNING = "Running"
-
     def __init__(
         self,
         name=None,
