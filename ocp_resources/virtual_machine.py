@@ -28,6 +28,7 @@ class VirtualMachine(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         STARTING = "Starting"
+        STOPPED = "stopped"
 
     def __init__(
         self,
