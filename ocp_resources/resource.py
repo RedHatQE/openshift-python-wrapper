@@ -231,6 +231,7 @@ class Resource(object):
         PENDING = "Pending"
         COMPLETED = "Completed"
         RUNNING = "Running"
+        TERMINATING = "Terminating"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"

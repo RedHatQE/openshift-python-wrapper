@@ -27,8 +27,12 @@ class VirtualMachine(NamespacedResource):
         RERUNONFAILURE = "RerunOnFailure"
 
     class Status(NamespacedResource.Status):
+        MIGRATING = "Migrating"
+        PAUSED = "Paused"
+        PROVISIONING = "Provisioning"
         STARTING = "Starting"
         STOPPED = "stopped"
+        STOPPING = "Stopping"
 
     def __init__(
         self,
