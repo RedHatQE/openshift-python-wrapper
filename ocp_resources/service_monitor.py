@@ -1,9 +1,9 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class ServiceMonitor(Resource):
+class ServiceMonitor(NamespacedResource):
     """
     Service Monitor object.
     """
 
-    api_group = Resource.ApiGroup.MONITORING_COREOS_COM
+    api_group = NamespacedResource.ApiGroup.MONITORING_COREOS_COM
