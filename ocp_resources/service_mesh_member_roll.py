@@ -8,7 +8,7 @@ class ServiceMeshMemberRoll(NamespacedResource):
     Service Mesh Member Roll object.
     """
 
-    api_version = NamespacedResource.ApiGroup.MAISTRA_IO
+    api_group = NamespacedResource.ApiGroup.MAISTRA_IO
 
     class Status:
         CONFIGURED = "Configured"
