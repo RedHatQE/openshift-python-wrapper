@@ -36,7 +36,6 @@ class Pod(NamespacedResource):
     api_version = NamespacedResource.ApiVersion.V1
 
     class Status(NamespacedResource.Status):
-        RUNNING = "Running"
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
 
     def __init__(
