@@ -300,6 +300,7 @@ class Resource(object):
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
+        SECURITY_ISTIO_IO = "security.istio.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
         SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
