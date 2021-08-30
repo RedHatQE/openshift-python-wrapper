@@ -70,7 +70,7 @@ class CatalogSourceConfig(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )

@@ -43,7 +43,7 @@ class VirtualMachineInstance(NamespacedResource):
     def _subresource_api_url(self):
         return (
             f"{self.client.configuration.host}/"
-            f"apis/subresources.kubevirt.io/{self.api().api_version}/"
+            f"apis/subresources.kubevirt.io/{self.api.api_version}/"
             f"namespaces/{self.namespace}/virtualmachineinstances/{self.name}"
         )
 
