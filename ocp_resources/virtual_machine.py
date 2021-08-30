@@ -148,12 +148,12 @@ class VirtualMachine(NamespacedResource):
         Returns:
             True if Running else None
         """
-        return self.instance.get("ready", {}).get("printableStatus")
+        return self.instance.get("status", {}).get("ready")
 
     @property
     def printable_status(self):
         """
-        Get VM printableStatus.
+        Get VM printableStatus
 
         Returns:
             VM printableStatus if VM.status.printableStatus else None
