@@ -88,7 +88,7 @@ class MTV:
         samples = TimeoutSampler(
             wait_timeout=wait_timeout,
             sleep=1,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )

@@ -58,7 +58,7 @@ class VirtualMachine(NamespacedResource):
     def _subresource_api_url(self):
         return (
             f"{self.client.configuration.host}/"
-            f"apis/subresources.kubevirt.io/{self.api().api_version}/"
+            f"apis/subresources.kubevirt.io/{self.api.api_version}/"
             f"namespaces/{self.namespace}/virtualmachines/{self.name}"
         )
 
@@ -111,7 +111,7 @@ class VirtualMachine(NamespacedResource):
             wait_timeout=timeout,
             sleep=sleep,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )

@@ -432,7 +432,13 @@ class Resource(object):
             kind=cls.kind, api_version=cls.api_version, **get_kwargs
         ).get(*args, **kwargs)
 
-    def api(self, **kwargs):
+    def _prepare_singular_name_kwargs(self, **kwargs):
+        if self.singular_name:
+            kwargs = kwargs if kwargs else {}
+            kwargs["singular_name"] = self.singular_name
+            return kwargs
+
+    def full_api(self, **kwargs):
         """
         Get resource API
 
@@ -451,8 +457,16 @@ class Resource(object):
         Returns:
             Resource: Resource object.
         """
-        if self.singular_name:
-            kwargs["singular_name"] = self.singular_name
+        kwargs = self._prepare_singular_name_kwargs(**kwargs)
+
+        return self.client.resources.get(
+            api_version=self.api_version, kind=self.kind, **kwargs
+        )
+
+    @property
+    def api(self):
+        kwargs = self._prepare_singular_name_kwargs()
+
         return self.client.resources.get(
             api_version=self.api_version, kind=self.kind, **kwargs
         )
@@ -537,7 +551,7 @@ class Resource(object):
             wait_timeout=timeout,
             sleep=sleep,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -591,15 +605,14 @@ class Resource(object):
 
         LOGGER.info(f"Posting {data}")
         LOGGER.info(f"Create {self.kind} {self.name}")
-        res = self.api().create(body=data, namespace=self.namespace)
+        res = self.api.create(body=data, namespace=self.namespace)
         if wait and res:
             return self.wait()
         return res
 
     def delete(self, wait=False, timeout=TIMEOUT, body=None):
-        resource_list = self.api()
         try:
-            res = resource_list.delete(
+            res = self.api.delete(
                 name=self.name, namespace=self.namespace, body=body
             )
         except NotFoundError:
@@ -631,7 +644,7 @@ class Resource(object):
             resource_dict: Resource dictionary
         """
         LOGGER.info(f"Update {self.kind} {self.name}: {resource_dict}")
-        self.api().patch(
+        self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
             content_type="application/merge-patch+json",
@@ -643,7 +656,7 @@ class Resource(object):
         Use this to remove existing field. (update() will only update existing fields)
         """
         LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
-        self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
+        self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
     def _retry_cluster_exceptions(func):
@@ -692,7 +705,7 @@ class Resource(object):
         """
 
         def _instance():
-            return self.api().get(name=self.name)
+            return self.api.get(name=self.name)
 
         return self._retry_cluster_exceptions(func=_instance)
 
@@ -725,7 +738,7 @@ class Resource(object):
             wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -841,7 +854,7 @@ class NamespacedResource(Resource):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api().get(name=self.name, namespace=self.namespace)
+        return self.api.get(name=self.name, namespace=self.namespace)
 
     def _base_body(self):
         res = super(NamespacedResource, self)._base_body()
