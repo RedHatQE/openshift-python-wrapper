@@ -156,6 +156,6 @@ class VirtualMachine(NamespacedResource):
         Get VM printableStatus
 
         Returns:
-            VM printableStatus is VM.status else None
+            VM printableStatus if VM.status.printableStatus else None
         """
         return self.instance.get("status", {}).get("printableStatus")
