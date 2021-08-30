@@ -595,10 +595,12 @@ class Resource(object):
             return self.wait()
         return res
 
-    def delete(self, wait=False, timeout=TIMEOUT):
+    def delete(self, wait=False, timeout=TIMEOUT, body=None):
         resource_list = self.api()
         try:
-            res = resource_list.delete(name=self.name, namespace=self.namespace)
+            res = resource_list.delete(
+                name=self.name, namespace=self.namespace, body=body
+            )
         except NotFoundError:
             return False
 
