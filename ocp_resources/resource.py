@@ -433,10 +433,11 @@ class Resource(object):
         ).get(*args, **kwargs)
 
     def _prepare_singular_name_kwargs(self, **kwargs):
+        kwargs = kwargs if kwargs else {}
         if self.singular_name:
-            kwargs = kwargs if kwargs else {}
             kwargs["singular_name"] = self.singular_name
-            return kwargs
+
+        return kwargs
 
     def full_api(self, **kwargs):
         """
