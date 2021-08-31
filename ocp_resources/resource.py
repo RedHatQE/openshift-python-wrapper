@@ -613,9 +613,7 @@ class Resource(object):
 
     def delete(self, wait=False, timeout=TIMEOUT, body=None):
         try:
-            res = self.api.delete(
-                name=self.name, namespace=self.namespace, body=body
-            )
+            res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
             return False
 
