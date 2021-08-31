@@ -204,6 +204,7 @@ class TimeoutSampler:
         if not exception_messages:
             return True
 
+        # Prevent match if provided with empty string
         return any(msg and msg in str(exp) for msg in exception_messages)
 
     def _is_raisable_exception(self, exp):
