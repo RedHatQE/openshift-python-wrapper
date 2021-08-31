@@ -1,0 +1,17 @@
+name: Issue from PR
+on:
+  push:
+  pull_request:
+    types: [closed]
+
+jobs:
+  issue_from_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Issue from PR
+        uses: myakove/pr-workflows@master
+        with:
+          token: ${{secrets.CNV_QE_BOT_TOKEN}}
+          action: issue_from_pr
