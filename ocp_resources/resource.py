@@ -581,11 +581,11 @@ class Resource(object):
             name = body.get("name")
             api_version = body["apiVersion"]
             if kind != self.kind:
-                ValueMismatch(f"{kind} != {self.kind}")
+                raise ValueMismatch(f"{kind} != {self.kind}")
             if name and name != self.name:
-                ValueMismatch(f"{name} != {self.name}")
+                raise ValueMismatch(f"{name} != {self.name}")
             if api_version != self.api_version:
-                ValueMismatch(f"{api_version} != {self.api_version}")
+                raise ValueMismatch(f"{api_version} != {self.api_version}")
 
             data.update(body)
 
