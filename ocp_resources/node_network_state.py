@@ -30,9 +30,9 @@ class NodeNetworkState(Resource):
 
         # First drop the interface is's already in the list
         interfaces = [
-            i
-            for i in self.desired_state["interfaces"]
-            if not (i["name"] == interface["name"])
+            iface
+            for iface in self.desired_state["interfaces"]
+            if iface["name"] != interface["name"]
         ]
 
         # Add the interface

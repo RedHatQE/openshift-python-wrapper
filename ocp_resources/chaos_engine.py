@@ -30,7 +30,4 @@ class ChaosEngine(NamespacedResource):
     @property
     def success(self):
         exps = self.experiments_status
-        for exp in exps.values():
-            if exp["verdict"] != "Pass":
-                return False
-        return True
+        return all(exp["verdict"] == "Pass" for exp in exps.values())

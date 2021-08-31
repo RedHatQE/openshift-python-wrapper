@@ -54,15 +54,14 @@ class Event:
         event_listener = dyn_client.resources.get(
             api_version=cls.api_version, kind=cls.__name__
         )
-        for event in event_listener.watch(
+        yield from event_listener.watch(
             namespace=namespace,
             name=name,
             label_selector=label_selector,
             field_selector=field_selector,
             resource_version=resource_version,
             timeout=timeout,
-        ):
-            yield event
+        )
 
     @classmethod
     def delete_events(

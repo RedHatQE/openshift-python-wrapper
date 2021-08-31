@@ -152,11 +152,12 @@ class MachineSet(NamespacedResource):
             bool: True if machine-set reached 'ready' state, False otherwise.
         """
         try:
-            for ready_replicas in TimeoutSampler(
-                wait_timeout=timeout, sleep=sleep, func=lambda: self.ready_replicas
-            ):
-                if ready_replicas and ready_replicas == self.desired_replicas:
-                    return True
+            return any(
+                ready_replicas and ready_replicas == self.desired_replicas
+                for ready_replicas in TimeoutSampler(
+                    wait_timeout=timeout, sleep=sleep, func=lambda: self.ready_replicas
+                )
+            )
         except TimeoutExpiredError:
             LOGGER.error(
                 f"Machine-set {self.name} replicas failed to reach into 'ready' state, actual ready replicas: "
