@@ -1,8 +1,5 @@
 name: Issue from PR
-on:
-  push:
-  pull_request_target:
-    types: [closed]
+on: pull_request_target
 
 jobs:
   issue_from_pr:
