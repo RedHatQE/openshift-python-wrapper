@@ -1,7 +1,6 @@
 import logging
 
 import kubernetes
-from openshift.dynamic.exceptions import NotFoundError
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.resource import TIMEOUT, NamespacedResource
@@ -48,27 +47,20 @@ class DaemonSet(NamespacedResource):
                 ):
                     return
 
-    def delete(self, wait=False, timeout=TIMEOUT):
+    def delete(self, wait=False, timeout=TIMEOUT, body=None):
         """
         Delete Daemonset
 
         Args:
             wait (bool): True to wait for Daemonset to be deleted.
             timeout (int): Time to wait for resource deletion
+            body (dict): Content to send for delete()
 
         Returns:
             bool: True if delete succeeded, False otherwise.
         """
-        try:
-            res = self.api().delete(
-                name=self.name,
-                namespace=self.namespace,
-                body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
-            )
-        except NotFoundError:
-            return False
-
-        LOGGER.info(f"Delete {self.name}")
-        if wait and res:
-            return self.wait_deleted(timeout=timeout)
-        return res
+        super().delete(
+            wait=wait,
+            timeout=timeout,
+            body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
+        )
