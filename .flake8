@@ -38,6 +38,7 @@ fcfn_exclude_functions =
     LOGGER,
     findall,
     raises,
+    contextlib,
 
 enable-extensions =
     FCFN,

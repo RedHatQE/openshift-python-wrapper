@@ -1,3 +1,4 @@
+import contextlib
 import json
 import logging
 import os
@@ -129,12 +130,12 @@ def sub_resource_level(current_class, owner_class, parent_class):
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
     for class_iterator in reversed(
-        list(
+        [
             class_iterator
             for class_iterator in current_class.mro()
             if class_iterator not in owner_class.mro()
             and issubclass(class_iterator, parent_class)
-        )
+        ]
     ):
         return class_iterator.__name__
 
@@ -153,12 +154,10 @@ class KubeAPIVersion(Version):
         super().__init__(vstring=vstring)
 
     def parse(self, vstring):
-        components = [x for x in self.component_re.split(vstring) if x]
-        for i, obj in enumerate(components):
-            try:
-                components[i] = int(obj)
-            except ValueError:
-                pass
+        components = [comp for comp in self.component_re.split(vstring) if comp]
+        for idx, obj in enumerate(components):
+            with contextlib.suppress(ValueError):
+                components[idx] = int(obj)
 
         errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
 
@@ -200,7 +199,7 @@ class KubeAPIVersion(Version):
             return 1
 
 
-class classproperty(object):  # noqa: N801
+class ClassProperty:
     def __init__(self, func):
         self.func = func
 
@@ -214,7 +213,7 @@ class ValueMismatch(Exception):
     """
 
 
-class Resource(object):
+class Resource:
     """
     Base class for API resources
     """
@@ -369,7 +368,7 @@ class Resource(object):
         self.teardown = teardown
         self.timeout = timeout
 
-    @classproperty
+    @ClassProperty
     def kind(cls):  # noqa: N805
         return sub_resource_level(cls, NamespacedResource, Resource)
 
@@ -862,7 +861,7 @@ class NamespacedResource(Resource):
         return self._base_body()
 
 
-class ResourceEditor(object):
+class ResourceEditor:
     def __init__(self, patches, action="update", user_backups=None):
         """
         Args:

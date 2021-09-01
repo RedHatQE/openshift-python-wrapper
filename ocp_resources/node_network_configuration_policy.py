@@ -99,7 +99,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         interfaces = [
             iface
             for iface in self.desired_state["interfaces"]
-            if not (iface["name"] == interface["name"])
+            if iface["name"] != interface["name"]
         ]
         # Add the interface
         interfaces.append(interface)

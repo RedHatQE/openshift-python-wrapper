@@ -116,11 +116,10 @@ class VirtualMachine(NamespacedResource):
             namespace=self.namespace,
         )
         for sample in samples:
-            if sample.items:
+            if sample.items and self.ready == status:
                 # VM with runStrategy does not have spec.running attribute
                 # VM status should be taken from spec.status.ready
-                if self.ready == status:
-                    return
+                return
 
     def get_interfaces(self):
         return self.instance.spec.template.spec.domain.devices.interfaces
