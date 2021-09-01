@@ -19,5 +19,9 @@ class PersistentVolume(Resource):
         Returns the maximum number (int) of PV's which are in 'Available' state
         """
         return len(
-            [pv for pv in self.api().get()["items"] if pv.status.phase == "Available"]
+            [
+                pv
+                for pv in self.api.get()["items"]
+                if pv.status.phase == Resource.Condition.AVAILABLE
+            ]
         )
