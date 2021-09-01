@@ -978,7 +978,7 @@ class ResourceEditor(object):
     @staticmethod
     def _dictify_resourcefield(res):
         """Recursively turns any ResourceField objects into dicts to avoid issues caused by appending lists, etc."""
-        if issubclass(type(res), ResourceField):
+        if isinstance(res, ResourceField):
             return ResourceEditor._dictify_resourcefield(res=dict(res.items()))
         elif isinstance(res, dict):
             return {
