@@ -3,9 +3,9 @@
 from ocp_resources.resource import NamespacedResource
 
 
-class DestinationRule(NamespacedResource):
+class VirtualService(NamespacedResource):
     """
-    Destination Rule object.
+    Virtual Service object.
     """
 
     api_group = NamespacedResource.ApiGroup.NETWORKING_ISTIO_IO
