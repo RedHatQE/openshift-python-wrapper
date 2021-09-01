@@ -231,6 +231,8 @@ class Resource(object):
         DEPLOYED = "Deployed"
         PENDING = "Pending"
         COMPLETED = "Completed"
+        RUNNING = "Running"
+        TERMINATING = "Terminating"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
@@ -299,6 +301,7 @@ class Resource(object):
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
+        SECURITY_ISTIO_IO = "security.istio.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
         SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
@@ -579,11 +582,11 @@ class Resource(object):
             name = body.get("name")
             api_version = body["apiVersion"]
             if kind != self.kind:
-                ValueMismatch(f"{kind} != {self.kind}")
+                raise ValueMismatch(f"{kind} != {self.kind}")
             if name and name != self.name:
-                ValueMismatch(f"{name} != {self.name}")
+                raise ValueMismatch(f"{name} != {self.name}")
             if api_version != self.api_version:
-                ValueMismatch(f"{api_version} != {self.api_version}")
+                raise ValueMismatch(f"{api_version} != {self.api_version}")
 
             data.update(body)
 
@@ -594,10 +597,12 @@ class Resource(object):
             return self.wait()
         return res
 
-    def delete(self, wait=False, timeout=TIMEOUT):
+    def delete(self, wait=False, timeout=TIMEOUT, body=None):
         resource_list = self.api()
         try:
-            res = resource_list.delete(name=self.name, namespace=self.namespace)
+            res = resource_list.delete(
+                name=self.name, namespace=self.namespace, body=body
+            )
         except NotFoundError:
             return False
 
