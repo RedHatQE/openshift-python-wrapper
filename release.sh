@@ -40,7 +40,9 @@ if ! git pull origin "$BASE_SOURCE_BRANCH"; then
   exit 1
 fi
 
-
+if ! git checkout "$BASE_SOURCE_BRANCH"; then
+  git switch -c "$BASE_SOURCE_BRANCH"
+fi
 
 OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 
