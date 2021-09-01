@@ -4,6 +4,7 @@ import logging
 
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
+from ocp_resources.utils import TimeoutSampler
 
 
 LOGGER = logging.getLogger(__name__)
@@ -184,6 +185,15 @@ class DataVolume(NamespacedResource):
         return self.pvc.wait_deleted(timeout=timeout)
 
     def wait(self, timeout=600):
+        for sample in TimeoutSampler(
+            wait_timeout=30,
+            sleep=1,
+            func=lambda: self.instance.get("items", [""])[0].status
+            in [self.Status.PENDING, self.Status.FAILED],
+        ):
+            if not sample:
+                break
+
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
         self.pvc.wait_for_status(
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
