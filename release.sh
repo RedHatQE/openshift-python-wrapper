@@ -40,18 +40,19 @@ if ! git pull origin "$BASE_SOURCE_BRANCH"; then
   exit 1
 fi
 
-OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
-
-# Update setup.cfg with the new version and push to $TARGET_BRANCH
-sed -i s/"$OLD_VERSION"/"$STRIPPED_VERSION"/g "$SETUP_CFG"
-git commit -am "Update version: $TARGET_BRANCH"
-git push origin "$BASE_SOURCE_BRANCH"
-
 # Create branch for the new release
 if ! git checkout -b "$TARGET_BRANCH" origin/"$BASE_SOURCE_BRANCH"; then
   echo "Failed to create new branch $TARGET_BRANCH"
   exit 1
 fi
+
+OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
+
+# Update setup.cfg with the new version and push to $TARGET_BRANCH
+sed -i s/"$OLD_VERSION"/"$STRIPPED_VERSION"/g "$SETUP_CFG"
+git commit -am "Update version: $TARGET_BRANCH"
+git push origin -f "$BASE_SOURCE_BRANCH"
+git push origin "$TARGET_BRANCH"
 
 # Create release on Github
 gh release create "$VERSION"
