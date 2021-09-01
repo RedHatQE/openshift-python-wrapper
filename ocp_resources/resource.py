@@ -199,7 +199,7 @@ class KubeAPIVersion(Version):
             return 1
 
 
-class ClassProperty:  # noqa: N801
+class ClassProperty:
     def __init__(self, func):
         self.func = func
 
