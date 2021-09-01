@@ -4,7 +4,7 @@ import logging
 
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import TimeoutSampler, WaitForStatusError
 
 
 LOGGER = logging.getLogger(__name__)
@@ -184,16 +184,10 @@ class DataVolume(NamespacedResource):
         super().wait_deleted(timeout=timeout)
         return self.pvc.wait_deleted(timeout=timeout)
 
-    def wait(self, timeout=600):
-        for sample in TimeoutSampler(
-            wait_timeout=30,
-            sleep=1,
-            func=lambda: self.instance.get("items", [""])[0].status
-            in [self.Status.PENDING, self.Status.FAILED],
-        ):
-            if not sample:
-                break
+    def wait(self, timeout=600, failure_timeout=60):
+        self._check_pending_status(failure_timeout=failure_timeout)
 
+        # If DV's status is not Pending, continue with the flow
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
         self.pvc.wait_for_status(
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
@@ -214,3 +208,16 @@ class DataVolume(NamespacedResource):
             namespace=self.namespace,
             client=self.client,
         )
+
+    def _check_pending_status(self, failure_timeout=60):
+        pending_counter = 0
+        # Avoid waiting for "Succeeded" status if DV's in Pending status
+        for sample in TimeoutSampler(
+            wait_timeout=failure_timeout,
+            sleep=15,
+            func=lambda: self.instance.items.status == self.Status.PENDING,
+        ):
+            if sample:
+                pending_counter += 1
+            if pending_counter > 3:
+                raise WaitForStatusError(f"DV {self.name} status is {sample}")
