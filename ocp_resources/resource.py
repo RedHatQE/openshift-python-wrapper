@@ -466,11 +466,7 @@ class Resource(object):
 
     @property
     def api(self):
-        kwargs = self._prepare_singular_name_kwargs()
-
-        return self.client.resources.get(
-            api_version=self.api_version, kind=self.kind, **kwargs
-        )
+        return self.full_api()
 
     def wait(self, timeout=TIMEOUT, sleep=1):
         """
