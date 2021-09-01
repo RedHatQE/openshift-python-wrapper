@@ -52,6 +52,7 @@ OLD_VERSION=$(grep version setup.cfg | awk -F' = ' '{print $2}')
 sed -i s/"$OLD_VERSION"/"$STRIPPED_VERSION"/g "$SETUP_CFG"
 git commit -a -m"Update version: $TARGET_BRANCH"
 git push origin "$TARGET_BRANCH"
+git push origin "$BASE_SOURCE_BRANCH"
 
 # Create release on Github
 gh release create "$VERSION"
