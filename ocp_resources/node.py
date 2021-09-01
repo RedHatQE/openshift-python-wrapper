@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource, Resource
+from ocp_resources.resource import Resource
 
 
 class Node(Resource):
@@ -8,7 +8,7 @@ class Node(Resource):
 
     api_version = Resource.ApiVersion.V1
 
-    class Status(NamespacedResource.Status):
+    class Status(Resource.Status):
         READY = "Ready"
         SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
 
