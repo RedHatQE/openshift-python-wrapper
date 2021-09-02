@@ -14,6 +14,7 @@ from openshift.dynamic.exceptions import (
     NotFoundError,
     ServerTimeoutError,
 )
+from openshift.dynamic.resource import ResourceField
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
@@ -894,7 +895,7 @@ class ResourceEditor:
          using an unprivileged_user; use default_client or similar instead.***
         """
 
-        self._patches = patches
+        self._patches = self._dictify_resourcefield(res=patches)
         self.action = action
         self.user_backups = user_backups
         self._backups = {}
@@ -980,6 +981,23 @@ class ResourceEditor:
     def __exit__(self, exc_type, exc_val, exc_tb):
         # restore backups
         self.restore()
+
+    @staticmethod
+    def _dictify_resourcefield(res):
+        """Recursively turns any ResourceField objects into dicts to avoid issues caused by appending lists, etc."""
+        if isinstance(res, ResourceField):
+            return ResourceEditor._dictify_resourcefield(res=dict(res.items()))
+        elif isinstance(res, dict):
+            return {
+                ResourceEditor._dictify_resourcefield(
+                    res=key
+                ): ResourceEditor._dictify_resourcefield(res=value)
+                for key, value in res.items()
+            }
+        elif isinstance(res, list):
+            return [ResourceEditor._dictify_resourcefield(res=x) for x in res]
+
+        return res
 
     @staticmethod
     def _create_backup(original, patch):
