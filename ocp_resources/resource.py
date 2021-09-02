@@ -26,7 +26,6 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ConnectionResetError: [],
     InternalServerError: ["etcdserver: leader changed"],
     ServerTimeoutError: [],
-    ConflictError: [],
 }
 
 LOGGER = logging.getLogger(__name__)
@@ -656,12 +655,14 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_cluster_exceptions(func):
+    def _retry_cluster_exceptions(
+        func, exception_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+    ):
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+            exceptions_dict=exception_dict,
             print_log=False,
         )
         for sample in sampler:
@@ -1091,4 +1092,8 @@ class ResourceEditor:
                         resource_dict=patch
                     )  # replace the resource metadata
 
-        return Resource._retry_cluster_exceptions(func=_patch)
+        exceptions_dict = {ConflictError: []}
+        exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
+        return Resource._retry_cluster_exceptions(
+            func=_patch, exception_dict=exceptions_dict
+        )
