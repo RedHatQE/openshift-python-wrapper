@@ -1055,36 +1055,40 @@ class ResourceEditor:
                 "ResourceEdit <action_text> for resource <resource name>"
                 will be printed for each resource; see below
         """
-        for resource, patch in patches.items():
-            LOGGER.info(
-                f"ResourceEdits: {action_text} data for "
-                f"resource {resource.kind} {resource.name}"
-            )
 
-            # add name to patch
-            if "metadata" not in patch:
-                patch["metadata"] = {}
+        def _patch():
+            for resource, patch in patches.items():
+                LOGGER.info(
+                    f"ResourceEdits: {action_text} data for "
+                    f"resource {resource.kind} {resource.name}"
+                )
 
-            # the api requires this field to be present in a yaml patch for
-            # some resource kinds even if it is not changed
-            if "name" not in patch["metadata"]:
-                patch["metadata"]["name"] = resource.name
-
-            if action == "update":
-                resource.update(resource_dict=patch)  # update the resource
-
-            if action == "replace":
+                # add name to patch
                 if "metadata" not in patch:
                     patch["metadata"] = {}
 
-                patch["metadata"]["name"] = resource.name
-                patch["metadata"]["namespace"] = resource.namespace
-                patch["metadata"][
-                    "resourceVersion"
-                ] = resource.instance.metadata.resourceVersion
-                patch["kind"] = resource.kind
-                patch["apiVersion"] = resource.api_version
+                # the api requires this field to be present in a yaml patch for
+                # some resource kinds even if it is not changed
+                if "name" not in patch["metadata"]:
+                    patch["metadata"]["name"] = resource.name
 
-                resource.update_replace(
-                    resource_dict=patch
-                )  # replace the resource metadata
+                if action == "update":
+                    resource.update(resource_dict=patch)  # update the resource
+
+                if action == "replace":
+                    if "metadata" not in patch:
+                        patch["metadata"] = {}
+
+                    patch["metadata"]["name"] = resource.name
+                    patch["metadata"]["namespace"] = resource.namespace
+                    patch["metadata"][
+                        "resourceVersion"
+                    ] = resource.instance.metadata.resourceVersion
+                    patch["kind"] = resource.kind
+                    patch["apiVersion"] = resource.api_version
+
+                    resource.update_replace(
+                        resource_dict=patch
+                    )  # replace the resource metadata
+
+        return Resource._retry_cluster_exceptions(func=_patch)
