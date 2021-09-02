@@ -10,6 +10,7 @@ import urllib3
 import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
+    ConflictError,
     InternalServerError,
     NotFoundError,
     ServerTimeoutError,
@@ -25,6 +26,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ConnectionResetError: [],
     InternalServerError: ["etcdserver: leader changed"],
     ServerTimeoutError: [],
+    ConflictError: [],
 }
 
 LOGGER = logging.getLogger(__name__)
