@@ -218,7 +218,7 @@ class DataVolume(NamespacedResource):
                 sleep=15,
                 func=lambda: self.instance.status.phase,
             ):
-                # If DV status is Pending (or Status is not yet updated), continue to wait, else exit the wait loop
+                # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
                 if sample and sample in [self.Status.PENDING, None]:
                     continue
                 else:
