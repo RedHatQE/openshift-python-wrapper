@@ -4,7 +4,7 @@ import logging
 
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
 LOGGER = logging.getLogger(__name__)
@@ -211,13 +211,18 @@ class DataVolume(NamespacedResource):
 
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
-        for sample in TimeoutSampler(
-            wait_timeout=failure_timeout,
-            sleep=15,
-            func=lambda: self.instance.status.phase in [self.Status.PENDING, None],
-        ):
-            # If DV status is Pending (or Status is not yet updated), continue to wait, else exit the wait loop
-            if sample:
-                continue
-            else:
-                break
+        sample = None
+        try:
+            for sample in TimeoutSampler(
+                wait_timeout=failure_timeout,
+                sleep=15,
+                func=lambda: self.instance.status.phase in [self.Status.PENDING, None],
+            ):
+                # If DV status is Pending (or Status is not yet updated), continue to wait, else exit the wait loop
+                if sample:
+                    continue
+                else:
+                    break
+        except TimeoutExpiredError:
+            LOGGER.error(f"{self.name} status is {sample}")
+            raise
