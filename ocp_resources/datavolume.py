@@ -215,7 +215,7 @@ class DataVolume(NamespacedResource):
         try:
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
-                sleep=15,
+                sleep=10,
                 func=lambda: self.instance.status.phase,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
