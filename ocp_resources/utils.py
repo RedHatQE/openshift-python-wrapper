@@ -19,10 +19,6 @@ class TimeoutExpiredError(Exception):
         return f"Timed Out: {self.value}"
 
 
-class WaitForStatusError(Exception):
-    pass
-
-
 class TimeoutSampler:
     """
     Samples the function output.

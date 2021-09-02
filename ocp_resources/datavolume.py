@@ -185,7 +185,7 @@ class DataVolume(NamespacedResource):
         return self.pvc.wait_deleted(timeout=timeout)
 
     def wait(self, timeout=600, failure_timeout=120):
-        self._check_pending_status(failure_timeout=failure_timeout)
+        self._check_none_pending_status(failure_timeout=failure_timeout)
 
         # If DV's status is not Pending, continue with the flow
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
@@ -209,8 +209,8 @@ class DataVolume(NamespacedResource):
             client=self.client,
         )
 
-    def _check_pending_status(self, failure_timeout=120):
-        # Avoid waiting for "Succeeded" status if DV's in Pending status
+    def _check_none_pending_status(self, failure_timeout=120):
+        # Avoid waiting for "Succeeded" status if DV's in Pending/None status
         for sample in TimeoutSampler(
             wait_timeout=failure_timeout,
             sleep=15,
