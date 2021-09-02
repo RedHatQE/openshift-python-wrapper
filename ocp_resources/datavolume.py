@@ -215,8 +215,7 @@ class DataVolume(NamespacedResource):
         for sample in TimeoutSampler(
             wait_timeout=failure_timeout,
             sleep=15,
-            func=lambda: self.instance.get("status").get("phase")
-            == self.Status.PENDING,
+            func=lambda: self.instance.status.phase == self.Status.PENDING,
         ):
             if sample:
                 pending_counter += 1
