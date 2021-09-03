@@ -162,7 +162,7 @@ class TimeoutSampler:
         timeout_watch = TimeoutWatch(timeout=self.wait_timeout)
         if self.print_log:
             LOGGER.info(
-                f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
+                f"{self._func_log}: Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
             )
 
         last_exp = None
