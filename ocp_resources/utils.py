@@ -144,13 +144,26 @@ class TimeoutSampler:
 
         return output
 
+    def _get_func_info(self, _func, type_):
+        res = getattr(_func, type_, None)
+        if res:
+            if type_ == "__name__" and res == "<lambda>":
+                return f"lambda: {'.'.join(_func.__code__.co_names)}"
+            return res
+
+        if getattr(_func, "func", None):
+            return self._get_func_info(_func=_func.func, type_=type_)
+
     @property
     def _func_log(self):
         """
         Returns:
             string: `func` information to include in log message
         """
-        return f"Function: {self.func} Kwargs: {self.func_kwargs}"
+        _func_kwargs = f"Kwargs: {self.func_kwargs}" if self.func_kwargs else ""
+        _func_module = self._get_func_info(_func=self.func, type_="__module__")
+        _func_name = self._get_func_info(_func=self.func, type_="__name__")
+        return f"Function: {_func_module}.{_func_name} {_func_kwargs}".strip()
 
     def __iter__(self):
         """
@@ -162,7 +175,7 @@ class TimeoutSampler:
         timeout_watch = TimeoutWatch(timeout=self.wait_timeout)
         if self.print_log:
             LOGGER.info(
-                f"{self._func_log}: Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
+                f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds. ({self._func_log})"
             )
 
         last_exp = None
