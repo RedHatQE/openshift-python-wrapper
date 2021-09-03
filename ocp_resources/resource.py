@@ -656,14 +656,20 @@ class Resource:
 
     @staticmethod
     def _retry_cluster_exceptions(
-        func, exception_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        func,
+        **kwargs,
     ):
+        exceptions_dict = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        if "exceptions_dict" in kwargs:
+            exceptions_dict.update(kwargs["exceptions_dict"])
+            del kwargs["exceptions_dict"]
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions_dict=exception_dict,
             print_log=False,
+            exceptions_dict=exceptions_dict,
+            **kwargs,
         )
         for sample in sampler:
             return sample
@@ -968,12 +974,12 @@ class ResourceEditor:
         }
 
         # apply changes
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=patches_to_apply, action_text="Updating", action=self.action
         )
 
     def restore(self):
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=self._backups, action_text="Restoring", action=self.action
         )
 
@@ -1057,43 +1063,47 @@ class ResourceEditor:
                 will be printed for each resource; see below
         """
 
-        def _patch():
-            for resource, patch in patches.items():
-                LOGGER.info(
-                    f"ResourceEdits: {action_text} data for "
-                    f"resource {resource.kind} {resource.name}"
-                )
+        for resource, patch in patches.items():
+            LOGGER.info(
+                f"ResourceEdits: {action_text} data for "
+                f"resource {resource.kind} {resource.name}"
+            )
 
-                # add name to patch
+            # add name to patch
+            if "metadata" not in patch:
+                patch["metadata"] = {}
+
+            # the api requires this field to be present in a yaml patch for
+            # some resource kinds even if it is not changed
+            if "name" not in patch["metadata"]:
+                patch["metadata"]["name"] = resource.name
+
+            if action == "update":
+                resource.update(resource_dict=patch)  # update the resource
+
+            if action == "replace":
                 if "metadata" not in patch:
                     patch["metadata"] = {}
 
-                # the api requires this field to be present in a yaml patch for
-                # some resource kinds even if it is not changed
-                if "name" not in patch["metadata"]:
-                    patch["metadata"]["name"] = resource.name
+                patch["metadata"]["name"] = resource.name
+                patch["metadata"]["namespace"] = resource.namespace
+                patch["metadata"][
+                    "resourceVersion"
+                ] = resource.instance.metadata.resourceVersion
+                patch["kind"] = resource.kind
+                patch["apiVersion"] = resource.api_version
 
-                if action == "update":
-                    resource.update(resource_dict=patch)  # update the resource
+                resource.update_replace(
+                    resource_dict=patch
+                )  # replace the resource metadata
 
-                if action == "replace":
-                    if "metadata" not in patch:
-                        patch["metadata"] = {}
-
-                    patch["metadata"]["name"] = resource.name
-                    patch["metadata"]["namespace"] = resource.namespace
-                    patch["metadata"][
-                        "resourceVersion"
-                    ] = resource.instance.metadata.resourceVersion
-                    patch["kind"] = resource.kind
-                    patch["apiVersion"] = resource.api_version
-
-                    resource.update_replace(
-                        resource_dict=patch
-                    )  # replace the resource metadata
-
+    @staticmethod
+    def _apply_patches_sampler(patches, action_text, action):
         exceptions_dict = {ConflictError: []}
-        exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
         return Resource._retry_cluster_exceptions(
-            func=_patch, exception_dict=exceptions_dict
+            func=ResourceEditor._apply_patches,
+            exceptions_dict=exceptions_dict,
+            patches=patches,
+            action_text=action_text,
+            action=action,
         )
