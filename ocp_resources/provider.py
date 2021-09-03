@@ -11,25 +11,34 @@ class Provider(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         provider_type=None,
         url=None,
         secret_name=None,
         secret_namespace=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.provider_type = provider_type
         self.url = url
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
+        self.condition_message_ready = self.ConditionMessage.PROVIDER_READY
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
@@ -44,10 +53,3 @@ class Provider(NamespacedResource, MTV):
         )
 
         return res
-
-    def wait_for_condition_ready(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.PROVIDER_READY,
-            condition_status=NamespacedResource.Condition.Status.TRUE,
-            condition_type=NamespacedResource.Condition.READY,
-        )

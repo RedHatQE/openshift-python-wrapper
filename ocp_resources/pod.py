@@ -36,11 +36,16 @@ class Pod(NamespacedResource):
     api_version = NamespacedResource.ApiVersion.V1
 
     class Status(NamespacedResource.Status):
-        RUNNING = "Running"
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
 
     def __init__(
-        self, name, namespace, client=None, teardown=True, privileged_client=None
+        self,
+        name=None,
+        namespace=None,
+        client=None,
+        teardown=True,
+        privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -48,6 +53,7 @@ class Pod(NamespacedResource):
             client=client,
             teardown=teardown,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 
@@ -61,7 +67,7 @@ class Pod(NamespacedResource):
         """
         return self.instance.spec.containers
 
-    def execute(self, command, timeout=60, container=None):
+    def execute(self, command, timeout=60, container=None, ignore_rc=False):
         """
         Run command on Pod
 
@@ -69,6 +75,7 @@ class Pod(NamespacedResource):
             command (list): Command to run.
             timeout (int): Time to wait for the command.
             container (str): Container name where to exec the command.
+            ignore_rc (bool): If True ignore error rc from the shell and return out.
 
         Returns:
             str: Command output.
@@ -117,7 +124,7 @@ class Pod(NamespacedResource):
         stdout = resp.read_stdout(timeout=5)
         stderr = resp.read_stderr(timeout=5)
 
-        if rcstring == "Success":
+        if rcstring == "Success" or ignore_rc:
             return stdout
 
         returncode = [

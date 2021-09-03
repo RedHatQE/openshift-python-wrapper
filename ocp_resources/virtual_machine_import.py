@@ -91,10 +91,10 @@ class VirtualMachineImport(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
-        provider_credentials_secret_name,
-        provider_type,
+        name=None,
+        namespace=None,
+        provider_credentials_secret_name=None,
+        provider_type=None,
         provider_credentials_secret_namespace=None,
         client=None,
         teardown=True,
@@ -110,6 +110,7 @@ class VirtualMachineImport(NamespacedResource):
         warm=False,
         finalize_date=None,
         privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -117,6 +118,7 @@ class VirtualMachineImport(NamespacedResource):
             client=client,
             teardown=teardown,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self.vm_id = vm_id
         self.vm_name = vm_name
@@ -146,6 +148,9 @@ class VirtualMachineImport(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         spec = res.setdefault("spec", {})
 
         secret = spec.setdefault("providerCredentialsSecret", {})
@@ -227,7 +232,7 @@ class VirtualMachineImport(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -265,14 +270,29 @@ class ResourceMapping(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.V2V_KUBEVIRT_IO
 
-    def __init__(self, name, namespace, mapping, client=None, teardown=True):
+    def __init__(
+        self,
+        name=None,
+        namespace=None,
+        mapping=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
+    ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.mapping = mapping
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         for provider, mapping in self.mapping.items():
             res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
             if mapping.network_mappings is not None:

@@ -1,7 +1,6 @@
 import logging
 
 from ocp_resources.resource import Resource
-from ocp_resources.utils import TimeoutExpiredError, nudge_delete
 
 
 LOGGER = logging.getLogger(__name__)
@@ -22,16 +21,22 @@ class Namespace(Resource):
 
     def __init__(
         self,
-        name,
+        name=None,
         client=None,
         teardown=True,
         label=None,
+        yaml_file=None,
     ):
-        super().__init__(name=name, client=client, teardown=teardown)
+        super().__init__(
+            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+        )
         self.label = label
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.label:
             res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
         return res
@@ -44,7 +49,4 @@ class Namespace(Resource):
             timeout (int): Time to wait for the resource.
 
         """
-        try:
-            super().client_wait_deleted(timeout=timeout)
-        except TimeoutExpiredError:
-            nudge_delete(name=self.name)
+        super().client_wait_deleted(timeout=timeout)

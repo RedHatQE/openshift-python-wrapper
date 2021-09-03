@@ -14,14 +14,25 @@ class HostPathProvisioner(Resource):
         HOSTPATH_PROVISIONER = "hostpath-provisioner"
 
     def __init__(
-        self, name, path=None, image_pull_policy=None, client=None, teardown=True
+        self,
+        name=None,
+        path=None,
+        image_pull_policy=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
     ):
-        super().__init__(name=name, client=client, teardown=teardown)
+        super().__init__(
+            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+        )
         self.path = path
         self.image_pull_policy = image_pull_policy
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         spec = res.setdefault("spec", {})
         path_config = spec.setdefault("pathConfig", {})
         if self.path:

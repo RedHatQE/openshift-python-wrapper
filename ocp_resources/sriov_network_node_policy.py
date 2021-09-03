@@ -10,20 +10,25 @@ class SriovNetworkNodePolicy(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
-        pf_names,
-        root_devices,
-        num_vfs,
-        resource_name,
+        name=None,
+        namespace=None,
+        pf_names=None,
+        root_devices=None,
+        num_vfs=None,
+        resource_name=None,
         client=None,
         priority=None,
         mtu=None,
         node_selector=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.pf_names = pf_names
         self.root_devices = root_devices
@@ -35,6 +40,9 @@ class SriovNetworkNodePolicy(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res["spec"] = {
             "deviceType": "vfio-pci",
             "nicSelector": {

@@ -29,8 +29,23 @@ class MTV:
     """
 
     def __init__(self):
+        self.api = None
+        self.name = None
+        self.namespace = None
+        self.kind = None
+        self.Condition = None
+        self.Status = None
+
+        self.condition_message_ready = None
+        self.condition_message_succeeded = None
+        self.mapping = None
+        self.source_provider_name = None
+        self.source_provider_namespace = None
+        self.destination_provider_name = None
+        self.destination_provider_namespace = None
+
         if self.__class__.__name__ == "MTV":
-            raise TypeError("MTV is not a Resource.Please Use one of its successors.")
+            raise TypeError("MTV is not a Resource. Please Use one of its successors.")
 
     class ConditionMessage:
         PROVIDER_READY = "The provider is ready."
@@ -73,7 +88,7 @@ class MTV:
         samples = TimeoutSampler(
             wait_timeout=wait_timeout,
             sleep=1,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -112,3 +127,35 @@ class MTV:
                 msg=f"Last Status Condition of {self.kind} {self.name} was: {last_condition}"
             )
             raise
+
+    def wait_for_condition_ready(self):
+        self.wait_for_resource_status(
+            condition_message=self.condition_message_ready,
+            condition_status=self.Condition.Status.TRUE,
+            condition_type=self.Condition.READY,
+        )
+
+    def wait_for_condition_succeeded(self):
+        self.wait_for_resource_status(
+            condition_type=self.Status.SUCCEEDED,
+            condition_message=self.condition_message_succeeded,
+            condition_status=self.Condition.Status.TRUE,
+        )
+
+    @property
+    def map_to_dict(self):
+        return {
+            "spec": {
+                "map": self.mapping,
+                "provider": {
+                    "source": {
+                        "name": self.source_provider_name,
+                        "namespace": self.source_provider_namespace,
+                    },
+                    "destination": {
+                        "name": self.destination_provider_name,
+                        "namespace": self.destination_provider_namespace,
+                    },
+                },
+            }
+        }

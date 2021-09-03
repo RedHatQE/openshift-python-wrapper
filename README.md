@@ -1,6 +1,7 @@
 # openshift-python-wrapper
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
 A python wrapper for [openshift-restclient-python](https://github.com/openshift/openshift-restclient-python) with support for RedHat Container Virtualization. ([Openshift Virtualization](https://www.openshift.com/learn/topics/virtualization))  
+Docs: [openshift-python-wrapper docs](https://redhatqe.github.io/openshift-python-wrapper/ocp_resources/index.html)
 
 ## Installation
 From source:
@@ -14,20 +15,32 @@ From pypi:
 pip install openshift-python-wrapper --user
 ```
 
-## Bump a version number
-* Create a PR
-* Update setup.cfg:
-  Update version (for example: 1.5 -> 1.6) and
-  download_url (for example: https://github.com/RedHatQE/openshift-python-wrapper/archive/refs/tags/v1.6.tar.gz)
-* Generate CHANGELOG.md [how-to](#changelog)
-* Merge the PR
-* Bump the version via github
-
-## changelog
-Changelog is generated using [github-changelog-generator](https://github.com/github-changelog-generator/github-changelog-generator)
+## Release new version
+### requirements:
+* gh [github cli](https://github.com/cli/cli/releases/)
 ```bash
-github_changelog_generator -u RedHatQE -p openshift-python-wrapper -t <TOKEN>
+gh auth login # Follow login instructions
 ```
+* [npm](https://docs.npmjs.com/about-npm)
+```bash
+sudo npm install github-release-notes -g
+```
+* export GREN_GITHUB_TOKEN=< TOKEN >
+* Run release.sh providing source branch and target version (must be executed from master branch)
+### usage:
+```bash
+./release.sh master v1.5.5
+```
+
+## docs
+Docs are generated using [pdoc](https://github.com/pdoc3/pdoc)
+```bash
+pdoc --html  -o docs ocp_resources --force
+```
+
+## PR dependency
+For PR dependency we use [dpulls](https://www.dpulls.com/)  
+To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR description.
 
 ## Examples
 ### Client

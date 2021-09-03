@@ -8,24 +8,31 @@ class NodeMaintenance(Resource):
 
     api_group = Resource.ApiGroup.NODEMAINTENANCE_KUBEVIRT_IO
 
-    class Status(Resource.Status):
-        RUNNING = "Running"
-
     def __init__(
         self,
-        name,
+        name=None,
         client=None,
         node=None,
         reason="TEST Reason",
         teardown=True,
         timeout=TIMEOUT,
+        yaml_file=None,
     ):
-        super().__init__(name=name, client=client, teardown=teardown, timeout=timeout)
+        super().__init__(
+            name=name,
+            client=client,
+            teardown=teardown,
+            timeout=timeout,
+            yaml_file=yaml_file,
+        )
         self.node = node
         self.reason = reason
 
     def to_dict(self):
-        assert self.node, "node is mandatory for create"
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
+        assert self.node, "node is mandatory for create"
         res["spec"] = {"nodeName": self.node.name, "reason": self.reason}
         return res

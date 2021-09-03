@@ -6,15 +6,16 @@ class KubeDescheduler(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
-        profiles=["AffinityAndTaints"],
+        name=None,
+        namespace=None,
+        profiles=None,
         descheduling_interval=3600,
         log_level="Normal",
         managemet_state="Managed",
         operator_log_level="Normal",
         teardown=True,
         client=None,
+        yaml_file=None,
     ):
         """
         Create Descheduler object.
@@ -28,9 +29,13 @@ class KubeDescheduler(NamespacedResource):
             operator_log_level (str): logging of an operator. Supported: "Normal", "Debug", "Trace", "TraceAll"
         """
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
-        self.profiles = profiles
+        self.profiles = profiles or ["AffinityAndTaints"]
         self.descheduling_interval = descheduling_interval
         self.log_level = log_level
         self.managemet_state = managemet_state
@@ -38,6 +43,9 @@ class KubeDescheduler(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
