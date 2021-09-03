@@ -148,7 +148,7 @@ class TimeoutSampler:
         res = getattr(_func, type_, None)
         if res:
             if type_ == "__name__" and res == "<lambda>":
-                return f"lambda: {'.'.join(_func.__code__.co_names)}"
+                return f"lambda: {_func.__qualname__.split('.')[1]}.{'.'.join(_func.__code__.co_names)}"
             return res
 
         if getattr(_func, "func", None):
