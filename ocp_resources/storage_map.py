@@ -31,8 +31,8 @@ class StorageMap(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         source_provider_name=None,
         source_provider_namespace=None,
         destination_provider_name=None,
@@ -40,40 +40,26 @@ class StorageMap(NamespacedResource, MTV):
         mapping=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.mapping = mapping
         self.source_provider_name = source_provider_name
         self.source_provider_namespace = source_provider_namespace
         self.destination_provider_name = destination_provider_name
         self.destination_provider_namespace = destination_provider_namespace
+        self.condition_message_ready = self.ConditionMessage.STORAGE_MAP_READY
 
     def to_dict(self):
         res = super().to_dict()
-        res.update(
-            {
-                "spec": {
-                    "map": self.mapping,
-                    "provider": {
-                        "source": {
-                            "name": self.source_provider_name,
-                            "namespace": self.source_provider_namespace,
-                        },
-                        "destination": {
-                            "name": self.destination_provider_name,
-                            "namespace": self.destination_provider_namespace,
-                        },
-                    },
-                }
-            }
-        )
-        return res
+        if self.yaml_file:
+            return res
 
-    def wait_for_condition_ready(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.STORAGE_MAP_READY,
-            condition_status=self.StatusCondition.Status.TRUE,
-            condition_type=self.StatusCondition.Type.READY,
-        )
+        res.update(self.map_to_dict)
+        return res

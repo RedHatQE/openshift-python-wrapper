@@ -14,18 +14,23 @@ class CatalogSourceConfig(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
-        source,
-        target_namespace,
-        packages,
-        cs_display_name,
-        cs_publisher,
+        name=None,
+        namespace=None,
+        source=None,
+        target_namespace=None,
+        packages=None,
+        cs_display_name=None,
+        cs_publisher=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.source = source
         self.target_namespace = target_namespace
@@ -35,6 +40,9 @@ class CatalogSourceConfig(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
@@ -62,7 +70,7 @@ class CatalogSourceConfig(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )

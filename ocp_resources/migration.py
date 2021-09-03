@@ -16,15 +16,33 @@ class Migration(NamespacedResource, MTV):
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     def __init__(
-        self, name, namespace, plan_name, plan_namespace, cut_over=None, teardown=True
+        self,
+        name=None,
+        namespace=None,
+        plan_name=None,
+        plan_namespace=None,
+        cut_over=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
     ):
-        super().__init__(name=name, namespace=namespace, teardown=teardown)
+        super().__init__(
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
+        )
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace
         self.cut_over = cut_over
+        self.condition_message_succeeded = self.ConditionMessage.MIGRATION_SUCCEEDED
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
@@ -39,11 +57,3 @@ class Migration(NamespacedResource, MTV):
             )
 
         return res
-
-    def wait_for_condition_succeeded(self):
-        self._wait_for_resource_status(
-            mtv_resource=self,
-            condition_message=self.ConditionMessage.MIGRATION_SUCCEEDED,
-            condition_category=self.StatusConditions.CATEGORY.REQUIRED,
-            condition_status=self.StatusConditions.STATUS.TRUE,
-        )

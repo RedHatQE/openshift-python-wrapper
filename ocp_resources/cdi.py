@@ -1,13 +1,13 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class CDI(NamespacedResource):
+class CDI(Resource):
     """
     CDI object.
     """
 
-    api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
+    api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
-    class Status(NamespacedResource.Status):
+    class Status(Resource.Status):
         DEPLOYING = "Deploying"
         DEPLOYED = "Deployed"

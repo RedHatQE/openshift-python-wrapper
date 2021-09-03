@@ -32,10 +32,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             CONFIGURING = "ConfigurationProgressing"
             SUCCESS = "SuccessfullyConfigured"
             FAILED = "FailedToConfigure"
+            NO_MATCHING_NODE = "NoMatchingNode"
 
     def __init__(
         self,
-        name,
+        name=None,
         client=None,
         worker_pods=None,
         node_selector=None,
@@ -49,6 +50,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         node_active_nics=None,
         dns_resolver=None,
         routes=None,
+        yaml_file=None,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -59,7 +61,9 @@ class NodeNetworkConfigurationPolicy(Resource):
          {"ip": "10.4.5.6", "prefix-length": 24},
          {"ip": "10.7.8.9", "prefix-length": 23}]
         """
-        super().__init__(name=name, client=client, teardown=teardown)
+        super().__init__(
+            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+        )
         self.desired_state = {"interfaces": []}
         self.worker_pods = worker_pods
         self.mtu = mtu
@@ -95,7 +99,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         interfaces = [
             iface
             for iface in self.desired_state["interfaces"]
-            if not (iface["name"] == interface["name"])
+            if iface["name"] != interface["name"]
         ]
         # Add the interface
         interfaces.append(interface)
@@ -103,6 +107,9 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.dns_resolver or self.routes or self.iface:
             res.setdefault("spec", {}).setdefault("desiredState", {})
 
@@ -295,6 +302,8 @@ class NodeNetworkConfigurationPolicy(Resource):
                 return condition["reason"]
 
     def wait_for_status_success(self):
+        failed_condition_reason = self.Conditions.Reason.FAILED
+        no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_conditions()
 
@@ -305,7 +314,12 @@ class NodeNetworkConfigurationPolicy(Resource):
                     LOGGER.info("NNCP configured Successfully")
                     return sample
 
-                if sample == self.Conditions.Reason.FAILED:
+                if sample == no_match_node_condition_reason:
+                    raise NNCPConfigurationFailed(
+                        f"Reason: {no_match_node_condition_reason}"
+                    )
+
+                if sample == failed_condition_reason:
                     for failed_nnce in self._get_failed_nnce():
                         nnce_dict = failed_nnce.instance.to_dict()
                         for cond in nnce_dict["status"]["conditions"]:
@@ -317,9 +331,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                                     f"NNCE {nnce_dict['metadata']['name']}: {error[0]}"
                                 )
 
-                    raise NNCPConfigurationFailed(
-                        f"Reason: {self.Conditions.Reason.FAILED}"
-                    )
+                    raise NNCPConfigurationFailed(f"Reason: {failed_condition_reason}")
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error("Unable to configure NNCP for node")

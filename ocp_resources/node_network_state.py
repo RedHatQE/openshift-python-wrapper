@@ -16,8 +16,10 @@ TIMEOUT = 240
 class NodeNetworkState(Resource):
     api_group = Resource.ApiGroup.NMSTATE_IO
 
-    def __init__(self, name, client=None, teardown=True):
-        super().__init__(name=name, client=client, teardown=teardown)
+    def __init__(self, name=None, client=None, teardown=True, yaml_file=None):
+        super().__init__(
+            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+        )
         status = self.instance.to_dict()["status"]
         if "desiredState" in status:
             self.desired_state = status["desiredState"]
@@ -28,9 +30,9 @@ class NodeNetworkState(Resource):
 
         # First drop the interface is's already in the list
         interfaces = [
-            i
-            for i in self.desired_state["interfaces"]
-            if not (i["name"] == interface["name"])
+            iface
+            for iface in self.desired_state["interfaces"]
+            if iface["name"] != interface["name"]
         ]
 
         # Add the interface
@@ -39,6 +41,9 @@ class NodeNetworkState(Resource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {

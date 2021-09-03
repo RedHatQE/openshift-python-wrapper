@@ -10,8 +10,8 @@ class Secret(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         accesskeyid=None,
         secretkey=None,
@@ -19,9 +19,14 @@ class Secret(NamespacedResource):
         teardown=True,
         data_dict=None,
         string_data=None,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.accesskeyid = accesskeyid
         self.secretkey = secretkey
@@ -31,6 +36,9 @@ class Secret(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         if self.accesskeyid:
             res.update(
                 {"data": {"accessKeyId": self.accesskeyid, "secretKey": self.secretkey}}

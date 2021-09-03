@@ -4,6 +4,7 @@ import logging
 
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
+from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
 LOGGER = logging.getLogger(__name__)
@@ -66,8 +67,8 @@ class DataVolume(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         source=None,
         size=None,
         storage_class=None,
@@ -86,6 +87,7 @@ class DataVolume(NamespacedResource):
         preallocation=None,
         teardown=True,
         privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -93,6 +95,7 @@ class DataVolume(NamespacedResource):
             client=client,
             teardown=teardown,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self.source = source
         self.url = url
@@ -112,6 +115,9 @@ class DataVolume(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
@@ -178,7 +184,10 @@ class DataVolume(NamespacedResource):
         super().wait_deleted(timeout=timeout)
         return self.pvc.wait_deleted(timeout=timeout)
 
-    def wait(self, timeout=600):
+    def wait(self, timeout=600, failure_timeout=120):
+        self._check_none_pending_status(failure_timeout=failure_timeout)
+
+        # If DV's status is not Pending, continue with the flow
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
         self.pvc.wait_for_status(
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
@@ -199,3 +208,21 @@ class DataVolume(NamespacedResource):
             namespace=self.namespace,
             client=self.client,
         )
+
+    def _check_none_pending_status(self, failure_timeout=120):
+        # Avoid waiting for "Succeeded" status if DV's in Pending/None status
+        sample = None
+        try:
+            for sample in TimeoutSampler(
+                wait_timeout=failure_timeout,
+                sleep=10,
+                func=lambda: self.instance.status.phase,
+            ):
+                # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
+                if sample in [self.Status.PENDING, None]:
+                    continue
+                else:
+                    break
+        except TimeoutExpiredError:
+            LOGGER.error(f"{self.name} status is {sample}")
+            raise

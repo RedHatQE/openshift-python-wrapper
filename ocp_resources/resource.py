@@ -1,3 +1,4 @@
+import contextlib
 import json
 import logging
 import os
@@ -6,12 +7,25 @@ from distutils.version import Version
 
 import kubernetes
 import urllib3
+import yaml
 from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import InternalServerError, NotFoundError
+from openshift.dynamic.exceptions import (
+    InternalServerError,
+    NotFoundError,
+    ServerTimeoutError,
+)
+from openshift.dynamic.resource import ResourceField
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
+
+DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
+    ConnectionAbortedError: [],
+    ConnectionResetError: [],
+    InternalServerError: ["etcdserver: leader changed"],
+    ServerTimeoutError: [],
+}
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
@@ -117,12 +131,12 @@ def sub_resource_level(current_class, owner_class, parent_class):
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
     for class_iterator in reversed(
-        list(
+        [
             class_iterator
             for class_iterator in current_class.mro()
             if class_iterator not in owner_class.mro()
             and issubclass(class_iterator, parent_class)
-        )
+        ]
     ):
         return class_iterator.__name__
 
@@ -141,12 +155,10 @@ class KubeAPIVersion(Version):
         super().__init__(vstring=vstring)
 
     def parse(self, vstring):
-        components = [x for x in self.component_re.split(vstring) if x]
-        for i, obj in enumerate(components):
-            try:
-                components[i] = int(obj)
-            except ValueError:
-                pass
+        components = [comp for comp in self.component_re.split(vstring) if comp]
+        for idx, obj in enumerate(components):
+            with contextlib.suppress(ValueError):
+                components[idx] = int(obj)
 
         errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
 
@@ -188,7 +200,7 @@ class KubeAPIVersion(Version):
             return 1
 
 
-class classproperty(object):  # noqa: N801
+class ClassProperty:
     def __init__(self, func):
         self.func = func
 
@@ -201,10 +213,8 @@ class ValueMismatch(Exception):
     Raises when value doesn't match the class value
     """
 
-    pass
 
-
-class Resource(object):
+class Resource:
     """
     Base class for API resources
     """
@@ -220,6 +230,8 @@ class Resource(object):
         DEPLOYED = "Deployed"
         PENDING = "Pending"
         COMPLETED = "Completed"
+        RUNNING = "Running"
+        TERMINATING = "Terminating"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
@@ -253,6 +265,7 @@ class Resource(object):
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
         APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
+        APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
@@ -269,10 +282,12 @@ class Resource(object):
         LITMUS_IO = "litmuschaos.io"
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
+        MAISTRA_IO = "maistra.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
             "networkaddonsoperator.network.kubevirt.io"
         )
+        NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
@@ -285,6 +300,7 @@ class Resource(object):
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
+        SECURITY_ISTIO_IO = "security.istio.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
         SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
@@ -296,14 +312,22 @@ class Resource(object):
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
+        VM_KUBEVIRT_IO = "vm.kubevirt.io"
 
     class ApiVersion:
         V1 = "v1"
         V1BETA1 = "v1beta1"
         V1ALPHA1 = "v1alpha1"
+        V1ALPHA3 = "v1alpha3"
 
     def __init__(
-        self, name, client=None, teardown=True, timeout=TIMEOUT, privileged_client=None
+        self,
+        name=None,
+        client=None,
+        teardown=True,
+        timeout=TIMEOUT,
+        privileged_client=None,
+        yaml_file=None,
     ):
         """
         Create a API resource
@@ -319,6 +343,11 @@ class Resource(object):
         self.name = name
         self.client = client
         self.privileged_client = privileged_client
+        self.yaml_file = yaml_file
+        self.resource_dict = None  # Filled in case yaml_file is not None
+        if not (self.name or self.yaml_file):
+            raise ValueError("name or yaml file is required")
+
         if not self.client:
             try:
                 self.client = DynamicClient(
@@ -340,11 +369,23 @@ class Resource(object):
         self.teardown = teardown
         self.timeout = timeout
 
-    @classproperty
+    @ClassProperty
     def kind(cls):  # noqa: N805
         return sub_resource_level(cls, NamespacedResource, Resource)
 
     def _base_body(self):
+        """
+        Generate resource dict from yaml if self.yaml_file else return base resource dict.
+
+        Returns:
+            dict: Resource dict.
+        """
+        if self.yaml_file:
+            with open(self.yaml_file, "r") as stream:
+                self.resource_dict = yaml.safe_load(stream=stream.read())
+                self.name = self.resource_dict["metadata"]["name"]
+                return self.resource_dict
+
         return {
             "apiVersion": self.api_version,
             "kind": self.kind,
@@ -391,7 +432,14 @@ class Resource(object):
             kind=cls.kind, api_version=cls.api_version, **get_kwargs
         ).get(*args, **kwargs)
 
-    def api(self, **kwargs):
+    def _prepare_singular_name_kwargs(self, **kwargs):
+        kwargs = kwargs if kwargs else {}
+        if self.singular_name:
+            kwargs["singular_name"] = self.singular_name
+
+        return kwargs
+
+    def full_api(self, **kwargs):
         """
         Get resource API
 
@@ -410,11 +458,15 @@ class Resource(object):
         Returns:
             Resource: Resource object.
         """
-        if self.singular_name:
-            kwargs["singular_name"] = self.singular_name
+        kwargs = self._prepare_singular_name_kwargs(**kwargs)
+
         return self.client.resources.get(
             api_version=self.api_version, kind=self.kind, **kwargs
         )
+
+    @property
+    def api(self):
+        return self.full_api()
 
     def wait(self, timeout=TIMEOUT, sleep=1):
         """
@@ -496,7 +548,7 @@ class Resource(object):
             wait_timeout=timeout,
             sleep=sleep,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -540,25 +592,24 @@ class Resource(object):
             name = body.get("name")
             api_version = body["apiVersion"]
             if kind != self.kind:
-                ValueMismatch(f"{kind} != {self.kind}")
+                raise ValueMismatch(f"{kind} != {self.kind}")
             if name and name != self.name:
-                ValueMismatch(f"{name} != {self.name}")
+                raise ValueMismatch(f"{name} != {self.name}")
             if api_version != self.api_version:
-                ValueMismatch(f"{api_version} != {self.api_version}")
+                raise ValueMismatch(f"{api_version} != {self.api_version}")
 
             data.update(body)
 
         LOGGER.info(f"Posting {data}")
         LOGGER.info(f"Create {self.kind} {self.name}")
-        res = self.api().create(body=data, namespace=self.namespace)
+        res = self.api.create(body=data, namespace=self.namespace)
         if wait and res:
             return self.wait()
         return res
 
-    def delete(self, wait=False, timeout=TIMEOUT):
-        resource_list = self.api()
+    def delete(self, wait=False, timeout=TIMEOUT, body=None):
         try:
-            res = resource_list.delete(name=self.name, namespace=self.namespace)
+            res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
             return False
 
@@ -588,7 +639,7 @@ class Resource(object):
             resource_dict: Resource dictionary
         """
         LOGGER.info(f"Update {self.kind} {self.name}: {resource_dict}")
-        self.api().patch(
+        self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
             content_type="application/merge-patch+json",
@@ -600,16 +651,15 @@ class Resource(object):
         Use this to remove existing field. (update() will only update existing fields)
         """
         LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
-        self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
+        self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_etcd_changed(func):
+    def _retry_cluster_exceptions(func):
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions=InternalServerError,
-            exceptions_msg="etcdserver: leader changed",
+            exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             print_log=False,
         )
         for sample in sampler:
@@ -638,7 +688,7 @@ class Resource(object):
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource._retry_etcd_changed(func=_get)
+        return Resource._retry_cluster_exceptions(func=_get)
 
     @property
     def instance(self):
@@ -650,9 +700,9 @@ class Resource(object):
         """
 
         def _instance():
-            return self.api().get(name=self.name)
+            return self.api.get(name=self.name)
 
-        return self._retry_etcd_changed(func=_instance)
+        return self._retry_cluster_exceptions(func=_instance)
 
     @property
     def labels(self):
@@ -683,7 +733,7 @@ class Resource(object):
             wait_timeout=timeout,
             sleep=1,
             exceptions=ProtocolError,
-            func=self.api().get,
+            func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
         )
@@ -741,12 +791,13 @@ class NamespacedResource(Resource):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         client=None,
         teardown=True,
         timeout=TIMEOUT,
         privileged_client=None,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -754,8 +805,11 @@ class NamespacedResource(Resource):
             teardown=teardown,
             timeout=timeout,
             privileged_client=privileged_client,
+            yaml_file=yaml_file,
         )
         self.namespace = namespace
+        if not (self.name and self.namespace) and not self.yaml_file:
+            raise ValueError("name and namespace or yaml file is required")
 
     @classmethod
     def get(cls, dyn_client, singular_name=None, *args, **kwargs):
@@ -795,20 +849,28 @@ class NamespacedResource(Resource):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api().get(name=self.name, namespace=self.namespace)
+        return self.api.get(name=self.name, namespace=self.namespace)
 
     def _base_body(self):
-        return {
-            "apiVersion": self.api_version,
-            "kind": self.kind,
-            "metadata": {"name": self.name, "namespace": self.namespace},
-        }
+        res = super(NamespacedResource, self)._base_body()
+        if self.yaml_file:
+            self.namespace = self.resource_dict["metadata"].get(
+                "namespace", self.namespace
+            )
+
+        if not self.namespace:
+            raise ValueError("Namespace must be passed or specified in the YAML file.")
+
+        if not self.yaml_file:
+            res["metadata"]["namespace"] = self.namespace
+
+        return res
 
     def to_dict(self):
         return self._base_body()
 
 
-class ResourceEditor(object):
+class ResourceEditor:
     def __init__(self, patches, action="update", user_backups=None):
         """
         Args:
@@ -833,7 +895,7 @@ class ResourceEditor(object):
          using an unprivileged_user; use default_client or similar instead.***
         """
 
-        self._patches = patches
+        self._patches = self._dictify_resourcefield(res=patches)
         self.action = action
         self.user_backups = user_backups
         self._backups = {}
@@ -919,6 +981,23 @@ class ResourceEditor(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         # restore backups
         self.restore()
+
+    @staticmethod
+    def _dictify_resourcefield(res):
+        """Recursively turns any ResourceField objects into dicts to avoid issues caused by appending lists, etc."""
+        if isinstance(res, ResourceField):
+            return ResourceEditor._dictify_resourcefield(res=dict(res.items()))
+        elif isinstance(res, dict):
+            return {
+                ResourceEditor._dictify_resourcefield(
+                    res=key
+                ): ResourceEditor._dictify_resourcefield(res=value)
+                for key, value in res.items()
+            }
+        elif isinstance(res, list):
+            return [ResourceEditor._dictify_resourcefield(res=x) for x in res]
+
+        return res
 
     @staticmethod
     def _create_backup(original, patch):

@@ -25,8 +25,8 @@ class Plan(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name,
-        namespace,
+        name=None,
+        namespace=None,
         source_provider_name=None,
         source_provider_namespace=None,
         destination_provider_name=None,
@@ -40,9 +40,14 @@ class Plan(NamespacedResource, MTV):
         warm_migration=False,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.source_provider_name = source_provider_name
         self.source_provider_namespace = source_provider_namespace
@@ -55,9 +60,14 @@ class Plan(NamespacedResource, MTV):
         self.virtual_machines_list = virtual_machines_list
         self.warm_migration = warm_migration
         self.target_namespace = target_namespace or self.namespace
+        self.condition_message_ready = self.ConditionMessage.PLAN_READY
+        self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
@@ -69,8 +79,8 @@ class Plan(NamespacedResource, MTV):
                             "namespace": self.storage_map_namespace,
                         },
                         "network": {
-                            "name": self.storage_map_name,
-                            "namespace": self.storage_map_namespace,
+                            "name": self.network_map_name,
+                            "namespace": self.network_map_namespace,
                         },
                     },
                     "vms": self.virtual_machines_list,
@@ -88,17 +98,3 @@ class Plan(NamespacedResource, MTV):
             }
         )
         return res
-
-    def wait_for_condition_ready(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.PLAN_READY,
-            condition_status=self.Condition.Status.TRUE,
-            condition_type=self.Condition.READY,
-        )
-
-    def wait_for_condition_successfully(self):
-        self.wait_for_resource_status(
-            condition_message=self.ConditionMessage.PLAN_SUCCEEDED,
-            condition_status=self.Condition.Status.TRUE,
-            condition_type=self.Status.SUCCEEDED,
-        )

@@ -6,17 +6,22 @@ class OperatorSource(NamespacedResource):
 
     def __init__(
         self,
-        name,
-        namespace,
-        registry_namespace,
-        display_name,
-        publisher,
-        secret,
+        name=None,
+        namespace=None,
+        registry_namespace=None,
+        display_name=None,
+        publisher=None,
+        secret=None,
         client=None,
         teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
-            name=name, namespace=namespace, client=client, teardown=teardown
+            name=name,
+            namespace=namespace,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
         )
         self.registry_namespace = registry_namespace
         self.display_name = display_name
@@ -25,6 +30,9 @@ class OperatorSource(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
+        if self.yaml_file:
+            return res
+
         res.update(
             {
                 "spec": {
