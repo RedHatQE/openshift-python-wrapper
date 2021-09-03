@@ -34,3 +34,7 @@ class Node(Resource):
         for addr in self.instance.status.addresses:
             if addr.type == "InternalIP":
                 return addr.address
+
+    @property
+    def hostname(self):
+        return self.labels["kubernetes.io/hostname"]
