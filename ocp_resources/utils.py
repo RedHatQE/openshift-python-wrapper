@@ -147,10 +147,16 @@ class TimeoutSampler:
     def _get_func_info(self, _func, type_):
         res = getattr(_func, type_, None)
         if res:
-            if type_ == "__name__" and res == "<lambda>":
-                return f"lambda: {_func.__qualname__.split('.')[1]}.{'.'.join(_func.__code__.co_names)}"
+            # If func is lambda function.
+            if _func.__name__ == "<lambda>":
+                if type_ == "__module__":
+                    return f"{res}.{_func.__qualname__.split('.')[1]}"
+
+                elif type_ == "__name__":
+                    return f"lambda: {'.'.join(_func.__code__.co_names)}"
             return res
 
+        # If func is partial function.
         if getattr(_func, "func", None):
             return self._get_func_info(_func=_func.func, type_=type_)
 
