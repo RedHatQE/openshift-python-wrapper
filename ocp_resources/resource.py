@@ -660,16 +660,16 @@ class Resource:
         func,
         **kwargs,
     ):
-        exceptions_dict = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
-        if "exceptions_dict" in kwargs:
-            exceptions_dict.update(kwargs["exceptions_dict"])
-            del kwargs["exceptions_dict"]
+        if "exceptions_dict" not in kwargs:
+            kwargs["exceptions_dict"] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        else:
+            kwargs["exceptions_dict"].update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
+
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
             print_log=False,
-            exceptions_dict=exceptions_dict,
             **kwargs,
         )
         for sample in sampler:
