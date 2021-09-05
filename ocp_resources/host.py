@@ -4,7 +4,7 @@ from ocp_resources.resource import NamespacedResource
 
 class Host(NamespacedResource, MTV):
     """
-    Migration Toolkit For Virtualization (MTV) Host object.
+    Migration Toolkit For Virtualization (MTV) Host resource.
     """
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
