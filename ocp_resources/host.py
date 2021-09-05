@@ -10,18 +10,18 @@ class Host(NamespacedResource, MTV):
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
 
     def __init__(
-            self,
-            name=None,
-            namespace=None,
-            host_id=None,
-            ip_address=None,
-            provider_name=None,
-            provider_namespace=None,
-            secret_name=None,
-            secret_namespace=None,
-            client=None,
-            teardown=True,
-            yaml_file=None,
+        self,
+        name=None,
+        namespace=None,
+        host_id=None,
+        ip_address=None,
+        provider_name=None,
+        provider_namespace=None,
+        secret_name=None,
+        secret_namespace=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
     ):
         super().__init__(
             name=name,
@@ -61,4 +61,3 @@ class Host(NamespacedResource, MTV):
         )
 
         return res
-
