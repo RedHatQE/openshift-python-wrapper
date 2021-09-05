@@ -83,7 +83,7 @@ def _resource_file():
 def resources_definitions():
     file_ = (
         "https://raw.githubusercontent.com/RedHatQE/"
-        "openshift-resources-definitions/master/resources_definitions.json"
+        "openshift-resources-definitions/main/resources_definitions.json"
     )
     content = requests.get(file_).content
     return json.loads(content)
