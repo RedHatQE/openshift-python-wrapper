@@ -707,10 +707,10 @@ class Resource:
     @property
     def labels(self):
         """
-        Method to get dict of labels for this resource
+        Method to get labels for this resource
 
         Returns:
-           labels(dict): dict labels
+           openshift.dynamic.resource.ResourceField: Representation of labels
         """
         return self.instance["metadata"]["labels"]
 
