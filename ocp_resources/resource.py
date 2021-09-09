@@ -655,20 +655,16 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_cluster_exceptions(
-        func,
-        **kwargs,
+    def retry_cluster_exceptions(
+        func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-        if "exceptions_dict" not in kwargs:
-            kwargs["exceptions_dict"] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
-        else:
-            kwargs["exceptions_dict"].update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
 
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
             print_log=False,
+            exceptions_dict=exceptions_dict,
             **kwargs,
         )
         for sample in sampler:
@@ -697,7 +693,7 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource._retry_cluster_exceptions(func=_get)
+        return Resource.retry_cluster_exceptions(func=_get)
 
     @property
     def instance(self):
@@ -711,7 +707,7 @@ class Resource:
         def _instance():
             return self.api.get(name=self.name)
 
-        return self._retry_cluster_exceptions(func=_instance)
+        return self.retry_cluster_exceptions(func=_instance)
 
     @property
     def labels(self):
@@ -1100,7 +1096,8 @@ class ResourceEditor:
     @staticmethod
     def _apply_patches_sampler(patches, action_text, action):
         exceptions_dict = {ConflictError: []}
-        return Resource._retry_cluster_exceptions(
+        exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
+        return Resource.retry_cluster_exceptions(
             func=ResourceEditor._apply_patches,
             exceptions_dict=exceptions_dict,
             patches=patches,
