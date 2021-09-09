@@ -6,4 +6,4 @@ class OAuth(Resource):
     OAuth object.
     """
 
-    api_version = Resource.ApiVersion.V1
+    api_group = Resource.ApiGroup.CONFIG_OPENSHIFT_IO

@@ -6,4 +6,4 @@ class ImageContentSourcePolicy(Resource):
     ICSP object, inherited from Resource.
     """
 
-    api_version = Resource.ApiVersion.V1ALPHA1
+    api_group = Resource.ApiGroup.OPERATOR_OPENSHIFT_IO

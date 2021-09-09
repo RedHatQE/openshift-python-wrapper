@@ -8,4 +8,4 @@ class ReplicaSet(NamespacedResource):
     OpenShift Service object.
     """
 
-    api_version = NamespacedResource.ApiVersion.V1
+    api_group = NamespacedResource.ApiGroup.APPS
