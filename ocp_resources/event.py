@@ -11,7 +11,7 @@ class Event:
     Allow read and remove K8s events.
     """
 
-    api_version = Resource.ApiVersion.V1
+    api_group = Resource.ApiGroup.EVENTS_K8S_IO
 
     @classmethod
     def get(
