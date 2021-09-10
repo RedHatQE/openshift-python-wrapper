@@ -153,7 +153,12 @@ class TimeoutSampler:
                     return f"{res}.{_func.__qualname__.split('.')[1]}"
 
                 elif type_ == "__name__":
-                    return f"lambda: {'.'.join(_func.__code__.co_names)}"
+                    _free_vars = ""
+                    free_vars = _func.__code__.co_freevars
+                    if free_vars:
+                        _free_vars = f"{'.'.join(free_vars)}."
+
+                    return f"lambda: {_free_vars}{'.'.join(_func.__code__.co_names)}"
             return res
 
         # If func is partial function.
