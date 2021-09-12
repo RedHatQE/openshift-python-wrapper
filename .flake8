@@ -39,6 +39,8 @@ fcfn_exclude_functions =
     findall,
     raises,
     contextlib,
+    re,
+    requests,
 
 enable-extensions =
     FCFN,
