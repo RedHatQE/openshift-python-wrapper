@@ -10,6 +10,9 @@ import pytest
 import requests
 
 
+EXCLUDE_RESOURCES = {"ingress.py": "Ingress"}
+
+
 def _process_api_type(api_type, api_value, resource_dict, cls):
     if api_type == "api_group":
         return _get_api_group(
@@ -94,9 +97,13 @@ def resources_definitions_errors(resources_definitions):
     errors = []
     for _file in _resource_file():
         with open(_file, "r") as fd:
+            exclude_cls = EXCLUDE_RESOURCES.get(_file.split("/")[-1])
             tree = ast.parse(source=fd.read())
             classes = [cls for cls in tree.body if isinstance(cls, ast.ClassDef)]
             for cls in classes:
+                if cls.name == exclude_cls:
+                    continue
+
                 resource_dict = resources_definitions.get(cls.name)
                 if not resource_dict:
                     continue
