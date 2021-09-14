@@ -97,7 +97,7 @@ def resources_definitions_errors(resources_definitions):
     errors = []
     for _file in _resource_file():
         with open(_file, "r") as fd:
-            exclude_cls = EXCLUDE_RESOURCES.get(_file.split("/")[-1])
+            exclude_cls = EXCLUDE_RESOURCES.get(os.path.basename(_file))
             tree = ast.parse(source=fd.read())
             classes = [cls for cls in tree.body if isinstance(cls, ast.ClassDef)]
             for cls in classes:
