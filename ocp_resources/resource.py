@@ -1094,12 +1094,11 @@ class ResourceEditor:
                     resource_dict=patch
                 )  # replace the resource metadata
 
-    @staticmethod
-    def _apply_patches_sampler(patches, action_text, action):
+    def _apply_patches_sampler(self, patches, action_text, action):
         exceptions_dict = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
         return Resource.retry_cluster_exceptions(
-            func=ResourceEditor._apply_patches,
+            func=self._apply_patches,
             exceptions_dict=exceptions_dict,
             patches=patches,
             action_text=action_text,
