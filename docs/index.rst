@@ -10,9 +10,8 @@ Welcome to openshift-python-wrapper's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   ocp_resources
-
-
+.. automodule:: ocp_resources
+    :members:
 
 Indices and tables
 ==================
