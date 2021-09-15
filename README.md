@@ -26,16 +26,14 @@ gh auth login # Follow login instructions
 sudo npm install github-release-notes -g
 ```
 * export GREN_GITHUB_TOKEN=< TOKEN >
-* Run release.sh providing source branch and target version (must be executed from master branch)
+* Run ./scripts/release.sh providing source branch and target version (must be executed from master branch)
 ### usage:
 ```bash
-./release.sh master v1.5.5
+./scripts/release.sh master v1.5.5
 ```
 
 ## docs
-Docs are generated using [pdoc](https://github.com/pdoc3/pdoc)
-```bash
-pdoc --html  -o docs ocp_resources --force
+Hosted on readthedocs.io
 ```
 
 ## PR dependency
