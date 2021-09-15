@@ -19,6 +19,8 @@
 import sys
 
 
+sys.path.insert(0, "../ocp_resources")
+
 project = "openshift-python-wrapper"
 copyright = "2021, myakove, rnetser"
 author = "myakove, rnetser"
@@ -69,5 +71,3 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-
-sys.path.insert(0, "../ocp_resources")
