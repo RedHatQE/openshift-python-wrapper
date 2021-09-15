@@ -10,6 +10,7 @@ import urllib3
 import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
+    ConflictError,
     InternalServerError,
     NotFoundError,
     ServerTimeoutError,
@@ -655,13 +656,17 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_cluster_exceptions(func):
+    def retry_cluster_exceptions(
+        func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
+    ):
+
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             print_log=False,
+            exceptions_dict=exceptions_dict,
+            **kwargs,
         )
         for sample in sampler:
             return sample
@@ -689,7 +694,7 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource._retry_cluster_exceptions(func=_get)
+        return Resource.retry_cluster_exceptions(func=_get)
 
     @property
     def instance(self):
@@ -703,7 +708,7 @@ class Resource:
         def _instance():
             return self.api.get(name=self.name)
 
-        return self._retry_cluster_exceptions(func=_instance)
+        return self.retry_cluster_exceptions(func=_instance)
 
     @property
     def labels(self):
@@ -966,12 +971,12 @@ class ResourceEditor:
         }
 
         # apply changes
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=patches_to_apply, action_text="Updating", action=self.action
         )
 
     def restore(self):
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=self._backups, action_text="Restoring", action=self.action
         )
 
@@ -1054,6 +1059,7 @@ class ResourceEditor:
                 "ResourceEdit <action_text> for resource <resource name>"
                 will be printed for each resource; see below
         """
+
         for resource, patch in patches.items():
             LOGGER.info(
                 f"ResourceEdits: {action_text} data for "
@@ -1087,3 +1093,14 @@ class ResourceEditor:
                 resource.update_replace(
                     resource_dict=patch
                 )  # replace the resource metadata
+
+    def _apply_patches_sampler(self, patches, action_text, action):
+        exceptions_dict = {ConflictError: []}
+        exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
+        return Resource.retry_cluster_exceptions(
+            func=self._apply_patches,
+            exceptions_dict=exceptions_dict,
+            patches=patches,
+            action_text=action_text,
+            action=action,
+        )
