@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: ./release.sh master v1.5.3
+# Usage: ./scripts/release.sh master v1.5.3
 # Run from master branch
 
 set -e
