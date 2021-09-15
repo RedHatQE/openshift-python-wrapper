@@ -15,7 +15,6 @@ setup(
         "openshift",
         "xmltodict",
         "urllib3",
-        "pdoc3",
     ],
     python_requires=">=3.6",
 )
