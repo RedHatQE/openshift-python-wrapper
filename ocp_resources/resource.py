@@ -777,13 +777,14 @@ class NamespacedResource(Resource):
         self.namespace = namespace
 
     @classmethod
-    def get(cls, dyn_client, singular_name=None, *args, **kwargs):
+    def get(cls, dyn_client, singular_name=None, raw=False, *args, **kwargs):
         """
         Get resources
 
         Args:
             dyn_client (DynamicClient): Open connection to remote cluster
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
+            raw (bool): If True return raw object from openshift-restclient-python
 
 
         Returns:
@@ -794,17 +795,23 @@ class NamespacedResource(Resource):
         )
         try:
             for resource_field in _resources.items:
+                if raw:
+                    yield resource_field
+                else:
+                    yield cls(
+                        client=dyn_client,
+                        name=resource_field.metadata.name,
+                        namespace=resource_field.metadata.namespace,
+                    )
+        except TypeError:
+            if raw:
+                yield _resources
+            else:
                 yield cls(
                     client=dyn_client,
-                    name=resource_field.metadata.name,
-                    namespace=resource_field.metadata.namespace,
+                    name=_resources.metadata.name,
+                    namespace=_resources.metadata.namespace,
                 )
-        except TypeError:
-            yield cls(
-                client=dyn_client,
-                name=_resources.metadata.name,
-                namespace=_resources.metadata.namespace,
-            )
 
     @property
     def instance(self):
