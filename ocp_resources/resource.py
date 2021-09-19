@@ -825,7 +825,7 @@ class NamespacedResource(Resource):
         Args:
             dyn_client (DynamicClient): Open connection to remote cluster
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
-            raw (bool): If True return rew object from openshift-restclient-python
+            raw (bool): If True return raw object from openshift-restclient-python
 
 
         Returns:
