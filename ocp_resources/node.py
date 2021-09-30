@@ -38,3 +38,7 @@ class Node(Resource):
     @property
     def hostname(self):
         return self.labels["kubernetes.io/hostname"]
+
+    @property
+    def taints(self):
+        return self.instance.get("spec", {}).get("taints")
