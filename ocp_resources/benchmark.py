@@ -1,7 +1,6 @@
 import logging
 
-from openshift.dynamic.exceptions import NotFoundError
-
+from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 
@@ -44,7 +43,7 @@ class Benchmark(NamespacedResource):
             wait_timeout=30,
             sleep=1,
             func=lambda: getattr(self.instance, parent, None),
-            exceptions=NotFoundError,
+            exceptions_dict=NOT_FOUND_ERROR_EXCEPTION_DICT,
         )
         for sample in samples:
             if sample:

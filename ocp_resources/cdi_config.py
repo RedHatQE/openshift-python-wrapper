@@ -2,8 +2,7 @@
 
 import logging
 
-from urllib3.exceptions import ProtocolError
-
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import TIMEOUT, Resource
 from ocp_resources.utils import TimeoutSampler
 
@@ -46,7 +45,7 @@ class CDIConfig(Resource):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
         )
