@@ -1,4 +1,5 @@
 import logging
+import shlex
 
 import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
@@ -196,6 +197,11 @@ class VirtualMachineInstance(NamespacedResource):
             name=self.instance.status.nodeName,
         )
 
+    def _virsh_cmd(self, action):
+        return shlex.split(
+            f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
+        )
+
     def get_xml(self):
         """
         Get virtual machine instance XML
@@ -204,8 +210,45 @@ class VirtualMachineInstance(NamespacedResource):
             xml_output(string): VMI XML in the multi-line string
         """
         return self.virt_launcher_pod.execute(
-            command=["virsh", "dumpxml", f"{self.namespace}_{self.name}"],
+            command=self._virsh_cmd(action="dumpxml"),
             container="compute",
+        )
+
+    @property
+    def virt_launcher_pod_user_uid(self):
+        """
+        Get Virt Launcher Pod User UID value
+
+        Returns:
+            Int: Virt Launcher Pod UID value
+        """
+        return self.virt_launcher_pod.instance.spec.securityContext.runAsUser
+
+    @property
+    def is_virt_launcher_pod_root(self):
+        """
+        Check if Virt Launcher Pod is Root
+
+        Returns:
+            Bool: True if Virt Launcher Pod is Root.
+        """
+        return not bool(self.virt_launcher_pod_user_uid)
+
+    @property
+    def virt_launcher_pod_hypervisor_connection_uri(self):
+        """
+        Get Virt Launcher Pod Hypervisor Connection URI
+
+        Required to connect to Hypervisor for
+        Non-Root Virt-Launcher Pod.
+
+        Returns:
+            String: Hypervisor Connection URI
+        """
+        return (
+            ""
+            if self.is_virt_launcher_pod_root
+            else "-c qemu+unix:///session?socket=/var/run/libvirt/libvirt-sock"
         )
 
     def get_domstate(self):
@@ -219,7 +262,7 @@ class VirtualMachineInstance(NamespacedResource):
             String: VMI Status as string
         """
         return self.virt_launcher_pod.execute(
-            command=["virsh", "domstate", f"{self.namespace}_{self.name}"],
+            command=self._virsh_cmd(action="domstate"),
             container="compute",
         )
 
