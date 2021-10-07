@@ -3,7 +3,7 @@
 from ocp_resources.resource import NamespacedResource
 
 
-class ServiceMeshMemberRoll(NamespacedResource):
+class ServiceMeshControlPlane(NamespacedResource):
     """
     Service Mesh Control Plane object.
     """
