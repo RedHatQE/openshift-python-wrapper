@@ -10,7 +10,6 @@ from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
-
 LOGGER = logging.getLogger(__name__)
 
 
