@@ -341,19 +341,20 @@ class NodeNetworkConfigurationPolicy(Resource):
     @staticmethod
     def _get_nnce_errors(nnce_name, nnce_condition):
         err_msg = ""
+        nnce_prefix = f"NNCE {nnce_name}"
         nnce_msg = nnce_condition.get("message")
         if not nnce_msg:
             return err_msg
 
         errors = nnce_msg.split("->")
         if errors:
-            err_msg += f"NNCE {nnce_name}: {errors[0]}"
+            err_msg += f"{nnce_prefix}: {errors[0]}"
             if len(errors) > 1:
                 err_msg += errors[-1]
 
         libnmstate_err = re.findall(r"libnmstate.error.*", nnce_msg)
         if libnmstate_err:
-            err_msg += f"NNCE {nnce_name}: {libnmstate_err[0]}"
+            err_msg += f"{nnce_prefix }: {libnmstate_err[0]}"
 
         return err_msg
 
