@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from urllib3.exceptions import ProtocolError
-
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 
@@ -48,7 +47,7 @@ class Deployment(NamespacedResource):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
         )

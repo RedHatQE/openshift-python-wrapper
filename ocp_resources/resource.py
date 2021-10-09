@@ -16,8 +16,11 @@ from openshift.dynamic.exceptions import (
     ServerTimeoutError,
 )
 from openshift.dynamic.resource import ResourceField
-from urllib3.exceptions import ProtocolError
 
+from ocp_resources.constants import (
+    NOT_FOUND_ERROR_EXCEPTION_DICT,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+)
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -297,6 +300,7 @@ class Resource:
         OPERATORS_COREOS_COM = "operators.coreos.com"
         OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
+        POLICY = "policy"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
@@ -485,7 +489,10 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions=(ProtocolError, NotFoundError),
+            exceptions_dict={
+                **PROTOCOL_ERROR_EXCEPTION_DICT,
+                **NOT_FOUND_ERROR_EXCEPTION_DICT,
+            },
             func=lambda: self.exists,
         )
         for sample in samples:
@@ -549,7 +556,7 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
@@ -738,7 +745,7 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,

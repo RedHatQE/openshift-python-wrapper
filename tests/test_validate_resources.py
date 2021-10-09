@@ -10,7 +10,16 @@ import pytest
 import requests
 
 
-EXCLUDE_RESOURCES = {"ingress.py": "Ingress"}
+def _api_group_name(api_value):
+    return re.sub("_", ".", api_value.lower())
+
+
+def _api_group_dict(resource_dict, api_group_name):
+    api_group = resource_dict["api_group"].get(api_group_name)
+    if not api_group:
+        api_group = resource_dict["api_group"]["null"]
+
+    return api_group
 
 
 def _process_api_type(api_type, api_value, resource_dict, cls):
@@ -37,12 +46,17 @@ def _get_api_group_and_version(bodies):
         return api_type, targets.value.attr
 
 
-def _get_namespaced(cls, resource_dict):
+def _get_namespaced(cls, resource_dict, api_value):
     errors = []
     for base in getattr(cls, "bases", []):
-        namespaced = "true" if base.id == "NamespacedResource" else "false"
-        should_be_namespaced = resource_dict["namespaced"] == "true"
-        if namespaced != resource_dict["namespaced"]:
+        api_group_name = _api_group_name(api_value=api_value)
+        namespaced = bool(base.id == "NamespacedResource")
+        api_group = _api_group_dict(
+            resource_dict=resource_dict, api_group_name=api_group_name
+        )
+        should_be_namespaced = api_group["namespaced"] == "true"
+
+        if namespaced != should_be_namespaced:
             errors.append(
                 f"Resource {cls.name} should be "
                 f"{'namespaced' if should_be_namespaced else 'in cluster scope (not namespaced)'}"
@@ -52,7 +66,7 @@ def _get_namespaced(cls, resource_dict):
 
 def _get_api_group(api_value, cls, resource_dict):
     errors = []
-    api_group_name = re.sub("_", ".", api_value.lower())
+    api_group_name = _api_group_name(api_value=api_value)
 
     if api_group_name not in resource_dict["api_group"]:
         errors.append(
@@ -64,12 +78,17 @@ def _get_api_group(api_value, cls, resource_dict):
 
 def _get_api_version(api_value, cls, resource_dict):
     errors = []
-    if api_value.lower() != resource_dict["api_version"]:
+    api_group_name = _api_group_name(api_value=api_value)
+    api_group = _api_group_dict(
+        resource_dict=resource_dict, api_group_name=api_group_name
+    )
+    if api_value.lower() != api_group["api_version"]:
         desire_api_group = resource_dict["api_version"].split("/")[0]
         errors.append(
             f"Resource {cls.name} have api_version {api_value} "
             f"but should have api_group = {desire_api_group}"
         )
+
     return errors
 
 
@@ -97,24 +116,24 @@ def resources_definitions_errors(resources_definitions):
     errors = []
     for _file in _resource_file():
         with open(_file, "r") as fd:
-            exclude_cls = EXCLUDE_RESOURCES.get(os.path.basename(_file))
             tree = ast.parse(source=fd.read())
             classes = [cls for cls in tree.body if isinstance(cls, ast.ClassDef)]
             for cls in classes:
-                if cls.name == exclude_cls:
-                    continue
-
                 resource_dict = resources_definitions.get(cls.name)
                 if not resource_dict:
                     continue
 
-                errors.extend(_get_namespaced(cls=cls, resource_dict=resource_dict))
                 bodies = [
                     body_
                     for body_ in getattr(cls, "body")
                     if isinstance(body_, ast.Assign)
                 ]
                 api_type, api_value = _get_api_group_and_version(bodies=bodies)
+                errors.extend(
+                    _get_namespaced(
+                        cls=cls, resource_dict=resource_dict, api_value=api_value
+                    )
+                )
                 errors.extend(
                     _process_api_type(
                         api_type=api_type,
