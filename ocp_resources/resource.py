@@ -319,7 +319,7 @@ class Resource:
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
         VM_KUBEVIRT_IO = "vm.kubevirt.io"
-        INFRA_FEATURES = "operators.openshift.io/infrastructure-features"
+        INFRA_FEATURES_IO = "operators.openshift.io"
 
     class ApiVersion:
         V1 = "v1"
