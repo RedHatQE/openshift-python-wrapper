@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.5.3.52 (11/10/2021)
+- [**Verified**][**Approve**][**Ready for merge**] add app.kubernetes.io to Resource ApiGroup [#212](https://github.com/RedHatQE/openshift-python-wrapper/pull/212)
+
+---
+
+## v2.0.9 (11/10/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] rename virtual_machine_import_configs to match standard naming convention [#208](https://github.com/RedHatQE/openshift-python-wrapper/pull/208)
+
+---
+
+## v2.0.8 (10/10/2021)
+- [**Verified**][**size/XS**][**Approve**] Add auto dns configuration options to nncp resource [#205](https://github.com/RedHatQE/openshift-python-wrapper/pull/205)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] service mesh control plane [#198](https://github.com/RedHatQE/openshift-python-wrapper/pull/198)
+
+---
+
 ## v1.5.3.51 (07/10/2021)
 - [**Verified**][**Approve**][**Ready for merge**] update ApiVersion [#199](https://github.com/RedHatQE/openshift-python-wrapper/pull/199)
 - [**Verified**][**size/S**][**Approve**] Run using Hypervisor Connection URI if Non-Root Virt-Launcher Pods [#113](https://github.com/RedHatQE/openshift-python-wrapper/pull/113)
@@ -154,24 +170,3 @@
 
 ## v1.5.13 (10/08/2021)
 - [**Verified**][**size/XS**] Add Infrastructure resource [#100](https://github.com/RedHatQE/openshift-python-wrapper/pull/100)
-
----
-
-## v1.5.12 (10/08/2021)
-- [**size/XS**] Update changelog for version v1.5.11 [#99](https://github.com/RedHatQE/openshift-python-wrapper/pull/99)
-
----
-
-## v1.5.11 (10/08/2021)
-- [**Verified**][**size/XS**] Split VolumeSnapshot, VolumeSnaphshotClass [#96](https://github.com/RedHatQE/openshift-python-wrapper/pull/96)
-- [**Verified**][**size/XS**] VolumeSnapshotClass resource is not namespaced [#95](https://github.com/RedHatQE/openshift-python-wrapper/pull/95)
-- [**Verified**][**size/XS**] Fixing network section in Plan resource [#94](https://github.com/RedHatQE/openshift-python-wrapper/pull/94)
-- [**size/XS**] Update readme [#92](https://github.com/RedHatQE/openshift-python-wrapper/pull/92)
-
----
-
-## v1.5.10 (05/08/2021)
-- [**size/XS**] [CI] Update pre-commit pycln rev tag [#90](https://github.com/RedHatQE/openshift-python-wrapper/pull/90)
-- [**Verified**][**approved**][**size/XS**] CDI resource is not Namespace resource [#82](https://github.com/RedHatQE/openshift-python-wrapper/pull/82)
-- [**Verified**][**approved**][**release-note-none**][**size/XL**] Move classes from virtual_machine.py to own files. [#79](https://github.com/RedHatQE/openshift-python-wrapper/pull/79)
-- [**Verified**][**approved**][**release-note-none**][**size/XS**] Add ApiGroup VM_KUBEVIRT_IO [#80](https://github.com/RedHatQE/openshift-python-wrapper/pull/80)
