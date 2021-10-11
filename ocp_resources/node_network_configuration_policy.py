@@ -324,7 +324,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                         nnce_name = failed_nnce.instance.metadata.name
                         nnce_dict = failed_nnce.instance.to_dict()
                         for cond in nnce_dict["status"]["conditions"]:
-                            err_msg = self._get_nnce_errors(
+                            err_msg = self._get_nnce_error_msg(
                                 nnce_name=nnce_name, nnce_condition=cond
                             )
                             if err_msg:
@@ -339,7 +339,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             raise
 
     @staticmethod
-    def _get_nnce_errors(nnce_name, nnce_condition):
+    def _get_nnce_error_msg(nnce_name, nnce_condition):
         err_msg = ""
         nnce_prefix = f"NNCE {nnce_name}"
         nnce_msg = nnce_condition.get("message")
