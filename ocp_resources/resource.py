@@ -298,6 +298,7 @@ class Resource:
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
         OPERATORS_COREOS_COM = "operators.coreos.com"
+        OPERATORS_OPENSHIFT_IO = "operators.openshift.io"
         OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
         POLICY = "policy"
