@@ -1,13 +1,8 @@
 import logging
 import time
-from warnings import warn
 
 
 LOGGER = logging.getLogger(__name__)
-
-
-class InvalidArgumentsError(Exception):
-    pass
 
 
 class TimeoutExpiredError(Exception):
@@ -28,8 +23,6 @@ class TimeoutSampler:
     sleeps `sleep` seconds.
 
     Yielding the output allows you to handle every value as you wish.
-
-    Feel free to set the instance variables.
 
     exceptions_dict should be in the following format:
     {
@@ -67,8 +60,6 @@ class TimeoutSampler:
         wait_timeout (int): Time in seconds to wait for func to return a value equating to True
         sleep (int): Time in seconds between calls to func
         func (function): to be wrapped by TimeoutSampler
-        exceptions (tuple): Deprecated: Tuple containing all retry exceptions
-        exceptions_msg (str): Deprecated: String to match exception against
         exceptions_dict (dict): Exception handling definition
         print_log (bool): Print elapsed time to log
     """
@@ -78,8 +69,6 @@ class TimeoutSampler:
         wait_timeout,
         sleep,
         func,
-        exceptions=None,  # TODO: Deprecated and will be removed, use exceptions_dict
-        exceptions_msg=None,  # TODO: Deprecated and will be removed, use exceptions_dict
         exceptions_dict=None,
         print_log=True,
         **func_kwargs,
@@ -91,58 +80,8 @@ class TimeoutSampler:
         self.elapsed_time = None
         self.print_log = print_log
 
-        # TODO: when exceptions arg removed replace with: self.exceptions_dict = exceptions_dict or {Exception: []}
-        self.exceptions_dict = self._pre_process_exceptions(
-            exceptions=exceptions,
-            exceptions_msg=exceptions_msg,
-            exceptions_dict=exceptions_dict,
-        )
+        self.exceptions_dict = exceptions_dict or {Exception: []}
         self._exceptions = tuple(self.exceptions_dict.keys())
-
-    def _pre_process_exceptions(self, exceptions, exceptions_msg, exceptions_dict):
-        """
-        Convert any deprecated `exceptions` and `exceptions_msg` arguments to an `exceptions_dict`
-
-        TODO: Deprecation: This method should be removed when the 'exceptions' argument is removed from __init__
-
-        Args:
-            exceptions (tuple): Deprecated: Tuple containing all retry exceptions
-            exceptions_msg (str): Deprecated: String to match exception against
-            exceptions_dict (dict): Exception handling definition
-
-        Returns:
-            dict: exceptions_dict compatible input
-        """
-        output = {}
-        if exceptions_dict and (exceptions or exceptions_msg):
-            raise InvalidArgumentsError(
-                "Must specify either exceptions_dict or exceptions/exception_msg, not both"
-            )
-
-        elif exceptions or exceptions_msg:
-            warn(
-                "TimeoutSampler() exception and exception_msg are now deprecated. "
-                "Please update to use exceptions_dict by Oct 12, 2021",
-                DeprecationWarning,
-            )
-
-        if exceptions_dict:
-            output.update(exceptions_dict)
-
-        elif exceptions is None:
-            output[Exception] = []
-
-        else:
-            if not isinstance(exceptions, tuple):
-                exceptions = (exceptions,)
-
-            for exp in exceptions:
-                if exceptions_msg:
-                    output[exp] = [exceptions_msg]
-                else:
-                    output[exp] = []
-
-        return output
 
     def _get_func_info(self, _func, type_):
         res = getattr(_func, type_, None)
