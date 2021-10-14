@@ -7,11 +7,24 @@ from distutils.version import Version
 import kubernetes
 import urllib3
 from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import InternalServerError, NotFoundError
+from openshift.dynamic.exceptions import (
+    ConflictError,
+    InternalServerError,
+    NotFoundError,
+    ServerTimeoutError,
+)
 from urllib3.exceptions import ProtocolError
 
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
+
+DEFAULT_CLUSTER_RETRY_EXCEPTIONS = (
+    ConnectionAbortedError,
+    ConnectionResetError,
+    InternalServerError,
+    ServerTimeoutError,
+    ConflictError,
+)
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
@@ -606,14 +619,17 @@ class Resource(object):
         self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_etcd_changed(func):
+    def retry_cluster_exceptions(
+        func, exceptions_tuple=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
+    ):
+
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions=InternalServerError,
-            exceptions_msg="etcdserver: leader changed",
+            exceptions=exceptions_tuple,
             print_log=False,
+            **kwargs,
         )
         for sample in sampler:
             return sample
@@ -641,7 +657,7 @@ class Resource(object):
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource._retry_etcd_changed(func=_get)
+        return Resource.retry_cluster_exceptions(func=_get)
 
     @property
     def instance(self):
@@ -655,7 +671,7 @@ class Resource(object):
         def _instance():
             return self.api().get(name=self.name)
 
-        return self._retry_etcd_changed(func=_instance)
+        return self.retry_cluster_exceptions(func=_instance)
 
     @property
     def labels(self):
@@ -906,12 +922,12 @@ class ResourceEditor(object):
         }
 
         # apply changes
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=patches_to_apply, action_text="Updating", action=self.action
         )
 
     def restore(self):
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=self._backups, action_text="Restoring", action=self.action
         )
 
@@ -1010,3 +1026,11 @@ class ResourceEditor(object):
                 resource.update_replace(
                     resource_dict=patch
                 )  # replace the resource metadata
+
+    def _apply_patches_sampler(self, patches, action_text, action):
+        return Resource.retry_cluster_exceptions(
+            func=self._apply_patches,
+            patches=patches,
+            action_text=action_text,
+            action=action,
+        )
