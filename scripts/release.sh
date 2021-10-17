@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Usage: ./scripts/release.sh master v1.5.3
-# Run from master branch
+# Usage: ./scripts/release.sh main v1.5.3
+# Run from main branch
 
 set -e
 
@@ -10,7 +10,7 @@ BASE_SOURCE_BRANCH="$1"
 VERSION="$2"
 STRIPPED_VERSION="${VERSION//v/}"
 REMOTE_ORIGIN=$(grep -A3 '\[remote "origin"\]' .git/config)
-MASTER_BRANCH="master"
+main_BRANCH="main"
 TARGET_BRANCH="branch-$VERSION" # New branch for the release; formatted: branch-vx.y.z[.i]
 
 if [[ $REMOTE_ORIGIN != *"github.com:RedHatQE/openshift-python-wrapper"* ]]; then
@@ -23,8 +23,8 @@ if [[ -z "${GREN_GITHUB_TOKEN}" ]]; then
   exit 1
 fi
 
-if [[ $(git branch --show-current) != "$MASTER_BRANCH" ]]; then
-  echo "Script must be executed from master branch"
+if [[ $(git branch --show-current) != "$main_BRANCH" ]]; then
+  echo "Script must be executed from main branch"
   exit 1
 fi
 
@@ -69,4 +69,4 @@ git commit -am "Update changelog for version $VERSION"
 git push -f origin "$TARGET_BRANCH"
 
 git pull origin "$TARGET_BRANCH"
-git checkout "$MASTER_BRANCH"
+git checkout "$main_BRANCH"
