@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.5.3.53 (17/10/2021)
+*No changelog for this release.*
+
+---
+
+## v2.0.13 (17/10/2021)
+- [**Verified**][**size/XS**][**Approve**] Rename master branch to main [#218](https://github.com/RedHatQE/openshift-python-wrapper/pull/218)
+
+---
+
+## v2.0.12 (17/10/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Fix docs link [#215](https://github.com/RedHatQE/openshift-python-wrapper/pull/215)
+- [**Verified**][**Approve**][**Ready for merge**] Add retry_cluster_exceptions [#214](https://github.com/RedHatQE/openshift-python-wrapper/pull/214)
+
+---
+
+## v2.0.11 (13/10/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Remove deprecated TimeoutSampler arguments [#103](https://github.com/RedHatQE/openshift-python-wrapper/pull/103)
+
+---
+
+## v2.0.10 (13/10/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add new entry to Resource.ApiGroup for Infra features [#210](https://github.com/RedHatQE/openshift-python-wrapper/pull/210)
+- [**Verified**][**size/S**][**Approve**] Improve NNCE logs when NNCP fail [#196](https://github.com/RedHatQE/openshift-python-wrapper/pull/196)
+
+---
+
 ## v1.5.3.52 (11/10/2021)
 - [**Verified**][**Approve**][**Ready for merge**] add app.kubernetes.io to Resource ApiGroup [#212](https://github.com/RedHatQE/openshift-python-wrapper/pull/212)
 
@@ -146,27 +173,3 @@
 
 ## v1.5.3.50 (23/08/2021)
 *No changelog for this release.*
-
----
-
-## v1.5.17 (17/08/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.16 (17/08/2021)
-
----
-
-## v1.5.15 (11/08/2021)
-- [**closed**] TimeoutSampler exceptions arg deprecation for Resource get() retry [#24](https://github.com/RedHatQE/openshift-python-wrapper/pull/24)
-
----
-
-## v1.5.14 (10/08/2021)
-- [**size/XS**] V1.5.13 [#101](https://github.com/RedHatQE/openshift-python-wrapper/pull/101)
-
----
-
-## v1.5.13 (10/08/2021)
-- [**Verified**][**size/XS**] Add Infrastructure resource [#100](https://github.com/RedHatQE/openshift-python-wrapper/pull/100)
