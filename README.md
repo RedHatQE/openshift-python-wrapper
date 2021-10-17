@@ -26,10 +26,10 @@ gh auth login # Follow login instructions
 sudo npm install github-release-notes -g
 ```
 * export GREN_GITHUB_TOKEN=< TOKEN >
-* Run ./scripts/release.sh providing source branch and target version (must be executed from master branch)
+* Run ./scripts/release.sh providing source branch and target version (must be executed from main branch)
 ### usage:
 ```bash
-./scripts/release.sh master v1.5.5
+./scripts/release.sh main v1.5.5
 ```
 
 ## docs
