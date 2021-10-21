@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.5.3.54 (21/10/2021)
+- [**Verified**][**Approve**][**Ready for merge**] nns.interfaces: return dict [#222](https://github.com/RedHatQE/openshift-python-wrapper/pull/222)
+
+---
+
+## v2.0.14 (21/10/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] nns.interfaces: return dict [#220](https://github.com/RedHatQE/openshift-python-wrapper/pull/220)
+
+---
+
 ## v1.5.3.53 (17/10/2021)
 *No changelog for this release.*
 
@@ -162,14 +172,3 @@
 - [**Verified**][**size/XS**][**Approve**] Add vm status [#124](https://github.com/RedHatQE/openshift-python-wrapper/pull/124)
 - [**Verified**][**size/XS**][**Approve**] fix inheritence for resources [#121](https://github.com/RedHatQE/openshift-python-wrapper/pull/121)
 - [**Verified**][**size/XS**][**Approve**] Adjust apiGroup and apiVersion for Gateway resource. [#122](https://github.com/RedHatQE/openshift-python-wrapper/pull/122)
-
----
-
-## v1.5.18 (24/08/2021)
-- [**size/XS**] Revert "Add VirtualService resource for Service Mesh usage." [#119](https://github.com/RedHatQE/openshift-python-wrapper/pull/119)
-- [**Verified**][**size/L**][**Approve**] add machineset resource implementation [#97](https://github.com/RedHatQE/openshift-python-wrapper/pull/97)
-
----
-
-## v1.5.3.50 (23/08/2021)
-*No changelog for this release.*
