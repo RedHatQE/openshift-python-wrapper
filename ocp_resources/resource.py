@@ -5,17 +5,18 @@ import os
 import re
 from distutils.version import Version
 
-import kubernetes
 import urllib3
 import yaml
-from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import (
+from kubernetes.client import CoreV1Api
+from kubernetes.config import ConfigException, new_client_from_config
+from kubernetes.dynamic.exceptions import (
     ConflictError,
     InternalServerError,
     NotFoundError,
     ServerTimeoutError,
 )
-from openshift.dynamic.resource import ResourceField
+from kubernetes.dynamic.resource import ResourceField
+from openshift.dynamic import DynamicClient
 
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -42,7 +43,7 @@ def _collect_instance_data(directory, resource_object):
 
 
 def _collect_pod_logs(dyn_client, resource_item, **kwargs):
-    kube_v1_api = kubernetes.client.CoreV1Api(api_client=dyn_client.client)
+    kube_v1_api = CoreV1Api(api_client=dyn_client.client)
     return kube_v1_api.read_namespaced_pod_log(
         name=resource_item.metadata.name,
         namespace=resource_item.metadata.namespace,
@@ -92,11 +93,7 @@ def _collect_data_volume_data(dyn_client, directory, resource_object):
 
 
 def _collect_data(resource_object, dyn_client=None):
-    dyn_client = (
-        dyn_client
-        if dyn_client
-        else DynamicClient(kubernetes.config.new_client_from_config())
-    )
+    dyn_client = dyn_client if dyn_client else DynamicClient(new_client_from_config())
     directory = os.environ.get("TEST_DIR_LOG")
     _collect_instance_data(directory=directory, resource_object=resource_object)
     _collect_virt_launcher_data(
@@ -357,11 +354,9 @@ class Resource:
 
         if not self.client:
             try:
-                self.client = DynamicClient(
-                    client=kubernetes.config.new_client_from_config()
-                )
+                self.client = DynamicClient(client=new_client_from_config())
             except (
-                kubernetes.config.ConfigException,
+                ConfigException,
                 urllib3.exceptions.MaxRetryError,
             ):
                 LOGGER.error(
@@ -724,7 +719,7 @@ class Resource:
         Method to get labels for this resource
 
         Returns:
-           openshift.dynamic.resource.ResourceField: Representation of labels
+           kubernetes.dynamic.resource.ResourceField: Representation of labels
         """
         return self.instance["metadata"]["labels"]
 

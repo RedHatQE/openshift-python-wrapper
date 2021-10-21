@@ -1,7 +1,7 @@
 import logging
 import time
 
-from openshift.dynamic.exceptions import ConflictError
+from kubernetes.dynamic.exceptions import ConflictError
 
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutSampler

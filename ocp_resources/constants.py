@@ -1,4 +1,4 @@
-from openshift.dynamic.exceptions import NotFoundError
+from kubernetes.dynamic.exceptions import NotFoundError
 from urllib3.exceptions import ProtocolError
 
 

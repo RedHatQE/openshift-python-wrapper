@@ -1,6 +1,6 @@
 import logging
 
-import kubernetes
+from kubernetes.client import V1DeleteOptions
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import TIMEOUT, NamespacedResource
@@ -62,5 +62,5 @@ class DaemonSet(NamespacedResource):
         super().delete(
             wait=wait,
             timeout=timeout,
-            body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
+            body=V1DeleteOptions(propagation_policy="Foreground"),
         )

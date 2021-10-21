@@ -1,7 +1,7 @@
 import logging
 import re
 
-from openshift.dynamic.exceptions import ConflictError
+from kubernetes.dynamic.exceptions import ConflictError
 
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,

@@ -1,5 +1,5 @@
-import kubernetes
 import pytest
+from kubernetes.config import new_client_from_config
 from openshift.dynamic import DynamicClient
 
 from ocp_resources.namespace import Namespace
@@ -10,7 +10,7 @@ from tests.utils import generate_yaml_from_template
 
 @pytest.fixture(scope="session")
 def client():
-    return DynamicClient(client=kubernetes.config.new_client_from_config())
+    return DynamicClient(client=new_client_from_config())
 
 
 @pytest.fixture(scope="session")

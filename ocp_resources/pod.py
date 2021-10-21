@@ -1,7 +1,9 @@
 import json
 import logging
 
-import kubernetes
+from kubernetes.client import CoreV1Api
+from kubernetes.stream import stream as k8s_stream
+from kubernetes.stream.ws_client import ERROR_CHANNEL
 
 from ocp_resources.node import Node
 from ocp_resources.resource import NamespacedResource
@@ -55,7 +57,7 @@ class Pod(NamespacedResource):
             privileged_client=privileged_client,
             yaml_file=yaml_file,
         )
-        self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
+        self._kube_api = CoreV1Api(api_client=self.client.client)
 
     @property
     def containers(self):
@@ -86,7 +88,7 @@ class Pod(NamespacedResource):
         error_channel = {}
         stream_closed_error = "stream resp is closed"
         LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
-        resp = kubernetes.stream.stream(
+        resp = k8s_stream(
             api_method=self._kube_api.connect_get_namespaced_pod_exec,
             name=self.name,
             namespace=self.namespace,
@@ -103,9 +105,7 @@ class Pod(NamespacedResource):
         while resp.is_open():
             resp.run_forever(timeout=2)
             try:
-                error_channel = json.loads(
-                    resp.read_channel(kubernetes.stream.ws_client.ERROR_CHANNEL)
-                )
+                error_channel = json.loads(resp.read_channel(ERROR_CHANNEL))
                 break
             except json.decoder.JSONDecodeError:
                 # Check remaining time, in order to throw exception
