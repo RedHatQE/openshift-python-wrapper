@@ -96,7 +96,7 @@ class NodeNetworkState(Resource):
 
     @property
     def interfaces(self):
-        return self.instance.status.currentState.interfaces
+        return self.instance.to_dict()["status"]["currentState"]["interfaces"]
 
     @property
     def routes(self):
