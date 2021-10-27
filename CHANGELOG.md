@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.2 (27/10/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.3.1 (27/10/2021)
 *No changelog for this release.*
 
@@ -161,11 +166,3 @@
 
 ## v1.5.21 (01/09/2021)
 *No changelog for this release.*
-
----
-
-## v1.5.20 (01/09/2021)
-- [**Verified**][**size/XS**][**Approve**] Add Vm printable status property [#128](https://github.com/RedHatQE/openshift-python-wrapper/pull/128)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] resource.delete: accept body [#131](https://github.com/RedHatQE/openshift-python-wrapper/pull/131)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add missing raise in create() [#132](https://github.com/RedHatQE/openshift-python-wrapper/pull/132)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add Service Mesh Peer Authentication Resource [#129](https://github.com/RedHatQE/openshift-python-wrapper/pull/129)
