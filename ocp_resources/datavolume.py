@@ -30,6 +30,7 @@ class DataVolume(NamespacedResource):
         SMART_CLONE_PVC_IN_PROGRESS = "SmartClonePVCInProgress"
         UPLOAD_READY = "UploadReady"
         UNKNOWN = "Unknown"
+        WAIT_FOR_FIRST_CONSUMER = "WaitForFirstConsumer"
 
     class AccessMode:
         """
