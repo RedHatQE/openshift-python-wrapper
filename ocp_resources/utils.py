@@ -84,6 +84,10 @@ class TimeoutSampler:
         self._exceptions = tuple(self.exceptions_dict.keys())
 
     def _get_func_info(self, _func, type_):
+        # If func is partial function.
+        if getattr(_func, "func", None):
+            return self._get_func_info(_func=_func.func, type_=type_)
+
         res = getattr(_func, type_, None)
         if res:
             # If func is lambda function.
@@ -96,10 +100,6 @@ class TimeoutSampler:
                     free_vars = f"{'.'.join(free_vars)}." if free_vars else ""
                     return f"lambda: {free_vars}{'.'.join(_func.__code__.co_names)}"
             return res
-
-        # If func is partial function.
-        if getattr(_func, "func", None):
-            return self._get_func_info(_func=_func.func, type_=type_)
 
     @property
     def _func_log(self):
