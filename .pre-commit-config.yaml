@@ -11,8 +11,9 @@ repos:
           - --remove-unused-variables
           - --remove-all-unused-imports
 
+  # TODO: Update rev once https://github.com/hadialqattan/pycln/pull/81 is released
   - repo: https://github.com/hadialqattan/pycln
-    rev: "master"
+    rev: "842e39c8f5badf472061455214bed653f73524a4"
     hooks:
       - id: pycln
 
@@ -22,7 +23,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: "21.8b0"
+    rev: "21.10b0"
     hooks:
     - id: black
 
@@ -38,7 +39,7 @@ repos:
     - id: check-builtin-literals
 
   - repo: https://github.com/PyCQA/flake8
-    rev: "3.9.2"
+    rev: "4.0.1"
     hooks:
       - id: flake8
         additional_dependencies: [
