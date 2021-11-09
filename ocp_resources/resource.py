@@ -33,7 +33,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
-MAX_SUPPORTED_API_VERSION = "v1"
+MAX_SUPPORTED_API_VERSION = "v2"
 
 
 def _collect_instance_data(directory, resource_object):
