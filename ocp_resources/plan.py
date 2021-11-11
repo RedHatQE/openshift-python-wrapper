@@ -38,6 +38,10 @@ class Plan(NamespacedResource, MTV):
         virtual_machines_list=None,
         target_namespace=None,
         warm_migration=False,
+        pre_hook_name=None,
+        pre_hook_namespace=None,
+        after_hook_name=None,
+        after_hook_namespace=None,
         client=None,
         teardown=True,
         yaml_file=None,
@@ -59,9 +63,46 @@ class Plan(NamespacedResource, MTV):
         self.network_map_namespace = network_map_namespace
         self.virtual_machines_list = virtual_machines_list
         self.warm_migration = warm_migration
+        self.pre_hook_name = pre_hook_name
+        self.pre_hook_namespace = pre_hook_namespace
+        self.after_hook_name = after_hook_name
+        self.after_hook_namespace = after_hook_namespace
         self.target_namespace = target_namespace or self.namespace
         self.condition_message_ready = self.ConditionMessage.PLAN_READY
         self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
+
+        def generate_hook_spec(hook_name, hook_namespace, hook_type):
+            hook = {
+                "hook": {
+                    "name": hook_name,
+                    "namespace": hook_namespace,
+                },
+                "step": hook_type,
+            }
+            return hook
+
+        hooks_array = []
+        if self.pre_hook_name and self.pre_hook_namespace:
+            hooks_array.append(
+                generate_hook_spec(
+                    hook_name=self.pre_hook_name,
+                    hook_namespace=self.pre_hook_namespace,
+                    hook_type="PreHook",
+                )
+            )
+
+        if self.after_hook_name and self.after_hook_namespace:
+            hooks_array.append(
+                generate_hook_spec(
+                    hook_name=self.after_hook_name,
+                    hook_namespace=self.after_hook_namespace,
+                    hook_type="AfterHook",
+                )
+            )
+
+        if hooks_array:
+            for vm in self.virtual_machines_list:
+                vm["hooks"] = hooks_array
 
     def to_dict(self):
         res = super().to_dict()
