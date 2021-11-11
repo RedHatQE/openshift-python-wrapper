@@ -33,7 +33,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
-MAX_SUPPORTED_API_VERSION = "v1"
+MAX_SUPPORTED_API_VERSION = "v2"
 
 
 def _collect_instance_data(directory, resource_object):
@@ -128,6 +128,8 @@ def _get_api_version(dyn_client, api_group, kind):
         log = f"Couldn't find {kind} in {api_group} api group"
         LOGGER.warning(log)
         raise NotImplementedError(log)
+
+    LOGGER.info(f"Using api version: {res.group_version}")
     return res.group_version
 
 
