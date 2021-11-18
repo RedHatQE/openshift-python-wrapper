@@ -1,5 +1,44 @@
 # Changelog
 
+## v1.5.3.55 (18/11/2021)
+- [**Verified**][**Approve**][**Ready for merge**] namespace resource: support get raw object in get() - Cherry-pick [#242](https://github.com/RedHatQE/openshift-python-wrapper/pull/242)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add kind to log api version in _get_api_version [#243](https://github.com/RedHatQE/openshift-python-wrapper/pull/243)
+
+---
+
+## v2.1.0 (11/11/2021)
+- [**Verified**][**size/M**][**Approve**] Added support for hooks in the plan [#238](https://github.com/RedHatQE/openshift-python-wrapper/pull/238)
+- [**Verified**][**size/XS**][**Approve**] Set  MAX_SUPPORTED_API_VERSION > v2 [#240](https://github.com/RedHatQE/openshift-python-wrapper/pull/240)
+
+---
+
+## v2.0.16 (09/11/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add python 3.10 support [#236](https://github.com/RedHatQE/openshift-python-wrapper/pull/236)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add OperatorCondition class [#234](https://github.com/RedHatQE/openshift-python-wrapper/pull/234)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Fixing 'cutover' position in migration mtv resource [#228](https://github.com/RedHatQE/openshift-python-wrapper/pull/228)
+
+---
+
+## v2.0.15 (02/11/2021)
+- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add WFFC status to DV [#226](https://github.com/RedHatQE/openshift-python-wrapper/pull/226)
+
+---
+
+## v1.3.10 (27/10/2021)
+*No changelog for this release.*
+
+---
+
+## v1.3.2 (27/10/2021)
+*No changelog for this release.*
+
+---
+
+## v1.3.1 (27/10/2021)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.54 (21/10/2021)
 - [**Verified**][**Approve**][**Ready for merge**] nns.interfaces: return dict [#222](https://github.com/RedHatQE/openshift-python-wrapper/pull/222)
 
@@ -131,44 +170,3 @@
 
 ## v1.5.26 (01/09/2021)
 *No changelog for this release.*
-
----
-
-## v1.5.25 (01/09/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.24 (01/09/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.23 (01/09/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.22 (01/09/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.21 (01/09/2021)
-*No changelog for this release.*
-
----
-
-## v1.5.20 (01/09/2021)
-- [**Verified**][**size/XS**][**Approve**] Add Vm printable status property [#128](https://github.com/RedHatQE/openshift-python-wrapper/pull/128)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] resource.delete: accept body [#131](https://github.com/RedHatQE/openshift-python-wrapper/pull/131)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add missing raise in create() [#132](https://github.com/RedHatQE/openshift-python-wrapper/pull/132)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add Service Mesh Peer Authentication Resource [#129](https://github.com/RedHatQE/openshift-python-wrapper/pull/129)
-
----
-
-## v1.5.19 (29/08/2021)
-- [**Verified**][**size/XS**][**Approve**] Adjust ApiGroup for SM Resources [#126](https://github.com/RedHatQE/openshift-python-wrapper/pull/126)
-- [**Verified**][**size/XS**][**Approve**] Add vm status [#124](https://github.com/RedHatQE/openshift-python-wrapper/pull/124)
-- [**Verified**][**size/XS**][**Approve**] fix inheritence for resources [#121](https://github.com/RedHatQE/openshift-python-wrapper/pull/121)
-- [**Verified**][**size/XS**][**Approve**] Adjust apiGroup and apiVersion for Gateway resource. [#122](https://github.com/RedHatQE/openshift-python-wrapper/pull/122)
