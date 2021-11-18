@@ -10,13 +10,17 @@ import urllib3
 import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
+    ConflictError,
     InternalServerError,
     NotFoundError,
     ServerTimeoutError,
 )
 from openshift.dynamic.resource import ResourceField
-from urllib3.exceptions import ProtocolError
 
+from ocp_resources.constants import (
+    NOT_FOUND_ERROR_EXCEPTION_DICT,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+)
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -29,7 +33,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT = 240
-MAX_SUPPORTED_API_VERSION = "v1"
+MAX_SUPPORTED_API_VERSION = "v2"
 
 
 def _collect_instance_data(directory, resource_object):
@@ -124,6 +128,8 @@ def _get_api_version(dyn_client, api_group, kind):
         log = f"Couldn't find {kind} in {api_group} api group"
         LOGGER.warning(log)
         raise NotImplementedError(log)
+
+    LOGGER.info(f"Using api version: {res.group_version}")
     return res.group_version
 
 
@@ -270,6 +276,7 @@ class Resource:
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
+        EVENTS_K8S_IO = "events.k8s.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
@@ -293,8 +300,10 @@ class Resource:
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
         OPERATORS_COREOS_COM = "operators.coreos.com"
+        OPERATORS_OPENSHIFT_IO = "operators.openshift.io"
         OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
+        POLICY = "policy"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
@@ -483,7 +492,10 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions=(ProtocolError, NotFoundError),
+            exceptions_dict={
+                **PROTOCOL_ERROR_EXCEPTION_DICT,
+                **NOT_FOUND_ERROR_EXCEPTION_DICT,
+            },
             func=lambda: self.exists,
         )
         for sample in samples:
@@ -547,7 +559,7 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
@@ -654,13 +666,17 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def _retry_cluster_exceptions(func):
+    def retry_cluster_exceptions(
+        func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
+    ):
+
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
             func=func,
-            exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             print_log=False,
+            exceptions_dict=exceptions_dict,
+            **kwargs,
         )
         for sample in sampler:
             return sample
@@ -688,7 +704,7 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource._retry_cluster_exceptions(func=_get)
+        return Resource.retry_cluster_exceptions(func=_get)
 
     @property
     def instance(self):
@@ -702,15 +718,15 @@ class Resource:
         def _instance():
             return self.api.get(name=self.name)
 
-        return self._retry_cluster_exceptions(func=_instance)
+        return self.retry_cluster_exceptions(func=_instance)
 
     @property
     def labels(self):
         """
-        Method to get dict of labels for this resource
+        Method to get labels for this resource
 
         Returns:
-           labels(dict): dict labels
+           openshift.dynamic.resource.ResourceField: Representation of labels
         """
         return self.instance["metadata"]["labels"]
 
@@ -732,7 +748,7 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
@@ -812,13 +828,14 @@ class NamespacedResource(Resource):
             raise ValueError("name and namespace or yaml file is required")
 
     @classmethod
-    def get(cls, dyn_client, singular_name=None, *args, **kwargs):
+    def get(cls, dyn_client, singular_name=None, raw=False, *args, **kwargs):
         """
         Get resources
 
         Args:
             dyn_client (DynamicClient): Open connection to remote cluster
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
+            raw (bool): If True return raw object from openshift-restclient-python
 
 
         Returns:
@@ -829,17 +846,23 @@ class NamespacedResource(Resource):
         )
         try:
             for resource_field in _resources.items:
+                if raw:
+                    yield resource_field
+                else:
+                    yield cls(
+                        client=dyn_client,
+                        name=resource_field.metadata.name,
+                        namespace=resource_field.metadata.namespace,
+                    )
+        except TypeError:
+            if raw:
+                yield _resources
+            else:
                 yield cls(
                     client=dyn_client,
-                    name=resource_field.metadata.name,
-                    namespace=resource_field.metadata.namespace,
+                    name=_resources.metadata.name,
+                    namespace=_resources.metadata.namespace,
                 )
-        except TypeError:
-            yield cls(
-                client=dyn_client,
-                name=_resources.metadata.name,
-                namespace=_resources.metadata.namespace,
-            )
 
     @property
     def instance(self):
@@ -965,12 +988,12 @@ class ResourceEditor:
         }
 
         # apply changes
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=patches_to_apply, action_text="Updating", action=self.action
         )
 
     def restore(self):
-        self._apply_patches(
+        self._apply_patches_sampler(
             patches=self._backups, action_text="Restoring", action=self.action
         )
 
@@ -1053,6 +1076,7 @@ class ResourceEditor:
                 "ResourceEdit <action_text> for resource <resource name>"
                 will be printed for each resource; see below
         """
+
         for resource, patch in patches.items():
             LOGGER.info(
                 f"ResourceEdits: {action_text} data for "
@@ -1086,3 +1110,14 @@ class ResourceEditor:
                 resource.update_replace(
                     resource_dict=patch
                 )  # replace the resource metadata
+
+    def _apply_patches_sampler(self, patches, action_text, action):
+        exceptions_dict = {ConflictError: []}
+        exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
+        return Resource.retry_cluster_exceptions(
+            func=self._apply_patches,
+            exceptions_dict=exceptions_dict,
+            patches=patches,
+            action_text=action_text,
+            action=action,
+        )

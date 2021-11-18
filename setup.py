@@ -15,10 +15,6 @@ setup(
         "openshift",
         "xmltodict",
         "urllib3",
-        "netaddr",
-        "paramiko",
-        "pbr",
-        "pdoc3",
     ],
     python_requires=">=3.6",
 )

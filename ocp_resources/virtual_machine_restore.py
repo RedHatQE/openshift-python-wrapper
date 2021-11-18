@@ -3,8 +3,7 @@
 
 import logging
 
-from urllib3.exceptions import ProtocolError
-
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
@@ -72,7 +71,7 @@ class VirtualMachineRestore(NamespacedResource):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
-            exceptions=ProtocolError,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=lambda: self.instance.get("status", {}).get("complete", None)
             == status,
         )

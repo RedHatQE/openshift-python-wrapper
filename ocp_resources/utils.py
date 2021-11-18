@@ -1,13 +1,8 @@
 import logging
 import time
-from warnings import warn
 
 
 LOGGER = logging.getLogger(__name__)
-
-
-class InvalidArgumentsError(Exception):
-    pass
 
 
 class TimeoutExpiredError(Exception):
@@ -28,8 +23,6 @@ class TimeoutSampler:
     sleeps `sleep` seconds.
 
     Yielding the output allows you to handle every value as you wish.
-
-    Feel free to set the instance variables.
 
     exceptions_dict should be in the following format:
     {
@@ -67,8 +60,6 @@ class TimeoutSampler:
         wait_timeout (int): Time in seconds to wait for func to return a value equating to True
         sleep (int): Time in seconds between calls to func
         func (function): to be wrapped by TimeoutSampler
-        exceptions (tuple): Deprecated: Tuple containing all retry exceptions
-        exceptions_msg (str): Deprecated: String to match exception against
         exceptions_dict (dict): Exception handling definition
         print_log (bool): Print elapsed time to log
     """
@@ -78,8 +69,6 @@ class TimeoutSampler:
         wait_timeout,
         sleep,
         func,
-        exceptions=None,  # TODO: Deprecated and will be removed, use exceptions_dict
-        exceptions_msg=None,  # TODO: Deprecated and will be removed, use exceptions_dict
         exceptions_dict=None,
         print_log=True,
         **func_kwargs,
@@ -91,58 +80,26 @@ class TimeoutSampler:
         self.elapsed_time = None
         self.print_log = print_log
 
-        # TODO: when exceptions arg removed replace with: self.exceptions_dict = exceptions_dict or {Exception: []}
-        self.exceptions_dict = self._pre_process_exceptions(
-            exceptions=exceptions,
-            exceptions_msg=exceptions_msg,
-            exceptions_dict=exceptions_dict,
-        )
+        self.exceptions_dict = exceptions_dict or {Exception: []}
         self._exceptions = tuple(self.exceptions_dict.keys())
 
-    def _pre_process_exceptions(self, exceptions, exceptions_msg, exceptions_dict):
-        """
-        Convert any deprecated `exceptions` and `exceptions_msg` arguments to an `exceptions_dict`
+    def _get_func_info(self, _func, type_):
+        # If func is partial function.
+        if getattr(_func, "func", None):
+            return self._get_func_info(_func=_func.func, type_=type_)
 
-        TODO: Deprecation: This method should be removed when the 'exceptions' argument is removed from __init__
+        res = getattr(_func, type_, None)
+        if res:
+            # If func is lambda function.
+            if _func.__name__ == "<lambda>":
+                if type_ == "__module__":
+                    return f"{res}.{_func.__qualname__.split('.')[1]}"
 
-        Args:
-            exceptions (tuple): Deprecated: Tuple containing all retry exceptions
-            exceptions_msg (str): Deprecated: String to match exception against
-            exceptions_dict (dict): Exception handling definition
-
-        Returns:
-            dict: exceptions_dict compatible input
-        """
-        output = {}
-        if exceptions_dict and (exceptions or exceptions_msg):
-            raise InvalidArgumentsError(
-                "Must specify either exceptions_dict or exceptions/exception_msg, not both"
-            )
-
-        elif exceptions or exceptions_msg:
-            warn(
-                "TimeoutSampler() exception and exception_msg are now deprecated. "
-                "Please update to use exceptions_dict by Oct 12, 2021",
-                DeprecationWarning,
-            )
-
-        if exceptions_dict:
-            output.update(exceptions_dict)
-
-        elif exceptions is None:
-            output[Exception] = []
-
-        else:
-            if not isinstance(exceptions, tuple):
-                exceptions = (exceptions,)
-
-            for exp in exceptions:
-                if exceptions_msg:
-                    output[exp] = [exceptions_msg]
-                else:
-                    output[exp] = []
-
-        return output
+                elif type_ == "__name__":
+                    free_vars = _func.__code__.co_freevars
+                    free_vars = f"{'.'.join(free_vars)}." if free_vars else ""
+                    return f"lambda: {free_vars}{'.'.join(_func.__code__.co_names)}"
+            return res
 
     @property
     def _func_log(self):
@@ -150,7 +107,10 @@ class TimeoutSampler:
         Returns:
             string: `func` information to include in log message
         """
-        return f"Function: {self.func} Kwargs: {self.func_kwargs}"
+        _func_kwargs = f"Kwargs: {self.func_kwargs}" if self.func_kwargs else ""
+        _func_module = self._get_func_info(_func=self.func, type_="__module__")
+        _func_name = self._get_func_info(_func=self.func, type_="__name__")
+        return f"Function: {_func_module}.{_func_name} {_func_kwargs}".strip()
 
     def __iter__(self):
         """
@@ -162,7 +122,7 @@ class TimeoutSampler:
         timeout_watch = TimeoutWatch(timeout=self.wait_timeout)
         if self.print_log:
             LOGGER.info(
-                f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds"
+                f"Waiting for {self.wait_timeout} seconds, retry every {self.sleep} seconds. ({self._func_log})"
             )
 
         last_exp = None

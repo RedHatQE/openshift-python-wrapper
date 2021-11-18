@@ -1,7 +1,7 @@
 # openshift-python-wrapper
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
 A python wrapper for [openshift-restclient-python](https://github.com/openshift/openshift-restclient-python) with support for RedHat Container Virtualization. ([Openshift Virtualization](https://www.openshift.com/learn/topics/virtualization))  
-Docs: [openshift-python-wrapper docs](https://redhatqe.github.io/openshift-python-wrapper/ocp_resources/index.html)
+Docs: [openshift-python-wrapper docs](https://openshift-python-wrapper.readthedocs.io/en/latest/)
 
 ## Installation
 From source:
@@ -26,16 +26,14 @@ gh auth login # Follow login instructions
 sudo npm install github-release-notes -g
 ```
 * export GREN_GITHUB_TOKEN=< TOKEN >
-* Run release.sh providing source branch and target version (must be executed from master branch)
+* Run ./scripts/release.sh providing source branch and target version (must be executed from main branch)
 ### usage:
 ```bash
-./release.sh master v1.5.5
+./scripts/release.sh main v1.5.5
 ```
 
 ## docs
-Docs are generated using [pdoc](https://github.com/pdoc3/pdoc)
-```bash
-pdoc --html  -o docs ocp_resources --force
+Hosted on readthedocs.io
 ```
 
 ## PR dependency

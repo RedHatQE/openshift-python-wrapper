@@ -45,6 +45,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         ports=None,
         ipv4_enable=False,
         ipv4_dhcp=False,
+        ipv4_auto_dns=True,
         ipv4_addresses=None,
         ipv6_enable=False,
         node_active_nics=None,
@@ -74,6 +75,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_active_nics = node_active_nics or []
         self.ipv4_enable = ipv4_enable
         self._ipv4_dhcp = ipv4_dhcp
+        self.ipv4_auto_dns = ipv4_auto_dns
         self.ipv4_addresses = ipv4_addresses or []
         self.ipv6_enable = ipv6_enable
         self.ipv4_iface_state = {}
@@ -129,7 +131,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             is a valid desired state and therefore not blocked in the code, but nmstate would
             reject it. Such configuration might be used for negative tests.
             """
-            self.iface["ipv4"] = {"enabled": self.ipv4_enable, "dhcp": self.ipv4_dhcp}
+            self.iface["ipv4"] = {
+                "enabled": self.ipv4_enable,
+                "dhcp": self.ipv4_dhcp,
+                "auto-dns": self.ipv4_auto_dns,
+            }
             if self.ipv4_addresses:
                 self.iface["ipv4"]["address"] = self.ipv4_addresses
 
@@ -148,7 +154,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         samples = TimeoutSampler(
             wait_timeout=3,
             sleep=1,
-            exceptions=ConflictError,
+            exceptions_dict={ConflictError: []},
             func=self.update,
             resource_dict=resource,
         )
@@ -311,31 +317,52 @@ class NodeNetworkConfigurationPolicy(Resource):
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESS:
-                    LOGGER.info("NNCP configured Successfully")
+                    LOGGER.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
                 if sample == no_match_node_condition_reason:
                     raise NNCPConfigurationFailed(
-                        f"Reason: {no_match_node_condition_reason}"
+                        f"{self.name}. Reason: {no_match_node_condition_reason}"
                     )
 
                 if sample == failed_condition_reason:
                     for failed_nnce in self._get_failed_nnce():
+                        nnce_name = failed_nnce.instance.metadata.name
                         nnce_dict = failed_nnce.instance.to_dict()
                         for cond in nnce_dict["status"]["conditions"]:
-                            error = re.findall(
-                                r"libnmstate.error.*", cond.get("message", "")
+                            err_msg = self._get_nnce_error_msg(
+                                nnce_name=nnce_name, nnce_condition=cond
                             )
-                            if error:
-                                LOGGER.error(
-                                    f"NNCE {nnce_dict['metadata']['name']}: {error[0]}"
-                                )
+                            if err_msg:
+                                LOGGER.error(err_msg)
 
                     raise NNCPConfigurationFailed(f"Reason: {failed_condition_reason}")
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
-            LOGGER.error("Unable to configure NNCP for node")
+            LOGGER.error(
+                f"Unable to configure NNCP {self.name} for node {self.node_selector}"
+            )
             raise
+
+    @staticmethod
+    def _get_nnce_error_msg(nnce_name, nnce_condition):
+        err_msg = ""
+        nnce_prefix = f"NNCE {nnce_name}"
+        nnce_msg = nnce_condition.get("message")
+        if not nnce_msg:
+            return err_msg
+
+        errors = nnce_msg.split("->")
+        if errors:
+            err_msg += f"{nnce_prefix}: {errors[0]}"
+            if len(errors) > 1:
+                err_msg += errors[-1]
+
+        libnmstate_err = re.findall(r"libnmstate.error.*", nnce_msg)
+        if libnmstate_err:
+            err_msg += f"{nnce_prefix }: {libnmstate_err[0]}"
+
+        return err_msg
 
     def _get_failed_nnce(self):
         for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):

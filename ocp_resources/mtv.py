@@ -26,6 +26,7 @@ class MTV:
         Migration
         StorageMap
         NetworkMap
+        Host
     """
 
     def __init__(self):
@@ -56,6 +57,7 @@ class MTV:
         MIGRATION_READY = "The migration is ready."
         MIGRATION_RUNNING = "The migration is RUNNING"
         MIGRATION_SUCCEEDED = "The migration has SUCCEEDED."
+        HOST_READY = "The host is ready."
 
     class ProviderType:
         VSPHERE = "vsphere"
