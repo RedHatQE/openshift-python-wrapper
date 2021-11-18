@@ -129,7 +129,7 @@ def _get_api_version(dyn_client, api_group, kind):
         LOGGER.warning(log)
         raise NotImplementedError(log)
 
-    LOGGER.info(f"Using api version: {res.group_version}")
+    LOGGER.info(f"kind: {kind} api version: {res.group_version}")
     return res.group_version
 
 
