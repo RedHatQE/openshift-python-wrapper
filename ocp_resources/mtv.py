@@ -27,6 +27,7 @@ class MTV:
         StorageMap
         NetworkMap
         Host
+        ForkliftController
     """
 
     def __init__(self):
