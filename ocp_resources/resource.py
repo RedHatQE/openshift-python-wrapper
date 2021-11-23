@@ -337,12 +337,19 @@ class Resource:
         timeout=TIMEOUT,
         privileged_client=None,
         yaml_file=None,
+        generate_name=False,
     ):
         """
         Create a API resource
 
         Args:
-            name (str): Resource name
+            name (str): Resource name.
+            client (kubernetes.client.api_client.ApiClient): Client to use.
+            teardown (bool): Whether to tear down the resource on exit.
+            timeout (int): Timeout for operations.
+            privileged_client (kubernetes.client.api_client.ApiClient): Admin client to use.
+            yaml_file (str): Path to YAML file to use.
+            generate_name (bool): Use name as prefix to generate unique resource name.
         """
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
@@ -353,6 +360,7 @@ class Resource:
         self.client = client
         self.privileged_client = privileged_client
         self.yaml_file = yaml_file
+        self.generate_name = generate_name
         self.resource_dict = None  # Filled in case yaml_file is not None
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
@@ -398,7 +406,9 @@ class Resource:
         return {
             "apiVersion": self.api_version,
             "kind": self.kind,
-            "metadata": {"name": self.name},
+            "metadata": {"generateName": self.name}
+            if self.generate_name
+            else {"name": self.name},
         }
 
     def to_dict(self):
