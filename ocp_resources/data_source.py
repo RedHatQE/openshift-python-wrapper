@@ -2,10 +2,6 @@ from ocp_resources.resource import NamespacedResource
 
 
 class DataSource(NamespacedResource):
-    """
-    DataSource object
-    """
-
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
