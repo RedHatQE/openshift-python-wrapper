@@ -41,6 +41,7 @@ fcfn_exclude_functions =
     contextlib,
     re,
     requests,
+    signal,
 
 enable-extensions =
     FCFN,
