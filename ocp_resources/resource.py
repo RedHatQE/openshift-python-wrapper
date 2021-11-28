@@ -3,7 +3,9 @@ import json
 import logging
 import os
 import re
+import sys
 from distutils.version import Version
+from signal import SIGINT, signal
 
 import kubernetes
 import urllib3
@@ -408,11 +410,16 @@ class Resource:
         return self._base_body()
 
     def __enter__(self):
+        signal(SIGINT, self._sigint_handler)
         return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
         if self.teardown:
             self.clean_up()
+
+    def _sigint_handler(self, signal_received, frame):
+        self.__exit__(exception_type=None, exception_value=None, traceback=None)
+        sys.exit(signal_received)
 
     def deploy(self):
         self.create()
