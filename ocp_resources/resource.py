@@ -414,6 +414,16 @@ class Resource:
         return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
+        # For debug, export kind (class name) + NOTEARDOWN to skip resource teardown.
+        # For example:export VirtualMachineInstanceNOTEARDOWN=True
+        skip_teardown_env = f"{self.kind}NOTEARDOWN"
+        no_teardown_from_environment = os.environ.get(skip_teardown_env)
+        if no_teardown_from_environment:
+            LOGGER.warning(
+                f"Skip teardown. Got {skip_teardown_env}={no_teardown_from_environment}"
+            )
+            return
+
         if self.teardown:
             self.clean_up()
 
