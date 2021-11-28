@@ -185,7 +185,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             return self
         except Exception as e:
             LOGGER.error(e)
-            self.clean_up()
+            super().__exit__(exception_type=None, exception_value=None, traceback=None)
             raise
 
     @property
