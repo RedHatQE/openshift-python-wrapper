@@ -54,6 +54,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         yaml_file=None,
         set_ipv4=True,
         set_ipv6=True,
+        max_unavailable=None,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -86,6 +87,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.routes = routes
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
+        self.max_unavailable = max_unavailable
         if self.node_selector:
             self._node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
@@ -152,6 +154,11 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self.ifaces.append(self.iface)
 
             res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
+
+        if self.max_unavailable:
+            res.setdefault("spec", {}).setdefault(
+                "maxUnavailable", self.max_unavailable
+            )
 
         return res
 
