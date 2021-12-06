@@ -29,7 +29,10 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ConnectionAbortedError: [],
     ConnectionResetError: [],
-    InternalServerError: ["etcdserver: leader changed"],
+    InternalServerError: [
+        "etcdserver: leader changed",
+        "etcdserver: request timed out",
+    ],
     ServerTimeoutError: [],
 }
 
