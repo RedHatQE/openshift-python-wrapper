@@ -301,6 +301,7 @@ class Resource:
         )
         NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
+        NODE_LABELLER_KUBEVIRT_IO = "node-labeller.kubevirt.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
