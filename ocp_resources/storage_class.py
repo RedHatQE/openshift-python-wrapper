@@ -19,11 +19,13 @@ class StorageClass(Resource):
         HOSTPATH = "hostpath-provisioner"
         CEPH_RBD = "ocs-storagecluster-ceph-rbd"
         NFS = "nfs"
+        HOSTPATH_CSI = "hostpath-csi"
 
     class Provisioner:
         HOSTPATH = "kubevirt.io/hostpath-provisioner"
-        LOCAL_BLOCK = "kubernetes.io/no-provisioner"
+        NO_PROVISIONER = "kubernetes.io/no-provisioner"
         CEPH_RBD = "openshift-storage.rbd.csi.ceph.com"
+        HOSTPATH_CSI = "kubevirt.io.hostpath-provisioner"
 
     class VolumeBindingMode:
         """

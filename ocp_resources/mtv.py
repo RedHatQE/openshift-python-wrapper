@@ -27,6 +27,7 @@ class MTV:
         StorageMap
         NetworkMap
         Host
+        ForkliftController
     """
 
     def __init__(self):
@@ -130,20 +131,20 @@ class MTV:
             )
             raise
 
-    def wait_for_condition_ready(self, timeout=600):
+    def wait_for_condition_ready(self, wait_timeout=360):
         self.wait_for_resource_status(
             condition_message=self.condition_message_ready,
             condition_status=self.Condition.Status.TRUE,
             condition_type=self.Condition.READY,
-            timeout=timeout,
+            wait_timeout=wait_timeout,
         )
 
-    def wait_for_condition_succeeded(self, timeout=600):
+    def wait_for_condition_succeeded(self, wait_timeout=600):
         self.wait_for_resource_status(
             condition_type=self.Status.SUCCEEDED,
             condition_message=self.condition_message_succeeded,
             condition_status=self.Condition.Status.TRUE,
-            timeout=timeout,
+            wait_timeout=wait_timeout,
         )
 
     @property

@@ -7,7 +7,7 @@ from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
 )
 from ocp_resources.node_network_state import NodeNetworkState
-from ocp_resources.resource import Resource
+from ocp_resources.resource import Resource, ResourceEditor
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -52,6 +52,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         dns_resolver=None,
         routes=None,
         yaml_file=None,
+        set_ipv4=True,
+        set_ipv6=True,
+        max_unavailable=None,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -82,6 +85,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_selector = node_selector
         self.dns_resolver = dns_resolver
         self.routes = routes
+        self.set_ipv4 = set_ipv4
+        self.set_ipv6 = set_ipv6
+        self.max_unavailable = max_unavailable
         if self.node_selector:
             self._node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
@@ -131,21 +137,28 @@ class NodeNetworkConfigurationPolicy(Resource):
             is a valid desired state and therefore not blocked in the code, but nmstate would
             reject it. Such configuration might be used for negative tests.
             """
-            self.iface["ipv4"] = {
-                "enabled": self.ipv4_enable,
-                "dhcp": self.ipv4_dhcp,
-                "auto-dns": self.ipv4_auto_dns,
-            }
-            if self.ipv4_addresses:
-                self.iface["ipv4"]["address"] = self.ipv4_addresses
+            if self.set_ipv4:
+                self.iface["ipv4"] = {
+                    "enabled": self.ipv4_enable,
+                    "dhcp": self.ipv4_dhcp,
+                    "auto-dns": self.ipv4_auto_dns,
+                }
+                if self.ipv4_addresses:
+                    self.iface["ipv4"]["address"] = self.ipv4_addresses
 
-            self.iface["ipv6"] = {"enabled": self.ipv6_enable}
+            if self.set_ipv6:
+                self.iface["ipv6"] = {"enabled": self.ipv6_enable}
 
             self.set_interface(interface=self.iface)
             if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
                 self.ifaces.append(self.iface)
 
             res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
+
+        if self.max_unavailable:
+            res.setdefault("spec", {}).setdefault(
+                "maxUnavailable", self.max_unavailable
+            )
 
         return res
 
@@ -185,7 +198,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             return self
         except Exception as e:
             LOGGER.error(e)
-            self.clean_up()
+            super().__exit__(exception_type=None, exception_value=None, traceback=None)
             raise
 
     @property
@@ -300,7 +313,10 @@ class NodeNetworkConfigurationPolicy(Resource):
                     interface = {"name": iface_name, "ipv4": ipv4}
                     self.set_interface(interface=interface)
 
-        self.apply(resource=self._resource_dict_for_cleanup())
+        desired_state = {"interfaces": self.ifaces}
+        ResourceEditor(
+            patches={self: {"spec": {"desiredState": desired_state}}}
+        ).update()
 
     def status(self):
         for condition in self.instance.status.conditions:
@@ -378,12 +394,3 @@ class NodeNetworkConfigurationPolicy(Resource):
                     and nnce_cond.status == Resource.Condition.Status.TRUE
                 ):
                     yield nnce
-
-    def _resource_dict_for_cleanup(self):
-        resource_dict = self.to_dict()
-        desired_state = {"interfaces": self.ifaces}
-        resource_dict.update({"spec": {"desiredState": desired_state}})
-        if self.routes:
-            resource_dict["spec"]["desiredState"]["routes"] = None
-
-        return resource_dict

@@ -3,7 +3,9 @@ import json
 import logging
 import os
 import re
+import sys
 from distutils.version import Version
+from signal import SIGINT, signal
 
 import kubernetes
 import urllib3
@@ -27,7 +29,10 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ConnectionAbortedError: [],
     ConnectionResetError: [],
-    InternalServerError: ["etcdserver: leader changed"],
+    InternalServerError: [
+        "etcdserver: leader changed",
+        "etcdserver: request timed out",
+    ],
     ServerTimeoutError: [],
 }
 
@@ -129,7 +134,7 @@ def _get_api_version(dyn_client, api_group, kind):
         LOGGER.warning(log)
         raise NotImplementedError(log)
 
-    LOGGER.info(f"Using api version: {res.group_version}")
+    LOGGER.info(f"kind: {kind} api version: {res.group_version}")
     return res.group_version
 
 
@@ -296,6 +301,7 @@ class Resource:
         )
         NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
+        NODE_LABELLER_KUBEVIRT_IO = "node-labeller.kubevirt.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
@@ -408,11 +414,26 @@ class Resource:
         return self._base_body()
 
     def __enter__(self):
+        signal(SIGINT, self._sigint_handler)
         return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
+        # For debug, export kind (class name) + NOTEARDOWN to skip resource teardown.
+        # For example:export VirtualMachineInstanceNOTEARDOWN=True
+        skip_teardown_env = f"{self.kind}NOTEARDOWN"
+        no_teardown_from_environment = os.environ.get(skip_teardown_env)
+        if no_teardown_from_environment:
+            LOGGER.warning(
+                f"Skip teardown. Got {skip_teardown_env}={no_teardown_from_environment}"
+            )
+            return
+
         if self.teardown:
             self.clean_up()
+
+    def _sigint_handler(self, signal_received, frame):
+        self.__exit__(exception_type=None, exception_value=None, traceback=None)
+        sys.exit(signal_received)
 
     def deploy(self):
         self.create()
