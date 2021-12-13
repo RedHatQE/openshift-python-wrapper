@@ -1,12 +1,4 @@
-import logging
-
 from ocp_resources.resource import Resource
-
-
-LOGGER = logging.getLogger(__name__)
-
-_DELETE_NUDGE_DELAY = 30
-_DELETE_NUDGE_INTERVAL = 5
 
 
 class Namespace(Resource):
@@ -40,13 +32,3 @@ class Namespace(Resource):
         if self.label:
             res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
         return res
-
-    def client_wait_deleted(self, timeout):
-        """
-        client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
-        """
-        super().client_wait_deleted(timeout=timeout)
