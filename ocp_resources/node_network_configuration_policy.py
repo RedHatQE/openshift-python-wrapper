@@ -23,15 +23,13 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     class Conditions:
         class Type:
-            FAILING = "Failing"
+            DEGRADED = "Degraded"
             AVAILABLE = "Available"
-            PROGRESSING = "Progressing"
-            MATCHING = "Matching"
 
         class Reason:
-            CONFIGURING = "ConfigurationProgressing"
-            SUCCESS = "SuccessfullyConfigured"
-            FAILED = "FailedToConfigure"
+            CONFIGURATION_PROGRESSING = "ConfigurationProgressing"
+            SUCCESSFULLY_CONFIGURED = "SuccessfullyConfigured"
+            FAILED_TO_CONFIGURE = "FailedToConfigure"
             NO_MATCHING_NODE = "NoMatchingNode"
 
     def __init__(
@@ -324,7 +322,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 return condition["reason"]
 
     def wait_for_status_success(self):
-        failed_condition_reason = self.Conditions.Reason.FAILED
+        failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_conditions()
@@ -332,7 +330,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         samples = TimeoutSampler(wait_timeout=480, sleep=1, func=self.status)
         try:
             for sample in samples:
-                if sample == self.Conditions.Reason.SUCCESS:
+                if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
                     LOGGER.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
