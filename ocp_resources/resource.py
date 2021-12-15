@@ -343,6 +343,7 @@ class Resource:
         timeout=TIMEOUT,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT,
     ):
         """
         Create a API resource
@@ -383,6 +384,7 @@ class Resource:
 
         self.teardown = teardown
         self.timeout = timeout
+        self.delete_timeout = delete_timeout
 
     @ClassProperty
     def kind(cls):  # noqa: N805
@@ -448,7 +450,7 @@ class Resource:
 
         data = self.to_dict()
         LOGGER.info(f"Deleting {data}")
-        self.delete(wait=True, timeout=self.timeout)
+        self.delete(wait=True, timeout=self.delete_timeout)
 
     @classmethod
     def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
