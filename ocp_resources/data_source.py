@@ -1,3 +1,4 @@
+from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
 
 
@@ -36,3 +37,12 @@ class DataSource(NamespacedResource):
         )
 
         return res
+
+    @property
+    def pvc(self):
+        data_source_pvc = self.instance.spec.source.pvc
+        return PersistentVolumeClaim.get(
+            dyn_client=self.client,
+            name=data_source_pvc.name,
+            namespace=data_source_pvc.namespace,
+        )
