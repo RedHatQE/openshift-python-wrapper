@@ -360,6 +360,14 @@ class NodeNetworkConfigurationPolicy(Resource):
             )
             raise
 
+    @property
+    def nnces(self):
+        nnces = []
+        for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):
+            if nnce.name.endswith(f".{self.name}"):
+                nnces.append(nnce)
+        return nnces
+
     @staticmethod
     def _get_nnce_error_msg(nnce_name, nnce_condition):
         err_msg = ""
@@ -381,7 +389,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         return err_msg
 
     def _get_failed_nnce(self):
-        for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):
+        for nnce in self.nnces:
             try:
                 nnce.wait_for_conditions()
             except TimeoutExpiredError:
