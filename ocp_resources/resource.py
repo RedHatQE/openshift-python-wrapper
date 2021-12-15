@@ -447,7 +447,7 @@ class Resource:
                 _collect_data(resource_object=self)
             except Exception as exception_:
                 LOGGER.warning(
-                    f"Log collector failed to collect info for {self.name}\nexception: {exception_}"
+                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
                 )
 
         data = self.to_dict()
