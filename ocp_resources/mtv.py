@@ -55,6 +55,7 @@ class MTV:
         STORAGE_MAP_READY = "The storage map is ready."
         PLAN_READY = "The migration plan is ready."
         PLAN_SUCCEEDED = "The plan execution has SUCCEEDED."
+        PLAN_FAILED = "The plan execution has FAILED."
         MIGRATION_READY = "The migration is ready."
         MIGRATION_RUNNING = "The migration is RUNNING"
         MIGRATION_SUCCEEDED = "The migration has SUCCEEDED."
