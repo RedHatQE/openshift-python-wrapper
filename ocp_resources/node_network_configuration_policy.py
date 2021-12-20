@@ -3,6 +3,7 @@ import re
 
 from openshift.dynamic.exceptions import ConflictError
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
 )
@@ -53,6 +54,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         set_ipv4=True,
         set_ipv6=True,
         max_unavailable=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -64,7 +66,11 @@ class NodeNetworkConfigurationPolicy(Resource):
          {"ip": "10.7.8.9", "prefix-length": 23}]
         """
         super().__init__(
-            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+            name=name,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.desired_state = {"interfaces": []}
         self.worker_pods = worker_pods

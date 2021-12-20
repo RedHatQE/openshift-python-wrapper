@@ -2,6 +2,7 @@
 
 import logging
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -47,6 +48,7 @@ class PersistentVolumeClaim(NamespacedResource):
         hostpath_node=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -54,6 +56,7 @@ class PersistentVolumeClaim(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.accessmodes = accessmodes
         self.volume_mode = volume_mode

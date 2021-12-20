@@ -2,6 +2,7 @@ import logging
 
 from openshift.dynamic.exceptions import ResourceNotFoundError
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
 
@@ -20,6 +21,7 @@ class DataSource(NamespacedResource):
         source=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -27,6 +29,7 @@ class DataSource(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.source = source
 

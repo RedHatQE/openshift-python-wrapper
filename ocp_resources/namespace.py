@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 
 
@@ -18,9 +19,14 @@ class Namespace(Resource):
         teardown=True,
         label=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
-            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+            name=name,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.label = label
 

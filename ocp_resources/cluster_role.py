@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 
 
@@ -19,9 +19,14 @@ class ClusterRole(Resource):
         verbs=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
-            client=client, name=name, teardown=teardown, yaml_file=yaml_file
+            client=client,
+            name=name,
+            teardown=teardown,
+            yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.api_groups = api_groups
         self.permissions_to_resources = permissions_to_resources

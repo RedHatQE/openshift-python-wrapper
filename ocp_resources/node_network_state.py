@@ -3,6 +3,7 @@ import time
 
 from openshift.dynamic.exceptions import ConflictError
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutSampler
 
@@ -10,15 +11,25 @@ from ocp_resources.utils import TimeoutSampler
 LOGGER = logging.getLogger(__name__)
 
 SLEEP = 1
-TIMEOUT = 240
 
 
 class NodeNetworkState(Resource):
     api_group = Resource.ApiGroup.NMSTATE_IO
 
-    def __init__(self, name=None, client=None, teardown=True, yaml_file=None):
+    def __init__(
+        self,
+        name=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+    ):
         super().__init__(
-            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+            name=name,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         status = self.instance.to_dict()["status"]
         if "desiredState" in status:
@@ -79,7 +90,7 @@ class NodeNetworkState(Resource):
 
         LOGGER.info(f"Checking if interface {name} is up -- {self.name}")
         samples = TimeoutSampler(
-            wait_timeout=TIMEOUT, sleep=SLEEP, func=_find_up_interface
+            wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface
         )
         for sample in samples:
             if sample:
@@ -88,7 +99,10 @@ class NodeNetworkState(Resource):
     def wait_until_deleted(self, name):
         LOGGER.info(f"Checking if interface {name} is deleted -- {self.name}")
         samples = TimeoutSampler(
-            wait_timeout=TIMEOUT, sleep=SLEEP, func=self.get_interface, name=name
+            wait_timeout=TIMEOUT_4MINUTES,
+            sleep=SLEEP,
+            func=self.get_interface,
+            name=name,
         )
         for sample in samples:
             if not sample:

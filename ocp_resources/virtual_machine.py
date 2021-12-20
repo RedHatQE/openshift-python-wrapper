@@ -2,8 +2,8 @@
 
 import logging
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
-from ocp_resources.resource import TIMEOUT, NamespacedResource
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
 
@@ -42,6 +42,7 @@ class VirtualMachine(NamespacedResource):
         teardown=True,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -50,6 +51,7 @@ class VirtualMachine(NamespacedResource):
             teardown=teardown,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.body = body
 
@@ -75,24 +77,24 @@ class VirtualMachine(NamespacedResource):
         res["spec"] = body_spec or {"template": {"spec": {}}}
         return res
 
-    def start(self, timeout=TIMEOUT, wait=False):
+    def start(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="start")
         if wait:
             return self.wait_for_status(timeout=timeout, status=True)
 
-    def restart(self, timeout=TIMEOUT, wait=False):
+    def restart(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="restart")
         if wait:
             self.vmi.virt_launcher_pod.wait_deleted()
             return self.vmi.wait_until_running(timeout=timeout, stop_status="dummy")
 
-    def stop(self, timeout=TIMEOUT, wait=False):
+    def stop(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="stop")
         if wait:
             self.wait_for_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted()
 
-    def wait_for_status(self, status, timeout=TIMEOUT, sleep=1):
+    def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
         Wait for resource to be in status
 
