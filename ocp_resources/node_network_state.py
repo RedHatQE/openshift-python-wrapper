@@ -99,7 +99,7 @@ class NodeNetworkState(Resource):
     def wait_until_deleted(self, name):
         LOGGER.info(f"Checking if interface {name} is deleted -- {self.name}")
         samples = TimeoutSampler(
-            wait_timeout=TIMEOUT_4MINUTES,
+            wait_timeout=self.delete_timeout,
             sleep=SLEEP,
             func=self.get_interface,
             name=name,
