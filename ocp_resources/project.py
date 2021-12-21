@@ -1,4 +1,5 @@
-from ocp_resources.resource import TIMEOUT, Resource
+from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.resource import Resource
 
 
 class Project(Resource):
@@ -23,7 +24,13 @@ class ProjectRequest(Resource):
     api_group = Resource.ApiGroup.PROJECT_OPENSHIFT_IO
 
     def __init__(
-        self, name=None, client=None, teardown=True, timeout=TIMEOUT, yaml_file=None
+        self,
+        name=None,
+        client=None,
+        teardown=True,
+        timeout=TIMEOUT_4MINUTES,
+        yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -31,6 +38,7 @@ class ProjectRequest(Resource):
             teardown=teardown,
             timeout=timeout,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
 
     def clean_up(self):

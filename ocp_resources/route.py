@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -23,6 +24,7 @@ class Route(NamespacedResource):
         destination_ca_cert=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -30,6 +32,7 @@ class Route(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.service = service
         self.destination_ca_cert = destination_ca_cert

@@ -22,6 +22,7 @@ from openshift.dynamic.resource import ResourceField
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_4MINUTES,
 )
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
@@ -37,7 +38,6 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
 }
 
 LOGGER = logging.getLogger(__name__)
-TIMEOUT = 240
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
@@ -340,10 +340,10 @@ class Resource:
         name=None,
         client=None,
         teardown=True,
-        timeout=TIMEOUT,
+        timeout=TIMEOUT_4MINUTES,
         privileged_client=None,
         yaml_file=None,
-        delete_timeout=TIMEOUT,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         """
         Create a API resource
@@ -502,7 +502,7 @@ class Resource:
     def api(self):
         return self.full_api()
 
-    def wait(self, timeout=TIMEOUT, sleep=1):
+    def wait(self, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
         Wait for resource
 
@@ -527,7 +527,7 @@ class Resource:
             if sample:
                 return
 
-    def wait_deleted(self, timeout=TIMEOUT):
+    def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait until resource is deleted
 
@@ -567,7 +567,9 @@ class Resource:
             if not sample:
                 return
 
-    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None, sleep=1):
+    def wait_for_status(
+        self, status, timeout=TIMEOUT_4MINUTES, stop_status=None, sleep=1
+    ):
         """
         Wait for resource to be in status
 
@@ -644,7 +646,7 @@ class Resource:
             return self.wait()
         return res
 
-    def delete(self, wait=False, timeout=TIMEOUT, body=None):
+    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
@@ -836,9 +838,10 @@ class NamespacedResource(Resource):
         namespace=None,
         client=None,
         teardown=True,
-        timeout=TIMEOUT,
+        timeout=TIMEOUT_4MINUTES,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -847,6 +850,7 @@ class NamespacedResource(Resource):
             timeout=timeout,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:
