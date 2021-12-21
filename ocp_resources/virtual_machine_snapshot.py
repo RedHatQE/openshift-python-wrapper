@@ -2,8 +2,8 @@
 
 import logging
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
-from ocp_resources.resource import TIMEOUT, NamespacedResource
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
 
@@ -26,6 +26,7 @@ class VirtualMachineSnapshot(NamespacedResource):
         client=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -33,6 +34,7 @@ class VirtualMachineSnapshot(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.vm_name = vm_name
 
@@ -49,7 +51,7 @@ class VirtualMachineSnapshot(NamespacedResource):
         spec["source"]["name"] = self.vm_name
         return res
 
-    def wait_ready_to_use(self, status=True, timeout=TIMEOUT):
+    def wait_ready_to_use(self, status=True, timeout=TIMEOUT_4MINUTES):
         """
         Wait for VirtualMachineSnapshot to be in readyToUse status
 

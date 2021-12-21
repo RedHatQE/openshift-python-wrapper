@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -18,6 +19,7 @@ class Subscription(NamespacedResource):
         tolerations=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             client=client,
@@ -25,6 +27,7 @@ class Subscription(NamespacedResource):
             namespace=namespace,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.source = source
         self.source_namespace = source_namespace

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
-from ocp_resources.resource import TIMEOUT, NamespacedResource
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 
 
@@ -32,7 +32,7 @@ class Deployment(NamespacedResource):
         LOGGER.info(f"Set deployment replicas: {replica_count}")
         return self.update(resource_dict=body)
 
-    def wait_for_replicas(self, deployed=True, timeout=TIMEOUT):
+    def wait_for_replicas(self, deployed=True, timeout=TIMEOUT_4MINUTES):
         """
         Wait until all replicas are updated.
 

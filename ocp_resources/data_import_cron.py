@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -26,6 +27,7 @@ class DataImportCron(NamespacedResource):
         teardown=True,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -34,6 +36,7 @@ class DataImportCron(NamespacedResource):
             teardown=teardown,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.image_stream = image_stream
         self.url = url

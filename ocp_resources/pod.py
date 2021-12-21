@@ -3,6 +3,7 @@ import logging
 
 import kubernetes
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.node import Node
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutWatch
@@ -46,6 +47,7 @@ class Pod(NamespacedResource):
         teardown=True,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -54,6 +56,7 @@ class Pod(NamespacedResource):
             teardown=teardown,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 
