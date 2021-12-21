@@ -640,6 +640,7 @@ class Resource:
             data.update(body)
 
         LOGGER.info(f"Posting {data}")
+        LOGGER.info(f"YAML: {yaml.dump(data)}")
         LOGGER.info(f"Create {self.kind} {self.name}")
         res = self.api.create(body=data, namespace=self.namespace)
         if wait and res:
