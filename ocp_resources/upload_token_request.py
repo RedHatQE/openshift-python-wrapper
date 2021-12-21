@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
 from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class UploadTokenRequest(NamespacedResource):
