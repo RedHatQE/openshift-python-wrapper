@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
@@ -20,6 +21,7 @@ class Provider(NamespacedResource, MTV):
         client=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -27,6 +29,7 @@ class Provider(NamespacedResource, MTV):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.provider_type = provider_type
         self.url = url

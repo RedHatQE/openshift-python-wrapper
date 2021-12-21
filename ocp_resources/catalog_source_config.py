@@ -1,6 +1,6 @@
 import logging
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
@@ -23,6 +23,7 @@ class CatalogSourceConfig(NamespacedResource):
         client=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -30,6 +31,7 @@ class CatalogSourceConfig(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.source = source
         self.target_namespace = target_namespace

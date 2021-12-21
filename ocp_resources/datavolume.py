@@ -2,8 +2,9 @@
 
 import logging
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
-from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
+from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -89,6 +90,7 @@ class DataVolume(NamespacedResource):
         teardown=True,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -97,6 +99,7 @@ class DataVolume(NamespacedResource):
             teardown=teardown,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.source = source
         self.url = url
@@ -172,7 +175,7 @@ class DataVolume(NamespacedResource):
 
         return res
 
-    def wait_deleted(self, timeout=TIMEOUT):
+    def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait until DataVolume and the PVC created by it are deleted
 

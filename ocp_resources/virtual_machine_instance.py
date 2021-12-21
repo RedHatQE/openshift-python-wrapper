@@ -4,10 +4,10 @@ import shlex
 import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
-from ocp_resources.resource import TIMEOUT, NamespacedResource
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -31,6 +31,7 @@ class VirtualMachineInstance(NamespacedResource):
         client=None,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -38,6 +39,7 @@ class VirtualMachineInstance(NamespacedResource):
             client=client,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
 
     @property
@@ -53,12 +55,12 @@ class VirtualMachineInstance(NamespacedResource):
             method=method, action=action, url=self._subresource_api_url, **params
         )
 
-    def pause(self, timeout=TIMEOUT, wait=False):
+    def pause(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="pause")
         if wait:
             return self.wait_for_pause_status(pause=True, timeout=timeout)
 
-    def unpause(self, timeout=TIMEOUT, wait=False):
+    def unpause(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="unpause")
         if wait:
             return self.wait_for_pause_status(pause=False, timeout=timeout)
@@ -102,7 +104,7 @@ class VirtualMachineInstance(NamespacedResource):
 
         raise ResourceNotFoundError
 
-    def wait_until_running(self, timeout=TIMEOUT, logs=True, stop_status=None):
+    def wait_until_running(self, timeout=TIMEOUT_4MINUTES, logs=True, stop_status=None):
         """
         Wait until VMI is running
 
@@ -129,7 +131,7 @@ class VirtualMachineInstance(NamespacedResource):
 
             raise
 
-    def wait_for_pause_status(self, pause, timeout=TIMEOUT):
+    def wait_for_pause_status(self, pause, timeout=TIMEOUT_4MINUTES):
         """
         Wait for Virtual Machine Instance to be paused / unpaused.
         Paused status is checked in libvirt and in the VMI conditions.
@@ -148,7 +150,7 @@ class VirtualMachineInstance(NamespacedResource):
         self.wait_for_domstate_pause_status(pause=pause, timeout=timeout)
         self.wait_for_vmi_condition_pause_status(pause=pause, timeout=timeout)
 
-    def wait_for_domstate_pause_status(self, pause, timeout=TIMEOUT):
+    def wait_for_domstate_pause_status(self, pause, timeout=TIMEOUT_4MINUTES):
         pause_status = "paused" if pause else "running"
         samples = TimeoutSampler(
             wait_timeout=timeout,
@@ -160,7 +162,7 @@ class VirtualMachineInstance(NamespacedResource):
             if pause_status in sample:
                 return
 
-    def wait_for_vmi_condition_pause_status(self, pause, timeout=TIMEOUT):
+    def wait_for_vmi_condition_pause_status(self, pause, timeout=TIMEOUT_4MINUTES):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,

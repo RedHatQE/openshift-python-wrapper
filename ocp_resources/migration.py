@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
@@ -25,6 +26,7 @@ class Migration(NamespacedResource, MTV):
         client=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -32,6 +34,7 @@ class Migration(NamespacedResource, MTV):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace

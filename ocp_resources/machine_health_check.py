@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -23,6 +24,7 @@ class MachineHealthCheck(NamespacedResource):
         reboot_strategy=False,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -30,6 +32,7 @@ class MachineHealthCheck(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.cluster_name = cluster_name
         self.machineset_name = machineset_name

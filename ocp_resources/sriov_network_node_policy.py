@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -22,6 +23,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
         node_selector=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
     ):
         super().__init__(
             name=name,
@@ -29,6 +31,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
         )
         self.pf_names = pf_names
         self.root_devices = root_devices
