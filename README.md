@@ -40,10 +40,10 @@ For PR dependency we use [dpulls](https://www.dpulls.com/)
 To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR description.
 
 ## Logging configuration
-To change log level export OPW_LOG_LEVEL:  
+To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:  
 
 ```bash
-OPW_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
 ```
 
 ## Examples
