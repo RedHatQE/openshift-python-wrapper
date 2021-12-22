@@ -24,6 +24,7 @@ class DataImportCron(NamespacedResource):
         garbage_collect=None,
         managed_data_source=None,
         imports_to_keep=None,
+        bind_immediate_annotation=None,
         teardown=True,
         privileged_client=None,
         yaml_file=None,
@@ -48,6 +49,7 @@ class DataImportCron(NamespacedResource):
         self.garbage_collect = garbage_collect
         self.managed_data_source = managed_data_source
         self.imports_to_keep = imports_to_keep
+        self.bind_immediate_annotation = bind_immediate_annotation
 
     def to_dict(self):
         res = super().to_dict()
@@ -70,6 +72,12 @@ class DataImportCron(NamespacedResource):
             }
         )
         spec = res["spec"]["template"]["spec"]
+        if self.bind_immediate_annotation:
+            res["metadata"].setdefault("annotations", {}).update(
+                {
+                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
+                }
+            )
         if self.image_stream:
             spec["source"]["registry"]["imageStream"] = self.image_stream
         if self.url:
