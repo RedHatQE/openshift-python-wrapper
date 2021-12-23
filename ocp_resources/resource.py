@@ -1,6 +1,5 @@
 import contextlib
 import json
-import logging
 import os
 import re
 import sys
@@ -24,6 +23,7 @@ from ocp_resources.constants import (
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,
 )
+from ocp_resources.logger import get_logger
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -37,7 +37,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ServerTimeoutError: [],
 }
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
@@ -639,20 +639,24 @@ class Resource:
 
             data.update(body)
 
-        LOGGER.info(f"Posting {data}")
         LOGGER.info(f"Create {self.kind} {self.name}")
+        LOGGER.info(f"Posting {data}")
+        LOGGER.debug(f"\n{yaml.dump(data)}")
         res = self.api.create(body=data, namespace=self.namespace)
         if wait and res:
             return self.wait()
         return res
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
+        LOGGER.info(f"Delete {self.kind} {self.name}")
+        if body:
+            LOGGER.debug(f"\n{yaml.dump(body)}")
+
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
             return False
 
-        LOGGER.info(f"Delete {self.kind} {self.name}")
         if wait and res:
             return self.wait_deleted(timeout=timeout)
         return res
@@ -677,7 +681,8 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        LOGGER.info(f"Update {self.kind} {self.name}: {resource_dict}")
+        LOGGER.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
+        LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -689,7 +694,8 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
+        LOGGER.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
+        LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
