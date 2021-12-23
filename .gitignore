@@ -19,7 +19,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-ocp_resources/lib/
 lib64/
 parts/
 sdist/
