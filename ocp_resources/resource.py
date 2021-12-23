@@ -650,7 +650,8 @@ class Resource:
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         LOGGER.info(f"Delete {self.kind} {self.name}")
         if body:
-            LOGGER.debug(f"\n{yaml.dump(body)}")
+            _body = body if isinstance(body, dict) else body.to_dict()
+            LOGGER.debug(f"\n{yaml.dump(_body)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
