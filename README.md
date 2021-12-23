@@ -33,12 +33,18 @@ sudo npm install github-release-notes -g
 ```
 
 ## docs
-Hosted on readthedocs.io
-```
+Hosted on readthedocs.io [openshift-python-wrapper](https://openshift-python-wrapper.readthedocs.io/en/latest/)
 
 ## PR dependency
 For PR dependency we use [dpulls](https://www.dpulls.com/)  
 To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR description.
+
+## Logging configuration
+To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:  
+
+```bash
+OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+```
 
 ## Examples
 ### Client
