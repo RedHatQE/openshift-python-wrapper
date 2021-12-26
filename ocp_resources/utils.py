@@ -72,6 +72,7 @@ class TimeoutSampler:
         func,
         exceptions_dict=None,
         print_log=True,
+        raise_error=True,
         **func_kwargs,
     ):
         self.wait_timeout = wait_timeout
@@ -80,6 +81,7 @@ class TimeoutSampler:
         self.func_kwargs = func_kwargs
         self.elapsed_time = None
         self.print_log = print_log
+        self.raise_error = raise_error
 
         self.exceptions_dict = exceptions_dict or {Exception: []}
         self._exceptions = tuple(self.exceptions_dict.keys())
@@ -149,7 +151,8 @@ class TimeoutSampler:
                 if self.elapsed_time and self.print_log:
                     LOGGER.info(f"Elapsed time: {self.elapsed_time}")
 
-        raise TimeoutExpiredError(self._get_exception_log(exp=last_exp))
+        if self.raise_error:
+            raise TimeoutExpiredError(self._get_exception_log(exp=last_exp))
 
     @staticmethod
     def _is_exception_matched(exp, exception_messages):
