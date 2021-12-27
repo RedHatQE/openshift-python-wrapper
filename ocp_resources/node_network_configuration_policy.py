@@ -42,6 +42,8 @@ class NodeNetworkConfigurationPolicy(Resource):
         teardown=True,
         mtu=None,
         ports=None,
+        ipv4_capture=None,
+        ipv6_capture=None,
         ipv4_enable=False,
         ipv4_dhcp=False,
         ipv4_auto_dns=True,
@@ -81,6 +83,8 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.iface = None
         self.ifaces = []
         self.node_active_nics = node_active_nics or []
+        self.ipv4_capture = ipv4_capture
+        self.ipv6_capture = ipv6_capture
         self.ipv4_enable = ipv4_enable
         self._ipv4_dhcp = ipv4_dhcp
         self.ipv4_auto_dns = ipv4_auto_dns
@@ -147,16 +151,25 @@ class NodeNetworkConfigurationPolicy(Resource):
             reject it. Such configuration might be used for negative tests.
             """
             if self.set_ipv4:
-                self.iface["ipv4"] = {
-                    "enabled": self.ipv4_enable,
-                    "dhcp": self.ipv4_dhcp,
-                    "auto-dns": self.ipv4_auto_dns,
-                }
-                if self.ipv4_addresses:
-                    self.iface["ipv4"]["address"] = self.ipv4_addresses
+
+                if self.ipv4_capture:
+                    self.iface["ipv4"] = self.ipv4_capture
+
+                else:
+                    self.iface["ipv4"] = {
+                        "enabled": self.ipv4_enable,
+                        "dhcp": self.ipv4_dhcp,
+                        "auto-dns": self.ipv4_auto_dns,
+                    }
+                    if self.ipv4_addresses:
+                        self.iface["ipv4"]["address"] = self.ipv4_addresses
 
             if self.set_ipv6:
-                self.iface["ipv6"] = {"enabled": self.ipv6_enable}
+
+                if self.ipv6_capture:
+                    self.iface["ipv6"] = self.ipv6_capture
+                else:
+                    self.iface["ipv6"] = {"enabled": self.ipv6_enable}
 
             self.set_interface(interface=self.iface)
             if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
