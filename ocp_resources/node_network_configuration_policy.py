@@ -44,6 +44,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         ports=None,
         ipv4_enable=False,
         ipv4_dhcp=False,
+        ipv4_auto_dns=True,
         ipv4_addresses=None,
         ipv6_enable=False,
         node_active_nics=None,
@@ -70,6 +71,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_active_nics = node_active_nics or []
         self.ipv4_enable = ipv4_enable
         self._ipv4_dhcp = ipv4_dhcp
+        self.ipv4_auto_dns = ipv4_auto_dns
         self.ipv4_addresses = ipv4_addresses or []
         self.ipv6_enable = ipv6_enable
         self.ipv4_iface_state = {}
@@ -122,7 +124,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             is a valid desired state and therefore not blocked in the code, but nmstate would
             reject it. Such configuration might be used for negative tests.
             """
-            self.iface["ipv4"] = {"enabled": self.ipv4_enable, "dhcp": self.ipv4_dhcp}
+            self.iface["ipv4"] = {
+                "enabled": self.ipv4_enable,
+                "dhcp": self.ipv4_dhcp,
+                "auto-dns": self.ipv4_auto_dns,
+            }
             if self.ipv4_addresses:
                 self.iface["ipv4"]["address"] = self.ipv4_addresses
 
