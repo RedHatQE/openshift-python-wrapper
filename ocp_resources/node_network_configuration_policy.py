@@ -53,6 +53,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         yaml_file=None,
         set_ipv4=True,
         set_ipv6=True,
+        capture=None,
         max_unavailable=None,
         delete_timeout=TIMEOUT_4MINUTES,
     ):
@@ -92,6 +93,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
+        self.capture = capture
         if self.node_selector:
             self._node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
@@ -127,6 +129,9 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         if self._node_selector:
             res.setdefault("spec", {}).setdefault("nodeSelector", self._node_selector)
+
+        if self.capture:
+            res["spec"]["capture"] = self.capture
 
         if self.dns_resolver:
             res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
@@ -232,20 +237,25 @@ class NodeNetworkConfigurationPolicy(Resource):
                 }
                 self.set_interface(interface=_port)
 
-        for iface in self.ifaces:
+        if not self.capture:
             """
-            If any physical interfaces are part of the policy - we will skip them,
-            because we don't want to delete them (and we actually can't, and this attempt
-            would end with failure).
+            When using capture, marking interfaces as absent will crash the teardown.
+            A new nncp has to be deployed to remove interfaces and restore old config.
             """
-            if iface["name"] in self.node_active_nics:
-                continue
-            try:
-                self._absent_interface()
-                self.wait_for_status_success()
-                self.wait_for_interface_deleted()
-            except Exception as e:
-                LOGGER.error(e)
+            for iface in self.ifaces:
+                """
+                If any physical interfaces are part of the policy - we will skip them,
+                because we don't want to delete them (and we actually can't, and this attempt
+                would end with failure).
+                """
+                if iface["name"] in self.node_active_nics:
+                    continue
+                try:
+                    self._absent_interface()
+                    self.wait_for_status_success()
+                    self.wait_for_interface_deleted()
+                except Exception as e:
+                    LOGGER.error(e)
 
         self.delete()
 
