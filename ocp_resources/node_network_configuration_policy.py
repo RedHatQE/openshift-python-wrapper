@@ -237,20 +237,25 @@ class NodeNetworkConfigurationPolicy(Resource):
                 }
                 self.set_interface(interface=_port)
 
-        for iface in self.ifaces:
+        if not self.capture:
             """
-            If any physical interfaces are part of the policy - we will skip them,
-            because we don't want to delete them (and we actually can't, and this attempt
-            would end with failure).
+            When using capture, marking interfaces as absent will crash the teardown.
+            A new nncp has to be deployed to remove interfaces and restore old config.
             """
-            if iface["name"] in self.node_active_nics:
-                continue
-            try:
-                self._absent_interface()
-                self.wait_for_status_success()
-                self.wait_for_interface_deleted()
-            except Exception as e:
-                LOGGER.error(e)
+            for iface in self.ifaces:
+                """
+                If any physical interfaces are part of the policy - we will skip them,
+                because we don't want to delete them (and we actually can't, and this attempt
+                would end with failure).
+                """
+                if iface["name"] in self.node_active_nics:
+                    continue
+                try:
+                    self._absent_interface()
+                    self.wait_for_status_success()
+                    self.wait_for_interface_deleted()
+                except Exception as e:
+                    LOGGER.error(e)
 
         self.delete()
 
