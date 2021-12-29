@@ -421,7 +421,9 @@ class Resource:
             try:
                 _collect_data(resource_object=self)
             except Exception as exception_:
-                LOGGER.warning(exception_)
+                LOGGER.warning(
+                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
+                )
 
         self.delete(wait=True, timeout=self.timeout)
 
