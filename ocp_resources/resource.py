@@ -423,8 +423,6 @@ class Resource:
             except Exception as exception_:
                 LOGGER.warning(exception_)
 
-        data = self.to_dict()
-        LOGGER.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.timeout)
 
     @classmethod
@@ -618,12 +616,17 @@ class Resource:
         return res
 
     def delete(self, wait=False, timeout=TIMEOUT, body=None):
+        LOGGER.info(f"Delete {self.kind} {self.name}")
+        if self.exists:
+            data = self.instance.to_dict()
+            LOGGER.info(f"Deleting {data}")
+            LOGGER.debug(f"\n{yaml.dump(data)}")
+
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
             return False
 
-        LOGGER.info(f"Delete {self.kind} {self.name}")
         if wait and res:
             return self.wait_deleted(timeout=timeout)
         return res
