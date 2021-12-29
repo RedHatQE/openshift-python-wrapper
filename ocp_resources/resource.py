@@ -622,7 +622,6 @@ class Resource:
         if self.exists:
             data = self.instance.to_dict()
             LOGGER.info(f"Deleting {data}")
-            LOGGER.debug(f"\n{yaml.dump(data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
