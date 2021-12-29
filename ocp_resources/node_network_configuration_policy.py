@@ -92,6 +92,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
+        self.res = None
         if self.node_selector:
             self._node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
@@ -118,21 +119,28 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
         if self.dns_resolver or self.routes or self.iface:
-            res.setdefault("spec", {}).setdefault("desiredState", {})
+            self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
         if self._node_selector:
-            res.setdefault("spec", {}).setdefault("nodeSelector", self._node_selector)
+            self.res.setdefault("spec", {}).setdefault(
+                "nodeSelector", self._node_selector
+            )
 
         if self.dns_resolver:
-            res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
+            self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
 
         if self.routes:
-            res["spec"]["desiredState"]["routes"] = self.routes
+            self.res["spec"]["desiredState"]["routes"] = self.routes
+
+        if self.max_unavailable:
+            self.res.setdefault("spec", {}).setdefault(
+                "maxUnavailable", self.max_unavailable
+            )
 
         if self.iface:
             """
@@ -141,30 +149,62 @@ class NodeNetworkConfigurationPolicy(Resource):
             is a valid desired state and therefore not blocked in the code, but nmstate would
             reject it. Such configuration might be used for negative tests.
             """
-            if self.set_ipv4:
-                self.iface["ipv4"] = {
-                    "enabled": self.ipv4_enable,
-                    "dhcp": self.ipv4_dhcp,
-                    "auto-dns": self.ipv4_auto_dns,
-                }
-                if self.ipv4_addresses:
-                    self.iface["ipv4"]["address"] = self.ipv4_addresses
-
-            if self.set_ipv6:
-                self.iface["ipv6"] = {"enabled": self.ipv6_enable}
-
-            self.set_interface(interface=self.iface)
-            if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
-                self.ifaces.append(self.iface)
-
-            res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
-
-        if self.max_unavailable:
-            res.setdefault("spec", {}).setdefault(
-                "maxUnavailable", self.max_unavailable
+            self.res = self.add_interface(
+                iface=self.iface,
+                state=self.Interface.State.UP,
+                set_ipv4=self.set_ipv4,
+                ipv4_enable=self.ipv4_enable,
+                ipv4_dhcp=self.ipv4_dhcp,
+                ipv4_auto_dns=self.ipv4_auto_dns,
+                ipv4_addresses=self.ipv4_addresses,
+                set_ipv6=self.set_ipv6,
+                ipv6_enable=self.ipv6_enable,
             )
 
-        return res
+        return self.res
+
+    def add_interface(
+        self,
+        iface=None,
+        name=None,
+        type_=None,
+        state=None,
+        set_ipv4=True,
+        ipv4_enable=False,
+        ipv4_dhcp=False,
+        ipv4_auto_dns=True,
+        ipv4_addresses=None,
+        set_ipv6=True,
+        ipv6_enable=False,
+    ):
+        self.res = self.to_dict()
+        self.res.setdefault("spec", {}).setdefault("desiredState", {})
+        if not iface:
+            iface = {
+                "name": name,
+                "type": type_,
+                "state": state,
+            }
+        if set_ipv4:
+            iface["ipv4"] = {
+                "enabled": ipv4_enable,
+                "dhcp": ipv4_dhcp,
+                "auto-dns": ipv4_auto_dns,
+            }
+            if ipv4_addresses:
+                iface["ipv4"]["address"] = ipv4_addresses
+
+        if set_ipv6:
+            iface["ipv6"] = {"enabled": ipv6_enable}
+
+        self.set_interface(interface=iface)
+        if iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
+            self.ifaces.append(iface)
+
+        self.res["spec"]["desiredState"]["interfaces"] = self.desired_state[
+            "interfaces"
+        ]
+        return self.res
 
     def apply(self, resource=None):
         resource = resource if resource else super().to_dict()
@@ -194,7 +234,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
                     self.mtu_dict[port] = mtu
 
-        self.create()
+        self.create(body=self.res)
 
         try:
             self.wait_for_status_success()
