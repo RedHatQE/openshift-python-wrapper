@@ -355,7 +355,6 @@ class NodeNetworkConfigurationPolicy(Resource):
                                 nnce_name=nnce_name, nnce_condition=cond
                             )
                             if err_msg:
-                                LOGGER.error(err_msg)
                                 last_err_msg = err_msg
 
                     raise NNCPConfigurationFailed(
