@@ -450,8 +450,6 @@ class Resource:
                     f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
                 )
 
-        data = self.to_dict()
-        LOGGER.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.delete_timeout)
 
     @classmethod
@@ -649,9 +647,10 @@ class Resource:
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         LOGGER.info(f"Delete {self.kind} {self.name}")
-        if body:
-            _body = body if isinstance(body, dict) else body.to_dict()
-            LOGGER.debug(f"\n{yaml.dump(_body)}")
+        if self.exists:
+            data = self.instance.to_dict()
+            LOGGER.info(f"Deleting {data}")
+            LOGGER.debug(f"\n{yaml.dump(data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
