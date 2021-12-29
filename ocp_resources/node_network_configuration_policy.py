@@ -177,7 +177,10 @@ class NodeNetworkConfigurationPolicy(Resource):
         set_ipv6=True,
         ipv6_enable=False,
     ):
-        self.res = self.to_dict()
+        #  If self.res is already defined (from to_dict()), don't call it again.
+        if not self.res:
+            self.res = self.to_dict()
+
         self.res.setdefault("spec", {}).setdefault("desiredState", {})
         if not iface:
             iface = {
@@ -284,8 +287,8 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self._absent_interface()
                 self.wait_for_status_success()
                 self.wait_for_interface_deleted()
-            except Exception as e:
-                LOGGER.error(e)
+            except Exception as exp:
+                LOGGER.error(exp)
 
         self.delete()
 
