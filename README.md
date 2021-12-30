@@ -43,7 +43,7 @@ To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR descripti
 To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:  
 
 ```bash
-OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
 ```
 
 ## Examples
