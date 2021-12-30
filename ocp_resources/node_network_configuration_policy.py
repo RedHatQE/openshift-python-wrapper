@@ -37,6 +37,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self,
         name=None,
         client=None,
+        capture=None,
         worker_pods=None,
         node_selector=None,
         teardown=True,
@@ -75,6 +76,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.desired_state = {"interfaces": []}
         self.worker_pods = worker_pods
         self.mtu = mtu
+        self.capture = capture
         self.mtu_dict = {}
         self.ports = ports or []
         self.iface = None
@@ -130,6 +132,9 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.res.setdefault("spec", {}).setdefault(
                 "nodeSelector", self._node_selector
             )
+
+        if self.capture:
+            self.res["spec"]["capture"] = self.capture
 
         if self.dns_resolver:
             self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
@@ -189,16 +194,26 @@ class NodeNetworkConfigurationPolicy(Resource):
                 "state": state,
             }
         if set_ipv4:
-            iface["ipv4"] = {
-                "enabled": ipv4_enable,
-                "dhcp": ipv4_dhcp,
-                "auto-dns": ipv4_auto_dns,
-            }
-            if ipv4_addresses:
-                iface["ipv4"]["address"] = ipv4_addresses
+
+            if type(set_ipv4) is str:
+                iface["ipv4"] = set_ipv4
+
+            else:
+                iface["ipv4"] = {
+                    "enabled": ipv4_enable,
+                    "dhcp": ipv4_dhcp,
+                    "auto-dns": ipv4_auto_dns,
+                }
+                if ipv4_addresses:
+                    iface["ipv4"]["address"] = ipv4_addresses
 
         if set_ipv6:
-            iface["ipv6"] = {"enabled": ipv6_enable}
+
+            if type(set_ipv6) is str:
+                iface["ipv6"] = set_ipv6
+
+            else:
+                iface["ipv6"] = {"enabled": ipv6_enable}
 
         self.set_interface(interface=iface)
         if iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
