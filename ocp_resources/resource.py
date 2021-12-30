@@ -421,10 +421,10 @@ class Resource:
             try:
                 _collect_data(resource_object=self)
             except Exception as exception_:
-                LOGGER.warning(exception_)
+                LOGGER.warning(
+                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
+                )
 
-        data = self.to_dict()
-        LOGGER.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.timeout)
 
     @classmethod
@@ -618,12 +618,16 @@ class Resource:
         return res
 
     def delete(self, wait=False, timeout=TIMEOUT, body=None):
+        LOGGER.info(f"Delete {self.kind} {self.name}")
+        if self.exists:
+            data = self.instance.to_dict()
+            LOGGER.info(f"Deleting {data}")
+
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
             return False
 
-        LOGGER.info(f"Delete {self.kind} {self.name}")
         if wait and res:
             return self.wait_deleted(timeout=timeout)
         return res
