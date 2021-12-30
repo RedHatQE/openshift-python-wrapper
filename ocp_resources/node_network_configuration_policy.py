@@ -346,6 +346,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
 
                 if sample == failed_condition_reason:
+                    last_err_msg = None
                     for failed_nnce in self._get_failed_nnce():
                         nnce_name = failed_nnce.instance.metadata.name
                         nnce_dict = failed_nnce.instance.to_dict()
@@ -354,9 +355,11 @@ class NodeNetworkConfigurationPolicy(Resource):
                                 nnce_name=nnce_name, nnce_condition=cond
                             )
                             if err_msg:
-                                LOGGER.error(err_msg)
+                                last_err_msg = err_msg
 
-                    raise NNCPConfigurationFailed(f"Reason: {failed_condition_reason}")
+                    raise NNCPConfigurationFailed(
+                        f"Reason: {failed_condition_reason}\n{last_err_msg}"
+                    )
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error(
