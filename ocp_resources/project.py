@@ -31,6 +31,7 @@ class ProjectRequest(Resource):
         timeout=TIMEOUT_4MINUTES,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -39,6 +40,7 @@ class ProjectRequest(Resource):
             timeout=timeout,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
 
     def clean_up(self):

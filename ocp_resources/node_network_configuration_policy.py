@@ -60,6 +60,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         max_unavailable=None,
         state=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         """
         ipv4_addresses should be sent in this format:
@@ -76,6 +77,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.desired_state = {"interfaces": []}
         self.mtu = mtu

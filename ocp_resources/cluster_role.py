@@ -20,6 +20,7 @@ class ClusterRole(Resource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             client=client,
@@ -27,6 +28,7 @@ class ClusterRole(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.api_groups = api_groups
         self.permissions_to_resources = permissions_to_resources

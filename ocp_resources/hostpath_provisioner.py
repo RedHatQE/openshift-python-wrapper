@@ -22,6 +22,7 @@ class HostPathProvisioner(Resource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -29,6 +30,7 @@ class HostPathProvisioner(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.path = path
         self.image_pull_policy = image_pull_policy
