@@ -55,6 +55,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         set_ipv4=True,
         set_ipv6=True,
         max_unavailable=None,
+        state=None,
         delete_timeout=TIMEOUT_4MINUTES,
     ):
         """
@@ -91,6 +92,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_selector = node_selector
         self.dns_resolver = dns_resolver
         self.routes = routes
+        self.state = state or self.Interface.State.UP
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
@@ -156,7 +158,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             """
             self.res = self.add_interface(
                 iface=self.iface,
-                state=self.Interface.State.UP,
+                state=self.state,
                 set_ipv4=self.set_ipv4,
                 ipv4_enable=self.ipv4_enable,
                 ipv4_dhcp=self.ipv4_dhcp,
