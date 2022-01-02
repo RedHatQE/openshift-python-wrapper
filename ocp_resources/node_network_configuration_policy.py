@@ -195,7 +195,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             }
         if set_ipv4:
 
-            if type(set_ipv4) is str:
+            if isinstance(set_ipv4, str):
                 iface["ipv4"] = set_ipv4
 
             else:
@@ -209,7 +209,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         if set_ipv6:
 
-            if type(set_ipv6) is str:
+            if isinstance(set_ipv6, str):
                 iface["ipv6"] = set_ipv6
 
             else:
