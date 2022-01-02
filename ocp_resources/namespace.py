@@ -20,7 +20,7 @@ class Namespace(Resource):
         label=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
-        dry_run=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -28,7 +28,7 @@ class Namespace(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
-            dry_run=dry_run,
+            **kwargs,
         )
         self.label = label
 
