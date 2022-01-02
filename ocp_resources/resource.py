@@ -861,7 +861,6 @@ class NamespacedResource(Resource):
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
-
         )
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:
