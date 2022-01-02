@@ -344,6 +344,7 @@ class Resource:
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        dry_run=None,
     ):
         """
         Create a API resource
@@ -385,6 +386,7 @@ class Resource:
         self.teardown = teardown
         self.timeout = timeout
         self.delete_timeout = delete_timeout
+        self.dry_run = dry_run
 
     @ClassProperty
     def kind(cls):  # noqa: N805
@@ -640,7 +642,7 @@ class Resource:
         LOGGER.info(f"Create {self.kind} {self.name}")
         LOGGER.info(f"Posting {data}")
         LOGGER.debug(f"\n{yaml.dump(data)}")
-        res = self.api.create(body=data, namespace=self.namespace)
+        res = self.api.create(body=data, namespace=self.namespace, dry_run=self.dry_run)
         if wait and res:
             return self.wait()
         return res
@@ -848,6 +850,7 @@ class NamespacedResource(Resource):
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        dry_run=None,
     ):
         super().__init__(
             name=name,
@@ -857,6 +860,8 @@ class NamespacedResource(Resource):
             privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            dry_run=dry_run,
+
         )
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:
