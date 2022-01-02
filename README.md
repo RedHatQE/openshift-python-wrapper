@@ -137,10 +137,10 @@ If no Pod was found, will raise ``ResourceNotFoundError``.
 Using capture syntax to switch ipv4 config between interfaces
 ```python
 with NodeNetworkConfigurationPolicy(
-    name = "capture_nncp",
-    capture ={'first-nic': 'interfaces.name=="ens8"',
+    name="capture_nncp",
+    capture={'first-nic': 'interfaces.name=="ens8"',
               'second-nic': 'interfaces.name=="ens9"'},
-    teardown = False, # Capture doesn't support reverting config on teardown
+    teardown=False, # Capture doesn't support reverting config on teardown
     ...  
 ) as nncp:
     nncp.add_interface(name="{{ capture.first-nic.interfaces.0.name }}", set_ipv4="{{ capture.second-nic.interfaces.0.ipv4 }}")
