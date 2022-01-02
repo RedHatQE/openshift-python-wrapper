@@ -324,8 +324,9 @@ class NodeNetworkConfigurationPolicy(Resource):
     def validate_create(self):
         for pod in self.worker_pods:
             for bridge in self.ifaces:
-                node_network_state = NodeNetworkState(name=pod.node.name)
-                node_network_state.wait_until_up(name=bridge["name"])
+                if "capture" not in bridge["name"]:
+                    node_network_state = NodeNetworkState(name=pod.node.name)
+                    node_network_state.wait_until_up(name=bridge["name"])
 
     def _ipv4_state_backup(self):
         # Backup current state of dhcp for the interfaces which arent veth or current bridge
