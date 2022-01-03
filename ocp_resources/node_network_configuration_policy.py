@@ -324,7 +324,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def validate_create(self):
         for pod in self.worker_pods:
             for bridge in self.ifaces:
-                if "capture" not in bridge["name"]:
+                if "capture" not in bridge["name"]:  # Can't check capture ifaces status
                     node_network_state = NodeNetworkState(name=pod.node.name)
                     node_network_state.wait_until_up(name=bridge["name"])
 
