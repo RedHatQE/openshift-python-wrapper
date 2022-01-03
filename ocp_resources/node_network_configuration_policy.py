@@ -324,9 +324,11 @@ class NodeNetworkConfigurationPolicy(Resource):
     def validate_create(self):
         for pod in self.worker_pods:
             for bridge in self.ifaces:
-                if (
-                    "capture" not in bridge["name"]
-                ):  # Wrapper can't tell a capture iface's actual name
+                if "capture" not in bridge["name"]:
+                    """
+                    When using captures, NNCP instance won't hold actual iface name.
+                    E.g., iface 'ens3' might be referenced as 'capture.br1.interfaces.0.bridge.port.0.name'
+                    """
                     node_network_state = NodeNetworkState(name=pod.node.name)
                     node_network_state.wait_until_up(name=bridge["name"])
 
@@ -454,7 +456,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         libnmstate_err = re.findall(r"libnmstate.error.*", nnce_msg)
         if libnmstate_err:
-            err_msg += f"{nnce_prefix }: {libnmstate_err[0]}"
+            err_msg += f"{nnce_prefix}: {libnmstate_err[0]}"
 
         return err_msg
 
