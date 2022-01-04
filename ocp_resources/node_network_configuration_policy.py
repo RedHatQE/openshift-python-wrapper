@@ -258,7 +258,6 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         try:
             self.wait_for_status_success()
-            self.validate_create()
             return self
         except Exception as e:
             LOGGER.error(e)
@@ -320,17 +319,6 @@ class NodeNetworkConfigurationPolicy(Resource):
                     continue
 
                 node_network_state.wait_until_deleted(name=iface_name)
-
-    def validate_create(self):
-        for pod in self.worker_pods:
-            for bridge in self.ifaces:
-                if "capture" not in bridge["name"]:
-                    """
-                    When using captures, NNCP instance won't hold actual iface name.
-                    E.g., iface 'ens3' might be referenced as 'capture.br1.interfaces.0.bridge.port.0.name'
-                    """
-                    node_network_state = NodeNetworkState(name=pod.node.name)
-                    node_network_state.wait_until_up(name=bridge["name"])
 
     def _ipv4_state_backup(self):
         # Backup current state of dhcp for the interfaces which arent veth or current bridge
