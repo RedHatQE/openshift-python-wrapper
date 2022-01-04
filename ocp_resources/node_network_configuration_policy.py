@@ -75,7 +75,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             delete_timeout=delete_timeout,
         )
         self.desired_state = {"interfaces": []}
-        self.worker_pods = worker_pods
+        self.worker_pods = worker_pods or []
         self.mtu = mtu
         self.capture = capture
         self.mtu_dict = {}
@@ -439,6 +439,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             if nnce.name.endswith(f".{self.name}"):
                 nnces.append(nnce)
         return nnces
+
+    def node_nnce(self, node_name):
+        for nnce in self.nnces:
+            if nnce.instance.metadata.labels["nmstate.io/node"] == node_name:
+                return nnce
 
     @staticmethod
     def _get_nnce_error_msg(nnce_name, nnce_condition):
