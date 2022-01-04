@@ -21,6 +21,7 @@ class SriovNetwork(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        macspoofchk=None,
     ):
         super().__init__(
             name=name,
@@ -34,6 +35,7 @@ class SriovNetwork(NamespacedResource):
         self.resource_name = resource_name
         self.vlan = vlan
         self.ipam = ipam
+        self.macspoofchk = macspoofchk
 
     def to_dict(self):
         res = super().to_dict()
@@ -47,4 +49,8 @@ class SriovNetwork(NamespacedResource):
         }
         if self.vlan:
             res["spec"]["vlan"] = self.vlan
+
+        if self.macspoofchk:
+            res["spec"]["spoofChk"] = self.macspoofchk
+
         return res
