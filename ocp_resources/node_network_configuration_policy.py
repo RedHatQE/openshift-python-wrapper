@@ -37,6 +37,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self,
         name=None,
         client=None,
+        capture=None,
         worker_pods=None,
         node_selector=None,
         teardown=True,
@@ -54,6 +55,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         set_ipv4=True,
         set_ipv6=True,
         max_unavailable=None,
+        state=None,
         delete_timeout=TIMEOUT_4MINUTES,
     ):
         """
@@ -75,6 +77,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.desired_state = {"interfaces": []}
         self.worker_pods = worker_pods
         self.mtu = mtu
+        self.capture = capture
         self.mtu_dict = {}
         self.ports = ports or []
         self.iface = None
@@ -89,6 +92,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_selector = node_selector
         self.dns_resolver = dns_resolver
         self.routes = routes
+        self.state = state or self.Interface.State.UP
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
@@ -131,6 +135,9 @@ class NodeNetworkConfigurationPolicy(Resource):
                 "nodeSelector", self._node_selector
             )
 
+        if self.capture:
+            self.res["spec"]["capture"] = self.capture
+
         if self.dns_resolver:
             self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
 
@@ -151,7 +158,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             """
             self.res = self.add_interface(
                 iface=self.iface,
-                state=self.Interface.State.UP,
+                state=self.state,
                 set_ipv4=self.set_ipv4,
                 ipv4_enable=self.ipv4_enable,
                 ipv4_dhcp=self.ipv4_dhcp,
@@ -189,16 +196,26 @@ class NodeNetworkConfigurationPolicy(Resource):
                 "state": state,
             }
         if set_ipv4:
-            iface["ipv4"] = {
-                "enabled": ipv4_enable,
-                "dhcp": ipv4_dhcp,
-                "auto-dns": ipv4_auto_dns,
-            }
-            if ipv4_addresses:
-                iface["ipv4"]["address"] = ipv4_addresses
+
+            if isinstance(set_ipv4, str):
+                iface["ipv4"] = set_ipv4
+
+            else:
+                iface["ipv4"] = {
+                    "enabled": ipv4_enable,
+                    "dhcp": ipv4_dhcp,
+                    "auto-dns": ipv4_auto_dns,
+                }
+                if ipv4_addresses:
+                    iface["ipv4"]["address"] = ipv4_addresses
 
         if set_ipv6:
-            iface["ipv6"] = {"enabled": ipv6_enable}
+
+            if isinstance(set_ipv6, str):
+                iface["ipv6"] = set_ipv6
+
+            else:
+                iface["ipv6"] = {"enabled": ipv6_enable}
 
         self.set_interface(interface=iface)
         if iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
@@ -307,8 +324,13 @@ class NodeNetworkConfigurationPolicy(Resource):
     def validate_create(self):
         for pod in self.worker_pods:
             for bridge in self.ifaces:
-                node_network_state = NodeNetworkState(name=pod.node.name)
-                node_network_state.wait_until_up(name=bridge["name"])
+                if "capture" not in bridge["name"]:
+                    """
+                    When using captures, NNCP instance won't hold actual iface name.
+                    E.g., iface 'ens3' might be referenced as 'capture.br1.interfaces.0.bridge.port.0.name'
+                    """
+                    node_network_state = NodeNetworkState(name=pod.node.name)
+                    node_network_state.wait_until_up(name=bridge["name"])
 
     def _ipv4_state_backup(self):
         # Backup current state of dhcp for the interfaces which arent veth or current bridge
@@ -434,7 +456,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         libnmstate_err = re.findall(r"libnmstate.error.*", nnce_msg)
         if libnmstate_err:
-            err_msg += f"{nnce_prefix }: {libnmstate_err[0]}"
+            err_msg += f"{nnce_prefix}: {libnmstate_err[0]}"
 
         return err_msg
 
