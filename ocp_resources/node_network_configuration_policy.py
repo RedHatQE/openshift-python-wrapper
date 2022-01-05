@@ -4,6 +4,7 @@ from openshift.dynamic.exceptions import ConflictError
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
+from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
 )
@@ -38,7 +39,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         name=None,
         client=None,
         capture=None,
-        worker_pods=None,
         node_selector=None,
         teardown=True,
         mtu=None,
@@ -78,16 +78,13 @@ class NodeNetworkConfigurationPolicy(Resource):
             delete_timeout=delete_timeout,
         )
         self.desired_state = {"interfaces": []}
-        self.worker_pods = worker_pods or []
         self.mtu = mtu
         self.capture = capture
         self.mtu_dict = {}
         self.ports = ports or []
         self.iface = None
-        self.ifaces = []
-        self.node_active_nics = node_active_nics or []
         self.ipv4_enable = ipv4_enable
-        self._ipv4_dhcp = ipv4_dhcp
+        self.ipv4_dhcp = ipv4_dhcp
         self.ipv4_auto_dns = ipv4_auto_dns
         self.ipv4_addresses = ipv4_addresses or []
         self.ipv4_iface_state = {}
@@ -104,19 +101,18 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
         self.res = None
+        self.ipv4_ports_backup_dict = {}
+        self.ipv6_ports_backup_dict = {}
         if self.node_selector:
             self._node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
             }
-            if self.worker_pods:
-                for pod in self.worker_pods:
-                    if pod.node.name == node_selector:
-                        self.worker_pods = [pod]
-                        break
+            self.nodes = list(Node.get(dyn_client=self.client, name=self.node_selector))
         else:
             self._node_selector = {
                 f"node-role.{self.ApiGroup.KUBERNETES_IO}/worker": ""
             }
+            self.nodes = list(Node.get(dyn_client=self.client))
 
     def set_interface(self, interface):
         # First drop the interface if it's already in the list
@@ -128,6 +124,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         # Add the interface
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
+        self.res["spec"]["desiredState"]["interfaces"] = self.desired_state[
+            "interfaces"
+        ]
 
     def to_dict(self):
         self.res = super().to_dict()
@@ -211,7 +210,6 @@ class NodeNetworkConfigurationPolicy(Resource):
                 "state": state,
             }
         if set_ipv4:
-
             if isinstance(set_ipv4, str):
                 iface["ipv4"] = set_ipv4
 
@@ -225,7 +223,6 @@ class NodeNetworkConfigurationPolicy(Resource):
                     iface["ipv4"]["address"] = ipv4_addresses
 
         if set_ipv6:
-
             if isinstance(set_ipv6, str):
                 iface["ipv6"] = set_ipv6
 
@@ -240,13 +237,44 @@ class NodeNetworkConfigurationPolicy(Resource):
                     iface["ipv6"]["address"] = ipv6_addresses
 
         self.set_interface(interface=iface)
-        if iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
-            self.ifaces.append(iface)
-
-        self.res["spec"]["desiredState"]["interfaces"] = self.desired_state[
-            "interfaces"
-        ]
         return self.res
+
+    def _get_port_from_nns(self, port_name):
+        nns = NodeNetworkState(name=self.nodes[0].name)
+        _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
+        return _port[0] if _port else None
+
+    def ipv4_ports_backup(self):
+        for port in self.ports:
+            _port = self._get_port_from_nns(port_name=port)
+            if _port:
+                self.ipv4_ports_backup_dict[port] = _port["ipv4"]
+
+    def ipv6_ports_backup(self):
+        for port in self.ports:
+            _port = self._get_port_from_nns(port_name=port)
+            if _port:
+                self.ipv6_ports_backup_dict[port] = _port["ipv6"]
+
+    def add_ports(self):
+        for port in self.ports:
+            _port = self._get_port_from_nns(port_name=port)
+            if _port:
+                ipv4_backup = self.ipv4_ports_backup_dict.get(port, None)
+                ipv6_backup = self.ipv6_ports_backup_dict.get(port, None)
+                if ipv4_backup or ipv6_backup:
+                    iface = {
+                        "name": port,
+                        "type": _port["type"],
+                        "state": _port["state"],
+                    }
+                    if ipv4_backup:
+                        iface["ipv4"] = ipv4_backup
+
+                    if ipv6_backup:
+                        iface["ipv6"] = ipv6_backup
+
+                    self.set_interface(interface=iface)
 
     def apply(self, resource=None):
         resource = resource if resource else super().to_dict()
@@ -262,151 +290,42 @@ class NodeNetworkConfigurationPolicy(Resource):
             return
 
     def deploy(self):
-        if self._ipv4_dhcp:
-            self._ipv4_state_backup()
-
-        if self.mtu:
-            for pod in self.worker_pods:
-                for port in self.ports:
-                    mtu = pod.execute(
-                        command=["cat", f"/sys/class/net/{port}/mtu"]
-                    ).strip()
-                    LOGGER.info(
-                        f"Backup MTU: {pod.node.name} interface {port} MTU is {mtu}"
-                    )
-                    self.mtu_dict[port] = mtu
-
+        self.ipv4_ports_backup()
+        self.ipv6_ports_backup()
         self.create(body=self.res)
-
         try:
             self.wait_for_status_success()
-            self.validate_create()
             return self
-        except Exception as e:
-            LOGGER.error(e)
+        except Exception as exp:
+            LOGGER.error(exp)
             super().__exit__(exception_type=None, exception_value=None, traceback=None)
             raise
 
-    @property
-    def ipv4_dhcp(self):
-        return self._ipv4_dhcp
-
-    @ipv4_dhcp.setter
-    def ipv4_dhcp(self, ipv4_dhcp):
-        if ipv4_dhcp != self._ipv4_dhcp:
-            self._ipv4_dhcp = ipv4_dhcp
-
-            if self._ipv4_dhcp:
-                self._ipv4_state_backup()
-                self.iface["ipv4"] = {"dhcp": True, "enabled": True}
-
-            self.set_interface(interface=self.iface)
-            self.apply()
-
     def clean_up(self):
-        if self.mtu:
-            for port in self.ports:
-                _port = {
-                    "name": port,
-                    "type": "ethernet",
-                    "state": self.Interface.State.UP,
-                    "mtu": int(self.mtu_dict[port]),
-                }
-                self.set_interface(interface=_port)
-
-        for iface in self.ifaces:
-            """
-            If any physical interfaces are part of the policy - we will skip them,
-            because we don't want to delete them (and we actually can't, and this attempt
-            would end with failure).
-            """
-            if iface["name"] in self.node_active_nics:
-                continue
-            try:
-                self._absent_interface()
-                self.wait_for_status_success()
-                self.wait_for_interface_deleted()
-            except Exception as exp:
-                LOGGER.error(exp)
+        try:
+            self._absent_interface()
+            self.wait_for_status_success()
+        except Exception as exp:
+            LOGGER.error(exp)
 
         self.delete()
 
-    def wait_for_interface_deleted(self):
-        for pod in self.worker_pods:
-            for iface in self.ifaces:
-                iface_name = iface["name"]
-                node_network_state = NodeNetworkState(name=pod.node.name)
-                iface_dict = node_network_state.get_interface(name=iface_name)
-                if iface_dict.get("type") == "ethernet":
-                    LOGGER.info(f"{iface_name} is type ethernet, skipping.")
-                    continue
-
-                node_network_state.wait_until_deleted(name=iface_name)
-
-    def validate_create(self):
-        for pod in self.worker_pods:
-            for bridge in self.ifaces:
-                if "capture" not in bridge["name"]:
-                    """
-                    When using captures, NNCP instance won't hold actual iface name.
-                    E.g., iface 'ens3' might be referenced as 'capture.br1.interfaces.0.bridge.port.0.name'
-                    """
-                    node_network_state = NodeNetworkState(name=pod.node.name)
-                    node_network_state.wait_until_up(name=bridge["name"])
-
-    def _ipv4_state_backup(self):
-        # Backup current state of dhcp for the interfaces which arent veth or current bridge
-        for pod in self.worker_pods:
-            node_network_state = NodeNetworkState(name=pod.node.name)
-            self.ipv4_iface_state[pod.node.name] = {}
-            for interface in node_network_state.instance.status.currentState.interfaces:
-                if interface["name"] in self.ports:
-                    self.ipv4_iface_state[pod.node.name].update(
-                        {
-                            interface["name"]: {
-                                k: interface["ipv4"][k] for k in ("dhcp", "enabled")
-                            }
-                        }
-                    )
-
     def _absent_interface(self):
-        for bridge in self.ifaces:
-            bridge["state"] = self.Interface.State.ABSENT
-            self.set_interface(interface=bridge)
+        for _iface in self.desired_state["interfaces"]:
+            _iface["state"] = self.Interface.State.ABSENT
+            self.set_interface(interface=_iface)
 
-            if self._ipv4_dhcp:
-                temp_ipv4_iface_state = {}
-                for pod in self.worker_pods:
-                    node_network_state = NodeNetworkState(name=pod.node.name)
-                    temp_ipv4_iface_state[pod.node.name] = {}
-                    # Find which interfaces got changed (of those that are connected to bridge)
-                    for (
-                        interface
-                    ) in node_network_state.instance.status.currentState.interfaces:
-                        if interface["name"] in self.ports:
-                            x = {k: interface["ipv4"][k] for k in ("dhcp", "enabled")}
-                            if (
-                                self.ipv4_iface_state[pod.node.name][interface["name"]]
-                                != x
-                            ):
-                                temp_ipv4_iface_state[pod.node.name].update(
-                                    {
-                                        interface["name"]: self.ipv4_iface_state[
-                                            pod.node.name
-                                        ][interface["name"]]
-                                    }
-                                )
+        if self.ports:
+            self.add_ports()
 
-                previous_state = next(iter(temp_ipv4_iface_state.values()))
-
-                # Restore DHCP state of the changed bridge connected ports
-                for iface_name, ipv4 in previous_state.items():
-                    interface = {"name": iface_name, "ipv4": ipv4}
-                    self.set_interface(interface=interface)
-
-        desired_state = {"interfaces": self.ifaces}
         ResourceEditor(
-            patches={self: {"spec": {"desiredState": desired_state}}}
+            patches={
+                self: {
+                    "spec": {
+                        "desiredState": {"interfaces": self.desired_state["interfaces"]}
+                    }
+                }
+            }
         ).update()
 
     def status(self):
@@ -416,6 +335,23 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
+
+        def _process_failed_status():
+            last_err_msg = None
+            for failed_nnce in self._get_failed_nnce():
+                nnce_name = failed_nnce.instance.metadata.name
+                nnce_dict = failed_nnce.instance.to_dict()
+                for cond in nnce_dict["status"]["conditions"]:
+                    err_msg = self._get_nnce_error_msg(
+                        nnce_name=nnce_name, nnce_condition=cond
+                    )
+                    if err_msg:
+                        last_err_msg = err_msg
+
+            raise NNCPConfigurationFailed(
+                f"Reason: {failed_condition_reason}\n{last_err_msg}"
+            )
+
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_conditions()
@@ -427,26 +363,13 @@ class NodeNetworkConfigurationPolicy(Resource):
                     LOGGER.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
-                if sample == no_match_node_condition_reason:
+                elif sample == no_match_node_condition_reason:
                     raise NNCPConfigurationFailed(
                         f"{self.name}. Reason: {no_match_node_condition_reason}"
                     )
 
-                if sample == failed_condition_reason:
-                    last_err_msg = None
-                    for failed_nnce in self._get_failed_nnce():
-                        nnce_name = failed_nnce.instance.metadata.name
-                        nnce_dict = failed_nnce.instance.to_dict()
-                        for cond in nnce_dict["status"]["conditions"]:
-                            err_msg = self._get_nnce_error_msg(
-                                nnce_name=nnce_name, nnce_condition=cond
-                            )
-                            if err_msg:
-                                last_err_msg = err_msg
-
-                    raise NNCPConfigurationFailed(
-                        f"Reason: {failed_condition_reason}\n{last_err_msg}"
-                    )
+                elif sample == failed_condition_reason:
+                    _process_failed_status()
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error(
