@@ -442,7 +442,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def node_nnce(self, node_name):
         for nnce in self.nnces:
-            if nnce.instance.metadata.labels["nmstate.io/node"] == node_name:
+            if nnce.labels["nmstate.io/node"] == node_name:
                 return nnce
 
     @staticmethod
