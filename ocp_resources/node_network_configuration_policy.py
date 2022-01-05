@@ -308,7 +308,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         except Exception as exp:
             LOGGER.error(exp)
 
-        self.delete()
+        super().clean_up()
 
     def _absent_interface(self):
         for _iface in self.desired_state["interfaces"]:
@@ -333,6 +333,12 @@ class NodeNetworkConfigurationPolicy(Resource):
             if condition["type"] == self.Conditions.Type.AVAILABLE:
                 return condition["reason"]
 
+    def _wait_for_configuration_progressing(self):
+        samples = TimeoutSampler(wait_timeout=30, sleep=1, func=self.status)
+        for sample in samples:
+            if sample and sample == self.Conditions.Reason.CONFIGURATION_PROGRESSING:
+                return
+
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
 
@@ -354,7 +360,8 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
         # if we get here too fast there are no conditions, we need to wait.
-        self.wait_for_conditions()
+
+        self._wait_for_configuration_progressing()
 
         samples = TimeoutSampler(wait_timeout=480, sleep=1, func=self.status)
         try:
