@@ -97,19 +97,20 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
         self.res = None
+        self.set_node_selector()
+
+    def set_node_selector(self):
         if self.node_selector:
-            self._node_selector = {
+            self.node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
             }
             if self.worker_pods:
                 for pod in self.worker_pods:
-                    if pod.node.name == node_selector:
+                    if pod.node.name == self.node_selector:
                         self.worker_pods = [pod]
                         break
         else:
-            self._node_selector = {
-                f"node-role.{self.ApiGroup.KUBERNETES_IO}/worker": ""
-            }
+            self.node_selector = {f"node-role.{self.ApiGroup.KUBERNETES_IO}/worker": ""}
 
     def set_interface(self, interface):
         # First drop the interface if it's already in the list
@@ -130,9 +131,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.dns_resolver or self.routes or self.iface:
             self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
-        if self._node_selector:
+        if self.node_selector:
             self.res.setdefault("spec", {}).setdefault(
-                "nodeSelector", self._node_selector
+                "nodeSelector", self.node_selector
             )
 
         if self.capture:
