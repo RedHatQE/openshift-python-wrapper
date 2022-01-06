@@ -90,9 +90,10 @@ class NodeNetworkConfigurationPolicy(Resource):
         self._ipv4_dhcp = ipv4_dhcp
         self.ipv4_auto_dns = ipv4_auto_dns
         self.ipv4_addresses = ipv4_addresses or []
-        self.ipv6_enable = ipv6_enable
         self.ipv4_iface_state = {}
+        self.ipv6_enable = ipv6_enable
         self.ipv6_dhcp = ipv6_dhcp
+        self.ipv6_autoconf = self.ipv6_dhcp
         self.ipv6_auto_dns = ipv6_auto_dns
         self.ipv6_addresses = ipv6_addresses
         self.node_selector = node_selector
@@ -175,6 +176,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 ipv6_dhcp=self.ipv6_dhcp,
                 ipv6_auto_dns=self.ipv6_auto_dns,
                 ipv6_addresses=self.ipv6_addresses,
+                ipv6_autoconf=self.ipv6_autoconf,
             )
 
         return self.res
@@ -195,6 +197,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         ipv6_dhcp=False,
         ipv6_auto_dns=True,
         ipv6_addresses=None,
+        ipv6_autoconf=False,
     ):
         #  If self.res is already defined (from to_dict()), don't call it again.
         if not self.res:
@@ -231,6 +234,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     "enabled": ipv6_enable,
                     "dhcp": ipv6_dhcp,
                     "auto-dns": ipv6_auto_dns,
+                    "autoconf": ipv6_autoconf,
                 }
                 if ipv6_addresses:
                     iface["ipv6"]["address"] = ipv6_addresses
