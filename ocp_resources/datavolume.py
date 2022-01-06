@@ -75,11 +75,11 @@ class DataVolume(NamespacedResource):
         storage_class=None,
         url=None,
         content_type=ContentType.KUBEVIRT,
-        access_modes=AccessMode.RWO,
+        access_modes=None,
         cert_configmap=None,
         secret=None,
         client=None,
-        volume_mode=VolumeMode.FILE,
+        volume_mode=None,
         hostpath_node=None,
         source_pvc=None,
         source_namespace=None,
@@ -90,6 +90,7 @@ class DataVolume(NamespacedResource):
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        api_name="pvc",
     ):
         super().__init__(
             name=name,
@@ -115,31 +116,32 @@ class DataVolume(NamespacedResource):
         self.multus_annotation = multus_annotation
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
+        self.api_name = api_name
 
     def to_dict(self):
         res = super().to_dict()
         if self.yaml_file:
             return res
-
         res.update(
             {
                 "spec": {
                     "source": {self.source: {"url": self.url}},
-                    "pvc": {
-                        "accessModes": [self.access_modes],
+                    self.api_name: {
                         "resources": {"requests": {"storage": self.size}},
                     },
                 }
             }
         )
+        if self.access_modes:
+            res["spec"][self.api_name]["accessModes"] = [self.access_modes]
         if self.content_type:
             res["spec"]["contentType"] = self.content_type
         if self.storage_class:
-            res["spec"]["pvc"]["storageClassName"] = self.storage_class
+            res["spec"][self.api_name]["storageClassName"] = self.storage_class
         if self.secret:
             res["spec"]["source"][self.source]["secretRef"] = self.secret.name
         if self.volume_mode:
-            res["spec"]["pvc"]["volumeMode"] = self.volume_mode
+            res["spec"][self.api_name]["volumeMode"] = self.volume_mode
         if self.source == "http" or "registry":
             res["spec"]["source"][self.source]["url"] = self.url
         if self.cert_configmap:
