@@ -48,6 +48,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         ipv4_auto_dns=True,
         ipv4_addresses=None,
         ipv6_enable=False,
+        ipv6_dhcp=False,
+        ipv6_auto_dns=True,
+        ipv6_addresses=None,
         node_active_nics=None,
         dns_resolver=None,
         routes=None,
@@ -87,8 +90,12 @@ class NodeNetworkConfigurationPolicy(Resource):
         self._ipv4_dhcp = ipv4_dhcp
         self.ipv4_auto_dns = ipv4_auto_dns
         self.ipv4_addresses = ipv4_addresses or []
-        self.ipv6_enable = ipv6_enable
         self.ipv4_iface_state = {}
+        self.ipv6_enable = ipv6_enable
+        self.ipv6_dhcp = ipv6_dhcp
+        self.ipv6_autoconf = self.ipv6_dhcp
+        self.ipv6_auto_dns = ipv6_auto_dns
+        self.ipv6_addresses = ipv6_addresses
         self.node_selector = node_selector
         self.dns_resolver = dns_resolver
         self.routes = routes
@@ -166,6 +173,10 @@ class NodeNetworkConfigurationPolicy(Resource):
                 ipv4_addresses=self.ipv4_addresses,
                 set_ipv6=self.set_ipv6,
                 ipv6_enable=self.ipv6_enable,
+                ipv6_dhcp=self.ipv6_dhcp,
+                ipv6_auto_dns=self.ipv6_auto_dns,
+                ipv6_addresses=self.ipv6_addresses,
+                ipv6_autoconf=self.ipv6_autoconf,
             )
 
         return self.res
@@ -183,6 +194,10 @@ class NodeNetworkConfigurationPolicy(Resource):
         ipv4_addresses=None,
         set_ipv6=True,
         ipv6_enable=False,
+        ipv6_dhcp=False,
+        ipv6_auto_dns=True,
+        ipv6_addresses=None,
+        ipv6_autoconf=False,
     ):
         #  If self.res is already defined (from to_dict()), don't call it again.
         if not self.res:
@@ -215,7 +230,14 @@ class NodeNetworkConfigurationPolicy(Resource):
                 iface["ipv6"] = set_ipv6
 
             else:
-                iface["ipv6"] = {"enabled": ipv6_enable}
+                iface["ipv6"] = {
+                    "enabled": ipv6_enable,
+                    "dhcp": ipv6_dhcp,
+                    "auto-dns": ipv6_auto_dns,
+                    "autoconf": ipv6_autoconf,
+                }
+                if ipv6_addresses:
+                    iface["ipv6"]["address"] = ipv6_addresses
 
         self.set_interface(interface=iface)
         if iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
