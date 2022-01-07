@@ -463,9 +463,10 @@ class NodeNetworkConfigurationPolicy(Resource):
         return nnces
 
     def node_nnce(self, node_name):
-        return [
+        nnce = [
             nnce for nnce in self.nnces if nnce.labels["nmstate.io/node"] == node_name
         ]
+        return nnce[0] if nnce else None
 
     @staticmethod
     def _get_nnce_error_msg(nnce_name, nnce_condition):
