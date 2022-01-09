@@ -244,24 +244,24 @@ class NodeNetworkConfigurationPolicy(Resource):
         _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
         return _port[0] if _port else None
 
-    def ipv4_ports_backup(self):
+    def _ports_backup(self, ip_family):
         for port in self.ports:
             _port = self._get_port_from_nns(port_name=port)
             if _port:
-                self.ipv4_ports_backup_dict[port] = _port["ipv4"]
+                self.ipv4_ports_backup_dict[port] = _port[ip_family]
+
+    def ipv4_ports_backup(self):
+        self._ports_backup(ip_family="ipv4")
 
     def ipv6_ports_backup(self):
-        for port in self.ports:
-            _port = self._get_port_from_nns(port_name=port)
-            if _port:
-                self.ipv6_ports_backup_dict[port] = _port["ipv6"]
+        self._ports_backup(ip_family="ipv6")
 
     def add_ports(self):
         for port in self.ports:
             _port = self._get_port_from_nns(port_name=port)
             if _port:
-                ipv4_backup = self.ipv4_ports_backup_dict.get(port, None)
-                ipv6_backup = self.ipv6_ports_backup_dict.get(port, None)
+                ipv4_backup = self.ipv4_ports_backup_dict.get(port)
+                ipv6_backup = self.ipv6_ports_backup_dict.get(port)
                 if ipv4_backup or ipv6_backup:
                     iface = {
                         "name": port,
@@ -341,6 +341,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
+        no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
         def _process_failed_status():
             last_err_msg = None
@@ -358,9 +359,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 f"Reason: {failed_condition_reason}\n{last_err_msg}"
             )
 
-        no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
         # if we get here too fast there are no conditions, we need to wait.
-
         self._wait_for_configuration_progressing()
 
         samples = TimeoutSampler(wait_timeout=480, sleep=1, func=self.status)
