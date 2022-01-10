@@ -100,7 +100,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
-        self.res = None
+        self.res = {}
         self.ipv4_ports_backup_dict = {}
         self.ipv6_ports_backup_dict = {}
         if self.node_selector:
