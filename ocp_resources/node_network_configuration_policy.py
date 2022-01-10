@@ -51,7 +51,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         ipv6_dhcp=False,
         ipv6_auto_dns=True,
         ipv6_addresses=None,
-        node_active_nics=None,
         dns_resolver=None,
         routes=None,
         yaml_file=None,
@@ -100,7 +99,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
         self.max_unavailable = max_unavailable
-        self.res = {}
+        self.res = None
         self.ipv4_ports_backup_dict = {}
         self.ipv6_ports_backup_dict = {}
         if self.node_selector:
@@ -115,6 +114,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.nodes = list(Node.get(dyn_client=self.client))
 
     def set_interface(self, interface):
+        if not self.res:
+            self.res = super().to_dict()
         # First drop the interface if it's already in the list
         interfaces = [
             iface
