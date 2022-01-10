@@ -22,6 +22,7 @@ class SriovNetwork(NamespacedResource):
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         macspoofchk=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -30,6 +31,7 @@ class SriovNetwork(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.network_namespace = network_namespace
         self.resource_name = resource_name

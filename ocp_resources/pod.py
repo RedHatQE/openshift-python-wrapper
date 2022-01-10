@@ -48,6 +48,7 @@ class Pod(NamespacedResource):
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -57,6 +58,7 @@ class Pod(NamespacedResource):
             privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 

@@ -24,6 +24,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -32,6 +33,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.pf_names = pf_names
         self.root_devices = root_devices

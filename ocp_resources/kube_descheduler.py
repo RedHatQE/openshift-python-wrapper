@@ -18,6 +18,7 @@ class KubeDescheduler(NamespacedResource):
         client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         """
         Create Descheduler object.
@@ -37,6 +38,7 @@ class KubeDescheduler(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.profiles = profiles or ["AffinityAndTaints"]
         self.descheduling_interval = descheduling_interval

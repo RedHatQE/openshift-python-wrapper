@@ -24,6 +24,7 @@ class RoleBinding(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
 
         super().__init__(
@@ -33,6 +34,7 @@ class RoleBinding(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.subjects_kind = subjects_kind
         self.subjects_name = subjects_name

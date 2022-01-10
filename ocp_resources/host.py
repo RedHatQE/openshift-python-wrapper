@@ -24,6 +24,7 @@ class Host(NamespacedResource, MTV):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -32,6 +33,7 @@ class Host(NamespacedResource, MTV):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.host_id = host_id
         self.ip_address = ip_address

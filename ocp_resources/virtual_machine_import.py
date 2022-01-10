@@ -110,6 +110,7 @@ class VirtualMachineImport(NamespacedResource):
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -119,6 +120,7 @@ class VirtualMachineImport(NamespacedResource):
             privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.vm_id = vm_id
         self.vm_name = vm_name
@@ -278,6 +280,7 @@ class ResourceMapping(NamespacedResource):
         client=None,
         teardown=True,
         yaml_file=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -285,6 +288,7 @@ class ResourceMapping(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            **kwargs,
         )
         self.mapping = mapping
 

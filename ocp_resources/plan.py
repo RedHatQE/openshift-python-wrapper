@@ -47,6 +47,7 @@ class Plan(NamespacedResource, MTV):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -55,6 +56,7 @@ class Plan(NamespacedResource, MTV):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.source_provider_name = source_provider_name
         self.source_provider_namespace = source_provider_namespace
