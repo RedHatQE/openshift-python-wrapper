@@ -57,10 +57,13 @@ class Deployment(NamespacedResource):
                 total_replicas = instance.status.replicas or 0
                 updated_replicas = instance.status.updatedReplicas or 0
                 available_replicas = instance.status.availableReplicas or 0
+                ready_replicas = instance.status.readyReplicas or 0
 
                 if (
-                    deployed
+                    (deployed and spec_replicas)
                     and spec_replicas
-                    and spec_replicas == updated_replicas == available_replicas
+                    == updated_replicas
+                    == available_replicas
+                    == ready_replicas
                 ) or not (deployed or spec_replicas or total_replicas):
                     return
