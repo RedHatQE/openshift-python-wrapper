@@ -125,8 +125,8 @@ class NodeNetworkConfigurationPolicy(Resource):
         # Add the interface
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
-        self.res.setdefault("spec", {}).setdefault("desiredState", {}).setdefault(
-            "interfaces", self.desired_state["interfaces"]
+        self.res.setdefault("spec", {}).setdefault("desiredState", {}).update(
+            self.desired_state
         )
 
     def to_dict(self):
