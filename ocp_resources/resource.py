@@ -344,6 +344,8 @@ class Resource:
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        node_selector=None,
+        node_selector_labels=None,
     ):
         """
         Create a API resource
@@ -385,6 +387,16 @@ class Resource:
         self.teardown = teardown
         self.timeout = timeout
         self.delete_timeout = delete_timeout
+        self.node_selector = node_selector
+        self.node_selector_labels = node_selector_labels
+        self._node_selector = self._set_node_selector()
+
+    def _set_node_selector(self):
+        if self.node_selector:
+            return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
+        if self.node_selector_labels:
+            return self.node_selector_labels
+        return None
 
     @ClassProperty
     def kind(cls):  # noqa: N805
