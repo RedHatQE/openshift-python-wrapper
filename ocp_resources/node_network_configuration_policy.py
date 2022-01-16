@@ -40,6 +40,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         client=None,
         capture=None,
         node_selector=None,
+        node_selector_labels=None,
         teardown=True,
         mtu=None,
         ports=None,
@@ -76,6 +77,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            node_selector=node_selector,
+            node_selector_labels=node_selector_labels,
             **kwargs,
         )
         self.desired_state = {"interfaces": []}
@@ -94,7 +97,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.ipv6_autoconf = self.ipv6_dhcp
         self.ipv6_auto_dns = ipv6_auto_dns
         self.ipv6_addresses = ipv6_addresses
-        self.node_selector = node_selector
         self.dns_resolver = dns_resolver
         self.routes = routes
         self.state = state or self.Interface.State.UP
@@ -104,16 +106,20 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.res = None
         self.ipv4_ports_backup_dict = {}
         self.ipv6_ports_backup_dict = {}
+        self.nodes = self._nodes()
+
+    def _nodes(self):
         if self.node_selector:
-            self._node_selector = {
-                f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
-            }
-            self.nodes = list(Node.get(dyn_client=self.client, name=self.node_selector))
-        else:
-            self._node_selector = {
-                f"node-role.{self.ApiGroup.KUBERNETES_IO}/worker": ""
-            }
-            self.nodes = list(Node.get(dyn_client=self.client))
+            return list(Node.get(dyn_client=self.client, name=self.node_selector))
+        if self.node_selector_labels:
+            label_key, label_value = list(self.node_selector_labels.items())[0]
+            nodes = list(
+                Node.get(
+                    dyn_client=self.client, label_selector=f"{label_key}={label_value}"
+                )
+            )
+            return nodes
+        return None
 
     def set_interface(self, interface):
         if not self.res:
@@ -382,7 +388,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error(
-                f"Unable to configure NNCP {self.name} for node {self.node_selector}"
+                f"Unable to configure NNCP {self.name} for nodes {[node.name for node in self.nodes]}"
             )
             raise
 
