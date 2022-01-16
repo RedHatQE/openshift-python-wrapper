@@ -398,7 +398,6 @@ class Resource:
             return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
         if self.node_selector_labels:
             return self.node_selector_labels
-        return None
 
     @ClassProperty
     def kind(cls):  # noqa: N805
