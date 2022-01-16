@@ -113,13 +113,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             return list(Node.get(dyn_client=self.client, name=self.node_selector))
         if self.node_selector_labels:
             label_key, label_value = list(self.node_selector_labels.items())[0]
-            nodes = list(
+            return list(
                 Node.get(
                     dyn_client=self.client, label_selector=f"{label_key}={label_value}"
                 )
             )
-            return nodes
-        return None
 
     def set_interface(self, interface):
         if not self.res:
