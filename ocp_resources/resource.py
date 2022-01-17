@@ -391,7 +391,7 @@ class Resource:
         self.dry_run = dry_run
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
-        self._node_selector = self._set_node_selector()
+        self.body_node_selector = self._set_node_selector()
 
     def _set_node_selector(self):
         if self.node_selector:

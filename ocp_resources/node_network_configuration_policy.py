@@ -112,12 +112,13 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.node_selector:
             return list(Node.get(dyn_client=self.client, name=self.node_selector))
         if self.node_selector_labels:
-            label_key, label_value = list(self.node_selector_labels.items())[0]
-            return list(
-                Node.get(
-                    dyn_client=self.client, label_selector=f"{label_key}={label_value}"
-                )
+            node_labels = ",".join(
+                [
+                    f"{label_key}={label_value}"
+                    for label_key, label_value in self.node_selector_labels.items()
+                ]
             )
+            return list(Node.get(dyn_client=self.client, label_selector=node_labels))
 
     def set_interface(self, interface):
         if not self.res:
@@ -143,9 +144,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.dns_resolver or self.routes or self.iface:
             self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
-        if self._node_selector:
+        if self.body_node_selector:
             self.res.setdefault("spec", {}).setdefault(
-                "nodeSelector", self._node_selector
+                "nodeSelector", self.body_node_selector
             )
 
         if self.capture:
