@@ -142,9 +142,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.dns_resolver or self.routes or self.iface:
             self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
-        if self.body_node_selector:
+        if self.spec_node_selector:
             self.res.setdefault("spec", {}).setdefault(
-                "nodeSelector", self.body_node_selector
+                "nodeSelector", self.spec_node_selector
             )
 
         if self.capture:
