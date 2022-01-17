@@ -14,6 +14,7 @@ class OperatorGroup(NamespacedResource):
         client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         """
         Args:
@@ -26,6 +27,7 @@ class OperatorGroup(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.target_namespaces = target_namespaces
 

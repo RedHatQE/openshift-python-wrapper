@@ -20,6 +20,7 @@ class Subscription(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             client=client,
@@ -28,6 +29,7 @@ class Subscription(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.source = source
         self.source_namespace = source_namespace

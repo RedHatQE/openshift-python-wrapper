@@ -24,6 +24,7 @@ class Route(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -32,6 +33,7 @@ class Route(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.service = service
         self.destination_ca_cert = destination_ca_cert

@@ -91,6 +91,7 @@ class DataVolume(NamespacedResource):
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         api_name="pvc",
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -100,6 +101,7 @@ class DataVolume(NamespacedResource):
             privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.source = source
         self.url = url

@@ -42,6 +42,7 @@ class VirtualMachine(NamespacedResource):
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -51,6 +52,7 @@ class VirtualMachine(NamespacedResource):
             privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.body = body
 

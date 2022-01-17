@@ -23,6 +23,7 @@ class NodeNetworkState(Resource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -30,6 +31,7 @@ class NodeNetworkState(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         status = self.instance.to_dict()["status"]
         self.desired_state = status.get("desiredState", {"interfaces": []})
