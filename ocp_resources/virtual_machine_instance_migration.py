@@ -14,6 +14,7 @@ class VirtualMachineInstanceMigration(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -22,6 +23,7 @@ class VirtualMachineInstanceMigration(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self._vmi = vmi
 

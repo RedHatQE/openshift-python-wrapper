@@ -20,6 +20,7 @@ class Hook(NamespacedResource, MTV):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         """
         Args:
@@ -33,6 +34,7 @@ class Hook(NamespacedResource, MTV):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.image = image
         self.playbook = playbook

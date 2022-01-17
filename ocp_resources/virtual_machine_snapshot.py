@@ -26,6 +26,7 @@ class VirtualMachineSnapshot(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -34,6 +35,7 @@ class VirtualMachineSnapshot(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.vm_name = vm_name
 

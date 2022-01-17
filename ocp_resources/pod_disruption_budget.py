@@ -20,6 +20,7 @@ class PodDisruptionBudget(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -28,6 +29,7 @@ class PodDisruptionBudget(NamespacedResource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.min_available = min_available
         self.max_unavailable = max_unavailable

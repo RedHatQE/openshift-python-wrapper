@@ -20,6 +20,7 @@ class PriorityClass(Resource):
         preemption_policy=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -27,6 +28,7 @@ class PriorityClass(Resource):
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.value = value
         self.global_default = global_default

@@ -19,6 +19,7 @@ class NodeMaintenance(Resource):
         timeout=TIMEOUT_4MINUTES,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -27,6 +28,7 @@ class NodeMaintenance(Resource):
             timeout=timeout,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.node = node
         self.reason = reason
