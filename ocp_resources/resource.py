@@ -391,9 +391,9 @@ class Resource:
         self.dry_run = dry_run
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
-        self.node_selector_spec = self._prepare_selector_spec()
+        self.node_selector_spec = self._prepare_node_selector_spec()
 
-    def _prepare_selector_spec(self):
+    def _prepare_node_selector_spec(self):
         if self.node_selector:
             return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
         if self.node_selector_labels:
