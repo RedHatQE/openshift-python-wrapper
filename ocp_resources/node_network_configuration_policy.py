@@ -334,7 +334,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             if condition["type"] == self.Conditions.Type.AVAILABLE:
                 return condition["reason"]
 
-    def _wait_for_configuration_status_unknown(self):
+    def _wait_for_configuration_conditions_unknown_or_progressing(self):
         samples = TimeoutSampler(
             wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
         )
@@ -342,7 +342,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             if (
                 sample
                 and sample[0]["type"] == self.Conditions.Type.AVAILABLE
-                and sample[0]["status"] == self.Condition.Status.UNKNOWN
+                and (
+                    sample[0]["status"] == self.Condition.Status.UNKNOWN
+                    or sample[0]["reason"]
+                    == self.Conditions.Reason.CONFIGURATION_PROGRESSING
+                )
             ):
                 return
 
@@ -367,7 +371,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             )
 
         # if we get here too fast there are no conditions, we need to wait.
-        self._wait_for_configuration_status_unknown()
+        self._wait_for_configuration_conditions_unknown_or_progressing()
 
         samples = TimeoutSampler(wait_timeout=480, sleep=1, func=self.status)
         try:
