@@ -51,13 +51,15 @@ class Deployment(NamespacedResource):
             field_selector=f"metadata.name=={self.name}",
         )
         for sample in samples:
-            instance = sample.items[0] if sample.items else None
-            if instance:
+            if sample.items:
+                instance = sample.items[0]
+                status = instance.status
+
                 spec_replicas = instance.spec.replicas
-                total_replicas = instance.status.replicas or 0
-                updated_replicas = instance.status.updatedReplicas or 0
-                available_replicas = instance.status.availableReplicas or 0
-                ready_replicas = instance.status.readyReplicas or 0
+                total_replicas = status.replicas or 0
+                updated_replicas = status.updatedReplicas or 0
+                available_replicas = status.availableReplicas or 0
+                ready_replicas = status.readyReplicas or 0
 
                 if (
                     (deployed and spec_replicas)
