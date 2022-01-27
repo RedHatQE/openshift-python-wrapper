@@ -41,6 +41,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         capture=None,
         node_selector=None,
         node_selector_labels=None,
+        teardown_absent_ifaces=True,
         teardown=True,
         mtu=None,
         ports=None,
@@ -107,6 +108,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.ipv4_ports_backup_dict = {}
         self.ipv6_ports_backup_dict = {}
         self.nodes = self._nodes()
+        self.teardown_absent_ifaces = teardown_absent_ifaces
 
     def _nodes(self):
         if self.node_selector:
@@ -310,11 +312,12 @@ class NodeNetworkConfigurationPolicy(Resource):
             raise
 
     def clean_up(self):
-        try:
-            self._absent_interface()
-            self.wait_for_status_success()
-        except Exception as exp:
-            LOGGER.error(exp)
+        if self.teardown_absent_ifaces:
+            try:
+                self._absent_interface()
+                self.wait_for_status_success()
+            except Exception as exp:
+                LOGGER.error(exp)
 
         super().clean_up()
 
