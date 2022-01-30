@@ -7,9 +7,7 @@ from colorlog import ColoredFormatter
 
 def get_logger(name):
     log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
-    log_file = os.environ.get(
-        "OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "openshift-python-wrapper.log"
-    )
+    log_file = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "")
     if log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
         raise ValueError(f"Invalid log level: {log_level}")
 
