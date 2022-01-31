@@ -34,13 +34,3 @@ class Namespace(Resource):
         if self.label:
             res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
         return res
-
-    def client_wait_deleted(self, timeout):
-        """
-        client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
-        """
-        super().client_wait_deleted(timeout=timeout)
