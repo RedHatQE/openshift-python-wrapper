@@ -278,6 +278,7 @@ class Resource:
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
         APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
+        BATCH = "batch"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
