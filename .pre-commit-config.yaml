@@ -11,11 +11,10 @@ repos:
           - --remove-unused-variables
           - --remove-all-unused-imports
 
-  # TODO: Enable once pycln work with python 3.10
-  #- repo: https://github.com/hadialqattan/pycln
-  #  rev: "v1.1.0"
-  #  hooks:
-  #    - id: pycln
+  - repo: https://github.com/hadialqattan/pycln
+    rev: "v1.1.0"
+    hooks:
+      - id: pycln
 
   - repo: https://github.com/pre-commit/mirrors-isort
     rev: "v5.10.1"
