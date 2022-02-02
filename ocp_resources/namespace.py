@@ -1,7 +1,6 @@
 import logging
 
 from ocp_resources.resource import Resource
-from ocp_resources.utils import TimeoutExpiredError, nudge_delete
 
 
 LOGGER = logging.getLogger(__name__)
@@ -35,16 +34,3 @@ class Namespace(Resource):
         if self.label:
             res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
         return res
-
-    def client_wait_deleted(self, timeout):
-        """
-        client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
-        """
-        try:
-            super().client_wait_deleted(timeout=timeout)
-        except TimeoutExpiredError:
-            nudge_delete(name=self.name)
