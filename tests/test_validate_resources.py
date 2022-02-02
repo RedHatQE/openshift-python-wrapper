@@ -50,7 +50,7 @@ def _get_namespaced(cls, resource_dict, api_value):
     errors = []
     for base in getattr(cls, "bases", []):
         api_group_name = _api_group_name(api_value=api_value)
-        namespaced = bool(base.id == "NamespacedResource")
+        namespaced = base.id == "NamespacedResource"
         api_group = _api_group_dict(
             resource_dict=resource_dict, api_group_name=api_group_name
         )
