@@ -360,7 +360,7 @@ class VirtualMachineInstance(NamespacedResource):
 
     @property
     def xml_dict(self):
-        """ Get virtual machine instance XML as dict """
+        """Get virtual machine instance XML as dict"""
 
         return xmltodict.parse(xml_input=self.get_xml(), process_namespaces=True)
 
