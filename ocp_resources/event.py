@@ -1,9 +1,8 @@
-import logging
-
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import Resource
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class Event:
@@ -11,7 +10,7 @@ class Event:
     Allow read and remove K8s events.
     """
 
-    api_group = Resource.ApiGroup.EVENTS_K8S_IO
+    api_version = Resource.ApiVersion.V1
 
     @classmethod
     def get(

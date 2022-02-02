@@ -33,12 +33,18 @@ sudo npm install github-release-notes -g
 ```
 
 ## docs
-Hosted on readthedocs.io
-```
+Hosted on readthedocs.io [openshift-python-wrapper](https://openshift-python-wrapper.readthedocs.io/en/latest/)
 
 ## PR dependency
 For PR dependency we use [dpulls](https://www.dpulls.com/)  
 To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR description.
+
+## Logging configuration
+To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:  
+
+```bash
+export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+```
 
 ## Examples
 ### Client
@@ -126,6 +132,21 @@ Then, we can get the Pod that is in Running state and execute a command on it:
 command_output = test_vmi.virt_launcher_pod.execute(command="command-example")
 ```
 If no Pod was found, will raise ``ResourceNotFoundError``.
+
+### NNCP Capture Syntax
+Using capture syntax to switch ipv4 config between interfaces
+```python
+with NodeNetworkConfigurationPolicy(
+    name="capture_nncp",
+    capture={'first-nic': 'interfaces.name=="ens8"',
+              'second-nic': 'interfaces.name=="ens9"'},
+    teardown=False, # Capture doesn't support reverting config on teardown
+    ...  
+) as nncp:
+    nncp.add_interface(name="{{ capture.first-nic.interfaces.0.name }}", set_ipv4="{{ capture.second-nic.interfaces.0.ipv4 }}")
+    nncp.add_interface(name="{{ capture.second-nic.interfaces.0.name }}", set_ipv4="{{ capture.first-nic.interfaces.0.ipv4 }}")
+    yield nncp
+```
 
 ## Code check
 We use pre-commit for code check.

@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -9,7 +10,14 @@ class Machine(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
 
     def __init__(
-        self, name=None, namespace=None, teardown=True, client=None, yaml_file=None
+        self,
+        name=None,
+        namespace=None,
+        teardown=True,
+        client=None,
+        yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -17,6 +25,8 @@ class Machine(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
 
     @property

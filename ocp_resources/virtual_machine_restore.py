@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
-
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
-from ocp_resources.resource import TIMEOUT, NamespacedResource
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachineRestore(NamespacedResource):
@@ -28,6 +27,8 @@ class VirtualMachineRestore(NamespacedResource):
         client=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -35,6 +36,8 @@ class VirtualMachineRestore(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.vm_name = vm_name
         self.snapshot_name = snapshot_name
@@ -53,7 +56,7 @@ class VirtualMachineRestore(NamespacedResource):
         spec["virtualMachineSnapshotName"] = self.snapshot_name
         return res
 
-    def wait_complete(self, status=True, timeout=TIMEOUT):
+    def wait_complete(self, status=True, timeout=TIMEOUT_4MINUTES):
         """
         Wait for VirtualMachineRestore to be in status complete
 

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class UploadTokenRequest(NamespacedResource):
@@ -23,6 +23,8 @@ class UploadTokenRequest(NamespacedResource):
         pvc_name=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -30,6 +32,8 @@ class UploadTokenRequest(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.pvc_name = pvc_name
 

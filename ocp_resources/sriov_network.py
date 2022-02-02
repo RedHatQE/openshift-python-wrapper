@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -19,6 +20,9 @@ class SriovNetwork(NamespacedResource):
         ipam=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        macspoofchk=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -26,11 +30,14 @@ class SriovNetwork(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.network_namespace = network_namespace
         self.resource_name = resource_name
         self.vlan = vlan
         self.ipam = ipam
+        self.macspoofchk = macspoofchk
 
     def to_dict(self):
         res = super().to_dict()
@@ -44,4 +51,8 @@ class SriovNetwork(NamespacedResource):
         }
         if self.vlan:
             res["spec"]["vlan"] = self.vlan
+
+        if self.macspoofchk:
+            res["spec"]["spoofChk"] = self.macspoofchk
+
         return res

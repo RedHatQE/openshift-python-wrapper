@@ -15,6 +15,7 @@ setup(
         "openshift",
         "xmltodict",
         "urllib3",
+        "colorlog",
     ],
     python_requires=">=3.6",
 )

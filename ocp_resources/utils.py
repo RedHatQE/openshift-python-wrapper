@@ -1,8 +1,9 @@
-import logging
 import time
 
+from ocp_resources.logger import get_logger
 
-LOGGER = logging.getLogger(__name__)
+
+LOGGER = get_logger(name=__name__)
 
 
 class TimeoutExpiredError(Exception):
@@ -212,7 +213,7 @@ class TimeoutWatch:
         self.timeout = timeout
         self.start_time = time.time()
 
-    def remaining_time(self, log=None):
+    def remaining_time(self):
         """
         Return the remaining part of timeout since the object was created.
         """

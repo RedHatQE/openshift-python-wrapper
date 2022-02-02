@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
-from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
+from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class DataVolume(NamespacedResource):
@@ -75,11 +75,11 @@ class DataVolume(NamespacedResource):
         storage_class=None,
         url=None,
         content_type=ContentType.KUBEVIRT,
-        access_modes=AccessMode.RWO,
+        access_modes=None,
         cert_configmap=None,
         secret=None,
         client=None,
-        volume_mode=VolumeMode.FILE,
+        volume_mode=None,
         hostpath_node=None,
         source_pvc=None,
         source_namespace=None,
@@ -89,6 +89,9 @@ class DataVolume(NamespacedResource):
         teardown=True,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        api_name="pvc",
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -97,6 +100,8 @@ class DataVolume(NamespacedResource):
             teardown=teardown,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.source = source
         self.url = url
@@ -113,31 +118,32 @@ class DataVolume(NamespacedResource):
         self.multus_annotation = multus_annotation
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
+        self.api_name = api_name
 
     def to_dict(self):
         res = super().to_dict()
         if self.yaml_file:
             return res
-
         res.update(
             {
                 "spec": {
                     "source": {self.source: {"url": self.url}},
-                    "pvc": {
-                        "accessModes": [self.access_modes],
+                    self.api_name: {
                         "resources": {"requests": {"storage": self.size}},
                     },
                 }
             }
         )
+        if self.access_modes:
+            res["spec"][self.api_name]["accessModes"] = [self.access_modes]
         if self.content_type:
             res["spec"]["contentType"] = self.content_type
         if self.storage_class:
-            res["spec"]["pvc"]["storageClassName"] = self.storage_class
+            res["spec"][self.api_name]["storageClassName"] = self.storage_class
         if self.secret:
             res["spec"]["source"][self.source]["secretRef"] = self.secret.name
         if self.volume_mode:
-            res["spec"]["pvc"]["volumeMode"] = self.volume_mode
+            res["spec"][self.api_name]["volumeMode"] = self.volume_mode
         if self.source == "http" or "registry":
             res["spec"]["source"][self.source]["url"] = self.url
         if self.cert_configmap:
@@ -172,7 +178,7 @@ class DataVolume(NamespacedResource):
 
         return res
 
-    def wait_deleted(self, timeout=TIMEOUT):
+    def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait until DataVolume and the PVC created by it are deleted
 

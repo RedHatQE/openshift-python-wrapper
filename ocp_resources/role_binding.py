@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -23,6 +23,8 @@ class RoleBinding(NamespacedResource):
         role_ref_name=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
 
         super().__init__(
@@ -31,6 +33,8 @@ class RoleBinding(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.subjects_kind = subjects_kind
         self.subjects_name = subjects_name
