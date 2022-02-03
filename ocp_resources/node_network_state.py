@@ -21,10 +21,7 @@ class NodeNetworkState(Resource):
             name=name, client=client, teardown=teardown, yaml_file=yaml_file
         )
         status = self.instance.to_dict()["status"]
-        if "desiredState" in status:
-            self.desired_state = status["desiredState"]
-        else:
-            self.desired_state = {"interfaces": []}
+        self.desired_state = status.get("desiredState", {"interfaces": []})
 
     def set_interface(self, interface):
 
