@@ -9,5 +9,4 @@ jobs:
     steps:
     - uses: yogevbd/enforce-label-action@2.2.2
       with:
-        token: ${{secrets.CNV_QE_BOT_TOKEN}}
         REQUIRED_LABELS_ALL: "Verified, PR: review-approved"
