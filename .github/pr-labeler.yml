@@ -1,0 +1,16 @@
+# The bot always updates the labels, add/remove as necessary [default: false]
+alwaysReplace: true
+# Treats the text and labels as case sensitive [default: true]
+caseSensitive: false
+# Array of labels to be applied to the PR [default: []]
+customLabels:
+  # Finds the `text` within the PR title and body and applies the `label`
+  - text: 'wip'
+    label: 'WIP'
+
+# Search the body of the PR for the `text` [default: true]
+searchBody: true
+# Search the title of the PR for the `text` [default: true]
+searchTitle: true
+# Search for whole words only [default: false]
+wholeWords: true
