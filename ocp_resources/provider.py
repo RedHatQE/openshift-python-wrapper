@@ -55,7 +55,7 @@ class Provider(NamespacedResource, MTV):
                         "name": self.secret_name,
                         "namespace": self.secret_namespace,
                     },
-                    "settings": {"vddkInitImage": self.vddk_init_image},
+                    "settings": {"vddkinitimage": self.vddk_init_image},
                 }
             }
         )
