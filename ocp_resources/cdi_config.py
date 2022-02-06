@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
-from ocp_resources.resource import TIMEOUT, Resource
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
+from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class CDIConfig(Resource):
@@ -29,7 +28,7 @@ class CDIConfig(Resource):
     def upload_proxy_url(self):
         return self.instance.status.uploadProxyURL
 
-    def wait_until_upload_url_changed(self, uploadproxy_url, timeout=TIMEOUT):
+    def wait_until_upload_url_changed(self, uploadproxy_url, timeout=TIMEOUT_4MINUTES):
         """
         Wait until upload proxy url is changed
 

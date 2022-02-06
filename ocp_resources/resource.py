@@ -1,6 +1,5 @@
 import contextlib
 import json
-import logging
 import os
 import re
 import sys
@@ -22,7 +21,9 @@ from openshift.dynamic.resource import ResourceField
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_4MINUTES,
 )
+from ocp_resources.logger import get_logger
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -36,8 +37,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ServerTimeoutError: [],
 }
 
-LOGGER = logging.getLogger(__name__)
-TIMEOUT = 240
+LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
@@ -278,6 +278,7 @@ class Resource:
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
         APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
+        BATCH = "batch"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
@@ -340,9 +341,13 @@ class Resource:
         name=None,
         client=None,
         teardown=True,
-        timeout=TIMEOUT,
+        timeout=TIMEOUT_4MINUTES,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        dry_run=None,
+        node_selector=None,
+        node_selector_labels=None,
     ):
         """
         Create a API resource
@@ -383,6 +388,17 @@ class Resource:
 
         self.teardown = teardown
         self.timeout = timeout
+        self.delete_timeout = delete_timeout
+        self.dry_run = dry_run
+        self.node_selector = node_selector
+        self.node_selector_labels = node_selector_labels
+        self.node_selector_spec = self._prepare_node_selector_spec()
+
+    def _prepare_node_selector_spec(self):
+        if self.node_selector:
+            return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
+        if self.node_selector_labels:
+            return self.node_selector_labels
 
     @ClassProperty
     def kind(cls):  # noqa: N805
@@ -444,11 +460,11 @@ class Resource:
             try:
                 _collect_data(resource_object=self)
             except Exception as exception_:
-                LOGGER.warning(exception_)
+                LOGGER.warning(
+                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
+                )
 
-        data = self.to_dict()
-        LOGGER.info(f"Deleting {data}")
-        self.delete(wait=True, timeout=self.timeout)
+        self.delete(wait=True, timeout=self.delete_timeout)
 
     @classmethod
     def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
@@ -498,7 +514,7 @@ class Resource:
     def api(self):
         return self.full_api()
 
-    def wait(self, timeout=TIMEOUT, sleep=1):
+    def wait(self, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
         Wait for resource
 
@@ -523,7 +539,7 @@ class Resource:
             if sample:
                 return
 
-    def wait_deleted(self, timeout=TIMEOUT):
+    def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait until resource is deleted
 
@@ -563,7 +579,9 @@ class Resource:
             if not sample:
                 return
 
-    def wait_for_status(self, status, timeout=TIMEOUT, stop_status=None, sleep=1):
+    def wait_for_status(
+        self, status, timeout=TIMEOUT_4MINUTES, stop_status=None, sleep=1
+    ):
         """
         Wait for resource to be in status
 
@@ -633,20 +651,26 @@ class Resource:
 
             data.update(body)
 
-        LOGGER.info(f"Posting {data}")
         LOGGER.info(f"Create {self.kind} {self.name}")
-        res = self.api.create(body=data, namespace=self.namespace)
+        LOGGER.info(f"Posting {data}")
+        LOGGER.debug(f"\n{yaml.dump(data)}")
+        res = self.api.create(body=data, namespace=self.namespace, dry_run=self.dry_run)
         if wait and res:
             return self.wait()
         return res
 
-    def delete(self, wait=False, timeout=TIMEOUT, body=None):
+    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
+        LOGGER.info(f"Delete {self.kind} {self.name}")
+        if self.exists:
+            data = self.instance.to_dict()
+            LOGGER.info(f"Deleting {data}")
+            LOGGER.debug(f"\n{yaml.dump(data)}")
+
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
         except NotFoundError:
             return False
 
-        LOGGER.info(f"Delete {self.kind} {self.name}")
         if wait and res:
             return self.wait_deleted(timeout=timeout)
         return res
@@ -671,7 +695,8 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        LOGGER.info(f"Update {self.kind} {self.name}: {resource_dict}")
+        LOGGER.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
+        LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -683,7 +708,8 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
+        LOGGER.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
+        LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -832,9 +858,11 @@ class NamespacedResource(Resource):
         namespace=None,
         client=None,
         teardown=True,
-        timeout=TIMEOUT,
+        timeout=TIMEOUT_4MINUTES,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -843,6 +871,8 @@ class NamespacedResource(Resource):
             timeout=timeout,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:

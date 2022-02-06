@@ -17,6 +17,7 @@ class Template(NamespacedResource):
         DESKTOP = "desktop"
         HIGHPERFORMANCE = "highperformance"
         SERVER = "server"
+        SAPHANA = "saphana"
 
     class Flavor:
         LARGE = "large"

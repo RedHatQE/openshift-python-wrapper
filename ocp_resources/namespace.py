@@ -1,12 +1,5 @@
-import logging
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
-
-
-LOGGER = logging.getLogger(__name__)
-
-_DELETE_NUDGE_DELAY = 30
-_DELETE_NUDGE_INTERVAL = 5
 
 
 class Namespace(Resource):
@@ -26,9 +19,16 @@ class Namespace(Resource):
         teardown=True,
         label=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
-            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+            name=name,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.label = label
 
@@ -40,13 +40,3 @@ class Namespace(Resource):
         if self.label:
             res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
         return res
-
-    def client_wait_deleted(self, timeout):
-        """
-        client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
-        """
-        super().client_wait_deleted(timeout=timeout)

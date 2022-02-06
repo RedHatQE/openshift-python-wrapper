@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -16,6 +17,8 @@ class KubeDescheduler(NamespacedResource):
         teardown=True,
         client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         """
         Create Descheduler object.
@@ -34,6 +37,8 @@ class KubeDescheduler(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.profiles = profiles or ["AffinityAndTaints"]
         self.descheduling_interval = descheduling_interval

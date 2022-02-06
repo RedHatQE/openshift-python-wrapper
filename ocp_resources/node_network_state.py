@@ -1,30 +1,40 @@
-import logging
 import time
 
 from openshift.dynamic.exceptions import ConflictError
 
+from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 SLEEP = 1
-TIMEOUT = 240
 
 
 class NodeNetworkState(Resource):
     api_group = Resource.ApiGroup.NMSTATE_IO
 
-    def __init__(self, name=None, client=None, teardown=True, yaml_file=None):
+    def __init__(
+        self,
+        name=None,
+        client=None,
+        teardown=True,
+        yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
+    ):
         super().__init__(
-            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+            name=name,
+            client=client,
+            teardown=teardown,
+            yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         status = self.instance.to_dict()["status"]
-        if "desiredState" in status:
-            self.desired_state = status["desiredState"]
-        else:
-            self.desired_state = {"interfaces": []}
+        self.desired_state = status.get("desiredState", {"interfaces": []})
 
     def set_interface(self, interface):
 
@@ -79,7 +89,7 @@ class NodeNetworkState(Resource):
 
         LOGGER.info(f"Checking if interface {name} is up -- {self.name}")
         samples = TimeoutSampler(
-            wait_timeout=TIMEOUT, sleep=SLEEP, func=_find_up_interface
+            wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface
         )
         for sample in samples:
             if sample:
@@ -88,7 +98,10 @@ class NodeNetworkState(Resource):
     def wait_until_deleted(self, name):
         LOGGER.info(f"Checking if interface {name} is deleted -- {self.name}")
         samples = TimeoutSampler(
-            wait_timeout=TIMEOUT, sleep=SLEEP, func=self.get_interface, name=name
+            wait_timeout=self.delete_timeout,
+            sleep=SLEEP,
+            func=self.get_interface,
+            name=name,
         )
         for sample in samples:
             if not sample:

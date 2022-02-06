@@ -1,13 +1,13 @@
-import logging
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
-TIMEOUT = 300
+TIMEOUT_5MINUTES = 300
 
 
 class MachineSet(NamespacedResource):
@@ -64,6 +64,8 @@ class MachineSet(NamespacedResource):
         replicas=1,
         provider_spec=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -71,6 +73,8 @@ class MachineSet(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.replicas = replicas
         self.cluster_name = cluster_name
@@ -140,7 +144,7 @@ class MachineSet(NamespacedResource):
     def provider_spec_value(self):
         return self.instance.spec.template.spec.providerSpec.value
 
-    def wait_for_replicas(self, timeout=TIMEOUT, sleep=1):
+    def wait_for_replicas(self, timeout=TIMEOUT_5MINUTES, sleep=1):
         """
         Wait for machine-set replicas to reach 'ready' state.
 
@@ -165,7 +169,9 @@ class MachineSet(NamespacedResource):
             )
             return False
 
-    def scale_replicas(self, replicas, wait_timeout=TIMEOUT, sleep=1, wait=True):
+    def scale_replicas(
+        self, replicas, wait_timeout=TIMEOUT_5MINUTES, sleep=1, wait=True
+    ):
         """
         Scale down/up a machine-set replicas.
 

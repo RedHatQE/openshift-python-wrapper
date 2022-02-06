@@ -13,16 +13,16 @@ jobs:
           token: ${{secrets.CNV_QE_BOT_TOKEN}}
           action: remove_merge_checks
 
-      - name: Assign Reviewers
-        uses: myakove/pr-workflows@master
-        with:
-          token: ${{secrets.CNV_QE_BOT_TOKEN}}
-          reviewers: myakove,rnetser
-          action: add_reviewers
-
-      - name: Assign Size Labels
-        uses: myakove/pr-workflows@master
-        with:
-          token: ${{secrets.CNV_QE_BOT_TOKEN}}
-          reviewers: myakove,rnetser
-          action: size_label_prs
+#      - name: Assign Reviewers
+#        uses: myakove/pr-workflows@master
+#        with:
+#          token: ${{secrets.CNV_QE_BOT_TOKEN}}
+#          reviewers: myakove,rnetser
+#          action: add_reviewers
+#
+#      - name: Assign Size Labels
+#        uses: myakove/pr-workflows@master
+#        with:
+#          token: ${{secrets.CNV_QE_BOT_TOKEN}}
+#          reviewers: myakove,rnetser
+#          action: size_label_prs

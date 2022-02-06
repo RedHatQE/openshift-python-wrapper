@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
-
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 def _map_mappings(mappings):
@@ -110,6 +109,8 @@ class VirtualMachineImport(NamespacedResource):
         finalize_date=None,
         privileged_client=None,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -118,6 +119,8 @@ class VirtualMachineImport(NamespacedResource):
             teardown=teardown,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.vm_id = vm_id
         self.vm_name = vm_name
@@ -277,6 +280,7 @@ class ResourceMapping(NamespacedResource):
         client=None,
         teardown=True,
         yaml_file=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -284,6 +288,7 @@ class ResourceMapping(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            **kwargs,
         )
         self.mapping = mapping
 

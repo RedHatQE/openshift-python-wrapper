@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
+from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class PersistentVolumeClaim(NamespacedResource):
@@ -47,6 +47,8 @@ class PersistentVolumeClaim(NamespacedResource):
         hostpath_node=None,
         teardown=True,
         yaml_file=None,
+        delete_timeout=TIMEOUT_4MINUTES,
+        **kwargs,
     ):
         super().__init__(
             name=name,
@@ -54,6 +56,8 @@ class PersistentVolumeClaim(NamespacedResource):
             client=client,
             teardown=teardown,
             yaml_file=yaml_file,
+            delete_timeout=delete_timeout,
+            **kwargs,
         )
         self.accessmodes = accessmodes
         self.volume_mode = volume_mode
