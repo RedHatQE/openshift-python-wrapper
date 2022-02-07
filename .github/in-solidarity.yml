@@ -3,7 +3,14 @@ rules:
     level: failure  # default rules are set to warning
   slave:
     level: failure
-
+  black:
+    regex:
+      - black
+    level: failure
+  white:
+    regex:
+      - white
+    level: failure
 ignore:
  - ".github/in-solidarity.yml"  # default
  - "**/*.yml"
