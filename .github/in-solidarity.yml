@@ -1,0 +1,12 @@
+rules:
+  master:
+    level: failure  # default rules are set to warning
+  slave:
+    level: failure
+  black:
+    level: failure
+  white:
+    level: failure
+ignore:
+ - ".github/in-solidarity.yml"  # default
+ - "**/*.yml"
