@@ -5,11 +5,11 @@ rules:
     level: failure
   black:
     regex:
-      - black
+      - /black
     level: failure
   white:
     regex:
-      - white
+      - /white
     level: failure
 ignore:
  - ".github/in-solidarity.yml"  # default
