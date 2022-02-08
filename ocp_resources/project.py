@@ -13,6 +13,9 @@ class Project(Resource):
     class Status(Resource.Status):
         ACTIVE = "Active"
 
+    def clean_up(self):
+        Project(name=self.name).delete(wait=True)
+
 
 class ProjectRequest(Resource):
     """
