@@ -1,5 +1,30 @@
 # Changelog
 
+## v2.0.17.2 (09/02/2022)
+*No changelog for this release.*
+
+---
+
+## v1.5.3.58 (09/02/2022)
+- [**size/XS**][**Verified**] nncp - use clean_up, add collect log [#414](https://github.com/RedHatQE/openshift-python-wrapper/pull/414)
+- [**size/XS**][**Verified**] nncp - use clean_up, add collect log [#416](https://github.com/RedHatQE/openshift-python-wrapper/pull/416)
+
+---
+
+## v2.1.26 (09/02/2022)
+- [**size/XS**][**Verified**] nncp - wait_for_configuration_conditions_unknown_or_progressing - ret… [#412](https://github.com/RedHatQE/openshift-python-wrapper/pull/412)
+
+---
+
+## v2.1.25 (09/02/2022)
+*No changelog for this release.*
+
+---
+
+## v2.1.24 (09/02/2022)
+null
+---
+
 ## v2.0.17.1 (03/02/2022)
 - [**Verified**][**size/S**][**Ready for merge**] Cherrypick - add DataSource resource [#373](https://github.com/RedHatQE/openshift-python-wrapper/pull/373)
 
@@ -150,32 +175,3 @@ null
 
 ## v2.1.1 (25/11/2021)
 - [**Verified**][**size/S**][**Approve**][**Ready for merge**] Add data source [#253](https://github.com/RedHatQE/openshift-python-wrapper/pull/253)
-
----
-
-## v1.5.3.55 (18/11/2021)
-- [**Verified**][**Approve**][**Ready for merge**] namespace resource: support get raw object in get() - Cherry-pick [#242](https://github.com/RedHatQE/openshift-python-wrapper/pull/242)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add kind to log api version in _get_api_version [#243](https://github.com/RedHatQE/openshift-python-wrapper/pull/243)
-
----
-
-## v2.1.0 (11/11/2021)
-- [**Verified**][**size/M**][**Approve**] Added support for hooks in the plan [#238](https://github.com/RedHatQE/openshift-python-wrapper/pull/238)
-- [**Verified**][**size/XS**][**Approve**] Set  MAX_SUPPORTED_API_VERSION > v2 [#240](https://github.com/RedHatQE/openshift-python-wrapper/pull/240)
-
----
-
-## v2.0.16 (09/11/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add python 3.10 support [#236](https://github.com/RedHatQE/openshift-python-wrapper/pull/236)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add OperatorCondition class [#234](https://github.com/RedHatQE/openshift-python-wrapper/pull/234)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Fixing 'cutover' position in migration mtv resource [#228](https://github.com/RedHatQE/openshift-python-wrapper/pull/228)
-
----
-
-## v2.0.15 (02/11/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add WFFC status to DV [#226](https://github.com/RedHatQE/openshift-python-wrapper/pull/226)
-
----
-
-## v1.3.10 (27/10/2021)
-*No changelog for this release.*
