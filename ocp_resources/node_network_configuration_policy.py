@@ -360,7 +360,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     == self.Conditions.Reason.CONFIGURATION_PROGRESSING
                 )
             ):
-                return
+                return sample
 
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
