@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.10.2 (10/02/2022)
+*No changelog for this release.*
+
+---
+
 ## v1.3.10.1 (10/02/2022)
 *No changelog for this release.*
 
@@ -164,11 +169,3 @@ null
 - [**Verified**][**size/XS**][**Approve**] clean_up - add resource kind to log [#291](https://github.com/RedHatQE/openshift-python-wrapper/pull/291)
 - [**Verified**][**size/S**][**Approve**][**Ready for merge**] Data source - add pvc property [#287](https://github.com/RedHatQE/openshift-python-wrapper/pull/287)
 - [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Event - use api version [#289](https://github.com/RedHatQE/openshift-python-wrapper/pull/289)
-
----
-
-## v2.1.7 (15/12/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Get NNCEs for the right NNCP [#285](https://github.com/RedHatQE/openshift-python-wrapper/pull/285)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Update log - resource collect data [#273](https://github.com/RedHatQE/openshift-python-wrapper/pull/273)
-- [**Verified**][**size/XS**][**Approve**] Namespace: remove client_wait_deleted() [#279](https://github.com/RedHatQE/openshift-python-wrapper/pull/279)
-- [**Verified**][**size/XS**][**Approve**] Resource: delete should use delete_timeout [#283](https://github.com/RedHatQE/openshift-python-wrapper/pull/283)
