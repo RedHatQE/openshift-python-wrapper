@@ -18,6 +18,7 @@ class Provider(NamespacedResource, MTV):
         url=None,
         secret_name=None,
         secret_namespace=None,
+        vddk_init_image=None,
         client=None,
         teardown=True,
         yaml_file=None,
@@ -38,6 +39,7 @@ class Provider(NamespacedResource, MTV):
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
         self.condition_message_ready = self.ConditionMessage.PROVIDER_READY
+        self.vddk_init_image = vddk_init_image
 
     def to_dict(self):
         res = super().to_dict()
@@ -53,6 +55,7 @@ class Provider(NamespacedResource, MTV):
                         "name": self.secret_name,
                         "namespace": self.secret_namespace,
                     },
+                    "settings": {"vddkInitImage": self.vddk_init_image},
                 }
             }
         )
