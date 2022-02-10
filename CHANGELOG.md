@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.5.3.59 (10/02/2022)
+*No changelog for this release.*
+
+---
+
+## v2.0.17.3 (10/02/2022)
+- [**size/XS**][**Verified**] nncp - fix clean_up() [#420](https://github.com/RedHatQE/openshift-python-wrapper/pull/420)
+- [**size/XS**][**Verified**] nncp - fix clean_up() [#418](https://github.com/RedHatQE/openshift-python-wrapper/pull/418)
+
+---
+
+## v2.0.17.2 (09/02/2022)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.58 (09/02/2022)
 - [**size/XS**][**Verified**] nncp - use clean_up, add collect log [#414](https://github.com/RedHatQE/openshift-python-wrapper/pull/414)
 - [**size/XS**][**Verified**] nncp - use clean_up, add collect log [#416](https://github.com/RedHatQE/openshift-python-wrapper/pull/416)
@@ -159,20 +175,3 @@ null
 
 ## v2.1.3 (29/11/2021)
 - [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Adding MTV ForkliftController resource [#247](https://github.com/RedHatQE/openshift-python-wrapper/pull/247)
-
----
-
-## v2.1.2 (28/11/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Support skip teardown from os env [#255](https://github.com/RedHatQE/openshift-python-wrapper/pull/255)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Always call __exit__ [#257](https://github.com/RedHatQE/openshift-python-wrapper/pull/257)
-
----
-
-## v2.1.1 (25/11/2021)
-- [**Verified**][**size/S**][**Approve**][**Ready for merge**] Add data source [#253](https://github.com/RedHatQE/openshift-python-wrapper/pull/253)
-
----
-
-## v1.5.3.55 (18/11/2021)
-- [**Verified**][**Approve**][**Ready for merge**] namespace resource: support get raw object in get() - Cherry-pick [#242](https://github.com/RedHatQE/openshift-python-wrapper/pull/242)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add kind to log api version in _get_api_version [#243](https://github.com/RedHatQE/openshift-python-wrapper/pull/243)
