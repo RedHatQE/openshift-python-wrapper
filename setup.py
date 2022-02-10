@@ -11,8 +11,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        "kubernetes",
-        "openshift",
+        "openshift==0.12.1",
         "xmltodict",
         "urllib3",
     ],
