@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.10.3 (10/02/2022)
+*No changelog for this release.*
+
+---
+
 ## v1.3.10.2 (10/02/2022)
 *No changelog for this release.*
 
@@ -162,10 +167,3 @@ null
 - [**Verified**][**size/S**][**Ready for merge**] Include new conditions.reason as part of maxUnavailable support. [#281](https://github.com/RedHatQE/openshift-python-wrapper/pull/281)
 - [**Verified**][**size/M**][**Ready for merge**] Add data import cron resource [#271](https://github.com/RedHatQE/openshift-python-wrapper/pull/271)
 - [**Verified**][**size/XS**][**Approve**][**Ready for merge**] MTV: Adding PLAN_FAILED condition message [#293](https://github.com/RedHatQE/openshift-python-wrapper/pull/293)
-
----
-
-## v2.1.8 (16/12/2021)
-- [**Verified**][**size/XS**][**Approve**] clean_up - add resource kind to log [#291](https://github.com/RedHatQE/openshift-python-wrapper/pull/291)
-- [**Verified**][**size/S**][**Approve**][**Ready for merge**] Data source - add pvc property [#287](https://github.com/RedHatQE/openshift-python-wrapper/pull/287)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Event - use api version [#289](https://github.com/RedHatQE/openshift-python-wrapper/pull/289)
