@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.10.4 (10/02/2022)
+null
+---
+
 ## v1.3.10.3 (10/02/2022)
 *No changelog for this release.*
 
@@ -160,10 +164,3 @@ null
 
 ## v2.1.10 (21/12/2021)
 - [**Verified**][**size/L**][**Ready for merge**] Expose delete_timeout arg [#297](https://github.com/RedHatQE/openshift-python-wrapper/pull/297)
-
----
-
-## v2.1.9 (20/12/2021)
-- [**Verified**][**size/S**][**Ready for merge**] Include new conditions.reason as part of maxUnavailable support. [#281](https://github.com/RedHatQE/openshift-python-wrapper/pull/281)
-- [**Verified**][**size/M**][**Ready for merge**] Add data import cron resource [#271](https://github.com/RedHatQE/openshift-python-wrapper/pull/271)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] MTV: Adding PLAN_FAILED condition message [#293](https://github.com/RedHatQE/openshift-python-wrapper/pull/293)
