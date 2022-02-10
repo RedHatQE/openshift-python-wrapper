@@ -230,7 +230,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             except Exception as e:
                 LOGGER.error(e)
 
-        self.super().clean_up()
+        super().clean_up()
 
     def wait_for_interface_deleted(self):
         for pod in self.worker_pods:
