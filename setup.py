@@ -12,7 +12,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "kubernetes",
-        "openshift!=0.13.0",  # 0.13.0 is broken https://github.com/openshift/openshift-restclient-python/issues/425
+        "openshift",
         "xmltodict",
         "urllib3",
         "colorlog",
