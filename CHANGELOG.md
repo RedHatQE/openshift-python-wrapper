@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.0.17.4 (10/02/2022)
+- [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#426](https://github.com/RedHatQE/openshift-python-wrapper/pull/426)
+- [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#428](https://github.com/RedHatQE/openshift-python-wrapper/pull/428)
+- [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#430](https://github.com/RedHatQE/openshift-python-wrapper/pull/430)
+
+---
+
+## v2.1.27 (10/02/2022)
+- [**size/XS**][**Verified**] Remove kubernetes from setup.py [#422](https://github.com/RedHatQE/openshift-python-wrapper/pull/422)
+- [**size/XS**][**Verified**] Add vddk settings in Provider [#376](https://github.com/RedHatQE/openshift-python-wrapper/pull/376)
+
+---
+
+## v1.5.3.59 (10/02/2022)
+*No changelog for this release.*
+
+---
+
 ## v2.0.17.3 (10/02/2022)
 - [**size/XS**][**Verified**] nncp - fix clean_up() [#420](https://github.com/RedHatQE/openshift-python-wrapper/pull/420)
 - [**size/XS**][**Verified**] nncp - fix clean_up() [#418](https://github.com/RedHatQE/openshift-python-wrapper/pull/418)
@@ -158,21 +176,3 @@ null
 - [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Expose wait_timeout in MTV  wait  methods [#251](https://github.com/RedHatQE/openshift-python-wrapper/pull/251)
 - [**Verified**][**size/XS**][**Approve**][**Ready for merge**] NNCP: add support for OVS bridge [#267](https://github.com/RedHatQE/openshift-python-wrapper/pull/267)
 - [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add hostpath-csi storage class [#263](https://github.com/RedHatQE/openshift-python-wrapper/pull/263)
-
----
-
-## v2.1.4 (06/12/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] add etcd timeout to DEFAULT_CLUSTER_RETRY_EXCEPTIONS [#245](https://github.com/RedHatQE/openshift-python-wrapper/pull/245)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add StorageProfile resource [#259](https://github.com/RedHatQE/openshift-python-wrapper/pull/259)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Rename StorageClass.Provisioner.LOCAL_BLOCK [#261](https://github.com/RedHatQE/openshift-python-wrapper/pull/261)
-
----
-
-## v2.1.3 (29/11/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Adding MTV ForkliftController resource [#247](https://github.com/RedHatQE/openshift-python-wrapper/pull/247)
-
----
-
-## v2.1.2 (28/11/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Support skip teardown from os env [#255](https://github.com/RedHatQE/openshift-python-wrapper/pull/255)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Always call __exit__ [#257](https://github.com/RedHatQE/openshift-python-wrapper/pull/257)
