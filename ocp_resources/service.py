@@ -13,3 +13,4 @@ class Service(NamespacedResource):
     class Type:
         CLUSTER_IP = "ClusterIP"
         NODE_PORT = "NodePort"
+        LOAD_BALANCER = "LoadBalancer"
