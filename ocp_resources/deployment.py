@@ -53,10 +53,20 @@ class Deployment(NamespacedResource):
         )
         for sample in samples:
             if sample.items:
-                status = sample.items[0].status
-                if deployed:
-                    if status.replicas == status.availableReplicas:
-                        return
-                else:
-                    if not status.availableReplicas:
-                        return
+                instance = sample.items[0]
+                status = instance.status
+
+                spec_replicas = instance.spec.replicas
+                total_replicas = status.replicas or 0
+                updated_replicas = status.updatedReplicas or 0
+                available_replicas = status.availableReplicas or 0
+                ready_replicas = status.readyReplicas or 0
+
+                if (
+                    (deployed and spec_replicas)
+                    and spec_replicas
+                    == updated_replicas
+                    == available_replicas
+                    == ready_replicas
+                ) or not (deployed or spec_replicas or total_replicas):
+                    return
