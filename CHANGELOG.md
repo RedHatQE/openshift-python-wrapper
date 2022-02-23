@@ -1,5 +1,49 @@
 # Changelog
 
+## v2.0.17.7 (23/02/2022)
+- [**size/S**][**Verified**] wait_for_replicas - cherrypick from main [#439](https://github.com/RedHatQE/openshift-python-wrapper/pull/439)
+- [**size/M**][**Verified**] Backport wait_for_configuration_conditions_unknown_or_progressing [#437](https://github.com/RedHatQE/openshift-python-wrapper/pull/437)
+
+---
+
+## v2.1.31 (21/02/2022)
+- [**size/XS**][**Verified**] Add LoadBalancer type - named LOAD_BALANCER [#433](https://github.com/RedHatQE/openshift-python-wrapper/pull/433)
+
+---
+
+## v2.1.30 (17/02/2022)
+*No changelog for this release.*
+
+---
+
+## v2.1.29 (17/02/2022)
+null
+---
+
+## v1.3.10.4 (10/02/2022)
+null
+---
+
+## v1.3.10.3 (10/02/2022)
+*No changelog for this release.*
+
+---
+
+## v1.3.10.2 (10/02/2022)
+*No changelog for this release.*
+
+---
+
+## v1.3.10.1 (10/02/2022)
+*No changelog for this release.*
+
+---
+
+## v1.5.3.60 (10/02/2022)
+*No changelog for this release.*
+
+---
+
 ## v2.0.17.4 (10/02/2022)
 - [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#426](https://github.com/RedHatQE/openshift-python-wrapper/pull/426)
 - [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#428](https://github.com/RedHatQE/openshift-python-wrapper/pull/428)
@@ -114,65 +158,3 @@ null
 
 ## v2.0.17 (30/12/2021)
 *No changelog for this release.*
-
----
-
-## v2.1.13 (30/12/2021)
-- [**Verified**][**size/M**][**Ready for merge**] NNCP: support adding interfaces [#315](https://github.com/RedHatQE/openshift-python-wrapper/pull/315)
-- [**Verified**][**size/XS**][**Ready for merge**] NNCPConfigurationFailed: raise with error [#319](https://github.com/RedHatQE/openshift-python-wrapper/pull/319)
-- [**Verified**][**size/XS**][**Ready for merge**] Move log to delete(), add more information to log in clean_up() [#317](https://github.com/RedHatQE/openshift-python-wrapper/pull/317)
-- [**Verified**][**size/XS**][**Ready for merge**] Move log to delete() [#313](https://github.com/RedHatQE/openshift-python-wrapper/pull/313)
-- [**Verified**][**size/XS**] Add hana workload [#309](https://github.com/RedHatQE/openshift-python-wrapper/pull/309)
-
----
-
-## v2.1.12 (23/12/2021)
-- [**Verified**][**size/XS**][**Ready for merge**] call to_dict if body is not dict type [#304](https://github.com/RedHatQE/openshift-python-wrapper/pull/304)
-
----
-
-## v2.1.11 (23/12/2021)
-- [**Verified**][**size/XS**][**Ready for merge**] Add bind_immediate_annotation for dataimportcron [#301](https://github.com/RedHatQE/openshift-python-wrapper/pull/301)
-- [**Verified**][**size/XS**][**Ready for merge**] Wait for replicas [#277](https://github.com/RedHatQE/openshift-python-wrapper/pull/277)
-- [**Verified**][**size/L**][**Ready for merge**] log YAML output on create, update and delete [#299](https://github.com/RedHatQE/openshift-python-wrapper/pull/299)
-
----
-
-## v2.1.10 (21/12/2021)
-- [**Verified**][**size/L**][**Ready for merge**] Expose delete_timeout arg [#297](https://github.com/RedHatQE/openshift-python-wrapper/pull/297)
-
----
-
-## v2.1.9 (20/12/2021)
-- [**Verified**][**size/S**][**Ready for merge**] Include new conditions.reason as part of maxUnavailable support. [#281](https://github.com/RedHatQE/openshift-python-wrapper/pull/281)
-- [**Verified**][**size/M**][**Ready for merge**] Add data import cron resource [#271](https://github.com/RedHatQE/openshift-python-wrapper/pull/271)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] MTV: Adding PLAN_FAILED condition message [#293](https://github.com/RedHatQE/openshift-python-wrapper/pull/293)
-
----
-
-## v2.1.8 (16/12/2021)
-- [**Verified**][**size/XS**][**Approve**] clean_up - add resource kind to log [#291](https://github.com/RedHatQE/openshift-python-wrapper/pull/291)
-- [**Verified**][**size/S**][**Approve**][**Ready for merge**] Data source - add pvc property [#287](https://github.com/RedHatQE/openshift-python-wrapper/pull/287)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Event - use api version [#289](https://github.com/RedHatQE/openshift-python-wrapper/pull/289)
-
----
-
-## v2.1.7 (15/12/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Get NNCEs for the right NNCP [#285](https://github.com/RedHatQE/openshift-python-wrapper/pull/285)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Update log - resource collect data [#273](https://github.com/RedHatQE/openshift-python-wrapper/pull/273)
-- [**Verified**][**size/XS**][**Approve**] Namespace: remove client_wait_deleted() [#279](https://github.com/RedHatQE/openshift-python-wrapper/pull/279)
-- [**Verified**][**size/XS**][**Approve**] Resource: delete should use delete_timeout [#283](https://github.com/RedHatQE/openshift-python-wrapper/pull/283)
-
----
-
-## v2.1.6 (13/12/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add ApiGroup NODE_LABELLER_KUBEVIRT_IO [#275](https://github.com/RedHatQE/openshift-python-wrapper/pull/275)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Added support for maxUnavailable [#265](https://github.com/RedHatQE/openshift-python-wrapper/pull/265)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] add resource ImageStream [#269](https://github.com/RedHatQE/openshift-python-wrapper/pull/269)
-
----
-
-## v2.1.5 (08/12/2021)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Expose wait_timeout in MTV  wait  methods [#251](https://github.com/RedHatQE/openshift-python-wrapper/pull/251)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] NNCP: add support for OVS bridge [#267](https://github.com/RedHatQE/openshift-python-wrapper/pull/267)
-- [**Verified**][**size/XS**][**Approve**][**Ready for merge**] Add hostpath-csi storage class [#263](https://github.com/RedHatQE/openshift-python-wrapper/pull/263)
