@@ -362,25 +362,25 @@ class NodeNetworkConfigurationPolicy(Resource):
             ):
                 return sample
 
+    def _process_failed_status(self, failed_condition_reason):
+        last_err_msg = None
+        for failed_nnce in self._get_failed_nnce():
+            nnce_name = failed_nnce.instance.metadata.name
+            nnce_dict = failed_nnce.instance.to_dict()
+            for cond in nnce_dict["status"]["conditions"]:
+                err_msg = self._get_nnce_error_msg(
+                    nnce_name=nnce_name, nnce_condition=cond
+                )
+                if err_msg:
+                    last_err_msg = err_msg
+
+        raise NNCPConfigurationFailed(
+            f"Reason: {failed_condition_reason}\n{last_err_msg}"
+        )
+
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
-
-        def _process_failed_status():
-            last_err_msg = None
-            for failed_nnce in self._get_failed_nnce():
-                nnce_name = failed_nnce.instance.metadata.name
-                nnce_dict = failed_nnce.instance.to_dict()
-                for cond in nnce_dict["status"]["conditions"]:
-                    err_msg = self._get_nnce_error_msg(
-                        nnce_name=nnce_name, nnce_condition=cond
-                    )
-                    if err_msg:
-                        last_err_msg = err_msg
-
-            raise NNCPConfigurationFailed(
-                f"Reason: {failed_condition_reason}\n{last_err_msg}"
-            )
 
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_configuration_conditions_unknown_or_progressing()
@@ -398,7 +398,9 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
 
                 elif sample == failed_condition_reason:
-                    _process_failed_status()
+                    self._process_failed_status(
+                        failed_condition_reason=failed_condition_reason
+                    )
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error(
