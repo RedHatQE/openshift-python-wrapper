@@ -405,7 +405,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             LOGGER.error(
                 f"Unable to configure NNCP {self.name} "
-                f"{f'nodes: {node.name for node in self.nodes}' if self.nodes else ''}"
+                f"{f'nodes: {[node.name for node in self.nodes]}' if self.nodes else ''}"
             )
             raise
 
