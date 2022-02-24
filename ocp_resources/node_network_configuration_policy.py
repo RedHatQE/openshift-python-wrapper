@@ -32,6 +32,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             CONFIGURING = "ConfigurationProgressing"
             SUCCESS = "SuccessfullyConfigured"
             FAILED = "FailedToConfigure"
+            NO_MATCHING_NODE = "NoMatchingNode"
 
     def __init__(
         self,
