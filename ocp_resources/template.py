@@ -40,6 +40,24 @@ class Template(NamespacedResource):
         FLAVOR = f"{Resource.ApiGroup.VM_KUBEVIRT_IO}/flavor"
         WORKLOAD = f"{Resource.ApiGroup.VM_KUBEVIRT_IO}/workload"
 
+    def __init__(
+        self,
+        name=None,
+        namespace=None,
+        client=None,
+        yaml_file=None,
+        use_template_validator=True,
+        **kwargs,
+    ):
+        super().__init__(
+            name=name,
+            namespace=namespace,
+            client=client,
+            yaml_file=yaml_file,
+            **kwargs,
+        )
+        self.use_template_validator = use_template_validator
+
     def process(self, client=None, **kwargs):
         client = client or self.client
         instance_dict = self.instance.to_dict()
@@ -51,11 +69,12 @@ class Template(NamespacedResource):
             except KeyError:
                 continue
         instance_dict["parameters"] = params
-        # TODO: remove after fix - https://issues.redhat.com/browse/KNIP-1055 (bug 1753554)
-        # For template validator to be used - template namespace needs to be updated
-        instance_dict["objects"][0]["metadata"]["labels"][
-            "vm.kubevirt.io/template.namespace"
-        ] = instance_dict["metadata"]["namespace"]
+        if self.use_template_validator:
+            # TODO: remove after fix - https://issues.redhat.com/browse/KNIP-1055 (bug 1753554)
+            # For template validator to be used - template namespace needs to be updated
+            instance_dict["objects"][0]["metadata"]["labels"][
+                "vm.kubevirt.io/template.namespace"
+            ] = instance_dict["metadata"]["namespace"]
         instance_json = json.dumps(instance_dict)
         body = json.loads(instance_json)
         response = client.request(
