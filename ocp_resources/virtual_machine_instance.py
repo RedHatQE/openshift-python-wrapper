@@ -201,7 +201,7 @@ class VirtualMachineInstance(NamespacedResource):
             name=self.instance.status.nodeName,
         )
 
-    def _virsh_cmd(self, action):
+    def virsh_cmd(self, action):
         return shlex.split(
             f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
         )
@@ -214,7 +214,7 @@ class VirtualMachineInstance(NamespacedResource):
             xml_output(string): VMI XML in the multi-line string
         """
         return self.virt_launcher_pod.execute(
-            command=self._virsh_cmd(action="dumpxml"),
+            command=self.virsh_cmd(action="dumpxml"),
             container="compute",
         )
 
@@ -266,7 +266,20 @@ class VirtualMachineInstance(NamespacedResource):
             String: VMI Status as string
         """
         return self.virt_launcher_pod.execute(
-            command=self._virsh_cmd(action="domstate"),
+            command=self.virsh_cmd(action="domstate"),
+            container="compute",
+        )
+
+    def get_dommemstat(self):
+        """
+        Get virtual machine domain memory stats
+        link: https://libvirt.org/manpages/virsh.html#dommemstat
+
+        Returns:
+            String: VMI domain memory stats as string
+        """
+        return self.virt_launcher_pod.execute(
+            command=self.virsh_cmd(action="dommemstat"),
             container="compute",
         )
 
