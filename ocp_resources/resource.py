@@ -932,9 +932,6 @@ class NamespacedResource(Resource):
                 "namespace", self.namespace
             )
 
-        if not self.namespace:
-            raise ValueError("Namespace must be passed or specified in the YAML file.")
-
         if not self.yaml_file:
             res["metadata"]["namespace"] = self.namespace
 
