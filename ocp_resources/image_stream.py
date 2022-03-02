@@ -14,10 +14,8 @@ class ImageStream(NamespacedResource):
         name=None,
         namespace=None,
         client=None,
-        image_repository=None,
-        scheduled=None,
         lookup_policy=False,
-        tag=None,
+        tags=None,
         teardown=True,
         privileged_client=None,
         yaml_file=None,
@@ -34,9 +32,7 @@ class ImageStream(NamespacedResource):
             delete_timeout=delete_timeout,
             **kwargs,
         )
-        self.image_repository = image_repository
-        self.scheduled = scheduled
-        self.tag = tag
+        self.tags = tags
         self.lookup_policy = lookup_policy
 
     def to_dict(self):
@@ -44,17 +40,6 @@ class ImageStream(NamespacedResource):
         if self.yaml_file:
             return res
         res.update(
-            {
-                "spec": {
-                    "lookupPolicy": {"local": self.lookup_policy},
-                    "tags": {
-                        "from": {"kind": "DockerImage", "name": self.image_repository},
-                        "name": self.tag,
-                        "referencePolicy": {"type": "Source"},
-                    },
-                }
-            }
+            {"spec": {"lookupPolicy": {"local": self.lookup_policy}, "tags": self.tags}}
         )
-        if self.scheduled:
-            res["spec"]["tags"]["importPolicy"] = self.scheduled
         return res
