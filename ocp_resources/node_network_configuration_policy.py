@@ -32,6 +32,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             CONFIGURING = "ConfigurationProgressing"
             SUCCESS = "SuccessfullyConfigured"
             FAILED = "FailedToConfigure"
+            NO_MATCHING_NODE = "NoMatchingNode"
 
     def __init__(
         self,
@@ -294,36 +295,86 @@ class NodeNetworkConfigurationPolicy(Resource):
             if condition["type"] == self.Conditions.Type.AVAILABLE:
                 return condition["reason"]
 
+    def wait_for_configuration_conditions_unknown_or_progressing(self, wait_timeout=30):
+        samples = TimeoutSampler(
+            wait_timeout=wait_timeout,
+            sleep=1,
+            func=lambda: self.instance.status.conditions,
+        )
+        for sample in samples:
+            if (
+                sample
+                and sample[0]["type"] == self.Conditions.Type.AVAILABLE
+                and (
+                    sample[0]["status"] == self.Condition.Status.UNKNOWN
+                    or sample[0]["reason"] == self.Conditions.Reason.CONFIGURING
+                )
+            ):
+                return sample
+
     def wait_for_status_success(self):
+        failed_condition_reason = self.Conditions.Reason.FAILED
+        no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
+
+        def _process_failed_status():
+            last_err_msg = None
+            for failed_nnce in self._get_failed_nnce():
+                nnce_name = failed_nnce.instance.metadata.name
+                nnce_dict = failed_nnce.instance.to_dict()
+                for cond in nnce_dict["status"]["conditions"]:
+                    err_msg = self._get_nnce_error_msg(
+                        nnce_name=nnce_name, nnce_condition=cond
+                    )
+                    if err_msg:
+                        last_err_msg = err_msg
+
+            raise NNCPConfigurationFailed(
+                f"Reason: {failed_condition_reason}\n{last_err_msg}"
+            )
+
         # if we get here too fast there are no conditions, we need to wait.
-        self.wait_for_conditions()
+        self.wait_for_configuration_conditions_unknown_or_progressing()
 
         samples = TimeoutSampler(wait_timeout=480, sleep=1, func=self.status)
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESS:
-                    LOGGER.info("NNCP configured Successfully")
+                    LOGGER.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
-                if sample == self.Conditions.Reason.FAILED:
-                    for failed_nnce in self._get_failed_nnce():
-                        nnce_dict = failed_nnce.instance.to_dict()
-                        for cond in nnce_dict["status"]["conditions"]:
-                            error = re.findall(
-                                r"libnmstate.error.*", cond.get("message", "")
-                            )
-                            if error:
-                                LOGGER.error(
-                                    f"NNCE {nnce_dict['metadata']['name']}: {error[0]}"
-                                )
-
+                elif sample == no_match_node_condition_reason:
                     raise NNCPConfigurationFailed(
-                        f"Reason: {self.Conditions.Reason.FAILED}"
+                        f"{self.name}. Reason: {no_match_node_condition_reason}"
                     )
 
+                elif sample == failed_condition_reason:
+                    _process_failed_status()
+
         except (TimeoutExpiredError, NNCPConfigurationFailed):
-            LOGGER.error("Unable to configure NNCP for node")
+            LOGGER.error(
+                f"Unable to configure NNCP {self.name} for node {self.node_selector}"
+            )
             raise
+
+    @staticmethod
+    def _get_nnce_error_msg(nnce_name, nnce_condition):
+        err_msg = ""
+        nnce_prefix = f"NNCE {nnce_name}"
+        nnce_msg = nnce_condition.get("message")
+        if not nnce_msg:
+            return err_msg
+
+        errors = nnce_msg.split("->")
+        if errors:
+            err_msg += f"{nnce_prefix}: {errors[0]}"
+            if len(errors) > 1:
+                err_msg += errors[-1]
+
+        libnmstate_err = re.findall(r"libnmstate.error.*", nnce_msg)
+        if libnmstate_err:
+            err_msg += f"{nnce_prefix }: {libnmstate_err[0]}"
+
+        return err_msg
 
     def _get_failed_nnce(self):
         for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):
