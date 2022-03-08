@@ -4,6 +4,7 @@ import os
 import re
 import sys
 from distutils.version import Version
+from io import StringIO
 from signal import SIGINT, signal
 
 import kubernetes
@@ -413,10 +414,16 @@ class Resource:
             dict: Resource dict.
         """
         if self.yaml_file:
-            with open(self.yaml_file, "r") as stream:
-                self.resource_dict = yaml.safe_load(stream=stream.read())
-                self.name = self.resource_dict["metadata"]["name"]
-                return self.resource_dict
+            if isinstance(self.yaml_file, StringIO):
+                data = self.yaml_file.read()
+            else:
+                with open(self.yaml_file, "r") as stream:
+                    data = stream.read()
+
+            self.resource_dict = yaml.safe_load(stream=data)
+            self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
+            self.name = self.resource_dict["metadata"]["name"]
+            return self.resource_dict
 
         return {
             "apiVersion": self.api_version,
