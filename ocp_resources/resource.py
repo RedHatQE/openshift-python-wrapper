@@ -421,7 +421,7 @@ class Resource:
                     data = stream.read()
 
             self.resource_dict = yaml.safe_load(stream=data)
-            self.resource_dict.pop("metadata", {}).get("resourceVersion", None)
+            self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.resource_dict["metadata"]["name"]
             return self.resource_dict
 
