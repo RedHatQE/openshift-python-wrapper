@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from openshift.dynamic.exceptions import ConflictError
 
@@ -17,6 +18,10 @@ LOGGER = get_logger(name=__name__)
 
 
 class NNCPConfigurationFailed(Exception):
+    pass
+
+
+class NNSUpdateFailed(Exception):
     pass
 
 
@@ -61,6 +66,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         max_unavailable=None,
         state=None,
         success_timeout=480,
+        verify_nns=False,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
@@ -111,6 +117,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.ipv6_ports_backup_dict = {}
         self.nodes = self._nodes()
         self.teardown_absent_ifaces = teardown_absent_ifaces
+        self.verify_nns = verify_nns
 
     def _nodes(self):
         if self.node_selector:
@@ -304,9 +311,18 @@ class NodeNetworkConfigurationPolicy(Resource):
     def deploy(self):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
+        if self.verify_nns:
+            last_update = NodeNetworkState(name=self.nodes[0].name).instance.status[
+                "lastSuccessfulUpdateTime"
+            ]
+            last_update = datetime.strptime(
+                date_string=last_update, format="%Y-%m-%dT%H:%M:%SZ"
+            )
         self.create(body=self.res)
         try:
             self.wait_for_status_success()
+            if self.verify_nns:
+                self.wait_for_nns_updates(last_update=last_update)
             return self
         except Exception as exp:
             LOGGER.error(exp)
@@ -345,6 +361,29 @@ class NodeNetworkConfigurationPolicy(Resource):
         for condition in self.instance.status.conditions:
             if condition["type"] == self.Conditions.Type.AVAILABLE:
                 return condition["reason"]
+
+    def nns_current_update(self):
+        current_update = NodeNetworkState(name=self.nodes[0].name).instance.status[
+            "lastSuccessfulUpdateTime"
+        ]
+        current_update = datetime.strptime(
+            date_string=current_update, format="%Y-%m-%dT%H:%M:%SZ"
+        )
+        return current_update
+
+    def wait_for_nns_updates(self, last_update):
+        try:
+            for sample in TimeoutSampler(
+                wait_timeout=60,
+                sleep=1,
+                func=self.nns_current_update,
+            ):
+                if sample > last_update:
+                    LOGGER.info("NNS Updated after NNCP deployment")
+                    return
+        except TimeoutExpiredError:
+            LOGGER.error("NNS Not updated after NNCP deployment")
+            raise NNSUpdateFailed
 
     def wait_for_configuration_conditions_unknown_or_progressing(self, wait_timeout=30):
         samples = TimeoutSampler(
