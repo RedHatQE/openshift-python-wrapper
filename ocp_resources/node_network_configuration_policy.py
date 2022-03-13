@@ -60,6 +60,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         set_ipv6=True,
         max_unavailable=None,
         state=None,
+        success_timeout=480,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
@@ -103,6 +104,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.state = state or self.Interface.State.UP
         self.set_ipv4 = set_ipv4
         self.set_ipv6 = set_ipv6
+        self.success_timeout = success_timeout
         self.max_unavailable = max_unavailable
         self.res = None
         self.ipv4_ports_backup_dict = {}
@@ -299,12 +301,12 @@ class NodeNetworkConfigurationPolicy(Resource):
         for _ in samples:
             return
 
-    def deploy(self, success_timeout=480):
+    def deploy(self):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
         self.create(body=self.res)
         try:
-            self.wait_for_status_success(success_timeout=success_timeout)
+            self.wait_for_status_success()
             return self
         except Exception as exp:
             LOGGER.error(exp)
@@ -378,7 +380,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             f"Reason: {failed_condition_reason}\n{last_err_msg}"
         )
 
-    def wait_for_status_success(self, success_timeout=480):
+    def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
@@ -386,7 +388,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.wait_for_configuration_conditions_unknown_or_progressing()
 
         samples = TimeoutSampler(
-            wait_timeout=success_timeout, sleep=1, func=self.status
+            wait_timeout=self.success_timeout, sleep=1, func=self.status
         )
         try:
             for sample in samples:
