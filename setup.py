@@ -15,6 +15,7 @@ setup(
         "xmltodict",
         "urllib3",
         "colorlog",
+        "packaging",
     ],
     python_requires=">=3.6",
 )
