@@ -3,7 +3,6 @@ import json
 import os
 import re
 import sys
-from distutils.version import Version
 from io import StringIO
 from signal import SIGINT, signal
 
@@ -18,6 +17,7 @@ from openshift.dynamic.exceptions import (
     ServerTimeoutError,
 )
 from openshift.dynamic.resource import ResourceField
+from packaging.version import Version
 
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -164,7 +164,7 @@ class KubeAPIVersion(Version):
     def __init__(self, vstring=None):
         self.vstring = vstring
         self.version = None
-        super().__init__(vstring=vstring)
+        super().__init__(version=vstring)
 
     def parse(self, vstring):
         components = [comp for comp in self.component_re.split(vstring) if comp]
