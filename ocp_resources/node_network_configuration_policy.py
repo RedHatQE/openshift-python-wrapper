@@ -124,8 +124,6 @@ class NodeNetworkConfigurationPolicy(Resource):
             )
             return list(Node.get(dyn_client=self.client, label_selector=node_labels))
 
-        return list(Node.get(dyn_client=self.client))
-
     def set_interface(self, interface):
         if not self.res:
             self.res = super().to_dict()
@@ -304,8 +302,10 @@ class NodeNetworkConfigurationPolicy(Resource):
             return
 
     def deploy(self):
-        self.ipv4_ports_backup()
-        self.ipv6_ports_backup()
+        if self.nodes:
+            self.ipv4_ports_backup()
+            self.ipv6_ports_backup()
+
         self.create(body=self.res)
         try:
             self.wait_for_status_success()
@@ -330,7 +330,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             _iface["state"] = self.Interface.State.ABSENT
             self.set_interface(interface=_iface)
 
-        if self.ports:
+        if self.ports and self.nodes:
             self.add_ports()
 
         ResourceEditor(
