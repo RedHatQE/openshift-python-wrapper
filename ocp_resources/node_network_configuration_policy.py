@@ -124,6 +124,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             )
             return list(Node.get(dyn_client=self.client, label_selector=node_labels))
 
+        return list(Node.get(dyn_client=self.client))
+
     def set_interface(self, interface):
         if not self.res:
             self.res = super().to_dict()
