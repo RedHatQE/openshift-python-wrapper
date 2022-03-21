@@ -252,6 +252,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         return self.res
 
     def _get_port_from_nns(self, port_name):
+        if not self.nodes:
+            return None
+
         nns = NodeNetworkState(name=self.nodes[0].name)
         _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
         return _port[0] if _port else None
@@ -302,9 +305,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             return
 
     def deploy(self):
-        if self.nodes:
-            self.ipv4_ports_backup()
-            self.ipv6_ports_backup()
+        self.ipv4_ports_backup()
+        self.ipv6_ports_backup()
 
         self.create(body=self.res)
         try:
@@ -330,7 +332,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             _iface["state"] = self.Interface.State.ABSENT
             self.set_interface(interface=_iface)
 
-        if self.ports and self.nodes:
+        if self.ports:
             self.add_ports()
 
         ResourceEditor(
