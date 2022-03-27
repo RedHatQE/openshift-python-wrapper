@@ -1,10 +1,10 @@
 from openshift.dynamic.exceptions import ResourceNotFoundError
 
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.constants import TIMEOUT_4MINUTES, PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
-
+from ocp_resources.utils import TimeoutSampler
 
 LOGGER = get_logger(name=__name__)
 
@@ -65,3 +65,31 @@ class DataSource(NamespacedResource):
                 f"dataSource {self.name} is pointing to a non-existing PVC, name: {pvc_name}, "
                 f"namespace: {pvc_namespace}"
             )
+
+    def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
+        """
+        Wait for data source to be in status
+
+        Args:
+            status: Expected status: True for a running VM, None for a stopped VM.
+            timeout (int): Time to wait for the resource.
+
+        Raises:
+            TimeoutExpiredError: If timeout reached.
+        """
+        LOGGER.info(
+            f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
+        )
+        samples = TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=sleep,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            func=self.api.get,
+            field_selector=f"metadata.name=={self.name}",
+            namespace=self.namespace,
+        )
+        for sample in samples:
+            if sample.items[0].status:
+                for condition in sample.items[0].status.conditions:
+                    if condition.reason == 'Ready' and condition.status == status:
+                        return
