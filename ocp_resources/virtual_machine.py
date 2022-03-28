@@ -110,7 +110,7 @@ class VirtualMachine(NamespacedResource):
             f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
         )
         samples = get_resource_timeout_sampler(
-            resource=self, status=status, timeout=timeout, sleep=sleep
+            resource=self, timeout=timeout, sleep=sleep
         )
         for sample in samples:
             if sample.items and self.ready == status:

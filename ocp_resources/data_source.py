@@ -82,7 +82,7 @@ class DataSource(NamespacedResource):
             f"Wait for {self.kind} {self.name} status to be {'' if status else 'not '}ready"
         )
         samples = get_resource_timeout_sampler(
-            resource=self, status=status, timeout=timeout, sleep=sleep
+            resource=self, timeout=timeout, sleep=sleep
         )
         for sample in samples:
             if sample.items[0].status:
