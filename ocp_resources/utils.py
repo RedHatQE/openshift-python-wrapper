@@ -1,7 +1,7 @@
 import time
 
 from ocp_resources.logger import get_logger
-
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 
 LOGGER = get_logger(name=__name__)
 
@@ -218,3 +218,17 @@ class TimeoutWatch:
         Return the remaining part of timeout since the object was created.
         """
         return self.start_time + self.timeout - time.time()
+
+
+def get_resource_timeout_sampler(resource, status, timeout, sleep):
+    LOGGER.info(
+        LOGGER.info(f"Wait for {resource.kind} {resource.name} status to be {'ready' if status == True else status}")
+    )
+    return TimeoutSampler(
+        wait_timeout=timeout,
+        sleep=sleep,
+        exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+        func=resource.api.get,
+        field_selector=f"metadata.name=={resource.name}",
+        namespace=resource.namespace,
+    )
