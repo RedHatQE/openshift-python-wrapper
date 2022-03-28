@@ -6,6 +6,7 @@ from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import get_resource_timeout_sampler
 
+
 LOGGER = get_logger(name=__name__)
 
 
@@ -77,9 +78,11 @@ class DataSource(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        samples = get_resource_timeout_sampler(self, status, timeout, sleep)
+        samples = get_resource_timeout_sampler(
+            resource=self, status=status, timeout=timeout, sleep=sleep
+        )
         for sample in samples:
             if sample.items[0].status:
                 for condition in sample.items[0].status.conditions:
-                    if condition.reason == 'Ready' and condition.status == status:
+                    if condition.reason == "Ready" and condition.status == status:
                         return

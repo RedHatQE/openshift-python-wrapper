@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler, get_resource_timeout_sampler
+from ocp_resources.utils import get_resource_timeout_sampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
 
 
@@ -106,7 +106,9 @@ class VirtualMachine(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        samples = get_resource_timeout_sampler(self, status, timeout, sleep)
+        samples = get_resource_timeout_sampler(
+            resource=self, status=status, timeout=timeout, sleep=sleep
+        )
         for sample in samples:
             if sample.items and self.ready == status:
                 # VM with runStrategy does not have spec.running attribute

@@ -1,7 +1,8 @@
 import time
 
-from ocp_resources.logger import get_logger
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
+from ocp_resources.logger import get_logger
+
 
 LOGGER = get_logger(name=__name__)
 
@@ -222,7 +223,9 @@ class TimeoutWatch:
 
 def get_resource_timeout_sampler(resource, status, timeout, sleep):
     LOGGER.info(
-        LOGGER.info(f"Wait for {resource.kind} {resource.name} status to be {'ready' if status == True else status}")
+        LOGGER.info(
+            f"Wait for {resource.kind} {resource.name} status to be {'ready' if status == True else status}"
+        )
     )
     return TimeoutSampler(
         wait_timeout=timeout,
