@@ -106,6 +106,9 @@ class VirtualMachine(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
+        LOGGER.info(
+            f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
+        )
         samples = get_resource_timeout_sampler(
             resource=self, status=status, timeout=timeout, sleep=sleep
         )

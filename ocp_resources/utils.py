@@ -221,12 +221,7 @@ class TimeoutWatch:
         return self.start_time + self.timeout - time.time()
 
 
-def get_resource_timeout_sampler(resource, status, timeout, sleep):
-    LOGGER.info(
-        LOGGER.info(
-            f"Wait for {resource.kind} {resource.name} status to be {'ready' if status == True else status}"
-        )
-    )
+def get_resource_timeout_sampler(resource, timeout, sleep):
     return TimeoutSampler(
         wait_timeout=timeout,
         sleep=sleep,

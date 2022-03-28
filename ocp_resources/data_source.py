@@ -72,12 +72,15 @@ class DataSource(NamespacedResource):
         Wait for data source to be in status
 
         Args:
-            status: Expected status: True for a running VM, None for a stopped VM.
+            status: Expected status: True for a Ready dataSource.
             timeout (int): Time to wait for the resource.
 
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
+        LOGGER.info(
+            f"Wait for {self.kind} {self.name} status to be {'' if status else 'not '}ready"
+        )
         samples = get_resource_timeout_sampler(
             resource=self, status=status, timeout=timeout, sleep=sleep
         )
