@@ -77,6 +77,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.node_selector = node_selector
         self.dns_resolver = dns_resolver
         self.routes = routes
+        self.res = None
         if self.node_selector:
             self._node_selector = {
                 f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector
@@ -92,6 +93,8 @@ class NodeNetworkConfigurationPolicy(Resource):
             }
 
     def set_interface(self, interface):
+        if not self.res:
+            self.res = super().to_dict()
         # First drop the interface if it's already in the list
         interfaces = [
             iface
@@ -101,20 +104,24 @@ class NodeNetworkConfigurationPolicy(Resource):
         # Add the interface
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
+        self.res.setdefault("spec", {}).setdefault("desiredState", {})[
+            "interfaces"
+        ] = self.desired_state["interfaces"]
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
+
         if self.dns_resolver or self.routes or self.iface:
-            res.setdefault("spec", {}).setdefault("desiredState", {})
+            self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
         if self._node_selector:
-            res.setdefault("spec", {}).setdefault("nodeSelector", self._node_selector)
+            self.res.setdefault("spec", {}).setdefault("nodeSelector", self._node_selector)
 
         if self.dns_resolver:
-            res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
+            self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
 
         if self.routes:
-            res["spec"]["desiredState"]["routes"] = self.routes
+            self.res["spec"]["desiredState"]["routes"] = self.routes
 
         if self.iface:
             """
@@ -133,9 +140,68 @@ class NodeNetworkConfigurationPolicy(Resource):
             if self.iface["name"] not in [_iface["name"] for _iface in self.ifaces]:
                 self.ifaces.append(self.iface)
 
-            res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
+            self.res["spec"]["desiredState"]["interfaces"] = self.desired_state["interfaces"]
 
-        return res
+        return self.res
+
+    def add_interface(
+            self,
+            iface=None,
+            name=None,
+            type_=None,
+            state=None,
+            set_ipv4=True,
+            ipv4_enable=False,
+            ipv4_dhcp=False,
+            ipv4_auto_dns=True,
+            ipv4_addresses=None,
+            set_ipv6=True,
+            ipv6_enable=False,
+            ipv6_dhcp=False,
+            ipv6_auto_dns=True,
+            ipv6_addresses=None,
+            ipv6_autoconf=False,
+    ):
+        #  If self.res is already defined (from to_dict()), don't call it again.
+        if not self.res:
+            self.res = self.to_dict()
+
+        self.res.setdefault("spec", {}).setdefault("desiredState", {})
+        if not iface:
+            iface = {
+                "name": name,
+                "type": type_,
+                "state": state,
+            }
+        if set_ipv4:
+            if isinstance(set_ipv4, str):
+                iface["ipv4"] = set_ipv4
+
+            else:
+                iface["ipv4"] = {
+                    "enabled": ipv4_enable,
+                    "dhcp": ipv4_dhcp,
+                    "auto-dns": ipv4_auto_dns,
+                }
+                if ipv4_addresses:
+                    iface["ipv4"]["address"] = ipv4_addresses
+
+        if set_ipv6:
+            if isinstance(set_ipv6, str):
+                iface["ipv6"] = set_ipv6
+
+            else:
+                iface["ipv6"] = {
+                    "enabled": ipv6_enable,
+                    "dhcp": ipv6_dhcp,
+                    "auto-dns": ipv6_auto_dns,
+                    "autoconf": ipv6_autoconf,
+                }
+                if ipv6_addresses:
+                    iface["ipv6"]["address"] = ipv6_addresses
+
+        self.set_interface(interface=iface)
+        return self.res
 
     def apply(self, resource=None):
         resource = resource if resource else super().to_dict()
