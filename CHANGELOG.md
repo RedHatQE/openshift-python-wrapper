@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.5.3.64 (04/04/2022)
+*No changelog for this release.*
+
+---
+
+## v1.5.3.63 (04/04/2022)
+- [**size/XS**][**Verified**] Update pre-commit modules 1.5.3 [#480](https://github.com/RedHatQE/openshift-python-wrapper/pull/480)
+- [**size/XS**][**Verified**] Update pre-commit modules 2.0.17 [#478](https://github.com/RedHatQE/openshift-python-wrapper/pull/478)
+- [**size/XS**][**Verified**] Pre commit update modules [#468](https://github.com/RedHatQE/openshift-python-wrapper/pull/468)
+- [**size/S**][**Verified**] Logger add duplicate filter [#465](https://github.com/RedHatQE/openshift-python-wrapper/pull/465)
+
+---
+
+## v2.1.37 (21/03/2022)
+null
+---
+
+## v2.1.36 (13/03/2022)
+- [**size/XS**][**Verified**] success timeout [#455](https://github.com/RedHatQE/openshift-python-wrapper/pull/455)
+
+---
+
+## v2.1.35 (08/03/2022)
+- [**size/XS**][**Verified**] yaml_file: accept .StringIO object [#457](https://github.com/RedHatQE/openshift-python-wrapper/pull/457)
+- [**size/XS**][**Verified**] add registry.redhat.io to Resource.ApiGroup [#453](https://github.com/RedHatQE/openshift-python-wrapper/pull/453)
+
+---
+
 ## v2.1.34 (06/03/2022)
 *No changelog for this release.*
 
@@ -127,30 +155,3 @@ null
 
 ## v2.1.23 (30/01/2022)
 - [**Verified**][**size/XS**][**Ready for merge**] Support log to file [#366](https://github.com/RedHatQE/openshift-python-wrapper/pull/366)
-
----
-
-## v2.1.22 (27/01/2022)
-null
----
-
-## v2.1.20 (24/01/2022)
-- [**Verified**][**size/XS**][**Ready for merge**] nncp: check status unknown before validate [#362](https://github.com/RedHatQE/openshift-python-wrapper/pull/362)
-- [**Verified**][**size/XS**][**Ready for merge**] reduce congitive complexity [#358](https://github.com/RedHatQE/openshift-python-wrapper/pull/358)
-
----
-
-## v2.1.19 (19/01/2022)
-- [**Verified**][**size/L**][**Ready for merge**] Allow using labels for nodeSelector [#360](https://github.com/RedHatQE/openshift-python-wrapper/pull/360)
-- [**Verified**][**size/M**] Add support to dry_run flag [#349](https://github.com/RedHatQE/openshift-python-wrapper/pull/349)
-- [**Verified**][**size/XS**][**Ready for merge**] Allow ifaces update [#356](https://github.com/RedHatQE/openshift-python-wrapper/pull/356)
-
----
-
-## v2.1.18 (11/01/2022)
-- [**Verified**][**size/XS**][**Ready for merge**] Add readyReplicas to deployment wait_for_replicas [#354](https://github.com/RedHatQE/openshift-python-wrapper/pull/354)
-
----
-
-## v2.1.17 (10/01/2022)
-- [**Verified**][**size/XS**] NNCP: call to_dict() if not self.res [#351](https://github.com/RedHatQE/openshift-python-wrapper/pull/351)
