@@ -252,6 +252,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         return self.res
 
     def _get_port_from_nns(self, port_name):
+        if not self.nodes:
+            return None
+
         nns = NodeNetworkState(name=self.nodes[0].name)
         _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
         return _port[0] if _port else None
@@ -304,6 +307,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def deploy(self):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
+
         self.create(body=self.res)
         try:
             self.wait_for_status_success()
