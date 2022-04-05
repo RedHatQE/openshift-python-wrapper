@@ -253,6 +253,7 @@ class Resource:
         CREATED = "Created"
         RECONCILE_COMPLETE = "ReconcileComplete"
         READY = "Ready"
+        FAILING = "Failing"
 
         class Status:
             TRUE = "True"
