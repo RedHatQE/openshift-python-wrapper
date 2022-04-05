@@ -11,10 +11,10 @@ repos:
           - --remove-unused-variables
           - --remove-all-unused-imports
 
-  #- repo: https://github.com/hadialqattan/pycln
-  # rev: "v1.2.5"
-  #  hooks:
-  #      - id: pycln
+  - repo: https://github.com/hadialqattan/pycln
+    rev: "v1.2.5"
+    hooks:
+        - id: pycln
 
   - repo: https://github.com/pre-commit/mirrors-isort
     rev: "v5.10.1"
