@@ -7,6 +7,11 @@
 
 ---
 
+## v1.5.3.68 (10/04/2022)
+*No changelog for this release.*
+
+---
+
 ## v1.5.3.67 (10/04/2022)
 - [**size/XS**][**Verified**] Update pre-commit [#491](https://github.com/RedHatQE/openshift-python-wrapper/pull/491)
 
@@ -149,8 +154,3 @@ null
 ## v2.0.17.3 (10/02/2022)
 - [**size/XS**][**Verified**] nncp - fix clean_up() [#420](https://github.com/RedHatQE/openshift-python-wrapper/pull/420)
 - [**size/XS**][**Verified**] nncp - fix clean_up() [#418](https://github.com/RedHatQE/openshift-python-wrapper/pull/418)
-
----
-
-## v2.0.17.2 (09/02/2022)
-*No changelog for this release.*
