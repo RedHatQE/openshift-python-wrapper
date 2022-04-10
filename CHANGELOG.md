@@ -7,6 +7,11 @@
 
 ---
 
+## v1.5.3.67 (10/04/2022)
+- [**size/XS**][**Verified**] Update pre-commit [#491](https://github.com/RedHatQE/openshift-python-wrapper/pull/491)
+
+---
+
 ## v1.5.3.66 (10/04/2022)
 - [**size/S**][**Verified**] Enter wait_for_interface_deleted() only if self.worker_pods [#490](https://github.com/RedHatQE/openshift-python-wrapper/pull/490)
 
@@ -148,9 +153,4 @@ null
 ---
 
 ## v2.0.17.2 (09/02/2022)
-*No changelog for this release.*
-
----
-
-## v1.5.3.59 (10/02/2022)
 *No changelog for this release.*
