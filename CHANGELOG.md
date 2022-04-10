@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.17.11 (10/04/2022)
+- [**size/XS**][**Verified**] pre-commit update [#497](https://github.com/RedHatQE/openshift-python-wrapper/pull/497)
+
+---
+
 ## v2.0.17.10 (10/04/2022)
 - [**size/XS**][**Verified**] pre-commit update [#495](https://github.com/RedHatQE/openshift-python-wrapper/pull/495)
 
@@ -149,8 +154,3 @@ null
 
 ## v2.1.26 (09/02/2022)
 - [**size/XS**][**Verified**] nncp - wait_for_configuration_conditions_unknown_or_progressing - ret… [#412](https://github.com/RedHatQE/openshift-python-wrapper/pull/412)
-
----
-
-## v2.1.25 (09/02/2022)
-*No changelog for this release.*
