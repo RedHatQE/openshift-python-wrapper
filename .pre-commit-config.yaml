@@ -13,22 +13,22 @@ repos:
 
   # TODO: Update rev once https://github.com/hadialqattan/pycln/pull/81 is released
   - repo: https://github.com/hadialqattan/pycln
-    rev: "842e39c8f5badf472061455214bed653f73524a4"
+    rev: "v1.2.5"
     hooks:
       - id: pycln
 
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: "v5.9.3"
+    rev: "v5.10.1"
     hooks:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: "21.10b0"
+    rev: "22.3.0"
     hooks:
     - id: black
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: "v4.0.1"
+    rev: "v4.2.0"
     hooks:
     - id: check-merge-conflict
     - id: debug-statements
