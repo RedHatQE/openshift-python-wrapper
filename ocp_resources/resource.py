@@ -286,6 +286,7 @@ class Resource:
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         EVENTS_K8S_IO = "events.k8s.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
+        FLAVOR_KUBEVIRT_IO = "flavor.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
@@ -299,6 +300,7 @@ class Resource:
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
         MAISTRA_IO = "maistra.io"
+        MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
             "networkaddonsoperator.network.kubevirt.io"
@@ -314,6 +316,7 @@ class Resource:
         OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
         POLICY = "policy"
+        POOL_KUBEVIRT_IO = "pool.kubevirt.io"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
@@ -332,7 +335,6 @@ class Resource:
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
         VM_KUBEVIRT_IO = "vm.kubevirt.io"
-        MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
 
     class ApiVersion:
         V1 = "v1"
