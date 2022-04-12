@@ -304,18 +304,21 @@ class NodeNetworkConfigurationPolicy(Resource):
         for _ in samples:
             return
 
-    def deploy(self):
+    def deploy(self, wait=True):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
 
         self.create(body=self.res)
-        try:
-            self.wait_for_status_success()
-            return self
-        except Exception as exp:
-            LOGGER.error(exp)
-            super().__exit__(exception_type=None, exception_value=None, traceback=None)
-            raise
+        if wait:
+            try:
+                self.wait_for_status_success()
+                return self
+            except Exception as exp:
+                LOGGER.error(exp)
+                super().__exit__(
+                    exception_type=None, exception_value=None, traceback=None
+                )
+                raise
 
     def clean_up(self):
         if self.teardown_absent_ifaces:
