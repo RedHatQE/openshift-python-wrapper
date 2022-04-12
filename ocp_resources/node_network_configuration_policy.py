@@ -233,22 +233,24 @@ class NodeNetworkConfigurationPolicy(Resource):
         super().clean_up()
 
     def wait_for_interface_deleted(self):
-        for pod in self.worker_pods:
-            for iface in self.ifaces:
-                iface_name = iface["name"]
-                node_network_state = NodeNetworkState(name=pod.node.name)
-                iface_dict = node_network_state.get_interface(name=iface_name)
-                if iface_dict.get("type") == "ethernet":
-                    LOGGER.info(f"{iface_name} is type ethernet, skipping.")
-                    continue
+        if self.worker_pods:
+            for pod in self.worker_pods:
+                for iface in self.ifaces:
+                    iface_name = iface["name"]
+                    node_network_state = NodeNetworkState(name=pod.node.name)
+                    iface_dict = node_network_state.get_interface(name=iface_name)
+                    if iface_dict.get("type") == "ethernet":
+                        LOGGER.info(f"{iface_name} is type ethernet, skipping.")
+                        continue
 
-                node_network_state.wait_until_deleted(name=iface_name)
+                    node_network_state.wait_until_deleted(name=iface_name)
 
     def validate_create(self):
-        for pod in self.worker_pods:
-            for bridge in self.ifaces:
-                node_network_state = NodeNetworkState(name=pod.node.name)
-                node_network_state.wait_until_up(name=bridge["name"])
+        if self.worker_pods:
+            for pod in self.worker_pods:
+                for bridge in self.ifaces:
+                    node_network_state = NodeNetworkState(name=pod.node.name)
+                    node_network_state.wait_until_up(name=bridge["name"])
 
     def _ipv4_state_backup(self):
         # Backup current state of dhcp for the interfaces which arent veth or current bridge
