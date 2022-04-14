@@ -304,7 +304,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         for _ in samples:
             return
 
-    def deploy(self, wait=True):
+    def deploy(self, wait=False):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
 
