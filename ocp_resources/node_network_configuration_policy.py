@@ -308,17 +308,14 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
 
-        self.create(body=self.res)
-        if wait:
-            try:
-                self.wait_for_status_success()
-                return self
-            except Exception as exp:
-                LOGGER.error(exp)
-                super().__exit__(
-                    exception_type=None, exception_value=None, traceback=None
-                )
-                raise
+        self.create(body=self.res, wait=wait)
+        try:
+            self.wait_for_status_success()
+            return self
+        except Exception as exp:
+            LOGGER.error(exp)
+            super().__exit__(exception_type=None, exception_value=None, traceback=None)
+            raise
 
     def clean_up(self):
         if self.teardown_absent_ifaces:

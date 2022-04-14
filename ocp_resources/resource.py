@@ -464,9 +464,7 @@ class Resource:
         sys.exit(signal_received)
 
     def deploy(self, wait=False):
-        self.create()
-        if wait:
-            self.wait()
+        self.create(wait=wait)
         return self
 
     def clean_up(self):
