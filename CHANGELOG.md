@@ -1,5 +1,29 @@
 # Changelog
 
+## v4.11.1 (11/04/2022)
+null
+---
+
+## v2.1.39 (18/04/2022)
+- [**closed**] Add Failing condition (#483) [#505](https://github.com/RedHatQE/openshift-python-wrapper/pull/505)
+
+---
+
+## v2.0.17.12 (17/04/2022)
+- [**size/S**][**Verified**] Enter validate_create and wait_for_interface_deleted if self.worker_pods [#504](https://github.com/RedHatQE/openshift-python-wrapper/pull/504)
+
+---
+
+## v2.0.17.11 (10/04/2022)
+- [**size/XS**][**Verified**] pre-commit update [#497](https://github.com/RedHatQE/openshift-python-wrapper/pull/497)
+
+---
+
+## v2.0.17.10 (10/04/2022)
+- [**size/XS**][**Verified**] pre-commit update [#495](https://github.com/RedHatQE/openshift-python-wrapper/pull/495)
+
+---
+
 ## v4.11.0 (05/04/2022)
 - [**size/XS**][**Verified**] Enable pycln in pre-commit [#486](https://github.com/RedHatQE/openshift-python-wrapper/pull/486)
 - [**size/XS**][**Verified**] Do not call `_get_port_from_nns` if no self.nodes [#464](https://github.com/RedHatQE/openshift-python-wrapper/pull/464)
@@ -129,28 +153,3 @@ null
 
 ## v1.3.10.3 (10/02/2022)
 *No changelog for this release.*
-
----
-
-## v1.3.10.2 (10/02/2022)
-*No changelog for this release.*
-
----
-
-## v1.3.10.1 (10/02/2022)
-*No changelog for this release.*
-
----
-
-## v2.1.26 (09/02/2022)
-- [**size/XS**][**Verified**] nncp - wait_for_configuration_conditions_unknown_or_progressing - ret… [#412](https://github.com/RedHatQE/openshift-python-wrapper/pull/412)
-
----
-
-## v2.1.25 (09/02/2022)
-*No changelog for this release.*
-
----
-
-## v2.1.24 (09/02/2022)
-null
