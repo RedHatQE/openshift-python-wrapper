@@ -463,8 +463,8 @@ class Resource:
         self.__exit__(exception_type=None, exception_value=None, traceback=None)
         sys.exit(signal_received)
 
-    def deploy(self):
-        self.create()
+    def deploy(self, wait=False):
+        self.create(wait=wait)
         return self
 
     def clean_up(self):
