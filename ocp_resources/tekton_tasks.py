@@ -1,9 +1,9 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class TektonTasks(Resource):
+class TektonTasks(NamespacedResource):
     """
     TektonTasks (a Custom Resource) object, inherited from Resource.
     """
 
-    api_group = Resource.ApiGroup.TEKTON_TASKS_KUBEVIRT_IO
+    api_group = NamespacedResource.ApiGroup.TEKTON_TASKS_KUBEVIRT_IO
