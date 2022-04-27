@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ocp_resources.cluster_role import ClusterRole
 from ocp_resources.resource import Resource
 
 
@@ -14,7 +15,7 @@ class ClusterRoleBinding(Resource):
         self,
         name=None,
         cluster_role=None,
-        subjects=[],
+        subjects=None,
     ):
         super().__init__(name=name)
         self.cluster_role = cluster_role
@@ -27,7 +28,7 @@ class ClusterRoleBinding(Resource):
         self.res.setdefault("roleRef", {})
         self.res["roleRef"] = {
             "apiGroup": self.api_group,
-            "kind": "ClusterRole",
+            "kind": ClusterRole.kind,
             "name": self.cluster_role,
         }
         self.res.setdefault("subjects", self.subjects)
