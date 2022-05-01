@@ -278,6 +278,7 @@ class Resource:
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
         APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
+        APISERVER_OPENSHIFT_IO = "apiserver.openshift.io"
         APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
         BATCH = "batch"
