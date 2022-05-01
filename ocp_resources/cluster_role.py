@@ -42,7 +42,7 @@ class ClusterRole(Resource):
             return self.res
 
         if self.permissions_to_resources:
-            self.res = self.add_rule(
+            self.add_rule(
                 api_groups=self.api_groups,
                 permissions_to_resources=self.permissions_to_resources,
                 verbs=self.verbs,
@@ -74,12 +74,6 @@ class ClusterRole(Resource):
     def set_rule(self, rule):
         if not self.res:
             self.res = super().to_dict()
-        # Drop the rule if it's already in the list
-        rules = [
-            current_rule
-            for current_rule in self.desired_state["rules"]
-            if rule["resources"] != current_rule["resources"]
-        ]
-        rules.append(rule)
-        self.desired_state["rules"] = rules
+
+        self.desired_state["rules"].append(rule)
         self.res["rules"] = self.desired_state["rules"]
