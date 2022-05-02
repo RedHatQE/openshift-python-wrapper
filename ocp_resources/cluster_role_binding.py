@@ -26,11 +26,6 @@ class ClusterRoleBinding(Resource):
         res = super().to_dict()
         res.setdefault("roleRef", {})
         if self.cluster_role:
-            """
-            It's the responsibility of the caller to verify the desired configuration they send.
-            It's possible to not set the clusterRole associated with a binding, but it will be rejected by
-            the OCP API.
-            """
             res["roleRef"] = {
                 "apiGroup": self.api_group,
                 "kind": ClusterRole.kind,
