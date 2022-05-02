@@ -66,13 +66,11 @@ class ClusterRole(Resource):
         if verbs:
             rule["verbs"] = verbs
         if rule:
-            self.set_rule(rule=rule)
+            self._set_rule(rule=rule)
 
         return self.res
 
-    def set_rule(self, rule):
-        if not self.res:
-            self.res = super().to_dict()
+    def _set_rule(self, rule):
 
         self.desired_state["rules"].append(rule)
         self.res["rules"] = self.desired_state["rules"]
