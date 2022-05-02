@@ -401,6 +401,7 @@ class Resource:
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
         self.node_selector_spec = self._prepare_node_selector_spec()
+        self.res = None
 
     def _prepare_node_selector_spec(self):
         if self.node_selector:
