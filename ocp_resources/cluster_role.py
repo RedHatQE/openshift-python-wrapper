@@ -34,7 +34,6 @@ class ClusterRole(Resource):
         self.permissions_to_resources = permissions_to_resources
         self.verbs = verbs
         self.desired_state = {"rules": []}
-        self.res = None
 
     def to_dict(self):
         self.res = super().to_dict()
