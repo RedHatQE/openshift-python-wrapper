@@ -1,5 +1,34 @@
 # Changelog
 
+## v4.11.6 (02/05/2022)
+- [**size/XS**][**Verified**] add wait argument to deploy() (#499) [#510](https://github.com/RedHatQE/openshift-python-wrapper/pull/510)
+
+---
+
+## v4.11.5 (02/05/2022)
+null
+---
+
+## v4.11.4 (02/05/2022)
+- [**size/XS**][**Verified**] nncp - change 'status' to propety [#517](https://github.com/RedHatQE/openshift-python-wrapper/pull/517)
+
+---
+
+## v2.1.40 (02/05/2022)
+*No changelog for this release.*
+
+---
+
+## v4.11.3 (26/04/2022)
+- [**size/XS**][**Verified**] Add tekton tasks [#508](https://github.com/RedHatQE/openshift-python-wrapper/pull/508)
+
+---
+
+## v4.11.2 (20/04/2022)
+- [**size/XS**][**size/S**][**Verified**] add wait argument to deploy() [#499](https://github.com/RedHatQE/openshift-python-wrapper/pull/499)
+
+---
+
 ## v4.11.1 (11/04/2022)
 null
 ---
@@ -121,35 +150,4 @@ null
 ---
 
 ## v2.1.30 (17/02/2022)
-*No changelog for this release.*
-
----
-
-## v2.1.29 (17/02/2022)
-null
----
-
-## v2.1.27 (10/02/2022)
-- [**size/XS**][**Verified**] Remove kubernetes from setup.py [#422](https://github.com/RedHatQE/openshift-python-wrapper/pull/422)
-- [**size/XS**][**Verified**] Add vddk settings in Provider [#376](https://github.com/RedHatQE/openshift-python-wrapper/pull/376)
-
----
-
-## v2.0.17.4 (10/02/2022)
-- [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#426](https://github.com/RedHatQE/openshift-python-wrapper/pull/426)
-- [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#428](https://github.com/RedHatQE/openshift-python-wrapper/pull/428)
-- [**size/XS**][**Verified**] Remove kubernetes and pin openshift to version==0.12.1 setup.py [#430](https://github.com/RedHatQE/openshift-python-wrapper/pull/430)
-
----
-
-## v1.5.3.60 (10/02/2022)
-*No changelog for this release.*
-
----
-
-## v1.3.10.4 (10/02/2022)
-null
----
-
-## v1.3.10.3 (10/02/2022)
 *No changelog for this release.*
