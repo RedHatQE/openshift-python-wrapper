@@ -14,6 +14,10 @@ null
 
 ---
 
+## v2.1.41 (03/05/2022)
+null
+---
+
 ## v2.1.40 (02/05/2022)
 *No changelog for this release.*
 
@@ -146,8 +150,3 @@ null
 ## v2.0.17.7 (23/02/2022)
 - [**size/S**][**Verified**] wait_for_replicas - cherrypick from main [#439](https://github.com/RedHatQE/openshift-python-wrapper/pull/439)
 - [**size/M**][**Verified**] Backport wait_for_configuration_conditions_unknown_or_progressing [#437](https://github.com/RedHatQE/openshift-python-wrapper/pull/437)
-
----
-
-## v2.1.30 (17/02/2022)
-*No changelog for this release.*
