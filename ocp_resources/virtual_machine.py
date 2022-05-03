@@ -89,11 +89,13 @@ class VirtualMachine(NamespacedResource):
             self.vmi.virt_launcher_pod.wait_deleted()
             return self.vmi.wait_until_running(timeout=timeout, stop_status="dummy")
 
-    def stop(self, timeout=TIMEOUT_4MINUTES, wait=False):
+    def stop(
+        self, timeout=TIMEOUT_4MINUTES, vmi_delete_timeout=TIMEOUT_4MINUTES, wait=False
+    ):
         self.api_request(method="PUT", action="stop")
         if wait:
             self.wait_for_status(timeout=timeout, status=None)
-            return self.vmi.wait_deleted()
+            return self.vmi.wait_deleted(timeout=vmi_delete_timeout)
 
     def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
