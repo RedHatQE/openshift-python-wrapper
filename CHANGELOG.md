@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.42 (03/05/2022)
+- [**size/M**][**size/XS**][**Verified**] nncp - change 'status' to propety [#520](https://github.com/RedHatQE/openshift-python-wrapper/pull/520)
+- [**size/XS**][**Verified**] Allow manipulting timeout for vmi deletion when stopping VM [#506](https://github.com/RedHatQE/openshift-python-wrapper/pull/506)
+
+---
+
 ## v4.11.6 (02/05/2022)
 - [**size/XS**][**Verified**] add wait argument to deploy() (#499) [#510](https://github.com/RedHatQE/openshift-python-wrapper/pull/510)
 
@@ -144,9 +150,3 @@ null
 
 ## v2.1.31 (21/02/2022)
 - [**size/XS**][**Verified**] Add LoadBalancer type - named LOAD_BALANCER [#433](https://github.com/RedHatQE/openshift-python-wrapper/pull/433)
-
----
-
-## v2.0.17.7 (23/02/2022)
-- [**size/S**][**Verified**] wait_for_replicas - cherrypick from main [#439](https://github.com/RedHatQE/openshift-python-wrapper/pull/439)
-- [**size/M**][**Verified**] Backport wait_for_configuration_conditions_unknown_or_progressing [#437](https://github.com/RedHatQE/openshift-python-wrapper/pull/437)
