@@ -341,6 +341,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             }
         ).update()
 
+    @property
     def status(self):
         for condition in self.instance.status.conditions:
             if condition["type"] == self.Conditions.Type.AVAILABLE:
