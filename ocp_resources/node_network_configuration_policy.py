@@ -393,7 +393,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.wait_for_configuration_conditions_unknown_or_progressing()
 
         samples = TimeoutSampler(
-            wait_timeout=self.success_timeout, sleep=1, func=self.status
+            wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status
         )
         try:
             for sample in samples:
