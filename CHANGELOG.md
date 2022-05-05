@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.11.8 (05/05/2022)
+null
+---
+
+## v2.1.43 (05/05/2022)
+- [**size/XS**][**Verified**] update TimeoutSampler call using self.status (#523) [#525](https://github.com/RedHatQE/openshift-python-wrapper/pull/525)
+
+---
+
+## v4.11.7 (03/05/2022)
+*No changelog for this release.*
+
+---
+
 ## v2.1.42 (03/05/2022)
 - [**size/M**][**size/XS**][**Verified**] nncp - change 'status' to propety [#520](https://github.com/RedHatQE/openshift-python-wrapper/pull/520)
 - [**size/XS**][**Verified**] Allow manipulting timeout for vmi deletion when stopping VM [#506](https://github.com/RedHatQE/openshift-python-wrapper/pull/506)
@@ -134,19 +148,3 @@ null
 
 ## v2.1.33 (06/03/2022)
 - [**size/XS**][**Verified**] Allow manipulation of nncp deployment timeout [#449](https://github.com/RedHatQE/openshift-python-wrapper/pull/449)
-
----
-
-## v1.5.3.61 (07/03/2022)
-null
----
-
-## v2.1.32 (02/03/2022)
-- [**size/S**][**Verified**] Support multiple tags in imagesteam [#436](https://github.com/RedHatQE/openshift-python-wrapper/pull/436)
-- [**size/S**][**Verified**] nncp - wait_for_status_success - fix log if no node selector [#441](https://github.com/RedHatQE/openshift-python-wrapper/pull/441)
-- [**size/XS**][**Verified**] Renamed function from _virsh_cmd to virsh_cmd [#443](https://github.com/RedHatQE/openshift-python-wrapper/pull/443)
-
----
-
-## v2.1.31 (21/02/2022)
-- [**size/XS**][**Verified**] Add LoadBalancer type - named LOAD_BALANCER [#433](https://github.com/RedHatQE/openshift-python-wrapper/pull/433)
