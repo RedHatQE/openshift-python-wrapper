@@ -22,15 +22,15 @@ class ClusterRoleBinding(Resource):
         self.subjects = subjects
 
     def to_dict(self):
-
         self.res = super().to_dict()
+
         self.res.setdefault("roleRef", {})
-        if self.cluster_role:
-            self.res["roleRef"] = {
-                "apiGroup": self.api_group,
-                "kind": ClusterRole.kind,
-                "name": self.cluster_role,
-            }
+        self.res["roleRef"] = {
+            "apiGroup": self.api_group,
+            "kind": ClusterRole.kind,
+            "name": self.cluster_role,
+        }
+
         if self.subjects:
             self.res.setdefault("subjects", self.subjects)
 
