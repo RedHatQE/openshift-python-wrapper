@@ -4,6 +4,11 @@
 null
 ---
 
+## v2.1.44 (11/05/2022)
+- [**size/XS**][**Verified**] add wait argument to deploy() (#499) [#527](https://github.com/RedHatQE/openshift-python-wrapper/pull/527)
+
+---
+
 ## v2.1.43 (05/05/2022)
 - [**size/XS**][**Verified**] update TimeoutSampler call using self.status (#523) [#525](https://github.com/RedHatQE/openshift-python-wrapper/pull/525)
 
@@ -143,8 +148,3 @@ null
 
 ## v2.1.34 (06/03/2022)
 *No changelog for this release.*
-
----
-
-## v2.1.33 (06/03/2022)
-- [**size/XS**][**Verified**] Allow manipulation of nncp deployment timeout [#449](https://github.com/RedHatQE/openshift-python-wrapper/pull/449)
