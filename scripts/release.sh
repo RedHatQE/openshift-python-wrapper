@@ -28,6 +28,8 @@ if [[ $(git branch --show-current) != "$main_BRANCH" ]]; then
   exit 1
 fi
 
+git fetch --all
+
 # checkout source branch
 if ! git checkout origin/"$BASE_SOURCE_BRANCH"; then
   echo "Source branch origin/$BASE_SOURCE_BRANCH does not exist"
