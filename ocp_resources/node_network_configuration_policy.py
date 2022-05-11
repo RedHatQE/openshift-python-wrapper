@@ -301,10 +301,11 @@ class NodeNetworkConfigurationPolicy(Resource):
         for _ in samples:
             return
 
-    def deploy(self):
+    def deploy(self, wait=False):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
-        self.create(body=self.res)
+
+        self.create(body=self.res, wait=wait)
         try:
             self.wait_for_status_success()
             return self
