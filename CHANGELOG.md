@@ -4,6 +4,11 @@
 null
 ---
 
+## v2.1.45 (11/05/2022)
+- [**size/XS**][**Verified**] Add wait for deploy() [#529](https://github.com/RedHatQE/openshift-python-wrapper/pull/529)
+
+---
+
 ## v2.1.44 (11/05/2022)
 - [**size/XS**][**Verified**] add wait argument to deploy() (#499) [#527](https://github.com/RedHatQE/openshift-python-wrapper/pull/527)
 
@@ -143,8 +148,3 @@ null
 ## v2.1.35 (08/03/2022)
 - [**size/XS**][**Verified**] yaml_file: accept .StringIO object [#457](https://github.com/RedHatQE/openshift-python-wrapper/pull/457)
 - [**size/XS**][**Verified**] add registry.redhat.io to Resource.ApiGroup [#453](https://github.com/RedHatQE/openshift-python-wrapper/pull/453)
-
----
-
-## v2.1.34 (06/03/2022)
-*No changelog for this release.*
