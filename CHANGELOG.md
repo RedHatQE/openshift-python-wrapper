@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.47 (13/05/2022)
+null
+---
+
 ## v4.11.8 (05/05/2022)
 null
 ---
@@ -143,7 +147,3 @@ null
 
 ## v2.1.37 (21/03/2022)
 null
----
-
-## v2.1.36 (13/03/2022)
-- [**size/XS**][**Verified**] success timeout [#455](https://github.com/RedHatQE/openshift-python-wrapper/pull/455)
