@@ -106,7 +106,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv6 = set_ipv6
         self.success_timeout = success_timeout
         self.max_unavailable = max_unavailable
-        self.res = None
         self.ipv4_ports_backup_dict = {}
         self.ipv6_ports_backup_dict = {}
         self.nodes = self._nodes()
