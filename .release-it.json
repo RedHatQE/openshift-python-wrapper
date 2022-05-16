@@ -1,0 +1,58 @@
+{
+  "git": {
+    "requireCleanWorkingDir": true,
+    "requireBranch": false,
+    "requireUpstream": true,
+    "requireCommits": false,
+    "addUntrackedFiles": false,
+    "commit": true,
+    "commitMessage": "Release ${version}",
+    "commitArgs": [],
+    "tag": true,
+    "tagName": null,
+    "tagMatch": null,
+    "tagAnnotation": "Release ${version}",
+    "tagArgs": [],
+    "push": true,
+    "pushArgs": [
+      "--follow-tags"
+    ],
+    "pushRepo": "",
+    "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
+  },
+  "github": {
+    "release": true,
+    "releaseName": "Release ${version}",
+    "releaseNotes": null,
+    "autoGenerate": false,
+    "preRelease": false,
+    "draft": false,
+    "tokenRef": "GITHUB_TOKEN",
+    "assets": null,
+    "host": null,
+    "timeout": 0,
+    "proxy": null,
+    "skipChecks": false,
+    "web": false
+  },
+  "plugins": {
+    "@j-ulrich/release-it-regex-bumper": {
+      "out": [
+        {
+          "files": [
+            "setup.cfg"
+          ],
+          "search": "\\d+\\.\\d+\\.\\d+",
+          "replace": "{{version}}"
+        },
+        {
+          "files": [
+            "setup.cfg"
+          ],
+          "search": "v\\d+\\.\\d+\\.\\d+",
+          "replace": "v{{version}}"
+        }
+      ]
+    }
+  }
+}
