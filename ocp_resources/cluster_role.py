@@ -33,19 +33,44 @@ class ClusterRole(Resource):
         self.api_groups = api_groups
         self.permissions_to_resources = permissions_to_resources
         self.verbs = verbs
+        self.desired_state = {"rules": []}
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        rules = {}
-        if self.api_groups:
-            rules["apiGroups"] = self.api_groups
         if self.permissions_to_resources:
-            rules["resources"] = self.permissions_to_resources
-        if self.verbs:
-            rules["verbs"] = self.verbs
-        if rules:
-            res["rules"] = [rules]
-        return res
+            self.add_rule(
+                api_groups=self.api_groups,
+                permissions_to_resources=self.permissions_to_resources,
+                verbs=self.verbs,
+            )
+
+        return self.res
+
+    def add_rule(
+        self,
+        api_groups=None,
+        permissions_to_resources=None,
+        verbs=None,
+    ):
+        if not self.res:
+            self.res = super().to_dict()
+
+        rule = {}
+        if api_groups:
+            rule["apiGroups"] = api_groups
+        if permissions_to_resources:
+            rule["resources"] = permissions_to_resources
+        if verbs:
+            rule["verbs"] = verbs
+        if rule:
+            self._set_rule(rule=rule)
+
+        return self.res
+
+    def _set_rule(self, rule):
+
+        self.desired_state["rules"].append(rule)
+        self.res["rules"] = self.desired_state["rules"]
