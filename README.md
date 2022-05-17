@@ -32,6 +32,7 @@ rm -f package.json package-lock.json
 To create a 4.10 release, run:
 ```bash
 git checkout v4.10
+git pull
 release-it # Follow the instructions
 ```
 
