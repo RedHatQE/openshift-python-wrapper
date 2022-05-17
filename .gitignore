@@ -118,3 +118,6 @@ docs/source/rst
 
 # General
 local-cluster/_hco/
+
+# nmp
+node_modules/
