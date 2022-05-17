@@ -17,19 +17,22 @@ pip install openshift-python-wrapper --user
 
 ## Release new version
 ### requirements:
-* gh [github cli](https://github.com/cli/cli/releases/)
+* Export GitHub token
 ```bash
-gh auth login # Follow login instructions
+export GITHUB_TOKEN=<your_github_token>
 ```
-* [npm](https://docs.npmjs.com/about-npm)
+* [release-it](https://github.com/release-it/release-it)
 ```bash
-sudo npm install github-release-notes -g
+sudo npm install --global release-it
+npm install --save-dev @j-ulrich/release-it-regex-bumper
+rm -f package.json package-lock.json
 ```
-* export GREN_GITHUB_TOKEN=< TOKEN >
-* Run ./scripts/release.sh providing source branch and target version (must be executed from main branch)
 ### usage:
+* Create a release, run from the relevant branch.  
+To create a 4.10 release, run:
 ```bash
-./scripts/release.sh main v1.5.5
+git checkout v4.10
+release-it # Follow the instructions
 ```
 
 ## docs
