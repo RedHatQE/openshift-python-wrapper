@@ -356,6 +356,7 @@ class Resource:
         dry_run=None,
         node_selector=None,
         node_selector_labels=None,
+        api_version=None,
     ):
         """
         Create a API resource
@@ -363,6 +364,8 @@ class Resource:
         Args:
             name (str): Resource name
         """
+        self.api_version = api_version
+
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
                 "Subclasses of Resource require self.api_group or self.api_version to be defined"
