@@ -3,7 +3,7 @@ name: Sync main to latest version
 on:
   push:
     branches:
-      - main
+      - v4.11 # change once main is updated
 
 jobs:
   sync-branches:
