@@ -1,4 +1,4 @@
-name: Sync mani to latest version
+name: Sync main to latest version
 
 on:
   push:
