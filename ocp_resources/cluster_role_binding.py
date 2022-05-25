@@ -16,6 +16,7 @@ class ClusterRoleBinding(Resource):
         name=None,
         cluster_role=None,
         subjects=None,
+        client=None,
     ):
         super().__init__(name=name)
         self.cluster_role = cluster_role
