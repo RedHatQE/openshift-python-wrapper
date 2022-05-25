@@ -21,5 +21,5 @@ jobs:
         uses: tretuna/sync-branches@1.4.0
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          FROM_BRANCH: 'main'
-          TO_BRANCH: 'v4.11' # change once main is updated
+          FROM_BRANCH: 'v4.11' # change once main is updated
+          TO_BRANCH: 'main'
