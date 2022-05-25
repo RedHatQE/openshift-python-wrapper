@@ -3,10 +3,10 @@ name: Sync main to latest version
 on:
   push:
     branches:
-      - v4.11 # change once main is updated
+      - main
 
 jobs:
-  sync-branches:
+  sync-branche-from-main:
     runs-on: ubuntu-latest
     name: Syncing branches
     steps:
@@ -21,5 +21,5 @@ jobs:
         uses: tretuna/sync-branches@1.4.0
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          FROM_BRANCH: 'v4.11' # change once main is updated
-          TO_BRANCH: 'main'
+          FROM_BRANCH: 'main'
+          TO_BRANCH: 'v4.11' # change once main is updated
