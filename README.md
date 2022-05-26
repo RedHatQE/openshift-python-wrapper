@@ -29,9 +29,9 @@ rm -f package.json package-lock.json
 ```
 ### usage:
 * Create a release, run from the relevant branch.  
-To create a 4.10 release, run:
+To create a 4.11 release, run:
 ```bash
-git checkout v4.10
+git checkout v4.11
 git pull
 release-it # Follow the instructions
 ```
