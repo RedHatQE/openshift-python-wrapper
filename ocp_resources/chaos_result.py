@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 
 class ChaosResult(NamespacedResource):
     """
-    Litmus ChaosResult resource.
+    ChaosResult resource (LitmusChaos)
     """
 
     api_group = NamespacedResource.ApiGroup.LITMUS_IO
