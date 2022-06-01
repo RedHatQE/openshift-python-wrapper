@@ -60,6 +60,7 @@ class Pod(NamespacedResource):
             delete_timeout=delete_timeout,
             **kwargs,
         )
+        self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 
     @property
     def containers(self):
@@ -90,9 +91,8 @@ class Pod(NamespacedResource):
         error_channel = {}
         stream_closed_error = "stream resp is closed"
         LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
-        kube_v1_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
         resp = kubernetes.stream.stream(
-            api_method=kube_v1_api.connect_get_namespaced_pod_exec,
+            api_method=self._kube_api.connect_get_namespaced_pod_exec,
             name=self.name,
             namespace=self.namespace,
             command=command,
