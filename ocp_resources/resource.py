@@ -42,14 +42,17 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
+def kube_v1_api(api_client):
+    return kubernetes.client.CoreV1Api(api_client=api_client)
+
+
 def _collect_instance_data(directory, resource_object):
     with open(os.path.join(directory, f"{resource_object.name}.yaml"), "w") as fd:
         fd.write(resource_object.instance.to_str())
 
 
 def _collect_pod_logs(dyn_client, resource_item, **kwargs):
-    kube_v1_api = kubernetes.client.CoreV1Api(api_client=dyn_client.client)
-    return kube_v1_api.read_namespaced_pod_log(
+    return kube_v1_api(api_client=dyn_client.client).read_namespaced_pod_log(
         name=resource_item.metadata.name,
         namespace=resource_item.metadata.namespace,
         **kwargs,
