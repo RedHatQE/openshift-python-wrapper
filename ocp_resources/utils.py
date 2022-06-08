@@ -241,33 +241,36 @@ def skip_existing_resource_creation_teardown(
         Return the resource if exists when got _check_exists else return None.
         If _check_exists=False returns the resource.
         """
-        if _check_exists:
-            if _resource.exists:  # In case of REUSE_IF_RESOURCE_EXISTS
-                LOGGER.warning(_msg)
-                return _resource
-        else:
-            return _resource  # In case of SKIP_RESOURCE_TEARDOWN
+        if not _check_exists:  # In case of SKIP_RESOURCE_TEARDOWN
+            return _resource
 
+        if _resource.exists:  # In case of REUSE_IF_RESOURCE_EXISTS
+            LOGGER.warning(_msg)
+            return _resource
+
+    resource_to_dict = resource.to_dict()
+    resource_name = resource_to_dict["metadata"]["name"]
+    resource_namespace = resource_to_dict["metadata"].get("namespace")
     skip_create_warn_msg = (
-        f"Skip resource {resource.kind} creation, using existing one."
+        f"Skip resource {resource.kind} {resource_name} creation, using existing one."
         f" Got {export_str}={user_exported_args}"
     )
     user_args = yaml.safe_load(stream=user_exported_args)
     if resource.kind in user_args:
-        if not user_args[resource.kind]:  # Match only by kind, user didn't send name.
-            return _return_resource(
-                _resource=resource,
-                _check_exists=check_exists,
-                _msg=skip_create_warn_msg,
-            )
-
         for _name, _namespace in user_args[resource.kind].items():
-            if resource.name == _name and (
-                resource.namespace == _namespace
-                or not (resource.namespace and _namespace)
+            if resource_name == _name and (
+                resource_namespace == _namespace
+                or not (resource_namespace and _namespace)
             ):
                 return _return_resource(
                     _resource=resource,
                     _check_exists=check_exists,
                     _msg=skip_create_warn_msg,
                 )
+
+        # Match only by kind, user didn't send name.
+        return _return_resource(
+            _resource=resource,
+            _check_exists=check_exists,
+            _msg=skip_create_warn_msg,
+        )
