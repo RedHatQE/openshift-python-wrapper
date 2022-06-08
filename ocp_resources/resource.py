@@ -456,7 +456,7 @@ class Resource:
             To skip creation of all resources by kind:
                 export REUSE_IF_RESOURCE_EXISTS="{Pod: {}}"
 
-            To skip creation of resource by name (on all namespaces):
+            To skip creation of resource by name (on all namespaces or non-namespaced resources):
                 export REUSE_IF_RESOURCE_EXISTS="{Pod: {<pod-name>: ''}}"
 
             To skip creation of resource by name and namespace:
@@ -476,7 +476,7 @@ class Resource:
 
     def __exit__(self, exception_type, exception_value, traceback):
         """
-        For debug, export SKIP_RESOURCE_TEARDOWN to skip resource create.
+        For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Examples:
             To skip creation of all resources by kind:
                 export SKIP_RESOURCE_TEARDOWN="{Pod: {}}"
