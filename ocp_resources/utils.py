@@ -257,20 +257,23 @@ def skip_existing_resource_creation_teardown(
     )
     user_args = yaml.safe_load(stream=user_exported_args)
     if resource.kind in user_args:
-        for _name, _namespace in user_args[resource.kind].items():
-            if resource_name == _name and (
-                resource_namespace == _namespace
-                or not (resource_namespace and _namespace)
-            ):
-                return _return_resource(
-                    _resource=resource,
-                    _check_exists=check_exists,
-                    _msg=skip_create_warn_msg,
-                )
+        _resource_args = user_args[resource.kind]
+        if _resource_args:
+            for _name, _namespace in _resource_args.items():
+                if resource_name == _name and (
+                    resource_namespace == _namespace
+                    or not (resource_namespace and _namespace)
+                ):
+                    return _return_resource(
+                        _resource=resource,
+                        _check_exists=check_exists,
+                        _msg=skip_create_warn_msg,
+                    )
 
-        # Match only by kind, user didn't send name.
-        return _return_resource(
-            _resource=resource,
-            _check_exists=check_exists,
-            _msg=skip_create_warn_msg,
-        )
+        else:
+            # Match only by kind, user didn't send name.
+            return _return_resource(
+                _resource=resource,
+                _check_exists=check_exists,
+                _msg=skip_create_warn_msg,
+            )
