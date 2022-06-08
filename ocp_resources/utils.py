@@ -244,7 +244,7 @@ def skip_existing_resource_creation_teardown(
         if not _check_exists:  # In case of SKIP_RESOURCE_TEARDOWN
             return _resource
 
-        if _resource.exists:  # In case of REUSE_IF_RESOURCE_EXISTS
+        elif _resource.exists:  # In case of REUSE_IF_RESOURCE_EXISTS
             LOGGER.warning(_msg)
             return _resource
 
@@ -258,22 +258,21 @@ def skip_existing_resource_creation_teardown(
     user_args = yaml.safe_load(stream=user_exported_args)
     if resource.kind in user_args:
         _resource_args = user_args[resource.kind]
-        if _resource_args:
-            for _name, _namespace in _resource_args.items():
-                if resource_name == _name and (
-                    resource_namespace == _namespace
-                    or not (resource_namespace and _namespace)
-                ):
-                    return _return_resource(
-                        _resource=resource,
-                        _check_exists=check_exists,
-                        _msg=skip_create_warn_msg,
-                    )
-
-        else:
-            # Match only by kind, user didn't send name.
+        if not _resource_args:
+            # Match only by kind, user didn't send name and/or namespace.
             return _return_resource(
                 _resource=resource,
                 _check_exists=check_exists,
                 _msg=skip_create_warn_msg,
             )
+
+        for _name, _namespace in _resource_args.items():
+            if resource_name == _name and (
+                resource_namespace == _namespace
+                or not (resource_namespace and _namespace)
+            ):
+                return _return_resource(
+                    _resource=resource,
+                    _check_exists=check_exists,
+                    _msg=skip_create_warn_msg,
+                )
