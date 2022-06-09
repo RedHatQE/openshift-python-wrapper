@@ -22,6 +22,7 @@ class Secret(NamespacedResource):
         string_data=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        type=None,
         **kwargs,
     ):
         super().__init__(
@@ -38,6 +39,7 @@ class Secret(NamespacedResource):
         self.htpasswd = htpasswd
         self.data_dict = data_dict
         self.string_data = string_data
+        self.type = type
 
     def to_dict(self):
         res = super().to_dict()
@@ -54,6 +56,8 @@ class Secret(NamespacedResource):
             res.update({"data": self.data_dict})
         if self.string_data:
             res.update({"stringData": self.string_data})
+        if self.type:
+            res.update({"type": self.type})
 
         return res
 
