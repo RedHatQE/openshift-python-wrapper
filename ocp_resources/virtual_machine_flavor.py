@@ -1,5 +1,5 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class VirtualMachineFlavor(Resource):
-    api_group = Resource.ApiGroup.FLAVOR_KUBEVIRT_IO
+class VirtualMachineFlavor(NamespacedResource):
+    api_group = NamespacedResource.ApiGroup.FLAVOR_KUBEVIRT_IO
