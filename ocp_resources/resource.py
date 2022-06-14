@@ -425,12 +425,13 @@ class Resource:
         Returns:
             dict: Resource dict.
         """
-        if self.yaml_file and not self.yaml_file_contents:
-            if isinstance(self.yaml_file, StringIO):
-                self.yaml_file_contents = self.yaml_file.read()
-            else:
-                with open(self.yaml_file, "r") as stream:
-                    self.yaml_file_contents = stream.read()
+        if self.yaml_file:
+            if not self.yaml_file_contents:
+                if isinstance(self.yaml_file, StringIO):
+                    self.yaml_file_contents = self.yaml_file.read()
+                else:
+                    with open(self.yaml_file, "r") as stream:
+                        self.yaml_file_contents = stream.read()
 
             self.resource_dict = yaml.safe_load(stream=self.yaml_file_contents)
             self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
