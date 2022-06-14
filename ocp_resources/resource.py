@@ -435,13 +435,14 @@ class Resource:
             self.resource_dict = yaml.safe_load(stream=self.yaml_file_contents)
             self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.resource_dict["metadata"]["name"]
-            return self.resource_dict
+        else:
+            self.resource_dict = {
+                "apiVersion": self.api_version,
+                "kind": self.kind,
+                "metadata": {"name": self.name},
+            }
 
-        return {
-            "apiVersion": self.api_version,
-            "kind": self.kind,
-            "metadata": {"name": self.name},
-        }
+        return self.resource_dict
 
     def to_dict(self):
         """
