@@ -406,6 +406,7 @@ class Resource:
         self.node_selector_labels = node_selector_labels
         self.node_selector_spec = self._prepare_node_selector_spec()
         self.res = None
+        self.yaml_file_contents = None
 
     def _prepare_node_selector_spec(self):
         if self.node_selector:
@@ -425,22 +426,24 @@ class Resource:
             dict: Resource dict.
         """
         if self.yaml_file:
-            if isinstance(self.yaml_file, StringIO):
-                data = self.yaml_file.read()
-            else:
-                with open(self.yaml_file, "r") as stream:
-                    data = stream.read()
+            if not self.yaml_file_contents:
+                if isinstance(self.yaml_file, StringIO):
+                    self.yaml_file_contents = self.yaml_file.read()
+                else:
+                    with open(self.yaml_file, "r") as stream:
+                        self.yaml_file_contents = stream.read()
 
-            self.resource_dict = yaml.safe_load(stream=data)
+            self.resource_dict = yaml.safe_load(stream=self.yaml_file_contents)
             self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.resource_dict["metadata"]["name"]
-            return self.resource_dict
+        else:
+            self.resource_dict = {
+                "apiVersion": self.api_version,
+                "kind": self.kind,
+                "metadata": {"name": self.name},
+            }
 
-        return {
-            "apiVersion": self.api_version,
-            "kind": self.kind,
-            "metadata": {"name": self.name},
-        }
+        return self.resource_dict
 
     def to_dict(self):
         """
