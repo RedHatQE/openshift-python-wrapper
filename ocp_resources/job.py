@@ -43,11 +43,12 @@ class Job(NamespacedResource):
         self.res = super().to_dict()
         self.res.setdefault("spec", {})
 
-        if self.backoff_limit:
+        if self.backoff_limit or self.backoff_limit == 0:
             self.res["spec"]["backoffLimit"] = self.backoff_limit
 
         if self.containers:
             self.res["spec"].setdefault("template", {}).setdefault("spec", {})
+            self.res["spec"]["template"]["spec"]["containers"] = self.containers
 
             if self.service_account:
                 self.res["spec"]["template"]["spec"][
@@ -58,7 +59,5 @@ class Job(NamespacedResource):
                 self.res["spec"]["template"]["spec"][
                     "restartPolicy"
                 ] = self.restart_policy
-
-            self.res["spec"]["template"]["spec"]["containers"] = self.containers
 
         return self.res
