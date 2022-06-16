@@ -36,5 +36,6 @@ class ConfigMap(NamespacedResource):
         if self.yaml_file:
             return res
 
-        res.setdefault("data", {}).update(self.data)
+        if self.data:
+            res.setdefault("data", {}).update(self.data)
         return res
