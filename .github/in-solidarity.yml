@@ -9,5 +9,6 @@ rules:
     level: failure
 ignore:
  - ".github/in-solidarity.yml"  # default
+ - ".github/workflows/*.yml"
  - "**/*.yml"
  - ".release-it.json"
