@@ -9,6 +9,9 @@ class Job(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.BATCH
 
+    class Condition(NamespacedResource.Condition):
+        COMPLETE = "Complete"
+
     def __init__(
         self,
         name=None,
@@ -43,7 +46,7 @@ class Job(NamespacedResource):
         self.res = super().to_dict()
         self.res.setdefault("spec", {})
 
-        if self.backoff_limit or self.backoff_limit == 0:
+        if self.backoff_limit is not None:
             self.res["spec"]["backoffLimit"] = self.backoff_limit
 
         if self.containers:
