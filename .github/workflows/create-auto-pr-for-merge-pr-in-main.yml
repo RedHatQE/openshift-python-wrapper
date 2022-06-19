@@ -1,0 +1,19 @@
+name: PR for branch v4.11
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release_pull_request:
+    runs-on: ubuntu-latest
+    name: release_pull_request
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+    - name: Create PR to branch
+      uses: gorillio/github-action-cherry-pick@master
+      with:
+        pr_branch: 'v4.11'
+      env:
+        GITHUB_TOKEN: ${{ secrets.CNV_QE_BOT_TOKEN }}
+        DRY_RUN: false
