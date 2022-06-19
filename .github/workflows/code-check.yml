@@ -4,7 +4,6 @@
 name: Code check
 
 on:
-  push:
   pull_request:
 
 jobs:
