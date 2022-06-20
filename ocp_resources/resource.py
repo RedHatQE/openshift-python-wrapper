@@ -453,6 +453,7 @@ class Resource:
 
     def __enter__(self):
         signal(SIGINT, self._sigint_handler)
+        return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
         if self.teardown:
