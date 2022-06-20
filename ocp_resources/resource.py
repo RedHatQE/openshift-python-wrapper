@@ -490,8 +490,8 @@ class Resource:
                 user_exported_args=skip_resource_kind_create_if_exists,
             )
 
-        if _resource:
-            return _resource
+            if _resource:
+                return _resource
 
         self.create(wait=wait)
         return self
