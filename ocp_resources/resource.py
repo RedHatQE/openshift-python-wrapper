@@ -288,7 +288,7 @@ class Resource:
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
-        DATA_IMPORT_CRON_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
+        DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
         EVENTS_K8S_IO = "events.k8s.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         FLAVOR_KUBEVIRT_IO = "flavor.kubevirt.io"
