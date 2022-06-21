@@ -454,6 +454,17 @@ class Resource:
 
     def __enter__(self):
         signal(SIGINT, self._sigint_handler)
+        return self.deploy()
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        if self.teardown:
+            self.clean_up()
+
+    def _sigint_handler(self, signal_received, frame):
+        self.__exit__(exception_type=None, exception_value=None, traceback=None)
+        sys.exit(signal_received)
+
+    def deploy(self, wait=False):
         """
         For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
         Spaces are important in the export dict
@@ -481,9 +492,21 @@ class Resource:
                 user_exported_args=skip_resource_kind_create_if_exists,
             )
 
-        return _resource or self.deploy()
+            if _resource:
+                return _resource
 
-    def __exit__(self, exception_type, exception_value, traceback):
+        self.create(wait=wait)
+        return self
+
+    def clean_up(self):
+        if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
+            try:
+                _collect_data(resource_object=self)
+            except Exception as exception_:
+                LOGGER.warning(
+                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
+                )
+
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
@@ -513,26 +536,6 @@ class Resource:
                 f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
             return
-
-        if self.teardown:
-            self.clean_up()
-
-    def _sigint_handler(self, signal_received, frame):
-        self.__exit__(exception_type=None, exception_value=None, traceback=None)
-        sys.exit(signal_received)
-
-    def deploy(self, wait=False):
-        self.create(wait=wait)
-        return self
-
-    def clean_up(self):
-        if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
-            try:
-                _collect_data(resource_object=self)
-            except Exception as exception_:
-                LOGGER.warning(
-                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
-                )
 
         self.delete(wait=True, timeout=self.delete_timeout)
 
