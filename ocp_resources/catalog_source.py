@@ -21,6 +21,7 @@ class CatalogSource(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        update_strategy_registry_poll_interval=None,
         **kwargs,
     ):
         super().__init__(
@@ -36,6 +37,9 @@ class CatalogSource(NamespacedResource):
         self.image = image
         self.display_name = display_name
         self.publisher = publisher
+        self.update_strategy_registry_poll_interval = (
+            update_strategy_registry_poll_interval
+        )
 
     def to_dict(self):
         res = super().to_dict()
@@ -52,5 +56,16 @@ class CatalogSource(NamespacedResource):
                 }
             }
         )
+
+        if self.update_strategy_registry_poll_interval:
+            res["spec"].update(
+                {
+                    "updateStrategy": {
+                        "registryPoll": {
+                            "interval": self.update_strategy_registry_poll_interval,
+                        },
+                    },
+                }
+            )
 
         return res
