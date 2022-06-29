@@ -15,9 +15,13 @@ def _api_group_name(api_value):
 
 
 def _api_group_dict(resource_dict, api_group_name):
-    api_group = resource_dict["api_group"].get(api_group_name)
+    resource_dict_api_group = resource_dict["api_group"]
+    api_group = resource_dict_api_group.get(api_group_name)
     if not api_group:
-        api_group = resource_dict["api_group"]["null"]
+        try:
+            api_group = resource_dict_api_group["null"]
+        except KeyError:
+            api_group = resource_dict_api_group[[*resource_dict_api_group][0]]
 
     return api_group
 
