@@ -248,6 +248,7 @@ class Resource:
         COMPLETED = "Completed"
         RUNNING = "Running"
         TERMINATING = "Terminating"
+        ERROR = "Error"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
