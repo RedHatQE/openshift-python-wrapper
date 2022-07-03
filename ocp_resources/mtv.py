@@ -60,6 +60,15 @@ class MTV:
         MIGRATION_SUCCEEDED = "The migration has SUCCEEDED."
         HOST_READY = "The host is ready."
 
+    class ConditionCategory:
+        PLAN_CRITICAL = "Critical"
+
+    class ConditionType:
+        PLAN_SUCCEEDED = "Succeeded"
+        PLAN_FAILED = "Failed"
+        PLAN_TARGET_NAME_NOT_VALID = "TargetNameNotValid"
+        PLAN_VM_ALREADY_EXISTS = "VMAlreadyExists"
+
     class ProviderType:
         VSPHERE = "vsphere"
         OPENSHIFT = "openshift"
