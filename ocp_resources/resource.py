@@ -7,7 +7,6 @@ from io import StringIO
 from signal import SIGINT, signal
 
 import kubernetes
-import urllib3
 import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
@@ -141,6 +140,30 @@ def _get_api_version(dyn_client, api_group, kind):
 
     LOGGER.info(f"kind: {kind} api version: {res.group_version}")
     return res.group_version
+
+
+def _get_client(config_file=None, context=None):
+    """
+    Get a kubernetes client.
+
+    Args:
+        config_file (str): path to a kubeconfig file.
+        context (str): name of the context to use.
+
+    Returns:
+        DynamicClient: a kubernetes client.
+    """
+    if config_file:
+        return DynamicClient(
+            client=kubernetes.config.new_client_from_config(
+                config_file=config_file,
+                context=context,
+            )
+        )
+
+    return DynamicClient(
+        client=kubernetes.config.new_client_from_config(context=context)
+    )
 
 
 def sub_resource_level(current_class, owner_class, parent_class):
@@ -387,21 +410,10 @@ class Resource:
             raise ValueError("name or yaml file is required")
 
         if not self.client:
-            try:
-                self.client = DynamicClient(
-                    client=kubernetes.config.new_client_from_config(
-                        config_file=self.config_file,
-                        context=self.context,
-                    )
-                )
-            except (
-                kubernetes.config.ConfigException,
-                urllib3.exceptions.MaxRetryError,
-            ):
-                LOGGER.error(
-                    "You need to be logged into a cluster or have $KUBECONFIG env configured"
-                )
-                raise
+            self.client = _get_client(
+                config_file=self.config_file, context=self.context
+            )
+
         if not self.api_version:
             self.api_version = _get_api_version(
                 dyn_client=self.client, api_group=self.api_group, kind=self.kind
@@ -810,17 +822,29 @@ class Resource:
             return sample
 
     @classmethod
-    def get(cls, dyn_client, singular_name=None, *args, **kwargs):
+    def get(
+        cls,
+        dyn_client=None,
+        config_file=None,
+        context=None,
+        singular_name=None,
+        *args,
+        **kwargs,
+    ):
         """
         Get resources
 
         Args:
-            dyn_client (DynamicClient): Open connection to remote cluster
-            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
+            dyn_client (DynamicClient): Open connection to remote cluster.
+            config_file (str): Path to config file for connecting to remote cluster.
+            context (str): Context name for connecting to remote cluster.
+            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
 
         Returns:
             generator: Generator of Resources of cls.kind
         """
+        if not dyn_client:
+            dyn_client = _get_client(config_file=config_file, context=context)
 
         def _get():
             _resources = cls._prepare_resources(
@@ -960,12 +984,23 @@ class NamespacedResource(Resource):
             raise ValueError("name and namespace or yaml file is required")
 
     @classmethod
-    def get(cls, dyn_client, singular_name=None, raw=False, *args, **kwargs):
+    def get(
+        cls,
+        dyn_client=None,
+        config_file=None,
+        context=None,
+        singular_name=None,
+        raw=False,
+        *args,
+        **kwargs,
+    ):
         """
         Get resources
 
         Args:
             dyn_client (DynamicClient): Open connection to remote cluster
+            config_file (str): Path to config file for connecting to remote cluster.
+            context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
             raw (bool): If True return raw object from openshift-restclient-python
 
@@ -973,6 +1008,9 @@ class NamespacedResource(Resource):
         Returns:
             generator: Generator of Resources of cls.kind
         """
+        if not dyn_client:
+            dyn_client = _get_client(config_file=config_file, context=context)
+
         _resources = cls._prepare_resources(
             dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
         )
