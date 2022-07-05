@@ -6,4 +6,4 @@ class TektonTasks(NamespacedResource):
     TektonTasks object, inherited from NamespacedResource.
     """
 
-    api_group = NamespacedResource.ApiGroup.TEKTON_TASKS_KUBEVIRT_IO
+    api_group = NamespacedResource.ApiGroup.TEKTONTASKS_KUBEVIRT_IO

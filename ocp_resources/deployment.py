@@ -47,15 +47,13 @@ class Deployment(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
+            func=lambda: self.instance,
         )
         for sample in samples:
-            if sample.items:
-                instance = sample.items[0]
-                status = instance.status
+            if sample:
+                status = sample.status
 
-                spec_replicas = instance.spec.replicas
+                spec_replicas = sample.spec.replicas
                 total_replicas = status.replicas or 0
                 updated_replicas = status.updatedReplicas or 0
                 available_replicas = status.availableReplicas or 0
