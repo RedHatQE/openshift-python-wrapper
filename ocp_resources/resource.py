@@ -153,16 +153,11 @@ def _get_client(config_file=None, context=None):
     Returns:
         DynamicClient: a kubernetes client.
     """
-    if config_file:
-        return DynamicClient(
-            client=kubernetes.config.new_client_from_config(
-                config_file=config_file,
-                context=context,
-            )
-        )
-
     return DynamicClient(
-        client=kubernetes.config.new_client_from_config(context=context)
+        client=kubernetes.config.new_client_from_config(
+            config_file=config_file,
+            context=context,
+        )
     )
 
 
