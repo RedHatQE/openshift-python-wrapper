@@ -362,6 +362,8 @@ class Resource:
         dry_run=None,
         node_selector=None,
         node_selector_labels=None,
+        config_file=None,
+        context=None,
     ):
         """
         Create a API resource
@@ -379,13 +381,18 @@ class Resource:
         self.privileged_client = privileged_client
         self.yaml_file = yaml_file
         self.resource_dict = None  # Filled in case yaml_file is not None
+        self.config_file = config_file
+        self.context = context
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
 
         if not self.client:
             try:
                 self.client = DynamicClient(
-                    client=kubernetes.config.new_client_from_config()
+                    client=kubernetes.config.new_client_from_config(
+                        config_file=self.config_file,
+                        context=self.context,
+                    )
                 )
             except (
                 kubernetes.config.ConfigException,
