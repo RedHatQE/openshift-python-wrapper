@@ -61,13 +61,13 @@ class MTV:
         HOST_READY = "The host is ready."
 
     class ConditionCategory:
-        PLAN_CRITICAL = "Critical"
+        CRITICAL = "Critical"
 
     class ConditionType:
-        PLAN_SUCCEEDED = "Succeeded"
-        PLAN_FAILED = "Failed"
-        PLAN_TARGET_NAME_NOT_VALID = "TargetNameNotValid"
-        PLAN_VM_ALREADY_EXISTS = "VMAlreadyExists"
+        SUCCEEDED = "Succeeded"
+        FAILED = "Failed"
+        TARGET_NAME_NOT_VALID = "TargetNameNotValid"
+        VM_ALREADY_EXISTS = "VMAlreadyExists"
 
     class ProviderType:
         VSPHERE = "vsphere"
