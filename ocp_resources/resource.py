@@ -25,7 +25,11 @@ from ocp_resources.constants import (
     TIMEOUT_4MINUTES,
 )
 from ocp_resources.logger import get_logger
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_resources.utils import (
+    TimeoutExpiredError,
+    TimeoutSampler,
+    skip_existing_resource_creation_teardown,
+)
 
 
 DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
@@ -448,16 +452,6 @@ class Resource:
         return self.deploy()
 
     def __exit__(self, exception_type, exception_value, traceback):
-        # For debug, export kind (class name) + NOTEARDOWN to skip resource teardown.
-        # For example:export VirtualMachineInstanceNOTEARDOWN=True
-        skip_teardown_env = f"{self.kind}NOTEARDOWN"
-        no_teardown_from_environment = os.environ.get(skip_teardown_env)
-        if no_teardown_from_environment:
-            LOGGER.warning(
-                f"Skip teardown. Got {skip_teardown_env}={no_teardown_from_environment}"
-            )
-            return
-
         if self.teardown:
             self.clean_up()
 
@@ -466,6 +460,36 @@ class Resource:
         sys.exit(signal_received)
 
     def deploy(self, wait=False):
+        """
+        For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
+        Spaces are important in the export dict
+
+        Examples:
+            To skip creation of all resources by kind:
+                export REUSE_IF_RESOURCE_EXISTS="{Pod: {}}"
+
+            To skip creation of resource by name (on all namespaces or non-namespaced resources):
+                export REUSE_IF_RESOURCE_EXISTS="{Pod: {<pod-name>:}}"
+
+            To skip creation of resource by name and namespace:
+                export REUSE_IF_RESOURCE_EXISTS="{Pod: {<pod-name>: <pod-namespace>}}"
+
+            To skip creation of multiple resources:
+                export REUSE_IF_RESOURCE_EXISTS="{Namespace: {<namespace-name>:}, Pod: {<pod-name>: <pod-namespace>}}"
+        """
+        _resource = None
+        _export_str = "REUSE_IF_RESOURCE_EXISTS"
+        skip_resource_kind_create_if_exists = os.environ.get(_export_str)
+        if skip_resource_kind_create_if_exists:
+            _resource = skip_existing_resource_creation_teardown(
+                resource=self,
+                export_str=_export_str,
+                user_exported_args=skip_resource_kind_create_if_exists,
+            )
+
+            if _resource:
+                return _resource
+
         self.create(wait=wait)
         return self
 
@@ -477,6 +501,36 @@ class Resource:
                 LOGGER.warning(
                     f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
                 )
+
+        """
+        For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
+        Spaces are important in the export dict
+
+        Examples:
+            To skip teardown of all resources by kind:
+                export SKIP_RESOURCE_TEARDOWN="{Pod: {}}"
+
+            To skip teardown of resource by name (on all namespaces):
+                export SKIP_RESOURCE_TEARDOWN="{Pod: {<pod-name>:}}"
+
+            To skip teardown of resource by name and namespace:
+                export SKIP_RESOURCE_TEARDOWN="{Pod: {<pod-name>: <pod-namespace>}}"
+
+            To skip teardown of multiple resources:
+                export SKIP_RESOURCE_TEARDOWN="{Namespace: {<namespace-name>:}, Pod: {<pod-name>: <pod-namespace>}}"
+        """
+        _export_str = "SKIP_RESOURCE_TEARDOWN"
+        skip_resource_teardown = os.environ.get(_export_str)
+        if skip_resource_teardown and skip_existing_resource_creation_teardown(
+            resource=self,
+            export_str=_export_str,
+            user_exported_args=skip_resource_teardown,
+            check_exists=False,
+        ):
+            LOGGER.warning(
+                f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
+            )
+            return
 
         self.delete(wait=True, timeout=self.delete_timeout)
 
