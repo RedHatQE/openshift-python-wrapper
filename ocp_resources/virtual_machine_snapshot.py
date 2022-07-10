@@ -77,3 +77,41 @@ class VirtualMachineSnapshot(NamespacedResource):
         for sample in samples:
             if sample:
                 return
+
+    def wait_snapshot_done(self, timeout=TIMEOUT_4MINUTES):
+        """
+        Wait for the the snapshot to be done. This check 2 parameters, the snapshot status to be readyToUse
+        and the VM status snapshotInProgress to bu null.
+
+        Args:
+            timeout (int): Time to wait.
+
+        Raises:
+            TimeoutExpiredError: If timeout reached.
+        """
+        self.wait_ready_to_use(timeout=timeout)
+
+        vm_snapshot_status = "snapshotInProgress"
+        vm = list(
+            VirtualMachine.get(
+                dyn_client=self.client,
+                namespace=self.namespace,
+                name=self.vm_name,
+            )
+        )
+
+        if vm:
+            LOGGER.info(
+                f"Wait for {vm[0].kind} {self.vm_name} {vm_snapshot_status} to be null"
+            )
+
+            for sample in TimeoutSampler(
+                wait_timeout=timeout,
+                sleep=1,
+                exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+                func=lambda: vm[0]
+                .instance.get("status", {})
+                .get(vm_snapshot_status, None),
+            ):
+                if not sample:
+                    return
