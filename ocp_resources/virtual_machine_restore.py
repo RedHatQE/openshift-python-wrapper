@@ -81,3 +81,41 @@ class VirtualMachineRestore(NamespacedResource):
         for sample in samples:
             if sample:
                 return
+
+    def wait_restore_done(self, timeout=TIMEOUT_4MINUTES):
+        """
+        Wait for the the restore to be done. This check 2 parameters, the restore status to be complete
+        and the VM status restoreInProgress to bu null.
+
+        Args:
+            timeout (int): Time to wait.
+
+        Raises:
+            TimeoutExpiredError: If timeout reached.
+        """
+        self.wait_complete(timeout=timeout)
+
+        vm_restore_status = "restoreInProgress"
+        vm = list(
+            VirtualMachine.get(
+                dyn_client=self.client,
+                namespace=self.namespace,
+                name=self.vm_name,
+            )
+        )
+
+        if vm:
+            LOGGER.info(
+                f"Wait for {vm[0].kind} {self.vm_name} {vm_restore_status} to be null"
+            )
+
+            for sample in TimeoutSampler(
+                wait_timeout=timeout,
+                sleep=1,
+                exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+                func=lambda: vm[0]
+                .instance.get("status", {})
+                .get(vm_restore_status, None),
+            ):
+                if not sample:
+                    return
