@@ -1,6 +1,5 @@
 import contextlib
 import json
-import logging
 import os
 import re
 from distutils.version import Version
@@ -21,6 +20,7 @@ from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
 )
+from ocp_resources.logger import get_logger
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
@@ -31,7 +31,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     ServerTimeoutError: [],
 }
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 TIMEOUT = 240
 MAX_SUPPORTED_API_VERSION = "v1"
 
