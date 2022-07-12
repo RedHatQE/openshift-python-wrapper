@@ -15,7 +15,7 @@ jobs:
 
     - name: Create PR to branch
       run: |
-        PR_BRANCH="auto-${{ INPUT_PR_BRANCH }}-${{ GITHUB_SHA }}"
+        PR_BRANCH="auto-${INPUT_PR_BRANCH}-${{ GITHUB_SHA }}"
         git remote update
         git fetch --all
         git checkout -b "${{ PR_BRANCH }}" origin/"${{ INPUT_PR_BRANCH }}"
