@@ -8,16 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     name: release_pull_request
     steps:
-    - name: safe directory
-      run: git config --global --add safe.directory /github/workspace
     - name: checkout
       uses: actions/checkout@v3
-    - name: safe directory
-      run: git config --global --add safe.directory /github/workspace
+      token: ${{ secrets.CNV_QE_BOT_TOKEN }}
     - name: Create PR to branch
-      uses: myakove/github-action-cherry-pick@master
-      with:
-        pr_branch: 'v4.11'
-      env:
-        GITHUB_TOKEN: ${{ secrets.CNV_QE_BOT_TOKEN }}
-        DRY_RUN: false
+      run: |
+        PR_BRANCH="auto-${{ INPUT_PR_BRANCH }}-${{ GITHUB_SHA }}"
+        git remote update
+        git fetch --all
+        git checkout -b "${{ PR_BRANCH }}" origin/"${{ INPUT_PR_BRANCH }}"
+        git cherry-pick "${{ GITHUB_SHA }}"
+        git push -u origin "${{ PR_BRANCH }}"
+        hub pull-request -b "${{ INPUT_PR_BRANCH }}" -h "${{ PR_BRANCH }}" -l autocreated -a "${{ GITHUB_ACTOR }}" -m "\"AUTO: ${{ PR_TITLE }}\""
+
+#      uses: myakove/github-action-cherry-pick@master
+#      with:
+#        pr_branch: 'v4.11'
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.CNV_QE_BOT_TOKEN }}
+#        DRY_RUN: false
