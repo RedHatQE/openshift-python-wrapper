@@ -1,8 +1,35 @@
 import logging
 import os
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 from colorlog import ColoredFormatter
+
+
+LOGGER = logging.getLogger(__name__)
+
+
+class DuplicateFilter(logging.Filter):
+    def filter(self, record):
+        repeated_number_exists = getattr(self, "repeated_number", None)
+        current_log = (record.module, record.levelno, record.msg)
+        if current_log != getattr(self, "last_log", None):
+            self.last_log = current_log
+            if repeated_number_exists:
+                LOGGER.warning(f"Last log repeated {self.repeated_number} times.")
+
+            self.repeated_number = 0
+            return True
+        if repeated_number_exists:
+            self.repeated_number += 1
+        else:
+            self.repeated_number = 1
+        return False
+
+
+class WrapperLogFormatter(ColoredFormatter):
+    def formatTime(self, record, datefmt=None):  # noqa: N802
+        return datetime.fromtimestamp(record.created).isoformat()
 
 
 def get_logger(name):
@@ -12,9 +39,8 @@ def get_logger(name):
         raise ValueError(f"Invalid log level: {log_level}")
 
     logger_obj = logging.getLogger(name)
-    log_formatter = ColoredFormatter(
-        fmt="%(name)s %(asctime)s %(log_color)s%(levelname) s%(reset)s %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+    log_formatter = WrapperLogFormatter(
+        fmt="%(asctime)s %(name)s %(log_color)s%(levelname)s%(reset)s %(message)s",
         log_colors={
             "DEBUG": "cyan",
             "INFO": "green",
