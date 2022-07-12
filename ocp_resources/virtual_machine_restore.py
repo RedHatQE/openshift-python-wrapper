@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import TimeoutSampler, wait_status_not_exist
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -85,7 +86,7 @@ class VirtualMachineRestore(NamespacedResource):
     def wait_restore_done(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait for the the restore to be done. This check 2 parameters, the restore status to be complete
-        and the VM status restoreInProgress to bu null.
+        and the VM status restoreInProgress to be null.
 
         Args:
             timeout (int): Time to wait.
@@ -95,7 +96,7 @@ class VirtualMachineRestore(NamespacedResource):
         """
         self.wait_complete(timeout=timeout)
 
-        vm_restore_status = "restoreInProgress"
+        restore_in_progress = "restoreInProgress"
         vm = list(
             VirtualMachine.get(
                 dyn_client=self.client,
@@ -104,18 +105,12 @@ class VirtualMachineRestore(NamespacedResource):
             )
         )
 
-        if vm:
-            LOGGER.info(
-                f"Wait for {vm[0].kind} {self.vm_name} {vm_restore_status} to be null"
-            )
+        if not vm:
+            raise ResourceNotFoundError(f"VirtualMachine: {self.vm_name} not found")
 
-            for sample in TimeoutSampler(
-                wait_timeout=timeout,
-                sleep=1,
-                exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-                func=lambda: vm[0]
-                .instance.get("status", {})
-                .get(vm_restore_status, None),
-            ):
-                if not sample:
-                    return
+        vm = vm[0]
+        LOGGER.info(
+            f"Wait for {vm.kind} {vm.name} status {restore_in_progress} to be null"
+        )
+
+        wait_status_not_exist(vm=vm, status=restore_in_progress, timeout=timeout)
