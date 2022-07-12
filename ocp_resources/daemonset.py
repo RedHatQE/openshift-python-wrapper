@@ -1,14 +1,13 @@
-import logging
-
 import kubernetes
 from openshift.dynamic.exceptions import NotFoundError
 from urllib3.exceptions import ProtocolError
 
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class DaemonSet(NamespacedResource):

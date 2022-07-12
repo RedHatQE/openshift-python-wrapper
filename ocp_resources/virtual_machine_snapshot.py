@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import logging
 
 from urllib3.exceptions import ProtocolError
 
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachineSnapshot(NamespacedResource):

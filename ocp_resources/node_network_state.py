@@ -1,13 +1,13 @@
-import logging
 import time
 
 from openshift.dynamic.exceptions import ConflictError
 
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 SLEEP = 1
 TIMEOUT = 240
