@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import logging
 
 from urllib3.exceptions import ProtocolError
 
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import TIMEOUT, Resource
 from ocp_resources.utils import TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class CDIConfig(Resource):
