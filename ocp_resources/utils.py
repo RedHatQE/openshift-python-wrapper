@@ -1,9 +1,10 @@
-import logging
 import subprocess
 import time
 
+from ocp_resources.logger import get_logger
 
-LOGGER = logging.getLogger(__name__)
+
+LOGGER = get_logger(name=__name__)
 
 
 class TimeoutExpiredError(Exception):

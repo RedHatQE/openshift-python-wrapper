@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import re
 from distutils.version import Version
@@ -10,10 +9,12 @@ from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import InternalServerError, NotFoundError
 from urllib3.exceptions import ProtocolError
 
+from ocp_resources.logger import get_logger
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
+
 TIMEOUT = 240
 MAX_SUPPORTED_API_VERSION = "v1"
 
