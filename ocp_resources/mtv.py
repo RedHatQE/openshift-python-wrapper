@@ -1,9 +1,8 @@
-import logging
-
+from ocp_resources.logger import get_logger
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 def _get_status_condition_log_message(**status_condition):
