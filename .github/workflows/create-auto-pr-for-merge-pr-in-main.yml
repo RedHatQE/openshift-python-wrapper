@@ -9,9 +9,11 @@ jobs:
     name: release_pull_request
     steps:
     - name: safe directory
-      run: git config --global --add safe.directory .
+      run: git config --global --add safe.directory /github/workspace
     - name: checkout
       uses: actions/checkout@v3
+    - name: safe directory
+      run: git config --global --add safe.directory /github/workspace
     - name: Create PR to branch
       uses: myakove/github-action-cherry-pick@master
       with:
