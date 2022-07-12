@@ -1,9 +1,8 @@
-import logging
-
+from ocp_resources.logger import get_logger
 from ocp_resources.resource import Resource
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 _DELETE_NUDGE_DELAY = 30
 _DELETE_NUDGE_INTERVAL = 5
