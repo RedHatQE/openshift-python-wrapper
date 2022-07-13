@@ -279,7 +279,8 @@ def skip_existing_resource_creation_teardown(
                 )
 
 
-def wait_status_not_exist(vm, status, timeout):
+def wait_status_null(vm, status, timeout):
+    LOGGER.info(f"Wait for {vm.kind} {vm.name} status {status} to be null")
     for sample in TimeoutSampler(
         wait_timeout=timeout,
         sleep=1,
