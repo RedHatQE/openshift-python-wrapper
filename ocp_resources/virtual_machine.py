@@ -162,3 +162,14 @@ class VirtualMachine(NamespacedResource):
             VM printableStatus if VM.status.printableStatus else None
         """
         return self.instance.get("status", {}).get("printableStatus")
+
+    def wait_for_status_null(self, status, timeout=TIMEOUT_4MINUTES):
+        LOGGER.info(f"Wait for {self.kind} {self.name} status {status} to be None")
+        for sample in TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            func=lambda: self.instance.get("status", {}).get(status),
+        ):
+            if not sample:
+                return

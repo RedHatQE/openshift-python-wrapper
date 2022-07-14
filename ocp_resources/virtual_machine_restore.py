@@ -5,7 +5,7 @@ from openshift.dynamic.exceptions import ResourceNotFoundError
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler, wait_status_null
+from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -86,7 +86,7 @@ class VirtualMachineRestore(NamespacedResource):
     def wait_restore_done(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait for the the restore to be done. This check 2 parameters, the restore status to be complete
-        and the VM status restoreInProgress to be null.
+        and the VM status restoreInProgress to be None.
 
         Args:
             timeout (int): Time to wait.
@@ -96,15 +96,13 @@ class VirtualMachineRestore(NamespacedResource):
         """
         self.wait_complete(timeout=timeout)
 
-        vm = list(
-            VirtualMachine.get(
-                dyn_client=self.client,
-                namespace=self.namespace,
-                name=self.vm_name,
-            )
+        vm = VirtualMachine(
+            client=self.client,
+            namespace=self.namespace,
+            name=self.vm_name,
         )
 
-        if not vm:
+        if not vm.exists:
             raise ResourceNotFoundError(f"VirtualMachine: {self.vm_name} not found")
 
-        wait_status_null(vm=vm[0], status="restoreInProgress", timeout=timeout)
+        vm.wait_for_status_null(status="restoreInProgress", timeout=timeout)

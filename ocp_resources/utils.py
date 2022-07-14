@@ -2,7 +2,6 @@ import time
 
 import yaml
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.logger import get_logger
 
 
@@ -277,15 +276,3 @@ def skip_existing_resource_creation_teardown(
                     _check_exists=check_exists,
                     _msg=skip_create_warn_msg,
                 )
-
-
-def wait_status_null(vm, status, timeout):
-    LOGGER.info(f"Wait for {vm.kind} {vm.name} status {status} to be null")
-    for sample in TimeoutSampler(
-        wait_timeout=timeout,
-        sleep=1,
-        exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-        func=lambda: vm.instance.get("status", {}).get(status),
-    ):
-        if not sample:
-            return
