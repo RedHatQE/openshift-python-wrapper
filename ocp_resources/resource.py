@@ -868,6 +868,11 @@ class Resource:
         def _instance():
             return self.api.get(name=self.name)
 
+        if self.yaml_file and not self.name:
+            self.to_dict()
+            if not self.name:
+                raise ValueError(f"Resource name is {self.name}")
+
         return self.retry_cluster_exceptions(func=_instance)
 
     @property
