@@ -17,7 +17,7 @@ class Restore(NamespacedResource):
             included_namespaces=None,
             backup_name=None,
             client=None,
-            teardown=True,
+            teardown=False,
             privileged_client=None,
             yaml_file=None,
             **kwargs,

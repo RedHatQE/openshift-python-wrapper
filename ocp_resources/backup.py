@@ -16,7 +16,7 @@ class Backup(NamespacedResource):
         namespace=None,
         included_namespaces = None,
         client=None,
-        teardown=True,
+        teardown=False,
         privileged_client=None,
         yaml_file=None,
         **kwargs,
