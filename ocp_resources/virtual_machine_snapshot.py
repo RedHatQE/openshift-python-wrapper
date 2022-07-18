@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
@@ -77,3 +78,27 @@ class VirtualMachineSnapshot(NamespacedResource):
         for sample in samples:
             if sample:
                 return
+
+    def wait_snapshot_done(self, timeout=TIMEOUT_4MINUTES):
+        """
+        Wait for the the snapshot to be done. This check 2 parameters, the snapshot status to be readyToUse
+        and the VM status snapshotInProgress to be None.
+
+        Args:
+            timeout (int): Time to wait.
+
+        Raises:
+            TimeoutExpiredError: If timeout reached.
+        """
+        self.wait_ready_to_use(timeout=timeout)
+
+        vm = VirtualMachine(
+            client=self.client,
+            namespace=self.namespace,
+            name=self.vm_name,
+        )
+
+        if not vm.exists:
+            raise ResourceNotFoundError(f"VirtualMachine: {self.vm_name} not found")
+
+        vm.wait_for_status_none(status="snapshotInProgress", timeout=timeout)
