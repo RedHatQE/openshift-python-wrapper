@@ -113,6 +113,8 @@ class Pod(NamespacedResource):
             raise ExecOnPodError(
                 command=command, rc=-1, out="", err=stream_closed_error
             )
+        if rcstring == "Failure":
+            raise ExecOnPodError(command=command, rc=-1, out="", err=error_channel)
 
         stdout = resp.read_stdout(timeout=5)
         stderr = resp.read_stderr(timeout=5)
