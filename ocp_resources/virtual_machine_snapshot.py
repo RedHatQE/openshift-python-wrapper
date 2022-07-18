@@ -101,4 +101,4 @@ class VirtualMachineSnapshot(NamespacedResource):
         if not vm.exists:
             raise ResourceNotFoundError(f"VirtualMachine: {self.vm_name} not found")
 
-        vm.wait_for_status_null(status="snapshotInProgress", timeout=timeout)
+        vm.wait_for_status_none(status="snapshotInProgress", timeout=timeout)

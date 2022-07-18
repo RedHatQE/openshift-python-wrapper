@@ -105,4 +105,4 @@ class VirtualMachineRestore(NamespacedResource):
         if not vm.exists:
             raise ResourceNotFoundError(f"VirtualMachine: {self.vm_name} not found")
 
-        vm.wait_for_status_null(status="restoreInProgress", timeout=timeout)
+        vm.wait_for_status_none(status="restoreInProgress", timeout=timeout)

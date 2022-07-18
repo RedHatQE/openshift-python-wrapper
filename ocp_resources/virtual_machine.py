@@ -163,7 +163,7 @@ class VirtualMachine(NamespacedResource):
         """
         return self.instance.get("status", {}).get("printableStatus")
 
-    def wait_for_status_null(self, status, timeout=TIMEOUT_4MINUTES):
+    def wait_for_status_none(self, status, timeout=TIMEOUT_4MINUTES):
         LOGGER.info(f"Wait for {self.kind} {self.name} status {status} to be None")
         for sample in TimeoutSampler(
             wait_timeout=timeout,
