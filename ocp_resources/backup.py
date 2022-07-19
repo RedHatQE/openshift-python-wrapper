@@ -14,7 +14,7 @@ class Backup(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        included_namespaces = None,
+        included_namespaces=None,
         client=None,
         teardown=False,
         privileged_client=None,
@@ -32,17 +32,10 @@ class Backup(NamespacedResource):
         )
         self.included_namespaces = included_namespaces
 
-
     def to_dict(self):
         res = super().to_dict()
         if self.yaml_file:
             return res
-        res.update(
-            {
-                "spec": {
-                    "includedNamespaces": self.included_namespaces
-                }
-            }
-        )
+        res.update({"spec": {"includedNamespaces": self.included_namespaces}})
 
         return res

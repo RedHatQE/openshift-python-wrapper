@@ -11,16 +11,16 @@ class Restore(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.VELERO_IO
 
     def __init__(
-            self,
-            name=None,
-            namespace=None,
-            included_namespaces=None,
-            backup_name=None,
-            client=None,
-            teardown=False,
-            privileged_client=None,
-            yaml_file=None,
-            **kwargs,
+        self,
+        name=None,
+        namespace=None,
+        included_namespaces=None,
+        backup_name=None,
+        client=None,
+        teardown=False,
+        privileged_client=None,
+        yaml_file=None,
+        **kwargs,
     ):
         super().__init__(
             name=name,
