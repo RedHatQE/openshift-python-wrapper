@@ -346,6 +346,7 @@ class Resource:
         POOL_KUBEVIRT_IO = "pool.kubevirt.io"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
+        REMEDIATION_MEDIK8S_IO = "remediation.medik8s.io"
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
