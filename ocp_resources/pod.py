@@ -5,7 +5,7 @@ import kubernetes
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import NamespacedResource, kube_v1_api
 from ocp_resources.utils import TimeoutWatch
 
 
@@ -60,7 +60,6 @@ class Pod(NamespacedResource):
             delete_timeout=delete_timeout,
             **kwargs,
         )
-        self._kube_api = kubernetes.client.CoreV1Api(api_client=self.client.client)
 
     @property
     def containers(self):
@@ -92,7 +91,7 @@ class Pod(NamespacedResource):
         stream_closed_error = "stream resp is closed"
         LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
         resp = kubernetes.stream.stream(
-            api_method=self._kube_api.connect_get_namespaced_pod_exec,
+            api_method=self._kube_v1_api.connect_get_namespaced_pod_exec,
             name=self.name,
             namespace=self.namespace,
             command=command,
@@ -125,6 +124,8 @@ class Pod(NamespacedResource):
             raise ExecOnPodError(
                 command=command, rc=-1, out="", err=stream_closed_error
             )
+        if rcstring == "Failure":
+            raise ExecOnPodError(command=command, rc=-1, out="", err=error_channel)
 
         stdout = resp.read_stdout(timeout=5)
         stderr = resp.read_stderr(timeout=5)
@@ -147,7 +148,7 @@ class Pod(NamespacedResource):
         Returns:
             str: Pod logs.
         """
-        return self._kube_api.read_namespaced_pod_log(
+        return self._kube_v1_api.read_namespaced_pod_log(
             name=self.name, namespace=self.namespace, **kwargs
         )
 
@@ -167,3 +168,7 @@ class Pod(NamespacedResource):
     @property
     def ip(self):
         return self.instance.status.podIP
+
+    @property
+    def _kube_v1_api(self):
+        return kube_v1_api(api_client=self.client.client)
