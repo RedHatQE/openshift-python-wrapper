@@ -23,6 +23,11 @@ class NNCPConfigurationFailed(Exception):
 class NodeNetworkConfigurationPolicy(Resource):
     api_group = Resource.ApiGroup.NMSTATE_IO
 
+    class Spec:
+        ROUTES = "routes"
+        CAPTURE = "capture"
+        INTERFACES = "interfaces"
+
     class Conditions:
         class Type:
             DEGRADED = "Degraded"
@@ -325,6 +330,31 @@ class NodeNetworkConfigurationPolicy(Resource):
                 LOGGER.error(exp)
 
         super().clean_up()
+
+    def append(self, nncp, specs):
+        """
+        Append config from a second nncp.
+
+        :param nncp: node_network_configuration_policy, the nncp which holds desired config
+        :param specs: list, list of config to append from supplied nncp
+
+        Example:
+        bridge_nncp.append(bond_nncp, [bond_nncp.Spec.Routes, bond_nncp.Spec.Interfaces])
+        will append routes and ifaces configured in bond_nncp to bridge_nncp.
+        """
+        if not self.res:
+            self.res = self.to_dict()
+
+        if self.Spec.ROUTES in specs:
+            self.res["spec"]["desiredState"][self.Spec.ROUTES].append(nncp.routes)
+
+        if self.Spec.CAPTURE in specs:
+            self.res["spec"][self.Spec.CAPTURE].update(nncp.capture)
+
+        if self.Spec.INTERFACES in specs:
+            self.res["spec"]["desiredState"][self.Spec.INTERFACES].append(
+                nncp.desired_state["interfaces"]
+            )
 
     def _absent_interface(self):
         for _iface in self.desired_state["interfaces"]:
