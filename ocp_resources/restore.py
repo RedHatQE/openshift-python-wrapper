@@ -22,6 +22,8 @@ class Restore(NamespacedResource):
         yaml_file=None,
         **kwargs,
     ):
+        assert backup_name
+
         super().__init__(
             name=name,
             namespace=namespace,
@@ -42,10 +44,13 @@ class Restore(NamespacedResource):
         res.update(
             {
                 "spec": {
-                    "includedNamespaces": self.included_namespaces,
                     "backupName": self.backup_name,
                 }
             }
         )
-
+        if self.included_namespaces:
+            res["spec"]["includedNamespaces"] = self.included_namespaces
         return res
+
+    class Status(NamespacedResource.Status):
+        COMPLETED = "Completed"
