@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils import missing_reuquired_arguments_msg
 
 
 class Restore(NamespacedResource):
@@ -22,7 +23,7 @@ class Restore(NamespacedResource):
         yaml_file=None,
         **kwargs,
     ):
-        assert backup_name
+        assert backup_name, missing_reuquired_arguments_msg("backup_name")
 
         super().__init__(
             name=name,

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils import missing_reuquired_arguments_msg
 
 
 class Backup(NamespacedResource):
@@ -22,7 +23,7 @@ class Backup(NamespacedResource):
         excluded_resources=None,
         **kwargs,
     ):
-        assert included_namespaces
+        assert included_namespaces, missing_reuquired_arguments_msg("included_namespaces")
 
         super().__init__(
             name=name,
