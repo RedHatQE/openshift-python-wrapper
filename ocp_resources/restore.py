@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import missing_reuquired_arguments_msg
 
 
 class Restore(NamespacedResource):
@@ -23,7 +22,8 @@ class Restore(NamespacedResource):
         yaml_file=None,
         **kwargs,
     ):
-        assert backup_name, missing_reuquired_arguments_msg("backup_name")
+        if not backup_name:
+            raise ValueError("backup_name can't be None")
 
         super().__init__(
             name=name,
@@ -52,6 +52,3 @@ class Restore(NamespacedResource):
         if self.included_namespaces:
             res["spec"]["includedNamespaces"] = self.included_namespaces
         return res
-
-    class Status(NamespacedResource.Status):
-        COMPLETED = "Completed"

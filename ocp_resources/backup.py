@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import missing_reuquired_arguments_msg
 
 
 class Backup(NamespacedResource):
@@ -23,9 +22,8 @@ class Backup(NamespacedResource):
         excluded_resources=None,
         **kwargs,
     ):
-        assert included_namespaces, missing_reuquired_arguments_msg(
-            "included_namespaces"
-        )
+        if not included_namespaces:
+            raise ValueError("included_namespaces can't be None")
 
         super().__init__(
             name=name,
@@ -54,6 +52,3 @@ class Backup(NamespacedResource):
         if self.excluded_resources:
             res["spec"]["excludedResources"] = self.excluded_resources
         return res
-
-    class Status(NamespacedResource.Status):
-        COMPLETED = "Completed"
