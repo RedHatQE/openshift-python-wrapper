@@ -339,7 +339,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         :param specs: list, list of config to append from supplied nncp
 
         Example:
-        bridge_nncp.append(bond_nncp, [bond_nncp.Spec.Routes, bond_nncp.Spec.Interfaces])
+        bridge_nncp.append(bond_nncp, [bond_nncp.Spec.ROUTES, bond_nncp.Spec.INTERFACES])
         will append routes and ifaces configured in bond_nncp to bridge_nncp.
         """
         if not self.res:
