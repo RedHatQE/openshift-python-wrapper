@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
@@ -175,8 +174,3 @@ class VirtualMachine(NamespacedResource):
         ):
             if not sample:
                 return
-
-    def verify_exists(self):
-        """ " Raise an error if VM is not exist"""
-        if not self.exists:
-            raise ResourceNotFoundError(f"VirtualMachine: {self.name} not found")

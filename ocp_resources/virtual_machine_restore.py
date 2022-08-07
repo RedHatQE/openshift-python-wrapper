@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
@@ -101,6 +102,6 @@ class VirtualMachineRestore(NamespacedResource):
             name=self.vm_name,
         )
 
-        vm.verify_exists()
-
-        vm.wait_for_status_none(status="restoreInProgress", timeout=timeout)
+        if vm.exists:
+            return vm.wait_for_status_none(status="restoreInProgress", timeout=timeout)
+        raise ResourceNotFoundError(f"VirtualMachine: {vm.name} not found")
