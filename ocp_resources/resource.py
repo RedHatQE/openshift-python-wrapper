@@ -49,76 +49,6 @@ def kube_v1_api(api_client):
     return kubernetes.client.CoreV1Api(api_client=api_client)
 
 
-def _collect_instance_data(directory, resource_object):
-    with open(os.path.join(directory, f"{resource_object.name}.yaml"), "w") as fd:
-        fd.write(resource_object.instance.to_str())
-
-
-def _collect_pod_logs(dyn_client, resource_item, **kwargs):
-    return kube_v1_api(api_client=dyn_client.client).read_namespaced_pod_log(
-        name=resource_item.metadata.name,
-        namespace=resource_item.metadata.namespace,
-        **kwargs,
-    )
-
-
-def _collect_virt_launcher_data(dyn_client, directory, resource_object):
-    if resource_object.kind == "VirtualMachineInstance":
-        for pod in dyn_client.resources.get(kind="Pod").get().items:
-            pod_name = pod.metadata.name
-            pod_instance = dyn_client.resources.get(
-                api_version=pod.apiVersion, kind=pod.kind
-            ).get(name=pod_name, namespace=pod.metadata.namespace)
-            if pod_name.startswith("virt-launcher"):
-                with open(os.path.join(directory, f"{pod_name}.log"), "w") as fd:
-                    fd.write(
-                        _collect_pod_logs(
-                            dyn_client=dyn_client,
-                            resource_item=pod,
-                            container="compute",
-                        )
-                    )
-
-                with open(os.path.join(directory, f"{pod_name}.yaml"), "w") as fd:
-                    fd.write(pod_instance.to_str())
-
-
-def _collect_data_volume_data(dyn_client, directory, resource_object):
-    if resource_object.kind == "DataVolume":
-        cdi_worker_prefixes = ("importer", "cdi-upload")
-        for pod in dyn_client.resources.get(kind="Pod").get().items:
-            pod_name = pod.metadata.name
-            pod_instance = dyn_client.resources.get(
-                api_version=pod.apiVersion, kind=pod.kind
-            ).get(name=pod_name, namespace=pod.metadata.namespace)
-            if pod_name.startswith(cdi_worker_prefixes) or pod_name.endswith(
-                "source-pod"
-            ):
-                with open(os.path.join(directory, f"{pod_name}.log"), "w") as fd:
-                    fd.write(
-                        _collect_pod_logs(dyn_client=dyn_client, resource_item=pod)
-                    )
-
-                with open(os.path.join(directory, f"{pod_name}.yaml"), "w") as fd:
-                    fd.write(pod_instance.to_str())
-
-
-def _collect_data(resource_object, dyn_client=None):
-    dyn_client = (
-        dyn_client
-        if dyn_client
-        else DynamicClient(kubernetes.config.new_client_from_config())
-    )
-    directory = os.environ.get("TEST_DIR_LOG")
-    _collect_instance_data(directory=directory, resource_object=resource_object)
-    _collect_virt_launcher_data(
-        dyn_client=dyn_client, directory=directory, resource_object=resource_object
-    )
-    _collect_data_volume_data(
-        dyn_client=dyn_client, directory=directory, resource_object=resource_object
-    )
-
-
 def _find_supported_resource(dyn_client, api_group, kind):
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(
@@ -518,14 +448,6 @@ class Resource:
         return self
 
     def clean_up(self):
-        if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
-            try:
-                _collect_data(resource_object=self)
-            except Exception as exception_:
-                LOGGER.warning(
-                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
-                )
-
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
