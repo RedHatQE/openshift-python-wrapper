@@ -172,5 +172,5 @@ class VirtualMachine(NamespacedResource):
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=lambda: self.instance.get("status", {}).get(status),
         ):
-            if not sample:
+            if sample is None:
                 return
