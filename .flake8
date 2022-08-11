@@ -1,5 +1,7 @@
 [flake8]
+
 max-line-length = 120
+
 exclude =
     doc,
     .tox,
@@ -44,4 +46,4 @@ fcfn_exclude_functions =
     signal,
 
 enable-extensions =
-    FCFN,
+    FCN,
