@@ -7,7 +7,6 @@ from io import StringIO
 from signal import SIGINT, signal
 
 import kubernetes
-import urllib3
 import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
@@ -46,14 +45,17 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
+def kube_v1_api(api_client):
+    return kubernetes.client.CoreV1Api(api_client=api_client)
+
+
 def _collect_instance_data(directory, resource_object):
     with open(os.path.join(directory, f"{resource_object.name}.yaml"), "w") as fd:
         fd.write(resource_object.instance.to_str())
 
 
 def _collect_pod_logs(dyn_client, resource_item, **kwargs):
-    kube_v1_api = kubernetes.client.CoreV1Api(api_client=dyn_client.client)
-    return kube_v1_api.read_namespaced_pod_log(
+    return kube_v1_api(api_client=dyn_client.client).read_namespaced_pod_log(
         name=resource_item.metadata.name,
         namespace=resource_item.metadata.namespace,
         **kwargs,
@@ -141,6 +143,25 @@ def _get_api_version(dyn_client, api_group, kind):
 
     LOGGER.info(f"kind: {kind} api version: {res.group_version}")
     return res.group_version
+
+
+def _get_client(config_file=None, context=None):
+    """
+    Get a kubernetes client.
+
+    Args:
+        config_file (str): path to a kubeconfig file.
+        context (str): name of the context to use.
+
+    Returns:
+        DynamicClient: a kubernetes client.
+    """
+    return DynamicClient(
+        client=kubernetes.config.new_client_from_config(
+            config_file=config_file,
+            context=context,
+        )
+    )
 
 
 def sub_resource_level(current_class, owner_class, parent_class):
@@ -248,6 +269,7 @@ class Resource:
         COMPLETED = "Completed"
         RUNNING = "Running"
         TERMINATING = "Terminating"
+        ERROR = "Error"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
@@ -359,6 +381,8 @@ class Resource:
         dry_run=None,
         node_selector=None,
         node_selector_labels=None,
+        config_file=None,
+        context=None,
     ):
         """
         Create a API resource
@@ -376,26 +400,10 @@ class Resource:
         self.privileged_client = privileged_client
         self.yaml_file = yaml_file
         self.resource_dict = None  # Filled in case yaml_file is not None
+        self.config_file = config_file
+        self.context = context
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
-
-        if not self.client:
-            try:
-                self.client = DynamicClient(
-                    client=kubernetes.config.new_client_from_config()
-                )
-            except (
-                kubernetes.config.ConfigException,
-                urllib3.exceptions.MaxRetryError,
-            ):
-                LOGGER.error(
-                    "You need to be logged into a cluster or have $KUBECONFIG env configured"
-                )
-                raise
-        if not self.api_version:
-            self.api_version = _get_api_version(
-                dyn_client=self.client, api_group=self.api_group, kind=self.kind
-            )
 
         self.teardown = teardown
         self.timeout = timeout
@@ -405,6 +413,7 @@ class Resource:
         self.node_selector_labels = node_selector_labels
         self.node_selector_spec = self._prepare_node_selector_spec()
         self.res = None
+        self.yaml_file_contents = None
 
     def _prepare_node_selector_spec(self):
         if self.node_selector:
@@ -424,22 +433,25 @@ class Resource:
             dict: Resource dict.
         """
         if self.yaml_file:
-            if isinstance(self.yaml_file, StringIO):
-                data = self.yaml_file.read()
-            else:
-                with open(self.yaml_file, "r") as stream:
-                    data = stream.read()
+            if not self.yaml_file_contents:
+                if isinstance(self.yaml_file, StringIO):
+                    self.yaml_file_contents = self.yaml_file.read()
+                else:
+                    with open(self.yaml_file, "r") as stream:
+                        self.yaml_file_contents = stream.read()
 
-            self.resource_dict = yaml.safe_load(stream=data)
+            self.resource_dict = yaml.safe_load(stream=self.yaml_file_contents)
             self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.resource_dict["metadata"]["name"]
-            return self.resource_dict
+        else:
+            self._set_client_and_api_version()
+            self.resource_dict = {
+                "apiVersion": self.api_version,
+                "kind": self.kind,
+                "metadata": {"name": self.name},
+            }
 
-        return {
-            "apiVersion": self.api_version,
-            "kind": self.kind,
-            "metadata": {"name": self.name},
-        }
+        return self.resource_dict
 
     def to_dict(self):
         """
@@ -553,6 +565,17 @@ class Resource:
 
         return kwargs
 
+    def _set_client_and_api_version(self):
+        if not self.client:
+            self.client = _get_client(
+                config_file=self.config_file, context=self.context
+            )
+
+        if not self.api_version:
+            self.api_version = _get_api_version(
+                dyn_client=self.client, api_group=self.api_group, kind=self.kind
+            )
+
     def full_api(self, **kwargs):
         """
         Get resource API
@@ -572,6 +595,8 @@ class Resource:
         Returns:
             Resource: Resource object.
         """
+        self._set_client_and_api_version()
+
         kwargs = self._prepare_singular_name_kwargs(**kwargs)
 
         return self.client.resources.get(
@@ -797,17 +822,29 @@ class Resource:
             return sample
 
     @classmethod
-    def get(cls, dyn_client, singular_name=None, *args, **kwargs):
+    def get(
+        cls,
+        dyn_client=None,
+        config_file=None,
+        context=None,
+        singular_name=None,
+        *args,
+        **kwargs,
+    ):
         """
         Get resources
 
         Args:
-            dyn_client (DynamicClient): Open connection to remote cluster
-            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
+            dyn_client (DynamicClient): Open connection to remote cluster.
+            config_file (str): Path to config file for connecting to remote cluster.
+            context (str): Context name for connecting to remote cluster.
+            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
 
         Returns:
             generator: Generator of Resources of cls.kind
         """
+        if not dyn_client:
+            dyn_client = _get_client(config_file=config_file, context=context)
 
         def _get():
             _resources = cls._prepare_resources(
@@ -947,12 +984,23 @@ class NamespacedResource(Resource):
             raise ValueError("name and namespace or yaml file is required")
 
     @classmethod
-    def get(cls, dyn_client, singular_name=None, raw=False, *args, **kwargs):
+    def get(
+        cls,
+        dyn_client=None,
+        config_file=None,
+        context=None,
+        singular_name=None,
+        raw=False,
+        *args,
+        **kwargs,
+    ):
         """
         Get resources
 
         Args:
             dyn_client (DynamicClient): Open connection to remote cluster
+            config_file (str): Path to config file for connecting to remote cluster.
+            context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
             raw (bool): If True return raw object from openshift-restclient-python
 
@@ -960,6 +1008,9 @@ class NamespacedResource(Resource):
         Returns:
             generator: Generator of Resources of cls.kind
         """
+        if not dyn_client:
+            dyn_client = _get_client(config_file=config_file, context=context)
+
         _resources = cls._prepare_resources(
             dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
         )
