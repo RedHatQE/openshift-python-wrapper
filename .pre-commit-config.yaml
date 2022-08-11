@@ -12,7 +12,7 @@ repos:
           - --remove-all-unused-imports
 
   - repo: https://github.com/hadialqattan/pycln
-    rev: "v1.2.5"
+    rev: "v2.1.1"
     hooks:
         - id: pycln
 
@@ -22,12 +22,12 @@ repos:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: "22.3.0"
+    rev: "22.6.0"
     hooks:
     - id: black
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: "v4.1.0"
+    rev: "v4.3.0"
     hooks:
     - id: check-merge-conflict
     - id: debug-statements
@@ -38,9 +38,10 @@ repos:
     - id: check-builtin-literals
 
   - repo: https://github.com/PyCQA/flake8
-    rev: "4.0.1"
+    rev: "5.0.4"
     hooks:
       - id: flake8
+        args: [--max-line-length=120]
         additional_dependencies: [
           "git+https://github.com/RedHatQE/flake8-plugins.git",
           "pep8-naming",
@@ -50,6 +51,6 @@ repos:
         ]
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.2.0
+    rev: v1.3.0
     hooks:
       - id: detect-secrets
