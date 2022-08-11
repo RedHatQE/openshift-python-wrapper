@@ -339,16 +339,6 @@ class Resource:
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
 
-        if not self.client:
-            self.client = _get_client(
-                config_file=self.config_file, context=self.context
-            )
-
-        if not self.api_version:
-            self.api_version = _get_api_version(
-                dyn_client=self.client, api_group=self.api_group, kind=self.kind
-            )
-
         self.teardown = teardown
         self.timeout = timeout
         self.delete_timeout = delete_timeout
@@ -388,6 +378,7 @@ class Resource:
             self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.resource_dict["metadata"]["name"]
         else:
+            self._set_client_and_api_version()
             self.resource_dict = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
@@ -500,6 +491,17 @@ class Resource:
 
         return kwargs
 
+    def _set_client_and_api_version(self):
+        if not self.client:
+            self.client = _get_client(
+                config_file=self.config_file, context=self.context
+            )
+
+        if not self.api_version:
+            self.api_version = _get_api_version(
+                dyn_client=self.client, api_group=self.api_group, kind=self.kind
+            )
+
     def full_api(self, **kwargs):
         """
         Get resource API
@@ -519,6 +521,8 @@ class Resource:
         Returns:
             Resource: Resource object.
         """
+        self._set_client_and_api_version()
+
         kwargs = self._prepare_singular_name_kwargs(**kwargs)
 
         return self.client.resources.get(
