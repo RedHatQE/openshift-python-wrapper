@@ -50,7 +50,7 @@ class VirtualMachineImport(NamespacedResource):
         """
 
         VALIDATION_COMPLETED = "ValidationCompleted"
-        SECRET_NOT_FOUND = "SecretNotFound"
+        SECRET_NOT_FOUND = "SecretNotFound"  # pragma: allowlist secret
         RESOURCE_MAPPING_NOT_FOUND = "ResourceMappingNotFound"
         UNINITIALIZED_PROVIDER = "UninitializedProvider"
         SOURCE_VM_NOT_FOUND = "SourceVMNotFound"
