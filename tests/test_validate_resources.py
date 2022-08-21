@@ -47,7 +47,9 @@ def _process_api_type(api_type, api_value, resource_dict, cls):
 def _get_api_group_and_version(bodies):
     for targets in bodies:
         api_type = targets.targets[0].id
-        return api_type, targets.value.attr
+        return api_type, getattr(
+            targets.value, "attr", getattr(targets.value, "s", None)
+        )
 
 
 def _get_namespaced(cls, resource_dict, api_value):
