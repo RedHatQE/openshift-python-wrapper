@@ -23,6 +23,7 @@ from ocp_resources.constants import (
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,
 )
+from ocp_resources.event import Event
 from ocp_resources.logger import get_logger
 from ocp_resources.utils import (
     TimeoutExpiredError,
@@ -886,6 +887,51 @@ class Resource:
         for sample in samples:
             if sample:
                 return
+
+    def events(
+        self,
+        name=None,
+        label_selector=None,
+        field_selector=None,
+        resource_version=None,
+        timeout=None,
+    ):
+        """
+        get - retrieves K8s events.
+
+        Args:
+            name (str): event name
+            label_selector (str): filter events by labels; comma separated string of key=value
+            field_selector (str): filter events by fields; comma separated string of key=valueevent fields;
+                comma separated string of key=value
+            resource_version (str): filter events by their resource's version
+            timeout (int): timeout in seconds
+
+        Returns
+            list: event objects
+
+        example: reading all CSV Warning events in namespace "my-namespace", with reason of "AnEventReason"
+            pod = Pod(client=client, name="pod", namespace="my-namespace")
+            for event in pod.events(
+                default_client,
+                namespace="my-namespace",
+                field_selector="involvedObject.kind==ClusterServiceVersion,type==Warning,reason=AnEventReason",
+                timeout=10,
+            ):
+                print(event.object)
+        """
+        _field_selector = f"involvedObject.name=={self.name}"
+        if field_selector:
+            field_selector = f"{_field_selector},{field_selector}"
+        yield from Event.get(
+            dyn_client=self.client,
+            namespace=self.namespace,
+            name=name,
+            label_selector=label_selector,
+            field_selector=field_selector or _field_selector,
+            resource_version=resource_version,
+            timeout=timeout,
+        )
 
 
 class NamespacedResource(Resource):
