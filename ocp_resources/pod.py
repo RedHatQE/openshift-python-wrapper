@@ -161,9 +161,11 @@ class Pod(NamespacedResource):
         Returns:
             Node: Node
         """
+        node_name = self.instance.spec.nodeName
+        assert node_name, f"Node not found for pod {self.name}"
         return Node(
             client=self.privileged_client or self.client,
-            name=self.instance.spec.nodeName,
+            name=node_name,
         )
 
     @property
