@@ -3,7 +3,6 @@ import json
 import kubernetes
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.exceptions import PodNotRunningError
 from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
 from ocp_resources.resource import NamespacedResource, kube_v1_api
@@ -162,9 +161,7 @@ class Pod(NamespacedResource):
         Returns:
             Node: Node
         """
-        if self.status != self.Status.RUNNING:
-            raise PodNotRunningError(self.name, self.status)
-
+        assert self.instance.spec.nodeName, f"Node not found for pod {self.name}"
         return Node(
             client=self.privileged_client or self.client,
             name=self.instance.spec.nodeName,
