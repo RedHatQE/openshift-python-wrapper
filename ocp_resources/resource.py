@@ -449,8 +449,9 @@ class Resource:
             if _resource:
                 return _resource
 
-        self.create(wait=wait)
-        return self
+        res = self.create(wait=wait)
+        #  dry-run object do not have instance, we return the cluster resource instead.
+        return res if self.dry_run is not None else self
 
     def clean_up(self):
         """
