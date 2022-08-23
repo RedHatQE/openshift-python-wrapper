@@ -38,6 +38,8 @@ class Pod(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
+        IMAGE_PULL_BACK_OFF = "ImagePullBackOff"
+        ERR_IMAGE_PULL = "ErrImagePull"
 
     def __init__(
         self,
