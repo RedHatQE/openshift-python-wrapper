@@ -8,6 +8,7 @@ from signal import SIGINT, signal
 
 import kubernetes
 import yaml
+from kubernetes.dynamic.exceptions import MethodNotAllowedError
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
     ConflictError,
@@ -932,6 +933,39 @@ class Resource:
             resource_version=resource_version,
             timeout=timeout,
         )
+
+    @staticmethod
+    def get_all_cluster_resources(
+        config_file=None, config_dict=None, context=None, *args, **kwargs
+    ):
+        """
+        Get all cluster resources
+
+        Args:
+            config_file (str): path to a kubeconfig file.
+            config_dict (dict): dict with kubeconfig configuration.
+            context (str): name of the context to use.
+            *args (tuple): args to pass to client.get()
+            **kwargs (dict): kwargs to pass to client.get()
+
+        Yields:
+            kubernetes.dynamic.resource.ResourceField: Cluster resource.
+
+        Example:
+            for resource in get_all_cluster_resources(label_selector="my-label=value"):
+                print(f"Resource: {resource}")
+        """
+
+        client = get_client(
+            config_file=config_file, config_dict=config_dict, context=context
+        )
+        for _resource in client.resources.search():
+            try:
+                _resources = client.get(_resource, *args, **kwargs)
+                yield from _resources.items
+
+            except (NotFoundError, TypeError, MethodNotAllowedError):
+                continue
 
 
 class NamespacedResource(Resource):
