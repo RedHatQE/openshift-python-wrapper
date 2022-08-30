@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from openshift.dynamic.exceptions import ResourceNotFoundError
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from urllib3.exceptions import ProtocolError
-from ocp_resources.logger import get_logger
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachineRestore(NamespacedResource):
@@ -49,7 +46,7 @@ class VirtualMachineRestore(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind} {self.name} status to be complete = {status}"
         )
 

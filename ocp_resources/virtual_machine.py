@@ -4,14 +4,11 @@
 import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
 from urllib3.exceptions import ProtocolError
-from ocp_resources.logger import get_logger
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachine(NamespacedResource):
@@ -149,7 +146,7 @@ class VirtualMachine(NamespacedResource):
         return self.instance.get("status", {}).get("printableStatus")
 
     def wait_for_status_none(self, status, timeout=TIMEOUT_4MINUTES):
-        LOGGER.info(f"Wait for {self.kind} {self.name} status {status} to be None")
+        self.logger.info(f"Wait for {self.kind} {self.name} status {status} to be None")
         for sample in TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
