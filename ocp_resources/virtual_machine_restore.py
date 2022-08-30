@@ -3,7 +3,6 @@
 from openshift.dynamic.exceptions import ResourceNotFoundError
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from urllib3.exceptions import ProtocolError
-
 from ocp_resources.logger import get_logger
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
