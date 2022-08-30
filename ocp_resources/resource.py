@@ -8,6 +8,7 @@ from signal import SIGINT, signal
 
 import kubernetes
 import yaml
+from kubernetes.dynamic.exceptions import MethodNotAllowedError
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
     ConflictError,
@@ -23,6 +24,7 @@ from ocp_resources.constants import (
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,
 )
+from ocp_resources.event import Event
 from ocp_resources.logger import get_logger
 from ocp_resources.utils import (
     TimeoutExpiredError,
@@ -47,76 +49,6 @@ MAX_SUPPORTED_API_VERSION = "v2"
 
 def kube_v1_api(api_client):
     return kubernetes.client.CoreV1Api(api_client=api_client)
-
-
-def _collect_instance_data(directory, resource_object):
-    with open(os.path.join(directory, f"{resource_object.name}.yaml"), "w") as fd:
-        fd.write(resource_object.instance.to_str())
-
-
-def _collect_pod_logs(dyn_client, resource_item, **kwargs):
-    return kube_v1_api(api_client=dyn_client.client).read_namespaced_pod_log(
-        name=resource_item.metadata.name,
-        namespace=resource_item.metadata.namespace,
-        **kwargs,
-    )
-
-
-def _collect_virt_launcher_data(dyn_client, directory, resource_object):
-    if resource_object.kind == "VirtualMachineInstance":
-        for pod in dyn_client.resources.get(kind="Pod").get().items:
-            pod_name = pod.metadata.name
-            pod_instance = dyn_client.resources.get(
-                api_version=pod.apiVersion, kind=pod.kind
-            ).get(name=pod_name, namespace=pod.metadata.namespace)
-            if pod_name.startswith("virt-launcher"):
-                with open(os.path.join(directory, f"{pod_name}.log"), "w") as fd:
-                    fd.write(
-                        _collect_pod_logs(
-                            dyn_client=dyn_client,
-                            resource_item=pod,
-                            container="compute",
-                        )
-                    )
-
-                with open(os.path.join(directory, f"{pod_name}.yaml"), "w") as fd:
-                    fd.write(pod_instance.to_str())
-
-
-def _collect_data_volume_data(dyn_client, directory, resource_object):
-    if resource_object.kind == "DataVolume":
-        cdi_worker_prefixes = ("importer", "cdi-upload")
-        for pod in dyn_client.resources.get(kind="Pod").get().items:
-            pod_name = pod.metadata.name
-            pod_instance = dyn_client.resources.get(
-                api_version=pod.apiVersion, kind=pod.kind
-            ).get(name=pod_name, namespace=pod.metadata.namespace)
-            if pod_name.startswith(cdi_worker_prefixes) or pod_name.endswith(
-                "source-pod"
-            ):
-                with open(os.path.join(directory, f"{pod_name}.log"), "w") as fd:
-                    fd.write(
-                        _collect_pod_logs(dyn_client=dyn_client, resource_item=pod)
-                    )
-
-                with open(os.path.join(directory, f"{pod_name}.yaml"), "w") as fd:
-                    fd.write(pod_instance.to_str())
-
-
-def _collect_data(resource_object, dyn_client=None):
-    dyn_client = (
-        dyn_client
-        if dyn_client
-        else DynamicClient(kubernetes.config.new_client_from_config())
-    )
-    directory = os.environ.get("TEST_DIR_LOG")
-    _collect_instance_data(directory=directory, resource_object=resource_object)
-    _collect_virt_launcher_data(
-        dyn_client=dyn_client, directory=directory, resource_object=resource_object
-    )
-    _collect_data_volume_data(
-        dyn_client=dyn_client, directory=directory, resource_object=resource_object
-    )
 
 
 def _find_supported_resource(dyn_client, api_group, kind):
@@ -145,17 +77,29 @@ def _get_api_version(dyn_client, api_group, kind):
     return res.group_version
 
 
-def _get_client(config_file=None, context=None):
+def get_client(config_file=None, config_dict=None, context=None):
     """
     Get a kubernetes client.
 
+    Pass either config_file or config_dict.
+    If none of them are passed, client will be created from default OS kubeconfig
+    (environment variable or .kube folder).
+
     Args:
         config_file (str): path to a kubeconfig file.
+        config_dict (dict): dict with kubeconfig configuration.
         context (str): name of the context to use.
 
     Returns:
         DynamicClient: a kubernetes client.
     """
+    if config_dict:
+        return DynamicClient(
+            client=kubernetes.config.new_client_from_config_dict(
+                config_dict=config_dict,
+                context=context,
+            )
+        )
     return DynamicClient(
         client=kubernetes.config.new_client_from_config(
             config_file=config_file,
@@ -313,7 +257,7 @@ class Resource:
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
         EVENTS_K8S_IO = "events.k8s.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
-        FLAVOR_KUBEVIRT_IO = "flavor.kubevirt.io"
+        INSTANCE_TYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
@@ -346,6 +290,7 @@ class Resource:
         POOL_KUBEVIRT_IO = "pool.kubevirt.io"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
+        REMEDIATION_MEDIK8S_IO = "remediation.medik8s.io"
         RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO = "route.openshift.io"
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
@@ -363,6 +308,7 @@ class Resource:
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
+        VELERO_IO = "velero.io"
         VM_KUBEVIRT_IO = "vm.kubevirt.io"
 
     class ApiVersion:
@@ -407,16 +353,6 @@ class Resource:
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
 
-        if not self.client:
-            self.client = _get_client(
-                config_file=self.config_file, context=self.context
-            )
-
-        if not self.api_version:
-            self.api_version = _get_api_version(
-                dyn_client=self.client, api_group=self.api_group, kind=self.kind
-            )
-
         self.teardown = teardown
         self.timeout = timeout
         self.delete_timeout = delete_timeout
@@ -456,6 +392,7 @@ class Resource:
             self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.resource_dict["metadata"]["name"]
         else:
+            self._set_client_and_api_version()
             self.resource_dict = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
@@ -517,14 +454,6 @@ class Resource:
         return self
 
     def clean_up(self):
-        if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
-            try:
-                _collect_data(resource_object=self)
-            except Exception as exception_:
-                LOGGER.warning(
-                    f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
-                )
-
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
@@ -576,6 +505,15 @@ class Resource:
 
         return kwargs
 
+    def _set_client_and_api_version(self):
+        if not self.client:
+            self.client = get_client(config_file=self.config_file, context=self.context)
+
+        if not self.api_version:
+            self.api_version = _get_api_version(
+                dyn_client=self.client, api_group=self.api_group, kind=self.kind
+            )
+
     def full_api(self, **kwargs):
         """
         Get resource API
@@ -595,6 +533,8 @@ class Resource:
         Returns:
             Resource: Resource object.
         """
+        self._set_client_and_api_version()
+
         kwargs = self._prepare_singular_name_kwargs(**kwargs)
 
         return self.client.resources.get(
@@ -842,7 +782,7 @@ class Resource:
             generator: Generator of Resources of cls.kind
         """
         if not dyn_client:
-            dyn_client = _get_client(config_file=config_file, context=context)
+            dyn_client = get_client(config_file=config_file, context=context)
 
         def _get():
             _resources = cls._prepare_resources(
@@ -949,6 +889,84 @@ class Resource:
             if sample:
                 return
 
+    def events(
+        self,
+        name=None,
+        label_selector=None,
+        field_selector=None,
+        resource_version=None,
+        timeout=None,
+    ):
+        """
+        get - retrieves K8s events.
+
+        Args:
+            name (str): event name
+            label_selector (str): filter events by labels; comma separated string of key=value
+            field_selector (str): filter events by fields; comma separated string of key=valueevent fields;
+                comma separated string of key=value
+            resource_version (str): filter events by their resource's version
+            timeout (int): timeout in seconds
+
+        Returns
+            list: event objects
+
+        example: reading all CSV Warning events in namespace "my-namespace", with reason of "AnEventReason"
+            pod = Pod(client=client, name="pod", namespace="my-namespace")
+            for event in pod.events(
+                default_client,
+                namespace="my-namespace",
+                field_selector="involvedObject.kind==ClusterServiceVersion,type==Warning,reason=AnEventReason",
+                timeout=10,
+            ):
+                print(event.object)
+        """
+        _field_selector = f"involvedObject.name=={self.name}"
+        if field_selector:
+            field_selector = f"{_field_selector},{field_selector}"
+        yield from Event.get(
+            dyn_client=self.client,
+            namespace=self.namespace,
+            name=name,
+            label_selector=label_selector,
+            field_selector=field_selector or _field_selector,
+            resource_version=resource_version,
+            timeout=timeout,
+        )
+
+    @staticmethod
+    def get_all_cluster_resources(
+        config_file=None, config_dict=None, context=None, *args, **kwargs
+    ):
+        """
+        Get all cluster resources
+
+        Args:
+            config_file (str): path to a kubeconfig file.
+            config_dict (dict): dict with kubeconfig configuration.
+            context (str): name of the context to use.
+            *args (tuple): args to pass to client.get()
+            **kwargs (dict): kwargs to pass to client.get()
+
+        Yields:
+            kubernetes.dynamic.resource.ResourceField: Cluster resource.
+
+        Example:
+            for resource in get_all_cluster_resources(label_selector="my-label=value"):
+                print(f"Resource: {resource}")
+        """
+
+        client = get_client(
+            config_file=config_file, config_dict=config_dict, context=context
+        )
+        for _resource in client.resources.search():
+            try:
+                _resources = client.get(_resource, *args, **kwargs)
+                yield from _resources.items
+
+            except (NotFoundError, TypeError, MethodNotAllowedError):
+                continue
+
 
 class NamespacedResource(Resource):
     """
@@ -1007,7 +1025,7 @@ class NamespacedResource(Resource):
             generator: Generator of Resources of cls.kind
         """
         if not dyn_client:
-            dyn_client = _get_client(config_file=config_file, context=context)
+            dyn_client = get_client(config_file=config_file, context=context)
 
         _resources = cls._prepare_resources(
             dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs

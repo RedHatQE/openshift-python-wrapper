@@ -38,6 +38,8 @@ class Pod(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
+        IMAGE_PULL_BACK_OFF = "ImagePullBackOff"
+        ERR_IMAGE_PULL = "ErrImagePull"
 
     def __init__(
         self,
@@ -131,6 +133,9 @@ class Pod(NamespacedResource):
         if rcstring == "Success" or ignore_rc:
             return stdout
 
+        if rcstring == "Failure":
+            raise ExecOnPodError(command=command, rc=-1, out="", err=error_channel)
+
         returncode = [
             int(cause["message"])
             for cause in error_channel["details"]["causes"]
@@ -158,9 +163,11 @@ class Pod(NamespacedResource):
         Returns:
             Node: Node
         """
+        node_name = self.instance.spec.nodeName
+        assert node_name, f"Node not found for pod {self.name}"
         return Node(
             client=self.privileged_client or self.client,
-            name=self.instance.spec.nodeName,
+            name=node_name,
         )
 
     @property
