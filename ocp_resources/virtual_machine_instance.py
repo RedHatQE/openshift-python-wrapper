@@ -213,10 +213,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             xml_output(string): VMI XML in the multi-line string
         """
-        return self.virt_launcher_pod.execute(
-            command=self.virsh_cmd(action="dumpxml"),
-            container="compute",
-        )
+        return self.execute_virsh_command(command="dumpxml")
 
     @property
     def virt_launcher_pod_user_uid(self):
@@ -265,10 +262,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: VMI Status as string
         """
-        return self.virt_launcher_pod.execute(
-            command=self.virsh_cmd(action="domstate"),
-            container="compute",
-        )
+        return self.execute_virsh_command(command="domstate")
 
     def get_dommemstat(self):
         """
@@ -278,10 +272,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: VMI domain memory stats as string
         """
-        return self.virt_launcher_pod.execute(
-            command=self.virsh_cmd(action="dommemstat"),
-            container="compute",
-        )
+        return self.execute_virsh_command(command="dommemstat")
 
     def get_vmi_active_condition(self):
         """A VMI may have multiple conditions; the active one it the one with
@@ -327,3 +318,9 @@ class VirtualMachineInstance(NamespacedResource):
             if iface["interfaceName"] == interface
         ]
         return iface_ip[0] if iface_ip else None
+
+    def execute_virsh_command(self, command):
+        return self.virt_launcher_pod.execute(
+            command=self.virsh_cmd(action=command),
+            container="compute",
+        )
