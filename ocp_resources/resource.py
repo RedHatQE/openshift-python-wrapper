@@ -256,6 +256,7 @@ class Resource:
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
         EVENTS_K8S_IO = "events.k8s.io"
+        FLAVOR_KUBEVIRT_IO = "flavor.kubevirt.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         INSTANCE_TYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
