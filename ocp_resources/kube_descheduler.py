@@ -12,7 +12,8 @@ class KubeDescheduler(NamespacedResource):
         profiles=None,
         descheduling_interval=3600,
         log_level="Normal",
-        managemet_state="Managed",
+        management_state="Managed",
+        mode="Predictive",
         operator_log_level="Normal",
         teardown=True,
         client=None,
@@ -43,7 +44,8 @@ class KubeDescheduler(NamespacedResource):
         self.profiles = profiles or ["AffinityAndTaints"]
         self.descheduling_interval = descheduling_interval
         self.log_level = log_level
-        self.managemet_state = managemet_state
+        self.management_state = management_state
+        self.mode = mode
         self.operator_log_level = operator_log_level
 
     def to_dict(self):
@@ -56,7 +58,8 @@ class KubeDescheduler(NamespacedResource):
                 "spec": {
                     "deschedulingIntervalSeconds": self.descheduling_interval,
                     "logLevel": self.log_level,
-                    "managementState": self.managemet_state,
+                    "managementState": self.management_state,
+                    "mode": self.mode,
                     "operatorLogLevel": self.operator_log_level,
                     "profiles": self.profiles,
                 }
