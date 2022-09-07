@@ -5,6 +5,14 @@
 # Required
 version: 2
 
+python:
+  version: "3.8"
+  install:
+    - method: pip
+      path: kubernetes
+    - method: pip
+      path: openshift
+
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
    configuration: docs/conf.py
