@@ -56,9 +56,7 @@ class MigrationPolicy(Resource):
             res["spec"]["completionTimeoutPerGiB"] = self.completion_timeout_per_gb
 
         if self.namespace_selector:
-            selectors.setdefault("namespaceSelector", {}).setdefault(
-                "matchLabels", self.namespace_selector
-            )
+            selectors.setdefault("namespaceSelector", self.namespace_selector)
 
         if self.vmi_selector:
             selectors.setdefault("virtualMachineInstanceSelector", {}).setdefault(
