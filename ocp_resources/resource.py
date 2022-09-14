@@ -252,6 +252,7 @@ class Resource:
         APPS = "apps"
         BATCH = "batch"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
+        CLONE_KUBEVIRT_IO = "clone.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
