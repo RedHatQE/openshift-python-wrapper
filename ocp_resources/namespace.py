@@ -25,9 +25,10 @@ class Namespace(Resource):
         teardown=True,
         label=None,
         yaml_file=None,
+        **kwargs
     ):
         super().__init__(
-            name=name, client=client, teardown=teardown, yaml_file=yaml_file
+            name=name, client=client, teardown=teardown, yaml_file=yaml_file, **kwargs
         )
         self.label = label
 
