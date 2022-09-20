@@ -814,6 +814,25 @@ class Resource:
         """
         return self.instance["metadata"]["labels"]
 
+    def conditions_sampler(self, timeout):
+        """
+        Get resource conditions for a given timeout.
+
+        Args:
+            timeout (int): Time to get conditions.
+
+        Returns:
+            TimeoutSampler: TimeoutSampler object.
+        """
+        return TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            func=self.api.get,
+            field_selector=f"metadata.name=={self.name}",
+            namespace=self.namespace,
+        )
+
     def wait_for_condition(self, condition, status, timeout=300):
         """
         Wait for Pod condition to be in desire status.
@@ -829,20 +848,11 @@ class Resource:
         self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
-        samples = TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=1,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
-        )
-        for sample in samples:
-            if (
-                sample.items
-                and sample.items[0].get("status")
-                and sample.items[0].status.get("conditions")
-            ):
+        for sample in self.conditions_sampler(timeout=timeout):
+            conditions = sample.items and sample.items[0].get("status", {}).get(
+                "conditions"
+            )
+            if conditions:
                 sample_conditions = sample.items[0].status.conditions
                 if sample_conditions:
                     for cond in sample_conditions:
