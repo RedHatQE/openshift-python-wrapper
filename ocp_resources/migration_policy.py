@@ -59,8 +59,6 @@ class MigrationPolicy(Resource):
             selectors.setdefault("namespaceSelector", self.namespace_selector)
 
         if self.vmi_selector:
-            selectors.setdefault("virtualMachineInstanceSelector", {}).setdefault(
-                "matchLabels", self.vmi_selector
-            )
+            selectors.setdefault("virtualMachineInstanceSelector", self.vmi_selector)
 
         return res
