@@ -60,13 +60,11 @@ class ClusterRole(Resource):
         if not self.res:
             self.res = super().to_dict()
 
-        rule = {}
+        rule = {"verbs": verbs}
         if api_groups:
             rule["apiGroups"] = api_groups
         if permissions_to_resources:
             rule["resources"] = permissions_to_resources
-        if verbs:
-            rule["verbs"] = verbs
         if rule:
             self._set_rule(rule=rule)
 
