@@ -28,6 +28,7 @@ class VirtualMachine(NamespacedResource):
         STARTING = "Starting"
         STOPPED = "Stopped"
         STOPPING = "Stopping"
+        WAITING_FOR_VOLUME_BINDING = "WaitingForVolumeBinding"
 
     def __init__(
         self,
