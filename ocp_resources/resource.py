@@ -215,8 +215,6 @@ class ValueMismatch(Exception):
     Raises when value doesn't match the class value
     """
 
-    pass
-
 
 class Resource(object):
     """

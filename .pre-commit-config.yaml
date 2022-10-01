@@ -2,6 +2,15 @@ default_language_version:
     python: python3
 
 repos:
+  - repo: https://github.com/myint/autoflake
+    rev: "v1.6.1"
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+
   - repo: https://github.com/hadialqattan/pycln
     rev: "v2.1.1"
     hooks:
@@ -13,7 +22,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: "22.6.0"
+    rev: "22.8.0"
     hooks:
     - id: black
 
@@ -35,7 +44,8 @@ repos:
         args: [--max-line-length=120]
         additional_dependencies: [
           "git+https://github.com/RedHatQE/flake8-plugins.git",
-          "pep8-naming"
+          "pep8-naming",
+          "flake8-mutable",
         ]
 
   - repo: https://github.com/Yelp/detect-secrets
