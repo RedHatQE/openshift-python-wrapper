@@ -12,6 +12,7 @@ class Subscription(NamespacedResource):
         client=None,
         source=None,
         source_namespace=None,
+        package_name=None,
         install_plan_approval=None,
         channel=None,
         starting_csv=None,
@@ -33,6 +34,7 @@ class Subscription(NamespacedResource):
         )
         self.source = source
         self.source_namespace = source_namespace
+        self.package_name = package_name
         self.channel = channel
         self.install_plan_approval = install_plan_approval
         self.starting_csv = starting_csv
@@ -49,7 +51,7 @@ class Subscription(NamespacedResource):
                 "spec": {
                     "sourceNamespace": self.source_namespace,
                     "source": self.source,
-                    "name": self.name,
+                    "name": self.package_name or self.name,
                     "channel": self.channel,
                     "installPlanApproval": self.install_plan_approval,
                     "startingCSV": self.starting_csv,
