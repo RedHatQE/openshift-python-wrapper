@@ -127,6 +127,34 @@ class VirtualMachine(NamespacedResource):
                 # VM status should be taken from spec.status.ready
                 return
 
+    def wait_for_status_ready(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
+        """
+        Wait for resource to be in status ready
+
+        Args:
+            status: Expected status: True for a running VM, None for a stopped VM.
+            timeout (int): Time to wait for the resource.
+
+        Raises:
+            TimeoutExpiredError: If timeout reached.
+        """
+        LOGGER.info(
+            f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
+        )
+        samples = TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=sleep,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            func=self.api.get,
+            field_selector=f"metadata.name=={self.name}",
+            namespace=self.namespace,
+        )
+        for sample in samples:
+            if sample.items and self.ready == status:
+                # VM with runStrategy does not have spec.running attribute
+                # VM status should be taken from spec.status.ready
+                return
+
     def get_interfaces(self):
         return self.instance.spec.template.spec.domain.devices.interfaces
 
