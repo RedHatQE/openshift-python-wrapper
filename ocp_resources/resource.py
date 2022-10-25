@@ -259,7 +259,7 @@ class Resource:
         EVENTS_K8S_IO = "events.k8s.io"
         EXPORT_KUBEVIRT_IO = "export.kubevirt.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
-        INSTANCE_TYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
+        INSTANCETYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
