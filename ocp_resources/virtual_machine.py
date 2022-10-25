@@ -127,9 +127,9 @@ class VirtualMachine(NamespacedResource):
                 # VM status should be taken from spec.status.ready
                 return
 
-    def wait_for_status_ready(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
+    def wait_for_ready_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
-        Wait for resource to be in status ready
+        Wait for VM resource ready status to be at desire status
 
         Args:
             status: Expected status: True for a running VM, None for a stopped VM.
