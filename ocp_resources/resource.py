@@ -317,7 +317,6 @@ class Resource:
         V1 = "v1"
         V1BETA1 = "v1beta1"
         V1ALPHA1 = "v1alpha1"
-        V1ALPHA2 = "v1alpha2"
         V1ALPHA3 = "v1alpha3"
 
     def __init__(
