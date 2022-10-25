@@ -8,6 +8,8 @@ import os
 import pytest
 import requests
 
+from ocp_resources.resource import Resource  # noqa
+
 
 def _api_group_name(api_value):
     try:
