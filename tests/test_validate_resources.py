@@ -4,14 +4,17 @@
 import ast
 import json
 import os
-import re
 
 import pytest
 import requests
 
 
 def _api_group_name(api_value):
-    return re.sub("_", ".", api_value.lower())
+    try:
+        return eval(f"Resource.ApiGroup.{api_value}")
+    except AttributeError:
+        return api_value
+    # return re.sub("_", ".", api_value.lower())
 
 
 def _api_group_dict(resource_dict, api_group_name):
