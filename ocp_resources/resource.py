@@ -39,6 +39,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     InternalServerError: [
         "etcdserver: leader changed",
         "etcdserver: request timed out",
+        "Internal error occurred: failed calling webhook",
     ],
     ServerTimeoutError: [],
 }
