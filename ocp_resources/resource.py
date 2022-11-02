@@ -825,9 +825,11 @@ class Resource:
             resource_version (str): The version with which to filter results. Only events with
                 a resource_version greater than this value will be returned
 
-        Returns:
-            TimeoutSampler: TimeoutSampler generator to interact with.
-                Check wait_for_condition() for example.
+        Yield:
+            Event object with these keys:
+                   'type': The type of event such as "ADDED", "DELETED", etc.
+                   'raw_object': a dict representing the watched object.
+                   'object': A ResourceInstance wrapping raw_object.
         """
         yield from self.api.watch(
             timeout=timeout,
