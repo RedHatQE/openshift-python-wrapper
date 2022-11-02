@@ -375,6 +375,7 @@ class Resource:
 
         self.teardown = teardown
         self.timeout = timeout
+        self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
 
     @ClassProperty
     def kind(cls):  # noqa: N805
@@ -487,7 +488,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
-        LOGGER.info(f"Wait until {self.kind} {self.name} is created")
+        self.logger.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
@@ -511,7 +512,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
+        self.logger.info(f"Wait until {self.kind} {self.name} is deleted")
         return self.client_wait_deleted(timeout=timeout)
 
     @property
@@ -554,7 +555,7 @@ class Resource:
             TimeoutExpiredError: If resource in not in desire status.
         """
         stop_status = stop_status if stop_status else self.Status.FAILED
-        LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
@@ -580,7 +581,9 @@ class Resource:
 
         except TimeoutExpiredError:
             if current_status:
-                LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
+                self.logger.error(
+                    f"Status of {self.kind} {self.name} is {current_status}"
+                )
             raise
 
     def create(self, body=None, wait=False):
@@ -611,9 +614,10 @@ class Resource:
 
             data.update(body)
 
-        LOGGER.info(f"Posting {data}")
-        LOGGER.info(f"Create {self.kind} {self.name}")
-        res = self.api.create(body=data, namespace=self.namespace)
+        self.logger.info(f"Create {self.kind} {self.name}")
+        self.logger.info(f"Posting {data}")
+        self.logger.debug(f"\n{yaml.dump(data)}")
+        res = self.api.create(body=data, namespace=self.namespace, dry_run=self.dry_run)
         if wait and res:
             return self.wait()
         return res
@@ -622,7 +626,8 @@ class Resource:
         LOGGER.info(f"Delete {self.kind} {self.name}")
         if self.exists:
             data = self.instance.to_dict()
-            LOGGER.info(f"Deleting {data}")
+            self.logger.info(f"Deleting {data}")
+            self.logger.debug(f"\n{yaml.dump(data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
@@ -643,7 +648,7 @@ class Resource:
         Returns:
            str: Status
         """
-        LOGGER.info(f"Get {self.kind} {self.name} status")
+        self.logger.info(f"Get {self.kind} {self.name} status")
         return self.instance.status.phase
 
     def update(self, resource_dict):
@@ -653,7 +658,8 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        LOGGER.info(f"Update {self.kind} {self.name}: {resource_dict}")
+        self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -665,7 +671,8 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
+        self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -745,7 +752,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If Pod condition in not in desire status.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
         samples = TimeoutSampler(
