@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
+
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachine(NamespacedResource):
@@ -106,7 +103,7 @@ class VirtualMachine(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
         )
         samples = TimeoutSampler(
