@@ -2,13 +2,9 @@
 
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
-
-
-LOGGER = get_logger(name=__name__)
 
 
 def _map_mappings(mappings):
@@ -227,7 +223,7 @@ class VirtualMachineImport(NamespacedResource):
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
     ):
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}"
         )
         samples = TimeoutSampler(
@@ -256,7 +252,7 @@ class VirtualMachineImport(NamespacedResource):
                                     f"Status of {self.kind} {self.name} {cond.type} is "
                                     f"{cond.status} ({cond.reason}: {cond.message})"
                                 )
-                                LOGGER.info(msg)
+                                self.logger.info(msg)
                                 return
         except TimeoutExpiredError:
             raise TimeoutExpiredError(

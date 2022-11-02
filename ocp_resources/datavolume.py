@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class DataVolume(NamespacedResource):
@@ -231,5 +227,5 @@ class DataVolume(NamespacedResource):
                 else:
                     break
         except TimeoutExpiredError:
-            LOGGER.error(f"{self.name} status is {sample}")
+            self.logger.error(f"{self.name} status is {sample}")
             raise

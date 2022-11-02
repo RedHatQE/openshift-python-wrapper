@@ -1,10 +1,6 @@
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 TIMEOUT_5MINUTES = 300
@@ -163,7 +159,7 @@ class MachineSet(NamespacedResource):
                 )
             )
         except TimeoutExpiredError:
-            LOGGER.error(
+            self.logger.error(
                 f"Machine-set {self.name} replicas failed to reach into 'ready' state, actual ready replicas: "
                 f"{self.ready_replicas}, desired replicas: {self.desired_replicas}"
             )
@@ -187,7 +183,7 @@ class MachineSet(NamespacedResource):
         body = super().to_dict()
         body.update({"spec": {"replicas": replicas}})
 
-        LOGGER.info(
+        self.logger.info(
             f"Scale machine-set from {self.desired_replicas} replicas to {replicas} replicas"
         )
         self.update(resource_dict=body)

@@ -3,7 +3,6 @@ import re
 from openshift.dynamic.exceptions import ConflictError
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
@@ -11,9 +10,6 @@ from ocp_resources.node_network_configuration_enactment import (
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class NNCPConfigurationFailed(Exception):
@@ -299,7 +295,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             func=self.update,
             resource_dict=resource,
         )
-        LOGGER.info(f"Applying {resource}")
+        self.logger.info(f"Applying {resource}")
         for _ in samples:
             return
 
@@ -312,7 +308,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.wait_for_status_success()
             return self
         except Exception as exp:
-            LOGGER.error(exp)
+            self.logger.error(exp)
             super().__exit__(exception_type=None, exception_value=None, traceback=None)
             raise
 
@@ -322,7 +318,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self._absent_interface()
                 self.wait_for_status_success()
             except Exception as exp:
-                LOGGER.error(exp)
+                self.logger.error(exp)
 
         super().clean_up()
 
@@ -397,7 +393,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
-                    LOGGER.info(f"NNCP {self.name} configured Successfully")
+                    self.logger.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
                 elif sample == no_match_node_condition_reason:
@@ -411,7 +407,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
-            LOGGER.error(
+            self.logger.error(
                 f"Unable to configure NNCP {self.name} "
                 f"{f'nodes: {[node.name for node in self.nodes]}' if self.nodes else ''}"
             )
@@ -456,7 +452,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             try:
                 nnce.wait_for_conditions()
             except TimeoutExpiredError:
-                LOGGER.error(f"Failed to get NNCE {nnce.name} status")
+                self.logger.error(f"Failed to get NNCE {nnce.name} status")
                 continue
 
             for nnce_cond in nnce.instance.status.conditions:

@@ -4,14 +4,10 @@ import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachineInstance(NamespacedResource):
@@ -128,8 +124,8 @@ class VirtualMachineInstance(NamespacedResource):
 
             virt_pod = self.virt_launcher_pod
             if virt_pod:
-                LOGGER.debug(f"{virt_pod.name} *****LOGS*****")
-                LOGGER.debug(virt_pod.log(container="compute"))
+                self.logger.debug(f"{virt_pod.name} *****LOGS*****")
+                self.logger.debug(virt_pod.log(container="compute"))
 
             raise
 
@@ -145,7 +141,7 @@ class VirtualMachineInstance(NamespacedResource):
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait until {self.kind} {self.name} is "
             f"{'Paused' if pause else 'Unpuased'}"
         )
@@ -306,7 +302,7 @@ class VirtualMachineInstance(NamespacedResource):
     def os_version(self):
         vmi_os_version = self.instance.status.guestOSInfo.get("version", {})
         if not vmi_os_version:
-            LOGGER.warning(
+            self.logger.warning(
                 "Guest agent is not installed on the VM; OS version is not available."
             )
         return vmi_os_version
