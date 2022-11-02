@@ -3,6 +3,9 @@ import json
 from ocp_resources.resource import NamespacedResource
 
 
+DEFAULT_CNI_VERSION = "0.3.1"
+
+
 class NetworkAttachmentDefinition(NamespacedResource):
     """
     NetworkAttachmentDefinition object.
@@ -15,8 +18,52 @@ class NetworkAttachmentDefinition(NamespacedResource):
         self,
         name=None,
         namespace=None,
-        bridge_name=None,
+        client=None,
         cni_type=None,
+        cni_version=None,
+        config=None,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(
+            name=name,
+            namespace=namespace,
+            client=client,
+            *args,
+            **kwargs,
+        )
+        self.cni_type = cni_type
+        self.cni_version = cni_version
+        self.config = config
+
+    def to_dict(self):
+        res = super().to_dict()
+        if self.yaml_file:
+            return res
+
+        if self.resource_name is not None:
+            res["metadata"]["annotations"] = {
+                f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
+            }
+        res["spec"] = {}
+        if self.config:
+            res["spec"]["config"] = self.config
+        else:
+            res["spec"]["config"] = {
+                "cniVersion": self.cni_version,
+                "type": self.cni_type,
+            }
+        return res
+
+
+class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
+    def __init__(
+        self,
+        name,
+        namespace,
+        bridge_name,
+        cni_type,
+        cni_version=DEFAULT_CNI_VERSION,
         vlan=None,
         client=None,
         mtu=None,
@@ -32,10 +79,11 @@ class NetworkAttachmentDefinition(NamespacedResource):
             client=client,
             teardown=teardown,
             dry_run=dry_run,
+            cni_version=cni_version,
+            cni_type=cni_type,
         )
         self.old_nad_format = old_nad_format
         self.bridge_name = bridge_name
-        self.cni_type = cni_type
         self.vlan = vlan
         self.mtu = mtu
         self.macspoofchk = macspoofchk
@@ -43,44 +91,31 @@ class NetworkAttachmentDefinition(NamespacedResource):
 
     def to_dict(self):
         res = super().to_dict()
-        if self.yaml_file:
-            return res
+        spec_config = res["spec"]["config"]
+        spec_config["name"] = self.bridge_name
+        spec_config["bridge"] = self.bridge_name
 
-        res["spec"] = {}
-        if self.resource_name is not None:
-            res["metadata"]["annotations"] = {
-                f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
-            }
-
-        spec_config = {"cniVersion": "0.3.1", "name": self.bridge_name}
-        bridge_dict = {"type": self.cni_type, "bridge": self.bridge_name}
         if self.mtu:
-            bridge_dict["mtu"] = self.mtu
+            spec_config["mtu"] = self.mtu
+
         if self.vlan:
-            bridge_dict["vlan"] = self.vlan
-        if self.old_nad_format:
-            spec_config["plugins"] = [bridge_dict]
-        else:
-            spec_config.update(bridge_dict)
+            spec_config["vlan"] = self.vlan
+
         if self.macspoofchk:
             spec_config["macspoofchk"] = self.macspoofchk
 
         res["spec"]["config"] = spec_config
         return res
 
-    def wait_for_status(
-        self, status, timeout=None, label_selector=None, resource_version=None
-    ):
-        raise NotImplementedError(f"{self.kind} does not have status")
 
-
-class LinuxBridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
+class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     def __init__(
         self,
         name,
         namespace,
         bridge_name,
         cni_type="cnv-bridge",
+        cni_version=DEFAULT_CNI_VERSION,
         vlan=None,
         client=None,
         mtu=None,
@@ -102,6 +137,7 @@ class LinuxBridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
             macspoofchk=macspoofchk,
             add_resource_name=add_resource_name,
             dry_run=dry_run,
+            cni_version=cni_version,
         )
         self.tuning_type = tuning_type
 
@@ -122,7 +158,7 @@ class LinuxBridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
             return f"bridge.network.kubevirt.io/{self.bridge_name}"
 
 
-class OvsBridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
+class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     def __init__(
         self,
         name,
@@ -133,6 +169,7 @@ class OvsBridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         mtu=None,
         teardown=True,
         dry_run=None,
+        cni_version=DEFAULT_CNI_VERSION,
     ):
         super().__init__(
             name=name,
@@ -144,6 +181,7 @@ class OvsBridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
             mtu=mtu,
             teardown=teardown,
             dry_run=dry_run,
+            cni_version=cni_version,
         )
 
     def to_dict(self):
