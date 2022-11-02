@@ -1,10 +1,6 @@
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class Benchmark(NamespacedResource):
