@@ -79,7 +79,7 @@ class VirtualMachine(NamespacedResource):
     def start(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="start")
         if wait:
-            return self.wait_for_status(timeout=timeout, status=True)
+            return self.wait_for_ready_status(timeout=timeout, status=True)
 
     def restart(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="restart")
@@ -92,7 +92,7 @@ class VirtualMachine(NamespacedResource):
     ):
         self.api_request(method="PUT", action="stop")
         if wait:
-            self.wait_for_status(timeout=timeout, status=None)
+            self.wait_for_ready_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted(timeout=vmi_delete_timeout)
 
     def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
@@ -128,7 +128,7 @@ class VirtualMachine(NamespacedResource):
         Wait for VM resource ready status to be at desire status
 
         Args:
-            status: Expected status: True for a running VM, None for a stopped VM.
+            status (any): True for a running VM, None for a stopped VM.
             timeout (int): Time to wait for the resource.
 
         Raises:
