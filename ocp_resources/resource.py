@@ -618,7 +618,7 @@ class Resource:
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {data}")
         self.logger.debug(f"\n{yaml.dump(data)}")
-        res = self.api.create(body=data, namespace=self.namespace, dry_run=self.dry_run)
+        res = self.api.create(body=data, namespace=self.namespace)
         if wait and res:
             return self.wait()
         return res
