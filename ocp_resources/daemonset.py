@@ -2,12 +2,8 @@ import kubernetes
 from openshift.dynamic.exceptions import NotFoundError
 from urllib3.exceptions import ProtocolError
 
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class DaemonSet(NamespacedResource):
@@ -27,7 +23,7 @@ class DaemonSet(NamespacedResource):
         Raises:
             TimeoutExpiredError: If not all the pods are deployed.
         """
-        LOGGER.info(f"Wait for {self.kind} {self.name} to deploy all desired pods")
+        self.logger.info(f"Wait for {self.kind} {self.name} to deploy all desired pods")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
@@ -67,7 +63,7 @@ class DaemonSet(NamespacedResource):
         except NotFoundError:
             return False
 
-        LOGGER.info(f"Delete {self.name}")
+        self.logger.info(f"Delete {self.name}")
         if wait and res:
             return self.wait_deleted(timeout=timeout)
         return res

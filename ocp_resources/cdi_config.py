@@ -3,12 +3,8 @@
 
 from urllib3.exceptions import ProtocolError
 
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import TIMEOUT, Resource
 from ocp_resources.utils import TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class CDIConfig(Resource):
@@ -40,7 +36,7 @@ class CDIConfig(Resource):
         Returns:
             bool: True if url is equal to uploadProxyURL.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind} {self.name} to ensure current URL == uploadProxyURL"
         )
         samples = TimeoutSampler(

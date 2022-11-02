@@ -1,11 +1,7 @@
 from urllib3.exceptions import ProtocolError
 
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class CatalogSourceConfig(NamespacedResource):
@@ -77,5 +73,7 @@ class CatalogSourceConfig(NamespacedResource):
 
         except TimeoutExpiredError:
             if current_status:
-                LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
+                self.logger.error(
+                    f"Status of {self.kind} {self.name} is {current_status}"
+                )
             raise

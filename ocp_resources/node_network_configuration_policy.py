@@ -2,16 +2,12 @@ import re
 
 from openshift.dynamic.exceptions import ConflictError
 
-from ocp_resources.logger import get_logger
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class NNCPConfigurationFailed(Exception):
@@ -146,7 +142,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             func=self.update,
             resource_dict=resource,
         )
-        LOGGER.info(f"Applying {resource}")
+        self.logger.info(f"Applying {resource}")
         for _ in samples:
             return
 
@@ -160,7 +156,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     mtu = pod.execute(
                         command=["cat", f"/sys/class/net/{port}/mtu"]
                     ).strip()
-                    LOGGER.info(
+                    self.logger.info(
                         f"Backup MTU: {pod.node.name} interface {port} MTU is {mtu}"
                     )
                     self.mtu_dict[port] = mtu
@@ -172,7 +168,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.validate_create()
             return self
         except Exception as e:
-            LOGGER.error(e)
+            self.logger.error(e)
             self.clean_up()
             raise
 
@@ -216,7 +212,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self.wait_for_status_success()
                 self.wait_for_interface_deleted()
             except Exception as e:
-                LOGGER.error(e)
+                self.logger.error(e)
 
         super().clean_up()
 
@@ -228,7 +224,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     node_network_state = NodeNetworkState(name=pod.node.name)
                     iface_dict = node_network_state.get_interface(name=iface_name)
                     if iface_dict.get("type") == "ethernet":
-                        LOGGER.info(f"{iface_name} is type ethernet, skipping.")
+                        self.logger.info(f"{iface_name} is type ethernet, skipping.")
                         continue
 
                     node_network_state.wait_until_deleted(name=iface_name)
@@ -341,7 +337,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESS:
-                    LOGGER.info(f"NNCP {self.name} configured Successfully")
+                    self.logger.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
                 elif sample == no_match_node_condition_reason:
@@ -353,7 +349,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     _process_failed_status()
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
-            LOGGER.error(
+            self.logger.error(
                 f"Unable to configure NNCP {self.name} for node {self.node_selector}"
             )
             raise
@@ -383,7 +379,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             try:
                 nnce.wait_for_conditions()
             except TimeoutExpiredError:
-                LOGGER.error(f"Failed to get NNCE {nnce.name} status")
+                self.logger.error(f"Failed to get NNCE {nnce.name} status")
                 continue
 
             for nnce_cond in nnce.instance.status.conditions:

@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import TIMEOUT, NamespacedResource, Resource
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class DataVolume(NamespacedResource):

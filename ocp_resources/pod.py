@@ -2,13 +2,9 @@ import json
 
 import kubernetes
 
-from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutWatch
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class ExecOnPodError(Exception):
@@ -78,7 +74,7 @@ class Pod(NamespacedResource):
         """
         error_channel = {}
         stream_closed_error = "stream resp is closed"
-        LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
+        self.logger.info(f"Execute {command} on {self.name} ({self.node.name})")
         resp = kubernetes.stream.stream(
             api_method=self._kube_api.connect_get_namespaced_pod_exec,
             name=self.name,
