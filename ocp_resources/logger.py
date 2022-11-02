@@ -7,6 +7,7 @@ from colorlog import ColoredFormatter
 
 
 LOGGER = logging.getLogger(__name__)
+LOGGERS = {}
 
 
 class DuplicateFilter(logging.Filter):
@@ -33,6 +34,9 @@ class WrapperLogFormatter(ColoredFormatter):
 
 
 def get_logger(name):
+    if LOGGERS.get(name):
+        return LOGGERS.get(name)
+
     log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
     log_file = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "")
     if log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
@@ -68,4 +72,5 @@ def get_logger(name):
         logger_obj.addHandler(hdlr=log_handler)
 
     logger_obj.propagate = False
+    LOGGERS[name] = logger_obj
     return logger_obj
