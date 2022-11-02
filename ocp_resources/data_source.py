@@ -1,12 +1,8 @@
 from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class DataSource(NamespacedResource):
@@ -61,7 +57,7 @@ class DataSource(NamespacedResource):
                 namespace=pvc_namespace,
             )
         except ResourceNotFoundError:
-            LOGGER.warning(
+            self.logger.warning(
                 f"dataSource {self.name} is pointing to a non-existing PVC, name: {pvc_name}, "
                 f"namespace: {pvc_namespace}"
             )
