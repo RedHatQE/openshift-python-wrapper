@@ -95,34 +95,6 @@ class VirtualMachine(NamespacedResource):
             self.wait_for_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted(timeout=vmi_delete_timeout)
 
-    def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
-        """
-        Wait for resource to be in status
-
-        Args:
-            status: Expected status: True for a running VM, None for a stopped VM.
-            timeout (int): Time to wait for the resource.
-
-        Raises:
-            TimeoutExpiredError: If timeout reached.
-        """
-        self.logger.info(
-            f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
-        )
-        samples = TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=sleep,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
-        )
-        for sample in samples:
-            if sample.items and self.ready == status:
-                # VM with runStrategy does not have spec.running attribute
-                # VM status should be taken from spec.status.ready
-                return
-
     def wait_for_ready_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
         Wait for VM resource ready status to be at desire status
