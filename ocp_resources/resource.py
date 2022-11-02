@@ -352,6 +352,8 @@ class Resource:
         self.privileged_client = privileged_client
         self.yaml_file = yaml_file
         self.resource_dict = None  # Filled in case yaml_file is not None
+        self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
 
@@ -364,7 +366,7 @@ class Resource:
                 kubernetes.config.ConfigException,
                 urllib3.exceptions.MaxRetryError,
             ):
-                LOGGER.error(
+                self.logger.error(
                     "You need to be logged into a cluster or have $KUBECONFIG env configured"
                 )
                 raise
@@ -375,7 +377,6 @@ class Resource:
 
         self.teardown = teardown
         self.timeout = timeout
-        self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
 
     @ClassProperty
     def kind(cls):  # noqa: N805
@@ -420,10 +421,10 @@ class Resource:
     def clean_up(self):
         if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
             try:
-                LOGGER.info(f"Collecting data for {self.kind} {self.name}")
+                self.logger.info(f"Collecting data for {self.kind} {self.name}")
                 _collect_data(resource_object=self)
             except Exception as exception_:
-                LOGGER.warning(
+                self.logger.warning(
                     f"Log collector failed to collect info for {self.kind} {self.name}\nexception: {exception_}"
                 )
 
@@ -623,7 +624,7 @@ class Resource:
         return res
 
     def delete(self, wait=False, timeout=TIMEOUT, body=None):
-        LOGGER.info(f"Delete {self.kind} {self.name}")
+        self.logger.info(f"Delete {self.kind} {self.name}")
         if self.exists:
             data = self.instance.to_dict()
             self.logger.info(f"Deleting {data}")
