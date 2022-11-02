@@ -838,7 +838,7 @@ class Resource:
 
     def wait_for_condition(self, condition, status, timeout=300):
         """
-        Wait for Pod condition to be in desire status.
+        Wait for Resource condition to be in desire status.
 
         Args:
             condition (str): Condition to query.
@@ -846,7 +846,7 @@ class Resource:
             timeout (int): Time to wait for the resource.
 
         Raises:
-            TimeoutExpiredError: If Pod condition in not in desire status.
+            TimeoutExpiredError: If Resource condition in not in desire status.
         """
         self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
