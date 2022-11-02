@@ -610,7 +610,7 @@ class Resource(object):
         """
         self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
         self.logger.debug(f"\n{yaml.dump(resource_dict)}")
-        self.api.patch(
+        self.api().patch(
             body=resource_dict,
             namespace=self.namespace,
             content_type="application/merge-patch+json",
@@ -623,7 +623,7 @@ class Resource(object):
         """
         self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
         self.logger.debug(f"\n{yaml.dump(resource_dict)}")
-        self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
+        self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
     def retry_cluster_exceptions(
