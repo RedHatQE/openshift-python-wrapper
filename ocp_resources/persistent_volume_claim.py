@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class PersistentVolumeClaim(NamespacedResource):
@@ -90,7 +86,7 @@ class PersistentVolumeClaim(NamespacedResource):
         Returns:
             bool: True if bound else False
         """
-        LOGGER.info(f"Check if {self.kind} {self.name} is bound")
+        self.logger.info(f"Check if {self.kind} {self.name} is bound")
         return self.status == self.Status.BOUND
 
     @property

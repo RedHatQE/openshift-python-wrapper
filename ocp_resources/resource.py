@@ -5,6 +5,7 @@ from distutils.version import Version
 
 import kubernetes
 import urllib3
+import yaml
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
     ConflictError,
@@ -334,6 +335,8 @@ class Resource(object):
         self.name = name
         self.client = client
         self.privileged_client = privileged_client
+        self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+
         if not self.client:
             try:
                 self.client = DynamicClient(
@@ -343,7 +346,7 @@ class Resource(object):
                 kubernetes.config.ConfigException,
                 urllib3.exceptions.MaxRetryError,
             ):
-                LOGGER.error(
+                self.logger.error(
                     "You need to be logged into a cluster or have $KUBECONFIG env configured"
                 )
                 raise
@@ -386,13 +389,13 @@ class Resource(object):
     def clean_up(self):
         if os.environ.get("CNV_TEST_COLLECT_LOGS", "0") == "1":
             try:
-                LOGGER.info(f"Collecting data for {self.kind} {self.name}")
+                self.logger.info(f"Collecting data for {self.kind} {self.name}")
                 _collect_data(resource_object=self)
             except Exception as exception_:
-                LOGGER.warning(exception_)
+                self.logger.warning(exception_)
 
         data = self.to_dict()
-        LOGGER.info(f"Deleting {data}")
+        self.logger.info(f"Deleting {data}")
         self.delete(wait=True, timeout=self.timeout)
 
     @classmethod
@@ -443,7 +446,7 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
-        LOGGER.info(f"Wait until {self.kind} {self.name} is created")
+        self.logger.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
@@ -464,7 +467,7 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
+        self.logger.info(f"Wait until {self.kind} {self.name} is deleted")
         return self.client_wait_deleted(timeout=timeout)
 
     @property
@@ -507,7 +510,7 @@ class Resource(object):
             TimeoutExpiredError: If resource in not in desire status.
         """
         stop_status = stop_status if stop_status else self.Status.FAILED
-        LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
@@ -533,7 +536,9 @@ class Resource(object):
 
         except TimeoutExpiredError:
             if current_status:
-                LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
+                self.logger.error(
+                    f"Status of {self.kind} {self.name} is {current_status}"
+                )
             raise
 
     def create(self, body=None, wait=False):
@@ -564,8 +569,8 @@ class Resource(object):
 
             data.update(body)
 
-        LOGGER.info(f"Posting {data}")
-        LOGGER.info(f"Create {self.kind} {self.name}")
+        self.logger.info(f"Posting {data}")
+        self.logger.info(f"Create {self.kind} {self.name}")
         res = self.api().create(body=data, namespace=self.namespace)
         if wait and res:
             return self.wait()
@@ -578,7 +583,7 @@ class Resource(object):
         except NotFoundError:
             return False
 
-        LOGGER.info(f"Delete {self.kind} {self.name}")
+        self.logger.info(f"Delete {self.kind} {self.name}")
         if wait and res:
             return self.wait_deleted(timeout=timeout)
         return res
@@ -593,7 +598,7 @@ class Resource(object):
         Returns:
            str: Status
         """
-        LOGGER.info(f"Get {self.kind} {self.name} status")
+        self.logger.info(f"Get {self.kind} {self.name} status")
         return self.instance.status.phase
 
     def update(self, resource_dict):
@@ -603,7 +608,8 @@ class Resource(object):
         Args:
             resource_dict: Resource dictionary
         """
-        LOGGER.info(f"Update {self.kind} {self.name}: {resource_dict}")
+        self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api().patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -615,7 +621,8 @@ class Resource(object):
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        LOGGER.info(f"Replace {self.kind} {self.name}: {resource_dict}")
+        self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api().replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -695,7 +702,7 @@ class Resource(object):
         Raises:
             TimeoutExpiredError: If Pod condition in not in desire status.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
         samples = TimeoutSampler(
