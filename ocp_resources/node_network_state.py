@@ -47,11 +47,11 @@ class NodeNetworkState(Resource):
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "nodeName": self.name,
@@ -60,7 +60,7 @@ class NodeNetworkState(Resource):
                 }
             }
         )
-        return res
+        return self.res
 
     def apply(self):
         resource = self.to_dict()

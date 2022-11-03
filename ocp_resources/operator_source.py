@@ -34,11 +34,11 @@ class OperatorSource(NamespacedResource):
         self.secret = secret
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "type": "appregistry",
@@ -51,4 +51,4 @@ class OperatorSource(NamespacedResource):
             }
         )
 
-        return res
+        return self.res

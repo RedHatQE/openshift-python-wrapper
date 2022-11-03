@@ -38,11 +38,11 @@ class CatalogSource(NamespacedResource):
         )
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "sourceType": self.source_type,
@@ -54,7 +54,7 @@ class CatalogSource(NamespacedResource):
         )
 
         if self.update_strategy_registry_poll_interval:
-            res["spec"].update(
+            self.res["spec"].update(
                 {
                     "updateStrategy": {
                         "registryPoll": {
@@ -64,4 +64,4 @@ class CatalogSource(NamespacedResource):
                 }
             )
 
-        return res
+        return self.res

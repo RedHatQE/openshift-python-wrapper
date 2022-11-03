@@ -49,23 +49,20 @@ class NetworkAttachmentDefinition(NamespacedResource):
         self.config = config
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        if self.resource_name is not None:
-            res["metadata"]["annotations"] = {
-                f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
-            }
-        res["spec"] = {}
-        if self.config:
-            res["spec"]["config"] = self.config
-        else:
-            res["spec"]["config"] = {
-                "cniVersion": self.cni_version,
-                "type": self.cni_type,
-            }
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            if self.resource_name is not None:
+                self.res["metadata"]["annotations"] = {
+                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
+                }
+            self.res["spec"] = {}
+            if self.config:
+                self.res["spec"]["config"] = self.config
+            else:
+                self.res["spec"]["config"] = {
+                    "cniVersion": self.cni_version,
+                    "type": self.cni_type,
+                }
 
 
 class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
@@ -102,8 +99,8 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         self.add_resource_name = add_resource_name
 
     def to_dict(self):
-        res = super().to_dict()
-        spec_config = res["spec"]["config"]
+        super().to_dict()
+        spec_config = self.res["spec"]["config"]
         spec_config["name"] = self.bridge_name
         spec_config["bridge"] = self.bridge_name
 
@@ -116,8 +113,7 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         if self.macspoofchk:
             spec_config["macspoofchk"] = self.macspoofchk
 
-        res["spec"]["config"] = spec_config
-        return res
+        self.res["spec"]["config"] = spec_config
 
 
 class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
@@ -154,15 +150,14 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         self.tuning_type = tuning_type
 
     def to_dict(self):
-        res = super().to_dict()
+        super().to_dict()
         if self.tuning_type:
             self.old_nad_format = True
-            res["spec"]["config"].setdefault("plugins", []).append(
+            self.res["spec"]["config"].setdefault("plugins", []).append(
                 {"type": self.tuning_type}
             )
 
-        res["spec"]["config"] = json.dumps(res["spec"]["config"])
-        return res
+        self.res["spec"]["config"] = json.dumps(self.res["spec"]["config"])
 
     @property
     def resource_name(self):
@@ -197,9 +192,8 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         )
 
     def to_dict(self):
-        res = super().to_dict()
-        res["spec"]["config"] = json.dumps(res["spec"]["config"])
-        return res
+        super().to_dict()
+        self.res["spec"]["config"] = json.dumps(self.res["spec"]["config"])
 
     @property
     def resource_name(self):

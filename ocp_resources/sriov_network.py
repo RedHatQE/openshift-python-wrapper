@@ -40,19 +40,19 @@ class SriovNetwork(NamespacedResource):
         self.macspoofchk = macspoofchk
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res["spec"] = {
+        self.res["spec"] = {
             "ipam": self.ipam or "{}\n",
             "networkNamespace": self.network_namespace,
             "resourceName": self.resource_name,
         }
         if self.vlan:
-            res["spec"]["vlan"] = self.vlan
+            self.res["spec"]["vlan"] = self.vlan
 
         if self.macspoofchk:
-            res["spec"]["spoofChk"] = self.macspoofchk
+            self.res["spec"]["spoofChk"] = self.macspoofchk
 
-        return res
+        return self.res

@@ -40,20 +40,21 @@ class MigrationPolicy(Resource):
         self.vmi_selector = vmi_selector or {}
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
-        spec = res.setdefault("spec", {})
+            return self.res
+
+        spec = self.res.setdefault("spec", {})
         selectors = spec.setdefault("selectors", {})
 
         if self.allow_auto_converge is not None:
-            res["spec"]["allowAutoConverge"] = self.allow_auto_converge
+            self.res["spec"]["allowAutoConverge"] = self.allow_auto_converge
         if self.allow_post_copy is not None:
-            res["spec"]["allowPostCopy"] = self.allow_post_copy
+            self.res["spec"]["allowPostCopy"] = self.allow_post_copy
         if self.bandwidth_per_migration:
-            res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
+            self.res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
         if self.completion_timeout_per_gb:
-            res["spec"]["completionTimeoutPerGiB"] = self.completion_timeout_per_gb
+            self.res["spec"]["completionTimeoutPerGiB"] = self.completion_timeout_per_gb
 
         if self.namespace_selector:
             selectors.setdefault("namespaceSelector", self.namespace_selector)
@@ -61,4 +62,4 @@ class MigrationPolicy(Resource):
         if self.vmi_selector:
             selectors.setdefault("virtualMachineInstanceSelector", self.vmi_selector)
 
-        return res
+        return self.res

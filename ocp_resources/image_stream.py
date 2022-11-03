@@ -36,10 +36,10 @@ class ImageStream(NamespacedResource):
         self.lookup_policy = lookup_policy
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
-        res.update(
+            return self.res
+        self.res.update(
             {"spec": {"lookupPolicy": {"local": self.lookup_policy}, "tags": self.tags}}
         )
-        return res
+        return self.res

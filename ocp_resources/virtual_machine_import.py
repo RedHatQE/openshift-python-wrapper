@@ -145,11 +145,11 @@ class VirtualMachineImport(NamespacedResource):
         )
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        spec = res.setdefault("spec", {})
+        spec = self.res.setdefault("spec", {})
 
         secret = spec.setdefault("providerCredentialsSecret", {})
         secret["name"] = self.provider_credentials_secret_name
@@ -214,7 +214,7 @@ class VirtualMachineImport(NamespacedResource):
                     "storageMappings", mappings
                 )
 
-        return res
+        return self.res
 
     def wait(
         self,
@@ -289,12 +289,14 @@ class ResourceMapping(NamespacedResource):
         self.mapping = mapping
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
         for provider, mapping in self.mapping.items():
-            res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
+            res_provider_section = self.res.setdefault("spec", {}).setdefault(
+                provider, {}
+            )
             if mapping.network_mappings is not None:
                 res_provider_section.setdefault(
                     "networkMappings",
@@ -306,4 +308,4 @@ class ResourceMapping(NamespacedResource):
                     _map_mappings(mappings=mapping.storage_mappings),
                 )
 
-        return res
+        return self.res

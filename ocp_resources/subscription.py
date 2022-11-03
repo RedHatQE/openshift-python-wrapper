@@ -42,11 +42,11 @@ class Subscription(NamespacedResource):
         self.tolerations = tolerations
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "sourceNamespace": self.source_namespace,
@@ -60,13 +60,13 @@ class Subscription(NamespacedResource):
         )
 
         if self.node_selector:
-            res["spec"].setdefault("config", {}).setdefault("nodeSelector", {}).update(
-                self.node_selector
-            )
+            self.res["spec"].setdefault("config", {}).setdefault(
+                "nodeSelector", {}
+            ).update(self.node_selector)
 
         if self.tolerations:
-            res["spec"].setdefault("config", {}).setdefault("tolerations", []).append(
-                self.tolerations
-            )
+            self.res["spec"].setdefault("config", {}).setdefault(
+                "tolerations", []
+            ).append(self.tolerations)
 
-        return res
+        return self.res

@@ -37,11 +37,11 @@ class CatalogSourceConfig(NamespacedResource):
         self.cs_publisher = cs_publisher
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "source": self.source,
@@ -53,7 +53,7 @@ class CatalogSourceConfig(NamespacedResource):
             }
         )
 
-        return res
+        return self.res
 
     def wait_for_csc_status(self, status, timeout=120):
         """

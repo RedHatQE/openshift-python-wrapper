@@ -42,11 +42,11 @@ class Provider(NamespacedResource, MTV):
         self.vddk_init_image = vddk_init_image
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "type": self.provider_type,
@@ -60,4 +60,4 @@ class Provider(NamespacedResource, MTV):
             }
         )
 
-        return res
+        return self.res

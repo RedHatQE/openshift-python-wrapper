@@ -44,11 +44,11 @@ class Host(NamespacedResource, MTV):
         self.condition_message_ready = self.ConditionMessage.HOST_READY
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "id": self.host_id,
@@ -65,4 +65,4 @@ class Host(NamespacedResource, MTV):
             }
         )
 
-        return res
+        return self.res

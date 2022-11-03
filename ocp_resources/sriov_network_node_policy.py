@@ -44,11 +44,11 @@ class SriovNetworkNodePolicy(NamespacedResource):
         self.node_selector = node_selector
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res["spec"] = {
+        self.res["spec"] = {
             "deviceType": "vfio-pci",
             "nicSelector": {
                 "pfNames": [self.pf_names],
@@ -58,13 +58,13 @@ class SriovNetworkNodePolicy(NamespacedResource):
             "resourceName": self.resource_name,
         }
         if self.mtu:
-            res["spec"]["mtu"] = self.mtu
+            self.res["spec"]["mtu"] = self.mtu
         if self.priority:
-            res["spec"]["priority"] = self.priority
+            self.res["spec"]["priority"] = self.priority
         if self.node_selector:
-            res["spec"]["nodeSelector"] = self.node_selector
+            self.res["spec"]["nodeSelector"] = self.node_selector
         else:
-            res["spec"]["nodeSelector"] = {
+            self.res["spec"]["nodeSelector"] = {
                 "feature.node.kubernetes.io/network-sriov.capable": "true"
             }
-        return res
+        return self.res

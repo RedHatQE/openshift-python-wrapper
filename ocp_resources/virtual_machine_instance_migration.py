@@ -30,10 +30,10 @@ class VirtualMachineInstanceMigration(NamespacedResource):
     def to_dict(self):
         # When creating VirtualMachineInstanceMigration vmi is mandatory but when calling get()
         # we cannot pass vmi.
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
         assert self._vmi, "vmi is mandatory for create"
-        res["spec"] = {"vmiName": self._vmi.name}
-        return res
+        self.res["spec"] = {"vmiName": self._vmi.name}
+        return self.res

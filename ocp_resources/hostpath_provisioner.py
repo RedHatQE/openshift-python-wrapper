@@ -36,17 +36,17 @@ class HostPathProvisioner(Resource):
         self.image_pull_policy = image_pull_policy
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        spec = res.setdefault("spec", {})
+        spec = self.res.setdefault("spec", {})
         path_config = spec.setdefault("pathConfig", {})
         if self.path:
             path_config["path"] = self.path
         if self.image_pull_policy:
             spec["imagePullPolicy"] = self.image_pull_policy
-        return res
+        return self.res
 
     @property
     def volume_path(self):

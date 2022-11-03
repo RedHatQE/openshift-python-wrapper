@@ -40,11 +40,11 @@ class Hook(NamespacedResource, MTV):
         self.playbook = playbook
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "image": self.image,
@@ -52,4 +52,4 @@ class Hook(NamespacedResource, MTV):
                 },
             }
         )
-        return res
+        return self.res

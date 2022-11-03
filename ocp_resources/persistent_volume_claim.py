@@ -62,11 +62,11 @@ class PersistentVolumeClaim(NamespacedResource):
         self.storage_class = storage_class
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update(
+        self.res.update(
             {
                 "spec": {
                     "volumeMode": self.volume_mode,
@@ -82,13 +82,13 @@ class PersistentVolumeClaim(NamespacedResource):
           kubevirt.io/provisionOnNode: <specified_node_name>
         """
         if self.hostpath_node:
-            res["metadata"]["annotations"] = {
+            self.res["metadata"]["annotations"] = {
                 "kubevirt.io/provisionOnNode": self.hostpath_node
             }
         if self.storage_class:
-            res["spec"]["storageClassName"] = self.storage_class
+            self.res["spec"]["storageClassName"] = self.storage_class
 
-        return res
+        return self.res
 
     def bound(self):
         """

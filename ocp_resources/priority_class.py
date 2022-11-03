@@ -36,16 +36,16 @@ class PriorityClass(Resource):
         self.preemption_policy = preemption_policy
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
         if self.value:
-            res["value"] = self.value
+            self.res["value"] = self.value
         if self.global_default:
-            res["globalDefault"] = self.global_default
+            self.res["globalDefault"] = self.global_default
         if self.description:
-            res["description"] = self.description
+            self.res["description"] = self.description
         if self.preemption_policy:
-            res["preemptionPolicy"] = self.preemption_policy
-        return res
+            self.res["preemptionPolicy"] = self.preemption_policy
+        return self.res

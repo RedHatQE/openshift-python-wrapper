@@ -79,9 +79,9 @@ class MachineSet(NamespacedResource):
         self.provider_spec = provider_spec or {}
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
         _spec, _metadata, _labels = ("spec", "metadata", "labels")
         (
@@ -96,13 +96,13 @@ class MachineSet(NamespacedResource):
             "cluster-api-machineset",
         )
 
-        res[_metadata][_labels] = {
+        self.res[_metadata][_labels] = {
             f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
             f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
             f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
         }
 
-        res[_spec] = {
+        self.res[_spec] = {
             "replicas": self.replicas,
             "selector": {
                 "matchLabels": {
@@ -122,7 +122,7 @@ class MachineSet(NamespacedResource):
                 _spec: {"providerSpec": self.provider_spec},
             },
         }
-        return res
+        return self.res
 
     @property
     def available_replicas(self):

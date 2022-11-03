@@ -34,9 +34,9 @@ class UploadTokenRequest(NamespacedResource):
         self.pvc_name = pvc_name
 
     def to_dict(self):
-        res = super().to_dict()
+        self.res = super().to_dict()
         if self.yaml_file:
-            return res
+            return self.res
 
-        res.update({"spec": {"pvcName": self.pvc_name}})
-        return res
+        self.res.update({"spec": {"pvcName": self.pvc_name}})
+        return self.res
