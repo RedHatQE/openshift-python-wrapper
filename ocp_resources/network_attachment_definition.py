@@ -20,11 +20,23 @@ class NetworkAttachmentDefinition(NamespacedResource):
         namespace=None,
         client=None,
         cni_type=None,
-        cni_version=None,
+        cni_version=DEFAULT_CNI_VERSION,
         config=None,
         *args,
         **kwargs,
     ):
+        """
+        Create and manage NetworkAttachmentDefinition
+
+        Args:
+            name (str): Name of the NetworkAttachmentDefinition.
+            namespace (str): Namespace of the NetworkAttachmentDefinition
+            client: (DynamicClient): DynamicClient to use.
+            cni_type (str): NetworkAttachmentDefinition CNI.
+            cni_version (str): NetworkAttachmentDefinition CNI version.
+            config (dict): NetworkAttachmentDefinition spec["config"] to use,
+                if config is None basic config will be created.
+        """
         super().__init__(
             name=name,
             namespace=namespace,
