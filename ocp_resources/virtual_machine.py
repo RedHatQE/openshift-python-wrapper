@@ -146,7 +146,11 @@ class VirtualMachine(NamespacedResource):
         return self.instance.get("status", {}).get("printableStatus")
 
     def wait_for_status_none(self, status, timeout=TIMEOUT_4MINUTES):
+<<<<<<< HEAD
         self.logger.info(f"Wait for {self.kind} {self.name} status {status} to be None")
+=======
+        LOGGER.info(f"Wait for {self.kind} {self.name} status {status} to be None")
+>>>>>>> 4820d34c2664faaf5ebee2dc6b68fe4a00fba48f
         for sample in TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
