@@ -32,18 +32,14 @@ class DataSource(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        self.res.update(
-            {
-                "spec": {
-                    "source": self.source,
-                },
-            }
-        )
-
-        return self.res
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "source": self.source,
+                    },
+                }
+            )
 
     @property
     def pvc(self):

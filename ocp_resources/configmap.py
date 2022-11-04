@@ -33,9 +33,5 @@ class ConfigMap(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        if self.data:
+        if not self.yaml_file and self.data:
             self.res.setdefault("data", {}).update(self.data)
-        return self.res

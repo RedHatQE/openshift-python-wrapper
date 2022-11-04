@@ -34,11 +34,7 @@ class Namespace(Resource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        if self.label:
+        if not self.yaml_file and self.label:
             self.res.setdefault("metadata", {}).setdefault("labels", {}).update(
                 self.label
             )
-        return self.res

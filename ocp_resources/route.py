@@ -36,17 +36,16 @@ class Route(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        if self.service:
-            self.res.update({"spec": {"to": {"kind": "Service", "name": self.service}}})
-        if self.destination_ca_cert:
-            self.res["spec"]["tls"] = {
-                "destinationCACertificate": self.destination_ca_cert,
-                "termination": "reencrypt",
-            }
-        return self.res
+        if not self.yaml_file:
+            if self.service:
+                self.res.update(
+                    {"spec": {"to": {"kind": "Service", "name": self.service}}}
+                )
+            if self.destination_ca_cert:
+                self.res["spec"]["tls"] = {
+                    "destinationCACertificate": self.destination_ca_cert,
+                    "termination": "reencrypt",
+                }
 
     @property
     def exposed_service(self):

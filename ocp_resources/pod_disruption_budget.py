@@ -37,21 +37,17 @@ class PodDisruptionBudget(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        if not self.yaml_file:
+            update_dict = {
+                "spec": {
+                    "selector": self.selector,
+                },
+            }
 
-        update_dict = {
-            "spec": {
-                "selector": self.selector,
-            },
-        }
+            if self.min_available is not None:
+                update_dict["spec"]["minAvailable"] = self.min_available
 
-        if self.min_available is not None:
-            update_dict["spec"]["minAvailable"] = self.min_available
+            if self.max_unavailable is not None:
+                update_dict["spec"]["maxUnavailable"] = self.max_unavailable
 
-        if self.max_unavailable is not None:
-            update_dict["spec"]["maxUnavailable"] = self.max_unavailable
-
-        self.res.update(update_dict)
-
-        return self.res
+            self.res.update(update_dict)

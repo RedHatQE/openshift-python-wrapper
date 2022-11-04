@@ -31,15 +31,13 @@ class HyperConverged(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        if not self.yaml_file:
+            if self.infra:
+                self.res.setdefault("spec", {}).setdefault("infra", {}).update(
+                    self.infra
+                )
 
-        if self.infra:
-            self.res.setdefault("spec", {}).setdefault("infra", {}).update(self.infra)
-
-        if self.workloads:
-            self.res.setdefault("spec", {}).setdefault("workloads", {}).update(
-                self.workloads
-            )
-
-        return self.res
+            if self.workloads:
+                self.res.setdefault("spec", {}).setdefault("workloads", {}).update(
+                    self.workloads
+                )

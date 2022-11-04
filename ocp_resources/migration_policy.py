@@ -41,25 +41,25 @@ class MigrationPolicy(Resource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
+            selectors = spec.setdefault("selectors", {})
 
-        spec = self.res.setdefault("spec", {})
-        selectors = spec.setdefault("selectors", {})
+            if self.allow_auto_converge is not None:
+                self.res["spec"]["allowAutoConverge"] = self.allow_auto_converge
+            if self.allow_post_copy is not None:
+                self.res["spec"]["allowPostCopy"] = self.allow_post_copy
+            if self.bandwidth_per_migration:
+                self.res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
+            if self.completion_timeout_per_gb:
+                self.res["spec"][
+                    "completionTimeoutPerGiB"
+                ] = self.completion_timeout_per_gb
 
-        if self.allow_auto_converge is not None:
-            self.res["spec"]["allowAutoConverge"] = self.allow_auto_converge
-        if self.allow_post_copy is not None:
-            self.res["spec"]["allowPostCopy"] = self.allow_post_copy
-        if self.bandwidth_per_migration:
-            self.res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
-        if self.completion_timeout_per_gb:
-            self.res["spec"]["completionTimeoutPerGiB"] = self.completion_timeout_per_gb
+            if self.namespace_selector:
+                selectors.setdefault("namespaceSelector", self.namespace_selector)
 
-        if self.namespace_selector:
-            selectors.setdefault("namespaceSelector", self.namespace_selector)
-
-        if self.vmi_selector:
-            selectors.setdefault("virtualMachineInstanceSelector", self.vmi_selector)
-
-        return self.res
+            if self.vmi_selector:
+                selectors.setdefault(
+                    "virtualMachineInstanceSelector", self.vmi_selector
+                )

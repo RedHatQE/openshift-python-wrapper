@@ -43,23 +43,24 @@ class Secret(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        if self.accesskeyid:
-            self.res.update(
-                {"data": {"accessKeyId": self.accesskeyid, "secretKey": self.secretkey}}
-            )
-        if self.htpasswd:
-            self.res.update({"data": {"htpasswd": self.htpasswd}})
-        if self.data_dict:
-            self.res.update({"data": self.data_dict})
-        if self.string_data:
-            self.res.update({"stringData": self.string_data})
-        if self.type:
-            self.res.update({"type": self.type})
-
-        return self.res
+        if not self.yaml_file:
+            if self.accesskeyid:
+                self.res.update(
+                    {
+                        "data": {
+                            "accessKeyId": self.accesskeyid,
+                            "secretKey": self.secretkey,
+                        }
+                    }
+                )
+            if self.htpasswd:
+                self.res.update({"data": {"htpasswd": self.htpasswd}})
+            if self.data_dict:
+                self.res.update({"data": self.data_dict})
+            if self.string_data:
+                self.res.update({"stringData": self.string_data})
+            if self.type:
+                self.res.update({"type": self.type})
 
     @property
     def certificate_not_after(self):

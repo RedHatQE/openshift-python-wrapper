@@ -63,32 +63,28 @@ class PersistentVolumeClaim(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        self.res.update(
-            {
-                "spec": {
-                    "volumeMode": self.volume_mode,
-                    "accessModes": [self.accessmodes],
-                    "resources": {"requests": {"storage": self.size}},
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "volumeMode": self.volume_mode,
+                        "accessModes": [self.accessmodes],
+                        "resources": {"requests": {"storage": self.size}},
+                    }
                 }
-            }
-        )
-        """
-        Hostpath-provisioner is "node aware", when using it,
-        a node attribute on the claim must be introduced as follows.
-        annotations:
-          kubevirt.io/provisionOnNode: <specified_node_name>
-        """
-        if self.hostpath_node:
-            self.res["metadata"]["annotations"] = {
-                "kubevirt.io/provisionOnNode": self.hostpath_node
-            }
-        if self.storage_class:
-            self.res["spec"]["storageClassName"] = self.storage_class
-
-        return self.res
+            )
+            """
+            Hostpath-provisioner is "node aware", when using it,
+            a node attribute on the claim must be introduced as follows.
+            annotations:
+              kubevirt.io/provisionOnNode: <specified_node_name>
+            """
+            if self.hostpath_node:
+                self.res["metadata"]["annotations"] = {
+                    "kubevirt.io/provisionOnNode": self.hostpath_node
+                }
+            if self.storage_class:
+                self.res["spec"]["storageClassName"] = self.storage_class
 
     def bound(self):
         """

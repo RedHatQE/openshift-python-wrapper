@@ -24,15 +24,13 @@ class ClusterRoleBinding(Resource):
 
     def to_dict(self):
         self.res = super().to_dict()
+        if not self.yaml_file:
+            self.res.setdefault("roleRef", {})
+            self.res["roleRef"] = {
+                "apiGroup": self.api_group,
+                "kind": ClusterRole.kind,
+                "name": self.cluster_role,
+            }
 
-        self.res.setdefault("roleRef", {})
-        self.res["roleRef"] = {
-            "apiGroup": self.api_group,
-            "kind": ClusterRole.kind,
-            "name": self.cluster_role,
-        }
-
-        if self.subjects:
-            self.res.setdefault("subjects", self.subjects)
-
-        return self.res
+            if self.subjects:
+                self.res.setdefault("subjects", self.subjects)

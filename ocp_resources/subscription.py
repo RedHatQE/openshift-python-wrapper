@@ -43,30 +43,26 @@ class Subscription(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        self.res.update(
-            {
-                "spec": {
-                    "sourceNamespace": self.source_namespace,
-                    "source": self.source,
-                    "name": self.package_name or self.name,
-                    "channel": self.channel,
-                    "installPlanApproval": self.install_plan_approval,
-                    "startingCSV": self.starting_csv,
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "sourceNamespace": self.source_namespace,
+                        "source": self.source,
+                        "name": self.package_name or self.name,
+                        "channel": self.channel,
+                        "installPlanApproval": self.install_plan_approval,
+                        "startingCSV": self.starting_csv,
+                    }
                 }
-            }
-        )
+            )
 
-        if self.node_selector:
-            self.res["spec"].setdefault("config", {}).setdefault(
-                "nodeSelector", {}
-            ).update(self.node_selector)
+            if self.node_selector:
+                self.res["spec"].setdefault("config", {}).setdefault(
+                    "nodeSelector", {}
+                ).update(self.node_selector)
 
-        if self.tolerations:
-            self.res["spec"].setdefault("config", {}).setdefault(
-                "tolerations", []
-            ).append(self.tolerations)
-
-        return self.res
+            if self.tolerations:
+                self.res["spec"].setdefault("config", {}).setdefault(
+                    "tolerations", []
+                ).append(self.tolerations)

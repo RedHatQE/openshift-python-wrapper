@@ -39,29 +39,25 @@ class CatalogSource(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        self.res.update(
-            {
-                "spec": {
-                    "sourceType": self.source_type,
-                    "image": self.image,
-                    "displayName": self.display_name,
-                    "publisher": self.publisher,
-                }
-            }
-        )
-
-        if self.update_strategy_registry_poll_interval:
-            self.res["spec"].update(
+        if not self.yaml_file:
+            self.res.update(
                 {
-                    "updateStrategy": {
-                        "registryPoll": {
-                            "interval": self.update_strategy_registry_poll_interval,
-                        },
-                    },
+                    "spec": {
+                        "sourceType": self.source_type,
+                        "image": self.image,
+                        "displayName": self.display_name,
+                        "publisher": self.publisher,
+                    }
                 }
             )
 
-        return self.res
+            if self.update_strategy_registry_poll_interval:
+                self.res["spec"].update(
+                    {
+                        "updateStrategy": {
+                            "registryPoll": {
+                                "interval": self.update_strategy_registry_poll_interval,
+                            },
+                        },
+                    }
+                )

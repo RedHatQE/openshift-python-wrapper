@@ -41,17 +41,14 @@ class VirtualMachineRestore(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        spec = self.res.setdefault("spec", {})
-        spec.setdefault("target", {})[
-            "apiGroup"
-        ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
-        spec["target"]["kind"] = VirtualMachine.kind
-        spec["target"]["name"] = self.vm_name
-        spec["virtualMachineSnapshotName"] = self.snapshot_name
-        return self.res
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
+            spec.setdefault("target", {})[
+                "apiGroup"
+            ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
+            spec["target"]["kind"] = VirtualMachine.kind
+            spec["target"]["name"] = self.vm_name
+            spec["virtualMachineSnapshotName"] = self.snapshot_name
 
     def wait_complete(self, status=True, timeout=TIMEOUT_4MINUTES):
         """

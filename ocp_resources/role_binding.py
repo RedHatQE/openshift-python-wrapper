@@ -45,27 +45,24 @@ class RoleBinding(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        if not self.yaml_file:
+            subjects = {}
+            if self.subjects_kind:
+                subjects["kind"] = self.subjects_kind
+            if self.subjects_name:
+                subjects["name"] = self.subjects_name
+            if self.subjects_namespace:
+                subjects["namespace"] = self.subjects_namespace
+            if self.subjects_api_group:
+                subjects["apiGroup"] = self.subjects_api_group
+            if subjects:
+                self.res["subjects"] = [subjects]
 
-        subjects = {}
-        if self.subjects_kind:
-            subjects["kind"] = self.subjects_kind
-        if self.subjects_name:
-            subjects["name"] = self.subjects_name
-        if self.subjects_namespace:
-            subjects["namespace"] = self.subjects_namespace
-        if self.subjects_api_group:
-            subjects["apiGroup"] = self.subjects_api_group
-        if subjects:
-            self.res["subjects"] = [subjects]
-
-        roleref = {}
-        if self.role_ref_kind:
-            roleref["kind"] = self.role_ref_kind
-        if self.role_ref_name:
-            roleref["name"] = self.role_ref_name
-        if roleref:
-            roleref["apiGroup"] = self.api_group
-            self.res["roleRef"] = roleref
-        return self.res
+            roleref = {}
+            if self.role_ref_kind:
+                roleref["kind"] = self.role_ref_kind
+            if self.role_ref_name:
+                roleref["name"] = self.role_ref_name
+            if roleref:
+                roleref["apiGroup"] = self.api_group
+                self.res["roleRef"] = roleref

@@ -41,18 +41,14 @@ class SriovNetwork(NamespacedResource):
 
     def to_dict(self):
         self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        if not self.yaml_file:
+            self.res["spec"] = {
+                "ipam": self.ipam or "{}\n",
+                "networkNamespace": self.network_namespace,
+                "resourceName": self.resource_name,
+            }
+            if self.vlan:
+                self.res["spec"]["vlan"] = self.vlan
 
-        self.res["spec"] = {
-            "ipam": self.ipam or "{}\n",
-            "networkNamespace": self.network_namespace,
-            "resourceName": self.resource_name,
-        }
-        if self.vlan:
-            self.res["spec"]["vlan"] = self.vlan
-
-        if self.macspoofchk:
-            self.res["spec"]["spoofChk"] = self.macspoofchk
-
-        return self.res
+            if self.macspoofchk:
+                self.res["spec"]["spoofChk"] = self.macspoofchk
