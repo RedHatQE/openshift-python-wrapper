@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ocp_resources.cdi_config import CDIConfig
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
@@ -8,6 +9,11 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
 LOGGER = get_logger(name=__name__)
+
+
+def is_garbage_collector_enabled_cdi_config():
+    dv_ttl_seconds = CDIConfig(name="config").instance.spec.get("dataVolumeTTLSeconds")
+    return not dv_ttl_seconds or dv_ttl_seconds >= 0
 
 
 class DataVolume(NamespacedResource):
@@ -216,6 +222,12 @@ class DataVolume(NamespacedResource):
             client=self.client,
         )
 
+    def _is_pending(self):
+        if self.exists:
+            return self.instance.status.phase
+        else:
+            return f"DV {self.name} does not exist"
+
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
         sample = None
@@ -223,7 +235,7 @@ class DataVolume(NamespacedResource):
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
                 sleep=10,
-                func=lambda: self.instance.status.phase,
+                func=self._is_pending,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
                 if sample in [self.Status.PENDING, None]:
@@ -233,3 +245,36 @@ class DataVolume(NamespacedResource):
         except TimeoutExpiredError:
             LOGGER.error(f"{self.name} status is {sample}")
             raise
+
+    def is_garbage_collector_enabled_dv(self):
+        if self.exists:
+            dv_annotations = self.instance.metadata.get("annotations")
+            if dv_annotations:
+                return (
+                    dv_annotations.get("cdi.kubevirt.io/storage.deleteAfterCompletion")
+                    is not False
+                )
+        return True
+
+    def wait_for_dv_success(self, timeout=600, failure_timeout=120):
+        LOGGER.info(f"Wait DV success for {timeout} seconds")
+        self._check_none_pending_status(failure_timeout=failure_timeout)
+        self.pvc.wait_for_status(
+            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
+        )
+        # if garbage collector enabled, the DV deleted once succeeded
+        if (
+            is_garbage_collector_enabled_cdi_config()
+            and self.is_garbage_collector_enabled_dv()
+        ):
+            super().wait_deleted(timeout=timeout)
+        else:
+            self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
+
+    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
+        if self.exists:
+            super().delete(wait=wait, timeout=timeout, body=body)
+        else:
+            super(PersistentVolumeClaim, self.pvc).delete(
+                wait=wait, timeout=timeout, body=body
+            )
