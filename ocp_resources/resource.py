@@ -541,12 +541,11 @@ class Resource(object):
                 )
             raise
 
-    def create(self, body=None, wait=False):
+    def create(self, wait=False):
         """
         Create resource.
 
         Args:
-            body (dict): Resource data to create.
             wait (bool) : True to wait for resource status.
 
         Returns:
@@ -556,19 +555,6 @@ class Resource(object):
             ValueMismatch: When body value doesn't match class value
         """
         data = self.to_dict()
-        if body:
-            kind = body["kind"]
-            name = body.get("name")
-            api_version = body["apiVersion"]
-            if kind != self.kind:
-                ValueMismatch(f"{kind} != {self.kind}")
-            if name and name != self.name:
-                ValueMismatch(f"{name} != {self.name}")
-            if api_version != self.api_version:
-                ValueMismatch(f"{api_version} != {self.api_version}")
-
-            data.update(body)
-
         self.logger.info(f"Posting {data}")
         self.logger.info(f"Create {self.kind} {self.name}")
         res = self.api().create(body=data, namespace=self.namespace)
