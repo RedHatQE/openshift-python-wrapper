@@ -300,7 +300,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
 
-        self.create(body=self.res, wait=wait)
+        self.create(wait=wait)
         try:
             self.wait_for_status_success()
             return self
