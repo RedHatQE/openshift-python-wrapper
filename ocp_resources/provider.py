@@ -42,7 +42,7 @@ class Provider(NamespacedResource, MTV):
         self.vddk_init_image = vddk_init_image
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             self.res.update(
                 {

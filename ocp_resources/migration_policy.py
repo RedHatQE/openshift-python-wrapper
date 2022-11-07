@@ -40,7 +40,7 @@ class MigrationPolicy(Resource):
         self.vmi_selector = vmi_selector or {}
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             spec = self.res.setdefault("spec", {})
             selectors = spec.setdefault("selectors", {})

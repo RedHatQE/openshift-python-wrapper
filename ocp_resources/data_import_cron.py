@@ -54,7 +54,7 @@ class DataImportCron(NamespacedResource):
         self.bind_immediate_annotation = bind_immediate_annotation
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url can not coexist")

@@ -44,7 +44,7 @@ class RoleBinding(NamespacedResource):
         self.role_ref_name = role_ref_name
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             subjects = {}
             if self.subjects_kind:

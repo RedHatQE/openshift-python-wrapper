@@ -36,7 +36,7 @@ class PriorityClass(Resource):
         self.preemption_policy = preemption_policy
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             if self.value:
                 self.res["value"] = self.value

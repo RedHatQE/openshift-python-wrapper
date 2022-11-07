@@ -37,7 +37,7 @@ class ClusterRole(Resource):
 
     def to_dict(self):
         if not self.res:
-            self.res = super().to_dict()
+            super().to_dict()
 
         if not self.yaml_file and self.permissions_to_resources:
             self.add_rule(
@@ -53,7 +53,7 @@ class ClusterRole(Resource):
         permissions_to_resources=None,
     ):
         if not self.res:
-            self.res = super().to_dict()
+            super().to_dict()
 
         rule = {"verbs": verbs}
         if api_groups:

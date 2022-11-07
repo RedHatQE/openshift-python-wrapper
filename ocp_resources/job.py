@@ -43,7 +43,7 @@ class Job(NamespacedResource):
         self.containers = containers
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             self.res.setdefault("spec", {})
 

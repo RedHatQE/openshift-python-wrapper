@@ -37,7 +37,7 @@ class CatalogSourceConfig(NamespacedResource):
         self.cs_publisher = cs_publisher
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             self.res.update(
                 {

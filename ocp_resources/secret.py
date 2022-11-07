@@ -42,7 +42,7 @@ class Secret(NamespacedResource):
         self.type = type
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             if self.accesskeyid:
                 self.res.update(

@@ -35,7 +35,7 @@ class Route(NamespacedResource):
         self.destination_ca_cert = destination_ca_cert
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             if self.service:
                 self.res.update(

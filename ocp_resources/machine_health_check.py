@@ -46,7 +46,7 @@ class MachineHealthCheck(NamespacedResource):
         self.reboot_strategy = reboot_strategy
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             if self.reboot_strategy:
                 self.res["metadata"]["annotations"] = {

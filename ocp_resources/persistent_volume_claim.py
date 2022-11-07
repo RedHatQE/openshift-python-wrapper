@@ -62,7 +62,7 @@ class PersistentVolumeClaim(NamespacedResource):
         self.storage_class = storage_class
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             self.res.update(
                 {

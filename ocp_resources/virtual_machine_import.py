@@ -145,7 +145,7 @@ class VirtualMachineImport(NamespacedResource):
         )
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             spec = self.res.setdefault("spec", {})
 
@@ -289,7 +289,7 @@ class ResourceMapping(NamespacedResource):
         self.mapping = mapping
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if self.yaml_file:
             return self.res
 

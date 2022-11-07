@@ -121,7 +121,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def set_interface(self, interface):
         if not self.res:
-            self.res = super().to_dict()
+            super().to_dict()
         # First drop the interface if it's already in the list
         interfaces = [
             iface
@@ -136,7 +136,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         ] = self.desired_state["interfaces"]
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             if self.dns_resolver or self.routes or self.iface:
                 self.res.setdefault("spec", {}).setdefault("desiredState", {})

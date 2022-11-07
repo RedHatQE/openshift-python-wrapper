@@ -44,7 +44,7 @@ class Host(NamespacedResource, MTV):
         self.condition_message_ready = self.ConditionMessage.HOST_READY
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             self.res.update(
                 {

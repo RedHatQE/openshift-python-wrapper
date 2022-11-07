@@ -44,7 +44,7 @@ class SriovNetworkNodePolicy(NamespacedResource):
         self.node_selector = node_selector
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
         if not self.yaml_file:
             self.res["spec"] = {
                 "deviceType": "vfio-pci",
