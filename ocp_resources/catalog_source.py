@@ -1,8 +1,4 @@
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class CatalogSource(NamespacedResource):
