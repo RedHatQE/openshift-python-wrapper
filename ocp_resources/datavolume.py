@@ -247,13 +247,11 @@ class DataVolume(NamespacedResource):
             dv_annotations = self.instance.metadata.get("annotations")
             if dv_annotations:
                 return (
-                    dv_annotations.get("cdi.kubevirt.io/storage.deleteAfterCompletion")
+                    dv_annotations.get(f"{Resource.ApiGroup.CDI_KUBEVIRT_IO}/storage.deleteAfterCompletion")
                     is not False
                 )
-        else:
-            if self.pvc.exists and self.pvc.instance.status.phase == "Bound":
-                return True
-            return False
+            return True
+        return self.pvc.exists and self.pvc.instance.status.phase == self.pvc.Status.BOUND
 
     def wait_for_dv_success(self, timeout=600, failure_timeout=120):
         LOGGER.info(f"Wait DV success for {timeout} seconds")
@@ -277,7 +275,7 @@ class DataVolume(NamespacedResource):
                         return
             except TimeoutExpiredError:
                 LOGGER.error(f"Status of {self.kind} {self.name} is {sample}")
-            raise
+                raise
         else:
             self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
 
