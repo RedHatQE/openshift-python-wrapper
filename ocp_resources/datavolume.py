@@ -282,11 +282,19 @@ class DataVolume(NamespacedResource):
             self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
-        """If garbage collector enabled the DV will be deleted by it
-        once succeed and only PVC should be deleted.
-        If DV does not succeed/longer ttl/garbage collector is not
-        enable the DV still exists and the the DV should be manually deleted"""
+        """
+            Delete DataVolume
+
+        Args:
+            wait (bool): True to wait for DataVolume and PVC to be deleted.
+            timeout (int): Time to wait for resources deletion
+            body (dict): Content to send for delete()
+
+        Returns:
+            bool: True if delete succeeded, False otherwise.
+        """
+
         if self.exists:
-            super().delete(wait=wait, timeout=timeout, body=body)
+            return super().delete(wait=wait, timeout=timeout, body=body)
         else:
-            self.pvc.delete(wait=wait, timeout=timeout, body=body)
+            return self.pvc.delete(wait=wait, timeout=timeout, body=body)
