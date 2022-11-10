@@ -1,10 +1,10 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class NodeHealthCheck(NamespacedResource):
+class NodeHealthCheck(Resource):
     """
     NodeHealthCheck object.
     Reference : https://github.com/medik8s/node-healthcheck-operator
     """
 
-    api_group = NamespacedResource.ApiGroup.REMEDIATION_MEDIK8S_IO
+    api_group = Resource.ApiGroup.REMEDIATION_MEDIK8S_IO
