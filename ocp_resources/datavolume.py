@@ -2,13 +2,11 @@
 
 from ocp_resources.cdi_config import CDIConfig
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-LOGGER = get_logger(name=__name__)
 DV_DOES_NOT_EXISTS = "DV does not exists"
 
 
@@ -239,7 +237,7 @@ class DataVolume(NamespacedResource):
                 else:
                     break
         except TimeoutExpiredError:
-            LOGGER.error(f"{self.name} status is {sample}")
+            self.logger.error(f"{self.name} status is {sample}")
             raise
 
     def is_garbage_collector_enabled_dv(self):
@@ -254,7 +252,7 @@ class DataVolume(NamespacedResource):
         return self.pvc.exists and self.pvc.instance.status.phase == self.pvc.Status.BOUND
 
     def wait_for_dv_success(self, timeout=600, failure_timeout=120):
-        LOGGER.info(f"Wait DV success for {timeout} seconds")
+        self.logger.info(f"Wait DV success for {timeout} seconds")
         self._check_none_pending_status(failure_timeout=failure_timeout)
         self.pvc.wait_for_status(
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
@@ -274,7 +272,7 @@ class DataVolume(NamespacedResource):
                     if sample in [self.Status.SUCCEEDED, DV_DOES_NOT_EXISTS]:
                         return
             except TimeoutExpiredError:
-                LOGGER.error(f"Status of {self.kind} {self.name} is {sample}")
+                self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
                 raise
         else:
             self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
