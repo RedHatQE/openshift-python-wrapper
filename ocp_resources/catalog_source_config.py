@@ -37,23 +37,19 @@ class CatalogSourceConfig(NamespacedResource):
         self.cs_publisher = cs_publisher
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "source": self.source,
-                    "targetNamespace": self.target_namespace,
-                    "packages": self.packages,
-                    "csDisplayName": self.cs_display_name,
-                    "csPublisher": self.cs_publisher,
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "source": self.source,
+                        "targetNamespace": self.target_namespace,
+                        "packages": self.packages,
+                        "csDisplayName": self.cs_display_name,
+                        "csPublisher": self.cs_publisher,
+                    }
                 }
-            }
-        )
-
-        return res
+            )
 
     def wait_for_csc_status(self, status, timeout=120):
         """

@@ -34,21 +34,17 @@ class OperatorSource(NamespacedResource):
         self.secret = secret
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "type": "appregistry",
-                    "endpoint": "https://quay.io/cnr",
-                    "registryNamespace": self.registry_namespace,
-                    "displayName": self.display_name,
-                    "publisher": self.publisher,
-                    "authorizationToken": {"secretName": self.secret},
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "type": "appregistry",
+                        "endpoint": "https://quay.io/cnr",
+                        "registryNamespace": self.registry_namespace,
+                        "displayName": self.display_name,
+                        "publisher": self.publisher,
+                        "authorizationToken": {"secretName": self.secret},
+                    }
                 }
-            }
-        )
-
-        return res
+            )

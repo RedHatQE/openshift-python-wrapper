@@ -44,19 +44,20 @@ class Migration(NamespacedResource, MTV):
         self.condition_message_succeeded = self.ConditionMessage.MIGRATION_SUCCEEDED
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "plan": {"name": self.plan_name, "namespace": self.plan_namespace}
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "plan": {
+                            "name": self.plan_name,
+                            "namespace": self.plan_namespace,
+                        }
+                    }
                 }
-            }
-        )
+            )
 
-        if self.cut_over:
-            res["spec"]["cutover"] = self.cut_over.strftime(format="%Y-%m-%dT%H:%M:%SZ")
-
-        return res
+            if self.cut_over:
+                self.res["spec"]["cutover"] = self.cut_over.strftime(
+                    format="%Y-%m-%dT%H:%M:%SZ"
+                )
