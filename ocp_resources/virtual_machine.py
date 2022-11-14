@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
@@ -153,3 +153,14 @@ class VirtualMachine(NamespacedResource):
             VM printableStatus if VM.status.printableStatus else None
         """
         return self.instance.get("status", {}).get("printableStatus")
+
+    def wait_for_status_none(self, status, timeout=TIMEOUT_4MINUTES):
+        self.logger.info(f"Wait for {self.kind} {self.name} status {status} to be None")
+        for sample in TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            func=lambda: self.instance.get("status", {}).get(status),
+        ):
+            if sample is None:
+                return
