@@ -42,31 +42,27 @@ class Subscription(NamespacedResource):
         self.tolerations = tolerations
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "sourceNamespace": self.source_namespace,
-                    "source": self.source,
-                    "name": self.package_name or self.name,
-                    "channel": self.channel,
-                    "installPlanApproval": self.install_plan_approval,
-                    "startingCSV": self.starting_csv,
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "sourceNamespace": self.source_namespace,
+                        "source": self.source,
+                        "name": self.package_name or self.name,
+                        "channel": self.channel,
+                        "installPlanApproval": self.install_plan_approval,
+                        "startingCSV": self.starting_csv,
+                    }
                 }
-            }
-        )
-
-        if self.node_selector:
-            res["spec"].setdefault("config", {}).setdefault("nodeSelector", {}).update(
-                self.node_selector
             )
 
-        if self.tolerations:
-            res["spec"].setdefault("config", {}).setdefault("tolerations", []).append(
-                self.tolerations
-            )
+            if self.node_selector:
+                self.res["spec"].setdefault("config", {}).setdefault(
+                    "nodeSelector", {}
+                ).update(self.node_selector)
 
-        return res
+            if self.tolerations:
+                self.res["spec"].setdefault("config", {}).setdefault(
+                    "tolerations", []
+                ).append(self.tolerations)
