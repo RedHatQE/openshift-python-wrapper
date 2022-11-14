@@ -145,76 +145,76 @@ class VirtualMachineImport(NamespacedResource):
         )
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
+        super().to_dict()
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
 
-        spec = res.setdefault("spec", {})
+            secret = spec.setdefault("providerCredentialsSecret", {})
+            secret["name"] = self.provider_credentials_secret_name
 
-        secret = spec.setdefault("providerCredentialsSecret", {})
-        secret["name"] = self.provider_credentials_secret_name
+            if self.provider_credentials_secret_namespace:
+                secret["namespace"] = self.provider_credentials_secret_namespace
 
-        if self.provider_credentials_secret_namespace:
-            secret["namespace"] = self.provider_credentials_secret_namespace
+            if self.resource_mapping_name:
+                spec.setdefault("resourceMapping", {})[
+                    "name"
+                ] = self.resource_mapping_name
+            if self.resource_mapping_namespace:
+                spec.setdefault("resourceMapping", {})[
+                    "namespace"
+                ] = self.resource_mapping_namespace
 
-        if self.resource_mapping_name:
-            spec.setdefault("resourceMapping", {})["name"] = self.resource_mapping_name
-        if self.resource_mapping_namespace:
-            spec.setdefault("resourceMapping", {})[
-                "namespace"
-            ] = self.resource_mapping_namespace
+            if self.target_vm_name:
+                spec["targetVmName"] = self.target_vm_name
 
-        if self.target_vm_name:
-            spec["targetVmName"] = self.target_vm_name
+            if self.start_vm is not None:
+                spec["startVm"] = self.start_vm
 
-        if self.start_vm is not None:
-            spec["startVm"] = self.start_vm
+            if self.warm:
+                spec["warm"] = self.warm
+            if self.finalize_date:
+                spec["finalizeDate"] = self.finalize_date.strftime(
+                    format="%Y-%m-%dT%H:%M:%SZ"
+                )
 
-        if self.warm:
-            spec["warm"] = self.warm
-        if self.finalize_date:
-            spec["finalizeDate"] = self.finalize_date.strftime(
-                format="%Y-%m-%dT%H:%M:%SZ"
+            provider_source = spec.setdefault("source", {}).setdefault(
+                self.provider_type, {}
             )
+            vm = provider_source.setdefault("vm", {})
+            if self.vm_id:
+                vm["id"] = self.vm_id
+            if self.vm_name:
+                vm["name"] = self.vm_name
 
-        provider_source = spec.setdefault("source", {}).setdefault(
-            self.provider_type, {}
-        )
-        vm = provider_source.setdefault("vm", {})
-        if self.vm_id:
-            vm["id"] = self.vm_id
-        if self.vm_name:
-            vm["name"] = self.vm_name
+            if self.cluster_id:
+                vm.setdefault("cluster", {})["id"] = self.cluster_id
+            if self.cluster_name:
+                vm.setdefault("cluster", {})["name"] = self.cluster_name
 
-        if self.cluster_id:
-            vm.setdefault("cluster", {})["id"] = self.cluster_id
-        if self.cluster_name:
-            vm.setdefault("cluster", {})["name"] = self.cluster_name
+            if self.provider_mappings:
+                if self.provider_mappings.disk_mappings:
+                    mappings = _map_mappings(
+                        mappings=self.provider_mappings.disk_mappings
+                    )
+                    provider_source.setdefault("mappings", {}).setdefault(
+                        "diskMappings", mappings
+                    )
 
-        if self.provider_mappings:
-            if self.provider_mappings.disk_mappings:
-                mappings = _map_mappings(mappings=self.provider_mappings.disk_mappings)
-                provider_source.setdefault("mappings", {}).setdefault(
-                    "diskMappings", mappings
-                )
+                if self.provider_mappings.network_mappings:
+                    mappings = _map_mappings(
+                        mappings=self.provider_mappings.network_mappings
+                    )
+                    provider_source.setdefault("mappings", {}).setdefault(
+                        "networkMappings", mappings
+                    )
 
-            if self.provider_mappings.network_mappings:
-                mappings = _map_mappings(
-                    mappings=self.provider_mappings.network_mappings
-                )
-                provider_source.setdefault("mappings", {}).setdefault(
-                    "networkMappings", mappings
-                )
-
-            if self.provider_mappings.storage_mappings:
-                mappings = _map_mappings(
-                    mappings=self.provider_mappings.storage_mappings
-                )
-                provider_source.setdefault("mappings", {}).setdefault(
-                    "storageMappings", mappings
-                )
-
-        return res
+                if self.provider_mappings.storage_mappings:
+                    mappings = _map_mappings(
+                        mappings=self.provider_mappings.storage_mappings
+                    )
+                    provider_source.setdefault("mappings", {}).setdefault(
+                        "storageMappings", mappings
+                    )
 
     def wait(
         self,
@@ -289,21 +289,19 @@ class ResourceMapping(NamespacedResource):
         self.mapping = mapping
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        for provider, mapping in self.mapping.items():
-            res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
-            if mapping.network_mappings is not None:
-                res_provider_section.setdefault(
-                    "networkMappings",
-                    _map_mappings(mappings=mapping.network_mappings),
+        super().to_dict()
+        if not self.yaml_file:
+            for provider, mapping in self.mapping.items():
+                res_provider_section = self.res.setdefault("spec", {}).setdefault(
+                    provider, {}
                 )
-            if mapping.storage_mappings is not None:
-                res_provider_section.setdefault(
-                    "storageMappings",
-                    _map_mappings(mappings=mapping.storage_mappings),
-                )
-
-        return res
+                if mapping.network_mappings is not None:
+                    res_provider_section.setdefault(
+                        "networkMappings",
+                        _map_mappings(mappings=mapping.network_mappings),
+                    )
+                if mapping.storage_mappings is not None:
+                    res_provider_section.setdefault(
+                        "storageMappings",
+                        _map_mappings(mappings=mapping.storage_mappings),
+                    )

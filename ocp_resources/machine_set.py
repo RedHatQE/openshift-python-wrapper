@@ -79,50 +79,47 @@ class MachineSet(NamespacedResource):
         self.provider_spec = provider_spec or {}
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
+        super().to_dict()
+        if not self.yaml_file:
+            _spec, _metadata, _labels = ("spec", "metadata", "labels")
+            (
+                _cluster_api_cluster,
+                _cluster_api_machine_role,
+                _cluster_api_machine_type,
+                _cluster_api_machineset,
+            ) = (
+                "cluster-api-cluster",
+                "cluster-api-machine-role",
+                "cluster-api-machine-type",
+                "cluster-api-machineset",
+            )
 
-        _spec, _metadata, _labels = ("spec", "metadata", "labels")
-        (
-            _cluster_api_cluster,
-            _cluster_api_machine_role,
-            _cluster_api_machine_type,
-            _cluster_api_machineset,
-        ) = (
-            "cluster-api-cluster",
-            "cluster-api-machine-role",
-            "cluster-api-machine-type",
-            "cluster-api-machineset",
-        )
+            self.res[_metadata][_labels] = {
+                f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
+                f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
+                f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
+            }
 
-        res[_metadata][_labels] = {
-            f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-            f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
-            f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
-        }
-
-        res[_spec] = {
-            "replicas": self.replicas,
-            "selector": {
-                "matchLabels": {
-                    f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                    f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
-                }
-            },
-            "template": {
-                _metadata: {
-                    _labels: {
+            self.res[_spec] = {
+                "replicas": self.replicas,
+                "selector": {
+                    "matchLabels": {
                         f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                        f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
-                        f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
                         f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
                     }
                 },
-                _spec: {"providerSpec": self.provider_spec},
-            },
-        }
-        return res
+                "template": {
+                    _metadata: {
+                        _labels: {
+                            f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
+                            f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
+                            f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
+                            f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
+                        }
+                    },
+                    _spec: {"providerSpec": self.provider_spec},
+                },
+            }
 
     @property
     def available_replicas(self):

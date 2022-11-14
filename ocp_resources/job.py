@@ -43,24 +43,23 @@ class Job(NamespacedResource):
         self.containers = containers
 
     def to_dict(self):
-        self.res = super().to_dict()
-        self.res.setdefault("spec", {})
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.setdefault("spec", {})
 
-        if self.backoff_limit is not None:
-            self.res["spec"]["backoffLimit"] = self.backoff_limit
+            if self.backoff_limit is not None:
+                self.res["spec"]["backoffLimit"] = self.backoff_limit
 
-        if self.containers:
-            self.res["spec"].setdefault("template", {}).setdefault("spec", {})
-            self.res["spec"]["template"]["spec"]["containers"] = self.containers
+            if self.containers:
+                self.res["spec"].setdefault("template", {}).setdefault("spec", {})
+                self.res["spec"]["template"]["spec"]["containers"] = self.containers
 
-            if self.service_account:
-                self.res["spec"]["template"]["spec"][
-                    "serviceAccount"
-                ] = self.service_account
+                if self.service_account:
+                    self.res["spec"]["template"]["spec"][
+                        "serviceAccount"
+                    ] = self.service_account
 
-            if self.restart_policy:
-                self.res["spec"]["template"]["spec"][
-                    "restartPolicy"
-                ] = self.restart_policy
-
-        return self.res
+                if self.restart_policy:
+                    self.res["spec"]["template"]["spec"][
+                        "restartPolicy"
+                    ] = self.restart_policy

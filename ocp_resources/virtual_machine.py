@@ -68,13 +68,10 @@ class VirtualMachine(NamespacedResource):
         )
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        body_spec = self.body.get("spec") if self.body else None
-        res["spec"] = body_spec or {"template": {"spec": {}}}
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            body_spec = self.body.get("spec") if self.body else None
+            self.res["spec"] = body_spec or {"template": {"spec": {}}}
 
     def start(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="start")
