@@ -110,37 +110,34 @@ class Plan(NamespacedResource, MTV):
                 vm["hooks"] = hooks_array
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "warm": self.warm_migration,
-                    "targetNamespace": self.target_namespace,
-                    "map": {
-                        "storage": {
-                            "name": self.storage_map_name,
-                            "namespace": self.storage_map_namespace,
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "warm": self.warm_migration,
+                        "targetNamespace": self.target_namespace,
+                        "map": {
+                            "storage": {
+                                "name": self.storage_map_name,
+                                "namespace": self.storage_map_namespace,
+                            },
+                            "network": {
+                                "name": self.network_map_name,
+                                "namespace": self.network_map_namespace,
+                            },
                         },
-                        "network": {
-                            "name": self.network_map_name,
-                            "namespace": self.network_map_namespace,
+                        "vms": self.virtual_machines_list,
+                        "provider": {
+                            "source": {
+                                "name": self.source_provider_name,
+                                "namespace": self.source_provider_namespace,
+                            },
+                            "destination": {
+                                "name": self.destination_provider_name,
+                                "namespace": self.destination_provider_namespace,
+                            },
                         },
-                    },
-                    "vms": self.virtual_machines_list,
-                    "provider": {
-                        "source": {
-                            "name": self.source_provider_name,
-                            "namespace": self.source_provider_namespace,
-                        },
-                        "destination": {
-                            "name": self.destination_provider_name,
-                            "namespace": self.destination_provider_namespace,
-                        },
-                    },
+                    }
                 }
-            }
-        )
-        return res
+            )

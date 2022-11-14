@@ -366,6 +366,7 @@ class Resource:
         self.res = None
         self.yaml_file_contents = None
         self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+        self._set_client_and_api_version()
 
     def _prepare_node_selector_spec(self):
         if self.node_selector:
@@ -392,24 +393,21 @@ class Resource:
                     with open(self.yaml_file, "r") as stream:
                         self.yaml_file_contents = stream.read()
 
-            self.resource_dict = yaml.safe_load(stream=self.yaml_file_contents)
-            self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
-            self.name = self.resource_dict["metadata"]["name"]
+            self.res = yaml.safe_load(stream=self.yaml_file_contents)
+            self.res.get("metadata", {}).pop("resourceVersion", None)
+            self.name = self.res["metadata"]["name"]
         else:
-            self._set_client_and_api_version()
-            self.resource_dict = {
+            self.res = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
 
-        return self.resource_dict
-
     def to_dict(self):
         """
         Generate intended dict representation of the resource.
         """
-        return self._base_body()
+        self._base_body()
 
     def __enter__(self):
         signal(SIGINT, self._sigint_handler)
@@ -673,14 +671,18 @@ class Resource:
         Raises:
             ValueMismatch: When body value doesn't match class value
         """
-        data = self.to_dict()
+        if not self.res:
+            self.to_dict()
+
         self.logger.info(f"Create {self.kind} {self.name}")
-        self.logger.info(f"Posting {data}")
-        self.logger.debug(f"\n{yaml.dump(data)}")
-        res = self.api.create(body=data, namespace=self.namespace, dry_run=self.dry_run)
-        if wait and res:
+        self.logger.info(f"Posting {self.res}")
+        self.logger.debug(f"\n{yaml.dump(self.res)}")
+        resource_ = self.api.create(
+            body=self.res, namespace=self.namespace, dry_run=self.dry_run
+        )
+        if wait and resource_:
             return self.wait()
-        return res
+        return resource_
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         self.logger.info(f"Delete {self.kind} {self.name}")
@@ -1053,22 +1055,20 @@ class NamespacedResource(Resource):
         return self.api.get(name=self.name, namespace=self.namespace)
 
     def _base_body(self):
-        res = super(NamespacedResource, self)._base_body()
+        if not self.res:
+            super(NamespacedResource, self)._base_body()
+
         if self.yaml_file:
-            self.namespace = self.resource_dict["metadata"].get(
-                "namespace", self.namespace
-            )
+            self.namespace = self.res["metadata"].get("namespace", self.namespace)
 
         if not self.namespace:
             raise ValueError("Namespace must be passed or specified in the YAML file.")
 
         if not self.yaml_file:
-            res["metadata"]["namespace"] = self.namespace
-
-        return res
+            self.res["metadata"]["namespace"] = self.namespace
 
     def to_dict(self):
-        return self._base_body()
+        self._base_body()
 
 
 class ResourceEditor:
