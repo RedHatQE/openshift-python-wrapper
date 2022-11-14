@@ -121,7 +121,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def set_interface(self, interface):
         if not self.res:
-            self.res = super().to_dict()
+            super().to_dict()
         # First drop the interface if it's already in the list
         interfaces = [
             iface
@@ -136,56 +136,52 @@ class NodeNetworkConfigurationPolicy(Resource):
         ] = self.desired_state["interfaces"]
 
     def to_dict(self):
-        self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        super().to_dict()
+        if not self.yaml_file:
+            if self.dns_resolver or self.routes or self.iface:
+                self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
-        if self.dns_resolver or self.routes or self.iface:
-            self.res.setdefault("spec", {}).setdefault("desiredState", {})
+            if self.node_selector_spec:
+                self.res.setdefault("spec", {}).setdefault(
+                    "nodeSelector", self.node_selector_spec
+                )
 
-        if self.node_selector_spec:
-            self.res.setdefault("spec", {}).setdefault(
-                "nodeSelector", self.node_selector_spec
-            )
+            if self.capture:
+                self.res["spec"]["capture"] = self.capture
 
-        if self.capture:
-            self.res["spec"]["capture"] = self.capture
+            if self.dns_resolver:
+                self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
 
-        if self.dns_resolver:
-            self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
+            if self.routes:
+                self.res["spec"]["desiredState"]["routes"] = self.routes
 
-        if self.routes:
-            self.res["spec"]["desiredState"]["routes"] = self.routes
+            if self.max_unavailable:
+                self.res.setdefault("spec", {}).setdefault(
+                    "maxUnavailable", self.max_unavailable
+                )
 
-        if self.max_unavailable:
-            self.res.setdefault("spec", {}).setdefault(
-                "maxUnavailable", self.max_unavailable
-            )
-
-        if self.iface:
-            """
-            It's the responsibility of the caller to verify the desired configuration they send.
-            For example: "ipv4.dhcp.enabled: false" without specifying any static IP address
-            is a valid desired state and therefore not blocked in the code, but nmstate would
-            reject it. Such configuration might be used for negative tests.
-            """
-            self.res = self.add_interface(
-                iface=self.iface,
-                state=self.state,
-                set_ipv4=self.set_ipv4,
-                ipv4_enable=self.ipv4_enable,
-                ipv4_dhcp=self.ipv4_dhcp,
-                ipv4_auto_dns=self.ipv4_auto_dns,
-                ipv4_addresses=self.ipv4_addresses,
-                set_ipv6=self.set_ipv6,
-                ipv6_enable=self.ipv6_enable,
-                ipv6_dhcp=self.ipv6_dhcp,
-                ipv6_auto_dns=self.ipv6_auto_dns,
-                ipv6_addresses=self.ipv6_addresses,
-                ipv6_autoconf=self.ipv6_autoconf,
-            )
-
-        return self.res
+            if self.iface:
+                """
+                It's the responsibility of the caller to verify the desired configuration they send.
+                For example: "ipv4.dhcp.enabled: false" without specifying any static IP address
+                is a valid desired state and therefore not blocked in the code, but nmstate would
+                reject it. Such configuration might be used for negative tests.
+                """
+                self.res = self.add_interface(
+                    iface=self.iface,
+                    state=self.state,
+                    set_ipv4=self.set_ipv4,
+                    ipv4_enable=self.ipv4_enable,
+                    ipv4_dhcp=self.ipv4_dhcp,
+                    ipv4_auto_dns=self.ipv4_auto_dns,
+                    ipv4_addresses=self.ipv4_addresses,
+                    set_ipv6=self.set_ipv6,
+                    ipv6_enable=self.ipv6_enable,
+                    ipv6_dhcp=self.ipv6_dhcp,
+                    ipv6_auto_dns=self.ipv6_auto_dns,
+                    ipv6_addresses=self.ipv6_addresses,
+                    ipv6_autoconf=self.ipv6_autoconf,
+                )
 
     def add_interface(
         self,
