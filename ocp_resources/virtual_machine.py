@@ -141,7 +141,7 @@ class VirtualMachine(NamespacedResource):
     def printable_status(self):
         """
         Get VM printableStatus
-        
+
         Returns:
             VM printableStatus if VM.status.printableStatus else None
         """
