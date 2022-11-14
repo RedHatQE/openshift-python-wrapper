@@ -290,20 +290,18 @@ class ResourceMapping(NamespacedResource):
 
     def to_dict(self):
         super().to_dict()
-        if self.yaml_file:
-            return self.res
-
-        for provider, mapping in self.mapping.items():
-            res_provider_section = self.res.setdefault("spec", {}).setdefault(
-                provider, {}
-            )
-            if mapping.network_mappings is not None:
-                res_provider_section.setdefault(
-                    "networkMappings",
-                    _map_mappings(mappings=mapping.network_mappings),
+        if not self.yaml_file:
+            for provider, mapping in self.mapping.items():
+                res_provider_section = self.res.setdefault("spec", {}).setdefault(
+                    provider, {}
                 )
-            if mapping.storage_mappings is not None:
-                res_provider_section.setdefault(
-                    "storageMappings",
-                    _map_mappings(mappings=mapping.storage_mappings),
-                )
+                if mapping.network_mappings is not None:
+                    res_provider_section.setdefault(
+                        "networkMappings",
+                        _map_mappings(mappings=mapping.network_mappings),
+                    )
+                if mapping.storage_mappings is not None:
+                    res_provider_section.setdefault(
+                        "storageMappings",
+                        _map_mappings(mappings=mapping.storage_mappings),
+                    )
