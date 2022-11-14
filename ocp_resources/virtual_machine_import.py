@@ -307,5 +307,3 @@ class ResourceMapping(NamespacedResource):
                     "storageMappings",
                     _map_mappings(mappings=mapping.storage_mappings),
                 )
-
-        return self.res
