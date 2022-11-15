@@ -233,8 +233,7 @@ class DataVolume(NamespacedResource):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
                 if sample in [self.Status.PENDING, None]:
                     continue
-                else:
-                    break
+                break
         except TimeoutExpiredError:
             self.logger.error(f"{self.name} status is {sample}")
             raise
