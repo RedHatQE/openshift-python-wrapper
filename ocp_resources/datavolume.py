@@ -219,8 +219,7 @@ class DataVolume(NamespacedResource):
     def _dv_phase(self):
         if self.exists:
             return self.instance.status.phase
-        else:
-            return DV_DOES_NOT_EXISTS
+        return DV_DOES_NOT_EXISTS
 
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
