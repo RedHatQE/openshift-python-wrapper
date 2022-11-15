@@ -26,7 +26,7 @@ class VirtualMachine(NamespacedResource):
         PAUSED = "Paused"
         PROVISIONING = "Provisioning"
         STARTING = "Starting"
-        STOPPED = "stopped"
+        STOPPED = "Stopped"
         STOPPING = "Stopping"
 
     def __init__(
