@@ -681,7 +681,10 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        self.initial_resource_version = self.res.metadata.resourceVersion
+        with contextlib.suppress(NotFoundError):
+            # some resources do not support get() (no instance)
+            self.initial_resource_version = self.instance.metadata.resourceVersion
+
         if wait and resource_:
             return self.wait()
         return resource_
