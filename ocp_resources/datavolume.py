@@ -7,7 +7,7 @@ from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-DV_DOES_NOT_EXISTS = "DV does not exists"
+DV_DELETED_BY_GC = "DV deleted by garbage collector"
 
 
 class DataVolume(NamespacedResource):
@@ -219,7 +219,7 @@ class DataVolume(NamespacedResource):
     def _dv_phase(self):
         if self.exists:
             return self.instance.status.phase
-        return DV_DOES_NOT_EXISTS
+        return DV_DELETED_BY_GC
 
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
@@ -243,11 +243,15 @@ class DataVolume(NamespacedResource):
             dv_annotations = self.instance.metadata.get("annotations")
             if dv_annotations:
                 return (
-                    dv_annotations.get(f"{Resource.ApiGroup.CDI_KUBEVIRT_IO}/storage.deleteAfterCompletion")
+                    dv_annotations.get(
+                        f"{Resource.ApiGroup.CDI_KUBEVIRT_IO}/storage.deleteAfterCompletion"
+                    )
                     is not False
                 )
             return True
-        return self.pvc.exists and self.pvc.instance.status.phase == self.pvc.Status.BOUND
+        return (
+            self.pvc.exists and self.pvc.instance.status.phase == self.pvc.Status.BOUND
+        )
 
     def wait_for_dv_success(self, timeout=600, failure_timeout=120):
         self.logger.info(f"Wait DV success for {timeout} seconds")
@@ -257,7 +261,7 @@ class DataVolume(NamespacedResource):
         )
         # if garbage collector enabled, the DV deleted once succeeded
         if (
-            CDIConfig.is_garbage_collector_enabled_cdi_config()
+            CDIConfig(name="config").is_garbage_collector_enabled_cdi_config()
             and self.is_garbage_collector_enabled_dv()
         ):
             try:
@@ -267,7 +271,7 @@ class DataVolume(NamespacedResource):
                     func=self._dv_phase,
                 ):
                     # DV reach to success if the status is succeeded or if the DV does not exists
-                    if sample in [self.Status.SUCCEEDED, DV_DOES_NOT_EXISTS]:
+                    if sample in [self.Status.SUCCEEDED, DV_DELETED_BY_GC]:
                         return
             except TimeoutExpiredError:
                 self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
@@ -277,7 +281,9 @@ class DataVolume(NamespacedResource):
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
-            Delete DataVolume
+        If DataVolume Succeeded and garbage collector enabled, the Datavolume resource will
+        be deleted by the GC and the cleanup should be done via the PVC.
+        In any other case, The Datavolume still exists and the cleanup done via the Datavolume.
 
         Args:
             wait (bool): True to wait for DataVolume and PVC to be deleted.
