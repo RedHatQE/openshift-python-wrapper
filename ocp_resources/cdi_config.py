@@ -56,7 +56,7 @@ class CDIConfig(Resource):
                     return
 
     @classmethod
-    def is_garbage_collector_enabled_cdi_config(cls):
+    def is_garbage_collector_enabled(cls):
         """Check if garbage collector enabled on config CDIconfig resource"""
         dv_ttl_seconds = cls(name="config").instance.spec.get("dataVolumeTTLSeconds")
         return dv_ttl_seconds is None or dv_ttl_seconds >= 0

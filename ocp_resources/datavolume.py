@@ -261,7 +261,7 @@ class DataVolume(NamespacedResource):
         )
         # if garbage collector enabled, the DV deleted once succeeded
         if (
-            CDIConfig(name="config").is_garbage_collector_enabled_cdi_config()
+            CDIConfig(name="config").is_garbage_collector_enabled()
             and self.is_garbage_collector_enabled_dv()
         ):
             try:
