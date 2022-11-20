@@ -35,9 +35,11 @@ class ControllerRevision(NamespacedResource):
         self.revision_object = revision_object
 
     def to_dict(self):
-        """
-        Generate intended dict representation of the resource.
-        """
-        self._base_body()
-        self.res["metadata"]["ownerReference"] = self.owner_references
-        self.res["data"] = self.revision_object.res
+        super().to_dict()
+        if not self.yaml_file:
+            if self.owner_references:
+                self.res.setdefault("metadata", {}).update(
+                    {"ownerReference": self.owner_references}
+                )
+            if self.revision_object:
+                self.res.update({"data": self.revision_object.res})
