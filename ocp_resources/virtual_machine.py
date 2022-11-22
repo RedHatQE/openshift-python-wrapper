@@ -4,6 +4,7 @@
 import xmltodict
 from openshift.dynamic.exceptions import ResourceNotFoundError
 from urllib3.exceptions import ProtocolError
+
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod

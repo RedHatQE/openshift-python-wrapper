@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from openshift.dynamic.exceptions import ResourceNotFoundError
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from urllib3.exceptions import ProtocolError
+
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import TIMEOUT, NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
