@@ -4,7 +4,8 @@ from ocp_resources.resource import NamespacedResource
 
 class ImageStream(NamespacedResource):
     """
-    ImageStream object.
+    ImageStream object. API reference:
+    https://docs.openshift.com/container-platform/4.11/rest_api/image_apis/imagestream-image-openshift-io-v1.html#imagestream-image-openshift-io-v1
     """
 
     api_group = NamespacedResource.ApiGroup.IMAGE_OPENSHIFT_IO
