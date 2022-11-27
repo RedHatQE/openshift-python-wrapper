@@ -365,6 +365,7 @@ class Resource:
         self.node_selector_spec = self._prepare_node_selector_spec()
         self.res = None
         self.yaml_file_contents = None
+        self.initial_resource_version = None
         self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
         self._set_client_and_api_version()
 
@@ -680,6 +681,10 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
+        with contextlib.suppress(NotFoundError):
+            # some resources do not support get() (no instance)
+            self.initial_resource_version = self.instance.metadata.resourceVersion
+
         if wait and resource_:
             return self.wait()
         return resource_
@@ -814,9 +819,31 @@ class Resource:
         """
         return self.instance["metadata"]["labels"]
 
+    def watcher(self, timeout, resource_version=None):
+        """
+        Get resource for a given timeout.
+
+        Args:
+            timeout (int): Time to get conditions.
+            resource_version (str): The version with which to filter results. Only events with
+                a resource_version greater than this value will be returned
+
+        Yield:
+            Event object with these keys:
+                   'type': The type of event such as "ADDED", "DELETED", etc.
+                   'raw_object': a dict representing the watched object.
+                   'object': A ResourceInstance wrapping raw_object.
+        """
+        yield from self.api.watch(
+            timeout=timeout,
+            namespace=self.namespace,
+            field_selector=f"metadata.name=={self.name}",
+            resource_version=resource_version or self.initial_resource_version,
+        )
+
     def wait_for_condition(self, condition, status, timeout=300):
         """
-        Wait for Pod condition to be in desire status.
+        Wait for Resource condition to be in desire status.
 
         Args:
             condition (str): Condition to query.
@@ -824,30 +851,18 @@ class Resource:
             timeout (int): Time to wait for the resource.
 
         Raises:
-            TimeoutExpiredError: If Pod condition in not in desire status.
+            TimeoutExpiredError: If Resource condition in not in desire status.
         """
         self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
-        samples = TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=1,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+        for sample in self.watcher(timeout=timeout):
+            for cond in sample["raw_object"].get("status", {}).get("conditions", []):
+                if cond["type"] == condition and cond["status"] == status:
+                    return
+        raise TimeoutExpiredError(
+            value=f"condition {condition} not in desired status {status} after {timeout} seconds"
         )
-        for sample in samples:
-            if (
-                sample.items
-                and sample.items[0].get("status")
-                and sample.items[0].status.get("conditions")
-            ):
-                sample_conditions = sample.items[0].status.conditions
-                if sample_conditions:
-                    for cond in sample_conditions:
-                        if cond.type == condition and cond.status == status:
-                            return
 
     def api_request(self, method, action, url, **params):
         """
