@@ -60,7 +60,7 @@ class CDIConfig(Resource):
         Check if garbage collector enabled on CDIconfig resource
 
         Returns:
-            True if the dataVolumeTTLSeconds don't exists or if dataVolumeTTLSeconds > 0
+            bool: True if the dataVolumeTTLSeconds don't exists or if dataVolumeTTLSeconds > 0
         """
         dv_ttl_seconds = self.instance.spec.dataVolumeTTLSeconds
         return dv_ttl_seconds is None or dv_ttl_seconds >= 0
