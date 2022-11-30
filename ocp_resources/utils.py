@@ -248,9 +248,9 @@ def skip_existing_resource_creation_teardown(
             LOGGER.warning(_msg)
             return _resource
 
-    resource_to_dict = resource.to_dict()
-    resource_name = resource_to_dict["metadata"]["name"]
-    resource_namespace = resource_to_dict["metadata"].get("namespace")
+    resource.to_dict()
+    resource_name = resource.res["metadata"]["name"]
+    resource_namespace = resource.res["metadata"].get("namespace")
     skip_create_warn_msg = (
         f"Skip resource {resource.kind} {resource_name} creation, using existing one."
         f" Got {export_str}={user_exported_args}"
