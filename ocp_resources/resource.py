@@ -5,7 +5,7 @@ import re
 import sys
 from io import StringIO
 from signal import SIGINT, signal
-
+from urllib3.exceptions import MaxRetryError
 import kubernetes
 import yaml
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
@@ -34,12 +34,14 @@ from ocp_resources.utils import (
 
 
 DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
+    MaxRetryError: [],
     ConnectionAbortedError: [],
     ConnectionResetError: [],
     InternalServerError: [
         "etcdserver: leader changed",
         "etcdserver: request timed out",
         "Internal error occurred: failed calling webhook",
+        "rpc error:"
     ],
     ServerTimeoutError: [],
 }
@@ -334,6 +336,7 @@ class Resource:
         node_selector_labels=None,
         config_file=None,
         context=None,
+        timeout_seconds=60,
     ):
         """
         Create a API resource
@@ -367,6 +370,7 @@ class Resource:
         self.yaml_file_contents = None
         self.initial_resource_version = None
         self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+        self.timeout_seconds = timeout_seconds
         self._set_client_and_api_version()
 
     def _prepare_node_selector_spec(self):
@@ -498,8 +502,8 @@ class Resource:
 
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
         return dyn_client.resources.get(
-            kind=cls.kind, api_version=cls.api_version, **get_kwargs
-        ).get(*args, **kwargs)
+            kind=cls.kind, api_version=cls.api_version, **get_kwargs,
+        ).get(*args, **kwargs, timeout_seconds=60)
 
     def _prepare_singular_name_kwargs(self, **kwargs):
         kwargs = kwargs if kwargs else {}
