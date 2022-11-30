@@ -241,6 +241,7 @@ class DataVolume(NamespacedResource):
     def is_garbage_collector_enabled_dv(self):
         if self.exists:
             dv_annotations = self.instance.metadata.get("annotations")
+            # if the dv don't have any annotation, the gc is enabled on the dv by default
             if dv_annotations:
                 return (
                     dv_annotations.get(
