@@ -47,20 +47,17 @@ class NodeNetworkState(Resource):
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "nodeName": self.name,
-                    "managed": True,
-                    "desiredState": self.desired_state,
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "nodeName": self.name,
+                        "managed": True,
+                        "desiredState": self.desired_state,
+                    }
                 }
-            }
-        )
-        return res
+            )
 
     def apply(self):
         resource = self.to_dict()

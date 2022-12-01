@@ -40,29 +40,28 @@ class MigrationPolicy(Resource):
         self.vmi_selector = vmi_selector or {}
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-        spec = res.setdefault("spec", {})
-        selectors = spec.setdefault("selectors", {})
+        super().to_dict()
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
+            selectors = spec.setdefault("selectors", {})
 
-        if self.allow_auto_converge is not None:
-            res["spec"]["allowAutoConverge"] = self.allow_auto_converge
-        if self.allow_post_copy is not None:
-            res["spec"]["allowPostCopy"] = self.allow_post_copy
-        if self.bandwidth_per_migration:
-            res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
-        if self.completion_timeout_per_gb:
-            res["spec"]["completionTimeoutPerGiB"] = self.completion_timeout_per_gb
+            if self.allow_auto_converge is not None:
+                self.res["spec"]["allowAutoConverge"] = self.allow_auto_converge
+            if self.allow_post_copy is not None:
+                self.res["spec"]["allowPostCopy"] = self.allow_post_copy
+            if self.bandwidth_per_migration:
+                self.res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
+            if self.completion_timeout_per_gb:
+                self.res["spec"][
+                    "completionTimeoutPerGiB"
+                ] = self.completion_timeout_per_gb
 
-        if self.namespace_selector:
-            selectors.setdefault("namespaceSelector", {}).setdefault(
-                "matchLabels", self.namespace_selector
-            )
+            if self.namespace_selector:
+                selectors.setdefault("namespaceSelector", {}).setdefault(
+                    "matchLabels", self.namespace_selector
+                )
 
-        if self.vmi_selector:
-            selectors.setdefault("virtualMachineInstanceSelector", {}).setdefault(
-                "matchLabels", self.vmi_selector
-            )
-
-        return res
+            if self.vmi_selector:
+                selectors.setdefault("virtualMachineInstanceSelector", {}).setdefault(
+                    "matchLabels", self.vmi_selector
+                )

@@ -30,16 +30,14 @@ class HyperConverged(NamespacedResource):
         self.workloads = workloads
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
+        super().to_dict()
+        if not self.yaml_file:
+            if self.infra:
+                self.res.setdefault("spec", {}).setdefault("infra", {}).update(
+                    self.infra
+                )
 
-        if self.infra:
-            res.setdefault("spec", {}).setdefault("infra", {}).update(self.infra)
-
-        if self.workloads:
-            res.setdefault("spec", {}).setdefault("workloads", {}).update(
-                self.workloads
-            )
-
-        return res
+            if self.workloads:
+                self.res.setdefault("spec", {}).setdefault("workloads", {}).update(
+                    self.workloads
+                )

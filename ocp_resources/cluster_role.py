@@ -36,18 +36,15 @@ class ClusterRole(Resource):
         self.desired_state = {"rules": []}
 
     def to_dict(self):
-        self.res = super().to_dict()
-        if self.yaml_file:
-            return self.res
+        if not self.res:
+            super().to_dict()
 
-        if self.permissions_to_resources:
+        if not self.yaml_file and self.permissions_to_resources:
             self.add_rule(
                 api_groups=self.api_groups,
                 permissions_to_resources=self.permissions_to_resources,
                 verbs=self.verbs,
             )
-
-        return self.res
 
     def add_rule(
         self,
@@ -56,7 +53,7 @@ class ClusterRole(Resource):
         verbs=None,
     ):
         if not self.res:
-            self.res = super().to_dict()
+            super().to_dict()
 
         rule = {}
         if api_groups:
@@ -68,9 +65,6 @@ class ClusterRole(Resource):
         if rule:
             self._set_rule(rule=rule)
 
-        return self.res
-
     def _set_rule(self, rule):
-
         self.desired_state["rules"].append(rule)
         self.res["rules"] = self.desired_state["rules"]
