@@ -1,3 +1,5 @@
+import yaml
+
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 
@@ -58,3 +60,28 @@ class ProjectRequest(Resource):
 
         """
         super().client_wait_deleted(timeout=timeout)
+
+    def deploy(self):
+        self.create()
+
+    def create(self):
+        """
+        Create a ProjectRequest
+
+        Returns:
+            bool: True if create succeeded, False otherwise.
+
+        Raises:
+            ValueMismatch: When body value doesn't match class value
+        """
+        if not self.res:
+            self.to_dict()
+
+        self.logger.info(f"Create {self.kind} {self.name}")
+        self.logger.info(f"Posting {self.res}")
+        self.logger.debug(f"\n{yaml.dump(self.res)}")
+
+        resource_ = self.api.create(
+            body=self.res, namespace=self.namespace, dry_run=self.dry_run
+        )
+        return resource_
