@@ -61,16 +61,7 @@ class ProjectRequest(Resource):
         """
         super().client_wait_deleted(timeout=timeout)
 
-    def deploy(self):
-        """
-        deploy a ProjectRequest
-
-        Returns:
-            bool: True if deploy succeeded, False otherwise.
-
-        Raises:
-            ValueMismatch: When body value doesn't match class value
-        """
+    def deploy(self, wait=False):
         if not self.res:
             self.to_dict()
 
@@ -79,4 +70,7 @@ class ProjectRequest(Resource):
         self.logger.debug(f"\n{yaml.dump(self.res)}")
 
         self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
+        if wait:
+            project = Project(name=self.name, client=self.client)
+            project.wait()
         return self
