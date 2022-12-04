@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from ocp_resources.cdi_config import CDIConfig
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
@@ -238,22 +237,6 @@ class DataVolume(NamespacedResource):
             self.logger.error(f"{self.name} status is {sample}")
             raise
 
-    def is_garbage_collector_enabled_dv(self):
-        if self.exists:
-            dv_annotations = self.instance.metadata.get("annotations")
-            # if the dv don't have any annotation, the gc is enabled on the dv by default
-            if dv_annotations:
-                return (
-                    dv_annotations.get(
-                        f"{Resource.ApiGroup.CDI_KUBEVIRT_IO}/storage.deleteAfterCompletion"
-                    )
-                    is not False
-                )
-            return True
-        return (
-            self.pvc.exists and self.pvc.instance.status.phase == self.pvc.Status.BOUND
-        )
-
     def wait_for_dv_success(self, timeout=600, failure_timeout=120):
         self.logger.info(f"Wait DV success for {timeout} seconds")
         self._check_none_pending_status(failure_timeout=failure_timeout)
@@ -261,24 +244,18 @@ class DataVolume(NamespacedResource):
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
         )
         # if garbage collector enabled, the DV deleted once succeeded
-        if (
-            CDIConfig(name="config").is_garbage_collector_enabled()
-            and self.is_garbage_collector_enabled_dv()
-        ):
-            try:
-                for sample in TimeoutSampler(
-                    sleep=1,
-                    wait_timeout=timeout,
-                    func=self._dv_phase,
-                ):
-                    # DV reach to success if the status is succeeded or if the DV does not exists
-                    if sample in [self.Status.SUCCEEDED, DV_DELETED_BY_GC]:
-                        return
-            except TimeoutExpiredError:
-                self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
-                raise
-        else:
-            self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
+        try:
+            for sample in TimeoutSampler(
+                sleep=1,
+                wait_timeout=timeout,
+                func=self._dv_phase,
+            ):
+                # DV reach to success if the status is succeeded or if the DV does not exists
+                if sample in [self.Status.SUCCEEDED, DV_DELETED_BY_GC]:
+                    return
+        except TimeoutExpiredError:
+            self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
+            raise
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """

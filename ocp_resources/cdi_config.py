@@ -54,13 +54,3 @@ class CDIConfig(Resource):
                 current_url = status.uploadProxyURL
                 if current_url == uploadproxy_url:
                     return
-
-    def is_garbage_collector_enabled(self):
-        """
-        Check if garbage collector enabled on CDIconfig resource
-
-        Returns:
-            bool: True if the dataVolumeTTLSeconds don't exists or if dataVolumeTTLSeconds > 0
-        """
-        dv_ttl_seconds = self.instance.spec.dataVolumeTTLSeconds
-        return dv_ttl_seconds is None or dv_ttl_seconds >= 0
