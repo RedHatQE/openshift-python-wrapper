@@ -5,7 +5,7 @@ import re
 import sys
 from io import StringIO
 from signal import SIGINT, signal
-from urllib3.exceptions import MaxRetryError
+
 import kubernetes
 import yaml
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
@@ -18,6 +18,7 @@ from openshift.dynamic.exceptions import (
 )
 from openshift.dynamic.resource import ResourceField
 from packaging.version import Version
+from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -41,7 +42,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
         "etcdserver: leader changed",
         "etcdserver: request timed out",
         "Internal error occurred: failed calling webhook",
-        "rpc error:"
+        "rpc error:",
     ],
     ServerTimeoutError: [],
 }
@@ -502,7 +503,9 @@ class Resource:
 
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
         return dyn_client.resources.get(
-            kind=cls.kind, api_version=cls.api_version, **get_kwargs,
+            kind=cls.kind,
+            api_version=cls.api_version,
+            **get_kwargs,
         ).get(*args, **kwargs, timeout_seconds=60)
 
     def _prepare_singular_name_kwargs(self, **kwargs):
