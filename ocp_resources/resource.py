@@ -8,7 +8,7 @@ from signal import SIGINT, signal
 from urllib3.exceptions import MaxRetryError
 import kubernetes
 import yaml
-from kubernetes.dynamic.exceptions import MethodNotAllowedError
+from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
     ConflictError,
@@ -685,8 +685,8 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        with contextlib.suppress(NotFoundError):
-            # some resources do not support get() (no instance)
+        with contextlib.suppress(NotFoundError, ForbiddenError):
+            # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
         if wait and resource_:
