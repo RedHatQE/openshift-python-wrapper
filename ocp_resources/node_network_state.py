@@ -60,7 +60,7 @@ class NodeNetworkState(Resource):
             )
 
     def apply(self):
-        resource = self.to_dict()
+        resource = self.res
         retries_on_conflict = 3
         while True:
             try:

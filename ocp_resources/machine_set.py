@@ -177,7 +177,8 @@ class MachineSet(NamespacedResource):
         Returns:
             bool: True if scaling the machine-set was successful or wait=False, False otherwise.
         """
-        body = super().to_dict()
+        super().to_dict()
+        body = self.res
         body.update({"spec": {"replicas": replicas}})
 
         self.logger.info(
