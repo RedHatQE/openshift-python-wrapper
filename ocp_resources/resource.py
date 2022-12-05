@@ -5,7 +5,7 @@ import re
 import sys
 from io import StringIO
 from signal import SIGINT, signal
-from urllib3.exceptions import MaxRetryError
+
 import kubernetes
 import yaml
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
