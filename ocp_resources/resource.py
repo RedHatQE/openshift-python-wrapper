@@ -340,10 +340,22 @@ class Resource:
         timeout_seconds=60,
     ):
         """
-        Create a API resource
+        Create an API resource
 
         Args:
             name (str): Resource name
+            client (DynamicClient): Dynamic client for connecting to a remote cluster
+            teardown (bool): Indicates if this resource would need to be deleted
+            privileged_client (DynamicClient): Instance of Dynamic client
+            yaml_file (str): yaml file for the resource
+            delete_timeout (int): timeout associated with delete action
+            dry_run (bool): dry run
+            node_selector (str): node selector
+            node_selector_labels (str): node selector labels
+            config_file (str): Path to config file for connecting to remote cluster.
+            context (str): Context name for connecting to remote cluster.
+            timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
+
         """
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
