@@ -215,11 +215,6 @@ class DataVolume(NamespacedResource):
             client=self.client,
         )
 
-    def _dv_phase(self):
-        if self.exists:
-            return self.instance.status.phase
-        return DV_DELETED_BY_GC
-
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
         sample = None
@@ -227,10 +222,13 @@ class DataVolume(NamespacedResource):
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
                 sleep=10,
-                func=self._dv_phase,
+                func=self.exists,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
-                if sample in [self.Status.PENDING, None]:
+                if sample and sample.instance.status.phase in [
+                    self.Status.PENDING,
+                    None,
+                ]:
                     continue
                 break
         except TimeoutExpiredError:
@@ -248,10 +246,12 @@ class DataVolume(NamespacedResource):
             for sample in TimeoutSampler(
                 sleep=1,
                 wait_timeout=timeout,
-                func=self._dv_phase,
+                func=self.exists,
             ):
                 # DV reach to success if the status is succeeded or if the DV does not exists
-                if sample in [self.Status.SUCCEEDED, DV_DELETED_BY_GC]:
+                if (
+                    sample and sample.instance.status.phase == self.Status.SUCCEEDED
+                ) or not sample:
                     return
         except TimeoutExpiredError:
             self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
@@ -259,9 +259,7 @@ class DataVolume(NamespacedResource):
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
-        If DataVolume Succeeded and garbage collector enabled, the Datavolume resource will
-        be deleted by the GC and the cleanup should be done via the PVC.
-        In any other case, The Datavolume still exists and the cleanup done via the Datavolume.
+        Delete DataVolume
 
         Args:
             wait (bool): True to wait for DataVolume and PVC to be deleted.
