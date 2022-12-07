@@ -222,13 +222,13 @@ class DataVolume(NamespacedResource):
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
                 sleep=10,
-                func=self.exists,
+                func=lambda: self.exists,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
-                if sample and sample.instance.status.phase in [
+                if sample and (not sample.status or sample.status.phase in [
                     self.Status.PENDING,
                     None,
-                ]:
+                ]):
                     continue
                 break
         except TimeoutExpiredError:
@@ -246,11 +246,11 @@ class DataVolume(NamespacedResource):
             for sample in TimeoutSampler(
                 sleep=1,
                 wait_timeout=timeout,
-                func=self.exists,
+                func=lambda: self.exists,
             ):
                 # DV reach to success if the status is succeeded or if the DV does not exists
                 if (
-                    sample and sample.instance.status.phase == self.Status.SUCCEEDED
+                    sample and sample.status.phase == self.Status.SUCCEEDED
                 ) or not sample:
                     return
         except TimeoutExpiredError:
