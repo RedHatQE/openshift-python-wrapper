@@ -21,11 +21,11 @@ class Deployment(NamespacedResource):
         Returns:
             Deployment is updated successfully
         """
-        body = super().to_dict()
-        body.update({"spec": {"replicas": replica_count}})
+        super().to_dict()
+        self.res.update({"spec": {"replicas": replica_count}})
 
         self.logger.info(f"Set deployment replicas: {replica_count}")
-        return self.update(resource_dict=body)
+        return self.update(resource_dict=self.res)
 
     def wait_for_replicas(self, deployed=True, timeout=TIMEOUT_4MINUTES):
         """
