@@ -517,7 +517,7 @@ class Resource:
             kind=cls.kind,
             api_version=cls.api_version,
             **get_kwargs,
-        ).get(*args, **kwargs, timeout_seconds=60)
+        ).get(*args, **kwargs, timeout_seconds=self.timeout_seconds)
 
     def _prepare_singular_name_kwargs(self, **kwargs):
         kwargs = kwargs if kwargs else {}
