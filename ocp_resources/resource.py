@@ -512,7 +512,6 @@ class Resource:
             cls.api_version = _get_api_version(
                 dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
             )
-
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
         return dyn_client.resources.get(
             kind=cls.kind,
