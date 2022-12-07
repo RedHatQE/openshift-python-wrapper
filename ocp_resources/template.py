@@ -51,12 +51,12 @@ class Template(NamespacedResource):
             except KeyError:
                 continue
         instance_dict["parameters"] = params
-        # TODO: remove after fix - https://issues.redhat.com/browse/KNIP-1055 (bug 1753554)
-        # For template validator to be used - template namespace needs to be updated
+        # namespace label - If not defined, the template is expected to belong to the same namespace as the VM.
         instance_namespace = instance_dict["metadata"]["namespace"]
         instance_dict["objects"][0]["metadata"]["labels"][
             "vm.kubevirt.io/template.namespace"
         ] = instance_namespace
+
         instance_json = json.dumps(instance_dict)
         body = json.loads(instance_json)
         response = client.request(
