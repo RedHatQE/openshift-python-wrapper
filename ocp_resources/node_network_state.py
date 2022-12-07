@@ -60,12 +60,11 @@ class NodeNetworkState(Resource):
             )
 
     def apply(self):
-        resource = self.to_dict()
         retries_on_conflict = 3
         while True:
             try:
-                resource["metadata"] = self.instance.to_dict()["metadata"]
-                self.update(resource)
+                self.res["metadata"] = self.instance.to_dict()["metadata"]
+                self.update(self.res)
                 break
             except ConflictError as e:
                 retries_on_conflict -= 1

@@ -203,7 +203,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     ):
         #  If self.res is already defined (from to_dict()), don't call it again.
         if not self.res:
-            self.res = self.to_dict()
+            self.to_dict()
 
         self.res.setdefault("spec", {}).setdefault("desiredState", {})
         if not iface:
@@ -283,7 +283,9 @@ class NodeNetworkConfigurationPolicy(Resource):
                     self.set_interface(interface=iface)
 
     def apply(self, resource=None):
-        resource = resource if resource else super().to_dict()
+        if not resource:
+            super().to_dict()
+            resource = self.res
         samples = TimeoutSampler(
             wait_timeout=3,
             sleep=1,
