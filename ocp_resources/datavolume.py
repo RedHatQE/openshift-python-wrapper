@@ -6,9 +6,6 @@ from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
-DV_DELETED_BY_GC = "DV deleted by garbage collector"
-
-
 class DataVolume(NamespacedResource):
     """
     DataVolume object.
@@ -225,10 +222,14 @@ class DataVolume(NamespacedResource):
                 func=lambda: self.exists,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
-                if sample and (not sample.status or sample.status.phase in [
-                    self.Status.PENDING,
-                    None,
-                ]):
+                if sample and (
+                    not sample.status
+                    or sample.status.phase
+                    in [
+                        self.Status.PENDING,
+                        None,
+                    ]
+                ):
                     continue
                 break
         except TimeoutExpiredError:
