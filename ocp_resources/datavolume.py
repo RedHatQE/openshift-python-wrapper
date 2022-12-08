@@ -215,6 +215,7 @@ class DataVolume(NamespacedResource):
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
         sample = None
+        # if garbage collector is enabled, DV will be deleted after success
         try:
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
@@ -250,9 +251,7 @@ class DataVolume(NamespacedResource):
                 func=lambda: self.exists,
             ):
                 # DV reach to success if the status is succeeded or if the DV does not exists
-                if (
-                    sample and sample.status.phase == self.Status.SUCCEEDED
-                ) or not sample:
+                if sample is None or sample.status.phase == self.Status.SUCCEEDED:
                     return
         except TimeoutExpiredError:
             self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
@@ -270,7 +269,7 @@ class DataVolume(NamespacedResource):
         Returns:
             bool: True if delete succeeded, False otherwise.
         """
-
+        # if garbage collector is enabled, DV will be deleted after success
         if self.exists:
             return super().delete(wait=wait, timeout=timeout, body=body)
         else:
