@@ -23,6 +23,7 @@ from urllib3.exceptions import MaxRetryError
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_1MINUTE,
     TIMEOUT_4MINUTES,
 )
 from ocp_resources.event import Event
@@ -207,6 +208,7 @@ class Resource:
     api_group = None
     api_version = None
     singular_name = None
+    timeout_seconds = TIMEOUT_1MINUTE
 
     class Status:
         SUCCEEDED = "Succeeded"
@@ -337,7 +339,7 @@ class Resource:
         node_selector_labels=None,
         config_file=None,
         context=None,
-        timeout_seconds=60,
+        timeout_seconds=TIMEOUT_1MINUTE,
     ):
         """
         Create an API resource
@@ -512,12 +514,13 @@ class Resource:
             cls.api_version = _get_api_version(
                 dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
             )
+
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
         return dyn_client.resources.get(
             kind=cls.kind,
             api_version=cls.api_version,
             **get_kwargs,
-        ).get(*args, **kwargs, timeout_seconds=60)
+        ).get(*args, **kwargs, timeout_seconds=cls.timeout_seconds)
 
     def _prepare_singular_name_kwargs(self, **kwargs):
         kwargs = kwargs if kwargs else {}
