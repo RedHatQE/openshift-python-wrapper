@@ -40,16 +40,13 @@ class Hook(NamespacedResource, MTV):
         self.playbook = playbook
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "image": self.image,
-                    "playbook": self.playbook,
-                },
-            }
-        )
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "image": self.image,
+                        "playbook": self.playbook,
+                    },
+                }
+            )

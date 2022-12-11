@@ -1,10 +1,6 @@
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class CatalogSourceConfig(NamespacedResource):
@@ -41,23 +37,19 @@ class CatalogSourceConfig(NamespacedResource):
         self.cs_publisher = cs_publisher
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "source": self.source,
-                    "targetNamespace": self.target_namespace,
-                    "packages": self.packages,
-                    "csDisplayName": self.cs_display_name,
-                    "csPublisher": self.cs_publisher,
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "source": self.source,
+                        "targetNamespace": self.target_namespace,
+                        "packages": self.packages,
+                        "csDisplayName": self.cs_display_name,
+                        "csPublisher": self.cs_publisher,
+                    }
                 }
-            }
-        )
-
-        return res
+            )
 
     def wait_for_csc_status(self, status, timeout=120):
         """
@@ -88,5 +80,7 @@ class CatalogSourceConfig(NamespacedResource):
 
         except TimeoutExpiredError:
             if current_status:
-                LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
+                self.logger.error(
+                    f"Status of {self.kind} {self.name} is {current_status}"
+                )
             raise

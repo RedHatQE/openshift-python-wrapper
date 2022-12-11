@@ -1,10 +1,6 @@
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
 
 
 TIMEOUT_5MINUTES = 300
@@ -83,50 +79,47 @@ class MachineSet(NamespacedResource):
         self.provider_spec = provider_spec or {}
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
+        super().to_dict()
+        if not self.yaml_file:
+            _spec, _metadata, _labels = ("spec", "metadata", "labels")
+            (
+                _cluster_api_cluster,
+                _cluster_api_machine_role,
+                _cluster_api_machine_type,
+                _cluster_api_machineset,
+            ) = (
+                "cluster-api-cluster",
+                "cluster-api-machine-role",
+                "cluster-api-machine-type",
+                "cluster-api-machineset",
+            )
 
-        _spec, _metadata, _labels = ("spec", "metadata", "labels")
-        (
-            _cluster_api_cluster,
-            _cluster_api_machine_role,
-            _cluster_api_machine_type,
-            _cluster_api_machineset,
-        ) = (
-            "cluster-api-cluster",
-            "cluster-api-machine-role",
-            "cluster-api-machine-type",
-            "cluster-api-machineset",
-        )
+            self.res[_metadata][_labels] = {
+                f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
+                f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
+                f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
+            }
 
-        res[_metadata][_labels] = {
-            f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-            f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
-            f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
-        }
-
-        res[_spec] = {
-            "replicas": self.replicas,
-            "selector": {
-                "matchLabels": {
-                    f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                    f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
-                }
-            },
-            "template": {
-                _metadata: {
-                    _labels: {
+            self.res[_spec] = {
+                "replicas": self.replicas,
+                "selector": {
+                    "matchLabels": {
                         f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                        f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
-                        f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
                         f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
                     }
                 },
-                _spec: {"providerSpec": self.provider_spec},
-            },
-        }
-        return res
+                "template": {
+                    _metadata: {
+                        _labels: {
+                            f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
+                            f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
+                            f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
+                            f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
+                        }
+                    },
+                    _spec: {"providerSpec": self.provider_spec},
+                },
+            }
 
     @property
     def available_replicas(self):
@@ -163,7 +156,7 @@ class MachineSet(NamespacedResource):
                 )
             )
         except TimeoutExpiredError:
-            LOGGER.error(
+            self.logger.error(
                 f"Machine-set {self.name} replicas failed to reach into 'ready' state, actual ready replicas: "
                 f"{self.ready_replicas}, desired replicas: {self.desired_replicas}"
             )
@@ -184,13 +177,13 @@ class MachineSet(NamespacedResource):
         Returns:
             bool: True if scaling the machine-set was successful or wait=False, False otherwise.
         """
-        body = super().to_dict()
-        body.update({"spec": {"replicas": replicas}})
+        super().to_dict()
+        self.res.update({"spec": {"replicas": replicas}})
 
-        LOGGER.info(
+        self.logger.info(
             f"Scale machine-set from {self.desired_replicas} replicas to {replicas} replicas"
         )
-        self.update(resource_dict=body)
+        self.update(resource_dict=self.res)
         if wait:
             return self.wait_for_replicas(timeout=wait_timeout, sleep=sleep)
         return True

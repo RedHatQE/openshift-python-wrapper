@@ -117,62 +117,61 @@ class DataVolume(NamespacedResource):
         self.api_name = api_name
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-        res.update(
-            {
-                "spec": {
-                    "source": {self.source: {"url": self.url}},
-                    self.api_name: {
-                        "resources": {"requests": {"storage": self.size}},
-                    },
-                }
-            }
-        )
-        if self.access_modes:
-            res["spec"][self.api_name]["accessModes"] = [self.access_modes]
-        if self.content_type:
-            res["spec"]["contentType"] = self.content_type
-        if self.storage_class:
-            res["spec"][self.api_name]["storageClassName"] = self.storage_class
-        if self.secret:
-            res["spec"]["source"][self.source]["secretRef"] = self.secret.name
-        if self.volume_mode:
-            res["spec"][self.api_name]["volumeMode"] = self.volume_mode
-        if self.source == "http" or "registry":
-            res["spec"]["source"][self.source]["url"] = self.url
-        if self.cert_configmap:
-            res["spec"]["source"][self.source]["certConfigMap"] = self.cert_configmap
-        if self.source == "upload" or self.source == "blank":
-            res["spec"]["source"][self.source] = {}
-        if self.hostpath_node:
-            res["metadata"].setdefault("annotations", {}).update(
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
                 {
-                    f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": self.hostpath_node
+                    "spec": {
+                        "source": {self.source: {"url": self.url}},
+                        self.api_name: {
+                            "resources": {"requests": {"storage": self.size}},
+                        },
+                    }
                 }
             )
-        if self.multus_annotation:
-            res["metadata"].setdefault("annotations", {}).update(
-                {
-                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": self.multus_annotation
+            if self.access_modes:
+                self.res["spec"][self.api_name]["accessModes"] = [self.access_modes]
+            if self.content_type:
+                self.res["spec"]["contentType"] = self.content_type
+            if self.storage_class:
+                self.res["spec"][self.api_name]["storageClassName"] = self.storage_class
+            if self.secret:
+                self.res["spec"]["source"][self.source]["secretRef"] = self.secret.name
+            if self.volume_mode:
+                self.res["spec"][self.api_name]["volumeMode"] = self.volume_mode
+            if self.source == "http" or "registry":
+                self.res["spec"]["source"][self.source]["url"] = self.url
+            if self.cert_configmap:
+                self.res["spec"]["source"][self.source][
+                    "certConfigMap"
+                ] = self.cert_configmap
+            if self.source == "upload" or self.source == "blank":
+                self.res["spec"]["source"][self.source] = {}
+            if self.hostpath_node:
+                self.res["metadata"].setdefault("annotations", {}).update(
+                    {
+                        f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": self.hostpath_node
+                    }
+                )
+            if self.multus_annotation:
+                self.res["metadata"].setdefault("annotations", {}).update(
+                    {
+                        f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": self.multus_annotation
+                    }
+                )
+            if self.bind_immediate_annotation:
+                self.res["metadata"].setdefault("annotations", {}).update(
+                    {
+                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
+                    }
+                )
+            if self.source == "pvc":
+                self.res["spec"]["source"]["pvc"] = {
+                    "name": self.source_pvc or "dv-source",
+                    "namespace": self.source_namespace or self.namespace,
                 }
-            )
-        if self.bind_immediate_annotation:
-            res["metadata"].setdefault("annotations", {}).update(
-                {
-                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
-                }
-            )
-        if self.source == "pvc":
-            res["spec"]["source"]["pvc"] = {
-                "name": self.source_pvc or "dv-source",
-                "namespace": self.source_namespace or self.namespace,
-            }
-        if self.preallocation is not None:
-            res["spec"]["preallocation"] = self.preallocation
-
-        return res
+            if self.preallocation is not None:
+                self.res["spec"]["preallocation"] = self.preallocation
 
     def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """

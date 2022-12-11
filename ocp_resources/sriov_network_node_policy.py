@@ -44,27 +44,24 @@ class SriovNetworkNodePolicy(NamespacedResource):
         self.node_selector = node_selector
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res["spec"] = {
-            "deviceType": "vfio-pci",
-            "nicSelector": {
-                "pfNames": [self.pf_names],
-                "rootDevices": [self.root_devices],
-            },
-            "numVfs": self.num_vfs,
-            "resourceName": self.resource_name,
-        }
-        if self.mtu:
-            res["spec"]["mtu"] = self.mtu
-        if self.priority:
-            res["spec"]["priority"] = self.priority
-        if self.node_selector:
-            res["spec"]["nodeSelector"] = self.node_selector
-        else:
-            res["spec"]["nodeSelector"] = {
-                "feature.node.kubernetes.io/network-sriov.capable": "true"
+        super().to_dict()
+        if not self.yaml_file:
+            self.res["spec"] = {
+                "deviceType": "vfio-pci",
+                "nicSelector": {
+                    "pfNames": [self.pf_names],
+                    "rootDevices": [self.root_devices],
+                },
+                "numVfs": self.num_vfs,
+                "resourceName": self.resource_name,
             }
-        return res
+            if self.mtu:
+                self.res["spec"]["mtu"] = self.mtu
+            if self.priority:
+                self.res["spec"]["priority"] = self.priority
+            if self.node_selector:
+                self.res["spec"]["nodeSelector"] = self.node_selector
+            else:
+                self.res["spec"]["nodeSelector"] = {
+                    "feature.node.kubernetes.io/network-sriov.capable": "true"
+                }

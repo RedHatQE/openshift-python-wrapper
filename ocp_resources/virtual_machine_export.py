@@ -55,20 +55,17 @@ class VirtualMachineExport(NamespacedResource):
         self.source_name = source_name
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
-                "spec": {
-                    "tokenSecretRef": self.token_secret_ref,
-                    "source": {
-                        "apiGroup": self.source_api_group,
-                        "kind": self.source_kind,
-                        "name": self.source_name,
-                    },
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(
+                {
+                    "spec": {
+                        "tokenSecretRef": self.token_secret_ref,
+                        "source": {
+                            "apiGroup": self.source_api_group,
+                            "kind": self.source_kind,
+                            "name": self.source_name,
+                        },
+                    }
                 }
-            }
-        )
-        return res
+            )

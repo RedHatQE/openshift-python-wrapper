@@ -54,47 +54,47 @@ class DataImportCron(NamespacedResource):
         self.bind_immediate_annotation = bind_immediate_annotation
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-        if self.image_stream and self.url:
-            raise ValueError("imageStream and url can not coexist")
-        res.update(
-            {
-                "spec": {
-                    "template": {
-                        "spec": {
-                            "source": {"registry": {"pullMethod": self.pull_method}},
-                            "storage": {
-                                "resources": {"requests": {"storage": self.size}}
-                            },
+        super().to_dict()
+        if not self.yaml_file:
+            if self.image_stream and self.url:
+                raise ValueError("imageStream and url can not coexist")
+
+            self.res.update(
+                {
+                    "spec": {
+                        "template": {
+                            "spec": {
+                                "source": {
+                                    "registry": {"pullMethod": self.pull_method}
+                                },
+                                "storage": {
+                                    "resources": {"requests": {"storage": self.size}}
+                                },
+                            }
                         }
                     }
                 }
-            }
-        )
-        spec = res["spec"]["template"]["spec"]
-        if self.bind_immediate_annotation:
-            res["metadata"].setdefault("annotations", {}).update(
-                {
-                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
-                }
             )
-        if self.image_stream:
-            spec["source"]["registry"]["imageStream"] = self.image_stream
-        if self.url:
-            spec["source"]["registry"]["url"] = self.url
-        if self.cert_configmap:
-            spec["source"]["registry"]["certConfigMap"] = self.cert_configmap
-        if self.storage_class:
-            spec["storage"]["storageClassName"] = self.storage_class
-        if self.schedule:
-            res["spec"]["schedule"] = self.schedule
-        if self.garbage_collect:
-            res["spec"]["garbageCollect"] = self.garbage_collect
-        if self.managed_data_source:
-            res["spec"]["managedDataSource"] = self.managed_data_source
-        if self.imports_to_keep:
-            res["spec"]["importsToKeep"] = self.imports_to_keep
-
-        return res
+            spec = self.res["spec"]["template"]["spec"]
+            if self.bind_immediate_annotation:
+                self.res["metadata"].setdefault("annotations", {}).update(
+                    {
+                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
+                    }
+                )
+            if self.image_stream:
+                spec["source"]["registry"]["imageStream"] = self.image_stream
+            if self.url:
+                spec["source"]["registry"]["url"] = self.url
+            if self.cert_configmap:
+                spec["source"]["registry"]["certConfigMap"] = self.cert_configmap
+            if self.storage_class:
+                spec["storage"]["storageClassName"] = self.storage_class
+            if self.schedule:
+                self.res["spec"]["schedule"] = self.schedule
+            if self.garbage_collect:
+                self.res["spec"]["garbageCollect"] = self.garbage_collect
+            if self.managed_data_source:
+                self.res["spec"]["managedDataSource"] = self.managed_data_source
+            if self.imports_to_keep:
+                self.res["spec"]["importsToKeep"] = self.imports_to_keep

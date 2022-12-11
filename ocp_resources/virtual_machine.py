@@ -2,13 +2,9 @@
 
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachine(NamespacedResource):
@@ -30,7 +26,7 @@ class VirtualMachine(NamespacedResource):
         PAUSED = "Paused"
         PROVISIONING = "Provisioning"
         STARTING = "Starting"
-        STOPPED = "stopped"
+        STOPPED = "Stopped"
         STOPPING = "Stopping"
         WAITING_FOR_VOLUME_BINDING = "WaitingForVolumeBinding"
 
@@ -72,18 +68,15 @@ class VirtualMachine(NamespacedResource):
         )
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        body_spec = self.body.get("spec") if self.body else None
-        res["spec"] = body_spec or {"template": {"spec": {}}}
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            body_spec = self.body.get("spec") if self.body else None
+            self.res["spec"] = body_spec or {"template": {"spec": {}}}
 
     def start(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="start")
         if wait:
-            return self.wait_for_status(timeout=timeout, status=True)
+            return self.wait_for_ready_status(timeout=timeout, status=True)
 
     def restart(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="restart")
@@ -96,21 +89,21 @@ class VirtualMachine(NamespacedResource):
     ):
         self.api_request(method="PUT", action="stop")
         if wait:
-            self.wait_for_status(timeout=timeout, status=None)
+            self.wait_for_ready_status(timeout=timeout, status=None)
             return self.vmi.wait_deleted(timeout=vmi_delete_timeout)
 
-    def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
+    def wait_for_ready_status(self, status, timeout=TIMEOUT_4MINUTES, sleep=1):
         """
-        Wait for resource to be in status
+        Wait for VM resource ready status to be at desire status
 
         Args:
-            status: Expected status: True for a running VM, None for a stopped VM.
+            status (any): True for a running VM, None for a stopped VM.
             timeout (int): Time to wait for the resource.
 
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind} {self.name} status to be {'ready' if status == True else status}"
         )
         samples = TimeoutSampler(
@@ -166,7 +159,7 @@ class VirtualMachine(NamespacedResource):
         return self.instance.get("status", {}).get("printableStatus")
 
     def wait_for_status_none(self, status, timeout=TIMEOUT_4MINUTES):
-        LOGGER.info(f"Wait for {self.kind} {self.name} status {status} to be None")
+        self.logger.info(f"Wait for {self.kind} {self.name} status {status} to be None")
         for sample in TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,

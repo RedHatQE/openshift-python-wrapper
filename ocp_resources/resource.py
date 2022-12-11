@@ -8,7 +8,7 @@ from signal import SIGINT, signal
 
 import kubernetes
 import yaml
-from kubernetes.dynamic.exceptions import MethodNotAllowedError
+from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import (
     ConflictError,
@@ -39,11 +39,12 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     InternalServerError: [
         "etcdserver: leader changed",
         "etcdserver: request timed out",
+        "Internal error occurred: failed calling webhook",
     ],
     ServerTimeoutError: [],
 }
 
-LOGGER = get_logger(name=__name__)
+LOGGER = get_logger(__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
@@ -259,7 +260,7 @@ class Resource:
         EVENTS_K8S_IO = "events.k8s.io"
         EXPORT_KUBEVIRT_IO = "export.kubevirt.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
-        INSTANCE_TYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
+        INSTANCETYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
@@ -364,6 +365,9 @@ class Resource:
         self.node_selector_spec = self._prepare_node_selector_spec()
         self.res = None
         self.yaml_file_contents = None
+        self.initial_resource_version = None
+        self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+        self._set_client_and_api_version()
 
     def _prepare_node_selector_spec(self):
         if self.node_selector:
@@ -390,24 +394,21 @@ class Resource:
                     with open(self.yaml_file, "r") as stream:
                         self.yaml_file_contents = stream.read()
 
-            self.resource_dict = yaml.safe_load(stream=self.yaml_file_contents)
-            self.resource_dict.get("metadata", {}).pop("resourceVersion", None)
-            self.name = self.resource_dict["metadata"]["name"]
+            self.res = yaml.safe_load(stream=self.yaml_file_contents)
+            self.res.get("metadata", {}).pop("resourceVersion", None)
+            self.name = self.res["metadata"]["name"]
         else:
-            self._set_client_and_api_version()
-            self.resource_dict = {
+            self.res = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
 
-        return self.resource_dict
-
     def to_dict(self):
         """
         Generate intended dict representation of the resource.
         """
-        return self._base_body()
+        self._base_body()
 
     def __enter__(self):
         signal(SIGINT, self._sigint_handler)
@@ -481,7 +482,7 @@ class Resource:
             user_exported_args=skip_resource_teardown,
             check_exists=False,
         ):
-            LOGGER.warning(
+            self.logger.warning(
                 f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
             return
@@ -558,7 +559,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
-        LOGGER.info(f"Wait until {self.kind} {self.name} is created")
+        self.logger.info(f"Wait until {self.kind} {self.name} is created")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
@@ -582,7 +583,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        LOGGER.info(f"Wait until {self.kind} {self.name} is deleted")
+        self.logger.info(f"Wait until {self.kind} {self.name} is deleted")
         return self.client_wait_deleted(timeout=timeout)
 
     @property
@@ -627,7 +628,7 @@ class Resource:
             TimeoutExpiredError: If resource in not in desire status.
         """
         stop_status = stop_status if stop_status else self.Status.FAILED
-        LOGGER.info(f"Wait for {self.kind} {self.name} status to be {status}")
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
@@ -653,15 +654,16 @@ class Resource:
 
         except TimeoutExpiredError:
             if current_status:
-                LOGGER.error(f"Status of {self.kind} {self.name} is {current_status}")
+                self.logger.error(
+                    f"Status of {self.kind} {self.name} is {current_status}"
+                )
             raise
 
-    def create(self, body=None, wait=False):
+    def create(self, wait=False):
         """
         Create resource.
 
         Args:
-            body (dict): Resource data to create.
             wait (bool) : True to wait for resource status.
 
         Returns:
@@ -670,34 +672,29 @@ class Resource:
         Raises:
             ValueMismatch: When body value doesn't match class value
         """
-        data = self.to_dict()
-        if body:
-            kind = body["kind"]
-            name = body.get("name")
-            api_version = body["apiVersion"]
-            if kind != self.kind:
-                raise ValueMismatch(f"{kind} != {self.kind}")
-            if name and name != self.name:
-                raise ValueMismatch(f"{name} != {self.name}")
-            if api_version != self.api_version:
-                raise ValueMismatch(f"{api_version} != {self.api_version}")
+        if not self.res:
+            self.to_dict()
 
-            data.update(body)
+        self.logger.info(f"Create {self.kind} {self.name}")
+        self.logger.info(f"Posting {self.res}")
+        self.logger.debug(f"\n{yaml.dump(self.res)}")
+        resource_ = self.api.create(
+            body=self.res, namespace=self.namespace, dry_run=self.dry_run
+        )
+        with contextlib.suppress(NotFoundError, ForbiddenError):
+            # some resources do not support get() (no instance) or the client do not have permissions
+            self.initial_resource_version = self.instance.metadata.resourceVersion
 
-        LOGGER.info(f"Create {self.kind} {self.name}")
-        LOGGER.info(f"Posting {data}")
-        LOGGER.debug(f"\n{yaml.dump(data)}")
-        res = self.api.create(body=data, namespace=self.namespace, dry_run=self.dry_run)
-        if wait and res:
+        if wait and resource_:
             return self.wait()
-        return res
+        return resource_
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
-        LOGGER.info(f"Delete {self.kind} {self.name}")
+        self.logger.info(f"Delete {self.kind} {self.name}")
         if self.exists:
             data = self.instance.to_dict()
-            LOGGER.info(f"Deleting {data}")
-            LOGGER.debug(f"\n{yaml.dump(data)}")
+            self.logger.info(f"Deleting {data}")
+            self.logger.debug(f"\n{yaml.dump(data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
@@ -718,7 +715,7 @@ class Resource:
         Returns:
            str: Status
         """
-        LOGGER.info(f"Get {self.kind} {self.name} status")
+        self.logger.info(f"Get {self.kind} {self.name} status")
         return self.instance.status.phase
 
     def update(self, resource_dict):
@@ -728,8 +725,8 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        LOGGER.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
-        LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
+        self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -741,8 +738,8 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        LOGGER.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
-        LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
+        self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -822,9 +819,31 @@ class Resource:
         """
         return self.instance["metadata"]["labels"]
 
+    def watcher(self, timeout, resource_version=None):
+        """
+        Get resource for a given timeout.
+
+        Args:
+            timeout (int): Time to get conditions.
+            resource_version (str): The version with which to filter results. Only events with
+                a resource_version greater than this value will be returned
+
+        Yield:
+            Event object with these keys:
+                   'type': The type of event such as "ADDED", "DELETED", etc.
+                   'raw_object': a dict representing the watched object.
+                   'object': A ResourceInstance wrapping raw_object.
+        """
+        yield from self.api.watch(
+            timeout=timeout,
+            namespace=self.namespace,
+            field_selector=f"metadata.name=={self.name}",
+            resource_version=resource_version or self.initial_resource_version,
+        )
+
     def wait_for_condition(self, condition, status, timeout=300):
         """
-        Wait for Pod condition to be in desire status.
+        Wait for Resource condition to be in desire status.
 
         Args:
             condition (str): Condition to query.
@@ -832,30 +851,18 @@ class Resource:
             timeout (int): Time to wait for the resource.
 
         Raises:
-            TimeoutExpiredError: If Pod condition in not in desire status.
+            TimeoutExpiredError: If Resource condition in not in desire status.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
-        samples = TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=1,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+        for sample in self.watcher(timeout=timeout):
+            for cond in sample["raw_object"].get("status", {}).get("conditions", []):
+                if cond["type"] == condition and cond["status"] == status:
+                    return
+        raise TimeoutExpiredError(
+            value=f"condition {condition} not in desired status {status} after {timeout} seconds"
         )
-        for sample in samples:
-            if (
-                sample.items
-                and sample.items[0].get("status")
-                and sample.items[0].status.get("conditions")
-            ):
-                sample_conditions = sample.items[0].status.conditions
-                if sample_conditions:
-                    for cond in sample_conditions:
-                        if cond.type == condition and cond.status == status:
-                            return
 
     def api_request(self, method, action, url, **params):
         """
@@ -1063,22 +1070,20 @@ class NamespacedResource(Resource):
         return self.api.get(name=self.name, namespace=self.namespace)
 
     def _base_body(self):
-        res = super(NamespacedResource, self)._base_body()
+        if not self.res:
+            super(NamespacedResource, self)._base_body()
+
         if self.yaml_file:
-            self.namespace = self.resource_dict["metadata"].get(
-                "namespace", self.namespace
-            )
+            self.namespace = self.res["metadata"].get("namespace", self.namespace)
 
         if not self.namespace:
             raise ValueError("Namespace must be passed or specified in the YAML file.")
 
         if not self.yaml_file:
-            res["metadata"]["namespace"] = self.namespace
-
-        return res
+            self.res["metadata"]["namespace"] = self.namespace
 
     def to_dict(self):
-        return self._base_body()
+        self._base_body()
 
 
 class ResourceEditor:

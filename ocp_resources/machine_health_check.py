@@ -46,34 +46,31 @@ class MachineHealthCheck(NamespacedResource):
         self.reboot_strategy = reboot_strategy
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        if self.reboot_strategy:
-            res["metadata"]["annotations"] = {
-                f"{self.api_group}/remediation-strategy": "external-baremetal"
+        super().to_dict()
+        if not self.yaml_file:
+            if self.reboot_strategy:
+                self.res["metadata"]["annotations"] = {
+                    f"{self.api_group}/remediation-strategy": "external-baremetal"
+                }
+            self.res.setdefault("spec", {})
+            self.res["spec"]["nodeStartupTimeout"] = self.node_startup_timeout
+            self.res["spec"]["maxUnhealthy"] = self.max_unhealthy
+            self.res["spec"].setdefault("selector", {})
+            self.res["spec"]["selector"]["matchLabels"] = {
+                f"{self.api_group}/cluster-api-cluster": self.cluster_name,
+                f"{self.api_group}/cluster-api-machine-role": self.machine_role,
+                f"{self.api_group}/cluster-api-machine-type": self.machine_type,
+                f"{self.api_group}/cluster-api-machineset": self.machineset_name,
             }
-        res.setdefault("spec", {})
-        res["spec"]["nodeStartupTimeout"] = self.node_startup_timeout
-        res["spec"]["maxUnhealthy"] = self.max_unhealthy
-        res["spec"].setdefault("selector", {})
-        res["spec"]["selector"]["matchLabels"] = {
-            f"{self.api_group}/cluster-api-cluster": self.cluster_name,
-            f"{self.api_group}/cluster-api-machine-role": self.machine_role,
-            f"{self.api_group}/cluster-api-machine-type": self.machine_type,
-            f"{self.api_group}/cluster-api-machineset": self.machineset_name,
-        }
-        res["spec"]["unhealthyConditions"] = [
-            {
-                "type": self.Condition.READY,
-                "timeout": self.unhealthy_timeout,
-                "status": self.Condition.Status.FALSE,
-            },
-            {
-                "type": self.Condition.READY,
-                "timeout": self.unhealthy_timeout,
-                "status": self.Condition.Status.UNKNOWN,
-            },
-        ]
-        return res
+            self.res["spec"]["unhealthyConditions"] = [
+                {
+                    "type": self.Condition.READY,
+                    "timeout": self.unhealthy_timeout,
+                    "status": self.Condition.Status.FALSE,
+                },
+                {
+                    "type": self.Condition.READY,
+                    "timeout": self.unhealthy_timeout,
+                    "status": self.Condition.Status.UNKNOWN,
+                },
+            ]

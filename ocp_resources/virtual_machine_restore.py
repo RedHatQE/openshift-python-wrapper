@@ -3,13 +3,9 @@
 from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachineRestore(NamespacedResource):
@@ -44,18 +40,15 @@ class VirtualMachineRestore(NamespacedResource):
         self.snapshot_name = snapshot_name
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        spec = res.setdefault("spec", {})
-        spec.setdefault("target", {})[
-            "apiGroup"
-        ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
-        spec["target"]["kind"] = VirtualMachine.kind
-        spec["target"]["name"] = self.vm_name
-        spec["virtualMachineSnapshotName"] = self.snapshot_name
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
+            spec.setdefault("target", {})[
+                "apiGroup"
+            ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
+            spec["target"]["kind"] = VirtualMachine.kind
+            spec["target"]["name"] = self.vm_name
+            spec["virtualMachineSnapshotName"] = self.snapshot_name
 
     def wait_complete(self, status=True, timeout=TIMEOUT_4MINUTES):
         """
@@ -68,7 +61,7 @@ class VirtualMachineRestore(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        LOGGER.info(
+        self.logger.info(
             f"Wait for {self.kind} {self.name} status to be complete = {status}"
         )
 

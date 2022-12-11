@@ -1,26 +1,23 @@
+# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/controller-revision-v1/
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class ImageStream(NamespacedResource):
-    """
-    ImageStream object. API reference:
-    https://docs.openshift.com/container-platform/4.11/rest_api/image_apis/imagestream-image-openshift-io-v1.html#imagestream-image-openshift-io-v1
-    """
-
-    api_group = NamespacedResource.ApiGroup.IMAGE_OPENSHIFT_IO
+class ControllerRevision(NamespacedResource):
+    api_group = NamespacedResource.ApiGroup.APPS
 
     def __init__(
         self,
         name=None,
         namespace=None,
         client=None,
-        lookup_policy=False,
-        tags=None,
         teardown=True,
+        timeout=TIMEOUT_4MINUTES,
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        owner_references=None,
+        revision_object=None,
         **kwargs,
     ):
         super().__init__(
@@ -28,22 +25,21 @@ class ImageStream(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
+            timeout=timeout,
             privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
         )
-        self.tags = tags
-        self.lookup_policy = lookup_policy
+        self.owner_references = owner_references
+        self.revision_object = revision_object
 
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "lookupPolicy": {"local": self.lookup_policy},
-                        "tags": self.tags,
-                    }
-                }
-            )
+            if self.owner_references:
+                self.res.setdefault("metadata", {}).update(
+                    {"ownerReference": self.owner_references}
+                )
+            if self.revision_object:
+                self.res.update({"data": self.revision_object.res})
