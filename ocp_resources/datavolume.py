@@ -214,17 +214,62 @@ class DataVolume(NamespacedResource):
     def _check_none_pending_status(self, failure_timeout=120):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
         sample = None
+        # if garbage collector is enabled, DV will be deleted after success
         try:
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
                 sleep=10,
-                func=lambda: self.instance.status.phase,
+                func=lambda: self.exists,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
-                if sample in [self.Status.PENDING, None]:
+                if sample and (
+                    not sample.status
+                    or sample.status.phase
+                    in [
+                        self.Status.PENDING,
+                        None,
+                    ]
+                ):
                     continue
-                else:
-                    break
+                break
         except TimeoutExpiredError:
             self.logger.error(f"{self.name} status is {sample}")
             raise
+
+    def wait_for_dv_success(self, timeout=600, failure_timeout=120):
+        self.logger.info(f"Wait DV success for {timeout} seconds")
+        self._check_none_pending_status(failure_timeout=failure_timeout)
+        self.pvc.wait_for_status(
+            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
+        )
+        # if garbage collector enabled, the DV deleted once succeeded
+        try:
+            for sample in TimeoutSampler(
+                sleep=1,
+                wait_timeout=timeout,
+                func=lambda: self.exists,
+            ):
+                # DV reach to success if the status is succeeded or if the DV does not exists
+                if sample is None or sample.status.phase == self.Status.SUCCEEDED:
+                    return
+        except TimeoutExpiredError:
+            self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
+            raise
+
+    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
+        """
+        Delete DataVolume
+
+        Args:
+            wait (bool): True to wait for DataVolume and PVC to be deleted.
+            timeout (int): Time to wait for resources deletion
+            body (dict): Content to send for delete()
+
+        Returns:
+            bool: True if delete succeeded, False otherwise.
+        """
+        # if garbage collector is enabled, DV will be deleted after success
+        if self.exists:
+            return super().delete(wait=wait, timeout=timeout, body=body)
+        else:
+            return self.pvc.delete(wait=wait, timeout=timeout, body=body)
