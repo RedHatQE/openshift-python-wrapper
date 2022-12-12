@@ -18,10 +18,12 @@ from openshift.dynamic.exceptions import (
 )
 from openshift.dynamic.resource import ResourceField
 from packaging.version import Version
+from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_1MINUTE,
     TIMEOUT_4MINUTES,
 )
 from ocp_resources.event import Event
@@ -34,12 +36,14 @@ from ocp_resources.utils import (
 
 
 DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
+    MaxRetryError: [],
     ConnectionAbortedError: [],
     ConnectionResetError: [],
     InternalServerError: [
         "etcdserver: leader changed",
         "etcdserver: request timed out",
         "Internal error occurred: failed calling webhook",
+        "rpc error:",
     ],
     ServerTimeoutError: [],
 }
@@ -204,6 +208,7 @@ class Resource:
     api_group = None
     api_version = None
     singular_name = None
+    timeout_seconds = TIMEOUT_1MINUTE
 
     class Status:
         SUCCEEDED = "Succeeded"
@@ -334,12 +339,25 @@ class Resource:
         node_selector_labels=None,
         config_file=None,
         context=None,
+        timeout_seconds=TIMEOUT_1MINUTE,
     ):
         """
-        Create a API resource
+        Create an API resource
 
         Args:
             name (str): Resource name
+            client (DynamicClient): Dynamic client for connecting to a remote cluster
+            teardown (bool): Indicates if this resource would need to be deleted
+            privileged_client (DynamicClient): Instance of Dynamic client
+            yaml_file (str): yaml file for the resource
+            delete_timeout (int): timeout associated with delete action
+            dry_run (bool): dry run
+            node_selector (str): node selector
+            node_selector_labels (str): node selector labels
+            config_file (str): Path to config file for connecting to remote cluster.
+            context (str): Context name for connecting to remote cluster.
+            timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
+
         """
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
@@ -367,6 +385,7 @@ class Resource:
         self.yaml_file_contents = None
         self.initial_resource_version = None
         self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+        self.timeout_seconds = timeout_seconds
         self._set_client_and_api_version()
 
     def _prepare_node_selector_spec(self):
@@ -498,8 +517,10 @@ class Resource:
 
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
         return dyn_client.resources.get(
-            kind=cls.kind, api_version=cls.api_version, **get_kwargs
-        ).get(*args, **kwargs)
+            kind=cls.kind,
+            api_version=cls.api_version,
+            **get_kwargs,
+        ).get(*args, **kwargs, timeout_seconds=cls.timeout_seconds)
 
     def _prepare_singular_name_kwargs(self, **kwargs):
         kwargs = kwargs if kwargs else {}
