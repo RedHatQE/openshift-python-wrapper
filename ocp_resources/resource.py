@@ -52,10 +52,6 @@ LOGGER = get_logger(__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-def kube_v1_api(api_client):
-    return kubernetes.client.CoreV1Api(api_client=api_client)
-
-
 def _find_supported_resource(dyn_client, api_group, kind):
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(
