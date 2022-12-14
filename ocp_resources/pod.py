@@ -4,7 +4,7 @@ import kubernetes
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.node import Node
-from ocp_resources.resource import NamespacedResource, kube_v1_api
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutWatch
 
 
@@ -172,4 +172,4 @@ class Pod(NamespacedResource):
 
     @property
     def _kube_v1_api(self):
-        return kube_v1_api(api_client=self.client.client)
+        return kubernetes.client.CoreV1Api(api_client=self.client.client)
