@@ -996,11 +996,16 @@ class Resource:
 
     def to_yaml(self):
         """
-        Show resource as yaml representation
+        Get resource as YAML representation.
+
+        Returns:
+            str: Resource YAML representation.
         """
         if not self.res:
             self.to_dict()
-        self.logger.info(f"\n{yaml.dump(self.res)}")
+        resource_yaml = yaml.dump(self.res)
+        self.logger.info(f"\n{resource_yaml}")
+        return resource_yaml
 
 
 class NamespacedResource(Resource):
