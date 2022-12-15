@@ -994,6 +994,14 @@ class Resource:
             except (NotFoundError, TypeError, MethodNotAllowedError):
                 continue
 
+    def to_yaml(self):
+        """
+        Show resource as yaml representation
+        """
+        if not self.res:
+            self.to_dict()
+        self.logger.info(f"\n{yaml.dump(self.res)}")
+
 
 class NamespacedResource(Resource):
     """
