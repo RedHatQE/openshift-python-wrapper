@@ -52,10 +52,6 @@ LOGGER = get_logger(__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-def kube_v1_api(api_client):
-    return kubernetes.client.CoreV1Api(api_client=api_client)
-
-
 def _find_supported_resource(dyn_client, api_group, kind):
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(
@@ -279,6 +275,7 @@ class Resource:
         MACHINE_OPENSHIFT_IO = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
         MAISTRA_IO = "maistra.io"
+        METALLB_IO = "metallb.io"
         MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
@@ -997,6 +994,19 @@ class Resource:
 
             except (NotFoundError, TypeError, MethodNotAllowedError):
                 continue
+
+    def to_yaml(self):
+        """
+        Get resource as YAML representation.
+
+        Returns:
+            str: Resource YAML representation.
+        """
+        if not self.res:
+            self.to_dict()
+        resource_yaml = yaml.dump(self.res)
+        self.logger.info(f"\n{resource_yaml}")
+        return resource_yaml
 
 
 class NamespacedResource(Resource):
