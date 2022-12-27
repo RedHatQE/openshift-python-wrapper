@@ -87,6 +87,7 @@ class DataVolume(NamespacedResource):
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         api_name="pvc",
+        delete_after_completion=None,
         **kwargs,
     ):
         super().__init__(
@@ -115,6 +116,7 @@ class DataVolume(NamespacedResource):
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
         self.api_name = api_name
+        self.delete_after_completion = delete_after_completion
 
     def to_dict(self):
         super().to_dict()
@@ -172,6 +174,14 @@ class DataVolume(NamespacedResource):
                 }
             if self.preallocation is not None:
                 self.res["spec"]["preallocation"] = self.preallocation
+            if self.delete_after_completion is not None:
+                self.res["metadata"].setdefault("annotations", {}).update(
+                    {
+                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.deleteAfterCompletion": str(
+                            self.delete_after_completion
+                        ).lower()
+                    }
+                )
 
     def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
