@@ -9,7 +9,6 @@ class Node(Resource):
     api_version = Resource.ApiVersion.V1
 
     class Status(Resource.Status):
-        READY = "Ready"
         SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
 
     @property
