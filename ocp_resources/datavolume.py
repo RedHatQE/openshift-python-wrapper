@@ -193,9 +193,7 @@ class DataVolume(NamespacedResource):
                 )
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
-                    }
+                    {f"{self.api_group}/storage.bind.immediate.requested": "true"}
                 )
             if self.source == "pvc":
                 self.res["spec"]["source"]["pvc"] = {
@@ -207,8 +205,7 @@ class DataVolume(NamespacedResource):
             if self.delete_after_completion is not None:
                 self.res["metadata"].setdefault("annotations", {}).update(
                     {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.deleteAfterCompletion":
-                            self.delete_after_completion
+                        f"{self.api_group}/storage.deleteAfterCompletion": self.delete_after_completion
                     }
                 )
 
