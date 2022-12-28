@@ -94,7 +94,6 @@ class DataVolume(NamespacedResource):
         DataVolume object
 
         Args:
-            eviction (bool, default False): If True, set evictionStrategy to LiveMigrate explicitly.
             name (str): DataVolume name.
             namespace (str): DataVolume namespace.
             source (str): source of DV - upload/http/pvc/registry.
@@ -104,14 +103,15 @@ class DataVolume(NamespacedResource):
             content_type (str, default: "kubevirt"): DataVolume content type.
             access_modes (str, default: None): DataVolume access mode.
             cert_configmap (str, default: None): name of config map for TLS certificates.
-            secret (Secret, default: None): secretRef.
+            secret (Secret, default: None): to be set as secretRef.
             client (DynamicClient): DynamicClient to use.
             volume_mode (str, default: None): DataVolume volume mode.
             hostpath_node (str, default: None): Node name to provision the DV on.
             source_pvc (str, default: None): PVC name for when cloning the DV.
             source_namespace (str, default: None): PVC namespace for when cloning the DV.
             multus_annotation (str, default: None): network nad name.
-            bind_immediate_annotation (bool, default: None): when wffc sc is used and DV should be bind immediate.
+            bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in  StorageClass and DV
+            should be bound immediately.
             preallocation (bool, default: None): preallocate disk space.
             teardown (bool, default: True): Indicates if this resource would need to be deleted.
             privileged_client (DynamicClient, default: None): Instance of Dynamic client
