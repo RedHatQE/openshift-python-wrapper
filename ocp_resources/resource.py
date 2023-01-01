@@ -214,6 +214,7 @@ class Resource:
         PENDING = "Pending"
         COMPLETED = "Completed"
         RUNNING = "Running"
+        READY = "Ready"
         TERMINATING = "Terminating"
         ERROR = "Error"
 
