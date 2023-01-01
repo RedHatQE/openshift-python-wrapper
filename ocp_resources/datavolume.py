@@ -118,7 +118,7 @@ class DataVolume(NamespacedResource):
             yaml_file (yaml, default: None): yaml file for the resource.
             delete_timeout (int, default: 4 minutes): timeout associated with delete action.
             api_name (str, default: "pvc"): api used for DV, pvc/storage
-            delete_after_completion (str, default: None): annotation for garbage collector, default behavior is "true"
+            delete_after_completion (str, default: None): annotation for garbage collector - "true"/"false"
         """
         super().__init__(
             name=name,
