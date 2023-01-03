@@ -202,7 +202,7 @@ class DataVolume(NamespacedResource):
                 }
             if self.preallocation is not None:
                 self.res["spec"]["preallocation"] = self.preallocation
-            if self.delete_after_completion is not None:
+            if self.delete_after_completion:
                 self.res["metadata"].setdefault("annotations", {}).update(
                     {
                         f"{self.api_group}/storage.deleteAfterCompletion": self.delete_after_completion
