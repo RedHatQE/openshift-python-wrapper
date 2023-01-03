@@ -245,7 +245,7 @@ class VirtualMachineInstance(NamespacedResource):
         return (
             ""
             if self.is_virt_launcher_pod_root
-            else "-c qemu+unix:///session?socket=/var/run/libvirt/libvirt-sock"
+            else "-c qemu+unix:///session?socket=/var/run/libvirt/virtqemud.sock"
         )
 
     def get_domstate(self):
