@@ -214,6 +214,7 @@ class Resource:
         PENDING = "Pending"
         COMPLETED = "Completed"
         RUNNING = "Running"
+        READY = "Ready"
         TERMINATING = "Terminating"
         ERROR = "Error"
 
@@ -309,6 +310,7 @@ class Resource:
         STORAGECLASS_KUBERNETES_IO = "storageclass.kubernetes.io"
         SUBRESOURCES_KUBEVIRT_IO = "subresources.kubevirt.io"
         TEKTONTASKS_KUBEVIRT_IO = "tektontasks.kubevirt.io"
+        TEKTON_DEV = "tekton.dev"
         TEMPLATE_KUBEVIRT_IO = "template.kubevirt.io"
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
