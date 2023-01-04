@@ -87,8 +87,39 @@ class DataVolume(NamespacedResource):
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         api_name="pvc",
+        delete_after_completion=None,
         **kwargs,
     ):
+        """
+        DataVolume object
+
+        Args:
+            name (str): DataVolume name.
+            namespace (str): DataVolume namespace.
+            source (str): source of DV - upload/http/pvc/registry.
+            size (str): DataVolume size - format size+size unit, for example: "5Gi".
+            storage_class (str, default: None): storage class name for DataVolume.
+            url (str, default: None): url for importing DV, when source is http/registry.
+            content_type (str, default: "kubevirt"): DataVolume content type.
+            access_modes (str, default: None): DataVolume access mode.
+            cert_configmap (str, default: None): name of config map for TLS certificates.
+            secret (Secret, default: None): to be set as secretRef.
+            client (DynamicClient): DynamicClient to use.
+            volume_mode (str, default: None): DataVolume volume mode.
+            hostpath_node (str, default: None): Node name to provision the DV on.
+            source_pvc (str, default: None): PVC name for when cloning the DV.
+            source_namespace (str, default: None): PVC namespace for when cloning the DV.
+            multus_annotation (str, default: None): network nad name.
+            bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in  StorageClass and DV
+            should be bound immediately.
+            preallocation (bool, default: None): preallocate disk space.
+            teardown (bool, default: True): Indicates if this resource would need to be deleted.
+            privileged_client (DynamicClient, default: None): Instance of Dynamic client
+            yaml_file (yaml, default: None): yaml file for the resource.
+            delete_timeout (int, default: 4 minutes): timeout associated with delete action.
+            api_name (str, default: "pvc"): api used for DV, pvc/storage
+            delete_after_completion (str, default: None): annotation for garbage collector - "true"/"false"
+        """
         super().__init__(
             name=name,
             namespace=namespace,
@@ -115,6 +146,7 @@ class DataVolume(NamespacedResource):
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
         self.api_name = api_name
+        self.delete_after_completion = delete_after_completion
 
     def to_dict(self):
         super().to_dict()
@@ -161,9 +193,7 @@ class DataVolume(NamespacedResource):
                 )
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
-                    }
+                    {f"{self.api_group}/storage.bind.immediate.requested": "true"}
                 )
             if self.source == "pvc":
                 self.res["spec"]["source"]["pvc"] = {
@@ -172,6 +202,12 @@ class DataVolume(NamespacedResource):
                 }
             if self.preallocation is not None:
                 self.res["spec"]["preallocation"] = self.preallocation
+            if self.delete_after_completion:
+                self.res["metadata"].setdefault("annotations", {}).update(
+                    {
+                        f"{self.api_group}/storage.deleteAfterCompletion": self.delete_after_completion
+                    }
+                )
 
     def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
