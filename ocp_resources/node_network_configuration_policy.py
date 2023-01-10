@@ -345,6 +345,12 @@ class NodeNetworkConfigurationPolicy(Resource):
                 return condition["reason"]
 
     def wait_for_configuration_conditions_unknown_or_progressing(self, wait_timeout=30):
+        if (
+            self.status
+            and self.status == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED
+        ):
+            return
+
         samples = TimeoutSampler(
             wait_timeout=wait_timeout,
             sleep=1,
