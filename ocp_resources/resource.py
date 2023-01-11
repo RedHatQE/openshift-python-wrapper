@@ -46,6 +46,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
         "rpc error:",
     ],
     ServerTimeoutError: [],
+    ForbiddenError: ["context deadline exceeded"],
 }
 
 LOGGER = get_logger(__name__)
