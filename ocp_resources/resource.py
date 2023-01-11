@@ -10,17 +10,12 @@ import kubernetes
 import yaml
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
 from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import (
-    ConflictError,
-    InternalServerError,
-    NotFoundError,
-    ServerTimeoutError,
-)
+from openshift.dynamic.exceptions import ConflictError, NotFoundError
 from openshift.dynamic.resource import ResourceField
 from packaging.version import Version
-from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
+    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_1MINUTE,
@@ -34,20 +29,6 @@ from ocp_resources.utils import (
     skip_existing_resource_creation_teardown,
 )
 
-
-DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
-    MaxRetryError: [],
-    ConnectionAbortedError: [],
-    ConnectionResetError: [],
-    InternalServerError: [
-        "etcdserver: leader changed",
-        "etcdserver: request timed out",
-        "Internal error occurred: failed calling webhook",
-        "rpc error:",
-    ],
-    ServerTimeoutError: [],
-    ForbiddenError: ["context deadline exceeded"],
-}
 
 LOGGER = get_logger(__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -587,6 +568,7 @@ class Resource:
             exceptions_dict={
                 **PROTOCOL_ERROR_EXCEPTION_DICT,
                 **NOT_FOUND_ERROR_EXCEPTION_DICT,
+                **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             },
             func=lambda: self.exists,
         )
@@ -653,7 +635,10 @@ class Resource:
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            exceptions_dict={
+                **PROTOCOL_ERROR_EXCEPTION_DICT,
+                **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+            },
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
