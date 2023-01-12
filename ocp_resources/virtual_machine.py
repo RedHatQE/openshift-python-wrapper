@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.constants import (
+    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_4MINUTES,
+)
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
@@ -110,7 +114,10 @@ class VirtualMachine(NamespacedResource):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            exceptions_dict={
+                **PROTOCOL_ERROR_EXCEPTION_DICT,
+                **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+            },
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
             namespace=self.namespace,
