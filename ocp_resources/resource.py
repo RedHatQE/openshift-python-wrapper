@@ -299,6 +299,7 @@ class Resource:
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
         VELERO_IO = "velero.io"
         VM_KUBEVIRT_IO = "vm.kubevirt.io"
+        OCS_OPENSHIFT_IO = "ocs.openshift.io"
 
     class ApiVersion:
         V1 = "v1"
