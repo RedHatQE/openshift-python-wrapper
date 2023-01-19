@@ -8,7 +8,7 @@ class Endpoints(NamespacedResource):
     https://docs.openshift.com/container-platform/4.12/rest_api/network_apis/endpoints-v1.html#endpoints-v1
     """
 
-    api_version = "v1"
+    api_version = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,
