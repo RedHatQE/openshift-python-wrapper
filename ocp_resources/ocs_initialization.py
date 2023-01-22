@@ -30,8 +30,6 @@ class OCSInitialization(NamespacedResource):
         enable_ceph_tools=None,
         **kwargs,
     ):
-        if not enable_ceph_tools:
-            raise ValueError("Please provide enable_ceph_tools")
 
         super().__init__(
             name=name,
@@ -48,6 +46,8 @@ class OCSInitialization(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
+            if not self.enable_ceph_tools:
+                raise ValueError("Please provide enable_ceph_tools")
             self.res.update(
                 {
                     "spec": {
