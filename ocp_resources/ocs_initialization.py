@@ -43,9 +43,7 @@ class OCSInitialization(NamespacedResource):
 
     def to_dict(self):
         super().to_dict()
-        if not self.yaml_file:
-            if not self.enable_ceph_tools:
-                raise ValueError("Please provide enable_ceph_tools")
+        if self.yaml_file is None and self.enable_ceph_tools is not None:
             self.res.update(
                 {
                     "spec": {
