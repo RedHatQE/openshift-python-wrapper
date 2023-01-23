@@ -20,15 +20,13 @@ class OCSInitialization(NamespacedResource):
     ):
         """
         OCSInitialization object.
-
         API reference (source code linked here due to lack of API doc for this resource):
             https://github.com/red-hat-storage/ocs-operator/blob/main/api/v1/ocsinitialization_types.go
 
         Args:
-        enable_ceph_tools (Boolean):
-            When True, creates a Deployment named "rook-ceph-tools" in the "openshift-storage" namespace.
-            More information about the Rook Ceph Toolbox can be found here:
-            https://rook.io/docs/rook/v1.10/Troubleshooting/ceph-toolbox/
+            enable_ceph_tools (bool): When True, creates a Deployment named "rook-ceph-tools" in the "openshift-storage"
+             namespace. More information about the Rook Ceph Toolbox can be found here:
+             https://rook.io/docs/rook/v1.10/Troubleshooting/ceph-toolbox/
         """
 
         super().__init__(
