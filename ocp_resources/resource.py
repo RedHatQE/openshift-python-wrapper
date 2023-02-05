@@ -6,10 +6,9 @@ import sys
 from io import StringIO
 from signal import SIGINT, signal
 
-import kubernetes
 import yaml
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
-from openshift.dynamic import DynamicClient
+from ocp_utilities.infra import get_client
 from openshift.dynamic.exceptions import ConflictError, NotFoundError
 from openshift.dynamic.resource import ResourceField
 from packaging.version import Version
@@ -58,37 +57,6 @@ def _get_api_version(dyn_client, api_group, kind):
 
     LOGGER.info(f"kind: {kind} api version: {res.group_version}")
     return res.group_version
-
-
-def get_client(config_file=None, config_dict=None, context=None):
-    """
-    Get a kubernetes client.
-
-    Pass either config_file or config_dict.
-    If none of them are passed, client will be created from default OS kubeconfig
-    (environment variable or .kube folder).
-
-    Args:
-        config_file (str): path to a kubeconfig file.
-        config_dict (dict): dict with kubeconfig configuration.
-        context (str): name of the context to use.
-
-    Returns:
-        DynamicClient: a kubernetes client.
-    """
-    if config_dict:
-        return DynamicClient(
-            client=kubernetes.config.new_client_from_config_dict(
-                config_dict=config_dict,
-                context=context,
-            )
-        )
-    return DynamicClient(
-        client=kubernetes.config.new_client_from_config(
-            config_file=config_file,
-            context=context,
-        )
-    )
 
 
 def sub_resource_level(current_class, owner_class, parent_class):
