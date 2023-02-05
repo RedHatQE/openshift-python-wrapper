@@ -16,6 +16,7 @@ setup(
         "urllib3",
         "colorlog",
         "packaging",
+        "openshift-python-wrapper-data-collector",
     ],
     python_requires=">=3.6",
 )
