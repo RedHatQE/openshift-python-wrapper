@@ -17,6 +17,7 @@ setup(
         "colorlog",
         "packaging",
         "openshift-python-wrapper-data-collector",
+        "openshift-python-utilities",
     ],
     python_requires=">=3.6",
 )
