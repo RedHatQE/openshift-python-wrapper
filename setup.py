@@ -17,7 +17,7 @@ setup(
         "colorlog",
         "packaging",
         "openshift-python-wrapper-data-collector",
-        "openshift-python-utilities",
+        "openshift-python-utilities @ git+https://github.com/RedHatQE/openshift-python-utilities.git#egg=main",
     ],
     python_requires=">=3.6",
 )
