@@ -242,11 +242,22 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: Hypervisor Connection URI
         """
-        return (
-            ""
-            if self.is_virt_launcher_pod_root
-            else "-c qemu+unix:///session?socket=/var/run/libvirt/libvirt-sock"
-        )
+        if self.is_virt_launcher_pod_root:
+            hypervisor_connection_uri = ""
+        else:
+            virtqemud_socket = "virtqemud"
+            socket = (
+                virtqemud_socket
+                if virtqemud_socket
+                in self.virt_launcher_pod.execute(
+                    command=["ls", "/var/run/libvirt/"], container="compute"
+                )
+                else "libvirt"
+            )
+            hypervisor_connection_uri = (
+                f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
+            )
+        return hypervisor_connection_uri
 
     def get_domstate(self):
         """
