@@ -3,7 +3,6 @@ from ocp_resources.resource import NamespacedResource
 
 
 class OCSInitialization(NamespacedResource):
-
     api_group = NamespacedResource.ApiGroup.OCS_OPENSHIFT_IO
 
     def __init__(
