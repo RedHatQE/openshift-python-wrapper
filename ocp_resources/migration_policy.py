@@ -2,7 +2,6 @@ from ocp_resources.resource import Resource
 
 
 class MigrationPolicy(Resource):
-
     api_group = Resource.ApiGroup.MIGRATIONS_KUBEVIRT_IO
 
     def __init__(
