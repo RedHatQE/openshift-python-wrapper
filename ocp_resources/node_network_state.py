@@ -21,7 +21,6 @@ class NodeNetworkState(Resource):
         self.desired_state = status.get("desiredState", {"interfaces": []})
 
     def set_interface(self, interface):
-
         # First drop the interface is's already in the list
         interfaces = [
             iface

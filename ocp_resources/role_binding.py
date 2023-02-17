@@ -24,7 +24,6 @@ class RoleBinding(NamespacedResource):
         teardown=True,
         yaml_file=None,
     ):
-
         super().__init__(
             name=name,
             namespace=namespace,
