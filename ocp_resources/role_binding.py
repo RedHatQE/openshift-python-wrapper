@@ -26,7 +26,6 @@ class RoleBinding(NamespacedResource):
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
-
         super().__init__(
             name=name,
             namespace=namespace,
