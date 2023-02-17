@@ -71,6 +71,5 @@ class ClusterRole(Resource):
         return self.res
 
     def _set_rule(self, rule):
-
         self.desired_state["rules"].append(rule)
         self.res["rules"] = self.desired_state["rules"]
