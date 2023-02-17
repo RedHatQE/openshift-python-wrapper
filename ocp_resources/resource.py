@@ -615,7 +615,6 @@ class Resource(object):
     def retry_cluster_exceptions(
         func, exceptions_tuple=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,

@@ -23,7 +23,6 @@ class RoleBinding(NamespacedResource):
         role_ref_name=None,
         teardown=True,
     ):
-
         super().__init__(
             name=name, namespace=namespace, client=client, teardown=teardown
         )
