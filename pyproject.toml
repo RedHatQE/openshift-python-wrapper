@@ -24,6 +24,7 @@ dependencies = [
     "urllib3",
     "colorlog",
     "packaging",
+    "kubernetes",
 ]
 dynamic = ["version"]
 # ...
