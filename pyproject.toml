@@ -42,3 +42,6 @@ Documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 
 [tool.setuptools]
 include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["ocp_resources"]
