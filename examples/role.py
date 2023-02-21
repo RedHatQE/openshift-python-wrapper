@@ -5,18 +5,18 @@ from ocp_resources.role import Role
 # Add multiple rules to a specific Role or ClusterRole as a list of rules dictionaries:
 rules = [
     {
-        "api_groups": ["kubevirt.io"],
-        "permissions_to_resources": ["virtualmachineinstances"],
+        "apiGroups": ["kubevirt.io"],
+        "resources": ["virtualmachineinstances"],
         "verbs": ["get", "create", "delete"],
     },
     {
-        "api_groups": ["subresources.kubevirt.io"],
-        "permissions_to_resources": ["virtualmachineinstances/console"],
+        "apiGroups": ["subresources.kubevirt.io"],
+        "resources": ["virtualmachineinstances/console"],
         "verbs": ["get"],
     },
     {
-        "api_groups": ["k8s.cni.cncf.io"],
-        "permissions_to_resources": ["network-attachment-definitions"],
+        "apiGroups": ["k8s.cni.cncf.io"],
+        "resources": ["network-attachment-definitions"],
         "verbs": ["get"],
     },
 ]
