@@ -40,17 +40,10 @@
       "out": [
         {
           "files": [
-            "setup.cfg"
+            "VERSION"
           ],
           "search": "\\d+\\.\\d+\\.\\d+",
           "replace": "{{version}}"
-        },
-        {
-          "files": [
-            "setup.cfg"
-          ],
-          "search": "v\\d+\\.\\d+\\.\\d+",
-          "replace": "v{{version}}"
         }
       ]
     }
