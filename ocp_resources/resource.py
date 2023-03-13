@@ -29,7 +29,6 @@ from ocp_resources.utils import (
     skip_existing_resource_creation_teardown,
 )
 
-
 LOGGER = get_logger(__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 

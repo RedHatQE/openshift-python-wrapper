@@ -6,7 +6,6 @@ from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 from ocp_resources.utils import TimeoutSampler
 
-
 SLEEP = 1
 
 
