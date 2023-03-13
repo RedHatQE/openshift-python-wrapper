@@ -6,7 +6,6 @@ from openshift.dynamic.exceptions import (
 )
 from urllib3.exceptions import MaxRetryError, ProtocolError
 
-
 DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
     MaxRetryError: [],
     ConnectionAbortedError: [],
