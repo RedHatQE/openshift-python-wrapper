@@ -2,7 +2,6 @@ from ocp_resources.node_network_configuration_policy import (
     NodeNetworkConfigurationPolicy,
 )
 
-
 # Using capture syntax to switch ipv4 config between interfaces
 my_nncp = NodeNetworkConfigurationPolicy(
     name="capture_nncp",

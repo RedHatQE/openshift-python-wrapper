@@ -3,7 +3,6 @@ from kubernetes.dynamic import DynamicClient
 
 from ocp_resources.namespace import Namespace
 
-
 client = DynamicClient(client=kubernetes.config.new_client_from_config())
 
 # The examples given below are relevant to all resources. For simplicity we will use the resource - Namespace.
