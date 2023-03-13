@@ -1,6 +1,5 @@
 from ocp_resources.virtual_machine import VirtualMachine
 
-
 # Create a VM
 with VirtualMachine(
     name="vm-example",

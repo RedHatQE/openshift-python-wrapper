@@ -3,7 +3,6 @@ from kubernetes.dynamic import DynamicClient
 
 from ocp_resources.pod import Pod
 
-
 client = DynamicClient(client=kubernetes.config.new_client_from_config())
 
 # Query to get Pods (resource) in the connected cluster with label of ``label_example=example``.
