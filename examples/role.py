@@ -1,6 +1,5 @@
 from ocp_resources.role import Role
 
-
 # The example bellow is also relevant for the ClusterRole resource.
 # Add multiple rules to a specific Role or ClusterRole as a list of rules dictionaries:
 rules = [

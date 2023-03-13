@@ -4,7 +4,6 @@ import yaml
 
 from ocp_resources.logger import get_logger
 
-
 LOGGER = get_logger(name=__name__)
 
 
