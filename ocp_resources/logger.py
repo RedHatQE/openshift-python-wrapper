@@ -5,7 +5,6 @@ from logging.handlers import RotatingFileHandler
 
 from colorlog import ColoredFormatter
 
-
 LOGGER = logging.getLogger(__name__)
 LOGGERS = {}
 
