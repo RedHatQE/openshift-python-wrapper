@@ -4,7 +4,6 @@ from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutSampler
 
-
 LOGGER = get_logger(name=__name__)
 
 
