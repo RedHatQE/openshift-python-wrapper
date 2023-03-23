@@ -44,6 +44,7 @@ class PersistentVolumeClaim(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
+        pvlabel=None,
         **kwargs,
     ):
         super().__init__(
@@ -60,6 +61,7 @@ class PersistentVolumeClaim(NamespacedResource):
         self.size = size
         self.hostpath_node = hostpath_node
         self.storage_class = storage_class
+        self.pvlabel = pvlabel
 
     def to_dict(self):
         super().to_dict()
@@ -85,6 +87,11 @@ class PersistentVolumeClaim(NamespacedResource):
                 }
             if self.storage_class:
                 self.res["spec"]["storageClassName"] = self.storage_class
+
+            if self.pvlabel:
+                self.res["spec"]["selector"] = {
+                    "matchLabels": {"pvLabel": self.pvlabel}
+                }
 
     def bound(self):
         """
