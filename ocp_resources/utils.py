@@ -19,8 +19,8 @@ class TimeoutSampler:
     """
     Samples the function output.
 
-    This is a generator object that at first yields the output of function
-    `func`. After the yield, it either raises instance of `TimeoutExpiredError` or
+    This is a generator object that at first yields the output of callable.
+    After the yield, it either raises instance of `TimeoutExpiredError` or
     sleeps `sleep` seconds.
 
     Yielding the output allows you to handle every value as you wish.
@@ -60,7 +60,7 @@ class TimeoutSampler:
     Args:
         wait_timeout (int): Time in seconds to wait for func to return a value equating to True
         sleep (int): Time in seconds between calls to func
-        func (function): to be wrapped by TimeoutSampler
+        func (Callable): to be wrapped by TimeoutSampler
         exceptions_dict (dict): Exception handling definition
         print_log (bool): Print elapsed time to log
     """
