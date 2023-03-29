@@ -24,8 +24,7 @@ export GITHUB_TOKEN=<your_github_token>
 * [release-it](https://github.com/release-it/release-it)
 ```bash
 sudo npm install --global release-it
-npm install --save-dev @j-ulrich/release-it-regex-bumper
-rm -f package.json package-lock.json
+npm install --save-dev @release-it/bumper
 ```
 ### usage:
 * Create a release, run from the relevant branch.  
