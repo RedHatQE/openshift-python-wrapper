@@ -33,6 +33,7 @@ class VirtualMachine(NamespacedResource):
         STOPPED = "Stopped"
         STOPPING = "Stopping"
         WAITING_FOR_VOLUME_BINDING = "WaitingForVolumeBinding"
+        ERROR_UNSCHEDULABLE = "ErrorUnschedulable"
 
     def __init__(
         self,
