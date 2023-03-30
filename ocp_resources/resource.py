@@ -13,6 +13,7 @@ from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import ConflictError, NotFoundError
 from openshift.dynamic.resource import ResourceField
 from packaging.version import Version
+from simple_logger.logger import get_logger
 
 from ocp_resources.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
@@ -22,7 +23,6 @@ from ocp_resources.constants import (
     TIMEOUT_4MINUTES,
 )
 from ocp_resources.event import Event
-from ocp_resources.logger import get_logger
 from ocp_resources.utils import (
     TimeoutExpiredError,
     TimeoutSampler,
@@ -365,9 +365,18 @@ class Resource:
         self.res = None
         self.yaml_file_contents = None
         self.initial_resource_version = None
-        self.logger = get_logger(name=f"{__name__.rsplit('.')[0]} {self.kind}")
+        self.logger = self._set_logger()
         self.timeout_seconds = timeout_seconds
         self._set_client_and_api_version()
+
+    def _set_logger(self):
+        log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
+        log_file = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "")
+        return get_logger(
+            name=f"{__name__.rsplit('.')[0]} {self.kind}",
+            level=log_level,
+            filename=log_file,
+        )
 
     def _prepare_node_selector_spec(self):
         if self.node_selector:
