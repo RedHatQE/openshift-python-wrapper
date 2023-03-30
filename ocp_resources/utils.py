@@ -1,8 +1,7 @@
 import time
 
 import yaml
-
-from ocp_resources.logger import get_logger
+from simple_logger.logger import get_logger
 
 LOGGER = get_logger(name=__name__)
 
