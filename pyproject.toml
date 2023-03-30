@@ -41,6 +41,7 @@ dependencies = [
     "colorlog",
     "packaging",
     "kubernetes",
+    "python-simple-logger",
 ]
 dynamic = ["version"]
 # ...
