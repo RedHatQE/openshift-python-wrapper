@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 class CSIStorageCapacity(NamespacedResource):
     """
     CSIStorageCapacity object. API reference:
-    https://docs.openshift.com/container-platform/4.12/rest_api/storage_apis/storage-apis-index.html#csistoragecapacity-storage-k8s-iov1
+    https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/csi-storage-capacity-v1/#CSIStorageCapacity
     """
 
     api_group = NamespacedResource.ApiGroup.STORAGE_K8S_IO
@@ -33,11 +33,14 @@ class CSIStorageCapacity(NamespacedResource):
             capacity (str): value reported by the csi driver
             maximum_volume_size (str): maximum volume size reported by csi driver
             storage_class_name (str): storage class name
-            node_topology (object): defines which node has access to the storage for which capacity was reported
+            node_topology (LabelSelector): defines which node has access to the storage for which capacity was reported
             teardown (bool): Indicates if the resource should be torn down at the end
             privileged_client (DynamicClient): Privileged client for api calls
             yaml_file (str): yaml file for the resource.
             delete_timeout (int): timeout associated with delete action
+
+        Example:
+            node_topology: {'matchLabels': {'topology.hostpath.csi/node': 'c01-dbn-413-4c48b-worker-0-pmtv8'}}
         """
         super().__init__(
             name=name,
@@ -57,6 +60,10 @@ class CSIStorageCapacity(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
+            if not self.storage_class_name:
+                raise ValueError(
+                    "yaml_file or parameter 'storage_class_name' is required."
+                )
             self.res.update(
                 {
                     "maximumVolumeSize": self.maximum_volume_size,

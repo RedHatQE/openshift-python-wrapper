@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 class EndpointSlice(NamespacedResource):
     """
     EndpointSlice object. API reference:
-    https://docs.openshift.com/container-platform/4.12/rest_api/network_apis/endpointslice-discovery-k8s-io-v1.html
+    https://kubernetes.io/docs/reference/kubernetes-api/service-resources/endpoint-slice-v1/
     """
 
     api_group = NamespacedResource.ApiGroup.DISCOVERY_K8S_IO

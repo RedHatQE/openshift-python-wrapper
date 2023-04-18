@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 class CronJob(NamespacedResource):
     """
     CronJob object. API reference:
-    https://docs.openshift.com/container-platform/4.12/rest_api/workloads_apis/cronjob-batch-v1.html
+    https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/cron-job-v1/
     """
 
     api_group = NamespacedResource.ApiGroup.BATCH
@@ -18,6 +18,12 @@ class CronJob(NamespacedResource):
         teardown=True,
         schedule=None,
         job_template=None,
+        timezone=None,
+        concurrency_policy=None,
+        starting_deadline_seconds=None,
+        suspend=None,
+        successful_jobs_history_limit=None,
+        failed_jobs_history_limit=None,
         privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
@@ -33,7 +39,17 @@ class CronJob(NamespacedResource):
             yaml_file (str): yaml file for the resource.
             delete_timeout (int): timeout associated with delete action
             schedule (str): schedule of the cron job
-            jobTemplate (object): describes data a job should have when created from a template
+            job_template (JobTemplateSpec): describes the job that would be created when a cronjob would be executed
+            timezone (str): timezone name for the given schedule
+            concurrency_policy (str): indicates how to treat concurrent execution of a job
+            suspend (bool): suspend subsequent executions
+            successful_jobs_history_limit (int): number of successful jobs to retain
+            failed_jobs_history_limit (int): number of failed jobs to retain
+            starting_deadline_seconds (int): deadline in seconds, for starting a job, in case it does not start at
+                                             scheduled time
+
+        Example:
+            job_template: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/#JobSpec
         """
         super().__init__(
             name=name,
@@ -47,15 +63,30 @@ class CronJob(NamespacedResource):
         )
         self.job_template = job_template
         self.schedule = schedule
+        self.timezone = timezone
+        self.concurrency_policy = concurrency_policy
+        self.suspend = suspend
+        self.successful_jobs_history_limit = successful_jobs_history_limit
+        self.failed_jobs_history_limit = failed_jobs_history_limit
+        self.starting_deadline_seconds = starting_deadline_seconds
 
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
+            if not (self.job_template and self.schedule):
+                raise ValueError(
+                    "yaml_file or parameters 'job_template' and 'schedule' are required."
+                )
             self.res.update(
                 {
                     "spec": {
                         "jobTemplate": self.job_template,
                         "schedule": self.schedule,
+                        "concurrencyPolicy": self.concurrency_policy,
+                        "failedJobsHistoryLimit": self.failed_jobs_history_limit,
+                        "successfulJobsHistoryLimit": self.successful_jobs_history_limit,
+                        "suspend": self.suspend,
+                        "timezone": self.timezone,
                     }
                 }
             )
