@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 class EndpointSlice(NamespacedResource):
     """
     EndpointSlice object. API reference:
-    https://github.com/kubernetes/metrics/blob/master/pkg/client/clientset/versioned/typed/metrics/v1beta1/podmetrics.go
+    https://docs.openshift.com/container-platform/4.12/rest_api/network_apis/endpointslice-discovery-k8s-io-v1.html
     """
 
     api_group = NamespacedResource.ApiGroup.DISCOVERY_K8S_IO

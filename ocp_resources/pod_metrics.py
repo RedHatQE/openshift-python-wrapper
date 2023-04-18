@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 class PodMetrics(NamespacedResource):
     """
     PodMetrics object. API reference:
-    https://docs.openshift.com/container-platform/4.9/rest_api/network_apis/endpointslice-discovery-k8s-io-v1.html
+    https://docs.openshift.com/container-platform/4.12/nodes/pods/nodes-pods-autoscaling.html
     """
 
     api_group = NamespacedResource.ApiGroup.METRICS_K8S_IO
