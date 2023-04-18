@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource
 class Lease(NamespacedResource):
     """
     Lease object. API reference:
-    https://docs.openshift.com/container-platform/4.9/rest_api/network_apis/endpointslice-discovery-k8s-io-v1.html
+    https://docs.openshift.com/container-platform/4.12/rest_api/metadata_apis/lease-coordination-k8s-io-v1.html
     """
 
     api_group = NamespacedResource.ApiGroup.COORDINATION_K8S_IO

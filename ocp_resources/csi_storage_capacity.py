@@ -4,7 +4,7 @@ from ocp_resources.resource import NamespacedResource
 
 class CSIStorageCapacity(NamespacedResource):
     """
-        CSIStorageCapacity object. API reference:
+    CSIStorageCapacity object. API reference:
     https://docs.openshift.com/container-platform/4.12/rest_api/storage_apis/storage-apis-index.html#csistoragecapacity-storage-k8s-iov1
     """
 
