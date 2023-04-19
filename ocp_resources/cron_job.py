@@ -37,19 +37,20 @@ class CronJob(NamespacedResource):
             teardown (bool): Indicates if the resource should be torn down at the end
             privileged_client (DynamicClient): Privileged client for api calls
             yaml_file (str): yaml file for the resource.
-            delete_timeout (int): timeout associated with delete action
+            delete_timeout (int, optional): timeout associated with delete action
             schedule (str): schedule of the cron job
             job_template (JobTemplateSpec): describes the job that would be created when a cronjob would be executed
-            timezone (str): timezone name for the given schedule
-            concurrency_policy (str): indicates how to treat concurrent execution of a job
-            suspend (bool): suspend subsequent executions
-            successful_jobs_history_limit (int): number of successful jobs to retain
-            failed_jobs_history_limit (int): number of failed jobs to retain
-            starting_deadline_seconds (int): deadline in seconds, for starting a job, in case it does not start at
-                                             scheduled time
+                Example:
+                    job_template: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/#JobSpec
+            timezone (str, optional): timezone name for the given schedule
+            concurrency_policy (str, optional): indicates how to treat concurrent execution of a job
+            suspend (bool, optional): suspend subsequent executions
+            successful_jobs_history_limit (int, optional): number of successful jobs to retain
+            failed_jobs_history_limit (int, optional): number of failed jobs to retain
+            starting_deadline_seconds (int, optional): deadline in seconds, for starting a job, in case it does not
+            start at scheduled time
 
-        Example:
-            job_template: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/#JobSpec
+
         """
         super().__init__(
             name=name,

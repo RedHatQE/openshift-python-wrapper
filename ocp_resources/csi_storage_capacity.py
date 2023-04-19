@@ -30,17 +30,17 @@ class CSIStorageCapacity(NamespacedResource):
             name (str): Name of the endpoints resource
             namespace (str): Namespace of endpoints resource
             client: (DynamicClient): DynamicClient for api calls
-            capacity (str): value reported by the csi driver
-            maximum_volume_size (str): maximum volume size reported by csi driver
+            capacity (str, optional): value reported by the csi driver
+            maximum_volume_size (str, optional): maximum volume size reported by csi driver
             storage_class_name (str): storage class name
-            node_topology (LabelSelector): defines which node has access to the storage for which capacity was reported
+            node_topology (LabelSelector, optional): defines which node has access to the storage for which capacity
+            was reported
+                Example:
+                    node_topology: {'matchLabels': {'topology.hostpath.csi/node': 'c01-dbn-413-4c48b-worker-0-pmtv8'}}
             teardown (bool): Indicates if the resource should be torn down at the end
             privileged_client (DynamicClient): Privileged client for api calls
             yaml_file (str): yaml file for the resource.
             delete_timeout (int): timeout associated with delete action
-
-        Example:
-            node_topology: {'matchLabels': {'topology.hostpath.csi/node': 'c01-dbn-413-4c48b-worker-0-pmtv8'}}
         """
         super().__init__(
             name=name,

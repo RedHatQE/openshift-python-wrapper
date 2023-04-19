@@ -31,7 +31,7 @@ class EndpointSlice(NamespacedResource):
             client: (DynamicClient): DynamicClient for api calls
             address_type (string): Type of address carried by this endpoint
             endpoints (list): List of unique endpoints in this slice
-            ports (list): List of port numbers available on the related ip addresses
+            ports (list, optional): List of port numbers available on the related ip addresses
             teardown (bool): Indicates if the resource should be torn down at the end
             privileged_client (DynamicClient): Privileged client for api calls
             yaml_file (str): yaml file for the resource.
