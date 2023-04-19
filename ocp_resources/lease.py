@@ -33,8 +33,7 @@ class Lease(NamespacedResource):
             client: (DynamicClient): DynamicClient for api calls
             teardown (bool): Indicates if the resource should be torn down at the end
             holder_identity (str, optional): identify of the holder of the current lease
-            lease_duration_seconds (int, optional): duration that candidates for a lease need to wait to force acquire
-            it.
+            lease_duration_seconds (int, optional): duration for which candidate of a lease needs to wait to acquire it
             lease_transitions (int, optional):  number of transitions of a lease between holders.
             acquire_time (time, optional): when the current lease was acquired
             renew_time (time, optional): when current holder of the lease has last updated it
