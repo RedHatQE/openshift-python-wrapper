@@ -83,7 +83,6 @@ class CronJob(NamespacedResource):
                     "spec": {
                         "jobTemplate": self.job_template,
                         "schedule": self.schedule,
-                        "concurrencyPolicy": self.concurrency_policy,
                     }
                 }
             )
