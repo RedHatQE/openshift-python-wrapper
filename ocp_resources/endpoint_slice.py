@@ -62,6 +62,7 @@ class EndpointSlice(NamespacedResource):
                 {
                     "addressTypes": self.address_type,
                     "endpoints": self.endpoints,
-                    "ports": self.ports,
                 }
             )
+            if self.ports:
+                self.res["ports"] = self.ports

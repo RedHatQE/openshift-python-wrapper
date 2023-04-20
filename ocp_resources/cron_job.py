@@ -84,10 +84,20 @@ class CronJob(NamespacedResource):
                         "jobTemplate": self.job_template,
                         "schedule": self.schedule,
                         "concurrencyPolicy": self.concurrency_policy,
-                        "failedJobsHistoryLimit": self.failed_jobs_history_limit,
-                        "successfulJobsHistoryLimit": self.successful_jobs_history_limit,
-                        "suspend": self.suspend,
-                        "timezone": self.timezone,
                     }
                 }
             )
+            if self.timezone:
+                self.res["spec"]["timezone"] = self.timezone
+            if self.suspend:
+                self.res["spec"]["suspend"] = self.suspend
+            if self.successful_jobs_history_limit:
+                self.res["spec"][
+                    "successfulJobsHistoryLimit"
+                ] = self.successful_jobs_history_limit
+            if self.failed_jobs_history_limit:
+                self.res["spec"][
+                    "failedJobsHistoryLimit"
+                ] = self.failed_jobs_history_limit
+            if self.concurrency_policy:
+                self.res["spec"]["concurrencyPolicy"] = self.concurrency_policy

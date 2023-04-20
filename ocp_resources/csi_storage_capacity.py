@@ -66,9 +66,12 @@ class CSIStorageCapacity(NamespacedResource):
                 )
             self.res.update(
                 {
-                    "maximumVolumeSize": self.maximum_volume_size,
-                    "nodeTopology": self.node_topology,
                     "storageClassName": self.storage_class_name,
-                    "capacity": self.capacity,
                 }
             )
+            if self.maximum_volume_size:
+                self.res["maximumVolumeSize"] = self.maximum_volume_size
+            if self.node_topology:
+                self.res["nodeTopology"] = self.node_topology
+            if self.capacity:
+                self.res["capacity"] = self.capacity

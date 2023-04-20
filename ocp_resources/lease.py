@@ -60,14 +60,13 @@ class Lease(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "acquireTime": self.acquire_time,
-                        "renewTime": self.renew_time,
-                        "holderIdentity": self.holder_identity,
-                        "leaseDurationSeconds": self.lease_duration_seconds,
-                        "leaseTransitions": self.lease_transitions,
-                    }
-                }
-            )
+            if self.acquire_time:
+                self.res["spec"]["acquireTime"] = self.acquire_time
+            if self.renew_time:
+                self.res["spec"]["renewTime"] = self.renew_time
+            if self.holder_identity:
+                self.res["spec"]["holderIdentity"] = self.holder_identity
+            if self.lease_duration_seconds:
+                self.res["spec"]["leaseDurationSeconds"] = self.lease_duration_seconds
+            if self.lease_transitions:
+                self.res["spec"]["leaseTransitions"] = self.lease_transitions
