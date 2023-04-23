@@ -248,6 +248,7 @@ class Resource:
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         IMAGE_REGISTRY = "registry.redhat.io"
+        INTEGREATLY_ORG = "integreatly.org"
         K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
         K8S_V1_CNI_CNCF_IO = "k8s.v1.cni.cncf.io"
         KUBERNETES_IO = "kubernetes.io"
