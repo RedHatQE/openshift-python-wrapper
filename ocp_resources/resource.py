@@ -318,6 +318,7 @@ class Resource:
         node_selector_labels=None,
         config_file=None,
         context=None,
+        label=None,
         timeout_seconds=TIMEOUT_1MINUTE,
     ):
         """
@@ -336,6 +337,7 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
+            label (dict): Resource labels
 
         """
         if not self.api_group and not self.api_version:
@@ -350,6 +352,7 @@ class Resource:
         self.resource_dict = None  # Filled in case yaml_file is not None
         self.config_file = config_file
         self.context = context
+        self.label = label
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
 
@@ -401,6 +404,10 @@ class Resource:
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
+            if self.label:
+                self.res.setdefault("metadata", {}).setdefault("labels", {}).update(
+                    self.label
+                )
 
     def to_dict(self):
         """
