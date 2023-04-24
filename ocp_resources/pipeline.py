@@ -46,7 +46,9 @@ class Pipeline(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.tasks or self.params or self.final_parallel_tasks):
-                raise ValueError("spec is expected to have at least one of the optional field, got none")
+                raise ValueError(
+                    "spec is expected to have at least one of the optional field, got none"
+                )
             self.res["spec"] = {}
             if self.params:
                 self.res["spec"]["params"] = self.params
