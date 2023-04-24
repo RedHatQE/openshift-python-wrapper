@@ -26,8 +26,8 @@ class EndpointSlice(NamespacedResource):
     ):
         """
         Args:
-            name (str): Name of the endpoints resource
-            namespace (str): Namespace of endpoints resource
+            name (str): Name of the EndpointSlice resource
+            namespace (str): Namespace of EndpointSlice resource
             client: (DynamicClient): DynamicClient for api calls
             address_type (string): Type of address carried by this endpoint
             endpoints (list): List of unique endpoints in this slice

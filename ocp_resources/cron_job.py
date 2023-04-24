@@ -31,8 +31,8 @@ class CronJob(NamespacedResource):
     ):
         """
         Args:
-            name (str): Name of the endpoints resource
-            namespace (str): Namespace of endpoints resource
+            name (str): Name of the CronJob resource
+            namespace (str): Namespace of CronJob resource
             client: (DynamicClient): DynamicClient for api calls
             teardown (bool): Indicates if the resource should be torn down at the end
             privileged_client (DynamicClient): Privileged client for api calls

@@ -27,8 +27,8 @@ class CSIStorageCapacity(NamespacedResource):
     ):
         """
         Args:
-            name (str): Name of the endpoints resource
-            namespace (str): Namespace of endpoints resource
+            name (str): Name of the CSIStorageCapacity resource
+            namespace (str): Namespace of CSIStorageCapacity resource
             client: (DynamicClient): DynamicClient for api calls
             capacity (str, optional): value reported by the csi driver
             maximum_volume_size (str, optional): maximum volume size reported by csi driver

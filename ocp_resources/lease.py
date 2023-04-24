@@ -28,8 +28,8 @@ class Lease(NamespacedResource):
     ):
         """
         Args:
-            name (str): Name of the endpoints resource
-            namespace (str): Namespace of endpoints resource
+            name (str): Name of the Lease resource
+            namespace (str): Namespace of Lease resource
             client: (DynamicClient): DynamicClient for api calls
             teardown (bool): Indicates if the resource should be torn down at the end
             holder_identity (str, optional): identify of the holder of the current lease
