@@ -39,7 +39,7 @@ class CronJob(NamespacedResource):
             yaml_file (str): yaml file for the resource.
             delete_timeout (int, optional): timeout associated with delete action
             schedule (str): schedule of the cron job
-            job_template (JobTemplateSpec): describes the job that would be created when a cronjob would be executed
+            job_template (dict): describes the job that would be created when a cronjob would be executed
                 Example:
                     job_template: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/job-v1/#JobSpec
             timezone (str, optional): timezone name for the given schedule

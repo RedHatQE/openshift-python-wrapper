@@ -33,7 +33,7 @@ class CSIStorageCapacity(NamespacedResource):
             capacity (str, optional): value reported by the csi driver
             maximum_volume_size (str, optional): maximum volume size reported by csi driver
             storage_class_name (str): storage class name
-            node_topology (LabelSelector, optional): defines which node has access to the storage for which capacity
+            node_topology (dict, optional): defines which node has access to the storage for which capacity
             was reported
                 Example:
                     node_topology: {'matchLabels': {'topology.hostpath.csi/node': 'c01-dbn-413-4c48b-worker-0-pmtv8'}}
