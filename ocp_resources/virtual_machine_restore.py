@@ -69,8 +69,7 @@ class VirtualMachineRestore(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=lambda: self.instance.get("status", {}).get("complete", None)
-            == status,
+            func=lambda: self.instance.get("status", {}).get("complete") == status,
         )
         for sample in samples:
             if sample:
