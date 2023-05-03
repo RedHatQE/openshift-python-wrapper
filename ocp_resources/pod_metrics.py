@@ -8,4 +8,3 @@ class PodMetrics(NamespacedResource):
     """
 
     api_group = NamespacedResource.ApiGroup.METRICS_K8S_IO
-    api_version = NamespacedResource.ApiVersion.V1BETA1
