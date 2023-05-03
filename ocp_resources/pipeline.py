@@ -29,7 +29,7 @@ class Pipeline(NamespacedResource):
             {'name': 'sourceTemplateNamespace', 'type':'string', 'description': 'Namespace pf template'}]}
             final_parallel_tasks (list, optional):  a list of one or more to be executed in parallel after all other
             tasks have completed in parallel.
-            spec section can't be empty. It require atleast one optional field.
+            spec section can't be empty. It requires at least one optional field.
         """
         super().__init__(
             name=name,
