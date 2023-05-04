@@ -3,6 +3,7 @@ import re
 from openshift.dynamic.exceptions import ConflictError
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
@@ -10,6 +11,9 @@ from ocp_resources.node_network_configuration_enactment import (
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+
+
+LOGGER = get_logger(name=__name__)
 
 
 class NNCPConfigurationFailed(Exception):
@@ -102,6 +106,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.set_ipv6 = set_ipv6
         self.success_timeout = success_timeout
         self.max_unavailable = max_unavailable
+        self.res = None
         self.ipv4_ports_backup_dict = {}
         self.ipv6_ports_backup_dict = {}
         self.nodes = self._nodes()
@@ -121,7 +126,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def set_interface(self, interface):
         if not self.res:
-            super().to_dict()
+            self.res = super().to_dict()
         # First drop the interface if it's already in the list
         interfaces = [
             iface
@@ -136,52 +141,56 @@ class NodeNetworkConfigurationPolicy(Resource):
         ] = self.desired_state["interfaces"]
 
     def to_dict(self):
-        super().to_dict()
-        if not self.yaml_file:
-            if self.dns_resolver or self.routes or self.iface:
-                self.res.setdefault("spec", {}).setdefault("desiredState", {})
+        self.res = super().to_dict()
+        if self.yaml_file:
+            return self.res
 
-            if self.node_selector_spec:
-                self.res.setdefault("spec", {}).setdefault(
-                    "nodeSelector", self.node_selector_spec
-                )
+        if self.dns_resolver or self.routes or self.iface:
+            self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
-            if self.capture:
-                self.res["spec"]["capture"] = self.capture
+        if self.node_selector_spec:
+            self.res.setdefault("spec", {}).setdefault(
+                "nodeSelector", self.node_selector_spec
+            )
 
-            if self.dns_resolver:
-                self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
+        if self.capture:
+            self.res["spec"]["capture"] = self.capture
 
-            if self.routes:
-                self.res["spec"]["desiredState"]["routes"] = self.routes
+        if self.dns_resolver:
+            self.res["spec"]["desiredState"]["dns-resolver"] = self.dns_resolver
 
-            if self.max_unavailable:
-                self.res.setdefault("spec", {}).setdefault(
-                    "maxUnavailable", self.max_unavailable
-                )
+        if self.routes:
+            self.res["spec"]["desiredState"]["routes"] = self.routes
 
-            if self.iface:
-                """
-                It's the responsibility of the caller to verify the desired configuration they send.
-                For example: "ipv4.dhcp.enabled: false" without specifying any static IP address
-                is a valid desired state and therefore not blocked in the code, but nmstate would
-                reject it. Such configuration might be used for negative tests.
-                """
-                self.res = self.add_interface(
-                    iface=self.iface,
-                    state=self.state,
-                    set_ipv4=self.set_ipv4,
-                    ipv4_enable=self.ipv4_enable,
-                    ipv4_dhcp=self.ipv4_dhcp,
-                    ipv4_auto_dns=self.ipv4_auto_dns,
-                    ipv4_addresses=self.ipv4_addresses,
-                    set_ipv6=self.set_ipv6,
-                    ipv6_enable=self.ipv6_enable,
-                    ipv6_dhcp=self.ipv6_dhcp,
-                    ipv6_auto_dns=self.ipv6_auto_dns,
-                    ipv6_addresses=self.ipv6_addresses,
-                    ipv6_autoconf=self.ipv6_autoconf,
-                )
+        if self.max_unavailable:
+            self.res.setdefault("spec", {}).setdefault(
+                "maxUnavailable", self.max_unavailable
+            )
+
+        if self.iface:
+            """
+            It's the responsibility of the caller to verify the desired configuration they send.
+            For example: "ipv4.dhcp.enabled: false" without specifying any static IP address
+            is a valid desired state and therefore not blocked in the code, but nmstate would
+            reject it. Such configuration might be used for negative tests.
+            """
+            self.res = self.add_interface(
+                iface=self.iface,
+                state=self.state,
+                set_ipv4=self.set_ipv4,
+                ipv4_enable=self.ipv4_enable,
+                ipv4_dhcp=self.ipv4_dhcp,
+                ipv4_auto_dns=self.ipv4_auto_dns,
+                ipv4_addresses=self.ipv4_addresses,
+                set_ipv6=self.set_ipv6,
+                ipv6_enable=self.ipv6_enable,
+                ipv6_dhcp=self.ipv6_dhcp,
+                ipv6_auto_dns=self.ipv6_auto_dns,
+                ipv6_addresses=self.ipv6_addresses,
+                ipv6_autoconf=self.ipv6_autoconf,
+            )
+
+        return self.res
 
     def add_interface(
         self,
@@ -203,7 +212,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     ):
         #  If self.res is already defined (from to_dict()), don't call it again.
         if not self.res:
-            self.to_dict()
+            self.res = self.to_dict()
 
         self.res.setdefault("spec", {}).setdefault("desiredState", {})
         if not iface:
@@ -243,9 +252,6 @@ class NodeNetworkConfigurationPolicy(Resource):
         return self.res
 
     def _get_port_from_nns(self, port_name):
-        if not self.nodes:
-            return None
-
         nns = NodeNetworkState(name=self.nodes[0].name)
         _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
         return _port[0] if _port else None
@@ -283,9 +289,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     self.set_interface(interface=iface)
 
     def apply(self, resource=None):
-        if not resource:
-            super().to_dict()
-            resource = self.res
+        resource = resource if resource else super().to_dict()
         samples = TimeoutSampler(
             wait_timeout=3,
             sleep=1,
@@ -293,20 +297,19 @@ class NodeNetworkConfigurationPolicy(Resource):
             func=self.update,
             resource_dict=resource,
         )
-        self.logger.info(f"Applying {resource}")
+        LOGGER.info(f"Applying {resource}")
         for _ in samples:
             return
 
-    def deploy(self, wait=False):
+    def deploy(self):
         self.ipv4_ports_backup()
         self.ipv6_ports_backup()
-
-        self.create(wait=wait)
+        self.create(body=self.res)
         try:
             self.wait_for_status_success()
             return self
         except Exception as exp:
-            self.logger.error(exp)
+            LOGGER.error(exp)
             super().__exit__(exception_type=None, exception_value=None, traceback=None)
             raise
 
@@ -316,7 +319,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self._absent_interface()
                 self.wait_for_status_success()
             except Exception as exp:
-                self.logger.error(exp)
+                LOGGER.error(exp)
 
         super().clean_up()
 
@@ -338,7 +341,6 @@ class NodeNetworkConfigurationPolicy(Resource):
             }
         ).update()
 
-    @property
     def status(self):
         for condition in self.instance.status.conditions:
             if condition["type"] == self.Conditions.Type.AVAILABLE:
@@ -386,12 +388,12 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.wait_for_configuration_conditions_unknown_or_progressing()
 
         samples = TimeoutSampler(
-            wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status
+            wait_timeout=self.success_timeout, sleep=1, func=self.status
         )
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
-                    self.logger.info(f"NNCP {self.name} configured Successfully")
+                    LOGGER.info(f"NNCP {self.name} configured Successfully")
                     return sample
 
                 elif sample == no_match_node_condition_reason:
@@ -405,7 +407,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                     )
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
-            self.logger.error(
+            LOGGER.error(
                 f"Unable to configure NNCP {self.name} "
                 f"{f'nodes: {[node.name for node in self.nodes]}' if self.nodes else ''}"
             )
@@ -450,7 +452,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             try:
                 nnce.wait_for_conditions()
             except TimeoutExpiredError:
-                self.logger.error(f"Failed to get NNCE {nnce.name} status")
+                LOGGER.error(f"Failed to get NNCE {nnce.name} status")
                 continue
 
             for nnce_cond in nnce.instance.status.conditions:
