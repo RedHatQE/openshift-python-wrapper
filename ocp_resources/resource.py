@@ -326,6 +326,7 @@ class Resource:
         context=None,
         label=None,
         timeout_seconds=TIMEOUT_1MINUTE,
+        api_group=None,
     ):
         """
         Create an API resource
@@ -344,8 +345,10 @@ class Resource:
             context (str): Context name for connecting to remote cluster.
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
+            api_group (str): Resource API group; will overwrite API group definition in resource class
 
         """
+        self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
                 "Subclasses of Resource require self.api_group or self.api_version to be defined"
