@@ -705,8 +705,9 @@ class Resource:
             self.to_dict()
 
         self.logger.info(f"Create {self.kind} {self.name}")
-        self.logger.info(f"Posting {self.res}")
-        self.logger.debug(f"\n{yaml.dump(self.res)}")
+        if self.kind != "Secret":
+            self.logger.info(f"Posting {self.res}")
+            self.logger.debug(f"\n{yaml.dump(self.res)}")
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
@@ -722,8 +723,9 @@ class Resource:
         self.logger.info(f"Delete {self.kind} {self.name}")
         if self.exists:
             data = self.instance.to_dict()
-            self.logger.info(f"Deleting {data}")
-            self.logger.debug(f"\n{yaml.dump(data)}")
+            if self.kind != "Secret":
+                self.logger.info(f"Deleting {data}")
+                self.logger.debug(f"\n{yaml.dump(data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
@@ -754,8 +756,9 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        if self.kind != "Secret":
+            self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
+            self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -767,8 +770,9 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        if self.kind != "Secret":
+            self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
+            self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
