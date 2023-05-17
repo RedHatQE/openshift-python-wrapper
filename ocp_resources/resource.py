@@ -1,4 +1,5 @@
 import contextlib
+import copy
 import json
 import os
 import re
@@ -346,7 +347,7 @@ class Resource:
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
             api_group (str): Resource API group; will overwrite API group definition in resource class
-
+            hash_log_data (bool): Hash sensitive data in the logs for resources with keys_to_hash property
         """
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
@@ -705,9 +706,10 @@ class Resource:
             self.to_dict()
 
         self.logger.info(f"Create {self.kind} {self.name}")
-        if self.kind != "Secret":
-            self.logger.info(f"Posting {self.res}")
-            self.logger.debug(f"\n{yaml.dump(self.res)}")
+        self.logger.info(f"Posting {self.hash_resource_dict(resource_dict=self.res)}")
+        self.logger.debug(
+            f"\n{yaml.dump(self.hash_resource_dict(resource_dict=self.res))}"
+        )
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
@@ -723,9 +725,10 @@ class Resource:
         self.logger.info(f"Delete {self.kind} {self.name}")
         if self.exists:
             data = self.instance.to_dict()
-            if self.kind != "Secret":
-                self.logger.info(f"Deleting {data}")
-                self.logger.debug(f"\n{yaml.dump(data)}")
+            self.logger.info(f"Deleting {self.hash_resource_dict(resource_dict=data)}")
+            self.logger.debug(
+                f"\n{yaml.dump(self.hash_resource_dict(resource_dict=data))}"
+            )
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
@@ -756,9 +759,12 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        if self.kind != "Secret":
-            self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
-            self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        self.logger.info(
+            f"Update {self.kind} {self.name}:\n{self.hash_resource_dict(resource_dict=resource_dict)}"
+        )
+        self.logger.debug(
+            f"\n{yaml.dump(self.hash_resource_dict(resource_dict=resource_dict))}"
+        )
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -770,9 +776,12 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        if self.kind != "Secret":
-            self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
-            self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        self.logger.info(
+            f"Replace {self.kind} {self.name}: \n{self.hash_resource_dict(resource_dict=resource_dict)}"
+        )
+        self.logger.debug(
+            f"\n{yaml.dump(self.hash_resource_dict(resource_dict=resource_dict))}"
+        )
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -1020,6 +1029,26 @@ class Resource:
         resource_yaml = yaml.dump(self.res)
         self.logger.info(f"\n{resource_yaml}")
         return resource_yaml
+
+    def hash_resource_dict(self, resource_dict: dict):
+        if hasattr(self, "keys_to_hash"):
+            return self.hash_resource_dict_rec(nested_dict=copy.deepcopy(resource_dict))
+        return resource_dict
+
+    def hash_resource_dict_rec(self, nested_dict: dict):
+        if not isinstance(nested_dict, dict):
+            return nested_dict
+
+        for key in nested_dict.keys():
+            if key in self.keys_to_hash:
+                if isinstance(nested_dict[key], dict):
+                    nested_dict[key] = {_key: "***" for _key in nested_dict[key].keys()}
+                else:
+                    nested_dict[key] = "***"
+            else:
+                nested_dict[key] = self.hash_resource_dict_rec(nested_dict[key])
+
+        return nested_dict
 
 
 class NamespacedResource(Resource):
