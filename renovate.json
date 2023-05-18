@@ -1,3 +1,12 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "baseBranches": [
+    "main",
+    "v4.13",
+    "v4.12",
+    "v4.11",
+    "v4.10",
+    "v4.9",
+    "v4.8"
+  ]
 }
