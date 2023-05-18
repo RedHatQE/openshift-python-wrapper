@@ -77,6 +77,11 @@ class Secret(NamespacedResource):
     @property
     def keys_to_hash(self):
         """
-        Resource attributes to hash in the logs
+        Resource attributes list to hash in the logs.
+
+         The list should hold absolute key paths in resource dict.
+
+         Example:
+             ["spec/data"]
         """
         return ["data"]

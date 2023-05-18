@@ -9,6 +9,7 @@ from signal import SIGINT, signal
 
 import kubernetes
 import yaml
+from benedict import benedict
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import ConflictError, NotFoundError
@@ -1032,23 +1033,22 @@ class Resource:
 
     def hash_resource_dict(self, resource_dict: dict):
         if hasattr(self, "keys_to_hash"):
-            return self.hash_resource_dict_rec(nested_dict=copy.deepcopy(resource_dict))
+            resource_dict = benedict(
+                copy.deepcopy(resource_dict), keypath_separator="/"
+            )
+
+            for key in self.keys_to_hash:
+                if key in resource_dict:
+                    if isinstance(resource_dict[key], dict):
+                        resource_dict[key] = {
+                            _key: "***" for _key in resource_dict[key].keys()
+                        }
+                    else:
+                        resource_dict[key] = "***"
+
+            return resource_dict
+
         return resource_dict
-
-    def hash_resource_dict_rec(self, nested_dict: dict):
-        if not isinstance(nested_dict, dict):
-            return nested_dict
-
-        for key in nested_dict.keys():
-            if key in self.keys_to_hash:
-                if isinstance(nested_dict[key], dict):
-                    nested_dict[key] = {_key: "***" for _key in nested_dict[key].keys()}
-                else:
-                    nested_dict[key] = "***"
-            else:
-                nested_dict[key] = self.hash_resource_dict_rec(nested_dict[key])
-
-        return nested_dict
 
 
 class NamespacedResource(Resource):
