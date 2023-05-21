@@ -706,11 +706,10 @@ class Resource:
         if not self.res:
             self.to_dict()
 
+        hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
-        self.logger.info(f"Posting {self.hash_resource_dict(resource_dict=self.res)}")
-        self.logger.debug(
-            f"\n{yaml.dump(self.hash_resource_dict(resource_dict=self.res))}"
-        )
+        self.logger.info(f"Posting {hashed_res}")
+        self.logger.debug(f"\n{yaml.dump(hashed_res)}")
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
@@ -725,11 +724,10 @@ class Resource:
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         self.logger.info(f"Delete {self.kind} {self.name}")
         if self.exists:
-            data = self.instance.to_dict()
-            self.logger.info(f"Deleting {self.hash_resource_dict(resource_dict=data)}")
-            self.logger.debug(
-                f"\n{yaml.dump(self.hash_resource_dict(resource_dict=data))}"
-            )
+            hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
+
+            self.logger.info(f"Deleting {hashed_data}")
+            self.logger.debug(f"\n{yaml.dump(hashed_data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
@@ -760,12 +758,9 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        self.logger.info(
-            f"Update {self.kind} {self.name}:\n{self.hash_resource_dict(resource_dict=resource_dict)}"
-        )
-        self.logger.debug(
-            f"\n{yaml.dump(self.hash_resource_dict(resource_dict=resource_dict))}"
-        )
+        hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
+        self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -777,12 +772,9 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        self.logger.info(
-            f"Replace {self.kind} {self.name}: \n{self.hash_resource_dict(resource_dict=resource_dict)}"
-        )
-        self.logger.debug(
-            f"\n{yaml.dump(self.hash_resource_dict(resource_dict=resource_dict))}"
-        )
+        hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
+        self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -1031,20 +1023,27 @@ class Resource:
         self.logger.info(f"\n{resource_yaml}")
         return resource_yaml
 
+    @property
+    def keys_to_hash(self):
+        """
+        Resource attributes list to hash in the logs.
+
+        The list should hold absolute key paths in resource dict.
+
+         Example:
+             given a dict: {"spec": {"data": <value_to_hash>}}
+             To hash spec['data'] key pass: ["spec..data"]
+        """
+        return []
+
     def hash_resource_dict(self, resource_dict: dict):
-        if hasattr(self, "keys_to_hash"):
-            resource_dict = benedict(
-                copy.deepcopy(resource_dict), keypath_separator="/"
-            )
+        if self.keys_to_hash:
+            resource_dict = copy.deepcopy(resource_dict)
+            resource_dict = benedict(resource_dict, keypath_separator="..")
 
             for key in self.keys_to_hash:
                 if key in resource_dict:
-                    if isinstance(resource_dict[key], dict):
-                        resource_dict[key] = {
-                            _key: "***" for _key in resource_dict[key].keys()
-                        }
-                    else:
-                        resource_dict[key] = "***"
+                    resource_dict[key] = "***"
 
             return resource_dict
 
