@@ -329,6 +329,7 @@ class Resource:
         label=None,
         timeout_seconds=TIMEOUT_1MINUTE,
         api_group=None,
+        hash_log_data=True,
     ):
         """
         Create an API resource
@@ -348,7 +349,8 @@ class Resource:
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
             api_group (str): Resource API group; will overwrite API group definition in resource class
-            hash_log_data (bool): Hash sensitive data in the logs for resources with keys_to_hash property
+            hash_log_data (bool): Hash resource content based on resource keys_to_hash property
+                (example: Secret resource)
         """
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
@@ -379,6 +381,8 @@ class Resource:
         self.initial_resource_version = None
         self.logger = self._set_logger()
         self.timeout_seconds = timeout_seconds
+        self.hash_log_data = hash_log_data
+        # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
 
     def _set_logger(self):
@@ -1036,7 +1040,7 @@ class Resource:
         """
         return []
 
-    def hash_resource_dict(self, resource_dict: dict):
+    def hash_resource_dict(self, resource_dict):
         if self.keys_to_hash:
             resource_dict = copy.deepcopy(resource_dict)
             resource_dict = benedict(resource_dict, keypath_separator="..")
