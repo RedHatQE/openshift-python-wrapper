@@ -73,3 +73,7 @@ class Secret(NamespacedResource):
         return self.instance.metadata.annotations[
             "auth.openshift.io/certificate-not-before"
         ]
+
+    @property
+    def keys_to_hash(self):
+        return ["data"]
