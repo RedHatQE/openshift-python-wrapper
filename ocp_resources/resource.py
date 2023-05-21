@@ -1041,7 +1041,7 @@ class Resource:
         return []
 
     def hash_resource_dict(self, resource_dict):
-        if self.keys_to_hash:
+        if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
             resource_dict = benedict(resource_dict, keypath_separator="..")
 
