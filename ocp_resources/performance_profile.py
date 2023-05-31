@@ -5,20 +5,19 @@ class PerformanceProfile(Resource):
     api_group = Resource.ApiGroup.PERFORMANCE_OPENSHIFT_IO
 
     def __init__(
-            self,
-            additional_kernel_args=None,
-            cpu=None,
-            globally_disable_irq_load_balancing=False,
-            hugepages=None,
-            machine_config_label=None,
-            machine_config_pool_selector=None,
-            net=None,
-            node_selector=None,
-            numa=None,
-            real_time_kernel=None,
-            workload_hints=None,
-            **kwargs
-
+        self,
+        additional_kernel_args=None,
+        cpu=None,
+        globally_disable_irq_load_balancing=False,
+        hugepages=None,
+        machine_config_label=None,
+        machine_config_pool_selector=None,
+        net=None,
+        node_selector=None,
+        numa=None,
+        real_time_kernel=None,
+        workload_hints=None,
+        **kwargs,
     ):
         """
         PerformanceProfile object. API reference:
@@ -71,7 +70,9 @@ class PerformanceProfile(Resource):
                 manifest_spec["cpu"] = self.cpu
 
             if self.globally_disable_irq_load_balancing:
-                manifest_spec["globallyDisableIrqLoadBalancing"] = self.globally_disable_irq_load_balancing
+                manifest_spec[
+                    "globallyDisableIrqLoadBalancing"
+                ] = self.globally_disable_irq_load_balancing
 
             if self.hugepages:
                 manifest_spec["hugepages"] = self.hugepages
@@ -80,7 +81,9 @@ class PerformanceProfile(Resource):
                 manifest_spec["machineConfigLabel"] = self.machine_config_label
 
             if self.machine_config_pool_selector:
-                manifest_spec["machineConfigPoolSelector"] = self.machine_config_pool_selector
+                manifest_spec[
+                    "machineConfigPoolSelector"
+                ] = self.machine_config_pool_selector
 
             if self.net:
                 manifest_spec["net"] = self.net
