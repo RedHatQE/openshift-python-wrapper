@@ -8,7 +8,7 @@ class ImageContentSourcePolicy(Resource):
 
     api_group = Resource.ApiGroup.OPERATOR_OPENSHIFT_IO
 
-    def __init__(self, repository_digest_mirrors, **kwargs):
+    def __init__(self, repository_digest_mirrors=None, **kwargs):
         """
         Create/Manage ICSP configuration object. API reference:
         https://docs.openshift.com/container-platform/4.12/rest_api/operator_apis/imagecontentsourcepolicy-operator-openshift-io-v1alpha1.html
