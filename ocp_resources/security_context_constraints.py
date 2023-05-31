@@ -5,32 +5,32 @@ class SecurityContextConstraints(Resource):
     api_group = Resource.ApiGroup.SECURITY_OPENSHIFT_IO
 
     def __init__(
-            self,
-            allow_host_dir_volume_plugin=False,
-            allow_host_ipc=False,
-            allow_host_network=False,
-            allow_host_pid=False,
-            allow_host_ports=False,
-            allow_privilege_escalation=None,
-            allow_privileged_container=False,
-            allowed_capabilities=None,
-            allowed_flex_volumes=None,
-            allowed_unsafe_sysctls=None,
-            default_add_capabilities=None,
-            default_allow_privilege_escalation=None,
-            forbidden_sysctls=None,
-            fs_group=None,
-            groups=None,
-            priority=0,
-            read_only_root_filesystem=False,
-            required_drop_capabilities=None,
-            run_as_user=None,
-            se_linux_context=None,
-            seccomp_profiles=None,
-            supplemental_groups=None,
-            users=None,
-            volumes=None,
-            **kwargs,
+        self,
+        allow_host_dir_volume_plugin=False,
+        allow_host_ipc=False,
+        allow_host_network=False,
+        allow_host_pid=False,
+        allow_host_ports=False,
+        allow_privilege_escalation=None,
+        allow_privileged_container=False,
+        allowed_capabilities=None,
+        allowed_flex_volumes=None,
+        allowed_unsafe_sysctls=None,
+        default_add_capabilities=None,
+        default_allow_privilege_escalation=None,
+        forbidden_sysctls=None,
+        fs_group=None,
+        groups=None,
+        priority=0,
+        read_only_root_filesystem=False,
+        required_drop_capabilities=None,
+        run_as_user=None,
+        se_linux_context=None,
+        seccomp_profiles=None,
+        supplemental_groups=None,
+        users=None,
+        volumes=None,
+        **kwargs,
     ):
         """
         Security Context Constraints object. API reference:
@@ -134,7 +134,9 @@ class SecurityContextConstraints(Resource):
                 self.res["defaultAddCapabilities"] = self.default_add_capabilities
 
             if self.default_allow_privilege_escalation:
-                self.res["defaultAllowPrivilegeEscalation"] = self.default_allow_privilege_escalation
+                self.res[
+                    "defaultAllowPrivilegeEscalation"
+                ] = self.default_allow_privilege_escalation
 
             if self.forbidden_sysctls:
                 self.res["forbiddenSysctls"] = self.forbidden_sysctls
