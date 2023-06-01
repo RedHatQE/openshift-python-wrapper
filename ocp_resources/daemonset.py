@@ -54,7 +54,7 @@ class DaemonSet(NamespacedResource):
         Returns:
             bool: True if delete succeeded, False otherwise.
         """
-        super().delete(
+        return super().delete(
             wait=wait,
             timeout=timeout,
             body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
