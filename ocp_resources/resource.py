@@ -1,4 +1,5 @@
 import contextlib
+import copy
 import json
 import os
 import re
@@ -8,6 +9,7 @@ from signal import SIGINT, signal
 
 import kubernetes
 import yaml
+from benedict import benedict
 from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
 from openshift.dynamic import DynamicClient
 from openshift.dynamic.exceptions import ConflictError, NotFoundError
@@ -239,7 +241,9 @@ class Resource:
         CLONE_KUBEVIRT_IO = "clone.kubevirt.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
+        COORDINATION_K8S_IO = "coordination.k8s.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
+        DISCOVERY_K8S_IO = "discovery.k8s.io"
         EVENTS_K8S_IO = "events.k8s.io"
         EXPORT_KUBEVIRT_IO = "export.kubevirt.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
@@ -248,6 +252,7 @@ class Resource:
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         IMAGE_REGISTRY = "registry.redhat.io"
+        INTEGREATLY_ORG = "integreatly.org"
         K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
         K8S_V1_CNI_CNCF_IO = "k8s.v1.cni.cncf.io"
         KUBERNETES_IO = "kubernetes.io"
@@ -258,6 +263,7 @@ class Resource:
         MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
         MAISTRA_IO = "maistra.io"
         METALLB_IO = "metallb.io"
+        METRICS_K8S_IO = "metrics.k8s.io"
         MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
@@ -319,7 +325,10 @@ class Resource:
         node_selector_labels=None,
         config_file=None,
         context=None,
+        label=None,
         timeout_seconds=TIMEOUT_1MINUTE,
+        api_group=None,
+        hash_log_data=True,
     ):
         """
         Create an API resource
@@ -337,8 +346,12 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
-
+            label (dict): Resource labels
+            api_group (str): Resource API group; will overwrite API group definition in resource class
+            hash_log_data (bool): Hash resource content based on resource keys_to_hash property
+                (example: Secret resource)
         """
+        self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
                 "Subclasses of Resource require self.api_group or self.api_version to be defined"
@@ -351,6 +364,7 @@ class Resource:
         self.resource_dict = None  # Filled in case yaml_file is not None
         self.config_file = config_file
         self.context = context
+        self.label = label
         if not (self.name or self.yaml_file):
             raise ValueError("name or yaml file is required")
 
@@ -366,6 +380,8 @@ class Resource:
         self.initial_resource_version = None
         self.logger = self._set_logger()
         self.timeout_seconds = timeout_seconds
+        self.hash_log_data = hash_log_data
+        # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
 
     def _set_logger(self):
@@ -411,6 +427,10 @@ class Resource:
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
+            if self.label:
+                self.res.setdefault("metadata", {}).setdefault("labels", {}).update(
+                    self.label
+                )
 
     def to_dict(self):
         """
@@ -689,9 +709,10 @@ class Resource:
         if not self.res:
             self.to_dict()
 
+        hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
-        self.logger.info(f"Posting {self.res}")
-        self.logger.debug(f"\n{yaml.dump(self.res)}")
+        self.logger.info(f"Posting {hashed_res}")
+        self.logger.debug(f"\n{yaml.dump(hashed_res)}")
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
@@ -706,9 +727,10 @@ class Resource:
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         self.logger.info(f"Delete {self.kind} {self.name}")
         if self.exists:
-            data = self.instance.to_dict()
-            self.logger.info(f"Deleting {data}")
-            self.logger.debug(f"\n{yaml.dump(data)}")
+            hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
+
+            self.logger.info(f"Deleting {hashed_data}")
+            self.logger.debug(f"\n{yaml.dump(hashed_data)}")
 
         try:
             res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
@@ -739,8 +761,9 @@ class Resource:
         Args:
             resource_dict: Resource dictionary
         """
-        self.logger.info(f"Update {self.kind} {self.name}:\n{resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
+        self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -752,8 +775,9 @@ class Resource:
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
-        self.logger.info(f"Replace {self.kind} {self.name}: \n{resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
+        self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
+        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -1001,6 +1025,32 @@ class Resource:
         resource_yaml = yaml.dump(self.res)
         self.logger.info(f"\n{resource_yaml}")
         return resource_yaml
+
+    @property
+    def keys_to_hash(self):
+        """
+        Resource attributes list to hash in the logs.
+
+        The list should hold absolute key paths in resource dict.
+
+         Example:
+             given a dict: {"spec": {"data": <value_to_hash>}}
+             To hash spec['data'] key pass: ["spec..data"]
+        """
+        return []
+
+    def hash_resource_dict(self, resource_dict):
+        if self.keys_to_hash and self.hash_log_data:
+            resource_dict = copy.deepcopy(resource_dict)
+            resource_dict = benedict(resource_dict, keypath_separator="..")
+
+            for key in self.keys_to_hash:
+                if key in resource_dict:
+                    resource_dict[key] = "***"
+
+            return resource_dict
+
+        return resource_dict
 
 
 class NamespacedResource(Resource):
