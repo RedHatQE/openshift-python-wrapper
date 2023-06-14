@@ -11,6 +11,9 @@ from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
+IPV4_STR = "ipv4"
+IPV6_STR = "ipv6"
+
 
 class NNCPConfigurationFailed(Exception):
     pass
@@ -214,30 +217,30 @@ class NodeNetworkConfigurationPolicy(Resource):
             }
         if set_ipv4:
             if isinstance(set_ipv4, str):
-                iface["ipv4"] = set_ipv4
+                iface[IPV4_STR] = set_ipv4
 
             else:
-                iface["ipv4"] = {
+                iface[IPV4_STR] = {
                     "enabled": ipv4_enable,
                     "dhcp": ipv4_dhcp,
                     "auto-dns": ipv4_auto_dns,
                 }
                 if ipv4_addresses:
-                    iface["ipv4"]["address"] = ipv4_addresses
+                    iface[IPV4_STR]["address"] = ipv4_addresses
 
         if set_ipv6:
             if isinstance(set_ipv6, str):
-                iface["ipv6"] = set_ipv6
+                iface[IPV6_STR] = set_ipv6
 
             else:
-                iface["ipv6"] = {
+                iface[IPV6_STR] = {
                     "enabled": ipv6_enable,
                     "dhcp": ipv6_dhcp,
                     "auto-dns": ipv6_auto_dns,
                     "autoconf": ipv6_autoconf,
                 }
                 if ipv6_addresses:
-                    iface["ipv6"]["address"] = ipv6_addresses
+                    iface[IPV6_STR]["address"] = ipv6_addresses
 
         self.set_interface(interface=iface)
         return self.res
@@ -254,13 +257,20 @@ class NodeNetworkConfigurationPolicy(Resource):
         for port in self.ports:
             _port = self._get_port_from_nns(port_name=port)
             if _port:
-                self.ipv4_ports_backup_dict[port] = _port[ip_family]
+                if ip_family == IPV4_STR:
+                    self.ipv4_ports_backup_dict[port] = _port[ip_family]
+                elif ip_family == IPV6_STR:
+                    self.ipv6_ports_backup_dict[port] = _port[ip_family]
+                else:
+                    raise ValueError(
+                        f"'ip_family' must be either '{IPV4_STR}' or '{IPV6_STR}'"
+                    )
 
     def ipv4_ports_backup(self):
-        self._ports_backup(ip_family="ipv4")
+        self._ports_backup(ip_family=IPV4_STR)
 
     def ipv6_ports_backup(self):
-        self._ports_backup(ip_family="ipv6")
+        self._ports_backup(ip_family=IPV6_STR)
 
     def add_ports(self):
         for port in self.ports:
@@ -275,10 +285,10 @@ class NodeNetworkConfigurationPolicy(Resource):
                         "state": _port["state"],
                     }
                     if ipv4_backup:
-                        iface["ipv4"] = ipv4_backup
+                        iface[IPV4_STR] = ipv4_backup
 
                     if ipv6_backup:
-                        iface["ipv6"] = ipv6_backup
+                        iface[IPV6_STR] = ipv6_backup
 
                     self.set_interface(interface=iface)
 
