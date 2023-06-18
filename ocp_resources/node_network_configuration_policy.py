@@ -11,6 +11,7 @@ from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
+
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
 
