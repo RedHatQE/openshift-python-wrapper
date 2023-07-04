@@ -65,9 +65,6 @@ class StorageClass(Resource):
         StorageClass object
 
         Args:
-            name (str): StorageClass name.
-            client (DynamicClient): DynamicClient to use.
-            teardown (bool): Indicates if this resource would need to be deleted.
             provisioner (str): The provisioner of the storage class
             reclaim_policy (str): Can be either "Delete" or "Retain"
             volume_binding_mode (str): When volume binding and dynamic provisioning should occur
