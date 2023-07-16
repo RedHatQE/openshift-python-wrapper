@@ -900,9 +900,10 @@ class Resource:
             sleep=1,
             func=lambda: self.instance,
         ):
-            for cond in sample.get("status", {}).get("conditions", []):
-                if cond["type"] == condition and cond["status"] == status:
-                    return
+            if sample:
+                for cond in sample.get("status", {}).get("conditions", []):
+                    if cond["type"] == condition and cond["status"] == status:
+                        return
 
     def api_request(self, method, action, url, **params):
         """
