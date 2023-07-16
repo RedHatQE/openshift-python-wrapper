@@ -894,13 +894,15 @@ class Resource:
         self.logger.info(
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
         )
-        for sample in self.watcher(timeout=timeout):
-            for cond in sample["raw_object"].get("status", {}).get("conditions", []):
+
+        for sample in TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            func=lambda: self.instance,
+        ):
+            for cond in sample.get("status", {}).get("conditions", []):
                 if cond["type"] == condition and cond["status"] == status:
                     return
-        raise TimeoutExpiredError(
-            value=f"condition {condition} not in desired status {status} after {timeout} seconds"
-        )
 
     def api_request(self, method, action, url, **params):
         """
