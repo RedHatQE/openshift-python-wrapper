@@ -45,3 +45,61 @@ class StorageClass(Resource):
         IS_DEFAULT_CLASS = (
             f"{Resource.ApiGroup.STORAGECLASS_KUBERNETES_IO}/is-default-class"
         )
+
+    class ReclaimPolicy:
+        DELETE = "Delete"
+        RETAIN = "Retain"
+
+    def __init__(
+        self,
+        provisioner=None,
+        reclaim_policy=None,
+        volume_binding_mode=None,
+        allow_volume_expansion=None,
+        parameters=None,
+        allowed_topologies=None,
+        mount_options=None,
+        **kwargs,
+    ):
+        """
+        StorageClass object
+
+        Args:
+            provisioner (str): The provisioner of the storage class
+            reclaim_policy (str): Can be either "Delete" or "Retain"
+            volume_binding_mode (str): When volume binding and dynamic provisioning should occur
+            allow_volume_expansion (bool): True for allowing the volume expansion
+            parameters (dict): Describe volumes belonging to the storage class.
+            allowed_topologies (list): Restrict provisioning to specific topologies
+            mount_options (list): PV's that are dynamically created by the SC will have the mount options
+        """
+        super().__init__(
+            **kwargs,
+        )
+
+        self.provisioner = provisioner
+        self.reclaim_policy = reclaim_policy
+        self.volume_binding_mode = volume_binding_mode
+        self.allow_volume_expansion = allow_volume_expansion
+        self.parameters = parameters
+        self.allowed_topologies = allowed_topologies
+        self.mount_options = mount_options
+
+    def to_dict(self):
+        super().to_dict()
+        if not self.yaml_file:
+            if not self.provisioner:
+                raise ValueError("provisioner must be specified")
+            self.res.update({"provisioner": self.provisioner})
+            if self.reclaim_policy:
+                self.res.update({"reclaimPolicy": self.reclaim_policy})
+            if self.volume_binding_mode:
+                self.res.update({"volumeBindingMode": self.volume_binding_mode})
+            if self.allow_volume_expansion:
+                self.res.update({"allowVolumeExpansion": self.allow_volume_expansion})
+            if self.parameters:
+                self.res.update({"parameters": self.parameters})
+            if self.allowed_topologies:
+                self.res.update({"allowedTopologies": self.allowed_topologies})
+            if self.mount_options:
+                self.res.update({"mountOptions": self.mount_options})
