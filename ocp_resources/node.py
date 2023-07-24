@@ -15,12 +15,10 @@ class Node(Resource):
     @property
     def kubelet_ready(self):
         return any(
-            [
-                stat
-                for stat in self.instance.status.conditions
-                if stat["reason"] == "KubeletReady"
-                and stat["status"] == self.Condition.Status.TRUE
-            ]
+            stat
+            for stat in self.instance.status.conditions
+            if stat["reason"] == "KubeletReady"
+            and stat["status"] == self.Condition.Status.TRUE
         )
 
     @property
