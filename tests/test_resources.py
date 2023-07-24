@@ -28,6 +28,7 @@ def test_create():
         pass
 
 
+@pytest.mark.kubevirt
 def test_vm(namespace):
     name = "test-vm"
     with VirtualMachine(
