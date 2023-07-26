@@ -1020,22 +1020,6 @@ signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
-name = "openshift"
-version = "0.13.2"
-description = "OpenShift python client"
-optional = false
-python-versions = "*"
-files = [
-    {file = "openshift-0.13.2-py3-none-any.whl", hash = "sha256:f1459006fc7f96ff7d2f6c0c00bdef5cb2e75a1b466f601997d9084a816a8949"},
-    {file = "openshift-0.13.2.tar.gz", hash = "sha256:f55789fce56fcbf7e2cd9377a68c4a99ab406074d3324b9abcca98477d101471"},
-]
-
-[package.dependencies]
-kubernetes = ">=12.0"
-python-string-utils = "*"
-six = "*"
-
-[[package]]
 name = "packaging"
 version = "23.1"
 description = "Core utilities for Python packages"
@@ -1398,17 +1382,6 @@ text-unidecode = ">=1.3"
 
 [package.extras]
 unidecode = ["Unidecode (>=1.1.1)"]
-
-[[package]]
-name = "python-string-utils"
-version = "1.0.0"
-description = "Utility functions for strings validation and manipulation."
-optional = false
-python-versions = ">=3.5"
-files = [
-    {file = "python-string-utils-1.0.0.tar.gz", hash = "sha256:dcf9060b03f07647c0a603408dc8b03f807f3b54a05c6e19eb14460256fac0cb"},
-    {file = "python_string_utils-1.0.0-py3-none-any.whl", hash = "sha256:f1a88700baf99db1a9b6953f44181ad9ca56623c81e257e6009707e2e7851fa4"},
-]
 
 [[package]]
 name = "pywin32-ctypes"
@@ -2075,4 +2048,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "295eb7a1327ce130f120706df284b17d600c5f14a26246eee5e7fbc591686788"
+content-hash = "1d8fb7ba26ac8a154dc34eae82defc562c7057b99d3027cc58850020a1614ca0"
