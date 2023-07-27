@@ -10,10 +10,14 @@ from signal import SIGINT, signal
 import kubernetes
 import yaml
 from benedict import benedict
-from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
-from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import ConflictError, NotFoundError
-from openshift.dynamic.resource import ResourceField
+from kubernetes.dynamic import DynamicClient
+from kubernetes.dynamic.exceptions import (
+    ConflictError,
+    ForbiddenError,
+    MethodNotAllowedError,
+    NotFoundError,
+)
+from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger
 
@@ -1106,8 +1110,8 @@ class NamespacedResource(Resource):
             dyn_client (DynamicClient): Open connection to remote cluster
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
-            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
-            raw (bool): If True return raw object from openshift-restclient-python
+            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            raw (bool): If True return raw object.
 
 
         Returns:
