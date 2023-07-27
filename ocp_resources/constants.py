@@ -1,5 +1,5 @@
-from kubernetes.dynamic.exceptions import ForbiddenError
-from openshift.dynamic.exceptions import (
+from kubernetes.dynamic.exceptions import (
+    ForbiddenError,
     InternalServerError,
     NotFoundError,
     ServerTimeoutError,
