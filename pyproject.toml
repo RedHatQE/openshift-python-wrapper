@@ -39,6 +39,10 @@ Download = "https://pypi.org/project/openshift-python-wrapper/"
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
 
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^7.4.0"
+
 [tool.poetry-dynamic-versioning.substitution]
 files = ["VERSION"]
 
