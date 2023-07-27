@@ -1,6 +1,6 @@
 # openshift-python-wrapper
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
-A python wrapper for [openshift-restclient-python](https://github.com/openshift/openshift-restclient-python) with support for RedHat Container Virtualization. ([Openshift Virtualization](https://www.openshift.com/learn/topics/virtualization))  
+A python wrapper for [kubernetes-python-client](https://github.com/kubernetes-client/python) with support for RedHat Container Virtualization. ([Openshift Virtualization](https://www.openshift.com/learn/topics/virtualization))
 Docs: [openshift-python-wrapper docs](https://openshift-python-wrapper.readthedocs.io/en/latest/)
 
 ## Installation

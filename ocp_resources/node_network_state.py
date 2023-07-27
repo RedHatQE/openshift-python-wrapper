@@ -1,6 +1,6 @@
 import time
 
-from openshift.dynamic.exceptions import ConflictError
+from kubernetes.dynamic.exceptions import ConflictError
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource

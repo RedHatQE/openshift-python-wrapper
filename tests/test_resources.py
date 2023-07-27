@@ -1,6 +1,6 @@
 import kubernetes
 import pytest
-from openshift.dynamic import DynamicClient
+from kubernetes.dynamic import DynamicClient
 
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
