@@ -10,30 +10,17 @@ class Backup(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.VELERO_IO
 
-    def __init__(
-        self,
-        name=None,
-        namespace=None,
-        included_namespaces=None,
-        client=None,
-        teardown=False,
-        privileged_client=None,
-        yaml_file=None,
-        excluded_resources=None,
-        **kwargs,
-    ):
+    def __init__(self, included_namespaces=None, excluded_resources=None, **kwargs):
+        """
+        Args:
+            #TODO
+            included_namespaces (..): NamespacedResource dict/list to include in backup.
+            excluded_resources (..): Update backup spec with excludedResources.
+        """
         if not included_namespaces:
             raise ValueError("included_namespaces can't be None")
 
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.included_namespaces = included_namespaces
         self.excluded_resources = excluded_resources
 
