@@ -13,9 +13,9 @@ class Backup(NamespacedResource):
     def __init__(self, included_namespaces=None, excluded_resources=None, **kwargs):
         """
         Args:
-            #TODO
-            included_namespaces (..): NamespacedResource dict/list to include in backup.
-            excluded_resources (..): Update backup spec with excludedResources.
+            included_namespaces (list): List of namespaces to include in the backup (optional).
+                If unspecified, all namespaces are included.
+            excluded_resources (list): List of namespaces to exclude from the backup (optional).
         """
         if not included_namespaces:
             raise ValueError("included_namespaces can't be None")
