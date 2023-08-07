@@ -13,9 +13,10 @@ class Backup(NamespacedResource):
     def __init__(self, included_namespaces=None, excluded_resources=None, **kwargs):
         """
         Args:
-            included_namespaces (list): List of namespaces to include in the backup (optional).
+            included_namespaces (list): Namespaces to include in the backup (optional).
                 If unspecified, all namespaces are included.
-            excluded_resources (list): List of namespaces to exclude from the backup (optional).
+            excluded_resources (list): Resources to exclude from the backup (optional).
+                Resources may be shortcuts (e.g. 'po' for 'pods') or fully-qualified.
         """
         if not included_namespaces:
             raise ValueError("included_namespaces can't be None")
