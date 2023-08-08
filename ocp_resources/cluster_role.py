@@ -23,7 +23,6 @@ class ClusterRole(Resource):
         self.rules = rules
 
     def to_dict(self):
-        super().to_dict()
         if not self.yaml_file:
             if not self.rules and not self.yaml_file:
                 raise ValueError("must send rules or yaml_file")
