@@ -28,12 +28,10 @@ class Backup(NamespacedResource):
         if not self.yaml_file:
             if self.included_namespaces:
                 self.res.update(
-                    {
-                        "spec": {
-                            "includedNamespaces": self.included_namespaces,
-                        }
-                    }
+                    {"spec": {"includedNamespaces": self.included_namespaces}}
                 )
 
             if self.excluded_resources:
-                self.res["spec"]["excludedResources"] = self.excluded_resources
+                self.res.update(
+                    {"spec": {"excludedResources": self.excluded_resources}}
+                )
