@@ -4,9 +4,8 @@ from ocp_resources.resource import Resource
 
 class ClusterRole(Resource):
     """
-    ClusterRole object
-    'rbac_authorization_k8s_io' API official docs:
-        https://docs.openshift.com/container-platform/3.11/rest_api/rbac_authorization_k8s_io/rbac-authorization-k8s-io-index.html
+    ClusterRole in 'rbac_authorization_k8s_io' official API:
+        https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-v1/
     """
 
     api_group = Resource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
@@ -23,9 +22,8 @@ class ClusterRole(Resource):
         self.rules = rules
 
     def to_dict(self):
+        super().to_dict()
         if not self.yaml_file:
             if not self.rules:
                 raise ValueError("must send rules or yaml_file")
-            if not self.res:
-                super().to_dict()
             self.res["rules"] = self.rules

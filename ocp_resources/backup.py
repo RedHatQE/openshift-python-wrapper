@@ -5,8 +5,7 @@ from ocp_resources.resource import NamespacedResource
 
 class Backup(NamespacedResource):
     """
-    Backup object.
-    'velero' API official docs:
+    Backup in 'velero' official API:
         https://velero.io/docs/v0.7.1/api-types/backup/
     """
 
@@ -20,9 +19,6 @@ class Backup(NamespacedResource):
             excluded_resources (list, optional): Resources to exclude from the backup.
                 Resources may be shortcuts (e.g. 'po' for 'pods') or fully-qualified.
         """
-        if not included_namespaces:
-            raise ValueError("included_namespaces can't be None")
-
         super().__init__(**kwargs)
         self.included_namespaces = included_namespaces
         self.excluded_resources = excluded_resources
