@@ -3,39 +3,41 @@ from ocp_resources.resource import NamespacedResource
 
 
 class CatalogSource(NamespacedResource):
+    """
+    CatalogSource object.
+    'velero' API official docs:
+        https://velero.io/docs/v0.7.1/api-types/backup/
+    # TODO API
+    """
+
     api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
         source_type=None,
         image=None,
         display_name=None,
         publisher=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         update_strategy_registry_poll_interval=None,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args:
+            source_type (str): Role name.
+            image (DynamicClient): DynamicClient to use.
+            display_name (list): list of dicts of rules. In the dict:
+                permissions_to_resources (list): List of string with resource/s to which you want to add permissions to.
+                Verbs (list): Determine the action/s (permissions) applicable on a specific resource.
+                    Available verbs per resource can be seen with the command 'oc api-resources --sort-by name -o wide'
+            publisher (bool, default: True): Indicates if this resource would need to be deleted.
+            update_strategy_registry_poll_interval (yaml, default: None): yaml file for the resource.
+        """
+        super().__init__(**kwargs)
         self.source_type = source_type
         self.image = image
         self.display_name = display_name
         self.publisher = publisher
-        self.update_strategy_registry_poll_interval = (
-            update_strategy_registry_poll_interval
-        )
+        self.update_strategy_registry_poll_interval = (update_strategy_registry_poll_interval)
 
     def to_dict(self):
         super().to_dict()
