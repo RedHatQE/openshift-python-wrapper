@@ -1,35 +1,47 @@
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 
 class CatalogSourceConfig(NamespacedResource):
+    """
+    # TODO fix
+    CatalogSourceConfig is used to enable an operator present in the OperatorSource to your cluster.
+    Behind the scenes, it will configure an OLM CatalogSource so that the operator can then be managed by OLM.
+
+    operators_v1_catalogsourceconfig_crd.yaml useful info
+        https://github.com/nikhil-thomas/operator-marketplace/blob/e3f737b75d60d206d15e10d7078f42358d865d10/deploy/crds/operators_v1_catalogsourceconfig_crd.yaml
+
+     Subscription in 'OLM' API official docs:
+        https://olm.operatorframework.io/docs/concepts/crds/subscription/
+    """
     api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
         source=None,
         target_namespace=None,
         packages=None,
         cs_display_name=None,
         cs_publisher=None,
-        client=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args: #TODO complete
+            source (..): ..
+            target_namespace (str): The namespace where the operators will be enabled.
+            packages (str): Comma separated list of operator(s) without spaces which will
+                be enabled in the target namespace.
+            cs_display_name (str): DisplayName is passed along to the CatalogSource to be used as a pretty name.
+            cs_publisher (str): Represents the entity that published the operator(s) from the OperatorSource and
+                specified in packages.
+        """
+        if not packages:
+            raise ValueError("packages can't be None")
+        elif not target_namespace:
+            raise ValueError("target_namespace can't be None")
+
+        super().__init__(**kwargs)
         self.source = source
         self.target_namespace = target_namespace
         self.packages = packages

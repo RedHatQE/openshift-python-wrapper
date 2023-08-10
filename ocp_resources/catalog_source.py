@@ -1,13 +1,10 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
 class CatalogSource(NamespacedResource):
     """
-    CatalogSource object.
-    'velero' API official docs:
-        https://velero.io/docs/v0.7.1/api-types/backup/
-    # TODO API
+    CatalogSource 'OLM' API official docs:
+        https://olm.operatorframework.io/docs/concepts/crds/catalogsource/
     """
 
     api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
@@ -37,7 +34,7 @@ class CatalogSource(NamespacedResource):
         self.image = image
         self.display_name = display_name
         self.publisher = publisher
-        self.update_strategy_registry_poll_interval = (update_strategy_registry_poll_interval)
+        self.update_strategy_registry_poll_interval = update_strategy_registry_poll_interval
 
     def to_dict(self):
         super().to_dict()
@@ -52,7 +49,6 @@ class CatalogSource(NamespacedResource):
                     }
                 }
             )
-
             if self.update_strategy_registry_poll_interval:
                 self.res["spec"].update(
                     {

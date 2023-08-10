@@ -13,12 +13,11 @@ class ClusterRoleBinding(Resource):
 
     def __init__(
         self,
-        name=None,
         cluster_role=None,
         subjects=None,
         **kwargs,
     ):
-        super().__init__(name=name, **kwargs)
+        super().__init__(**kwargs)
         self.cluster_role = cluster_role
         self.subjects = subjects
 
