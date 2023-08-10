@@ -34,7 +34,9 @@ class CatalogSource(NamespacedResource):
         self.image = image
         self.display_name = display_name
         self.publisher = publisher
-        self.update_strategy_registry_poll_interval = update_strategy_registry_poll_interval
+        self.update_strategy_registry_poll_interval = (
+            update_strategy_registry_poll_interval
+        )
 
     def to_dict(self):
         super().to_dict()

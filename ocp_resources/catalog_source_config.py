@@ -15,6 +15,7 @@ class CatalogSourceConfig(NamespacedResource):
      Subscription in 'OLM' API official docs:
         https://olm.operatorframework.io/docs/concepts/crds/subscription/
     """
+
     api_group = NamespacedResource.ApiGroup.OPERATORS_COREOS_COM
 
     def __init__(
