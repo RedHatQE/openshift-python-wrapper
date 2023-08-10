@@ -105,7 +105,10 @@ class VirtualMachineInstance(NamespacedResource):
 
     @property
     def vm(self):
-        return list(VirtualMachine.get(name=self.name, namespace=self.namespace))[0]
+        vms = list(VirtualMachine.get(name=self.name, namespace=self.namespace))
+        if vms:
+            return vms[0]
+        raise ResourceNotFoundError
 
     def wait_until_running(self, timeout=TIMEOUT_4MINUTES, logs=True, stop_status=None):
         """
