@@ -30,8 +30,5 @@ class Backup(NamespacedResource):
                 self.res.update(
                     {"spec": {"includedNamespaces": self.included_namespaces}}
                 )
-
             if self.excluded_resources:
-                self.res.update(
-                    {"spec": {"excludedResources": self.excluded_resources}}
-                )
+                self.res["spec"]["excludedResources"] = self.excluded_resources
