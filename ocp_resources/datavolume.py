@@ -1,6 +1,10 @@
-# -*- coding: utf-8 -*-
-
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.constants import (
+    TIMEOUT_1MINUTE,
+    TIMEOUT_2MINUTES,
+    TIMEOUT_4MINUTES,
+    TIMEOUT_10MINUTES,
+    TIMEOUT_10SEC,
+)
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
@@ -27,6 +31,7 @@ class DataVolume(NamespacedResource):
         UPLOAD_READY = "UploadReady"
         UNKNOWN = "Unknown"
         WAIT_FOR_FIRST_CONSUMER = "WaitForFirstConsumer"
+        PENDING_POPULATION = "PendingPopulation"
 
     class AccessMode:
         """
@@ -222,7 +227,7 @@ class DataVolume(NamespacedResource):
         super().wait_deleted(timeout=timeout)
         return self.pvc.wait_deleted(timeout=timeout)
 
-    def wait(self, timeout=600, failure_timeout=120):
+    def wait(self, timeout=TIMEOUT_10MINUTES, failure_timeout=TIMEOUT_2MINUTES):
         self._check_none_pending_status(failure_timeout=failure_timeout)
 
         # If DV's status is not Pending, continue with the flow
@@ -247,14 +252,14 @@ class DataVolume(NamespacedResource):
             client=self.client,
         )
 
-    def _check_none_pending_status(self, failure_timeout=120):
+    def _check_none_pending_status(self, failure_timeout=TIMEOUT_2MINUTES):
         # Avoid waiting for "Succeeded" status if DV's in Pending/None status
         sample = None
         # if garbage collector is enabled, DV will be deleted after success
         try:
             for sample in TimeoutSampler(
                 wait_timeout=failure_timeout,
-                sleep=10,
+                sleep=TIMEOUT_10SEC,
                 func=lambda: self.exists,
             ):
                 # If DV status is Pending (or Status is not yet updated) continue to wait, else exit the wait loop
@@ -272,25 +277,68 @@ class DataVolume(NamespacedResource):
             self.logger.error(f"{self.name} status is {sample}")
             raise
 
-    def wait_for_dv_success(self, timeout=600, failure_timeout=120):
+    def wait_for_dv_success(
+        self,
+        timeout=TIMEOUT_10MINUTES,
+        failure_timeout=TIMEOUT_2MINUTES,
+        stop_status_func=None,
+        *stop_status_func_args,
+        **stop_status_func_kwargs,
+    ):
+        """
+        Wait until DataVolume succeeded with or without DV Garbage Collection enabled
+
+        Args:
+            timeout (int):  Time to wait for the DataVolume to succeed.
+            failure_timeout (int): Time to wait for the DataVolume to have not Pending/None status
+            stop_status_func (function): function that is called inside the TimeoutSampler
+                if it returns True - stop the Sampler and raise TimeoutExpiredError
+                Example:
+                def dv_is_not_progressing(dv):
+                    return True if dv.instance.status.conditions.restartCount > 3 else False
+
+                def test_dv():
+                    ...
+                    stop_status_func_kwargs = {"dv": dv}
+                    dv.wait_for_dv_success(stop_status_func=dv_is_not_progressing, **stop_status_func_kwargs)
+
+        Returns:
+            bool: True if DataVolume succeeded.
+        """
         self.logger.info(f"Wait DV success for {timeout} seconds")
         self._check_none_pending_status(failure_timeout=failure_timeout)
-        self.pvc.wait_for_status(
-            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
+
+        sample = None
+        status_of_dv_str = (
+            f"Status of {self.kind} '{self.name}' in namespace '{self.namespace}':\n"
         )
-        # if garbage collector enabled, the DV deleted once succeeded
         try:
             for sample in TimeoutSampler(
                 sleep=1,
                 wait_timeout=timeout,
                 func=lambda: self.exists,
             ):
-                # DV reach to success if the status is succeeded or if the DV does not exists
+                # DV reach to success if the status is succeeded or if the DV does not exist
                 if sample is None or sample.status.phase == self.Status.SUCCEEDED:
-                    return
+                    break
+                elif stop_status_func and stop_status_func(
+                    *stop_status_func_args, **stop_status_func_kwargs
+                ):
+                    raise TimeoutExpiredError(
+                        value=(
+                            f"Exited on the stop_status_func {stop_status_func.__name__}. "
+                            f"{status_of_dv_str} {sample.status}"
+                        )
+                    )
+
         except TimeoutExpiredError:
-            self.logger.error(f"Status of {self.kind} {self.name} is {sample}")
+            self.logger.error(f"{status_of_dv_str} {sample.status}")
             raise
+
+        # For CSI storage, PVC gets Bound after DV succeeded
+        return self.pvc.wait_for_status(
+            status=PersistentVolumeClaim.Status.BOUND, timeout=TIMEOUT_1MINUTE
+        )
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
