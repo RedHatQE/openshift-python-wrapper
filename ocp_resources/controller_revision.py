@@ -1,36 +1,30 @@
-# https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/controller-revision-v1/
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
 class ControllerRevision(NamespacedResource):
+    """
+    ControllerRevision in kubernetes official API:
+        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#controllerrevision-v1-apps
+    """
+
     api_group = NamespacedResource.ApiGroup.APPS
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
-        timeout=TIMEOUT_4MINUTES,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         owner_references=None,
         revision_object=None,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            timeout=timeout,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args:
+            owner_references (list): List of objects depended by this object.
+                If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller,
+                then an entry in this list will point to this controller, with the controller field set to true.
+                There cannot be more than one managing controller.
+            revision_object (int): Revision indicates the revision of the state represented by Data.
+                Data is the serialized representation of the state.
+        """
+        super().__init__(**kwargs)
         self.owner_references = owner_references
         self.revision_object = revision_object
 

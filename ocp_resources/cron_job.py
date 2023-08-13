@@ -1,4 +1,3 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -12,10 +11,6 @@ class CronJob(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
         schedule=None,
         job_template=None,
         timezone=None,
@@ -24,20 +19,10 @@ class CronJob(NamespacedResource):
         suspend=None,
         successful_jobs_history_limit=None,
         failed_jobs_history_limit=None,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
         """
         Args:
-            name (str): Name of the CronJob resource
-            namespace (str): Namespace of CronJob resource
-            client: (DynamicClient): DynamicClient for api calls
-            teardown (bool): Indicates if the resource should be torn down at the end
-            privileged_client (DynamicClient): Privileged client for api calls
-            yaml_file (str): yaml file for the resource.
-            delete_timeout (int, optional): timeout associated with delete action
             schedule (str): schedule of the cron job
             job_template (dict): describes the job that would be created when a cronjob would be executed
                 Example:
@@ -52,16 +37,7 @@ class CronJob(NamespacedResource):
 
 
         """
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.job_template = job_template
         self.schedule = schedule
         self.timezone = timezone

@@ -1,19 +1,16 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
 class DataImportCron(NamespacedResource):
     """
-    DataImportCron object.
+    DataImportCron in 'kubevirt' official API:
+        https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_dataimportcron
     """
 
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
         image_stream=None,
         url=None,
         cert_configmap=None,
@@ -25,22 +22,26 @@ class DataImportCron(NamespacedResource):
         managed_data_source=None,
         imports_to_keep=None,
         bind_immediate_annotation=None,
-        teardown=True,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args:
+            garbage_collect (str, optional, default: "Outdated"): GarbageCollect specifies whether old PVCs should be
+                cleaned up after a new PVC is imported. Options are currently "Outdated" and "Never".
+            imports_to_keep (int, optional, default: 3): Number of import PVCs to keep when garbage collecting.
+            managed_data_source(str, default: ""): ManagedDataSource specifies the name of the corresponding DataSource this cron
+                will manage. DataSource has to be in the same namespace.
+            schedule (str, default: ""): Schedule specifies in cron format when and how often to look for new imports.
+            # TODO checkout:
+            size (str): cron size - format size+size unit, for example: "5Gi".
+            storage_class (str, default: None): storage class name for cron.
+            url (str, default: None): url for importing the data fron this cron, when source is http/registry.
+            cert_configmap (str, default: None): name of config map for TLS certificates.
+            bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in StorageClass and the
+                DataSource should be bound immediately.
+            image_stream (str, optional): ImageStream file name.
+        """
+        super().__init__(**kwargs)
         self.image_stream = image_stream
         self.url = url
         self.cert_configmap = cert_configmap

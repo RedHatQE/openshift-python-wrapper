@@ -12,7 +12,8 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 class DataVolume(NamespacedResource):
     """
-    DataVolume object.
+    DataVolume in 'kubevirt' official API:
+        https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datavolume
     """
 
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
@@ -69,8 +70,6 @@ class DataVolume(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
         source=None,
         size=None,
         storage_class=None,
@@ -79,7 +78,6 @@ class DataVolume(NamespacedResource):
         access_modes=None,
         cert_configmap=None,
         secret=None,
-        client=None,
         volume_mode=None,
         hostpath_node=None,
         source_pvc=None,
@@ -87,10 +85,6 @@ class DataVolume(NamespacedResource):
         multus_annotation=None,
         bind_immediate_annotation=None,
         preallocation=None,
-        teardown=True,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         api_name="pvc",
         delete_after_completion=None,
         **kwargs,
@@ -99,8 +93,6 @@ class DataVolume(NamespacedResource):
         DataVolume object
 
         Args:
-            name (str): DataVolume name.
-            namespace (str): DataVolume namespace.
             source (str): source of DV - upload/http/pvc/registry.
             size (str): DataVolume size - format size+size unit, for example: "5Gi".
             storage_class (str, default: None): storage class name for DataVolume.
@@ -109,7 +101,6 @@ class DataVolume(NamespacedResource):
             access_modes (str, default: None): DataVolume access mode.
             cert_configmap (str, default: None): name of config map for TLS certificates.
             secret (Secret, default: None): to be set as secretRef.
-            client (DynamicClient): DynamicClient to use.
             volume_mode (str, default: None): DataVolume volume mode.
             hostpath_node (str, default: None): Node name to provision the DV on.
             source_pvc (str, default: None): PVC name for when cloning the DV.
@@ -118,23 +109,10 @@ class DataVolume(NamespacedResource):
             bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in  StorageClass and DV
             should be bound immediately.
             preallocation (bool, default: None): preallocate disk space.
-            teardown (bool, default: True): Indicates if this resource would need to be deleted.
-            privileged_client (DynamicClient, default: None): Instance of Dynamic client
-            yaml_file (yaml, default: None): yaml file for the resource.
-            delete_timeout (int, default: 4 minutes): timeout associated with delete action.
             api_name (str, default: "pvc"): api used for DV, pvc/storage
             delete_after_completion (str, default: None): annotation for garbage collector - "true"/"false"
         """
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.source = source
         self.url = url
         self.cert_configmap = cert_configmap

@@ -1,33 +1,28 @@
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
-
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
 
 
 class DataSource(NamespacedResource):
+    """
+    DataSource in 'kubevirt' official API:
+        https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datasource
+    """
+
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
         source=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args:
+            source (DataSourceSource): Source is the current source of the data referenced by the DataSource.
+                For more information on DataSourceSource on kubevirt API:
+                https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datasourcesource
+        """
+        super().__init__(**kwargs)
         self.source = source
 
     def to_dict(self):
