@@ -18,8 +18,8 @@ class ControllerRevision(NamespacedResource):
         """
         Args:
             owner_references (list): List of objects depended by this object.
-                If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller,
-                then an entry in this list will point to this controller, with the controller field set to true.
+                If ALL objects in the list have been deleted, this object will be garbage collected. If this object is
+                managed by a controller, then an entry in this list will point to this controller, with the controller field set to true.
                 There cannot be more than one managing controller.
             revision_object (int): Revision indicates the revision of the state represented by Data.
                 Data is the serialized representation of the state.

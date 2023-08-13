@@ -29,13 +29,13 @@ class DataImportCron(NamespacedResource):
             garbage_collect (str, optional, default: "Outdated"): GarbageCollect specifies whether old PVCs should be
                 cleaned up after a new PVC is imported. Options are currently "Outdated" and "Never".
             imports_to_keep (int, optional, default: 3): Number of import PVCs to keep when garbage collecting.
-            managed_data_source(str, default: ""): ManagedDataSource specifies the name of the corresponding DataSource this cron
-                will manage. DataSource has to be in the same namespace.
+            managed_data_source(str, default: ""): ManagedDataSource specifies the name of the corresponding
+                DataSource this cron will manage. DataSource has to be in the same namespace.
             schedule (str, default: ""): Schedule specifies in cron format when and how often to look for new imports.
             # TODO checkout:
-            size (str): cron size - format size+size unit, for example: "5Gi".
-            storage_class (str, default: None): storage class name for cron.
-            url (str, default: None): url for importing the data fron this cron, when source is http/registry.
+            size (str): DataSource size - format size+size unit, for example: "5Gi".
+            storage_class (str, default: None): storage class name for cron's DataSource.
+            url (str, default: None): url for importing the data for this cron, when source is http/registry.
             cert_configmap (str, default: None): name of config map for TLS certificates.
             bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in StorageClass and the
                 DataSource should be bound immediately.
