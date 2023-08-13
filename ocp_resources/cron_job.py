@@ -34,8 +34,6 @@ class CronJob(NamespacedResource):
             failed_jobs_history_limit (int, optional): number of failed jobs to retain
             starting_deadline_seconds (int, optional): deadline in seconds, for starting a job, in case it does not
             start at scheduled time
-
-
         """
         super().__init__(**kwargs)
         self.job_template = job_template
