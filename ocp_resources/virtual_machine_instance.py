@@ -8,7 +8,6 @@ from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-from ocp_resources.virtual_machine import VirtualMachine
 
 
 class VirtualMachineInstance(NamespacedResource):
@@ -103,13 +102,6 @@ class VirtualMachineInstance(NamespacedResource):
 
         raise ResourceNotFoundError
 
-    @property
-    def vm(self):
-        vms = list(VirtualMachine.get(name=self.name, namespace=self.namespace))
-        if vms:
-            return vms[0]
-        raise ResourceNotFoundError
-
     def wait_until_running(self, timeout=TIMEOUT_4MINUTES, logs=True, stop_status=None):
         """
         Wait until VMI is running
@@ -124,9 +116,6 @@ class VirtualMachineInstance(NamespacedResource):
         """
         try:
             self.logger.info(
-                f"VM {self.vm.name} status before wait: {self.vm.printable_status}"
-            )
-            self.logger.info(
                 f"VMI {self.name} status before wait: {self.instance.status.phase}"
             )
             self.wait_for_status(
@@ -135,7 +124,7 @@ class VirtualMachineInstance(NamespacedResource):
         except TimeoutExpiredError:
             if not logs:
                 raise
-
+            self.logger.error(f"VMI {self.name} status: {self.instance.status.phase}")
             virt_pod = self.virt_launcher_pod
             if virt_pod:
                 self.logger.error(
