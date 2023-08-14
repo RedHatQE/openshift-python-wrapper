@@ -115,15 +115,21 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If VMI failed to run.
         """
         try:
+            self.logger.info(
+                f"VMI {self.name} status before wait: {self.instance.status.phase}"
+            )
             self.wait_for_status(
                 status=self.Status.RUNNING, timeout=timeout, stop_status=stop_status
             )
         except TimeoutExpiredError:
             if not logs:
                 raise
-
+            self.logger.error(f"VMI {self.name} status: {self.instance.status.phase}")
             virt_pod = self.virt_launcher_pod
             if virt_pod:
+                self.logger.error(
+                    f"Status of virt-launcher pod {virt_pod.name}: {virt_pod.status}"
+                )
                 self.logger.debug(f"{virt_pod.name} *****LOGS*****")
                 self.logger.debug(virt_pod.log(container="compute"))
 
