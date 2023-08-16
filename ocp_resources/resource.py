@@ -1151,7 +1151,11 @@ class NamespacedResource(Resource):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api.get(name=self.name, namespace=self.namespace)
+
+        def _instance():
+            return self.api.get(name=self.name, namespace=self.namespace)
+
+        return self.retry_cluster_exceptions(func=_instance)
 
     def _base_body(self):
         if not self.res:
