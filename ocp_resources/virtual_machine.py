@@ -34,6 +34,11 @@ class VirtualMachine(NamespacedResource):
         STOPPING = "Stopping"
         WAITING_FOR_VOLUME_BINDING = "WaitingForVolumeBinding"
         ERROR_UNSCHEDULABLE = "ErrorUnschedulable"
+        DATAVOLUME_ERROR = "DataVolumeError"
+        ERROR_PVC_NOT_FOUND = "ErrorPvcNotFound"
+        IMAGE_PULL_BACK_OFF = "ImagePullBackOff"
+        ERR_IMAGE_PULL = "ErrImagePull"
+        CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
 
     def __init__(
         self,
