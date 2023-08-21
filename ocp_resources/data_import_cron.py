@@ -32,14 +32,13 @@ class DataImportCron(NamespacedResource):
             managed_data_source(str, default: ""): ManagedDataSource specifies the name of the corresponding
                 DataSource this cron will manage. DataSource has to be in the same namespace.
             schedule (str, default: ""): Schedule specifies in cron format when and how often to look for new imports.
-            # TODO checkout:
-            size (str): DataSource size - format size+size unit, for example: "5Gi".
-            storage_class (str, default: None): storage class name for cron's DataSource.
-            url (str, default: None): url for importing the data for this cron, when source is http/registry.
-            cert_configmap (str, default: None): name of config map for TLS certificates.
+            storage_class (str, optional): Name of the StorageClass required by the claim.
+            size (str): Size of the resources claim quantity. Format is size+size unit, for example: "5Gi".
+            url (str, optional): URL is the url of the registry source (starting with the scheme: docker, oci-archive).
+            cert_configmap (str, optional): CertConfigMap provides a reference to the Registry certs
+            image_stream (str, optional): ImageStream is the name of image stream for import
             bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in StorageClass and the
                 DataSource should be bound immediately.
-            image_stream (str, optional): ImageStream file name.
         """
         super().__init__(**kwargs)
         self.image_stream = image_stream
