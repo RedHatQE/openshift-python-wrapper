@@ -3,7 +3,6 @@ from ocp_resources.resource import NamespacedResource
 
 class CSIStorageCapacity(NamespacedResource):
     """
-    CSIStorageCapacity object. API reference:
     https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/csi-storage-capacity-v1/#CSIStorageCapacity
     """
 

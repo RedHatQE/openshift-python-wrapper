@@ -6,8 +6,7 @@ from ocp_resources.resource import NamespacedResource
 
 class DataSource(NamespacedResource):
     """
-    DataSource in 'kubevirt' official API:
-        https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datasource
+    https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datasource
     """
 
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
@@ -19,8 +18,8 @@ class DataSource(NamespacedResource):
     ):
         """
         Args:
-            source (DataSourceSource): Source is the current source of the data referenced by the DataSource.
-                For more information on DataSourceSource on kubevirt API:
+            source (object): Source is the current source of the data referenced by the DataSource object.
+            For more information on DataSourceSource on kubevirt API:
                 https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datasourcesource
         """
         super().__init__(**kwargs)

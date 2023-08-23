@@ -3,8 +3,7 @@ from ocp_resources.resource import NamespacedResource
 
 class ConfigMap(NamespacedResource):
     """
-    Configmap in kubernetes API official docs:
-        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#configmap-v1-core
+    https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#configmap-v1-core
     """
 
     api_version = NamespacedResource.ApiVersion.V1
@@ -16,10 +15,7 @@ class ConfigMap(NamespacedResource):
     ):
         """
         Args:
-            data (Object): Data contains the configuration data.
-                Each key must consist of alphanumeric characters, '-', '_' or '.'.
-                Values with non-UTF-8 byte sequences must use the BinaryData field. The keys stored in
-                Data must not overlap with the keys in the BinaryData field, this is enforced during validation process.
+            data (object): contains the configuration data.
         """
         super().__init__(**kwargs)
         self.data = data

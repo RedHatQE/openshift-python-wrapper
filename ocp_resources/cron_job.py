@@ -3,7 +3,6 @@ from ocp_resources.resource import NamespacedResource
 
 class CronJob(NamespacedResource):
     """
-    CronJob object. API reference:
     https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/cron-job-v1/
     """
 

@@ -3,8 +3,7 @@ from ocp_resources.resource import NamespacedResource
 
 class ControllerRevision(NamespacedResource):
     """
-    ControllerRevision in kubernetes official API:
-        https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#controllerrevision-v1-apps
+    https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#controllerrevision-v1-apps
     """
 
     api_group = NamespacedResource.ApiGroup.APPS
@@ -18,11 +17,7 @@ class ControllerRevision(NamespacedResource):
         """
         Args:
             owner_references (list): List of objects depended by this object.
-                If ALL objects in the list have been deleted, this object will be garbage collected. If this object is
-                managed by a controller, then an entry in this list will point to this controller,
-                with the controller field set to true. There cannot be more than one managing controller.
-            revision_object (int): Revision indicates the revision of the state represented by Data.
-                Data is the serialized representation of the state.
+            revision_object (int): indicates the revision of the state represented by Data.
         """
         super().__init__(**kwargs)
         self.owner_references = owner_references

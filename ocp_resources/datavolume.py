@@ -12,8 +12,7 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 
 class DataVolume(NamespacedResource):
     """
-    DataVolume in 'kubevirt' official API:
-        https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datavolume
+    https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datavolume
     """
 
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
@@ -97,20 +96,20 @@ class DataVolume(NamespacedResource):
             size (str): DataVolume size - format size+size unit, for example: "5Gi".
             storage_class (str, default: None): storage class name for DataVolume.
             url (str, default: None): url for importing DV, when source is http/registry.
-            content_type (str, default: "kubevirt"): DataVolume content type.
-            access_modes (str, default: None): DataVolume access mode.
-            cert_configmap (str, default: None): name of config map for TLS certificates.
-            secret (Secret, default: None): to be set as secretRef.
-            volume_mode (str, default: None): DataVolume volume mode.
-            hostpath_node (str, default: None): Node name to provision the DV on.
-            source_pvc (str, default: None): PVC name for when cloning the DV.
-            source_namespace (str, default: None): PVC namespace for when cloning the DV.
-            multus_annotation (str, default: None): network nad name.
-            bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in  StorageClass and DV
-            should be bound immediately.
-            preallocation (bool, default: None): preallocate disk space.
-            api_name (str, default: "pvc"): api used for DV, pvc/storage
-            delete_after_completion (str, default: None): annotation for garbage collector - "true"/"false"
+            content_type (str, optional): DataVolume content type. Default value is "kubevirt".
+            access_modes (str, optional): DataVolume access mode. Default value is None.
+            cert_configmap (str, optional): name of config map for TLS certificates. Default value is None.
+            secret (Secret, optional): to be set as secretRef. Default value is None.
+            volume_mode (str, optional): DataVolume volume mode. Default value is None.
+            hostpath_node (str, optional): Node name to provision the DV on. Default value is None.
+            source_pvc (str, optional): PVC name for when cloning the DV. Default value is None.
+            source_namespace (str, optional): PVC namespace for when cloning the DV. Default value is None.
+            multus_annotation (str, optional): network nad name. Default value is None.
+            bind_immediate_annotation (bool, optional): when WaitForFirstConsumer is set in  StorageClass and DV
+            should be bound immediately. Default value is None.
+            preallocation (bool, optional): preallocate disk space. Default value is None.
+            api_name (str, optional): api used for DV, pvc/storage. Default value is "pvc".
+            delete_after_completion (str, optional): annotation for garbage collector - "true"/"false". Default value is None.
         """
         super().__init__(**kwargs)
         self.source = source
@@ -154,7 +153,7 @@ class DataVolume(NamespacedResource):
                 self.res["spec"]["source"][self.source]["secretRef"] = self.secret.name
             if self.volume_mode:
                 self.res["spec"][self.api_name]["volumeMode"] = self.volume_mode
-            if self.source == "http" or "registry":
+            if self.source == "http" or self.source == "registry":
                 self.res["spec"]["source"][self.source]["url"] = self.url
             if self.cert_configmap:
                 self.res["spec"]["source"][self.source][
