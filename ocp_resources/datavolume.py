@@ -109,7 +109,8 @@ class DataVolume(NamespacedResource):
             should be bound immediately. Default value is None.
             preallocation (bool, optional): preallocate disk space. Default value is None.
             api_name (str, optional): api used for DV, pvc/storage. Default value is "pvc".
-            delete_after_completion (str, optional): annotation for garbage collector - "true"/"false". Default value is None.
+            delete_after_completion (str, optional): annotation for garbage collector - "true"/"false".
+                Default value is None.
         """
         super().__init__(**kwargs)
         self.source = source
