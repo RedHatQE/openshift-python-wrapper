@@ -52,7 +52,9 @@ class NetworkAttachmentDefinition(NamespacedResource):
         if not self.yaml_file:
             if self.resource_name is not None:
                 self.res["metadata"]["annotations"] = {
-                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
+                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": (
+                        self.resource_name
+                    )
                 }
             self.res["spec"] = {}
             if self.config:

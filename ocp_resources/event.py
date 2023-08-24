@@ -49,8 +49,9 @@ class Event:
 
         LOGGER.info("Reading events")
         LOGGER.debug(
-            f"get events parameters: namespace={namespace}, name={name}, label_selector={label_selector}, "
-            f"field_selector='{field_selector}', resource_version={resource_version}, timeout={timeout}"
+            f"get events parameters: namespace={namespace}, name={name},"
+            f" label_selector={label_selector}, field_selector='{field_selector}',"
+            f" resource_version={resource_version}, timeout={timeout}"
         )
 
         event_listener = dyn_client.resources.get(
@@ -100,8 +101,9 @@ class Event:
         """
         LOGGER.info("Deleting events")
         LOGGER.debug(
-            f"delete_events parameters: namespace={namespace}, name={name}, label_selector={label_selector}, "
-            f"field_selector='{field_selector}', resource_version={resource_version}, timeout={timeout}"
+            f"delete_events parameters: namespace={namespace}, name={name},"
+            f" label_selector={label_selector}, field_selector='{field_selector}',"
+            f" resource_version={resource_version}, timeout={timeout}"
         )
         dyn_client.resources.get(api_version=cls.api_version, kind=cls.__name__).delete(
             namespace=namespace,
