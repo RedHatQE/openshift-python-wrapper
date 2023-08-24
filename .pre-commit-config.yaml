@@ -25,6 +25,7 @@ repos:
     rev: "23.7.0"
     hooks:
     - id: black
+      args: [--preview]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: "v4.4.0"
