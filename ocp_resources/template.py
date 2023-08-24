@@ -70,6 +70,8 @@ class Template(NamespacedResource):
     def generate_template_labels(os, workload, flavor):
         return [
             f"{Template.Labels.OS}/{os}",
-            f"{Template.Labels.WORKLOAD}/{getattr(Template.Workload, workload.upper())}",
+            (
+                f"{Template.Labels.WORKLOAD}/{getattr(Template.Workload, workload.upper())}"
+            ),
             f"{Template.Labels.FLAVOR}/{getattr(Template.Flavor, flavor.upper())}",
         ]

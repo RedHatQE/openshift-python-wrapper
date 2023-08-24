@@ -43,7 +43,8 @@ class TaskRun(NamespacedResource):
                 raise ValueError("Mandatory to have either task_ref or task_spec")
             if self.task_ref and self.task_spec:
                 raise ValueError(
-                    "Validation failed: expected exactly one either task_ref or task_spec, got both"
+                    "Validation failed: expected exactly one either task_ref or"
+                    " task_spec, got both"
                 )
             self.res["spec"] = {}
             if self.task_ref:
