@@ -812,6 +812,7 @@ class Resource:
         config_file=None,
         context=None,
         singular_name=None,
+        exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         *args,
         **kwargs,
     ):
@@ -823,6 +824,7 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -840,7 +842,9 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource.retry_cluster_exceptions(func=_get)
+        return Resource.retry_cluster_exceptions(
+            func=_get, exceptions_dict=exceptions_dict
+        )
 
     @property
     def instance(self):
