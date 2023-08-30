@@ -125,7 +125,10 @@ class KubeAPIVersion(Version):
             with contextlib.suppress(ValueError):
                 components[idx] = int(obj)
 
-        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
+        errmsg = (
+            f"version '{vstring}' does not conform to kubernetes api versioning"
+            " guidelines"
+        )
 
         if (
             len(components) not in (2, 4)
@@ -355,7 +358,8 @@ class Resource:
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
-                "Subclasses of Resource require self.api_group or self.api_version to be defined"
+                "Subclasses of Resource require self.api_group or self.api_version to"
+                " be defined"
             )
         self.namespace = None
         self.name = name
@@ -512,7 +516,8 @@ class Resource:
             check_exists=False,
         ):
             self.logger.warning(
-                f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
+                f"Skip resource {self.kind} {self.name} teardown. Got"
+                f" {_export_str}={skip_resource_teardown}"
             )
             return
 
@@ -896,7 +901,8 @@ class Resource:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
         self.logger.info(
-            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
+            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be"
+            f" '{status}'"
         )
 
         for sample in TimeoutSampler(
@@ -1252,7 +1258,7 @@ class ResourceEditor:
                         self._backups[resource] = backup
                     else:
                         LOGGER.warning(
-                            f"ResourceEdit: no diff found in patch for "
+                            "ResourceEdit: no diff found in patch for "
                             f"{resource.name} -- skipping"
                         )
                 if not resource_to_patch:
