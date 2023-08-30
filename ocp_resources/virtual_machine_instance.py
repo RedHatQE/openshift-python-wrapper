@@ -142,8 +142,7 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If resource not exists.
         """
         self.logger.info(
-            f"Wait until {self.kind} {self.name} is "
-            f"{'Paused' if pause else 'Unpuased'}"
+            f"Wait until {self.kind} {self.name} is {'Paused' if pause else 'Unpuased'}"
         )
         self.wait_for_domstate_pause_status(pause=pause, timeout=timeout)
         self.wait_for_vmi_condition_pause_status(pause=pause, timeout=timeout)
@@ -199,7 +198,8 @@ class VirtualMachineInstance(NamespacedResource):
 
     def virsh_cmd(self, action):
         return shlex.split(
-            f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
+            "virsh"
+            f" {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
         )
 
     def get_xml(self):

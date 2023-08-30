@@ -182,13 +182,17 @@ class DataVolume(NamespacedResource):
             if self.hostpath_node:
                 self.res["metadata"].setdefault("annotations", {}).update(
                     {
-                        f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": self.hostpath_node
+                        f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": (
+                            self.hostpath_node
+                        )
                     }
                 )
             if self.multus_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update(
                     {
-                        f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": self.multus_annotation
+                        f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": (
+                            self.multus_annotation
+                        )
                     }
                 )
             if self.bind_immediate_annotation:
@@ -205,7 +209,9 @@ class DataVolume(NamespacedResource):
             if self.delete_after_completion:
                 self.res["metadata"].setdefault("annotations", {}).update(
                     {
-                        f"{self.api_group}/storage.deleteAfterCompletion": self.delete_after_completion
+                        f"{self.api_group}/storage.deleteAfterCompletion": (
+                            self.delete_after_completion
+                        )
                     }
                 )
 

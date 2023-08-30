@@ -79,7 +79,9 @@ class DataImportCron(NamespacedResource):
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update(
                     {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": "true"
+                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": (
+                            "true"
+                        )
                     }
                 )
             if self.image_stream:
