@@ -132,7 +132,10 @@ class MTV:
 
         except TimeoutExpiredError:
             self.logger.error(
-                msg=f"Last Status Condition of {self.kind} {self.name} was: {last_condition}"
+                msg=(
+                    f"Last Status Condition of {self.kind} {self.name} was:"
+                    f" {last_condition}"
+                )
             )
             raise
 

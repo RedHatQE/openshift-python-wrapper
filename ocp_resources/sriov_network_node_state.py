@@ -39,6 +39,7 @@ class SriovNetworkNodeState(NamespacedResource):
                     return
         except TimeoutExpiredError:
             self.logger.error(
-                f"after {timeout} seconds, {self.name} status is {self.instance.status.syncStatus}"
+                f"after {timeout} seconds, {self.name} status is"
+                f" {self.instance.status.syncStatus}"
             )
             raise
