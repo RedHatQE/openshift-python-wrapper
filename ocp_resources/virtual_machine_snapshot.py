@@ -59,7 +59,8 @@ class VirtualMachineSnapshot(NamespacedResource):
             TimeoutExpiredError: If timeout reached.
         """
         self.logger.info(
-            f"Wait for {self.kind} {self.name} status to be {'' if status else 'not '}ready to use"
+            f"Wait for {self.kind} {self.name} status to be"
+            f" {'' if status else 'not '}ready to use"
         )
 
         samples = TimeoutSampler(

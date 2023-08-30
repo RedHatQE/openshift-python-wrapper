@@ -125,7 +125,10 @@ class KubeAPIVersion(Version):
             with contextlib.suppress(ValueError):
                 components[idx] = int(obj)
 
-        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
+        errmsg = (
+            f"version '{vstring}' does not conform to kubernetes api versioning"
+            " guidelines"
+        )
 
         if (
             len(components) not in (2, 4)
@@ -354,7 +357,8 @@ class Resource:
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
-                "Subclasses of Resource require self.api_group or self.api_version to be defined"
+                "Subclasses of Resource require self.api_group or self.api_version to"
+                " be defined"
             )
         self.namespace = None
         self.name = name
@@ -511,7 +515,8 @@ class Resource:
             check_exists=False,
         ):
             self.logger.warning(
-                f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
+                f"Skip resource {self.kind} {self.name} teardown. Got"
+                f" {_export_str}={skip_resource_teardown}"
             )
             return
 
@@ -802,6 +807,7 @@ class Resource:
         config_file=None,
         context=None,
         singular_name=None,
+        exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         *args,
         **kwargs,
     ):
@@ -813,6 +819,7 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -830,7 +837,9 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource.retry_cluster_exceptions(func=_get)
+        return Resource.retry_cluster_exceptions(
+            func=_get, exceptions_dict=exceptions_dict
+        )
 
     @property
     def instance(self):
@@ -891,14 +900,18 @@ class Resource:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
         self.logger.info(
-            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
+            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be"
+            f" '{status}'"
         )
         for sample in self.watcher(timeout=timeout):
             for cond in sample["raw_object"].get("status", {}).get("conditions", []):
                 if cond["type"] == condition and cond["status"] == status:
                     return
         raise TimeoutExpiredError(
-            value=f"condition {condition} not in desired status {status} after {timeout} seconds"
+            value=(
+                f"condition {condition} not in desired status {status} after"
+                f" {timeout} seconds"
+            )
         )
 
     def api_request(self, method, action, url, **params):
@@ -1244,7 +1257,7 @@ class ResourceEditor:
                         self._backups[resource] = backup
                     else:
                         LOGGER.warning(
-                            f"ResourceEdit: no diff found in patch for "
+                            "ResourceEdit: no diff found in patch for "
                             f"{resource.name} -- skipping"
                         )
                 if not resource_to_patch:

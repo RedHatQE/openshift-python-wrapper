@@ -54,6 +54,6 @@ class DataSource(NamespacedResource):
             )
         except ResourceNotFoundError:
             self.logger.warning(
-                f"dataSource {self.name} is pointing to a non-existing PVC, name: {pvc_name}, "
-                f"namespace: {pvc_namespace}"
+                f"dataSource {self.name} is pointing to a non-existing PVC, name:"
+                f" {pvc_name}, namespace: {pvc_namespace}"
             )
