@@ -633,7 +633,7 @@ class Resource:
         """
         try:
             return self.instance
-        except NotFoundError:
+        except TimeoutExpiredError:
             return None
 
     def client_wait_deleted(self, timeout):
