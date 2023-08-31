@@ -677,12 +677,19 @@ class Resource:
             namespace=self.namespace,
         )
         current_status = None
+        last_logged_status = None
         try:
             for sample in samples:
                 if sample.items:
                     sample_status = sample.items[0].status
                     if sample_status:
                         current_status = sample_status.phase
+                        if current_status != last_logged_status:
+                            last_logged_status = current_status
+                            self.logger.info(
+                                f"Status of {self.kind} {self.name} is {current_status}"
+                            )
+
                         if current_status == status:
                             return
 
