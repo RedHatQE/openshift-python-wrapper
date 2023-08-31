@@ -117,10 +117,6 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If VMI failed to run.
         """
         try:
-            self.wait(timeout=timeout)
-            self.logger.info(
-                f"VMI {self.name} status before wait: {self.instance.status.phase}"
-            )
             self.wait_for_status(
                 status=self.Status.RUNNING, timeout=timeout, stop_status=stop_status
             )
