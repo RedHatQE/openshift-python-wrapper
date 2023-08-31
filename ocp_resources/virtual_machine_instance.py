@@ -86,7 +86,9 @@ class VirtualMachineInstance(NamespacedResource):
         else:
             return pods[0]
 
-        raise ResourceNotFoundError
+        raise ResourceNotFoundError(
+            f"VIRT launcher POD not found for {self.kind}:{self.name}"
+        )
 
     @property
     def virt_handler_pod(self):
@@ -121,17 +123,20 @@ class VirtualMachineInstance(NamespacedResource):
             self.wait_for_status(
                 status=self.Status.RUNNING, timeout=timeout, stop_status=stop_status
             )
-        except TimeoutExpiredError:
+        except TimeoutExpiredError as sampler_ex:
             if not logs:
                 raise
             self.logger.error(f"VMI {self.name} status: {self.instance.status.phase}")
-            virt_pod = self.virt_launcher_pod
-            if virt_pod:
+            try:
+                virt_pod = self.virt_launcher_pod
                 self.logger.error(
                     f"Status of virt-launcher pod {virt_pod.name}: {virt_pod.status}"
                 )
                 self.logger.debug(f"{virt_pod.name} *****LOGS*****")
                 self.logger.debug(virt_pod.log(container="compute"))
+            except ResourceNotFoundError as virt_pod_ex:
+                self.logger.error(virt_pod_ex)
+                raise sampler_ex
 
             raise
 
