@@ -13,7 +13,6 @@ from benedict import benedict
 from kubernetes.dynamic import DynamicClient
 from kubernetes.dynamic.exceptions import (
     ConflictError,
-    ForbiddenError,
     MethodNotAllowedError,
     NotFoundError,
 )
@@ -733,7 +732,7 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        with contextlib.suppress(NotFoundError, ForbiddenError):
+        with contextlib.suppress(TimeoutExpiredError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
