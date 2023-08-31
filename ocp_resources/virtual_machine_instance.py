@@ -123,8 +123,6 @@ class VirtualMachineInstance(NamespacedResource):
         except TimeoutExpiredError as sampler_ex:
             if not logs:
                 raise
-            if not self.exists:
-                self.logger.error(f"VMI {self.name} does not exist!")
             try:
                 virt_pod = self.virt_launcher_pod
                 self.logger.error(

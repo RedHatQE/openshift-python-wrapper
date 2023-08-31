@@ -708,6 +708,10 @@ class Resource:
                 self.logger.error(
                     f"Status of {self.kind} {self.name} is {current_status}"
                 )
+            else:
+                self.logger.error(
+                    f"{self.kind} {self.name}: status is None!/does not exist!"
+                )
             raise
 
     def create(self, wait=False):
