@@ -141,7 +141,7 @@ class TimeoutSampler:
                 last_exp_log = self._get_exception_log(exp=last_exp)
                 if self._is_raisable_exception(exp=last_exp):
                     LOGGER.error(last_exp_log)
-                    raise exp
+                    raise TimeoutExpiredError(self._get_exception_log(exp=last_exp))
 
                 self.elapsed_time = None
                 time.sleep(self.sleep)
