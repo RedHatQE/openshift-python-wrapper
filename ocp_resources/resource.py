@@ -10,10 +10,13 @@ from signal import SIGINT, signal
 import kubernetes
 import yaml
 from benedict import benedict
-from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
-from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import ConflictError, NotFoundError
-from openshift.dynamic.resource import ResourceField
+from kubernetes.dynamic import DynamicClient
+from kubernetes.dynamic.exceptions import (
+    ConflictError,
+    MethodNotAllowedError,
+    NotFoundError,
+)
+from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger
 
@@ -629,7 +632,7 @@ class Resource:
         """
         try:
             return self.instance
-        except NotFoundError:
+        except TimeoutExpiredError:
             return None
 
     def client_wait_deleted(self, timeout):
@@ -728,7 +731,7 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        with contextlib.suppress(NotFoundError, ForbiddenError):
+        with contextlib.suppress(TimeoutExpiredError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
@@ -1122,8 +1125,8 @@ class NamespacedResource(Resource):
             dyn_client (DynamicClient): Open connection to remote cluster
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
-            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
-            raw (bool): If True return raw object from openshift-restclient-python
+            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            raw (bool): If True return raw object.
 
 
         Returns:
@@ -1163,7 +1166,11 @@ class NamespacedResource(Resource):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api.get(name=self.name, namespace=self.namespace)
+
+        def _instance():
+            return self.api.get(name=self.name, namespace=self.namespace)
+
+        return self.retry_cluster_exceptions(func=_instance)
 
     def _base_body(self):
         if not self.res:
