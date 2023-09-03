@@ -31,6 +31,7 @@ from ocp_resources.event import Event
 from ocp_resources.utils import (
     TimeoutExpiredError,
     TimeoutSampler,
+    TimeoutWatch,
     skip_existing_resource_creation_teardown,
 )
 
@@ -799,16 +800,19 @@ class Resource:
     def retry_cluster_exceptions(
         func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-        sampler = TimeoutSampler(
-            wait_timeout=10,
-            sleep=1,
-            func=func,
-            print_log=False,
-            exceptions_dict=exceptions_dict,
-            **kwargs,
-        )
-        for sample in sampler:
-            return sample
+        try:
+            sampler = TimeoutSampler(
+                wait_timeout=10,
+                sleep=1,
+                func=func,
+                print_log=False,
+                exceptions_dict=exceptions_dict,
+                **kwargs,
+            )
+            for sample in sampler:
+                return sample
+        except TimeoutExpiredError:
+            return None
 
     @classmethod
     def get(
@@ -913,16 +917,25 @@ class Resource:
             f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be"
             f" '{status}'"
         )
-        for sample in self.watcher(timeout=timeout):
-            for cond in sample["raw_object"].get("status", {}).get("conditions", []):
-                if cond["type"] == condition and cond["status"] == status:
-                    return
-        raise TimeoutExpiredError(
-            value=(
-                f"condition {condition} not in desired status {status} after"
-                f" {timeout} seconds"
-            )
-        )
+
+        timeout_watcher = TimeoutWatch(timeout=timeout)
+        for sample in TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        for sample in TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
+            sleep=1,
+            func=lambda: self.instance,
+        ):
+            if sample:
+                for cond in sample.get("status", {}).get("conditions", []):
+                    if cond["type"] == condition and cond["status"] == status:
+                        return
 
     def api_request(self, method, action, url, **params):
         """
@@ -951,8 +964,19 @@ class Resource:
             return response.data
 
     def wait_for_conditions(self):
+        timeout_watcher = TimeoutWatch(timeout=30)
+        for sample in TimeoutSampler(
+            wait_timeout=30,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
         samples = TimeoutSampler(
-            wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
+            wait_timeout=timeout_watcher.remaining_time(),
+            sleep=1,
+            func=lambda: self.instance.status.conditions,
         )
         for sample in samples:
             if sample:
