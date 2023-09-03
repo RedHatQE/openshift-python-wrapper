@@ -4,7 +4,7 @@ from openshift.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import TimeoutSampler, TimeoutWatch
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -63,8 +63,17 @@ class VirtualMachineSnapshot(NamespacedResource):
             f" {'' if status else 'not '}ready to use"
         )
 
-        samples = TimeoutSampler(
+        timeout_watcher = TimeoutWatch(timeout=timeout)
+        for sample in TimeoutSampler(
             wait_timeout=timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        samples = TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
             sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=lambda: self.instance.get("status", {}).get("readyToUse") == status,

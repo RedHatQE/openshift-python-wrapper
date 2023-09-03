@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from ocp_resources.utils import TimeoutSampler, TimeoutWatch
 
 
 class Deployment(NamespacedResource):
@@ -39,8 +39,18 @@ class Deployment(NamespacedResource):
             TimeoutExpiredError: If not availableReplicas is equal to replicas.
         """
         self.logger.info(f"Wait for {self.kind} {self.name} to be deployed: {deployed}")
-        samples = TimeoutSampler(
+
+        timeout_watcher = TimeoutWatch(timeout=timeout)
+        for sample in TimeoutSampler(
             wait_timeout=timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        samples = TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
             sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=lambda: self.instance,

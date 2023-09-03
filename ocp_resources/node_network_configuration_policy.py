@@ -9,7 +9,7 @@ from ocp_resources.node_network_configuration_enactment import (
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -355,8 +355,17 @@ class NodeNetworkConfigurationPolicy(Resource):
                 return condition["reason"]
 
     def wait_for_configuration_conditions_unknown_or_progressing(self, wait_timeout=30):
-        samples = TimeoutSampler(
+        timeout_watcher = TimeoutWatch(timeout=wait_timeout)
+        for sample in TimeoutSampler(
             wait_timeout=wait_timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        samples = TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
             sleep=1,
             func=lambda: self.instance.status.conditions,
         )
