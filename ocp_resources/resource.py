@@ -31,6 +31,7 @@ from ocp_resources.event import Event
 from ocp_resources.utils import (
     TimeoutExpiredError,
     TimeoutSampler,
+    TimeoutWatch,
     skip_existing_resource_creation_teardown,
 )
 
@@ -915,8 +916,17 @@ class Resource:
             f" '{status}'"
         )
 
+        timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(
             wait_timeout=timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        for sample in TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
             sleep=1,
             func=lambda: self.instance,
         ):
@@ -952,8 +962,19 @@ class Resource:
             return response.data
 
     def wait_for_conditions(self):
+        timeout_watcher = TimeoutWatch(timeout=30)
+        for sample in TimeoutSampler(
+            wait_timeout=30,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
         samples = TimeoutSampler(
-            wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
+            wait_timeout=timeout_watcher.remaining_time(),
+            sleep=1,
+            func=lambda: self.instance.status.conditions,
         )
         for sample in samples:
             if sample:
