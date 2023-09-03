@@ -801,16 +801,19 @@ class Resource:
     def retry_cluster_exceptions(
         func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-        sampler = TimeoutSampler(
-            wait_timeout=10,
-            sleep=1,
-            func=func,
-            print_log=False,
-            exceptions_dict=exceptions_dict,
-            **kwargs,
-        )
-        for sample in sampler:
-            return sample
+        try:
+            sampler = TimeoutSampler(
+                wait_timeout=10,
+                sleep=1,
+                func=func,
+                print_log=False,
+                exceptions_dict=exceptions_dict,
+                **kwargs,
+            )
+            for sample in sampler:
+                return sample
+        except TimeoutExpiredError:
+            return None
 
     @classmethod
     def get(
