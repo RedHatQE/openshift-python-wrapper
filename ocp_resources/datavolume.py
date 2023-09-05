@@ -256,7 +256,7 @@ class DataVolume(NamespacedResource):
         scratch_pvc_prefix = (
             f"prime-{pvc_metadata.uid}"
             if pvc_metadata.annotations.get(
-                f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator"
+                f"{self.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator"
             )
             == "true"
             else self.name
