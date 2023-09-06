@@ -797,9 +797,8 @@ class Resource:
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
-    @staticmethod
     def retry_cluster_exceptions(
-        func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
+        self, func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
         try:
             sampler = TimeoutSampler(
@@ -812,7 +811,8 @@ class Resource:
             )
             for sample in sampler:
                 return sample
-        except TimeoutExpiredError:
+        except TimeoutExpiredError as ex:
+            self.logger.error(ex)
             return None
 
     @classmethod
@@ -837,7 +837,7 @@ class Resource:
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
-            generator: Generator of Resources of cls.kind
+            generator: Generator of Resources of cls.kind.
         """
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
