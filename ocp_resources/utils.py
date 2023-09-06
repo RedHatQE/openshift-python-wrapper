@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import yaml
@@ -123,7 +124,8 @@ class TimeoutSampler:
         timeout_watch = TimeoutWatch(timeout=self.wait_timeout)
         if self.print_log:
             LOGGER.info(
-                f"Waiting for {self.wait_timeout} seconds, retry every"
+                f"Waiting for {self.wait_timeout} seconds"
+                f" [{datetime.timedelta(seconds=self.wait_timeout)}], retry every"
                 f" {self.sleep} seconds. ({self._func_log})"
             )
 
@@ -146,7 +148,10 @@ class TimeoutSampler:
 
             finally:
                 if self.elapsed_time and self.print_log:
-                    LOGGER.info(f"Elapsed time: {self.elapsed_time}")
+                    LOGGER.info(
+                        "Elapsed time:"
+                        f" {self.elapsed_time} [{datetime.timedelta(seconds=self.elapsed_time)}]"
+                    )
 
         raise TimeoutExpiredError(self._get_exception_log(exp=last_exp))
 
