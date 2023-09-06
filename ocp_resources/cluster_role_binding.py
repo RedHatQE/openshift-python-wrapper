@@ -6,19 +6,23 @@ from ocp_resources.resource import Resource
 
 class ClusterRoleBinding(Resource):
     """
-    ClusterRoleBinding object.
+    https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding
     """
 
     api_group = Resource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
 
     def __init__(
         self,
-        name=None,
         cluster_role=None,
         subjects=None,
         **kwargs,
     ):
-        super().__init__(name=name, **kwargs)
+        """
+        Args:
+            cluster_role (ClusterRole): Specifies the binding to a ClusterRole
+            subjects (list, optional): User subjects that are authorised to access the cluster role
+        """
+        super().__init__(**kwargs)
         self.cluster_role = cluster_role
         self.subjects = subjects
 
