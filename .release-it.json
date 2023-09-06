@@ -21,7 +21,7 @@
       "--follow-tags"
     ],
     "pushRepo": "",
-    "changelog": "git log --pretty=format:\"* %s (%h) by %cn on %as\" ${from}...${to}"
+    "changelog": "git log --pretty=format:\"* %s (%h) by %an on %as\" ${from}...${to}"
   },
   "github": {
     "release": true,
