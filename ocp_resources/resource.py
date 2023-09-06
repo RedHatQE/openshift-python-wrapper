@@ -733,7 +733,7 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        with contextlib.suppress(TimeoutExpiredError, AttributeError):
+        with contextlib.suppress(TimeoutExpiredError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
@@ -797,23 +797,20 @@ class Resource:
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
+    @staticmethod
     def retry_cluster_exceptions(
-        self, func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
+        func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-        try:
-            sampler = TimeoutSampler(
-                wait_timeout=10,
-                sleep=1,
-                func=func,
-                print_log=False,
-                exceptions_dict=exceptions_dict,
-                **kwargs,
-            )
-            for sample in sampler:
-                return sample
-        except TimeoutExpiredError as ex:
-            self.logger.error(ex)
-            return None
+        sampler = TimeoutSampler(
+            wait_timeout=10,
+            sleep=1,
+            func=func,
+            print_log=False,
+            exceptions_dict=exceptions_dict,
+            **kwargs,
+        )
+        for sample in sampler:
+            return sample
 
     @classmethod
     def get(
@@ -852,13 +849,9 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        res = Resource.retry_cluster_exceptions(
+        return Resource.retry_cluster_exceptions(
             func=_get, exceptions_dict=exceptions_dict
         )
-        if not res:
-            raise TimeoutExpiredError(value="Resource._get")
-
-        return res
 
     @property
     def instance(self):
@@ -1439,14 +1432,10 @@ class ResourceEditor:
     def _apply_patches_sampler(self, patches, action_text, action):
         exceptions_dict = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
-        res = Resource.retry_cluster_exceptions(
+        return Resource.retry_cluster_exceptions(
             func=self._apply_patches,
             exceptions_dict=exceptions_dict,
             patches=patches,
             action_text=action_text,
             action=action,
         )
-        if not res:
-            raise TimeoutExpiredError(value="ResourceEditor._apply_patches_sampler")
-
-        return res
