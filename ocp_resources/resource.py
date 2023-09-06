@@ -852,9 +852,13 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource.retry_cluster_exceptions(
+        res = Resource.retry_cluster_exceptions(
             func=_get, exceptions_dict=exceptions_dict
         )
+        if not res:
+            raise TimeoutExpiredError(value="Resource._get")
+
+        return res
 
     @property
     def instance(self):
@@ -1435,10 +1439,14 @@ class ResourceEditor:
     def _apply_patches_sampler(self, patches, action_text, action):
         exceptions_dict = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
-        return Resource.retry_cluster_exceptions(
+        res = Resource.retry_cluster_exceptions(
             func=self._apply_patches,
             exceptions_dict=exceptions_dict,
             patches=patches,
             action_text=action_text,
             action=action,
         )
+        if not res:
+            raise TimeoutExpiredError(value="ResourceEditor._apply_patches_sampler")
+
+        return res
