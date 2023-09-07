@@ -243,15 +243,6 @@ class DataVolume(NamespacedResource):
         )
 
     @property
-    def deployed_by_populators(self):
-        return (
-            self.pvc.instance.metadata.annotations.get(
-                f"{self.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator"
-            )
-            == "true"
-        )
-
-    @property
     def pvc(self):
         return PersistentVolumeClaim(
             client=self.privileged_client or self.client,
@@ -263,7 +254,7 @@ class DataVolume(NamespacedResource):
     def scratch_pvc(self):
         scratch_pvc_prefix = (
             f"prime-{self.pvc.instance.metadata.uid}"
-            if self.is_deployed_by_populators
+            if self.pvc.use_populator
             else self.name
         )
         return PersistentVolumeClaim(
