@@ -732,7 +732,7 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        with contextlib.suppress(TimeoutExpiredError, AttributeError):
+        with contextlib.suppress(TimeoutExpiredError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
@@ -800,19 +800,16 @@ class Resource:
     def retry_cluster_exceptions(
         func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-        try:
-            sampler = TimeoutSampler(
-                wait_timeout=10,
-                sleep=1,
-                func=func,
-                print_log=False,
-                exceptions_dict=exceptions_dict,
-                **kwargs,
-            )
-            for sample in sampler:
-                return sample
-        except TimeoutExpiredError:
-            return None
+        sampler = TimeoutSampler(
+            wait_timeout=10,
+            sleep=1,
+            func=func,
+            print_log=False,
+            exceptions_dict=exceptions_dict,
+            **kwargs,
+        )
+        for sample in sampler:
+            return sample
 
     @classmethod
     def get(
@@ -836,7 +833,7 @@ class Resource:
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
-            generator: Generator of Resources of cls.kind
+            generator: Generator of Resources of cls.kind.
         """
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
