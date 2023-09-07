@@ -1,6 +1,6 @@
 import kubernetes
 import pytest
-from openshift.dynamic import DynamicClient
+from kubernetes.dynamic import DynamicClient
 
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
@@ -28,6 +28,7 @@ def test_create():
         pass
 
 
+@pytest.mark.kubevirt
 def test_vm(namespace):
     name = "test-vm"
     with VirtualMachine(

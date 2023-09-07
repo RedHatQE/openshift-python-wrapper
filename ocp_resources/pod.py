@@ -17,7 +17,7 @@ class ExecOnPodError(Exception):
 
     def __str__(self):
         return (
-            f"Command execution failure: "
+            "Command execution failure: "
             f"{self.cmd}, "
             f"RC: {self.rc}, "
             f"OUT: {self.out}, "

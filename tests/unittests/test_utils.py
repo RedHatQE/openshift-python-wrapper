@@ -23,7 +23,7 @@ class TestTimeoutSampler:
             continue
 
     @pytest.mark.parametrize(
-        "test_params, expected",
+        "test_params",
         [
             pytest.param(
                 {
@@ -31,9 +31,6 @@ class TestTimeoutSampler:
                         KeyError: [],
                     },
                     "runtime_exception": ValueError(),
-                },
-                {
-                    "raises": ValueError,
                 },
                 id="init_keyerror_raise_valueerror_with_no_msg",
             ),
@@ -43,9 +40,6 @@ class TestTimeoutSampler:
                         ValueError: ["allowed exception text"],
                     },
                     "runtime_exception": ValueError("test"),
-                },
-                {
-                    "raises": ValueError,
                 },
                 id="init_valueerror_with_msg_raise_valueerror_with_invalid_msg",
             ),
@@ -58,15 +52,12 @@ class TestTimeoutSampler:
                     },
                     "runtime_exception": IndexError("test"),
                 },
-                {
-                    "raises": IndexError,
-                },
                 id="init_multi_exceptions_raise_allowed_with_invalid_msg",
             ),
         ],
     )
-    def test_timeout_sampler_raises(self, test_params, expected):
-        with pytest.raises(expected["raises"]):
+    def test_timeout_sampler_raises(self, test_params):
+        with pytest.raises(TimeoutExpiredError):
             self._trigger_func_exception_during_iter(
                 exceptions_dict=test_params.get("init_exceptions_dict"),
                 runtime_exception=test_params.get("runtime_exception"),
@@ -122,7 +113,9 @@ class TestTimeoutSampler:
                     "runtime_exception": IndexError("my allowed exception text"),
                 },
                 {
-                    "exception_log_regex": "^.*\nLast exception: IndexError: my allowed exception text$",
+                    "exception_log_regex": (
+                        "^.*\nLast exception: IndexError: my allowed exception text$"
+                    ),
                 },
                 id="init_multi_exceptions_raise_allowed_with_allowed_msg",
             ),
@@ -142,6 +135,7 @@ class TestTimeoutSampler:
                 pattern=expected["exception_log_regex"], flags=re.DOTALL
             ).match(string=exception_log)
 
-        assert (
-            exception_match
-        ), f"Expected Regex: {expected['exception_log_regex']!r} Exception Log: {exception_log!r}"
+        assert exception_match, (
+            f"Expected Regex: {expected['exception_log_regex']!r} Exception Log:"
+            f" {exception_log!r}"
+        )

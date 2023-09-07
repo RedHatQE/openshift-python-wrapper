@@ -47,7 +47,8 @@ class Pipeline(NamespacedResource):
         if not self.yaml_file:
             if not (self.tasks or self.params or self.final_parallel_tasks):
                 raise ValueError(
-                    "spec is expected to have at least one of the optional fields, got none"
+                    "spec is expected to have at least one of the optional fields, got"
+                    " none"
                 )
             self.res["spec"] = {}
             if self.params:

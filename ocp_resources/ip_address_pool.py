@@ -44,7 +44,8 @@ class IPAddressPool(NamespacedResource):
         if not self.yaml_file:
             if not self.addresses:
                 raise ValueError(
-                    "Either required parameter is missing 'addresses' or provide yaml_file."
+                    "Either required parameter is missing 'addresses' or provide"
+                    " yaml_file."
                 )
 
             self.res["spec"] = {"addresses": self.addresses}

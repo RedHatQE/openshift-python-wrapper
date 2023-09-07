@@ -10,10 +10,13 @@ from signal import SIGINT, signal
 import kubernetes
 import yaml
 from benedict import benedict
-from kubernetes.dynamic.exceptions import ForbiddenError, MethodNotAllowedError
-from openshift.dynamic import DynamicClient
-from openshift.dynamic.exceptions import ConflictError, NotFoundError
-from openshift.dynamic.resource import ResourceField
+from kubernetes.dynamic import DynamicClient
+from kubernetes.dynamic.exceptions import (
+    ConflictError,
+    MethodNotAllowedError,
+    NotFoundError,
+)
+from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger
 
@@ -28,6 +31,7 @@ from ocp_resources.event import Event
 from ocp_resources.utils import (
     TimeoutExpiredError,
     TimeoutSampler,
+    TimeoutWatch,
     skip_existing_resource_creation_teardown,
 )
 
@@ -125,7 +129,10 @@ class KubeAPIVersion(Version):
             with contextlib.suppress(ValueError):
                 components[idx] = int(obj)
 
-        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
+        errmsg = (
+            f"version '{vstring}' does not conform to kubernetes api versioning"
+            " guidelines"
+        )
 
         if (
             len(components) not in (2, 4)
@@ -355,7 +362,8 @@ class Resource:
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
-                "Subclasses of Resource require self.api_group or self.api_version to be defined"
+                "Subclasses of Resource require self.api_group or self.api_version to"
+                " be defined"
             )
         self.namespace = None
         self.name = name
@@ -512,7 +520,8 @@ class Resource:
             check_exists=False,
         ):
             self.logger.warning(
-                f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
+                f"Skip resource {self.kind} {self.name} teardown. Got"
+                f" {_export_str}={skip_resource_teardown}"
             )
             return
 
@@ -625,7 +634,7 @@ class Resource:
         """
         try:
             return self.instance
-        except NotFoundError:
+        except TimeoutExpiredError:
             return None
 
     def client_wait_deleted(self, timeout):
@@ -673,12 +682,19 @@ class Resource:
             namespace=self.namespace,
         )
         current_status = None
+        last_logged_status = None
         try:
             for sample in samples:
                 if sample.items:
                     sample_status = sample.items[0].status
                     if sample_status:
                         current_status = sample_status.phase
+                        if current_status != last_logged_status:
+                            last_logged_status = current_status
+                            self.logger.info(
+                                f"Status of {self.kind} {self.name} is {current_status}"
+                            )
+
                         if current_status == status:
                             return
 
@@ -717,7 +733,7 @@ class Resource:
         resource_ = self.api.create(
             body=self.res, namespace=self.namespace, dry_run=self.dry_run
         )
-        with contextlib.suppress(NotFoundError, ForbiddenError):
+        with contextlib.suppress(TimeoutExpiredError, AttributeError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
@@ -785,16 +801,19 @@ class Resource:
     def retry_cluster_exceptions(
         func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
     ):
-        sampler = TimeoutSampler(
-            wait_timeout=10,
-            sleep=1,
-            func=func,
-            print_log=False,
-            exceptions_dict=exceptions_dict,
-            **kwargs,
-        )
-        for sample in sampler:
-            return sample
+        try:
+            sampler = TimeoutSampler(
+                wait_timeout=10,
+                sleep=1,
+                func=func,
+                print_log=False,
+                exceptions_dict=exceptions_dict,
+                **kwargs,
+            )
+            for sample in sampler:
+                return sample
+        except TimeoutExpiredError:
+            return None
 
     @classmethod
     def get(
@@ -803,6 +822,7 @@ class Resource:
         config_file=None,
         context=None,
         singular_name=None,
+        exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         *args,
         **kwargs,
     ):
@@ -814,6 +834,7 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -831,7 +852,9 @@ class Resource:
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource.retry_cluster_exceptions(func=_get)
+        return Resource.retry_cluster_exceptions(
+            func=_get, exceptions_dict=exceptions_dict
+        )
 
     @property
     def instance(self):
@@ -892,15 +915,28 @@ class Resource:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
         self.logger.info(
-            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'"
+            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be"
+            f" '{status}'"
         )
-        for sample in self.watcher(timeout=timeout):
-            for cond in sample["raw_object"].get("status", {}).get("conditions", []):
-                if cond["type"] == condition and cond["status"] == status:
-                    return
-        raise TimeoutExpiredError(
-            value=f"condition {condition} not in desired status {status} after {timeout} seconds"
-        )
+
+        timeout_watcher = TimeoutWatch(timeout=timeout)
+        for sample in TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        for sample in TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
+            sleep=1,
+            func=lambda: self.instance,
+        ):
+            if sample:
+                for cond in sample.get("status", {}).get("conditions", []):
+                    if cond["type"] == condition and cond["status"] == status:
+                        return
 
     def api_request(self, method, action, url, **params):
         """
@@ -929,8 +965,19 @@ class Resource:
             return response.data
 
     def wait_for_conditions(self):
+        timeout_watcher = TimeoutWatch(timeout=30)
+        for sample in TimeoutSampler(
+            wait_timeout=30,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
         samples = TimeoutSampler(
-            wait_timeout=30, sleep=1, func=lambda: self.instance.status.conditions
+            wait_timeout=timeout_watcher.remaining_time(),
+            sleep=1,
+            func=lambda: self.instance.status.conditions,
         )
         for sample in samples:
             if sample:
@@ -1103,8 +1150,8 @@ class NamespacedResource(Resource):
             dyn_client (DynamicClient): Open connection to remote cluster
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
-            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource
-            raw (bool): If True return raw object from openshift-restclient-python
+            singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            raw (bool): If True return raw object.
 
 
         Returns:
@@ -1144,7 +1191,11 @@ class NamespacedResource(Resource):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
-        return self.api.get(name=self.name, namespace=self.namespace)
+
+        def _instance():
+            return self.api.get(name=self.name, namespace=self.namespace)
+
+        return self.retry_cluster_exceptions(func=_instance)
 
     def _base_body(self):
         if not self.res:
@@ -1245,7 +1296,7 @@ class ResourceEditor:
                         self._backups[resource] = backup
                     else:
                         LOGGER.warning(
-                            f"ResourceEdit: no diff found in patch for "
+                            "ResourceEdit: no diff found in patch for "
                             f"{resource.name} -- skipping"
                         )
                 if not resource_to_patch:

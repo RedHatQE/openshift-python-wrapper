@@ -52,7 +52,9 @@ class NetworkAttachmentDefinition(NamespacedResource):
         if not self.yaml_file:
             if self.resource_name is not None:
                 self.res["metadata"]["annotations"] = {
-                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": self.resource_name
+                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": (
+                        self.resource_name
+                    )
                 }
             self.res["spec"] = {}
             if self.config:
@@ -197,3 +199,37 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
     @property
     def resource_name(self):
         return f"ovs-cni.network.kubevirt.io/{self.bridge_name}"
+
+
+class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
+    def __init__(
+        self,
+        network_name=None,
+        **kwargs,
+    ):
+        """
+        Create and manage an OVN k8s overlay NetworkAttachmentDefinition (a switched, layer 2, topology network).
+
+        API reference:
+        https://docs.openshift.com/container-platform/4.13/networking/multiple_networks/configuring-additional-network.html#configuration-ovnk-network-plugin-json-object_configuring-additional-network
+
+        Args:
+            network_name (str): The name of the network. This field is mandatory when not using yaml
+                file.
+        """
+        super().__init__(
+            cni_type="ovn-k8s-cni-overlay",
+            **kwargs,
+        )
+        self.network_name = network_name
+
+    def to_dict(self):
+        super().to_dict()
+        if not self.yaml_file:
+            if not self.network_name:
+                raise ValueError("network_name is required")
+            spec_config = self.res["spec"]["config"]
+            spec_config["name"] = self.network_name
+            spec_config["netAttachDefName"] = f"{self.namespace}/{self.name}"
+            spec_config["topology"] = "layer2"
+            self.res["spec"]["config"] = json.dumps(spec_config)

@@ -16,51 +16,50 @@ exclude = '''
 line_length = 88
 profile = "black"
 
-
-[build-system]
-requires = ["setuptools>=61.2"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "openshift-python-wrapper"
-authors = [
-    {name = "Meni Yakove", email = "myakove@gmail.com"},
-    {name = "Ruth Netser", email = "rnetser@gmail.com"}
-]
-description = "Wrapper around https://github.com/openshift/openshift-restclient-python"
+version = "0.0.0"
+description = "Wrapper around https://github.com/kubernetes-client/python"
+authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
+readme = "README.md"
+license = "Apache-2.0"
+packages = [{include = "ocp_resources"}]
+homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
+documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
+keywords = ["Openshift", "Kubevirt", "CNV"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.7"
-keywords = ["Openshift", "Kubevirt", "CNV"]
-dependencies = [
-    "openshift",
-    "xmltodict",
-    "urllib3",
-    "colorlog",
-    "packaging",
-    "kubernetes",
-    "python-simple-logger",
-    "python-benedict"
-]
-dynamic = ["version"]
-# ...
-[tool.setuptools.dynamic]
-version = {file = "VERSION"}
 
-[project.readme]
-file = "README.md"
-content-type = "text/markdown"
-
-[project.urls]
-Homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
+[tool.poetry.urls]
 Download = "https://pypi.org/project/openshift-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
-Documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 
-[tool.setuptools]
-include-package-data = true
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
 
-[tool.setuptools.packages.find]
-include = ["ocp_resources"]
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^7.4.0"
+requests = "^2.31.0"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["VERSION"]
+
+[tool.poetry-dynamic-versioning]
+enable = true
+pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+xmltodict = "^0.13.0"
+colorlog = "^6.7.0"
+kubernetes = "^27.2.0"
+python-benedict = "^0.32.0"
+packaging = "^23.1"
+python-simple-logger = "^1.0.6"

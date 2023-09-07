@@ -104,16 +104,26 @@ class MachineSet(NamespacedResource):
                 "selector": {
                     "matchLabels": {
                         f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                        f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
+                        f"{self.api_group}/{_cluster_api_machineset}": (
+                            f"{self.cluster_name}-{self.machine_role}"
+                        ),
                     }
                 },
                 "template": {
                     _metadata: {
                         _labels: {
-                            f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                            f"{self.api_group}/{_cluster_api_machine_role}": self.machine_role,
-                            f"{self.api_group}/{_cluster_api_machine_type}": self.machine_type,
-                            f"{self.api_group}/{_cluster_api_machineset}": f"{self.cluster_name}-{self.machine_role}",
+                            f"{self.api_group}/{_cluster_api_cluster}": (
+                                self.cluster_name
+                            ),
+                            f"{self.api_group}/{_cluster_api_machine_role}": (
+                                self.machine_role
+                            ),
+                            f"{self.api_group}/{_cluster_api_machine_type}": (
+                                self.machine_type
+                            ),
+                            f"{self.api_group}/{_cluster_api_machineset}": (
+                                f"{self.cluster_name}-{self.machine_role}"
+                            ),
                         }
                     },
                     _spec: {"providerSpec": self.provider_spec},
@@ -156,8 +166,9 @@ class MachineSet(NamespacedResource):
             )
         except TimeoutExpiredError:
             self.logger.error(
-                f"Machine-set {self.name} replicas failed to reach into 'ready' state, actual ready replicas: "
-                f"{self.ready_replicas}, desired replicas: {self.desired_replicas}"
+                f"Machine-set {self.name} replicas failed to reach into 'ready' state,"
+                f" actual ready replicas: {self.ready_replicas}, desired replicas:"
+                f" {self.desired_replicas}"
             )
             return False
 
@@ -180,7 +191,8 @@ class MachineSet(NamespacedResource):
         self.res.update({"spec": {"replicas": replicas}})
 
         self.logger.info(
-            f"Scale machine-set from {self.desired_replicas} replicas to {replicas} replicas"
+            f"Scale machine-set from {self.desired_replicas} replicas to"
+            f" {replicas} replicas"
         )
         self.update(resource_dict=self.res)
         if wait:

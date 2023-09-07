@@ -1,7 +1,7 @@
 import shlex
 
 import xmltodict
-from openshift.dynamic.exceptions import ResourceNotFoundError
+from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.node import Node
@@ -86,7 +86,9 @@ class VirtualMachineInstance(NamespacedResource):
         else:
             return pods[0]
 
-        raise ResourceNotFoundError
+        raise ResourceNotFoundError(
+            f"VIRT launcher POD not found for {self.kind}:{self.name}"
+        )
 
     @property
     def virt_handler_pod(self):
@@ -118,14 +120,19 @@ class VirtualMachineInstance(NamespacedResource):
             self.wait_for_status(
                 status=self.Status.RUNNING, timeout=timeout, stop_status=stop_status
             )
-        except TimeoutExpiredError:
+        except TimeoutExpiredError as sampler_ex:
             if not logs:
                 raise
-
-            virt_pod = self.virt_launcher_pod
-            if virt_pod:
+            try:
+                virt_pod = self.virt_launcher_pod
+                self.logger.error(
+                    f"Status of virt-launcher pod {virt_pod.name}: {virt_pod.status}"
+                )
                 self.logger.debug(f"{virt_pod.name} *****LOGS*****")
                 self.logger.debug(virt_pod.log(container="compute"))
+            except ResourceNotFoundError as virt_pod_ex:
+                self.logger.error(virt_pod_ex)
+                raise sampler_ex
 
             raise
 
@@ -142,8 +149,7 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If resource not exists.
         """
         self.logger.info(
-            f"Wait until {self.kind} {self.name} is "
-            f"{'Paused' if pause else 'Unpuased'}"
+            f"Wait until {self.kind} {self.name} is {'Paused' if pause else 'Unpuased'}"
         )
         self.wait_for_domstate_pause_status(pause=pause, timeout=timeout)
         self.wait_for_vmi_condition_pause_status(pause=pause, timeout=timeout)
@@ -199,7 +205,8 @@ class VirtualMachineInstance(NamespacedResource):
 
     def virsh_cmd(self, action):
         return shlex.split(
-            f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
+            "virsh"
+            f" {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
         )
 
     def get_xml(self):

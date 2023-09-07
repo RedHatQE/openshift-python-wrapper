@@ -76,7 +76,8 @@ class CronJob(NamespacedResource):
         if not self.yaml_file:
             if not (self.job_template and self.schedule):
                 raise ValueError(
-                    "yaml_file or parameters 'job_template' and 'schedule' are required."
+                    "yaml_file or parameters 'job_template' and 'schedule' are"
+                    " required."
                 )
             self.res.update(
                 {

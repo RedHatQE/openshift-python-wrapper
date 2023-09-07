@@ -224,7 +224,8 @@ class VirtualMachineImport(NamespacedResource):
         cond_type=Condition.SUCCEEDED,
     ):
         self.logger.info(
-            f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}"
+            f"Wait for {self.kind} {self.name} {cond_reason} condition to be"
+            f" {cond_status}"
         )
         samples = TimeoutSampler(
             wait_timeout=timeout,
@@ -256,8 +257,9 @@ class VirtualMachineImport(NamespacedResource):
                                 return
         except TimeoutExpiredError:
             raise TimeoutExpiredError(
-                f"Last condition of {self.kind} {self.name} {last_condition.type} was "
-                f"{last_condition.status} ({last_condition.reason}: {last_condition.message})"
+                f"Last condition of {self.kind} {self.name} {last_condition.type} was"
+                f" {last_condition.status} ({last_condition.reason}:"
+                f" {last_condition.message})"
             )
 
 
