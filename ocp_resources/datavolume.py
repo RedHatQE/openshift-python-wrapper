@@ -242,7 +242,8 @@ class DataVolume(NamespacedResource):
             status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
         )
 
-    def is_deployed_by_populators(self):
+    @property
+    def deployed_by_populators(self):
         return (
             self.pvc.instance.metadata.annotations.get(
                 f"{self.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator"
