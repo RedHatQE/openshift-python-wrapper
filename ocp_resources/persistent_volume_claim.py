@@ -108,3 +108,12 @@ class PersistentVolumeClaim(NamespacedResource):
         return self.instance.metadata.annotations.get(
             "volume.kubernetes.io/selected-node"
         )
+
+    @property
+    def use_populator(self):
+        return (
+            self.instance.metadata.annotations.get(
+                f"{self.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator"
+            )
+            == "true"
+        )
