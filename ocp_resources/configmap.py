@@ -3,7 +3,7 @@ from ocp_resources.resource import NamespacedResource
 
 class ConfigMap(NamespacedResource):
     """
-    https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#configmap-v1-core
+    https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/config-map-v1/
     """
 
     api_version = NamespacedResource.ApiVersion.V1
@@ -15,7 +15,7 @@ class ConfigMap(NamespacedResource):
     ):
         """
         Args:
-            data (dict): key-value configuration pairs.
+            data (dict, optional): key-value configuration pairs.
         """
         super().__init__(**kwargs)
         self.data = data
