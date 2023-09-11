@@ -28,7 +28,8 @@ class ControllerRevision(NamespacedResource):
         if not self.yaml_file:
             if not (self.owner_references and self.revision_object):
                 raise ValueError(
-                    "Passing yaml_file or parameters 'owner_references' and 'revision_object' is required."
+                    "Passing yaml_file or parameters 'owner_references' and"
+                    " 'revision_object' is required."
                 )
             if self.owner_references:
                 self.res.setdefault("metadata", {}).update(
