@@ -30,7 +30,9 @@ class ClusterRoleBinding(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.cluster_role:
-                raise ValueError("Passing yaml_file or parameter 'cluster_role' is required.")
+                raise ValueError(
+                    "Passing yaml_file or parameter 'cluster_role' is required."
+                )
             self.res.setdefault("roleRef", {})
             self.res["roleRef"] = {
                 "apiGroup": self.api_group,
