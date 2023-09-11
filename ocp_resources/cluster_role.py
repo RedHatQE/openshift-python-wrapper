@@ -4,8 +4,7 @@ from ocp_resources.resource import Resource
 
 class ClusterRole(Resource):
     """
-    ClusterRole in kubernetes 'authorization-resources' official API:
-        https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-v1/
+    https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-v1/
     """
 
     api_group = Resource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
