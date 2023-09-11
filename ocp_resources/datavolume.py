@@ -252,13 +252,9 @@ class DataVolume(NamespacedResource):
 
     @property
     def scratch_pvc(self):
-        pvc_metadata = self.pvc.instance.metadata
         scratch_pvc_prefix = (
-            f"prime-{pvc_metadata.uid}"
-            if pvc_metadata.annotations.get(
-                f"{self.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator"
-            )
-            == "true"
+            f"prime-{self.pvc.instance.metadata.uid}"
+            if self.pvc.use_populator
             else self.name
         )
         return PersistentVolumeClaim(
