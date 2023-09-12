@@ -3,7 +3,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/PyCQA/autoflake
-    rev: "v2.2.0"
+    rev: "v2.2.1"
     hooks:
       - id: autoflake
         args:
@@ -22,7 +22,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/psf/black
-    rev: "23.7.0"
+    rev: "23.9.1"
     hooks:
     - id: black
       args: [--preview]
