@@ -246,6 +246,7 @@ class Resource:
         BATCH = "batch"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CLONE_KUBEVIRT_IO = "clone.kubevirt.io"
+        CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO = "cluster.open-cluster-management.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         COORDINATION_K8S_IO = "coordination.k8s.io"
