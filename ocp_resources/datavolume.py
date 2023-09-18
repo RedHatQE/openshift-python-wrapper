@@ -253,7 +253,7 @@ class DataVolume(NamespacedResource):
     @property
     def scratch_pvc(self):
         scratch_pvc_prefix = (
-            f"prime-{self.pvc.instance.metadata.uid}"
+            self.pvc.prime_pvc.name
             if self.pvc.use_populator
             else self.name
         )
