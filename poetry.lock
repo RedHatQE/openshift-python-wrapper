@@ -624,13 +624,12 @@ files = [
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.6"
+version = "1.0.7"
 description = "A simple logger for python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "python_simple_logger-1.0.6-py3-none-any.whl", hash = "sha256:5a556e56f2739a9b1d2deb2e793fc6b28b03eafddb498dbf8f8b625818fe4dec"},
-    {file = "python_simple_logger-1.0.6.tar.gz", hash = "sha256:7032fa65731c7e9387969773850752d1d923f8b06dfa69aa44b240545394e679"},
+    {file = "python_simple_logger-1.0.7.tar.gz", hash = "sha256:a6b724f253bf9bf34b48e2ac4b6b0f113ffe5440d4a177b3d3aabd06c3b13cf0"},
 ]
 
 [package.dependencies]
