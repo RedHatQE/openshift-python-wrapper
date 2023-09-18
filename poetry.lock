@@ -573,13 +573,13 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "python-benedict"
-version = "0.32.0"
+version = "0.32.1"
 description = "python-benedict is a dict subclass with keylist/keypath/keyattr support, normalized I/O operations (base64, csv, ini, json, pickle, plist, query-string, toml, xls, xml, yaml) and many utilities... for humans, obviously."
 optional = false
 python-versions = "*"
 files = [
-    {file = "python-benedict-0.32.0.tar.gz", hash = "sha256:f5e8e56cd8b510ef6655b881c4a1004a544f043211fa6c5b709532d08aef078a"},
-    {file = "python_benedict-0.32.0-py3-none-any.whl", hash = "sha256:46638bc34b527b3deba5fbd267572ba51f907b0b755c95e7e2f9243285c63d54"},
+    {file = "python-benedict-0.32.1.tar.gz", hash = "sha256:d669cbd0ca4e6cd9fbdc10b8f68ae57ac3224b49f7f55e9b2c13622c0434a148"},
+    {file = "python_benedict-0.32.1-py3-none-any.whl", hash = "sha256:61272f128ea5046399d261047b33d53e0836c951d9697b23a02d0723f9322e1d"},
 ]
 
 [package.dependencies]
