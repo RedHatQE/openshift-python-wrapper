@@ -117,3 +117,12 @@ class PersistentVolumeClaim(NamespacedResource):
             )
             == "true"
         )
+
+    @property
+    def prime_pvc(self):
+        if self.use_populator:
+            return PersistentVolumeClaim(
+                name=f"prime-{self.instance.metadata.uid}",
+                namespace=self.namespace,
+                client=self.client,
+            )
