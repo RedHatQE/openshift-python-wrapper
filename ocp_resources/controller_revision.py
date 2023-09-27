@@ -1,5 +1,6 @@
-from ocp_resources.resource import NamespacedResource
 import numpy
+
+from ocp_resources.resource import NamespacedResource
 
 
 class ControllerRevision(NamespacedResource):
