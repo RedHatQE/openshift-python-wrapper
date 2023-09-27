@@ -76,4 +76,4 @@ class Secret(NamespacedResource):
 
     @property
     def keys_to_hash(self):
-        return ["data"]
+        return ["data", "stringData"]
