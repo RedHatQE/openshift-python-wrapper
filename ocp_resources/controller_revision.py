@@ -1,4 +1,5 @@
 from ocp_resources.resource import NamespacedResource
+import numpy
 
 
 class ControllerRevision(NamespacedResource):
@@ -12,24 +13,29 @@ class ControllerRevision(NamespacedResource):
         self,
         owner_references=None,
         revision_object=None,
+        revision=None,
         **kwargs,
     ):
         """
         Args:
-            owner_references (list): List of objects depended on this object.
-            revision_object (int): indicates the revision of the state represented by Data.
+            owner_references (list, optional): List of objects depended on this object.
+            revision_object (object, optional): the Data Object representing the state.
+            revision (int64): indicates the revision of the state represented by Data.
         """
         super().__init__(**kwargs)
         self.owner_references = owner_references
         self.revision_object = revision_object
+        self.revision = numpy.int64(revision)
 
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            if not (self.owner_references and self.revision_object):
+            if not self.revision:
                 raise ValueError(
-                    "Passing yaml_file or parameters 'owner_references' and 'revision_object' is required."
+                    "Passing yaml_file or parameter 'revision' is required."
                 )
+            self.res.update({"revision": self.revision})
+
             if self.owner_references:
                 self.res.setdefault("metadata", {}).update(
                     {"ownerReference": self.owner_references}
