@@ -1,19 +1,15 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
 class DataImportCron(NamespacedResource):
     """
-    DataImportCron object.
+    https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_dataimportcron
     """
 
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
         image_stream=None,
         url=None,
         cert_configmap=None,
@@ -25,22 +21,25 @@ class DataImportCron(NamespacedResource):
         managed_data_source=None,
         imports_to_keep=None,
         bind_immediate_annotation=None,
-        teardown=True,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args:
+            garbage_collect (str, optional): whether old PVCs should be cleaned up after a new PVC is imported.
+                Options are "Outdated"/"Never".
+            imports_to_keep (int, optional): number of import PVCs to keep when garbage collecting.
+            managed_data_source(str, optional): specifies the name of the corresponding DataSource to manage.
+                DataSource has to be in the same namespace.
+            schedule (str, optional): specifies in cron format when and how often to look for new imports.
+            storage_class (str, optional): Name of the StorageClass required by the claim.
+            size (str): Size of the resources claim quantity. Format is size+size unit, for example: "5Gi".
+            url (str, optional): URL is the url of the registry source (starting with the scheme: docker, oci-archive).
+            cert_configmap (str, optional): CertConfigMap provides a reference to the Registry certs
+            image_stream (str, optional): ImageStream is the name of image stream for import
+            bind_immediate_annotation (bool, optional): when WaitForFirstConsumer is set in StorageClass and the
+                DataSource should be bound immediately.
+        """
+        super().__init__(**kwargs)
         self.image_stream = image_stream
         self.url = url
         self.cert_configmap = cert_configmap
