@@ -282,6 +282,9 @@ class Resource:
         NODE_LABELLER_KUBEVIRT_IO = "node-labeller.kubevirt.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
+        OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO = (
+            "observability.open-cluster-management.io"
+        )
         OCS_OPENSHIFT_IO = "ocs.openshift.io"
         OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO = "operator.open-cluster-management.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
