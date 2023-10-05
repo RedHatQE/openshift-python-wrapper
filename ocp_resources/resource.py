@@ -318,7 +318,7 @@ class Resource:
         VELERO_IO = "velero.io"
         VM_KUBEVIRT_IO = "vm.kubevirt.io"
         OBSERVABILITY_ADDON_IO = (
-            "observabilityaddons.observability.open-cluster-management.io"
+            f"observabilityaddons.{OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO}"
         )
 
     class ApiVersion:
