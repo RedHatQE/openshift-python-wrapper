@@ -285,6 +285,9 @@ class Resource:
         OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO = (
             "observability.open-cluster-management.io"
         )
+        OBSERVABILITY_ADDON_IO = (
+            f"observabilityaddons.{OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO}"
+        )
         OCS_OPENSHIFT_IO = "ocs.openshift.io"
         OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO = "operator.open-cluster-management.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
@@ -317,9 +320,6 @@ class Resource:
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
         VELERO_IO = "velero.io"
         VM_KUBEVIRT_IO = "vm.kubevirt.io"
-        OBSERVABILITY_ADDON_IO = (
-            f"observabilityaddons.{OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO}"
-        )
 
     class ApiVersion:
         V1 = "v1"
