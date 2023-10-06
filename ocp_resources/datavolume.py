@@ -328,7 +328,10 @@ class DataVolume(NamespacedResource):
                 func=lambda: self.exists,
             ):
                 # DV reach to success if the status is succeeded or if the DV does not exist
-                if sample is None or sample.status.phase == self.Status.SUCCEEDED:
+                if (
+                    sample is None
+                    or sample.get("status", {}).get("phase") == self.Status.SUCCEEDED
+                ):
                     break
                 elif stop_status_func and stop_status_func(
                     *stop_status_func_args, **stop_status_func_kwargs
