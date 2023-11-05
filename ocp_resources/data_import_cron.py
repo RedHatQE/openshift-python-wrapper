@@ -57,7 +57,7 @@ class DataImportCron(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.image_stream and self.url:
-                raise ValueError("imageStream and url can not coexist")
+                raise ValueError("imageStream and url cannot coexist")
             if not all(
                 [self.size, self.managed_data_source, self.pull_method, self.schedule]
             ):
