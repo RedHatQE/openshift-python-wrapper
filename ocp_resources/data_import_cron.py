@@ -103,4 +103,6 @@ class DataImportCron(NamespacedResource):
                 storage["resources"] = {"requests": {"storage": self.size}}
             if self.storage_class:
                 storage["storageClassName"] = self.storage_class
-            spec["storage"] = storage
+            if storage:
+                spec["storage"] = storage
+
