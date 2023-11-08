@@ -9,28 +9,28 @@ class DataImportCron(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
-        self,
-        image_stream=None,
-        url=None,
-        cert_configmap=None,
-        pull_method=None,
-        storage_class=None,
-        size=None,
-        schedule=None,
-        garbage_collect=None,
-        managed_data_source=None,
-        imports_to_keep=None,
-        bind_immediate_annotation=None,
-        **kwargs,
+            self,
+            image_stream=None,
+            url=None,
+            cert_configmap=None,
+            pull_method=None,
+            storage_class=None,
+            size=None,
+            schedule=None,
+            garbage_collect=None,
+            managed_data_source=None,
+            imports_to_keep=None,
+            bind_immediate_annotation=None,
+            **kwargs,
     ):
         """
         Args:
             garbage_collect (str, optional): whether old PVCs should be cleaned up after a new PVC is imported.
                 Options are "Outdated"/"Never".
             imports_to_keep (int, optional): number of import PVCs to keep when garbage collecting.
-            managed_data_source(str): specifies the name of the corresponding DataSource to manage.
+            managed_data_source(str, optional): specifies the name of the corresponding DataSource to manage.
                 DataSource has to be in the same namespace.
-            schedule (str): specifies in cron format when and how often to look for new imports.
+            schedule (str, optional): specifies in cron format when and how often to look for new imports.
             storage_class (str, optional): Name of the StorageClass required by the claim.
             size (str): Size of the resources claim quantity. Format is size+size unit, for example: "5Gi".
             url (str, optional): URL is the url of the registry source (starting with the scheme: docker, oci-archive).
@@ -58,13 +58,8 @@ class DataImportCron(NamespacedResource):
         if not self.yaml_file:
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url cannot coexist")
-            if not all(
-                [self.size, self.managed_data_source, self.pull_method, self.schedule]
-            ):
-                raise ValueError(
-                    "Passing yaml_file or parameters 'size', 'schedule',"
-                    " 'managed_data_source' and 'pull_method' is required."
-                )
+            if not self.pull_method:
+                raise ValueError("Passing yaml_file or parameter 'pull_method' is required")
             self.res.update(
                 {
                     "spec": {
@@ -72,9 +67,6 @@ class DataImportCron(NamespacedResource):
                             "spec": {
                                 "source": {
                                     "registry": {"pullMethod": self.pull_method}
-                                },
-                                "storage": {
-                                    "resources": {"requests": {"storage": self.size}}
                                 },
                             }
                         },
@@ -99,9 +91,15 @@ class DataImportCron(NamespacedResource):
                 spec["source"]["registry"]["url"] = self.url
             if self.cert_configmap:
                 spec["source"]["registry"]["certConfigMap"] = self.cert_configmap
-            if self.storage_class:
-                spec["storage"]["storageClassName"] = self.storage_class
             if self.garbage_collect:
                 self.res["spec"]["garbageCollect"] = self.garbage_collect
             if self.imports_to_keep:
                 self.res["spec"]["importsToKeep"] = self.imports_to_keep
+
+            storage = {}
+            if self.size:
+                storage["resources"] = {"requests": {"storage": self.size}}
+            if self.storage_class:
+                storage["storageClassName"] = self.storage_class
+            spec["storage"] = storage
+
