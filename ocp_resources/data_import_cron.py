@@ -9,19 +9,19 @@ class DataImportCron(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
-            self,
-            image_stream=None,
-            url=None,
-            cert_configmap=None,
-            pull_method=None,
-            storage_class=None,
-            size=None,
-            schedule=None,
-            garbage_collect=None,
-            managed_data_source=None,
-            imports_to_keep=None,
-            bind_immediate_annotation=None,
-            **kwargs,
+        self,
+        image_stream=None,
+        url=None,
+        cert_configmap=None,
+        pull_method=None,
+        storage_class=None,
+        size=None,
+        schedule=None,
+        garbage_collect=None,
+        managed_data_source=None,
+        imports_to_keep=None,
+        bind_immediate_annotation=None,
+        **kwargs,
     ):
         """
         Args:
@@ -59,7 +59,9 @@ class DataImportCron(NamespacedResource):
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url cannot coexist")
             if not self.pull_method:
-                raise ValueError("Passing yaml_file or parameter 'pull_method' is required")
+                raise ValueError(
+                    "Passing yaml_file or parameter 'pull_method' is required"
+                )
             self.res.update(
                 {
                     "spec": {
@@ -102,4 +104,3 @@ class DataImportCron(NamespacedResource):
             if self.storage_class:
                 storage["storageClassName"] = self.storage_class
             spec["storage"] = storage
-
