@@ -59,7 +59,9 @@ class DataImportCron(NamespacedResource):
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url cannot coexist")
             if not self.pull_method:
-                raise ValueError("Passing yaml_file or parameter 'pull_method' is required")
+                raise ValueError(
+                    "Passing yaml_file or parameter 'pull_method' is required"
+                )
             self.res.update(
                 {
                     "spec": {
@@ -102,4 +104,3 @@ class DataImportCron(NamespacedResource):
             if self.storage_class:
                 storage["storageClassName"] = self.storage_class
             spec["storage"] = storage
-
