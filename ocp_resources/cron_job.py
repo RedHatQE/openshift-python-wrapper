@@ -52,14 +52,12 @@ class CronJob(NamespacedResource):
                     "yaml_file or parameters 'job_template' and 'schedule' are"
                     " required."
                 )
-            self.res.update(
-                {
-                    "spec": {
-                        "jobTemplate": self.job_template,
-                        "schedule": self.schedule,
-                    }
+            self.res.update({
+                "spec": {
+                    "jobTemplate": self.job_template,
+                    "schedule": self.schedule,
                 }
-            )
+            })
             if self.timezone:
                 self.res["spec"]["timezone"] = self.timezone
             if self.suspend:

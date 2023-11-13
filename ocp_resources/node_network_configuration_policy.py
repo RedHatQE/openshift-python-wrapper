@@ -114,12 +114,10 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.node_selector:
             return list(Node.get(dyn_client=self.client, name=self.node_selector))
         if self.node_selector_labels:
-            node_labels = ",".join(
-                [
-                    f"{label_key}={label_value}"
-                    for label_key, label_value in self.node_selector_labels.items()
-                ]
-            )
+            node_labels = ",".join([
+                f"{label_key}={label_value}"
+                for label_key, label_value in self.node_selector_labels.items()
+            ])
             return list(Node.get(dyn_client=self.client, label_selector=node_labels))
 
     def set_interface(self, interface):

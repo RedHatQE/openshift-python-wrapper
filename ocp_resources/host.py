@@ -46,19 +46,17 @@ class Host(NamespacedResource, MTV):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "id": self.host_id,
-                        "ipAddress": self.ip_address,
-                        "secret": {
-                            "name": self.secret_name,
-                            "namespace": self.secret_namespace,
-                        },
-                        "provider": {
-                            "name": self.provider_name,
-                            "namespace": self.provider_namespace,
-                        },
-                    }
+            self.res.update({
+                "spec": {
+                    "id": self.host_id,
+                    "ipAddress": self.ip_address,
+                    "secret": {
+                        "name": self.secret_name,
+                        "namespace": self.secret_namespace,
+                    },
+                    "provider": {
+                        "name": self.provider_name,
+                        "namespace": self.provider_namespace,
+                    },
                 }
-            )
+            })

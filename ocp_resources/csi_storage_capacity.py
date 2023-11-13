@@ -39,11 +39,9 @@ class CSIStorageCapacity(NamespacedResource):
                 raise ValueError(
                     "yaml_file or parameter 'storage_class_name' is required."
                 )
-            self.res.update(
-                {
-                    "storageClassName": self.storage_class_name,
-                }
-            )
+            self.res.update({
+                "storageClassName": self.storage_class_name,
+            })
             if self.maximum_volume_size:
                 self.res["maximumVolumeSize"] = self.maximum_volume_size
             if self.node_topology:

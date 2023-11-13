@@ -38,9 +38,9 @@ class Route(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.service:
-                self.res.update(
-                    {"spec": {"to": {"kind": "Service", "name": self.service}}}
-                )
+                self.res.update({
+                    "spec": {"to": {"kind": "Service", "name": self.service}}
+                })
             if self.destination_ca_cert:
                 self.res["spec"]["tls"] = {
                     "destinationCACertificate": self.destination_ca_cert,

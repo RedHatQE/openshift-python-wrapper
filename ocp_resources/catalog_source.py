@@ -38,30 +38,26 @@ class CatalogSource(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            if not all(
-                [self.source_type, self.image, self.display_name, self.publisher]
-            ):
+            if not all([
+                self.source_type, self.image, self.display_name, self.publisher
+            ]):
                 raise ValueError(
                     "Passing yaml_file or all parameters 'source_type', 'image',"
                     " 'display_name' and 'publisher' is required."
                 )
-            self.res.update(
-                {
-                    "spec": {
-                        "sourceType": self.source_type,
-                        "image": self.image,
-                        "displayName": self.display_name,
-                        "publisher": self.publisher,
-                    }
+            self.res.update({
+                "spec": {
+                    "sourceType": self.source_type,
+                    "image": self.image,
+                    "displayName": self.display_name,
+                    "publisher": self.publisher,
                 }
-            )
+            })
             if self.update_strategy_registry_poll_interval:
-                self.res["spec"].update(
-                    {
-                        "updateStrategy": {
-                            "registryPoll": {
-                                "interval": self.update_strategy_registry_poll_interval,
-                            },
+                self.res["spec"].update({
+                    "updateStrategy": {
+                        "registryPoll": {
+                            "interval": self.update_strategy_registry_poll_interval,
                         },
-                    }
-                )
+                    },
+                })
