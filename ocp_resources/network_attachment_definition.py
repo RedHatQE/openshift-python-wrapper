@@ -154,9 +154,9 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         super().to_dict()
         if self.tuning_type:
             self.old_nad_format = True
-            self.res["spec"]["config"].setdefault("plugins", []).append(
-                {"type": self.tuning_type}
-            )
+            self.res["spec"]["config"].setdefault("plugins", []).append({
+                "type": self.tuning_type
+            })
 
         self.res["spec"]["config"] = json.dumps(self.res["spec"]["config"])
 

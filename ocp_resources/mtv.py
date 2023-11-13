@@ -125,9 +125,9 @@ class MTV:
                         condition_category == condition.category
                         or condition_category is None
                     )
-                    if all(
-                        [valid_status_type, valid_message, valid_reason, valid_category]
-                    ):
+                    if all([
+                        valid_status_type, valid_message, valid_reason, valid_category
+                    ]):
                         return
 
         except TimeoutExpiredError:

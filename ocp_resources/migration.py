@@ -46,16 +46,14 @@ class Migration(NamespacedResource, MTV):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "plan": {
-                            "name": self.plan_name,
-                            "namespace": self.plan_namespace,
-                        }
+            self.res.update({
+                "spec": {
+                    "plan": {
+                        "name": self.plan_name,
+                        "namespace": self.plan_namespace,
                     }
                 }
-            )
+            })
 
             if self.cut_over:
                 self.res["spec"]["cutover"] = self.cut_over.strftime(
