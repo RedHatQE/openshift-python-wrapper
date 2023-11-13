@@ -99,14 +99,12 @@ def get_client(config_file=None, config_dict=None, context=None):
 def sub_resource_level(current_class, owner_class, parent_class):
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
-    for class_iterator in reversed(
-        [
-            class_iterator
-            for class_iterator in current_class.mro()
-            if class_iterator not in owner_class.mro()
-            and issubclass(class_iterator, parent_class)
-        ]
-    ):
+    for class_iterator in reversed([
+        class_iterator
+        for class_iterator in current_class.mro()
+        if class_iterator not in owner_class.mro()
+        and issubclass(class_iterator, parent_class)
+    ]):
         return class_iterator.__name__
 
 

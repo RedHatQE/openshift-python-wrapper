@@ -41,12 +41,10 @@ class Restore(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "backupName": self.backup_name,
-                    }
+            self.res.update({
+                "spec": {
+                    "backupName": self.backup_name,
                 }
-            )
+            })
             if self.included_namespaces:
                 self.res["spec"]["includedNamespaces"] = self.included_namespaces

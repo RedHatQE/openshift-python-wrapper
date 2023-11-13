@@ -45,14 +45,12 @@ class Secret(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.accesskeyid:
-                self.res.update(
-                    {
-                        "data": {
-                            "accessKeyId": self.accesskeyid,
-                            "secretKey": self.secretkey,
-                        }
+                self.res.update({
+                    "data": {
+                        "accessKeyId": self.accesskeyid,
+                        "secretKey": self.secretkey,
                     }
-                )
+                })
             if self.htpasswd:
                 self.res.update({"data": {"htpasswd": self.htpasswd}})
             if self.data_dict:

@@ -56,15 +56,13 @@ class VirtualMachineExport(NamespacedResource):
                 raise ValueError(
                     "source_kind and source_name or a yaml_file is required"
                 )
-            self.res.update(
-                {
-                    "spec": {
-                        "tokenSecretRef": self.token_secret_ref,
-                        "source": {
-                            "apiGroup": self.source_api_group,
-                            "kind": self.source_kind,
-                            "name": self.source_name,
-                        },
-                    }
+            self.res.update({
+                "spec": {
+                    "tokenSecretRef": self.token_secret_ref,
+                    "source": {
+                        "apiGroup": self.source_api_group,
+                        "kind": self.source_kind,
+                        "name": self.source_name,
+                    },
                 }
-            )
+            })
