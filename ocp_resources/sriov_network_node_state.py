@@ -26,9 +26,7 @@ class SriovNetworkNodeState(NamespacedResource):
         return iface.totalvfs
 
     def wait_for_status_sync(self, wanted_status, timeout=1000):
-        self.logger.info(
-            f"Wait for {self.kind} {self.name} status to be {wanted_status}"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {wanted_status}")
         try:
             timeout_watcher = TimeoutWatch(timeout=timeout)
             for sample in TimeoutSampler(
@@ -47,8 +45,5 @@ class SriovNetworkNodeState(NamespacedResource):
                 if sample == wanted_status:
                     return
         except TimeoutExpiredError:
-            self.logger.error(
-                f"after {timeout} seconds, {self.name} status is"
-                f" {self.instance.status.syncStatus}"
-            )
+            self.logger.error(f"after {timeout} seconds, {self.name} status is" f" {self.instance.status.syncStatus}")
             raise

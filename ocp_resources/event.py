@@ -54,9 +54,7 @@ class Event:
             f" resource_version={resource_version}, timeout={timeout}"
         )
 
-        event_listener = dyn_client.resources.get(
-            api_version=cls.api_version, kind=cls.__name__
-        )
+        event_listener = dyn_client.resources.get(api_version=cls.api_version, kind=cls.__name__)
         yield from event_listener.watch(
             namespace=namespace,
             name=name,
