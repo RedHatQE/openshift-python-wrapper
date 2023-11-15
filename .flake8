@@ -12,7 +12,6 @@ exclude =
 
 fcn_exclude_functions =
     update,
-    getLogger,
     loads,
     get,
     next,
@@ -44,6 +43,7 @@ fcn_exclude_functions =
     signal,
     yaml,
     benedict,
+    logger,
 
 enable-extensions =
     FCN,
