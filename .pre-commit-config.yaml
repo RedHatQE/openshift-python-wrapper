@@ -21,7 +21,6 @@ repos:
       - id: flake8
         args: [--config=.flake8]
         additional_dependencies: [
-          "git+https://github.com/RedHatQE/flake8-plugins.git",
           "flake8-mutable",
         ]
 
