@@ -149,8 +149,7 @@ class TimeoutSampler:
             finally:
                 if self.elapsed_time and self.print_log:
                     LOGGER.info(
-                        "Elapsed time:"
-                        f" {self.elapsed_time} [{datetime.timedelta(seconds=self.elapsed_time)}]"
+                        "Elapsed time:" f" {self.elapsed_time} [{datetime.timedelta(seconds=self.elapsed_time)}]"
                     )
 
         raise TimeoutExpiredError(self._get_exception_log(exp=last_exp))
@@ -186,9 +185,7 @@ class TimeoutSampler:
         for entry in self.exceptions_dict:
             if isinstance(exp, entry):  # Check inheritance for raised exception
                 exception_messages = self.exceptions_dict.get(entry)
-                if self._is_exception_matched(
-                    exp=exp, exception_messages=exception_messages
-                ):
+                if self._is_exception_matched(exp=exp, exception_messages=exception_messages):
                     return False
 
         return True
@@ -224,9 +221,7 @@ class TimeoutWatch:
         return self.start_time + self.timeout - time.time()
 
 
-def skip_existing_resource_creation_teardown(
-    resource, export_str, user_exported_args, check_exists=True
-):
+def skip_existing_resource_creation_teardown(resource, export_str, user_exported_args, check_exists=True):
     """
     Args:
         resource (Resource): Resource to match against.
@@ -269,10 +264,7 @@ def skip_existing_resource_creation_teardown(
             )
 
         for _name, _namespace in _resource_args.items():
-            if resource_name == _name and (
-                resource_namespace == _namespace
-                or not (resource_namespace and _namespace)
-            ):
+            if resource_name == _name and (resource_namespace == _namespace or not (resource_namespace and _namespace)):
                 return _return_resource(
                     _resource=resource,
                     _check_exists=check_exists,

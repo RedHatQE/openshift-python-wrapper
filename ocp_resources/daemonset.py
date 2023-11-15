@@ -36,10 +36,7 @@ class DaemonSet(NamespacedResource):
                 status = sample.items[0].status
                 desired_number_scheduled = status.desiredNumberScheduled
                 number_ready = status.numberReady
-                if (
-                    desired_number_scheduled > 0
-                    and desired_number_scheduled == number_ready
-                ):
+                if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
                     return
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):

@@ -62,6 +62,4 @@ class SriovNetworkNodePolicy(NamespacedResource):
             if self.node_selector:
                 self.res["spec"]["nodeSelector"] = self.node_selector
             else:
-                self.res["spec"]["nodeSelector"] = {
-                    "feature.node.kubernetes.io/network-sriov.capable": "true"
-                }
+                self.res["spec"]["nodeSelector"] = {"feature.node.kubernetes.io/network-sriov.capable": "true"}

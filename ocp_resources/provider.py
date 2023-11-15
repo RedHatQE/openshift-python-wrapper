@@ -44,14 +44,16 @@ class Provider(NamespacedResource, MTV):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update({
-                "spec": {
-                    "type": self.provider_type,
-                    "url": self.url,
-                    "secret": {
-                        "name": self.secret_name,
-                        "namespace": self.secret_namespace,
-                    },
-                    "settings": {"vddkInitImage": self.vddk_init_image},
+            self.res.update(
+                {
+                    "spec": {
+                        "type": self.provider_type,
+                        "url": self.url,
+                        "secret": {
+                            "name": self.secret_name,
+                            "namespace": self.secret_namespace,
+                        },
+                        "settings": {"vddkInitImage": self.vddk_init_image},
+                    }
                 }
-            })
+            )

@@ -49,9 +49,7 @@ class MachineHealthCheck(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.reboot_strategy:
-                self.res["metadata"]["annotations"] = {
-                    f"{self.api_group}/remediation-strategy": "external-baremetal"
-                }
+                self.res["metadata"]["annotations"] = {f"{self.api_group}/remediation-strategy": "external-baremetal"}
             self.res.setdefault("spec", {})
             self.res["spec"]["nodeStartupTimeout"] = self.node_startup_timeout
             self.res["spec"]["maxUnhealthy"] = self.max_unhealthy
