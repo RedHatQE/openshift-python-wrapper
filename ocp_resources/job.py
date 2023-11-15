@@ -76,14 +76,10 @@ class Job(NamespacedResource):
                 self.res["spec"]["template"]["spec"]["containers"] = self.containers
 
                 if self.service_account:
-                    self.res["spec"]["template"]["spec"][
-                        "serviceAccount"
-                    ] = self.service_account
+                    self.res["spec"]["template"]["spec"]["serviceAccount"] = self.service_account
 
                 if self.restart_policy:
-                    self.res["spec"]["template"]["spec"][
-                        "restartPolicy"
-                    ] = self.restart_policy
+                    self.res["spec"]["template"]["spec"]["restartPolicy"] = self.restart_policy
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
@@ -98,7 +94,5 @@ class Job(NamespacedResource):
             bool: True if delete succeeded, False otherwise.
         """
         if not body and self.background_propagation_policy:
-            body = kubernetes.client.V1DeleteOptions(
-                propagation_policy=self.background_propagation_policy
-            )
+            body = kubernetes.client.V1DeleteOptions(propagation_policy=self.background_propagation_policy)
         return super().delete(wait=wait, timeout=timeout, body=body)

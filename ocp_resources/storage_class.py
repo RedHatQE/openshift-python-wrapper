@@ -42,9 +42,7 @@ class StorageClass(Resource):
         WaitForFirstConsumer = "WaitForFirstConsumer"
 
     class Annotations:
-        IS_DEFAULT_CLASS = (
-            f"{Resource.ApiGroup.STORAGECLASS_KUBERNETES_IO}/is-default-class"
-        )
+        IS_DEFAULT_CLASS = f"{Resource.ApiGroup.STORAGECLASS_KUBERNETES_IO}/is-default-class"
 
     class ReclaimPolicy:
         DELETE = "Delete"

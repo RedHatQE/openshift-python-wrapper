@@ -80,7 +80,5 @@ class CatalogSourceConfig(NamespacedResource):
 
         except TimeoutExpiredError:
             if current_status:
-                self.logger.error(
-                    f"Status of {self.kind} {self.name} is {current_status}"
-                )
+                self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
