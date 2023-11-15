@@ -31,7 +31,5 @@ def test_create():
 @pytest.mark.kubevirt
 def test_vm(namespace):
     name = "test-vm"
-    with VirtualMachine(
-        name=name, namespace=namespace.name, body=generate_yaml_from_template(name=name)
-    ):
+    with VirtualMachine(name=name, namespace=namespace.name, body=generate_yaml_from_template(name=name)):
         pass

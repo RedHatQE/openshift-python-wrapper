@@ -35,15 +35,11 @@ class Machine(NamespacedResource):
 
     @property
     def machine_role(self):
-        return self.instance.metadata.labels[
-            f"{self.api_group}/cluster-api-machine-role"
-        ]
+        return self.instance.metadata.labels[f"{self.api_group}/cluster-api-machine-role"]
 
     @property
     def machine_type(self):
-        return self.instance.metadata.labels[
-            f"{self.api_group}/cluster-api-machine-type"
-        ]
+        return self.instance.metadata.labels[f"{self.api_group}/cluster-api-machine-type"]
 
     @property
     def machineset_name(self):

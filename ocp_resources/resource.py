@@ -35,27 +35,21 @@ from ocp_resources.utils import (
     skip_existing_resource_creation_teardown,
 )
 
-LOGGER = get_logger(__name__)
+LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
 def _find_supported_resource(dyn_client, api_group, kind):
     results = dyn_client.resources.search(group=api_group, kind=kind)
-    sorted_results = sorted(
-        results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True
-    )
+    sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
     for result in sorted_results:
-        if KubeAPIVersion(result.api_version) <= KubeAPIVersion(
-            MAX_SUPPORTED_API_VERSION
-        ):
+        if KubeAPIVersion(result.api_version) <= KubeAPIVersion(MAX_SUPPORTED_API_VERSION):
             return result
 
 
 def _get_api_version(dyn_client, api_group, kind):
     # Returns api_group/api_version
-    res = _find_supported_resource(
-        dyn_client=dyn_client, api_group=api_group, kind=kind
-    )
+    res = _find_supported_resource(dyn_client=dyn_client, api_group=api_group, kind=kind)
     if not res:
         log = f"Couldn't find {kind} in {api_group} api group"
         LOGGER.warning(log)
@@ -103,8 +97,7 @@ def sub_resource_level(current_class, owner_class, parent_class):
         [
             class_iterator
             for class_iterator in current_class.mro()
-            if class_iterator not in owner_class.mro()
-            and issubclass(class_iterator, parent_class)
+            if class_iterator not in owner_class.mro() and issubclass(class_iterator, parent_class)
         ]
     ):
         return class_iterator.__name__
@@ -129,20 +122,11 @@ class KubeAPIVersion(Version):
             with contextlib.suppress(ValueError):
                 components[idx] = int(obj)
 
-        errmsg = (
-            f"version '{vstring}' does not conform to kubernetes api versioning"
-            " guidelines"
-        )
+        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning" " guidelines"
 
-        if (
-            len(components) not in (2, 4)
-            or components[0] != "v"
-            or not isinstance(components[1], int)
-        ):
+        if len(components) not in (2, 4) or components[0] != "v" or not isinstance(components[1], int):
             raise ValueError(errmsg)
-        if len(components) == 4 and (
-            components[2] not in ("alpha", "beta") or not isinstance(components[3], int)
-        ):
+        if len(components) == 4 and (components[2] not in ("alpha", "beta") or not isinstance(components[3], int)):
             raise ValueError(errmsg)
 
         self.version = components
@@ -274,17 +258,13 @@ class Resource:
         METRICS_K8S_IO = "metrics.k8s.io"
         MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
-        NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = (
-            "networkaddonsoperator.network.kubevirt.io"
-        )
+        NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = "networkaddonsoperator.network.kubevirt.io"
         NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
         NODE_LABELLER_KUBEVIRT_IO = "node-labeller.kubevirt.io"
         NMSTATE_IO = "nmstate.io"
         NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
-        OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO = (
-            "observability.open-cluster-management.io"
-        )
+        OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO = "observability.open-cluster-management.io"
         OCS_OPENSHIFT_IO = "ocs.openshift.io"
         OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO = "operator.open-cluster-management.io"
         OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
@@ -367,8 +347,7 @@ class Resource:
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
             raise NotImplementedError(
-                "Subclasses of Resource require self.api_group or self.api_version to"
-                " be defined"
+                "Subclasses of Resource require self.api_group or self.api_version to" " be defined"
             )
         self.namespace = None
         self.name = name
@@ -442,9 +421,7 @@ class Resource:
                 "metadata": {"name": self.name},
             }
             if self.label:
-                self.res.setdefault("metadata", {}).setdefault("labels", {}).update(
-                    self.label
-                )
+                self.res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
 
     def to_dict(self):
         """
@@ -525,8 +502,7 @@ class Resource:
             check_exists=False,
         ):
             self.logger.warning(
-                f"Skip resource {self.kind} {self.name} teardown. Got"
-                f" {_export_str}={skip_resource_teardown}"
+                f"Skip resource {self.kind} {self.name} teardown. Got" f" {_export_str}={skip_resource_teardown}"
             )
             return
 
@@ -535,9 +511,7 @@ class Resource:
     @classmethod
     def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
         if not cls.api_version:
-            cls.api_version = _get_api_version(
-                dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind
-            )
+            cls.api_version = _get_api_version(dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind)
 
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
         return dyn_client.resources.get(
@@ -558,9 +532,7 @@ class Resource:
             self.client = get_client(config_file=self.config_file, context=self.context)
 
         if not self.api_version:
-            self.api_version = _get_api_version(
-                dyn_client=self.client, api_group=self.api_group, kind=self.kind
-            )
+            self.api_version = _get_api_version(dyn_client=self.client, api_group=self.api_group, kind=self.kind)
 
     def full_api(self, **kwargs):
         """
@@ -585,9 +557,7 @@ class Resource:
 
         kwargs = self._prepare_singular_name_kwargs(**kwargs)
 
-        return self.client.resources.get(
-            api_version=self.api_version, kind=self.kind, **kwargs
-        )
+        return self.client.resources.get(api_version=self.api_version, kind=self.kind, **kwargs)
 
     @property
     def api(self):
@@ -652,16 +622,12 @@ class Resource:
         Raises:
             TimeoutExpiredError: If resource still exists.
         """
-        samples = TimeoutSampler(
-            wait_timeout=timeout, sleep=1, func=lambda: self.exists
-        )
+        samples = TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists)
         for sample in samples:
             if not sample:
                 return
 
-    def wait_for_status(
-        self, status, timeout=TIMEOUT_4MINUTES, stop_status=None, sleep=1
-    ):
+    def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, stop_status=None, sleep=1):
         """
         Wait for resource to be in status
 
@@ -696,23 +662,17 @@ class Resource:
                         current_status = sample_status.phase
                         if current_status != last_logged_status:
                             last_logged_status = current_status
-                            self.logger.info(
-                                f"Status of {self.kind} {self.name} is {current_status}"
-                            )
+                            self.logger.info(f"Status of {self.kind} {self.name} is {current_status}")
 
                         if current_status == status:
                             return
 
                         if current_status == stop_status:
-                            raise TimeoutExpiredError(
-                                f"Status of {self.kind} {self.name} is {current_status}"
-                            )
+                            raise TimeoutExpiredError(f"Status of {self.kind} {self.name} is {current_status}")
 
         except TimeoutExpiredError:
             if current_status:
-                self.logger.error(
-                    f"Status of {self.kind} {self.name} is {current_status}"
-                )
+                self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
     def create(self, wait=False):
@@ -735,9 +695,7 @@ class Resource:
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
-        resource_ = self.api.create(
-            body=self.res, namespace=self.namespace, dry_run=self.dry_run
-        )
+        resource_ = self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
         with contextlib.suppress(TimeoutExpiredError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
@@ -803,9 +761,7 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def retry_cluster_exceptions(
-        func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs
-    ):
+    def retry_cluster_exceptions(func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs):
         sampler = TimeoutSampler(
             wait_timeout=10,
             sleep=1,
@@ -845,18 +801,14 @@ class Resource:
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get():
-            _resources = cls._prepare_resources(
-                dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
-            )
+            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)
             try:
                 for resource_field in _resources.items:
                     yield cls(client=dyn_client, name=resource_field.metadata.name)
             except TypeError:
                 yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource.retry_cluster_exceptions(
-            func=_get, exceptions_dict=exceptions_dict
-        )
+        return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
     @property
     def instance(self):
@@ -916,10 +868,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
-        self.logger.info(
-            f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be"
-            f" '{status}'"
-        )
+        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be" f" '{status}'")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(
@@ -1031,9 +980,7 @@ class Resource:
         )
 
     @staticmethod
-    def get_all_cluster_resources(
-        config_file=None, config_dict=None, context=None, *args, **kwargs
-    ):
+    def get_all_cluster_resources(config_file=None, config_dict=None, context=None, *args, **kwargs):
         """
         Get all cluster resources
 
@@ -1052,9 +999,7 @@ class Resource:
                 print(f"Resource: {resource}")
         """
 
-        client = get_client(
-            config_file=config_file, config_dict=config_dict, context=context
-        )
+        client = get_client(config_file=config_file, config_dict=config_dict, context=context)
         for _resource in client.resources.search():
             try:
                 _resources = client.get(_resource, *args, **kwargs)
@@ -1162,9 +1107,7 @@ class NamespacedResource(Resource):
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
 
-        _resources = cls._prepare_resources(
-            dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs
-        )
+        _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)
         try:
             for resource_field in _resources.items:
                 if raw:
@@ -1284,9 +1227,7 @@ class ResourceEditor:
                         )[0].to_dict()
                         namespace = update.get("metadata", {}).get("namespace")
 
-                    backup = self._create_backup(
-                        original=original_resource_dict, patch=update
-                    )
+                    backup = self._create_backup(original=original_resource_dict, patch=update)
                     if namespace:
                         # Add namespace to metadata for restore.
                         backup["metadata"]["namespace"] = namespace
@@ -1297,28 +1238,19 @@ class ResourceEditor:
                         resource_to_patch.append(resource)
                         self._backups[resource] = backup
                     else:
-                        LOGGER.warning(
-                            "ResourceEdit: no diff found in patch for "
-                            f"{resource.name} -- skipping"
-                        )
+                        LOGGER.warning("ResourceEdit: no diff found in patch for " f"{resource.name} -- skipping")
                 if not resource_to_patch:
                     return
         else:
             resource_to_patch = self._patches
 
-        patches_to_apply = {
-            resource: self._patches[resource] for resource in resource_to_patch
-        }
+        patches_to_apply = {resource: self._patches[resource] for resource in resource_to_patch}
 
         # apply changes
-        self._apply_patches_sampler(
-            patches=patches_to_apply, action_text="Updating", action=self.action
-        )
+        self._apply_patches_sampler(patches=patches_to_apply, action_text="Updating", action=self.action)
 
     def restore(self):
-        self._apply_patches_sampler(
-            patches=self._backups, action_text="Restoring", action=self.action
-        )
+        self._apply_patches_sampler(patches=self._backups, action_text="Restoring", action=self.action)
 
     def __enter__(self):
         self.update(backup_resources=True)
@@ -1335,9 +1267,7 @@ class ResourceEditor:
             return ResourceEditor._dictify_resourcefield(res=dict(res.items()))
         elif isinstance(res, dict):
             return {
-                ResourceEditor._dictify_resourcefield(
-                    res=key
-                ): ResourceEditor._dictify_resourcefield(res=value)
+                ResourceEditor._dictify_resourcefield(res=key): ResourceEditor._dictify_resourcefield(res=value)
                 for key, value in res.items()
             }
         elif isinstance(res, list):
@@ -1372,9 +1302,7 @@ class ResourceEditor:
                     continue
 
                 # recursive call
-                key_diff = ResourceEditor._create_backup(
-                    original=original[key], patch=value
-                )
+                key_diff = ResourceEditor._create_backup(original=original[key], patch=value)
 
                 if key_diff is not None:
                     diff_dict[key] = key_diff
@@ -1401,10 +1329,7 @@ class ResourceEditor:
         """
 
         for resource, patch in patches.items():
-            LOGGER.info(
-                f"ResourceEdits: {action_text} data for "
-                f"resource {resource.kind} {resource.name}"
-            )
+            LOGGER.info(f"ResourceEdits: {action_text} data for " f"resource {resource.kind} {resource.name}")
 
             # add name to patch
             if "metadata" not in patch:
@@ -1424,15 +1349,11 @@ class ResourceEditor:
 
                 patch["metadata"]["name"] = resource.name
                 patch["metadata"]["namespace"] = resource.namespace
-                patch["metadata"][
-                    "resourceVersion"
-                ] = resource.instance.metadata.resourceVersion
+                patch["metadata"]["resourceVersion"] = resource.instance.metadata.resourceVersion
                 patch["kind"] = resource.kind
                 patch["apiVersion"] = resource.api_version
 
-                resource.update_replace(
-                    resource_dict=patch
-                )  # replace the resource metadata
+                resource.update_replace(resource_dict=patch)  # replace the resource metadata
 
     def _apply_patches_sampler(self, patches, action_text, action):
         exceptions_dict = {ConflictError: []}

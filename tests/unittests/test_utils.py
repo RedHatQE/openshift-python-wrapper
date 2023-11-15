@@ -113,9 +113,7 @@ class TestTimeoutSampler:
                     "runtime_exception": IndexError("my allowed exception text"),
                 },
                 {
-                    "exception_log_regex": (
-                        "^.*\nLast exception: IndexError: my allowed exception text$"
-                    ),
+                    "exception_log_regex": ("^.*\nLast exception: IndexError: my allowed exception text$"),
                 },
                 id="init_multi_exceptions_raise_allowed_with_allowed_msg",
             ),
@@ -131,11 +129,10 @@ class TestTimeoutSampler:
             )
         except TimeoutExpiredError as exp:
             exception_log = str(exp)
-            exception_match = re.compile(
-                pattern=expected["exception_log_regex"], flags=re.DOTALL
-            ).match(string=exception_log)
+            exception_match = re.compile(pattern=expected["exception_log_regex"], flags=re.DOTALL).match(
+                string=exception_log
+            )
 
         assert exception_match, (
-            f"Expected Regex: {expected['exception_log_regex']!r} Exception Log:"
-            f" {exception_log!r}"
+            f"Expected Regex: {expected['exception_log_regex']!r} Exception Log:" f" {exception_log!r}"
         )

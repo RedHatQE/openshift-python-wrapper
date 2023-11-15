@@ -51,9 +51,7 @@ def _process_api_type(api_type, api_value, resource_dict, cls):
 def _get_api_group_and_version(bodies):
     for targets in bodies:
         api_type = targets.targets[0].id
-        return api_type, getattr(
-            targets.value, "attr", getattr(targets.value, "s", None)
-        )
+        return api_type, getattr(targets.value, "attr", getattr(targets.value, "s", None))
 
 
 def _get_namespaced(cls, resource_dict, api_value):
@@ -61,9 +59,7 @@ def _get_namespaced(cls, resource_dict, api_value):
     for base in getattr(cls, "bases", []):
         api_group_name = _api_group_name(api_value=api_value)
         namespaced = base.id == "NamespacedResource"
-        api_group = _api_group_dict(
-            resource_dict=resource_dict, api_group_name=api_group_name
-        )
+        api_group = _api_group_dict(resource_dict=resource_dict, api_group_name=api_group_name)
         should_be_namespaced = api_group["namespaced"] == "true"
 
         if namespaced != should_be_namespaced:
@@ -79,24 +75,18 @@ def _get_api_group(api_value, cls, resource_dict):
     api_group_name = _api_group_name(api_value=api_value)
 
     if api_group_name not in resource_dict["api_group"]:
-        errors.append(
-            f"Resource {cls.name} api_group should be "
-            f"{resource_dict['api_group']}. got {api_group_name}"
-        )
+        errors.append(f"Resource {cls.name} api_group should be " f"{resource_dict['api_group']}. got {api_group_name}")
     return errors
 
 
 def _get_api_version(api_value, cls, resource_dict):
     errors = []
     api_group_name = _api_group_name(api_value=api_value)
-    api_group = _api_group_dict(
-        resource_dict=resource_dict, api_group_name=api_group_name
-    )
+    api_group = _api_group_dict(resource_dict=resource_dict, api_group_name=api_group_name)
     if api_value.lower() != api_group["api_version"]:
         desire_api_group = resource_dict["api_version"].split("/")[0]
         errors.append(
-            f"Resource {cls.name} have api_version {api_value} "
-            f"but should have api_group = {desire_api_group}"
+            f"Resource {cls.name} have api_version {api_value} " f"but should have api_group = {desire_api_group}"
         )
 
     return errors
@@ -113,10 +103,7 @@ def _resource_file():
 
 @pytest.fixture()
 def resources_definitions():
-    file_ = (
-        "https://raw.githubusercontent.com/RedHatQE/"
-        "openshift-resources-definitions/main/resources_definitions.json"
-    )
+    file_ = "https://raw.githubusercontent.com/RedHatQE/openshift-resources-definitions/main/resources_definitions.json"
     content = requests.get(file_).content
     return json.loads(content)
 
@@ -133,17 +120,9 @@ def resources_definitions_errors(resources_definitions):
                 if not resource_dict:
                     continue
 
-                bodies = [
-                    body_
-                    for body_ in getattr(cls, "body")
-                    if isinstance(body_, ast.Assign)
-                ]
+                bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, ast.Assign)]
                 api_type, api_value = _get_api_group_and_version(bodies=bodies)
-                errors.extend(
-                    _get_namespaced(
-                        cls=cls, resource_dict=resource_dict, api_value=api_value
-                    )
-                )
+                errors.extend(_get_namespaced(cls=cls, resource_dict=resource_dict, api_value=api_value))
                 errors.extend(
                     _process_api_type(
                         api_type=api_type,

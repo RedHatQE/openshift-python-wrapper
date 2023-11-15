@@ -125,9 +125,7 @@ class VirtualMachineImport(NamespacedResource):
         self.target_vm_name = target_vm_name
         self.start_vm = start_vm
         self.provider_credentials_secret_name = provider_credentials_secret_name
-        self.provider_credentials_secret_namespace = (
-            provider_credentials_secret_namespace
-        )
+        self.provider_credentials_secret_namespace = provider_credentials_secret_namespace
         self.provider_mappings = provider_mappings
         self.resource_mapping_name = resource_mapping_name
         self.resource_mapping_namespace = resource_mapping_namespace
@@ -156,13 +154,9 @@ class VirtualMachineImport(NamespacedResource):
                 secret["namespace"] = self.provider_credentials_secret_namespace
 
             if self.resource_mapping_name:
-                spec.setdefault("resourceMapping", {})[
-                    "name"
-                ] = self.resource_mapping_name
+                spec.setdefault("resourceMapping", {})["name"] = self.resource_mapping_name
             if self.resource_mapping_namespace:
-                spec.setdefault("resourceMapping", {})[
-                    "namespace"
-                ] = self.resource_mapping_namespace
+                spec.setdefault("resourceMapping", {})["namespace"] = self.resource_mapping_namespace
 
             if self.target_vm_name:
                 spec["targetVmName"] = self.target_vm_name
@@ -173,13 +167,9 @@ class VirtualMachineImport(NamespacedResource):
             if self.warm:
                 spec["warm"] = self.warm
             if self.finalize_date:
-                spec["finalizeDate"] = self.finalize_date.strftime(
-                    format="%Y-%m-%dT%H:%M:%SZ"
-                )
+                spec["finalizeDate"] = self.finalize_date.strftime(format="%Y-%m-%dT%H:%M:%SZ")
 
-            provider_source = spec.setdefault("source", {}).setdefault(
-                self.provider_type, {}
-            )
+            provider_source = spec.setdefault("source", {}).setdefault(self.provider_type, {})
             vm = provider_source.setdefault("vm", {})
             if self.vm_id:
                 vm["id"] = self.vm_id
@@ -193,28 +183,16 @@ class VirtualMachineImport(NamespacedResource):
 
             if self.provider_mappings:
                 if self.provider_mappings.disk_mappings:
-                    mappings = _map_mappings(
-                        mappings=self.provider_mappings.disk_mappings
-                    )
-                    provider_source.setdefault("mappings", {}).setdefault(
-                        "diskMappings", mappings
-                    )
+                    mappings = _map_mappings(mappings=self.provider_mappings.disk_mappings)
+                    provider_source.setdefault("mappings", {}).setdefault("diskMappings", mappings)
 
                 if self.provider_mappings.network_mappings:
-                    mappings = _map_mappings(
-                        mappings=self.provider_mappings.network_mappings
-                    )
-                    provider_source.setdefault("mappings", {}).setdefault(
-                        "networkMappings", mappings
-                    )
+                    mappings = _map_mappings(mappings=self.provider_mappings.network_mappings)
+                    provider_source.setdefault("mappings", {}).setdefault("networkMappings", mappings)
 
                 if self.provider_mappings.storage_mappings:
-                    mappings = _map_mappings(
-                        mappings=self.provider_mappings.storage_mappings
-                    )
-                    provider_source.setdefault("mappings", {}).setdefault(
-                        "storageMappings", mappings
-                    )
+                    mappings = _map_mappings(mappings=self.provider_mappings.storage_mappings)
+                    provider_source.setdefault("mappings", {}).setdefault("storageMappings", mappings)
 
     def wait(
         self,
@@ -223,10 +201,7 @@ class VirtualMachineImport(NamespacedResource):
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
     ):
-        self.logger.info(
-            f"Wait for {self.kind} {self.name} {cond_reason} condition to be"
-            f" {cond_status}"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
@@ -244,11 +219,7 @@ class VirtualMachineImport(NamespacedResource):
                         current_conditions = sample_status.conditions
                         for cond in current_conditions:
                             last_condition = cond
-                            if (
-                                cond.type == cond_type
-                                and cond.status == cond_status
-                                and cond.reason == cond_reason
-                            ):
+                            if cond.type == cond_type and cond.status == cond_status and cond.reason == cond_reason:
                                 msg = (
                                     f"Status of {self.kind} {self.name} {cond.type} is "
                                     f"{cond.status} ({cond.reason}: {cond.message})"
@@ -294,9 +265,7 @@ class ResourceMapping(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             for provider, mapping in self.mapping.items():
-                res_provider_section = self.res.setdefault("spec", {}).setdefault(
-                    provider, {}
-                )
+                res_provider_section = self.res.setdefault("spec", {}).setdefault(provider, {})
                 if mapping.network_mappings is not None:
                     res_provider_section.setdefault(
                         "networkMappings",
