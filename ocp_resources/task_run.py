@@ -42,10 +42,7 @@ class TaskRun(NamespacedResource):
             if not (self.task_ref or self.task_spec):
                 raise ValueError("Mandatory to have either task_ref or task_spec")
             if self.task_ref and self.task_spec:
-                raise ValueError(
-                    "Validation failed: expected exactly one either task_ref or"
-                    " task_spec, got both"
-                )
+                raise ValueError("Validation failed: expected exactly one either task_ref or" " task_spec, got both")
             self.res["spec"] = {}
             if self.task_ref:
                 self.res["spec"]["taskRef"] = {"name": self.task_ref}
@@ -55,8 +52,7 @@ class TaskRun(NamespacedResource):
 
             if self.params:
                 self.res["spec"]["params"] = [
-                    {"name": params_name, "value": params_value}
-                    for params_name, params_value in self.params.items()
+                    {"name": params_name, "value": params_value} for params_name, params_value in self.params.items()
                 ]
 
             if self.taskrun_timeout:

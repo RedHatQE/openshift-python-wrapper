@@ -38,8 +38,6 @@ class ControllerRevision(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.owner_references:
-                self.res.setdefault("metadata", {}).update({
-                    "ownerReference": self.owner_references
-                })
+                self.res.setdefault("metadata", {}).update({"ownerReference": self.owner_references})
             if self.revision_object:
                 self.res.update({"data": self.revision_object.res})

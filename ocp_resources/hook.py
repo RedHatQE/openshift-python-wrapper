@@ -42,9 +42,11 @@ class Hook(NamespacedResource, MTV):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update({
-                "spec": {
-                    "image": self.image,
-                    "playbook": self.playbook,
-                },
-            })
+            self.res.update(
+                {
+                    "spec": {
+                        "image": self.image,
+                        "playbook": self.playbook,
+                    },
+                }
+            )
