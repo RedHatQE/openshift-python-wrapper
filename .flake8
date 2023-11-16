@@ -15,7 +15,6 @@ fcn_exclude_functions =
     getLogger,
     loads,
     get,
-    appens,
     next,
     setdefault,
     dumps,
@@ -43,9 +42,9 @@ fcn_exclude_functions =
     re,
     requests,
     signal,
-    self,
     yaml,
     benedict,
+    logger,
 
 enable-extensions =
     FCN,
