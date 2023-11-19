@@ -43,9 +43,7 @@ class MultiClusterObservability(Resource):
             if not self.metric_object_storage:
                 raise ValueError("metric_object_storage or yaml file is required")
             spec_dict = {"observabilityAddonSpec": self.observability_addon_spec}
-            spec_dict.setdefault("storageConfig", {})[
-                "metricObjectStorage"
-            ] = self.metric_object_storage
+            spec_dict.setdefault("storageConfig", {})["metricObjectStorage"] = self.metric_object_storage
 
             if self.enable_downsampling:
                 spec_dict["enableDownsampling"] = self.enable_downsampling

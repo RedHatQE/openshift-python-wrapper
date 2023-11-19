@@ -48,10 +48,7 @@ class CronJob(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.job_template and self.schedule):
-                raise ValueError(
-                    "yaml_file or parameters 'job_template' and 'schedule' are"
-                    " required."
-                )
+                raise ValueError("yaml_file or parameters 'job_template' and 'schedule' are" " required.")
             self.res.update(
                 {
                     "spec": {
@@ -65,12 +62,8 @@ class CronJob(NamespacedResource):
             if self.suspend:
                 self.res["spec"]["suspend"] = self.suspend
             if self.successful_jobs_history_limit:
-                self.res["spec"][
-                    "successfulJobsHistoryLimit"
-                ] = self.successful_jobs_history_limit
+                self.res["spec"]["successfulJobsHistoryLimit"] = self.successful_jobs_history_limit
             if self.failed_jobs_history_limit:
-                self.res["spec"][
-                    "failedJobsHistoryLimit"
-                ] = self.failed_jobs_history_limit
+                self.res["spec"]["failedJobsHistoryLimit"] = self.failed_jobs_history_limit
             if self.concurrency_policy:
                 self.res["spec"]["concurrencyPolicy"] = self.concurrency_policy

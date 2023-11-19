@@ -67,9 +67,6 @@ class Deployment(NamespacedResource):
 
                 if (
                     (deployed and spec_replicas)
-                    and spec_replicas
-                    == updated_replicas
-                    == available_replicas
-                    == ready_replicas
+                    and spec_replicas == updated_replicas == available_replicas == ready_replicas
                 ) or not (deployed or spec_replicas or total_replicas):
                     return

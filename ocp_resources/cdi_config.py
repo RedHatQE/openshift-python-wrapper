@@ -34,9 +34,7 @@ class CDIConfig(Resource):
         Returns:
             bool: True if url is equal to uploadProxyURL.
         """
-        self.logger.info(
-            f"Wait for {self.kind} {self.name} to ensure current URL == uploadProxyURL"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} to ensure current URL == uploadProxyURL")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,

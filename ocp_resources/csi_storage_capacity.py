@@ -61,9 +61,7 @@ class CSIStorageCapacity(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.storage_class_name:
-                raise ValueError(
-                    "yaml_file or parameter 'storage_class_name' is required."
-                )
+                raise ValueError("yaml_file or parameter 'storage_class_name' is required.")
             self.res.update(
                 {
                     "storageClassName": self.storage_class_name,

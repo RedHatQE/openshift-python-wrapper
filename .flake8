@@ -1,6 +1,5 @@
 [flake8]
-
-max-line-length = 120
+select=FCN,M511
 
 exclude =
     doc,
@@ -11,12 +10,10 @@ exclude =
     docs/*,
     .cache/*
 
-fcfn_exclude_functions =
+fcn_exclude_functions =
     update,
-    getLogger,
     loads,
     get,
-    appens,
     next,
     setdefault,
     dumps,
@@ -44,6 +41,9 @@ fcfn_exclude_functions =
     re,
     requests,
     signal,
+    yaml,
+    benedict,
+    logger,
 
 enable-extensions =
     FCN,
