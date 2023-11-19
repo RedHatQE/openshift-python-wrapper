@@ -1,4 +1,3 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -60,15 +59,11 @@ class DataImportCron(NamespacedResource):
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url cannot coexist")
             if not self.pull_method:
-                raise ValueError(
-                    "Passing yaml_file or parameter 'pull_method' is required"
-                )
+                raise ValueError("Passing yaml_file or parameter 'pull_method' is required")
             self.res.update(
                 {
                     "spec": {
-                        "template": {
-                            "spec": {"source": {"registry": {"pullMethod": self.pull_method}}}
-                        },
+                        "template": {"spec": {"source": {"registry": {"pullMethod": self.pull_method}}}},
                         "managedDataSource": self.managed_data_source,
                         "schedule": self.schedule,
                     }
@@ -98,4 +93,3 @@ class DataImportCron(NamespacedResource):
                 storage["storageClassName"] = self.storage_class
             if storage:
                 spec["storage"] = storage
-
