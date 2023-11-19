@@ -32,9 +32,7 @@ class ControllerRevision(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.revision:
-                raise ValueError(
-                    "Passing yaml_file or parameter 'revision' is required."
-                )
+                raise ValueError("Passing yaml_file or parameter 'revision' is required.")
             if type(self.revision) != numpy.int64:
                 raise ValueError("Parameter 'revision' must be an int64 data type object")
             self.res.update({"revision": self.revision})
