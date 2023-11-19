@@ -148,9 +148,7 @@ class TimeoutSampler:
 
             finally:
                 if self.elapsed_time and self.print_log:
-                    LOGGER.info(
-                        "Elapsed time:" f" {self.elapsed_time} [{datetime.timedelta(seconds=self.elapsed_time)}]"
-                    )
+                    LOGGER.info(f"Elapsed time: {self.elapsed_time} [{datetime.timedelta(seconds=self.elapsed_time)}]")
 
         raise TimeoutExpiredError(self._get_exception_log(exp=last_exp))
 

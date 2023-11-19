@@ -133,6 +133,4 @@ class TestTimeoutSampler:
                 string=exception_log
             )
 
-        assert exception_match, (
-            f"Expected Regex: {expected['exception_log_regex']!r} Exception Log:" f" {exception_log!r}"
-        )
+        assert exception_match, f"Expected Regex: {expected['exception_log_regex']!r} Exception Log: {exception_log!r}"

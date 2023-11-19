@@ -178,7 +178,7 @@ class MachineSet(NamespacedResource):
         super().to_dict()
         self.res.update({"spec": {"replicas": replicas}})
 
-        self.logger.info(f"Scale machine-set from {self.desired_replicas} replicas to" f" {replicas} replicas")
+        self.logger.info(f"Scale machine-set from {self.desired_replicas} replicas to {replicas} replicas")
         self.update(resource_dict=self.res)
         if wait:
             return self.wait_for_replicas(timeout=wait_timeout, sleep=sleep)

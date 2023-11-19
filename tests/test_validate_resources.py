@@ -75,7 +75,7 @@ def _get_api_group(api_value, cls, resource_dict):
     api_group_name = _api_group_name(api_value=api_value)
 
     if api_group_name not in resource_dict["api_group"]:
-        errors.append(f"Resource {cls.name} api_group should be " f"{resource_dict['api_group']}. got {api_group_name}")
+        errors.append(f"Resource {cls.name} api_group should be {resource_dict['api_group']}. got {api_group_name}")
     return errors
 
 
@@ -86,7 +86,7 @@ def _get_api_version(api_value, cls, resource_dict):
     if api_value.lower() != api_group["api_version"]:
         desire_api_group = resource_dict["api_version"].split("/")[0]
         errors.append(
-            f"Resource {cls.name} have api_version {api_value} " f"but should have api_group = {desire_api_group}"
+            f"Resource {cls.name} have api_version {api_value} but should have api_group = {desire_api_group}"
         )
 
     return errors
