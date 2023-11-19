@@ -43,9 +43,7 @@ class VirtualMachineRestore(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             spec = self.res.setdefault("spec", {})
-            spec.setdefault("target", {})[
-                "apiGroup"
-            ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
+            spec.setdefault("target", {})["apiGroup"] = NamespacedResource.ApiGroup.KUBEVIRT_IO
             spec["target"]["kind"] = VirtualMachine.kind
             spec["target"]["name"] = self.vm_name
             spec["virtualMachineSnapshotName"] = self.snapshot_name
@@ -61,9 +59,7 @@ class VirtualMachineRestore(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        self.logger.info(
-            f"Wait for {self.kind} {self.name} status to be complete = {status}"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be complete = {status}")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(

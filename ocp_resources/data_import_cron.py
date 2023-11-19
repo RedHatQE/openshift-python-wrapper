@@ -1,3 +1,4 @@
+from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -66,11 +67,7 @@ class DataImportCron(NamespacedResource):
                 {
                     "spec": {
                         "template": {
-                            "spec": {
-                                "source": {
-                                    "registry": {"pullMethod": self.pull_method}
-                                },
-                            }
+                            "spec": {"source": {"registry": {"pullMethod": self.pull_method}}}
                         },
                         "managedDataSource": self.managed_data_source,
                         "schedule": self.schedule,
@@ -81,11 +78,7 @@ class DataImportCron(NamespacedResource):
 
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": (
-                            "true"
-                        )
-                    }
+                    {f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": ("true")}
                 )
             if self.image_stream:
                 spec["source"]["registry"]["imageStream"] = self.image_stream

@@ -53,9 +53,7 @@ class VirtualMachineExport(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.source_kind and self.source_name):
-                raise ValueError(
-                    "source_kind and source_name or a yaml_file is required"
-                )
+                raise ValueError("source_kind and source_name or a yaml_file is required")
             self.res.update(
                 {
                     "spec": {

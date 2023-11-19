@@ -28,6 +28,4 @@ class ImageContentSourcePolicy(Resource):
         if not self.yaml_file:
             if not self.repository_digest_mirrors:
                 raise ValueError("repository_digest_mirrors must be defined")
-            self.res["spec"] = {
-                "repositoryDigestMirrors": self.repository_digest_mirrors
-            }
+            self.res["spec"] = {"repositoryDigestMirrors": self.repository_digest_mirrors}

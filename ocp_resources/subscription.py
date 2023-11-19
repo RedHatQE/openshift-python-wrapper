@@ -58,11 +58,7 @@ class Subscription(NamespacedResource):
             )
 
             if self.node_selector:
-                self.res["spec"].setdefault("config", {}).setdefault(
-                    "nodeSelector", {}
-                ).update(self.node_selector)
+                self.res["spec"].setdefault("config", {}).setdefault("nodeSelector", {}).update(self.node_selector)
 
             if self.tolerations:
-                self.res["spec"].setdefault("config", {}).setdefault(
-                    "tolerations", []
-                ).append(self.tolerations)
+                self.res["spec"].setdefault("config", {}).setdefault("tolerations", []).append(self.tolerations)

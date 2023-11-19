@@ -48,8 +48,7 @@ class PipelineRun(NamespacedResource):
 
             if self.params:
                 self.res["spec"]["params"] = [
-                    {"name": params_name, "value": params_value}
-                    for params_name, params_value in self.params.items()
+                    {"name": params_name, "value": params_value} for params_name, params_value in self.params.items()
                 ]
 
             if self.service_account_name:
