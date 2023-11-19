@@ -16,13 +16,7 @@ class ExecOnPodError(Exception):
         self.err = err
 
     def __str__(self):
-        return (
-            "Command execution failure: "
-            f"{self.cmd}, "
-            f"RC: {self.rc}, "
-            f"OUT: {self.out}, "
-            f"ERR: {self.err}"
-        )
+        return f"Command execution failure: {self.cmd} RC: {self.rc}, OUT: {self.out}, ERR: {self.err}"
 
 
 class Pod(NamespacedResource):
@@ -105,23 +99,17 @@ class Pod(NamespacedResource):
         while resp.is_open():
             resp.run_forever(timeout=2)
             try:
-                error_channel = json.loads(
-                    resp.read_channel(kubernetes.stream.ws_client.ERROR_CHANNEL)
-                )
+                error_channel = json.loads(resp.read_channel(kubernetes.stream.ws_client.ERROR_CHANNEL))
                 break
             except json.decoder.JSONDecodeError:
                 # Check remaining time, in order to throw exception
                 # if remaining time reached zero
                 if timeout_watch.remaining_time() <= 0:
-                    raise ExecOnPodError(
-                        command=command, rc=-1, out="", err=stream_closed_error
-                    )
+                    raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error)
 
         rcstring = error_channel.get("status")
         if rcstring is None:
-            raise ExecOnPodError(
-                command=command, rc=-1, out="", err=stream_closed_error
-            )
+            raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error)
 
         stdout = resp.read_stdout(timeout=5)
         stderr = resp.read_stderr(timeout=5)
@@ -133,9 +121,7 @@ class Pod(NamespacedResource):
             raise ExecOnPodError(command=command, rc=-1, out="", err=error_channel)
 
         returncode = [
-            int(cause["message"])
-            for cause in error_channel["details"]["causes"]
-            if cause["reason"] == "ExitCode"
+            int(cause["message"]) for cause in error_channel["details"]["causes"] if cause["reason"] == "ExitCode"
         ][0]
 
         raise ExecOnPodError(command=command, rc=returncode, out=stdout, err=stderr)
@@ -147,9 +133,7 @@ class Pod(NamespacedResource):
         Returns:
             str: Pod logs.
         """
-        return self._kube_v1_api.read_namespaced_pod_log(
-            name=self.name, namespace=self.namespace, **kwargs
-        )
+        return self._kube_v1_api.read_namespaced_pod_log(name=self.name, namespace=self.namespace, **kwargs)
 
     @property
     def node(self):

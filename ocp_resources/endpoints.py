@@ -52,9 +52,7 @@ class Endpoints(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.addresses and self.ports):
-                raise ValueError(
-                    "yaml_file or parameters 'addresses' and 'ports' are required."
-                )
+                raise ValueError("yaml_file or parameters 'addresses' and 'ports' are required.")
             self.res.update(
                 {
                     "subsets": {

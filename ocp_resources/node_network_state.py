@@ -34,11 +34,7 @@ class NodeNetworkState(Resource):
 
     def set_interface(self, interface):
         # First drop the interface is's already in the list
-        interfaces = [
-            iface
-            for iface in self.desired_state["interfaces"]
-            if iface["name"] != interface["name"]
-        ]
+        interfaces = [iface for iface in self.desired_state["interfaces"] if iface["name"] != interface["name"]]
 
         # Add the interface
         interfaces.append(interface)
@@ -79,9 +75,7 @@ class NodeNetworkState(Resource):
             return None
 
         self.logger.info(f"Checking if interface {name} is up -- {self.name}")
-        samples = TimeoutSampler(
-            wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface
-        )
+        samples = TimeoutSampler(wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface)
         for sample in samples:
             if sample:
                 return

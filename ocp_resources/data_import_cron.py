@@ -64,12 +64,8 @@ class DataImportCron(NamespacedResource):
                     "spec": {
                         "template": {
                             "spec": {
-                                "source": {
-                                    "registry": {"pullMethod": self.pull_method}
-                                },
-                                "storage": {
-                                    "resources": {"requests": {"storage": self.size}}
-                                },
+                                "source": {"registry": {"pullMethod": self.pull_method}},
+                                "storage": {"resources": {"requests": {"storage": self.size}}},
                             }
                         }
                     }
@@ -78,11 +74,7 @@ class DataImportCron(NamespacedResource):
             spec = self.res["spec"]["template"]["spec"]
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": (
-                            "true"
-                        )
-                    }
+                    {f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": ("true")}
                 )
             if self.image_stream:
                 spec["source"]["registry"]["imageStream"] = self.image_stream

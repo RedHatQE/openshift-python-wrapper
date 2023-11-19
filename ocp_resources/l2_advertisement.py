@@ -51,6 +51,4 @@ class L2Advertisement(NamespacedResource):
                 self.res["spec"]["ipAddressPools"] = self.ip_address_pools
 
             if self.ip_address_pools_selectors:
-                self.res["spec"][
-                    "ipAddressPoolSelectors"
-                ] = self.ip_address_pools_selectors
+                self.res["spec"]["ipAddressPoolSelectors"] = self.ip_address_pools_selectors

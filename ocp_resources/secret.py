@@ -64,15 +64,11 @@ class Secret(NamespacedResource):
 
     @property
     def certificate_not_after(self):
-        return self.instance.metadata.annotations[
-            "auth.openshift.io/certificate-not-after"
-        ]
+        return self.instance.metadata.annotations["auth.openshift.io/certificate-not-after"]
 
     @property
     def certificate_not_before(self):
-        return self.instance.metadata.annotations[
-            "auth.openshift.io/certificate-not-before"
-        ]
+        return self.instance.metadata.annotations["auth.openshift.io/certificate-not-before"]
 
     @property
     def keys_to_hash(self):
