@@ -64,8 +64,6 @@ class DataImportCron(NamespacedResource):
                 {
                     "spec": {
                         "template": {"spec": {"source": {"registry": {"pullMethod": self.pull_method}}}},
-                        "managedDataSource": self.managed_data_source,
-                        "schedule": self.schedule,
                     }
                 }
             )
@@ -81,8 +79,12 @@ class DataImportCron(NamespacedResource):
                 spec["source"]["registry"]["url"] = self.url
             if self.cert_configmap:
                 spec["source"]["registry"]["certConfigMap"] = self.cert_configmap
+            if self.schedule:
+                self.res["spec"]["schedule"] = self.schedule
             if self.garbage_collect:
                 self.res["spec"]["garbageCollect"] = self.garbage_collect
+            if self.managed_data_source:
+                self.res["spec"]["managedDataSource"] = self.managed_data_source
             if self.imports_to_keep:
                 self.res["spec"]["importsToKeep"] = self.imports_to_keep
 
