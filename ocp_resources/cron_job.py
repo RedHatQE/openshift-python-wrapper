@@ -1,10 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
 class CronJob(NamespacedResource):
     """
-    CronJob object. API reference:
     https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/cron-job-v1/
     """
 
@@ -12,10 +10,6 @@ class CronJob(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
         schedule=None,
         job_template=None,
         timezone=None,
@@ -24,20 +18,10 @@ class CronJob(NamespacedResource):
         suspend=None,
         successful_jobs_history_limit=None,
         failed_jobs_history_limit=None,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
         """
         Args:
-            name (str): Name of the CronJob resource
-            namespace (str): Namespace of CronJob resource
-            client: (DynamicClient): DynamicClient for api calls
-            teardown (bool): Indicates if the resource should be torn down at the end
-            privileged_client (DynamicClient): Privileged client for api calls
-            yaml_file (str): yaml file for the resource.
-            delete_timeout (int, optional): timeout associated with delete action
             schedule (str): schedule of the cron job
             job_template (dict): describes the job that would be created when a cronjob would be executed
                 Example:
@@ -49,19 +33,8 @@ class CronJob(NamespacedResource):
             failed_jobs_history_limit (int, optional): number of failed jobs to retain
             starting_deadline_seconds (int, optional): deadline in seconds, for starting a job, in case it does not
             start at scheduled time
-
-
         """
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.job_template = job_template
         self.schedule = schedule
         self.timezone = timezone
@@ -75,10 +48,7 @@ class CronJob(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.job_template and self.schedule):
-                raise ValueError(
-                    "yaml_file or parameters 'job_template' and 'schedule' are"
-                    " required."
-                )
+                raise ValueError("yaml_file or parameters 'job_template' and 'schedule' are" " required.")
             self.res.update(
                 {
                     "spec": {
@@ -92,12 +62,8 @@ class CronJob(NamespacedResource):
             if self.suspend:
                 self.res["spec"]["suspend"] = self.suspend
             if self.successful_jobs_history_limit:
-                self.res["spec"][
-                    "successfulJobsHistoryLimit"
-                ] = self.successful_jobs_history_limit
+                self.res["spec"]["successfulJobsHistoryLimit"] = self.successful_jobs_history_limit
             if self.failed_jobs_history_limit:
-                self.res["spec"][
-                    "failedJobsHistoryLimit"
-                ] = self.failed_jobs_history_limit
+                self.res["spec"]["failedJobsHistoryLimit"] = self.failed_jobs_history_limit
             if self.concurrency_policy:
                 self.res["spec"]["concurrencyPolicy"] = self.concurrency_policy

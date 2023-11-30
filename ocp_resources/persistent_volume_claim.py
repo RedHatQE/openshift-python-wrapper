@@ -82,16 +82,12 @@ class PersistentVolumeClaim(NamespacedResource):
               kubevirt.io/provisionOnNode: <specified_node_name>
             """
             if self.hostpath_node:
-                self.res["metadata"]["annotations"] = {
-                    "kubevirt.io/provisionOnNode": self.hostpath_node
-                }
+                self.res["metadata"]["annotations"] = {"kubevirt.io/provisionOnNode": self.hostpath_node}
             if self.storage_class:
                 self.res["spec"]["storageClassName"] = self.storage_class
 
             if self.pvlabel:
-                self.res["spec"]["selector"] = {
-                    "matchLabels": {"pvLabel": self.pvlabel}
-                }
+                self.res["spec"]["selector"] = {"matchLabels": {"pvLabel": self.pvlabel}}
 
     def bound(self):
         """
@@ -105,6 +101,17 @@ class PersistentVolumeClaim(NamespacedResource):
 
     @property
     def selected_node(self):
-        return self.instance.metadata.annotations.get(
-            "volume.kubernetes.io/selected-node"
-        )
+        return self.instance.metadata.annotations.get("volume.kubernetes.io/selected-node")
+
+    @property
+    def use_populator(self):
+        return self.instance.metadata.annotations.get(f"{self.ApiGroup.CDI_KUBEVIRT_IO}/storage.usePopulator") == "true"
+
+    @property
+    def prime_pvc(self):
+        if self.use_populator:
+            return PersistentVolumeClaim(
+                name=f"prime-{self.instance.metadata.uid}",
+                namespace=self.namespace,
+                client=self.client,
+            )

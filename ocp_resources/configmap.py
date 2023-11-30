@@ -1,34 +1,23 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
 class ConfigMap(NamespacedResource):
     """
-    Configmap object
+    https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/config-map-v1/
     """
 
     api_version = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
         data=None,
-        teardown=True,
-        client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        """
+        Args:
+            data (dict, optional): key-value configuration pairs.
+        """
+        super().__init__(**kwargs)
         self.data = data
 
     def to_dict(self):

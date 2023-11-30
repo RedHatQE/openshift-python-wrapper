@@ -1,20 +1,11 @@
-[tool.black]
-line-length = 88
-target_version = ['py37', 'py38', 'py39', 'py310', "py311"]
-exclude = '''
-(
-  /(
-    | \.git
-    | \.venv
-    | \.mypy_cache
-    | \.tox
-  )/
-)
-'''
+[tool.ruff]
+preview = true
+line-length = 120
+fix = true
+output-format = "grouped"
 
-[tool.isort]
-line_length = 88
-profile = "black"
+[tool.ruff.format]
+exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.poetry]
 name = "openshift-python-wrapper"
@@ -41,7 +32,7 @@ ipdb = "^0.13.13"
 
 
 [tool.poetry.group.tests.dependencies]
-pytest = "^7.4.0"
+pytest = "^7.4.2"
 requests = "^2.31.0"
 
 [tool.poetry-dynamic-versioning.substitution]
@@ -59,7 +50,8 @@ build-backend = "poetry_dynamic_versioning.backend"
 python = "^3.8"
 xmltodict = "^0.13.0"
 colorlog = "^6.7.0"
-kubernetes = "^27.2.0"
-python-benedict = "^0.32.0"
+kubernetes = "^28.1.0-beta.1"
+python-benedict = "^0.33.0"
 packaging = "^23.1"
 python-simple-logger = "^1.0.6"
+jinja2 = "^3.1.2"
