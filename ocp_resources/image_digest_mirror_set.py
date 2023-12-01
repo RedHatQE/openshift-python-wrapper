@@ -1,9 +1,11 @@
 from ocp_resources.resource import Resource
 
+
 class ImageDigestMirrorSet(Resource):
     """
     ImageDigestMirrorSet object, inherited from Resource.
     """
+
     api_version = "v1"
     api_group = Resource.ApiGroup.CONFIG_OPENSHIFT_IO
 
