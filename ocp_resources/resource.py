@@ -234,6 +234,9 @@ class Resource:
             INSTALL_READY = "InstallReady"
             SUCCEEDED = "Succeeded"
 
+        class restartCount:
+            restartCount = "restartCount"
+
         class Reason:
             ALL_REQUIREMENTS_MET = "AllRequirementsMet"
             INSTALL_SUCCEEDED = "InstallSucceeded"
