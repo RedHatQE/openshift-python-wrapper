@@ -27,5 +27,5 @@ class ImageDigestMirrorSet(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.image_digest_mirrors:
-                raise ValueError("image_digest_mirrors must be defined")
+                raise ValueError("image_digest_mirrors or yaml file must be defined")
             self.res["spec"] = {"imageDigestMirrors": self.image_digest_mirrors}
