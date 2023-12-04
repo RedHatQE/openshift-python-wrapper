@@ -51,7 +51,7 @@ def _process_api_type(api_type, api_value, resource_dict, cls):
 def _get_api_group_and_version(bodies):
     for targets in bodies:
         api_type = targets.targets[0].id
-        return api_type, getattr(targets.value, "attr", getattr(targets.value, "s", None))
+        return api_type, getattr(targets.value, "attr", getattr(targets.value, "value", None))
 
 
 def _get_namespaced(cls, resource_dict, api_value):
@@ -75,7 +75,7 @@ def _get_api_group(api_value, cls, resource_dict):
     api_group_name = _api_group_name(api_value=api_value)
 
     if api_group_name not in resource_dict["api_group"]:
-        errors.append(f"Resource {cls.name} api_group should be " f"{resource_dict['api_group']}. got {api_group_name}")
+        errors.append(f"Resource {cls.name} api_group should be {resource_dict['api_group']}. got {api_group_name}")
     return errors
 
 
@@ -86,7 +86,7 @@ def _get_api_version(api_value, cls, resource_dict):
     if api_value.lower() != api_group["api_version"]:
         desire_api_group = resource_dict["api_version"].split("/")[0]
         errors.append(
-            f"Resource {cls.name} have api_version {api_value} " f"but should have api_group = {desire_api_group}"
+            f"Resource {cls.name} have api_version {api_value} but should have api_group = {desire_api_group}"
         )
 
     return errors
@@ -103,9 +103,7 @@ def _resource_file():
 
 @pytest.fixture()
 def resources_definitions():
-    file_ = (
-        "https://raw.githubusercontent.com/RedHatQE/" "openshift-resources-definitions/main/resources_definitions.json"
-    )
+    file_ = "https://raw.githubusercontent.com/RedHatQE/openshift-resources-definitions/main/resources_definitions.json"
     content = requests.get(file_).content
     return json.loads(content)
 
