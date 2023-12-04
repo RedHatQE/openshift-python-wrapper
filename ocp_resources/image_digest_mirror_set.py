@@ -1,0 +1,28 @@
+from ocp_resources.resource import Resource
+
+
+class ImageDigestMirrorSet(Resource):
+    """
+    Create/Manage ImageDigestMirrorSet configuration object. API reference:
+    https://docs.openshift.com/container-platform/4.14/rest_api/config_apis/imagedigestmirrorset-config-openshift-io-v1.html
+    Args:
+        imageDigestMirrors (list of dict):
+            e.g. [{source: <str>, mirrors: <list>}, ..., {source: <str>, mirrors: <list>}]
+            - source - the repository that users refer to, e.g. in image pull specifications
+            - mirrors - one or more repositories (str) that may also contain the same images. The order
+                of mirrors in this list is treated as the user’s desired priority
+    """
+
+    api_version = "v1"
+    api_group = Resource.ApiGroup.CONFIG_OPENSHIFT_IO
+
+    def __init__(self, image_digest_mirrors=None, **kwargs):
+        self.image_digest_mirrors = image_digest_mirrors
+        super().__init__(**kwargs)
+
+    def to_dict(self):
+        super().to_dict()
+        if not self.yaml_file:
+            if not self.image_digest_mirrors:
+                raise ValueError("image_digest_mirrors or yaml file must be defined")
+            self.res["spec"] = {"imageDigestMirrors": self.image_digest_mirrors}
