@@ -12,6 +12,7 @@ class ImageDigestMirrorSet(Resource):
     def __init__(self, image_digest_mirrors=None, **kwargs):
         """
         Create/Manage ImageDigestMirrorSet configuration object.
+
         Args:
             imageDigestMirrors (list of dict):
                 e.g. [{source: <str>, mirrors: <list>}, ..., {source: <str>, mirrors: <list>}]
