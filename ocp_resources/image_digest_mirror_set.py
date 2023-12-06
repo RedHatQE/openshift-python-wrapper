@@ -14,7 +14,7 @@ class ImageDigestMirrorSet(Resource):
         Create/Manage ImageDigestMirrorSet configuration object.
 
         Args:
-            imageDigestMirrors (list of dict):
+            image_digest_mirrors (list of dict):
                 e.g. [{source: <str>, mirrors: <list>}, ..., {source: <str>, mirrors: <list>}]
                 - source - the repository that users refer to, e.g. in image pull specifications
                 - mirrors - one or more repositories (str) that may also contain the same images. The order
