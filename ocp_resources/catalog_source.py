@@ -41,23 +41,19 @@ class CatalogSource(NamespacedResource):
                     "Passing yaml_file or all parameters 'source_type', 'image',"
                     " 'display_name' and 'publisher' is required."
                 )
-            self.res.update(
-                {
-                    "spec": {
-                        "sourceType": self.source_type,
-                        "image": self.image,
-                        "displayName": self.display_name,
-                        "publisher": self.publisher,
-                    }
+            self.res.update({
+                "spec": {
+                    "sourceType": self.source_type,
+                    "image": self.image,
+                    "displayName": self.display_name,
+                    "publisher": self.publisher,
                 }
-            )
+            })
             if self.update_strategy_registry_poll_interval:
-                self.res["spec"].update(
-                    {
-                        "updateStrategy": {
-                            "registryPoll": {
-                                "interval": self.update_strategy_registry_poll_interval,
-                            },
+                self.res["spec"].update({
+                    "updateStrategy": {
+                        "registryPoll": {
+                            "interval": self.update_strategy_registry_poll_interval,
                         },
-                    }
-                )
+                    },
+                })
