@@ -11,13 +11,23 @@ class Backup(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.VELERO_IO
 
-    def __init__(self, included_namespaces=None, excluded_resources=None, snapshot_move_data=False, storage_location=None, **kwargs):
+    def __init__(
+            self,
+            included_namespaces=None,
+            excluded_resources=None,
+            snapshot_move_data=False,
+            storage_location=None,
+            **kwargs
+    ):
         """
         Args:
             included_namespaces (list, optional): Namespaces to include in the backup.
                 If unspecified, all namespaces are included.
             excluded_resources (list, optional): Resources to exclude from the backup.
                 Resources may be shortcuts (e.g. 'po' for 'pods') or fully-qualified.
+            snapshot_move_data (bool, optional): If set to true, deploys the volume snapshot mover
+                controller and a modified CSI Data Mover plugin.
+            storage_location (string, optional): Define the location for the DataMover.
         """
         super().__init__(**kwargs)
         self.included_namespaces = included_namespaces
