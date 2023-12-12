@@ -60,19 +60,17 @@ class DataImportCron(NamespacedResource):
                 raise ValueError("imageStream and url cannot coexist")
             if not self.pull_method:
                 raise ValueError("Passing yaml_file or parameter 'pull_method' is required")
-            self.res.update(
-                {
-                    "spec": {
-                        "template": {"spec": {"source": {"registry": {"pullMethod": self.pull_method}}}},
-                    }
+            self.res.update({
+                "spec": {
+                    "template": {"spec": {"source": {"registry": {"pullMethod": self.pull_method}}}},
                 }
-            )
+            })
             spec = self.res["spec"]["template"]["spec"]
 
             if self.bind_immediate_annotation:
-                self.res["metadata"].setdefault("annotations", {}).update(
-                    {f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": ("true")}
-                )
+                self.res["metadata"].setdefault("annotations", {}).update({
+                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": ("true")
+                })
             if self.image_stream:
                 spec["source"]["registry"]["imageStream"] = self.image_stream
             if self.url:

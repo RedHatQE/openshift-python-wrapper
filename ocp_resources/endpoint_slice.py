@@ -56,11 +56,9 @@ class EndpointSlice(NamespacedResource):
         if not self.yaml_file:
             if not (self.address_type and self.endpoints):
                 raise ValueError("yaml_file or parameters 'address_type' and 'endpoints' are" " required.")
-            self.res.update(
-                {
-                    "addressTypes": self.address_type,
-                    "endpoints": self.endpoints,
-                }
-            )
+            self.res.update({
+                "addressTypes": self.address_type,
+                "endpoints": self.endpoints,
+            })
             if self.ports:
                 self.res["ports"] = self.ports
