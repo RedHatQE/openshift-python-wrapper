@@ -53,11 +53,9 @@ class Endpoints(NamespacedResource):
         if not self.yaml_file:
             if not (self.addresses and self.ports):
                 raise ValueError("yaml_file or parameters 'addresses' and 'ports' are required.")
-            self.res.update(
-                {
-                    "subsets": {
-                        "addresses": self.addresses,
-                        "ports": self.ports,
-                    }
+            self.res.update({
+                "subsets": {
+                    "addresses": self.addresses,
+                    "ports": self.ports,
                 }
-            )
+            })
