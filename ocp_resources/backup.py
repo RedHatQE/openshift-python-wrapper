@@ -34,6 +34,7 @@ class Backup(NamespacedResource):
         self.excluded_resources = excluded_resources
         self.snapshot_move_data = snapshot_move_data
         self.storage_location = storage_location
+
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
@@ -42,9 +43,9 @@ class Backup(NamespacedResource):
                 spec_dict.update({"includedNamespaces": self.included_namespaces})
             if self.excluded_resources:
                 spec_dict.update({"excludedResources": self.excluded_resources})
-            if snapshot_move_data:
+            if self.snapshot_move_data:
                 spec_dict.update({"snapshotMoveData": self.snapshot_move_data})
-            if storage_location:
+            if self.storage_location:
                 spec_dict.update({"storageLocation": self.storage_location})
             if spec_dict:
                 self.res.update({"spec": spec_dict})
