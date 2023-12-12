@@ -66,15 +66,13 @@ class PersistentVolumeClaim(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "volumeMode": self.volume_mode,
-                        "accessModes": [self.accessmodes],
-                        "resources": {"requests": {"storage": self.size}},
-                    }
+            self.res.update({
+                "spec": {
+                    "volumeMode": self.volume_mode,
+                    "accessModes": [self.accessmodes],
+                    "resources": {"requests": {"storage": self.size}},
                 }
-            )
+            })
             """
             Hostpath-provisioner is "node aware", when using it,
             a node attribute on the claim must be introduced as follows.
