@@ -256,6 +256,7 @@ class Resource:
         METRICS_K8S_IO = "metrics.k8s.io"
         MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
+        MTQ_KUBEVIRT_IO = "mtq.kubevirt.io"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = "networkaddonsoperator.network.kubevirt.io"
         NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
