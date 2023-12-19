@@ -286,6 +286,7 @@ class Resource:
         SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
         STORAGE_K8S_IO = "storage.k8s.io"
         STORAGECLASS_KUBERNETES_IO = "storageclass.kubernetes.io"
+        STORAGECLASS_KUBEVIRT_IO = "storageclass.kubevirt.io"
         SUBRESOURCES_KUBEVIRT_IO = "subresources.kubevirt.io"
         TEKTONTASKS_KUBEVIRT_IO = "tektontasks.kubevirt.io"
         TEKTON_DEV = "tekton.dev"
