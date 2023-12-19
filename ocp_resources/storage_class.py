@@ -43,6 +43,7 @@ class StorageClass(Resource):
 
     class Annotations:
         IS_DEFAULT_CLASS = f"{Resource.ApiGroup.STORAGECLASS_KUBERNETES_IO}/is-default-class"
+        IS_DEFAULT_VIRT_CLASS = f"{Resource.ApiGroup.STORAGECLASS_KUBEVIRT_IO}/is-default-virt-class"
 
     class ReclaimPolicy:
         DELETE = "Delete"
