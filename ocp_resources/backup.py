@@ -12,12 +12,12 @@ class Backup(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.VELERO_IO
 
     def __init__(
-            self,
-            included_namespaces=None,
-            excluded_resources=None,
-            snapshot_move_data=False,
-            storage_location=None,
-            **kwargs
+        self,
+        included_namespaces=None,
+        excluded_resources=None,
+        snapshot_move_data=False,
+        storage_location=None,
+        **kwargs,
     ):
         """
         https://velero.io/docs/main/api-types/backup/
@@ -51,4 +51,3 @@ class Backup(NamespacedResource):
                 spec_dict.update({"storageLocation": self.storage_location})
             if spec_dict:
                 self.res.update({"spec": spec_dict})
-
