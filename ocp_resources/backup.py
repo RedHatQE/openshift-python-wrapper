@@ -20,6 +20,8 @@ class Backup(NamespacedResource):
             **kwargs
     ):
         """
+        https://velero.io/docs/main/api-types/backup/
+
         Args:
             included_namespaces (list, optional): Namespaces to include in the backup.
                 If unspecified, all namespaces are included.
