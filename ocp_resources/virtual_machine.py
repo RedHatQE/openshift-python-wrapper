@@ -73,9 +73,7 @@ class VirtualMachine(NamespacedResource):
         )
 
     def api_request(self, method, action, **params):
-        return super().api_request(
-            method=method, action=action, url=self._subresource_api_url, **params
-        )
+        return super().api_request(method=method, action=action, url=self._subresource_api_url, **params)
 
     def to_dict(self):
         super().to_dict()
@@ -94,9 +92,7 @@ class VirtualMachine(NamespacedResource):
             self.vmi.virt_launcher_pod.wait_deleted()
             return self.vmi.wait_until_running(timeout=timeout, stop_status="dummy")
 
-    def stop(
-        self, timeout=TIMEOUT_4MINUTES, vmi_delete_timeout=TIMEOUT_4MINUTES, wait=False
-    ):
+    def stop(self, timeout=TIMEOUT_4MINUTES, vmi_delete_timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="stop")
         if wait:
             self.wait_for_ready_status(timeout=timeout, status=None)
@@ -113,10 +109,7 @@ class VirtualMachine(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        self.logger.info(
-            f"Wait for {self.kind} {self.name} status to be"
-            f" {'ready' if status == True else status}"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {'ready' if status is True else status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,

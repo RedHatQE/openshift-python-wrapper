@@ -104,26 +104,16 @@ class MachineSet(NamespacedResource):
                 "selector": {
                     "matchLabels": {
                         f"{self.api_group}/{_cluster_api_cluster}": self.cluster_name,
-                        f"{self.api_group}/{_cluster_api_machineset}": (
-                            f"{self.cluster_name}-{self.machine_role}"
-                        ),
+                        f"{self.api_group}/{_cluster_api_machineset}": (f"{self.cluster_name}-{self.machine_role}"),
                     }
                 },
                 "template": {
                     _metadata: {
                         _labels: {
-                            f"{self.api_group}/{_cluster_api_cluster}": (
-                                self.cluster_name
-                            ),
-                            f"{self.api_group}/{_cluster_api_machine_role}": (
-                                self.machine_role
-                            ),
-                            f"{self.api_group}/{_cluster_api_machine_type}": (
-                                self.machine_type
-                            ),
-                            f"{self.api_group}/{_cluster_api_machineset}": (
-                                f"{self.cluster_name}-{self.machine_role}"
-                            ),
+                            f"{self.api_group}/{_cluster_api_cluster}": (self.cluster_name),
+                            f"{self.api_group}/{_cluster_api_machine_role}": (self.machine_role),
+                            f"{self.api_group}/{_cluster_api_machine_type}": (self.machine_type),
+                            f"{self.api_group}/{_cluster_api_machineset}": (f"{self.cluster_name}-{self.machine_role}"),
                         }
                     },
                     _spec: {"providerSpec": self.provider_spec},
@@ -172,9 +162,7 @@ class MachineSet(NamespacedResource):
             )
             return False
 
-    def scale_replicas(
-        self, replicas, wait_timeout=TIMEOUT_5MINUTES, sleep=1, wait=True
-    ):
+    def scale_replicas(self, replicas, wait_timeout=TIMEOUT_5MINUTES, sleep=1, wait=True):
         """
         Scale down/up a machine-set replicas.
 
@@ -190,10 +178,7 @@ class MachineSet(NamespacedResource):
         super().to_dict()
         self.res.update({"spec": {"replicas": replicas}})
 
-        self.logger.info(
-            f"Scale machine-set from {self.desired_replicas} replicas to"
-            f" {replicas} replicas"
-        )
+        self.logger.info(f"Scale machine-set from {self.desired_replicas} replicas to" f" {replicas} replicas")
         self.update(resource_dict=self.res)
         if wait:
             return self.wait_for_replicas(timeout=wait_timeout, sleep=sleep)

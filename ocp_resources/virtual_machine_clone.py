@@ -48,9 +48,7 @@ class VirtualMachineClone(NamespacedResource):
 
             source = spec.setdefault("source", {})
             source["apiGroup"] = NamespacedResource.ApiGroup.KUBEVIRT_IO
-            source["kind"] = (
-                self.source_kind if self.source_kind else VirtualMachine.kind
-            )
+            source["kind"] = self.source_kind if self.source_kind else VirtualMachine.kind
             source["name"] = self.source_name
 
             if self.target_name:
