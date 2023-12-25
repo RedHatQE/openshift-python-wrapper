@@ -93,13 +93,11 @@ def get_client(config_file=None, config_dict=None, context=None):
 def sub_resource_level(current_class, owner_class, parent_class):
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
-    for class_iterator in reversed(
-        [
-            class_iterator
-            for class_iterator in current_class.mro()
-            if class_iterator not in owner_class.mro() and issubclass(class_iterator, parent_class)
-        ]
-    ):
+    for class_iterator in reversed([
+        class_iterator
+        for class_iterator in current_class.mro()
+        if class_iterator not in owner_class.mro() and issubclass(class_iterator, parent_class)
+    ]):
         return class_iterator.__name__
 
 
@@ -258,6 +256,7 @@ class Resource:
         METRICS_K8S_IO = "metrics.k8s.io"
         MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
         MONITORING_COREOS_COM = "monitoring.coreos.com"
+        MTQ_KUBEVIRT_IO = "mtq.kubevirt.io"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = "networkaddonsoperator.network.kubevirt.io"
         NETWORKING_ISTIO_IO = "networking.istio.io"
         NETWORKING_K8S_IO = "networking.k8s.io"
@@ -288,6 +287,7 @@ class Resource:
         SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
         STORAGE_K8S_IO = "storage.k8s.io"
         STORAGECLASS_KUBERNETES_IO = "storageclass.kubernetes.io"
+        STORAGECLASS_KUBEVIRT_IO = "storageclass.kubevirt.io"
         SUBRESOURCES_KUBEVIRT_IO = "subresources.kubevirt.io"
         TEKTONTASKS_KUBEVIRT_IO = "tektontasks.kubevirt.io"
         TEKTON_DEV = "tekton.dev"
