@@ -1,5 +1,7 @@
 import datetime
 import time
+from warnings import warn
+
 
 import yaml
 from simple_logger.logger import get_logger
@@ -75,6 +77,11 @@ class TimeoutSampler:
         print_log=True,
         **func_kwargs,
     ):
+        warn(
+            f"{self.__class__.__name__} will be deprecated. Use timeout-sampler [https://github.com/RedHatQE/timeout-sampler] module instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.wait_timeout = wait_timeout
         self.sleep = sleep
         self.func = func
@@ -209,6 +216,12 @@ class TimeoutWatch:
     """
 
     def __init__(self, timeout):
+        warn(
+            f"{self.__class__.__name__} will be deprecated. Use timeout-sampler [https://github.com/RedHatQE/timeout-sampler] module instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         self.timeout = timeout
         self.start_time = time.time()
 
