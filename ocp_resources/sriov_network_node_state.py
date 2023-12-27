@@ -1,5 +1,5 @@
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 
 
 class SriovNetworkNodeState(NamespacedResource):

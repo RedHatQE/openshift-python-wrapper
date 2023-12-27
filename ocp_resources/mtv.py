@@ -1,4 +1,4 @@
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
 
 def _get_status_condition_log_message(**status_condition):
