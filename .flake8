@@ -44,6 +44,7 @@ fcn_exclude_functions =
     yaml,
     benedict,
     logger,
+    warn,
 
 enable-extensions =
     FCN,
