@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
 
 class TestTimeoutSampler:
