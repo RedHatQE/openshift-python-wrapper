@@ -621,13 +621,13 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pytest"
-version = "7.4.3"
+version = "7.4.4"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-7.4.3-py3-none-any.whl", hash = "sha256:0d009c083ea859a71b76adf7c1d502e4bc170b80a8ef002da5806527b9591fac"},
-    {file = "pytest-7.4.3.tar.gz", hash = "sha256:d989d136982de4e3b29dabcc838ad581c64e8ed52c11fbe86ddebd9da0818cd5"},
+    {file = "pytest-7.4.4-py3-none-any.whl", hash = "sha256:b090cdf5ed60bf4c45261be03239c2c1c22df034fbffe691abe93cd80cea01d8"},
+    {file = "pytest-7.4.4.tar.gz", hash = "sha256:2cf0005922c6ace4a3e2ec8b4080eb0d9753fdc93107415332f50ce9e7994280"},
 ]
 
 [package.dependencies]
@@ -643,13 +643,13 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "python-benedict"
-version = "0.33.0"
+version = "0.33.1"
 description = "python-benedict is a dict subclass with keylist/keypath/keyattr support, normalized I/O operations (base64, csv, ini, json, pickle, plist, query-string, toml, xls, xml, yaml) and many utilities... for humans, obviously."
 optional = false
 python-versions = "*"
 files = [
-    {file = "python-benedict-0.33.0.tar.gz", hash = "sha256:0a783caa1776cf73e890725be30be4310031f2e62d320ee8b8445fcfcb51b493"},
-    {file = "python_benedict-0.33.0-py3-none-any.whl", hash = "sha256:2b6c2ee1edba2794bfe868e66b0eec260df899125b6187a63f486535b8db3dcc"},
+    {file = "python-benedict-0.33.1.tar.gz", hash = "sha256:e65ecfc16b505b0fefa08ed97c65f6f93cf32c0309dd2e1614fc0f58f22b2c4e"},
+    {file = "python_benedict-0.33.1-py3-none-any.whl", hash = "sha256:8838ebe33ed7508d37472346e67516fcf525ebc717a6f48b37aa00e0b89bc463"},
 ]
 
 [package.dependencies]
@@ -659,9 +659,9 @@ requests = ">=2.26.0,<3.0.0"
 
 [package.extras]
 all = ["python-benedict[io,parse,s3]"]
-html = ["beautifulsoup4 (>=4.12.0,<5.0.0)"]
+html = ["beautifulsoup4 (>=4.12.0,<5.0.0)", "python-benedict[xml]"]
 io = ["python-benedict[html,toml,xls,xml,yaml]"]
-parse = ["ftfy (>=6.0.0,<7.0.0)", "mailchecker (>=4.1.0,<6.0.0)", "phonenumbers (>=8.12.0,<9.0.0)", "python-dateutil (>=2.8.0,<3.0.0)"]
+parse = ["ftfy (>=6.0.0,<7.0.0)", "mailchecker (>=4.1.0,<7.0.0)", "phonenumbers (>=8.12.0,<9.0.0)", "python-dateutil (>=2.8.0,<3.0.0)"]
 s3 = ["boto3 (>=1.24.89,<2.0.0)"]
 toml = ["toml (>=0.10.2,<1.0.0)"]
 xls = ["openpyxl (>=3.0.0,<4.0.0)", "xlrd (>=2.0.0,<3.0.0)"]
@@ -877,6 +877,19 @@ files = [
 ]
 
 [[package]]
+name = "timeout-sampler"
+version = "0.0.1"
+description = "Timeout utility class to wait for any function output and interact with it in given time"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "timeout_sampler-0.0.1.tar.gz", hash = "sha256:e148f6e04a19b64f36209bbf3a7f8eb44ce6d9746edc09923fa8ea9dc6a110e9"},
+]
+
+[package.dependencies]
+python-simple-logger = ">=1.0.8,<2.0.0"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -970,4 +983,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "5fbc0eae7d87a1c45401961eed28490a57dc405c07ee68f49929f423cbf1b38d"
+content-hash = "679cdc502d101834f26fcfe442e11580b9d851d4873501c9ad64286062111470"
