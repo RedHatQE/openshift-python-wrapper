@@ -6,7 +6,7 @@ from ocp_resources.resource import NamespacedResource
 class Backup(NamespacedResource):
     """
     Backup in 'velero' official API:
-        https://velero.io/docs/v0.7.1/api-types/backup/
+        https://velero.io/docs/main/api-types/backup/
     """
 
     api_group = NamespacedResource.ApiGroup.VELERO_IO
@@ -20,8 +20,6 @@ class Backup(NamespacedResource):
         **kwargs,
     ):
         """
-        https://velero.io/docs/main/api-types/backup/
-
         Args:
             included_namespaces (list, optional): Namespaces to include in the backup.
                 If unspecified, all namespaces are included.
