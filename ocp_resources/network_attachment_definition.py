@@ -201,31 +201,36 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def __init__(
         self,
         network_name=None,
+        topology=None,
         **kwargs,
     ):
         """
         Create and manage an OVN k8s overlay NetworkAttachmentDefinition (a switched, layer 2, topology network).
 
         API reference:
-        https://docs.openshift.com/container-platform/4.13/networking/multiple_networks/configuring-additional-network.html#configuration-ovnk-network-plugin-json-object_configuring-additional-network
+        https://docs.openshift.com/container-platform/4.14/networking/multiple_networks/configuring-additional-network.html#configuration-ovnk-additional-networks_configuring-additional-network
 
         Args:
             network_name (str): The name of the network. This field is mandatory when not using yaml
                 file.
+            topology (str): The secondary network topology to be created.
         """
         super().__init__(
             cni_type="ovn-k8s-cni-overlay",
             **kwargs,
         )
         self.network_name = network_name
+        self.topology = topology
 
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
             if not self.network_name:
                 raise ValueError("network_name is required")
+            if not self.topology:
+                raise ValueError("topology is required")
             spec_config = self.res["spec"]["config"]
             spec_config["name"] = self.network_name
+            spec_config["topology"] = self.topology
             spec_config["netAttachDefName"] = f"{self.namespace}/{self.name}"
-            spec_config["topology"] = "layer2"
             self.res["spec"]["config"] = json.dumps(spec_config)
