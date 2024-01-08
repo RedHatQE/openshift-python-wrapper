@@ -24,7 +24,7 @@ pre-commit install
 - When submitting a pull request, make sure to fill all the required, relevant fields for your PR.  
 Make sure the title is descriptive and short.
 - If the fix is needed in a released version, once your pull request is merged, cherry-pick it to the relevant branch(s).  
-Add `!cherry-pick <target branch to cherry-pick to>` to the PR comment.
+Add `/cherry-pick <target branch to cherry-pick to>` to the PR comment.
 
 ## Adding a new module (resource)
 To support working with a new (or missing) resource:
