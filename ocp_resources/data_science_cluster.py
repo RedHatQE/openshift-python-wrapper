@@ -5,10 +5,14 @@ class DataScienceCluster(Resource):
     """
     DataScienceCluster Resource for RHOAI operator
 
-    https://access.redhat.com/documentation/en-us/red_hat_openshift_ai_self-managed/2.5/html/installing_and_uninstalling_openshift_ai_self-managed/index
+    https://access.redhat.com/documentation/en-us/red_hat_openshift_ai_self-managed/2.5/html/installing_and_uninstalling_openshift_ai_self-managed/installing-and-managing-openshift-ai-components_component-install
+
+    https://github.com/opendatahub-io/opendatahub-operator/blob/incubation/config/crd/bases/datasciencecluster.opendatahub.io_datascienceclusters.yaml
+
+    https://github.com/opendatahub-io/opendatahub-operator/blob/incubation/apis/datasciencecluster/v1/datasciencecluster_types.go
     """
 
-    api_group = Resource.ApiGroup.DATASCIENCE_CLUSTER
+    api_group = Resource.ApiGroup.DATA_SCIENCE_CLUSTER
 
     class ManagementState:
         """
@@ -26,17 +30,14 @@ class DataScienceCluster(Resource):
 
     def __init__(
         self,
-        name=None,
-        client=None,
-        yaml_file=None,
-        codeflare_state=ManagementState.REMOVED,
-        dashboard_state=ManagementState.MANAGED,
-        datasciencepipelines_state=ManagementState.REMOVED,
-        kserve_state=ManagementState.REMOVED,
-        modelmeshserving_state=ManagementState.REMOVED,
-        ray_state=ManagementState.REMOVED,
-        trustyai_state=ManagementState.REMOVED,
-        workbenches_state=ManagementState.REMOVED,
+        codeflare_state=None,
+        dashboard_state=None,
+        datasciencepipelines_state=None,
+        kserve_state=None,
+        modelmeshserving_state=None,
+        ray_state=None,
+        trustyai_state=None,
+        workbenches_state=None,
         **kwargs,
     ):
         """
@@ -44,20 +45,17 @@ class DataScienceCluster(Resource):
             name (str): Name of the DataScienceCluster
             client (DynamicClient): DynamicClient to use.
             yaml_file (yaml, default: None): yaml file for the resource.
-            codeflare_state (str, default: Removed): State of codeflare Component.
-            dashboard_state (str, default: Managed): State of dashboard Component.
-            datasciencepipelines_state (str, default: Removed): State of datasciencepipelines Component.
-            kserve_state (str, default: Removed): State of kserve Component.
-            modelmeshserving_state (str, default: Removed): State of modelmeshserving Component.
-            ray_state (str, default: Removed): State of ray Component.
-            trustyai_state (str, default: Removed): State of trustyai Component.
-            workbenches_state (str, default: Removed): State of workbenches Component.
+            codeflare_state (str): ManagementState of codeflare Component.
+            dashboard_state (str): ManagementState of dashboard Component.
+            datasciencepipelines_state (str): ManagementState of datasciencepipelines Component.
+            kserve_state (str): ManagementState of kserve Component.
+            modelmeshserving_state (str): ManagementState of modelmeshserving Component.
+            ray_state (str): ManagementState of ray Component.
+            trustyai_state (str): ManagementState of trustyai Component.
+            workbenches_state (str): ManagementState of workbenches Component.
 
         """
         super().__init__(
-            name=name,
-            client=client,
-            yaml_file=yaml_file,
             **kwargs,
         )
         self.codeflare_state = codeflare_state
