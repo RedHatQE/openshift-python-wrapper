@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.resource import Resource
+from ocp_resources.storage_profile import StorageProfile
 
 
 class StorageClass(Resource):
@@ -102,3 +104,13 @@ class StorageClass(Resource):
                 self.res.update({"allowedTopologies": self.allowed_topologies})
             if self.mount_options:
                 self.res.update({"mountOptions": self.mount_options})
+
+    @property
+    def storage_profile(self):
+        try:
+            return StorageProfile(
+                client=self.client,
+                name=self.name,
+            )
+        except ResourceNotFoundError:
+            self.logger.warning(f" storageProfile is not found for {self.name}  storageClass")
