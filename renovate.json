@@ -2,6 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "baseBranches": [
     "main",
+    "v4.15",
     "v4.14",
     "v4.13"
   ]
