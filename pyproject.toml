@@ -9,7 +9,7 @@ exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.poetry]
 name = "openshift-python-wrapper"
-version = "4.999.999"
+version = "0.0.0"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
