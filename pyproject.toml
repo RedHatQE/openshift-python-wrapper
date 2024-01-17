@@ -9,18 +9,18 @@ exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.poetry]
 name = "openshift-python-wrapper"
-version = "0.0.0"
+version = "4.999.999"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
-packages = [{include = "ocp_resources"}]
+packages = [{ include = "ocp_resources" }]
 homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
 documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 keywords = ["Openshift", "Kubevirt", "CNV"]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
 ]
 
 [tool.poetry.urls]
