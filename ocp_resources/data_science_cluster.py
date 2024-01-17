@@ -14,6 +14,22 @@ class DataScienceCluster(Resource):
 
     api_group = Resource.ApiGroup.DATA_SCIENCE_CLUSTER
 
+    class Condition(Resource.Condition):
+        DASHBOARD_READY = "dashboardReady"
+        WORKBENCHES_READY = "workbenchesReady"
+        MODEL_MESH_READY = "model-meshReady"
+        DATA_SCIENCE_PIPELINES_READY = "data-science-pipelines-operatorReady"
+        KSERVE_READY = "kserveReady"
+        CODEFLARE_READY = "codeflareReady"
+        RAY_READY = "rayReady"
+        TRUSTYAI_READY = "trustyaiReady"
+
+        class Reason:
+            RECONCILE_COMPLETED_WITH_COMPONENT_ERRORS = "ReconcileCompletedWithComponentErrors"
+            RECONCILE_FAILED = "ReconcileFailed"
+            RECONCILE_COMPLETED = "ReconcileCompleted"
+
+
     class ManagementState:
         """
         Supported Management States of components of DataScienceCluster.
@@ -32,9 +48,9 @@ class DataScienceCluster(Resource):
         self,
         codeflare_state=None,
         dashboard_state=None,
-        datasciencepipelines_state=None,
+        data_science_pipelines_state=None,
         kserve_state=None,
-        modelmeshserving_state=None,
+        model_mesh_state=None,
         ray_state=None,
         trustyai_state=None,
         workbenches_state=None,
@@ -47,9 +63,9 @@ class DataScienceCluster(Resource):
             yaml_file (yaml, default: None): yaml file for the resource.
             codeflare_state (str): ManagementState of codeflare Component.
             dashboard_state (str): ManagementState of dashboard Component.
-            datasciencepipelines_state (str): ManagementState of datasciencepipelines Component.
+            data_science_pipelines_state (str): ManagementState of datasciencepipelines Component.
             kserve_state (str): ManagementState of kserve Component.
-            modelmeshserving_state (str): ManagementState of modelmeshserving Component.
+            model_mesh_state (str): ManagementState of modelmeshserving Component.
             ray_state (str): ManagementState of ray Component.
             trustyai_state (str): ManagementState of trustyai Component.
             workbenches_state (str): ManagementState of workbenches Component.
@@ -60,9 +76,9 @@ class DataScienceCluster(Resource):
         )
         self.codeflare_state = codeflare_state
         self.dashboard_state = dashboard_state
-        self.datasciencepipelines_state = datasciencepipelines_state
+        self.datasciencepipelines_state = data_science_pipelines_state
         self.kserve_state = kserve_state
-        self.modelmeshserving_state = modelmeshserving_state
+        self.modelmeshserving_state = model_mesh_state
         self.ray_state = ray_state
         self.trustyai_state = trustyai_state
         self.workbenches_state = workbenches_state
