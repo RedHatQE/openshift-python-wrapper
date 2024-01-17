@@ -29,7 +29,6 @@ class DataScienceCluster(Resource):
             RECONCILE_FAILED = "ReconcileFailed"
             RECONCILE_COMPLETED = "ReconcileCompleted"
 
-
     class ManagementState:
         """
         Supported Management States of components of DataScienceCluster.
