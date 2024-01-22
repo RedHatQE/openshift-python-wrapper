@@ -1,68 +1,61 @@
+from warnings import warn
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
-
-from ocp_resources.constants import TIMEOUT_4MINUTES
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.volume_snapshot import VolumeSnapshot
 
 
 class DataSource(NamespacedResource):
+    """
+    DataSource object.
+
+    https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_datasource
+    """
+
     api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
-    def __init__(
-        self,
-        name=None,
-        namespace=None,
-        client=None,
-        source=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
-    ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
-        self.source = source
+    def __init__(self, source=None, **kwargs):
+        """
+        Args:
+            source (dict): The source of the data.
+        """
+        super().__init__(**kwargs)
+        self._source = source
 
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update({
-                "spec": {
-                    "source": self.source,
-                },
-            })
+            if not self._source:
+                raise ValueError("Passing yaml_file or parameter 'source' is required")
 
-    def _get_boot_source(self, boot_source_type):
-        boot_source = self.instance.spec.source.get(boot_source_type)
-        if not boot_source:
-            return None
-        boot_source_name = boot_source.name
-        boot_source_namespace = boot_source.namespace
-        try:
-            boot_source_object = PersistentVolumeClaim if boot_source_type == "pvc" else VolumeSnapshot
-            return boot_source_object(
-                client=self.client,
-                name=boot_source_name,
-                namespace=boot_source_namespace,
-            )
-        except ResourceNotFoundError:
-            self.logger.warning(
-                f"dataSource {self.name} is pointing to a non-existing {boot_source_type}, name:"
-                f" {boot_source_name}, namespace: {boot_source_namespace}"
-            )
+            self.res["spec"]["source"] = self._source
 
     @property
     def pvc(self):
-        return self._get_boot_source(boot_source_type="pvc")
+        warn("pvc will be deprecated in v4.16, Use source instead", DeprecationWarning, stacklevel=2)
+        data_source_pvc = self.instance.spec.source.pvc
+        pvc_name = data_source_pvc.name
+        pvc_namespace = data_source_pvc.namespace
+        try:
+            return PersistentVolumeClaim(
+                client=self.client,
+                name=pvc_name,
+                namespace=pvc_namespace,
+            )
+        except ResourceNotFoundError:
+            self.logger.warning(
+                f"dataSource {self.name} is pointing to a non-existing PVC, name:"
+                f" {pvc_name}, namespace: {pvc_namespace}"
+            )
 
     @property
-    def snapshot(self):
-        return self._get_boot_source(boot_source_type="snapshot")
+    def source(self):
+        _instance_source = self.instance.spec.source
+        _source = [*_instance_source][0][0]
+        _source_mapping = {"pvc": PersistentVolumeClaim, "snapshot": VolumeSnapshot}
+
+        return _source_mapping[_source](
+            client=self.client,
+            name=_instance_source[_source].name,
+            namespace=_instance_source[_source].namespace,
+        )
