@@ -15,6 +15,9 @@ class StorageClass(Resource):
     class Types:
         """
         These are names of StorageClass instances when you run `oc get sc`
+
+        API:
+        https://kubernetes.io/docs/concepts/storage/storage-classes/
         """
 
         LOCAL_BLOCK = "local-block"
@@ -113,4 +116,5 @@ class StorageClass(Resource):
                 name=self.name,
             )
         except ResourceNotFoundError:
-            self.logger.warning(f" storageProfile is not found for {self.name}  storageClass")
+            self.logger.error(f" storageProfile is not found for {self.name}  storageClass")
+            raise
