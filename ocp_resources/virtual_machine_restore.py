@@ -4,7 +4,7 @@ from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler, TimeoutWatch
+from timeout_sampler import TimeoutSampler, TimeoutWatch
 from ocp_resources.virtual_machine import VirtualMachine
 
 

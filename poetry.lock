@@ -877,6 +877,19 @@ asttokens = ">=2.1.0"
 executing = ">=1.2.0"
 pure-eval = "*"
 
+[[package]]
+name = "timeout-sampler"
+version = "0.0.1"
+description = "Timeout utility class to wait for any function output and interact with it in given time"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "timeout_sampler-0.0.1.tar.gz", hash = "sha256:e148f6e04a19b64f36209bbf3a7f8eb44ce6d9746edc09923fa8ea9dc6a110e9"},
+]
+
+[package.dependencies]
+python-simple-logger = ">=1.0.8,<2.0.0"
+
 [package.extras]
 tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
@@ -985,4 +998,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "aba38fde353c6cefe4389d7ebd782ef8c42ca51b8d5710a8d1d33eb5fc17c9c8"
+content-hash = "6008097a62f1ec68d969d793201d865025f99b16b76eeafad3522fa9264d2076"
