@@ -1,6 +1,6 @@
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from timeout_sampler import TimeoutSampler
 
 
 class Benchmark(NamespacedResource):

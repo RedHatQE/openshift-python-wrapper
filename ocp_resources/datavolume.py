@@ -7,7 +7,7 @@ from ocp_resources.constants import (
 )
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
 
 class DataVolume(NamespacedResource):

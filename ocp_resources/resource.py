@@ -28,12 +28,12 @@ from ocp_resources.constants import (
     TIMEOUT_4MINUTES,
 )
 from ocp_resources.event import Event
-from ocp_resources.utils import (
+from timeout_sampler import (
     TimeoutExpiredError,
     TimeoutSampler,
     TimeoutWatch,
-    skip_existing_resource_creation_teardown,
 )
+from ocp_resources.utils import skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
