@@ -7,6 +7,7 @@ from json import JSONDecodeError
 def resources_dict_from_api_resources():
     """
     Build dict with resources and matched values.
+
     Output example for resource:
     {
         'api_version': 'networking.k8s.io/v1',
