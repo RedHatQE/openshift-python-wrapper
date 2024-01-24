@@ -43,6 +43,8 @@ if __name__ == "__main__":
 
     new_data = resources_dict_from_api_resources()
     if new_data:
+        for key in new_data:
+            data[key] = new_data[key]
+
         with open(data_file, "w") as fd_write:
-            data.update(new_data)
             fd_write.write(json.dumps(data))
