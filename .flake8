@@ -44,6 +44,9 @@ fcn_exclude_functions =
     yaml,
     benedict,
     logger,
+    warn,
+    pytest,
+    json,
 
 enable-extensions =
     FCN,

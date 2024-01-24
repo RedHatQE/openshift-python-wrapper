@@ -6,7 +6,6 @@ import json
 import os
 
 import pytest
-import requests
 
 from ocp_resources.resource import Resource  # noqa
 
@@ -103,11 +102,8 @@ def _resource_file():
 
 @pytest.fixture()
 def resources_definitions():
-    file_ = (
-        "https://raw.githubusercontent.com/RedHatQE/" "openshift-resources-definitions/main/resources_definitions.json"
-    )
-    content = requests.get(file_).content
-    return json.loads(content)
+    with open("tests/scripts/resources_definitions.json") as fd:
+        yield json.load(fd)
 
 
 @pytest.fixture()
@@ -120,6 +116,8 @@ def resources_definitions_errors(resources_definitions):
             for cls in classes:
                 resource_dict = resources_definitions.get(cls.name)
                 if not resource_dict:
+                    # TODO: Fail and let the user know that 'tests/scripts/resources_definitions.json'
+                    #   need to be updated using 'update_resources_definitions' script
                     continue
 
                 bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, ast.Assign)]
