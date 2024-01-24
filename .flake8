@@ -45,6 +45,8 @@ fcn_exclude_functions =
     benedict,
     logger,
     warn,
+    pytest,
+    json,
 
 enable-extensions =
     FCN,
