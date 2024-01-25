@@ -91,4 +91,4 @@ class PerformanceProfile(Resource):
             if self.workload_hints:
                 manifest_spec["workloadHints"] = self.workload_hints
 
-            self.res.update({"spec": manifest_spec})
+            self.res["spec"] = manifest_spec
