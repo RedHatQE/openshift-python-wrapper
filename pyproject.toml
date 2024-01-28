@@ -32,7 +32,7 @@ ipdb = "^0.13.13"
 
 
 [tool.poetry.group.tests.dependencies]
-pytest = "^7.4.2"
+pytest = "^8.0.0"
 requests = "^2.31.0"
 
 [tool.poetry-dynamic-versioning.substitution]
