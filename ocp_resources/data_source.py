@@ -28,7 +28,7 @@ class DataSource(NamespacedResource):
             if not self._source:
                 raise ValueError("Passing yaml_file or parameter 'source' is required")
 
-            self.res["spec"]["source"] = self._source
+            self.res.update({"spec": {"source": self._source}})
 
     @property
     def pvc(self):
