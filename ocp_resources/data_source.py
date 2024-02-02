@@ -25,13 +25,6 @@ class DataSource(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "source": self.source,
-                    },
-                }
-            )
             if not self._source:
                 raise ValueError("Passing yaml_file or parameter 'source' is required")
 
