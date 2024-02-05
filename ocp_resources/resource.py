@@ -189,7 +189,6 @@ class Resource:
         READY = "Ready"
         TERMINATING = "Terminating"
         ERROR = "Error"
-        INSTALLATION = "installation"
         COMPLETE = "complete"
 
     class Condition:
