@@ -24,7 +24,7 @@ class RHMI(NamespacedResource):
         self.logger.info(f"Wait for {self.kind} {self.name} installation status to be {RHMI.Status.COMPLETE}")
         try:
             timeout_watcher = TimeoutWatch(timeout=timeout)
-            self.wait(timeout=timeout)
+            self.wait(timeout=timeout_watcher.remaining_time())
 
             for sample in TimeoutSampler(
                 wait_timeout=timeout_watcher.remaining_time(),
