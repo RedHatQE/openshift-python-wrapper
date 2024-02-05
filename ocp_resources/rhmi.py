@@ -15,7 +15,7 @@ class RHMI(NamespacedResource):
         Wait until RHMI stage status is complete.
 
         Args:
-            timeout (int): Time in seconds to wait for installation status.
+            timeout (int): Time in seconds to wait for stage status.
 
         Raises:
             TimeoutExpiredError: If stage status is not complete.
