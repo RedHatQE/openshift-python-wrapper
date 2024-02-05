@@ -25,10 +25,11 @@ class RHMI(NamespacedResource):
         sample = None
         try:
             timeout_watcher = TimeoutWatch(timeout=timeout)
-            self.wait(timeout=timeout_watcher.remaining_time())
+            timeout_remain = timeout_watcher.remaining_time()
+            self.wait(timeout=timeout_remain)
 
             for sample in TimeoutSampler(
-                wait_timeout=timeout_watcher.remaining_time(),
+                wait_timeout=timeout_remain,
                 sleep=1,
                 func=lambda: self.instance.status.stage,
             ):
