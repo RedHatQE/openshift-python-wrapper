@@ -10,11 +10,7 @@ class RHMI(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.INTEGREATLY_ORG
 
-    class Status:
-        INSTALLATION = "installation"
-        COMPLETE = "complete"
-
-    def wait_for_status_complete(self, timeout):
+    def wait_for_install_status_complete(self, timeout):
         """
         Wait until RHMI stage status is complete.
 
@@ -28,13 +24,7 @@ class RHMI(NamespacedResource):
         self.logger.info(f"Wait for {self.kind} {self.name} installation status to be {RHMI.Status.COMPLETE}")
         try:
             timeout_watcher = TimeoutWatch(timeout=timeout)
-            for sample in TimeoutSampler(
-                wait_timeout=timeout,
-                sleep=1,
-                func=lambda: self.exists,
-            ):
-                if sample:
-                    break
+            self.wait(timeout=timeout)
 
             for sample in TimeoutSampler(
                 wait_timeout=timeout_watcher.remaining_time(),
@@ -45,7 +35,5 @@ class RHMI(NamespacedResource):
                     return
 
         except TimeoutExpiredError:
-            self.logger.error(
-                f"after {timeout} seconds, {self.kind} {self.name} stage status is {self.instance.status.stage}"
-            )
+            self.logger.error(f"after {timeout} seconds, {self.kind} {self.name} stage status is {sample}")
             raise
