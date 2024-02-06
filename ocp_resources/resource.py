@@ -221,6 +221,7 @@ class Resource:
             ABSENT = "absent"
 
     class ApiGroup:
+        AAQ_KUBEVIRT_IO = "aaq.kubevirt.io"
         ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
         APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
         APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
