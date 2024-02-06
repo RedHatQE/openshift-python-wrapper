@@ -189,6 +189,7 @@ class Resource:
         READY = "Ready"
         TERMINATING = "Terminating"
         ERROR = "Error"
+        COMPLETE = "complete"
 
     class Condition:
         UPGRADEABLE = "Upgradeable"
