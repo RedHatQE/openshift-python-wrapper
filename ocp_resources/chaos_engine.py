@@ -4,7 +4,6 @@ from ocp_resources.resource import NamespacedResource
 
 
 class ChaosEngine(NamespacedResource):
-
     api_group = NamespacedResource.ApiGroup.LITMUS_IO
 
     class EngineStatus:

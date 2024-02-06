@@ -32,9 +32,6 @@ class OperatorGroup(NamespacedResource):
         self.target_namespaces = target_namespaces
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update({"spec": {"targetNamespaces": self.target_namespaces}})
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({"spec": {"targetNamespaces": self.target_namespaces}})

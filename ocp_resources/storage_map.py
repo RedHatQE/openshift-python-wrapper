@@ -62,9 +62,6 @@ class StorageMap(NamespacedResource, MTV):
         self.condition_message_ready = self.ConditionMessage.STORAGE_MAP_READY
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(self.map_to_dict)
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update(self.map_to_dict)

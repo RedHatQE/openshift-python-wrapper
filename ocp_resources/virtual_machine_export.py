@@ -34,11 +34,6 @@ class VirtualMachineExport(NamespacedResource):
         yaml_file=None,
         **kwargs,
     ):
-        if not (source_kind and source_name and token_secret_ref) and not yaml_file:
-            raise ValueError(
-                "source_kind, source_name and token_secret_ref or a yaml_file is required"
-            )
-
         super().__init__(
             name=name,
             namespace=namespace,
@@ -55,12 +50,11 @@ class VirtualMachineExport(NamespacedResource):
         self.source_name = source_name
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
+        super().to_dict()
+        if not self.yaml_file:
+            if not (self.source_kind and self.source_name):
+                raise ValueError("source_kind and source_name or a yaml_file is required")
+            self.res.update({
                 "spec": {
                     "tokenSecretRef": self.token_secret_ref,
                     "source": {
@@ -69,6 +63,4 @@ class VirtualMachineExport(NamespacedResource):
                         "name": self.source_name,
                     },
                 }
-            }
-        )
-        return res
+            })

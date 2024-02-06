@@ -1,17 +1,13 @@
 import shlex
 
 import xmltodict
-from openshift.dynamic.exceptions import ResourceNotFoundError
+from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
 
 class VirtualMachineInstance(NamespacedResource):
@@ -54,9 +50,7 @@ class VirtualMachineInstance(NamespacedResource):
         )
 
     def api_request(self, method, action, **params):
-        return super().api_request(
-            method=method, action=action, url=self._subresource_api_url, **params
-        )
+        return super().api_request(method=method, action=action, url=self._subresource_api_url, **params)
 
     def pause(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="pause")
@@ -91,7 +85,7 @@ class VirtualMachineInstance(NamespacedResource):
         else:
             return pods[0]
 
-        raise ResourceNotFoundError
+        raise ResourceNotFoundError(f"VIRT launcher POD not found for {self.kind}:{self.name}")
 
     @property
     def virt_handler_pod(self):
@@ -120,17 +114,18 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If VMI failed to run.
         """
         try:
-            self.wait_for_status(
-                status=self.Status.RUNNING, timeout=timeout, stop_status=stop_status
-            )
-        except TimeoutExpiredError:
+            self.wait_for_status(status=self.Status.RUNNING, timeout=timeout, stop_status=stop_status)
+        except TimeoutExpiredError as sampler_ex:
             if not logs:
                 raise
-
-            virt_pod = self.virt_launcher_pod
-            if virt_pod:
-                LOGGER.debug(f"{virt_pod.name} *****LOGS*****")
-                LOGGER.debug(virt_pod.log(container="compute"))
+            try:
+                virt_pod = self.virt_launcher_pod
+                self.logger.error(f"Status of virt-launcher pod {virt_pod.name}: {virt_pod.status}")
+                self.logger.debug(f"{virt_pod.name} *****LOGS*****")
+                self.logger.debug(virt_pod.log(container="compute"))
+            except ResourceNotFoundError as virt_pod_ex:
+                self.logger.error(virt_pod_ex)
+                raise sampler_ex
 
             raise
 
@@ -146,10 +141,7 @@ class VirtualMachineInstance(NamespacedResource):
         Raises:
             TimeoutExpiredError: If resource not exists.
         """
-        LOGGER.info(
-            f"Wait until {self.kind} {self.name} is "
-            f"{'Paused' if pause else 'Unpuased'}"
-        )
+        self.logger.info(f"Wait until {self.kind} {self.name} is {'Paused' if pause else 'Unpuased'}")
         self.wait_for_domstate_pause_status(pause=pause, timeout=timeout)
         self.wait_for_vmi_condition_pause_status(pause=pause, timeout=timeout)
 
@@ -178,9 +170,7 @@ class VirtualMachineInstance(NamespacedResource):
             # 'reason' may not exist yet
             # or
             # 'reason' may still exist after unpause if the CR has not been updated before we perform this check
-            if (pause and not sample.get("reason")) or (
-                sample.get("reason") == "PausedByUser" and not pause
-            ):
+            if (pause and not sample.get("reason")) or (sample.get("reason") == "PausedByUser" and not pause):
                 continue
             # Paused VM
             if pause and sample["reason"] == "PausedByUser":
@@ -204,7 +194,7 @@ class VirtualMachineInstance(NamespacedResource):
 
     def virsh_cmd(self, action):
         return shlex.split(
-            f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
+            "virsh" f" {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
         )
 
     def get_xml(self):
@@ -247,11 +237,18 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: Hypervisor Connection URI
         """
-        return (
-            ""
-            if self.is_virt_launcher_pod_root
-            else "-c qemu+unix:///session?socket=/var/run/libvirt/libvirt-sock"
-        )
+        if self.is_virt_launcher_pod_root:
+            hypervisor_connection_uri = ""
+        else:
+            virtqemud_socket = "virtqemud"
+            socket = (
+                virtqemud_socket
+                if virtqemud_socket
+                in self.virt_launcher_pod.execute(command=["ls", "/var/run/libvirt/"], container="compute")
+                else "libvirt"
+            )
+            hypervisor_connection_uri = f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
+        return hypervisor_connection_uri
 
     def get_domstate(self):
         """
@@ -307,17 +304,11 @@ class VirtualMachineInstance(NamespacedResource):
     def os_version(self):
         vmi_os_version = self.instance.status.guestOSInfo.get("version", {})
         if not vmi_os_version:
-            LOGGER.warning(
-                "Guest agent is not installed on the VM; OS version is not available."
-            )
+            self.logger.warning("Guest agent is not installed on the VM; OS version is not available.")
         return vmi_os_version
 
     def interface_ip(self, interface):
-        iface_ip = [
-            iface["ipAddress"]
-            for iface in self.interfaces
-            if iface["interfaceName"] == interface
-        ]
+        iface_ip = [iface["ipAddress"] for iface in self.interfaces if iface["interfaceName"] == interface]
         return iface_ip[0] if iface_ip else None
 
     def execute_virsh_command(self, command):

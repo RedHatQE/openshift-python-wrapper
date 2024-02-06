@@ -42,33 +42,32 @@ class Secret(NamespacedResource):
         self.type = type
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        if self.accesskeyid:
-            res.update(
-                {"data": {"accessKeyId": self.accesskeyid, "secretKey": self.secretkey}}
-            )
-        if self.htpasswd:
-            res.update({"data": {"htpasswd": self.htpasswd}})
-        if self.data_dict:
-            res.update({"data": self.data_dict})
-        if self.string_data:
-            res.update({"stringData": self.string_data})
-        if self.type:
-            res.update({"type": self.type})
-
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            if self.accesskeyid:
+                self.res.update({
+                    "data": {
+                        "accessKeyId": self.accesskeyid,
+                        "secretKey": self.secretkey,
+                    }
+                })
+            if self.htpasswd:
+                self.res.update({"data": {"htpasswd": self.htpasswd}})
+            if self.data_dict:
+                self.res.update({"data": self.data_dict})
+            if self.string_data:
+                self.res.update({"stringData": self.string_data})
+            if self.type:
+                self.res.update({"type": self.type})
 
     @property
     def certificate_not_after(self):
-        return self.instance.metadata.annotations[
-            "auth.openshift.io/certificate-not-after"
-        ]
+        return self.instance.metadata.annotations["auth.openshift.io/certificate-not-after"]
 
     @property
     def certificate_not_before(self):
-        return self.instance.metadata.annotations[
-            "auth.openshift.io/certificate-not-before"
-        ]
+        return self.instance.metadata.annotations["auth.openshift.io/certificate-not-before"]
+
+    @property
+    def keys_to_hash(self):
+        return ["data", "stringData"]

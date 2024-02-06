@@ -49,12 +49,9 @@ class KubeDescheduler(NamespacedResource):
         self.operator_log_level = operator_log_level
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({
                 "spec": {
                     "deschedulingIntervalSeconds": self.descheduling_interval,
                     "logLevel": self.log_level,
@@ -63,6 +60,4 @@ class KubeDescheduler(NamespacedResource):
                     "operatorLogLevel": self.operator_log_level,
                     "profiles": self.profiles,
                 }
-            }
-        )
-        return res
+            })

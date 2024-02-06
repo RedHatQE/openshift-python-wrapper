@@ -1,14 +1,10 @@
 import time
 
-from openshift.dynamic.exceptions import ConflictError
+from kubernetes.dynamic.exceptions import ConflictError
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import Resource
-from ocp_resources.utils import TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
+from timeout_sampler import TimeoutSampler
 
 SLEEP = 1
 
@@ -37,41 +33,30 @@ class NodeNetworkState(Resource):
         self.desired_state = status.get("desiredState", {"interfaces": []})
 
     def set_interface(self, interface):
-
         # First drop the interface is's already in the list
-        interfaces = [
-            iface
-            for iface in self.desired_state["interfaces"]
-            if iface["name"] != interface["name"]
-        ]
+        interfaces = [iface for iface in self.desired_state["interfaces"] if iface["name"] != interface["name"]]
 
         # Add the interface
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({
                 "spec": {
                     "nodeName": self.name,
                     "managed": True,
                     "desiredState": self.desired_state,
                 }
-            }
-        )
-        return res
+            })
 
     def apply(self):
-        resource = self.to_dict()
         retries_on_conflict = 3
         while True:
             try:
-                resource["metadata"] = self.instance.to_dict()["metadata"]
-                self.update(resource)
+                self.res["metadata"] = self.instance.to_dict()["metadata"]
+                self.update(self.res)
                 break
             except ConflictError as e:
                 retries_on_conflict -= 1
@@ -87,16 +72,14 @@ class NodeNetworkState(Resource):
 
             return None
 
-        LOGGER.info(f"Checking if interface {name} is up -- {self.name}")
-        samples = TimeoutSampler(
-            wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface
-        )
+        self.logger.info(f"Checking if interface {name} is up -- {self.name}")
+        samples = TimeoutSampler(wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface)
         for sample in samples:
             if sample:
                 return
 
     def wait_until_deleted(self, name):
-        LOGGER.info(f"Checking if interface {name} is deleted -- {self.name}")
+        self.logger.info(f"Checking if interface {name} is deleted -- {self.name}")
         samples = TimeoutSampler(
             wait_timeout=self.delete_timeout,
             sleep=SLEEP,

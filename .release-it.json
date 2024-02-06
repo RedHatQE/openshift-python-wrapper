@@ -1,4 +1,7 @@
 {
+  "npm": {
+    "publish": false
+  },
   "git": {
     "requireCleanWorkingDir": true,
     "requireBranch": false,
@@ -18,7 +21,7 @@
       "--follow-tags"
     ],
     "pushRepo": "",
-    "changelog": "git log --pretty=format:\"* %s (%h)\" ${from}...${to}"
+    "changelog": "git log --pretty=format:\"* %s (%h) by %cn on %as\" ${from}...${to}"
   },
   "github": {
     "release": true,
@@ -36,23 +39,9 @@
     "web": false
   },
   "plugins": {
-    "@j-ulrich/release-it-regex-bumper": {
-      "out": [
-        {
-          "files": [
-            "setup.cfg"
-          ],
-          "search": "\\d+\\.\\d+\\.\\d+",
-          "replace": "{{version}}"
-        },
-        {
-          "files": [
-            "setup.cfg"
-          ],
-          "search": "v\\d+\\.\\d+\\.\\d+",
-          "replace": "v{{version}}"
-        }
-      ]
+    "@release-it/bumper": {
+      "in": "VERSION",
+      "out": "VERSION"
     }
   }
 }

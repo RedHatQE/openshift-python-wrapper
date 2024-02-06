@@ -4,7 +4,8 @@ from ocp_resources.resource import NamespacedResource
 
 class ImageStream(NamespacedResource):
     """
-    ImageStream object.
+    ImageStream object. API reference:
+    https://docs.openshift.com/container-platform/4.11/rest_api/image_apis/imagestream-image-openshift-io-v1.html#imagestream-image-openshift-io-v1
     """
 
     api_group = NamespacedResource.ApiGroup.IMAGE_OPENSHIFT_IO
@@ -36,10 +37,11 @@ class ImageStream(NamespacedResource):
         self.lookup_policy = lookup_policy
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-        res.update(
-            {"spec": {"lookupPolicy": {"local": self.lookup_policy}, "tags": self.tags}}
-        )
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({
+                "spec": {
+                    "lookupPolicy": {"local": self.lookup_policy},
+                    "tags": self.tags,
+                }
+            })

@@ -2,13 +2,9 @@
 
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
-
-
-LOGGER = get_logger(name=__name__)
 
 
 def _map_mappings(mappings):
@@ -129,9 +125,7 @@ class VirtualMachineImport(NamespacedResource):
         self.target_vm_name = target_vm_name
         self.start_vm = start_vm
         self.provider_credentials_secret_name = provider_credentials_secret_name
-        self.provider_credentials_secret_namespace = (
-            provider_credentials_secret_namespace
-        )
+        self.provider_credentials_secret_namespace = provider_credentials_secret_namespace
         self.provider_mappings = provider_mappings
         self.resource_mapping_name = resource_mapping_name
         self.resource_mapping_namespace = resource_mapping_namespace
@@ -149,76 +143,56 @@ class VirtualMachineImport(NamespacedResource):
         )
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
+        super().to_dict()
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
 
-        spec = res.setdefault("spec", {})
+            secret = spec.setdefault("providerCredentialsSecret", {})
+            secret["name"] = self.provider_credentials_secret_name
 
-        secret = spec.setdefault("providerCredentialsSecret", {})
-        secret["name"] = self.provider_credentials_secret_name
+            if self.provider_credentials_secret_namespace:
+                secret["namespace"] = self.provider_credentials_secret_namespace
 
-        if self.provider_credentials_secret_namespace:
-            secret["namespace"] = self.provider_credentials_secret_namespace
+            if self.resource_mapping_name:
+                spec.setdefault("resourceMapping", {})["name"] = self.resource_mapping_name
+            if self.resource_mapping_namespace:
+                spec.setdefault("resourceMapping", {})["namespace"] = self.resource_mapping_namespace
 
-        if self.resource_mapping_name:
-            spec.setdefault("resourceMapping", {})["name"] = self.resource_mapping_name
-        if self.resource_mapping_namespace:
-            spec.setdefault("resourceMapping", {})[
-                "namespace"
-            ] = self.resource_mapping_namespace
+            if self.target_vm_name:
+                spec["targetVmName"] = self.target_vm_name
 
-        if self.target_vm_name:
-            spec["targetVmName"] = self.target_vm_name
+            if self.start_vm is not None:
+                spec["startVm"] = self.start_vm
 
-        if self.start_vm is not None:
-            spec["startVm"] = self.start_vm
+            if self.warm:
+                spec["warm"] = self.warm
+            if self.finalize_date:
+                spec["finalizeDate"] = self.finalize_date.strftime(format="%Y-%m-%dT%H:%M:%SZ")
 
-        if self.warm:
-            spec["warm"] = self.warm
-        if self.finalize_date:
-            spec["finalizeDate"] = self.finalize_date.strftime(
-                format="%Y-%m-%dT%H:%M:%SZ"
-            )
+            provider_source = spec.setdefault("source", {}).setdefault(self.provider_type, {})
+            vm = provider_source.setdefault("vm", {})
+            if self.vm_id:
+                vm["id"] = self.vm_id
+            if self.vm_name:
+                vm["name"] = self.vm_name
 
-        provider_source = spec.setdefault("source", {}).setdefault(
-            self.provider_type, {}
-        )
-        vm = provider_source.setdefault("vm", {})
-        if self.vm_id:
-            vm["id"] = self.vm_id
-        if self.vm_name:
-            vm["name"] = self.vm_name
+            if self.cluster_id:
+                vm.setdefault("cluster", {})["id"] = self.cluster_id
+            if self.cluster_name:
+                vm.setdefault("cluster", {})["name"] = self.cluster_name
 
-        if self.cluster_id:
-            vm.setdefault("cluster", {})["id"] = self.cluster_id
-        if self.cluster_name:
-            vm.setdefault("cluster", {})["name"] = self.cluster_name
+            if self.provider_mappings:
+                if self.provider_mappings.disk_mappings:
+                    mappings = _map_mappings(mappings=self.provider_mappings.disk_mappings)
+                    provider_source.setdefault("mappings", {}).setdefault("diskMappings", mappings)
 
-        if self.provider_mappings:
-            if self.provider_mappings.disk_mappings:
-                mappings = _map_mappings(mappings=self.provider_mappings.disk_mappings)
-                provider_source.setdefault("mappings", {}).setdefault(
-                    "diskMappings", mappings
-                )
+                if self.provider_mappings.network_mappings:
+                    mappings = _map_mappings(mappings=self.provider_mappings.network_mappings)
+                    provider_source.setdefault("mappings", {}).setdefault("networkMappings", mappings)
 
-            if self.provider_mappings.network_mappings:
-                mappings = _map_mappings(
-                    mappings=self.provider_mappings.network_mappings
-                )
-                provider_source.setdefault("mappings", {}).setdefault(
-                    "networkMappings", mappings
-                )
-
-            if self.provider_mappings.storage_mappings:
-                mappings = _map_mappings(
-                    mappings=self.provider_mappings.storage_mappings
-                )
-                provider_source.setdefault("mappings", {}).setdefault(
-                    "storageMappings", mappings
-                )
-
-        return res
+                if self.provider_mappings.storage_mappings:
+                    mappings = _map_mappings(mappings=self.provider_mappings.storage_mappings)
+                    provider_source.setdefault("mappings", {}).setdefault("storageMappings", mappings)
 
     def wait(
         self,
@@ -227,9 +201,7 @@ class VirtualMachineImport(NamespacedResource):
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
     ):
-        LOGGER.info(
-            f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be" f" {cond_status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
@@ -247,21 +219,18 @@ class VirtualMachineImport(NamespacedResource):
                         current_conditions = sample_status.conditions
                         for cond in current_conditions:
                             last_condition = cond
-                            if (
-                                cond.type == cond_type
-                                and cond.status == cond_status
-                                and cond.reason == cond_reason
-                            ):
+                            if cond.type == cond_type and cond.status == cond_status and cond.reason == cond_reason:
                                 msg = (
                                     f"Status of {self.kind} {self.name} {cond.type} is "
                                     f"{cond.status} ({cond.reason}: {cond.message})"
                                 )
-                                LOGGER.info(msg)
+                                self.logger.info(msg)
                                 return
         except TimeoutExpiredError:
             raise TimeoutExpiredError(
-                f"Last condition of {self.kind} {self.name} {last_condition.type} was "
-                f"{last_condition.status} ({last_condition.reason}: {last_condition.message})"
+                f"Last condition of {self.kind} {self.name} {last_condition.type} was"
+                f" {last_condition.status} ({last_condition.reason}:"
+                f" {last_condition.message})"
             )
 
 
@@ -293,21 +262,17 @@ class ResourceMapping(NamespacedResource):
         self.mapping = mapping
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        for provider, mapping in self.mapping.items():
-            res_provider_section = res.setdefault("spec", {}).setdefault(provider, {})
-            if mapping.network_mappings is not None:
-                res_provider_section.setdefault(
-                    "networkMappings",
-                    _map_mappings(mappings=mapping.network_mappings),
-                )
-            if mapping.storage_mappings is not None:
-                res_provider_section.setdefault(
-                    "storageMappings",
-                    _map_mappings(mappings=mapping.storage_mappings),
-                )
-
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            for provider, mapping in self.mapping.items():
+                res_provider_section = self.res.setdefault("spec", {}).setdefault(provider, {})
+                if mapping.network_mappings is not None:
+                    res_provider_section.setdefault(
+                        "networkMappings",
+                        _map_mappings(mappings=mapping.network_mappings),
+                    )
+                if mapping.storage_mappings is not None:
+                    res_provider_section.setdefault(
+                        "storageMappings",
+                        _map_mappings(mappings=mapping.storage_mappings),
+                    )

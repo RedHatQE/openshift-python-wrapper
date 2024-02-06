@@ -1,5 +1,5 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class VirtualMachineClusterPreference(NamespacedResource):
-    api_group = NamespacedResource.ApiGroup.INSTANCE_TYPE_KUBEVIRT_IO
+class VirtualMachineClusterPreference(Resource):
+    api_group = Resource.ApiGroup.INSTANCETYPE_KUBEVIRT_IO

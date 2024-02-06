@@ -3,13 +3,9 @@ import json
 import kubernetes
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.node import Node
-from ocp_resources.resource import NamespacedResource, kube_v1_api
-from ocp_resources.utils import TimeoutWatch
-
-
-LOGGER = get_logger(name=__name__)
+from ocp_resources.resource import NamespacedResource
+from timeout_sampler import TimeoutWatch
 
 
 class ExecOnPodError(Exception):
@@ -20,13 +16,7 @@ class ExecOnPodError(Exception):
         self.err = err
 
     def __str__(self):
-        return (
-            f"Command execution failure: "
-            f"{self.cmd}, "
-            f"RC: {self.rc}, "
-            f"OUT: {self.out}, "
-            f"ERR: {self.err}"
-        )
+        return "Command execution failure: " f"{self.cmd}, " f"RC: {self.rc}, " f"OUT: {self.out}, " f"ERR: {self.err}"
 
 
 class Pod(NamespacedResource):
@@ -91,7 +81,7 @@ class Pod(NamespacedResource):
         """
         error_channel = {}
         stream_closed_error = "stream resp is closed"
-        LOGGER.info(f"Execute {command} on {self.name} ({self.node.name})")
+        self.logger.info(f"Execute {command} on {self.name} ({self.node.name})")
         resp = kubernetes.stream.stream(
             api_method=self._kube_v1_api.connect_get_namespaced_pod_exec,
             name=self.name,
@@ -109,23 +99,17 @@ class Pod(NamespacedResource):
         while resp.is_open():
             resp.run_forever(timeout=2)
             try:
-                error_channel = json.loads(
-                    resp.read_channel(kubernetes.stream.ws_client.ERROR_CHANNEL)
-                )
+                error_channel = json.loads(resp.read_channel(kubernetes.stream.ws_client.ERROR_CHANNEL))
                 break
             except json.decoder.JSONDecodeError:
                 # Check remaining time, in order to throw exception
                 # if remaining time reached zero
                 if timeout_watch.remaining_time() <= 0:
-                    raise ExecOnPodError(
-                        command=command, rc=-1, out="", err=stream_closed_error
-                    )
+                    raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error)
 
         rcstring = error_channel.get("status")
         if rcstring is None:
-            raise ExecOnPodError(
-                command=command, rc=-1, out="", err=stream_closed_error
-            )
+            raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error)
 
         stdout = resp.read_stdout(timeout=5)
         stderr = resp.read_stderr(timeout=5)
@@ -137,9 +121,7 @@ class Pod(NamespacedResource):
             raise ExecOnPodError(command=command, rc=-1, out="", err=error_channel)
 
         returncode = [
-            int(cause["message"])
-            for cause in error_channel["details"]["causes"]
-            if cause["reason"] == "ExitCode"
+            int(cause["message"]) for cause in error_channel["details"]["causes"] if cause["reason"] == "ExitCode"
         ][0]
 
         raise ExecOnPodError(command=command, rc=returncode, out=stdout, err=stderr)
@@ -151,9 +133,7 @@ class Pod(NamespacedResource):
         Returns:
             str: Pod logs.
         """
-        return self._kube_v1_api.read_namespaced_pod_log(
-            name=self.name, namespace=self.namespace, **kwargs
-        )
+        return self._kube_v1_api.read_namespaced_pod_log(name=self.name, namespace=self.namespace, **kwargs)
 
     @property
     def node(self):
@@ -176,4 +156,4 @@ class Pod(NamespacedResource):
 
     @property
     def _kube_v1_api(self):
-        return kube_v1_api(api_client=self.client.client)
+        return kubernetes.client.CoreV1Api(api_client=self.client.client)

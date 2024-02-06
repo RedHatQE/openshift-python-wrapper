@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from openshift.dynamic.exceptions import ResourceNotFoundError
+from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler
+from timeout_sampler import TimeoutSampler, TimeoutWatch
 from ocp_resources.virtual_machine import VirtualMachine
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class VirtualMachineRestore(NamespacedResource):
@@ -44,18 +40,13 @@ class VirtualMachineRestore(NamespacedResource):
         self.snapshot_name = snapshot_name
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        spec = res.setdefault("spec", {})
-        spec.setdefault("target", {})[
-            "apiGroup"
-        ] = NamespacedResource.ApiGroup.KUBEVIRT_IO
-        spec["target"]["kind"] = VirtualMachine.kind
-        spec["target"]["name"] = self.vm_name
-        spec["virtualMachineSnapshotName"] = self.snapshot_name
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            spec = self.res.setdefault("spec", {})
+            spec.setdefault("target", {})["apiGroup"] = NamespacedResource.ApiGroup.KUBEVIRT_IO
+            spec["target"]["kind"] = VirtualMachine.kind
+            spec["target"]["name"] = self.vm_name
+            spec["virtualMachineSnapshotName"] = self.snapshot_name
 
     def wait_complete(self, status=True, timeout=TIMEOUT_4MINUTES):
         """
@@ -68,16 +59,22 @@ class VirtualMachineRestore(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        LOGGER.info(
-            f"Wait for {self.kind} {self.name} status to be complete = {status}"
-        )
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be complete = {status}")
 
-        samples = TimeoutSampler(
+        timeout_watcher = TimeoutWatch(timeout=timeout)
+        for sample in TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                break
+
+        samples = TimeoutSampler(
+            wait_timeout=timeout_watcher.remaining_time(),
+            sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=lambda: self.instance.get("status", {}).get("complete", None)
-            == status,
+            func=lambda: self.instance.get("status", {}).get("complete") == status,
         )
         for sample in samples:
             if sample:

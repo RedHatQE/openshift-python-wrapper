@@ -1,12 +1,8 @@
 import kubernetes
 
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
+from timeout_sampler import TimeoutSampler
 
 
 class DaemonSet(NamespacedResource):
@@ -26,7 +22,7 @@ class DaemonSet(NamespacedResource):
         Raises:
             TimeoutExpiredError: If not all the pods are deployed.
         """
-        LOGGER.info(f"Wait for {self.kind} {self.name} to deploy all desired pods")
+        self.logger.info(f"Wait for {self.kind} {self.name} to deploy all desired pods")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
@@ -40,10 +36,7 @@ class DaemonSet(NamespacedResource):
                 status = sample.items[0].status
                 desired_number_scheduled = status.desiredNumberScheduled
                 number_ready = status.numberReady
-                if (
-                    desired_number_scheduled > 0
-                    and desired_number_scheduled == number_ready
-                ):
+                if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
                     return
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
@@ -58,7 +51,7 @@ class DaemonSet(NamespacedResource):
         Returns:
             bool: True if delete succeeded, False otherwise.
         """
-        super().delete(
+        return super().delete(
             wait=wait,
             timeout=timeout,
             body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),

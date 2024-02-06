@@ -44,12 +44,9 @@ class Host(NamespacedResource, MTV):
         self.condition_message_ready = self.ConditionMessage.HOST_READY
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({
                 "spec": {
                     "id": self.host_id,
                     "ipAddress": self.ip_address,
@@ -62,7 +59,4 @@ class Host(NamespacedResource, MTV):
                         "namespace": self.provider_namespace,
                     },
                 }
-            }
-        )
-
-        return res
+            })

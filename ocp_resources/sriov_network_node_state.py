@@ -1,9 +1,5 @@
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 
 
 class SriovNetworkNodeState(NamespacedResource):
@@ -30,17 +26,24 @@ class SriovNetworkNodeState(NamespacedResource):
         return iface.totalvfs
 
     def wait_for_status_sync(self, wanted_status, timeout=1000):
-        LOGGER.info(f"Wait for {self.kind} {self.name} status to be {wanted_status}")
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {wanted_status}")
         try:
+            timeout_watcher = TimeoutWatch(timeout=timeout)
             for sample in TimeoutSampler(
                 wait_timeout=timeout,
+                sleep=1,
+                func=lambda: self.exists,
+            ):
+                if sample:
+                    break
+
+            for sample in TimeoutSampler(
+                wait_timeout=timeout_watcher.remaining_time(),
                 sleep=3,
                 func=lambda: self.instance.status.syncStatus,
             ):
                 if sample == wanted_status:
                     return
         except TimeoutExpiredError:
-            LOGGER.error(
-                f"after {timeout} seconds, {self.name} status is {self.instance.status.syncStatus}"
-            )
+            self.logger.error(f"after {timeout} seconds, {self.name} status is" f" {self.instance.status.syncStatus}")
             raise

@@ -1,5 +1,4 @@
-from ocp_resources.logger import get_logger
-
+from simple_logger.logger import get_logger
 
 LOGGER = get_logger(name=__name__)
 
@@ -50,13 +49,12 @@ class Event:
 
         LOGGER.info("Reading events")
         LOGGER.debug(
-            f"get events parameters: namespace={namespace}, name={name}, label_selector={label_selector}, "
-            f"field_selector='{field_selector}', resource_version={resource_version}, timeout={timeout}"
+            f"get events parameters: namespace={namespace}, name={name},"
+            f" label_selector={label_selector}, field_selector='{field_selector}',"
+            f" resource_version={resource_version}, timeout={timeout}"
         )
 
-        event_listener = dyn_client.resources.get(
-            api_version=cls.api_version, kind=cls.__name__
-        )
+        event_listener = dyn_client.resources.get(api_version=cls.api_version, kind=cls.__name__)
         yield from event_listener.watch(
             namespace=namespace,
             name=name,
@@ -101,8 +99,9 @@ class Event:
         """
         LOGGER.info("Deleting events")
         LOGGER.debug(
-            f"delete_events parameters: namespace={namespace}, name={name}, label_selector={label_selector}, "
-            f"field_selector='{field_selector}', resource_version={resource_version}, timeout={timeout}"
+            f"delete_events parameters: namespace={namespace}, name={name},"
+            f" label_selector={label_selector}, field_selector='{field_selector}',"
+            f" resource_version={resource_version}, timeout={timeout}"
         )
         dyn_client.resources.get(api_version=cls.api_version, kind=cls.__name__).delete(
             namespace=namespace,

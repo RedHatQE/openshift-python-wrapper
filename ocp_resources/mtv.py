@@ -1,18 +1,10 @@
-from ocp_resources.logger import get_logger
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-
-
-LOGGER = get_logger(name=__name__)
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
 
 def _get_status_condition_log_message(**status_condition):
     log_msg = "Waiting For: \n"
     for status_condition_name, status_condition in status_condition.items():
-        log_msg += (
-            f"{status_condition_name}->{status_condition} \n"
-            if status_condition
-            else ""
-        )
+        log_msg += f"{status_condition_name}->{status_condition} \n" if status_condition else ""
 
     return log_msg
 
@@ -87,7 +79,7 @@ class MTV:
         Wait for MTV Resource Status Conditions.
         """
 
-        LOGGER.info(
+        self.logger.info(
             _get_status_condition_log_message(
                 condition_status=condition_status,
                 condition_type=condition_type,
@@ -108,36 +100,19 @@ class MTV:
         try:
             for sample in samples:
                 current_conditions = (
-                    sample.items[0].status.get("conditions")
-                    if sample.items and sample.items[0].status
-                    else []
+                    sample.items[0].status.get("conditions") if sample.items and sample.items[0].status else []
                 )
                 for condition in current_conditions:
                     last_condition = condition
-                    valid_status_type = (
-                        condition_status == condition.status
-                        and condition_type == condition.type
-                    )
-                    valid_message = (
-                        condition_message == condition.message
-                        or condition_message is None
-                    )
-                    valid_reason = (
-                        condition_reason == condition.reason or condition_reason is None
-                    )
-                    valid_category = (
-                        condition_category == condition.category
-                        or condition_category is None
-                    )
-                    if all(
-                        [valid_status_type, valid_message, valid_reason, valid_category]
-                    ):
+                    valid_status_type = condition_status == condition.status and condition_type == condition.type
+                    valid_message = condition_message == condition.message or condition_message is None
+                    valid_reason = condition_reason == condition.reason or condition_reason is None
+                    valid_category = condition_category == condition.category or condition_category is None
+                    if all([valid_status_type, valid_message, valid_reason, valid_category]):
                         return
 
         except TimeoutExpiredError:
-            LOGGER.error(
-                msg=f"Last Status Condition of {self.kind} {self.name} was: {last_condition}"
-            )
+            self.logger.error(msg=(f"Last Status Condition of {self.kind} {self.name} was:" f" {last_condition}"))
             raise
 
     def wait_for_condition_ready(self, wait_timeout=360):

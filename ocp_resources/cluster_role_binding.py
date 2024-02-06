@@ -6,33 +6,37 @@ from ocp_resources.resource import Resource
 
 class ClusterRoleBinding(Resource):
     """
-    ClusterRoleBinding object.
+    https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-binding-v1/
     """
 
     api_group = Resource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
 
     def __init__(
         self,
-        name=None,
         cluster_role=None,
         subjects=None,
         **kwargs,
     ):
-        super().__init__(name=name, **kwargs)
+        """
+        Args:
+            cluster_role (str): Name of referenced ClusterRole
+            subjects (list, optional): User subjects that are authorised to access the cluster role
+        """
+        super().__init__(**kwargs)
         self.cluster_role = cluster_role
         self.subjects = subjects
 
     def to_dict(self):
-        self.res = super().to_dict()
+        super().to_dict()
+        if not self.yaml_file:
+            if not self.cluster_role:
+                raise ValueError("Passing yaml_file or parameter 'cluster_role' is required.")
+            self.res.setdefault("roleRef", {})
+            self.res["roleRef"] = {
+                "apiGroup": self.api_group,
+                "kind": ClusterRole.kind,
+                "name": self.cluster_role,
+            }
 
-        self.res.setdefault("roleRef", {})
-        self.res["roleRef"] = {
-            "apiGroup": self.api_group,
-            "kind": ClusterRole.kind,
-            "name": self.cluster_role,
-        }
-
-        if self.subjects:
-            self.res.setdefault("subjects", self.subjects)
-
-        return self.res
+            if self.subjects:
+                self.res.setdefault("subjects", self.subjects)

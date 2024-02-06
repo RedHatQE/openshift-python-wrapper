@@ -34,10 +34,7 @@ class NodeMaintenance(Resource):
         self.reason = reason
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        assert self.node, "node is mandatory for create"
-        res["spec"] = {"nodeName": self.node.name, "reason": self.reason}
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            assert self.node, "node is mandatory for create"
+            self.res["spec"] = {"nodeName": self.node.name, "reason": self.reason}

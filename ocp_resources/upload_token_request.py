@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.logger import get_logger
 from ocp_resources.resource import NamespacedResource
-
-
-LOGGER = get_logger(name=__name__)
 
 
 class UploadTokenRequest(NamespacedResource):
@@ -38,9 +34,6 @@ class UploadTokenRequest(NamespacedResource):
         self.pvc_name = pvc_name
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update({"spec": {"pvcName": self.pvc_name}})
-        return res
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({"spec": {"pvcName": self.pvc_name}})

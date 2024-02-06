@@ -121,3 +121,5 @@ local-cluster/_hco/
 
 # nmp
 node_modules/
+package.json
+package-lock.json

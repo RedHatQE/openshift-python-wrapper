@@ -110,12 +110,9 @@ class Plan(NamespacedResource, MTV):
                 vm["hooks"] = hooks_array
 
     def to_dict(self):
-        res = super().to_dict()
-        if self.yaml_file:
-            return res
-
-        res.update(
-            {
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.update({
                 "spec": {
                     "warm": self.warm_migration,
                     "targetNamespace": self.target_namespace,
@@ -141,6 +138,4 @@ class Plan(NamespacedResource, MTV):
                         },
                     },
                 }
-            }
-        )
-        return res
+            })

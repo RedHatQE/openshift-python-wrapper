@@ -12,3 +12,5 @@ ignore:
  - ".github/workflows/*.yml"
  - "**/*.yml"
  - ".release-it.json"
+ - "ocp_resources/grafana*"  # TODO: Remove when updated upstream https://github.com/grafana-operator/grafana-operator/issues/898
+ - "ocp_resources/rhmi*"
