@@ -21,7 +21,9 @@ class RHMI(NamespacedResource):
             TimeoutExpiredError: If stage status is not complete.
 
         """
-        self.logger.info(f"Wait for {self.kind} {self.name} stage status to be {self.Status.COMPLETE}")
+        # TODO: Replace complete_status_str with self.Status.COMPLETE once RHMI `complete` status starts with uppercase
+        complete_status_str = "complete"
+        self.logger.info(f"Wait for {self.kind} {self.name} stage status to be {complete_status_str}")
         sample = None
         try:
             timeout_watcher = TimeoutWatch(timeout=timeout)
@@ -33,7 +35,7 @@ class RHMI(NamespacedResource):
                 sleep=1,
                 func=lambda: self.instance.status.stage,
             ):
-                if sample == self.Status.COMPLETE:
+                if sample == complete_status_str:
                     return
 
         except TimeoutExpiredError:
