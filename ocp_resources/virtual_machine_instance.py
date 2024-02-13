@@ -19,6 +19,7 @@ class VirtualMachineInstance(NamespacedResource):
 
     class Status(NamespacedResource.Status):
         SCHEDULING = "Scheduling"
+        SCHEDULED = "Scheduled"
 
     def __init__(
         self,
