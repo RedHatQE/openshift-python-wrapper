@@ -219,12 +219,15 @@ class DataVolume(NamespacedResource):
         super().wait_deleted(timeout=timeout)
         return self.pvc.wait_deleted(timeout=timeout)
 
-    def wait(self, timeout=TIMEOUT_10MINUTES, failure_timeout=TIMEOUT_2MINUTES):
-        self._check_none_pending_status(failure_timeout=failure_timeout)
+    def wait(self, timeout=TIMEOUT_10MINUTES, failure_timeout=TIMEOUT_2MINUTES, wait_for_exists_only=False):
+        if wait_for_exists_only:
+            return super().wait(timeout=timeout)
+        else:
+            self._check_none_pending_status(failure_timeout=failure_timeout)
 
-        # If DV's status is not Pending, continue with the flow
-        self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=timeout)
+            # If DV's status is not Pending, continue with the flow
+            self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
+            self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=timeout)
 
     @property
     def pvc(self):
