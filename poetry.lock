@@ -640,12 +640,12 @@ files = [
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.12"
+version = "1.0.13"
 description = "A simple logger for python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "python_simple_logger-1.0.12.tar.gz", hash = "sha256:94f2745e637abea2bfb01a1d6549aa154b92684e72ae55fc04ca950f9651e762"},
+    {file = "python_simple_logger-1.0.13.tar.gz", hash = "sha256:ff5bc7c4869c7d7a656413d0b8bcd8e0a259392f32c1946ab92a8cf761ac6d71"},
 ]
 
 [package.dependencies]
