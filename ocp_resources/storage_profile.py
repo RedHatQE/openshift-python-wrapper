@@ -18,7 +18,7 @@ class StorageProfile(Resource):
         return self.instance.status.get("claimPropertySets")
 
     def first_claim_property_set_access_modes(self):
-        return self.claim_property_sets[0].get("volumeMode") if self.claim_property_sets else None
+        return self.claim_property_sets[0].get("accessModes") if self.claim_property_sets else None
 
     def first_claim_property_set_volume_mode(self):
         return self.claim_property_sets[0].get("volumeMode") if self.claim_property_sets else None
