@@ -894,12 +894,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.16"
+version = "0.0.17"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.16.tar.gz", hash = "sha256:0587e5aae74a46bf24dca4c43e17675cad9754110f8d69dc00103dbcb8066d95"},
+    {file = "timeout_sampler-0.0.17.tar.gz", hash = "sha256:c4685f343ead7542df03293aa40efdf455bab8c45f89e51a21ac4a3f4c8855d9"},
 ]
 
 [package.dependencies]
