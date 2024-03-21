@@ -15,6 +15,7 @@ from kubernetes.dynamic.exceptions import (
     ConflictError,
     MethodNotAllowedError,
     NotFoundError,
+    ForbiddenError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
@@ -700,7 +701,7 @@ class Resource:
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
         resource_ = self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
-        with contextlib.suppress(TimeoutExpiredError):
+        with contextlib.suppress(ForbiddenError, AttributeError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
