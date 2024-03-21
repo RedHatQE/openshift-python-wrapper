@@ -765,16 +765,22 @@ class Resource:
 
     @staticmethod
     def retry_cluster_exceptions(func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs):
-        sampler = TimeoutSampler(
-            wait_timeout=10,
-            sleep=1,
-            func=func,
-            print_log=False,
-            exceptions_dict=exceptions_dict,
-            **kwargs,
-        )
-        for sample in sampler:
-            return sample
+        try:
+            sampler = TimeoutSampler(
+                wait_timeout=10,
+                sleep=1,
+                func=func,
+                print_log=False,
+                exceptions_dict=exceptions_dict,
+                **kwargs,
+            )
+            for sample in sampler:
+                return sample
+        except TimeoutExpiredError as exp:
+            last_exception = re.findall(r"Last exception: (.*)", str(exp))
+            if last_exception:
+                raise eval(last_exception[0].strip(": "))
+            raise
 
     @classmethod
     def get(
