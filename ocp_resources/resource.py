@@ -15,6 +15,7 @@ from kubernetes.dynamic.exceptions import (
     ConflictError,
     MethodNotAllowedError,
     NotFoundError,
+    ForbiddenError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
@@ -26,6 +27,7 @@ from ocp_resources.constants import (
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_1MINUTE,
     TIMEOUT_4MINUTES,
+    TIMEOUT_10SEC,
 )
 from ocp_resources.event import Event
 from timeout_sampler import (
@@ -612,7 +614,7 @@ class Resource:
         """
         try:
             return self.instance
-        except TimeoutExpiredError:
+        except NotFoundError:
             return None
 
     def client_wait_deleted(self, timeout):
@@ -699,7 +701,7 @@ class Resource:
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
         resource_ = self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
-        with contextlib.suppress(TimeoutExpiredError):
+        with contextlib.suppress(ForbiddenError, AttributeError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
@@ -765,16 +767,23 @@ class Resource:
 
     @staticmethod
     def retry_cluster_exceptions(func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs):
-        sampler = TimeoutSampler(
-            wait_timeout=10,
-            sleep=1,
-            func=func,
-            print_log=False,
-            exceptions_dict=exceptions_dict,
-            **kwargs,
-        )
-        for sample in sampler:
-            return sample
+        try:
+            sampler = TimeoutSampler(
+                wait_timeout=TIMEOUT_10SEC,
+                sleep=1,
+                func=func,
+                print_log=False,
+                exceptions_dict=exceptions_dict,
+                **kwargs,
+            )
+            for sample in sampler:
+                return sample
+
+        except TimeoutExpiredError as exp:
+            if exp.last_exp:
+                raise exp.last_exp
+
+            raise
 
     @classmethod
     def get(
