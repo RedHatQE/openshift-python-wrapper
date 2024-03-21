@@ -26,6 +26,7 @@ from ocp_resources.constants import (
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_1MINUTE,
     TIMEOUT_4MINUTES,
+    TIMEOUT_10SEC,
 )
 from ocp_resources.event import Event
 from timeout_sampler import (
@@ -767,7 +768,7 @@ class Resource:
     def retry_cluster_exceptions(func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs):
         try:
             sampler = TimeoutSampler(
-                wait_timeout=10,
+                wait_timeout=TIMEOUT_10SEC,
                 sleep=1,
                 func=func,
                 print_log=False,
