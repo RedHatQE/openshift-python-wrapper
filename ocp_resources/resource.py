@@ -776,10 +776,11 @@ class Resource:
             )
             for sample in sampler:
                 return sample
+
         except TimeoutExpiredError as exp:
-            last_exception = re.findall(r"Last exception: (.*)", str(exp))
-            if last_exception:
-                raise eval(last_exception[0].strip(": "))
+            if exp.last_exp:
+                raise exp.last_exp
+
             raise
 
     @classmethod
