@@ -1,13 +1,1 @@
-{
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranches": [
-    "main",
-    "v4.14",
-    "v4.13",
-    "v4.12",
-    "v4.11",
-    "v4.10",
-    "v4.9",
-    "v4.8"
-  ]
-}
+{"$schema": "https://docs.renovatebot.com/renovate-schema.json", "packageRules": [{"matchPackagePatterns": ["openshift", "xmltodict", "colorlog", "python-benedict", "packaging", "python-simple-logger", "kubernetes", "ipdb", "pytest"], "groupName": "poetry-deps"}]}
