@@ -10,3 +10,10 @@ jobs:
     steps:
       - name: Run pull request stats
         uses: flowwer-dev/pull-request-stats@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          organization: 'piedpiper'
+          period: 7
+          charts: true
+          disableLinks: true
+          sortBy: 'COMMENTS'
