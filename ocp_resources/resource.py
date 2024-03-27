@@ -1080,7 +1080,7 @@ class Resource:
                         return condition.message
 
                     self.logger.error(
-                        f"Condition {condition_type} status is not {condition_status}, got {condition.status}"
+                        f"Condition `{condition_type}` status is not {condition_status}, got {condition.status}"
                     )
                     break
 
