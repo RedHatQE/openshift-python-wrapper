@@ -1059,6 +1059,33 @@ class Resource:
 
         return resource_dict
 
+    def get_condition_message(self, condition_type, condition_status=None):
+        """
+        Get condition message by condition type and condition status
+
+        Args:
+            condition_type (str): condition type name
+            condition_status (str, optional): condition status to match
+
+        Returns:
+            str: condition message or empty string if condition status doesn't match
+        """
+        if _conditions := self.instance.status.conditions:
+            for condition in _conditions:
+                if condition_type == condition.type:
+                    if not condition_status:
+                        return condition.message
+
+                    if condition_status == condition.status:
+                        return condition.message
+
+                    self.logger.error(
+                        f"Condition {condition_type} status is not {condition_status}, got {condition.status}"
+                    )
+                    break
+
+        return ""
+
 
 class NamespacedResource(Resource):
     """
