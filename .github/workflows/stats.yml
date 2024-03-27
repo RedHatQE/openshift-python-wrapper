@@ -7,6 +7,9 @@ on:
 jobs:
   stats:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Run pull request stats
         uses: flowwer-dev/pull-request-stats@v2.14.0
@@ -14,4 +17,4 @@ jobs:
           period: 7
           charts: true
           disableLinks: true
-          sortBy: 'COMMENTS'
+          sortBy: "COMMENTS"
