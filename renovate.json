@@ -2,6 +2,12 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "packageRules": [
     {
+      "excludeDepNames": [
+        "kubernetes",
+        "openshift"
+      ]
+    },
+    {
       "matchPackagePatterns": [
         "openshift",
         "xmltodict",
@@ -14,12 +20,6 @@
         "pytest"
       ],
       "groupName": "poetry-deps"
-    },
-    {
-      "excludeDepNames": [
-        "kubernetes",
-        "openshift"
-      ]
     }
   ]
 }
