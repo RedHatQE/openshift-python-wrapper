@@ -1,1 +1,25 @@
-{"$schema": "https://docs.renovatebot.com/renovate-schema.json", "packageRules": [{"matchPackagePatterns": ["openshift", "xmltodict", "colorlog", "python-benedict", "packaging", "python-simple-logger", "kubernetes", "ipdb", "pytest"], "groupName": "poetry-deps"}]}
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "openshift",
+        "xmltodict",
+        "colorlog",
+        "python-benedict",
+        "packaging",
+        "python-simple-logger",
+        "kubernetes",
+        "ipdb",
+        "pytest"
+      ],
+      "groupName": "poetry-deps"
+    },
+    {
+      "excludeDepNames": [
+        "kubernetes",
+        "openshift"
+      ]
+    }
+  ]
+}
