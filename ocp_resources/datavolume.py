@@ -275,6 +275,7 @@ class DataVolume(NamespacedResource):
         self,
         timeout=TIMEOUT_10MINUTES,
         failure_timeout=TIMEOUT_2MINUTES,
+        dv_garbage_collection_enabled=False,
         stop_status_func=None,
         *stop_status_func_args,
         **stop_status_func_kwargs,
@@ -285,6 +286,7 @@ class DataVolume(NamespacedResource):
         Args:
             timeout (int):  Time to wait for the DataVolume to succeed.
             failure_timeout (int): Time to wait for the DataVolume to have not Pending/None status
+            dv_garbage_collection_enabled (bool, default: False): if True, expect that DV will disappear after success
             stop_status_func (function): function that is called inside the TimeoutSampler
                 if it returns True - stop the Sampler and raise TimeoutExpiredError
                 Example:
@@ -310,8 +312,10 @@ class DataVolume(NamespacedResource):
                 wait_timeout=timeout,
                 func=lambda: self.exists,
             ):
-                # DV reach to success if the status is succeeded or if the DV does not exist
-                if sample is None or sample.get("status", {}).get("phase") == self.Status.SUCCEEDED:
+                # DV reach success if the status is Succeeded, or if DV garbage collection enabled and the DV does not exist
+                if sample and sample.get("status", {}).get("phase") == self.Status.SUCCEEDED:
+                    break
+                elif sample is None and dv_garbage_collection_enabled:
                     break
                 elif stop_status_func and stop_status_func(*stop_status_func_args, **stop_status_func_kwargs):
                     raise TimeoutExpiredError(
@@ -321,7 +325,6 @@ class DataVolume(NamespacedResource):
                             f" {status_of_dv_str} {sample.status}"
                         )
                     )
-
         except TimeoutExpiredError:
             self.logger.error(f"{status_of_dv_str} {sample.status}")
             raise
