@@ -65,6 +65,10 @@ def get_client(config_file=None, config_dict=None, context=None, **kwargs):
     """
     Get a kubernetes client.
 
+
+    This function is a replica of `ocp_utilities.infra.get_client` which cannot be imported as ocp_utilities imports
+    from ocp_resources.
+
     Pass either config_file or config_dict.
     If none of them are passed, client will be created from default OS kubeconfig
     (environment variable or .kube folder).
