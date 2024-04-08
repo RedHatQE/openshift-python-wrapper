@@ -10,7 +10,6 @@ from signal import SIGINT, signal
 import kubernetes
 import yaml
 from benedict import benedict
-from kubernetes.dynamic import DynamicClient
 from kubernetes.dynamic.exceptions import (
     ConflictError,
     MethodNotAllowedError,
@@ -20,6 +19,7 @@ from kubernetes.dynamic.exceptions import (
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger
+from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
@@ -61,7 +61,7 @@ def _get_api_version(dyn_client, api_group, kind):
     return res.group_version
 
 
-def get_client(config_file=None, config_dict=None, context=None):
+def get_client(config_file=None, config_dict=None, context=None, **kwargs):
     """
     Get a kubernetes client.
 
@@ -77,19 +77,31 @@ def get_client(config_file=None, config_dict=None, context=None):
     Returns:
         DynamicClient: a kubernetes client.
     """
+    # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
-        return DynamicClient(
-            client=kubernetes.config.new_client_from_config_dict(
-                config_dict=config_dict,
-                context=context,
+        return kubernetes.dynamic.DynamicClient(
+            client=kubernetes.config.new_client_from_config_dict(config_dict=config_dict, context=context, **kwargs)
+        )
+    try:
+        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
+        LOGGER.info("Trying to get client via new_client_from_config")
+
+        # kubernetes.config.kube_config.load_kube_config sets KUBE_CONFIG_DEFAULT_LOCATION during module import.
+        # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
+        # is populated during import which comes before setting the variable in code.
+        config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
+        return kubernetes.dynamic.DynamicClient(
+            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context, **kwargs)
+        )
+    except MaxRetryError:
+        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
+        LOGGER.info("Trying to get client via incluster_config")
+        return kubernetes.dynamic.DynamicClient(
+            client=kubernetes.config.incluster_config.load_incluster_config(
+                client_configuration=kwargs.get("client_configuration"),
+                try_refresh_token=kwargs.get("try_refresh_token", True),
             )
         )
-    return DynamicClient(
-        client=kubernetes.config.new_client_from_config(
-            config_file=config_file,
-            context=context,
-        )
-    )
 
 
 def sub_resource_level(current_class, owner_class, parent_class):
