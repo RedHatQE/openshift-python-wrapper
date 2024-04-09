@@ -276,6 +276,7 @@ class Resource:
         OPERATORS_OPENSHIFT_IO = "operators.openshift.io"
         OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
         PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
+        PERFORMANCE_OPENSHIFT_IO = "performance.openshift.io"
         POLICY = "policy"
         POOL_KUBEVIRT_IO = "pool.kubevirt.io"
         PROJECT_OPENSHIFT_IO = "project.openshift.io"
