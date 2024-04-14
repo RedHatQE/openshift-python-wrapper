@@ -4,7 +4,8 @@
   "packageRules": [
     {
       "baseBranchList": ["v4.14"],
-      "excludeDepNames": ["kubernetes", "openshift"]
+      "excludeDepNames": ["kubernetes", "openshift"],
+      "enabled": false
     },
     {
       "matchPackagePatterns": [
