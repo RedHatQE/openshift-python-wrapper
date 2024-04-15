@@ -1,11 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranches": [
-    "main",
-    "v4.15",
-    "v4.14"
-  ],
+  "baseBranches": ["main", "v4.15", "v4.14"],
   "packageRules": [
+    {
+      "baseBranchList": ["v4.14"],
+      "excludeDepNames": ["kubernetes", "openshift"],
+      "enabled": false
+    },
     {
       "matchPackagePatterns": [
         "xmltodict",
