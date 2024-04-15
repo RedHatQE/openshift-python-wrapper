@@ -617,6 +617,10 @@ class Resource:
         except NotFoundError:
             return None
 
+    @property
+    def _kube_v1_api(self):
+        return kubernetes.client.CoreV1Api(api_client=self.client.client)
+
     def client_wait_deleted(self, timeout):
         """
         client-side Wait until resource is deleted

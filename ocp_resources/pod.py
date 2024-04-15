@@ -153,7 +153,3 @@ class Pod(NamespacedResource):
     @property
     def ip(self):
         return self.instance.status.podIP
-
-    @property
-    def _kube_v1_api(self):
-        return kubernetes.client.CoreV1Api(api_client=self.client.client)
