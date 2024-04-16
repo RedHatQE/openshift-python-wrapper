@@ -4,7 +4,7 @@ from ocp_resources.resource import NamespacedResource
 
 class ServiceAccount(NamespacedResource):
     """
-    https://docs.openshift.com/container-platform/4.15/rest_api/security_apis/serviceaccount-v1.html
+    https://kubernetes.io/docs/reference/kubernetes-api/authentication-resources/service-account-v1/
     """
 
     api_version = NamespacedResource.ApiVersion.V1
@@ -18,10 +18,10 @@ class ServiceAccount(NamespacedResource):
     ):
         """
         Args:
-            automountServiceAccountToken (bool): indicates whether pods running as this service account should have an
+            automount_service_account_token (bool, Optional): indicates whether pods running as this service account should have an
                                                  API token automatically mounted
-            imagePullSecrets (list): list of references to secrets in the same namespace to use for pulling pod images
-            secrets (list): list of secrets for the pods to use
+            image_pull_secrets (list, Optional): list of references to secrets in the same namespace to use for pulling pod images
+            secrets (list, Optional): list of secrets for the pods to use
         """
         super().__init__(**kwargs)
         self.automount_service_account_token = automount_service_account_token
@@ -38,7 +38,14 @@ class ServiceAccount(NamespacedResource):
             if self.secrets:
                 self.res["secrets"] = self.secrets
 
-    def create_service_account_token(self, expiration_seconds=None, audiences=None, bound_object_ref=None):
+    def create_service_account_token(self, audiences=None, bound_object_ref=None, expiration_seconds=None):
+        """
+        Args:
+            audiences (list, Optional): Intended audiences of the token
+            bound_object_ref (BoundObjectReference, Optional): Reference to an object that a token is bound to
+            expiration_seconds (int, Optional): Requested duration of validity of the token in seconds.
+                                                Defaults to 3600 seconds
+        """
         return self._kube_v1_api.create_namespaced_service_account_token(
             name=self.name,
             namespace=self.namespace,
