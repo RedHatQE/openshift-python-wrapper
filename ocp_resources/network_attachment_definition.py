@@ -214,8 +214,8 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
 
         Args:
             topology (str): The secondary network topology to be created.
-            network_name (str, optional): The name of the network, including the namespace
-                where the network it available, e.g. namespace/network-name.
+            network_name (str, optional): The name of the network. This name is used
+                to connect resources created in different namespaces to the same network.
             vlan (int, optional): A vlan tag ID that will be assigned to traffic from this
                 additional network.
             mtu (str, optional): The maximum transmission unit (MTU).
@@ -239,7 +239,7 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
                 spec_config["vlanID"] = self.vlan
             if self.mtu:
                 spec_config["mtu"] = self.mtu
-            spec_config["name"] = self.name
+            spec_config["name"] = self.network_name or self.name
             spec_config["topology"] = self.topology
-            spec_config["netAttachDefName"] = self.network_name or f"{self.namespace}/{self.name}"
+            spec_config["netAttachDefName"] = f"{self.namespace}/{self.name}"
             self.res["spec"]["config"] = json.dumps(spec_config)
