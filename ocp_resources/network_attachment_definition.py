@@ -200,10 +200,8 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
 class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def __init__(
         self,
-        topology=None,
         network_name=None,
-        vlan=None,
-        mtu=None,
+        topology=None,
         **kwargs,
     ):
         """
@@ -213,12 +211,9 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         https://docs.openshift.com/container-platform/4.14/networking/multiple_networks/configuring-additional-network.html#configuration-ovnk-additional-networks_configuring-additional-network
 
         Args:
+            network_name (str): The name of the network. This field is mandatory when not using yaml
+                file.
             topology (str): The secondary network topology to be created.
-            network_name (str, optional): The name of the network, including the namespace
-                where the network it available, e.g. namespace/network-name.
-            vlan (int, optional): A vlan tag ID that will be assigned to traffic from this
-                additional network.
-            mtu (str, optional): The maximum transmission unit (MTU).
         """
         super().__init__(
             cni_type="ovn-k8s-cni-overlay",
@@ -226,20 +221,16 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         )
         self.network_name = network_name
         self.topology = topology
-        self.vlan = vlan
-        self.mtu = mtu
 
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
+            if not self.network_name:
+                raise ValueError("network_name is required")
             if not self.topology:
                 raise ValueError("topology is required")
             spec_config = self.res["spec"]["config"]
-            if self.vlan:
-                spec_config["vlanID"] = self.vlan
-            if self.mtu:
-                spec_config["mtu"] = self.mtu
-            spec_config["name"] = self.name
+            spec_config["name"] = self.network_name
             spec_config["topology"] = self.topology
-            spec_config["netAttachDefName"] = self.network_name or f"{self.namespace}/{self.name}"
+            spec_config["netAttachDefName"] = f"{self.namespace}/{self.name}"
             self.res["spec"]["config"] = json.dumps(spec_config)
