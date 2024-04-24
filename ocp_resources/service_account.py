@@ -42,9 +42,8 @@ class ServiceAccount(NamespacedResource):
         """
         Args:
             audiences (list, Optional): Intended audiences of the token
-            bound_object_ref (BoundObjectReference, Optional): Reference to an object that a token is bound to
+            bound_object_ref (dict, Optional): Reference to an object that a token is bound to
             expiration_seconds (int, Optional): Requested duration of validity of the token in seconds.
-                                                Defaults to 3600 seconds
         """
         return self._kube_v1_api.create_namespaced_service_account_token(
             name=self.name,
@@ -56,4 +55,4 @@ class ServiceAccount(NamespacedResource):
                     "expirationSeconds": expiration_seconds,
                 }
             ),
-        ).to_dict()
+        )
