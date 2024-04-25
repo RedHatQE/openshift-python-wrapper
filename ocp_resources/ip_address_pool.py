@@ -1,6 +1,6 @@
 # API reference: https://metallb.universe.tf/apis/#metallb.io/v1beta1.IPAddressPool
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class IPAddressPool(NamespacedResource):
@@ -43,7 +43,7 @@ class IPAddressPool(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.addresses:
-                raise ValueError("Either required parameter is missing 'addresses' or provide" " yaml_file.")
+                raise MissingRequiredArgumentError(argument="addresses")
 
             self.res["spec"] = {"addresses": self.addresses}
 

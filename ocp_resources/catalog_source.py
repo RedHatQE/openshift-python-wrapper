@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class CatalogSource(NamespacedResource):
@@ -37,10 +37,7 @@ class CatalogSource(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not all([self.source_type, self.image, self.display_name, self.publisher]):
-                raise ValueError(
-                    "Passing yaml_file or all parameters 'source_type', 'image',"
-                    " 'display_name' and 'publisher' is required."
-                )
+                raise MissingRequiredArgumentError(argument="'source_type', 'image', 'display_name' and 'publisher'")
             self.res.update({
                 "spec": {
                     "sourceType": self.source_type,

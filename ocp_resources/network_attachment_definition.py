@@ -1,6 +1,6 @@
 import json
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 DEFAULT_CNI_VERSION = "0.3.1"
 
@@ -225,10 +225,9 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            if not self.network_name:
-                raise ValueError("network_name is required")
-            if not self.topology:
-                raise ValueError("topology is required")
+            if not self.network_name and not self.topology:
+                raise MissingRequiredArgumentError(argument="'network_name' and 'topology'")
+
             spec_config = self.res["spec"]["config"]
             spec_config["name"] = self.network_name
             spec_config["topology"] = self.topology
