@@ -1,4 +1,4 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class PerformanceProfile(Resource):
@@ -54,10 +54,8 @@ class PerformanceProfile(Resource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            if not self.cpu:
-                raise ValueError("Passing yaml_file or parameter 'cpu' is required")
-            if not self.node_selector:
-                raise ValueError("Passing yaml_file or parameter 'node_selector' is required")
+            if not self.cpu and not self.node_selector:
+                raise MissingRequiredArgumentError(argument="'cpu' and 'node_selector'")
 
             manifest_spec = {
                 "cpu": self.cpu,

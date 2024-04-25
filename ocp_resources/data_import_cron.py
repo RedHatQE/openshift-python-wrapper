@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class DataImportCron(NamespacedResource):
@@ -58,8 +58,10 @@ class DataImportCron(NamespacedResource):
         if not self.yaml_file:
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url cannot coexist")
+
             if not self.pull_method:
-                raise ValueError("Passing yaml_file or parameter 'pull_method' is required")
+                raise MissingRequiredArgumentError(argument="pull_method")
+
             self.res.update({
                 "spec": {
                     "template": {"spec": {"source": {"registry": {"pullMethod": self.pull_method}}}},

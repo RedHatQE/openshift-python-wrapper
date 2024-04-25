@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Restore(NamespacedResource):
@@ -22,9 +22,6 @@ class Restore(NamespacedResource):
         yaml_file=None,
         **kwargs,
     ):
-        if not backup_name:
-            raise ValueError("backup_name can't be None")
-
         super().__init__(
             name=name,
             namespace=namespace,
@@ -40,11 +37,16 @@ class Restore(NamespacedResource):
 
     def to_dict(self):
         super().to_dict()
+
         if not self.yaml_file:
-            self.res.update({
-                "spec": {
-                    "backupName": self.backup_name,
-                }
-            })
-            if self.included_namespaces:
-                self.res["spec"]["includedNamespaces"] = self.included_namespaces
+            if not self.backup_name:
+                raise MissingRequiredArgumentError(argument="backup_name")
+
+            if not self.yaml_file:
+                self.res.update({
+                    "spec": {
+                        "backupName": self.backup_name,
+                    }
+                })
+                if self.included_namespaces:
+                    self.res["spec"]["includedNamespaces"] = self.included_namespaces

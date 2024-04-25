@@ -1,6 +1,6 @@
 # API reference: https://kubevirt.io/user-guide/operations/clone_api/
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -43,7 +43,7 @@ class VirtualMachineClone(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.source_name:
-                raise ValueError("yaml_file or parameter 'source_name' required.")
+                raise MissingRequiredArgumentError(argument="source_name")
             spec = self.res.setdefault("spec", {})
 
             source = spec.setdefault("source", {})

@@ -1,6 +1,6 @@
 # API reference: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/resource-quota-v1/
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class ResourceQuota(NamespacedResource):
@@ -33,7 +33,8 @@ class ResourceQuota(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.hard:
-                raise ValueError("yaml_file or parameter 'hard' required.")
+                raise MissingRequiredArgumentError(argument="hard")
+
             spec = self.res.setdefault("spec", {})
             spec["hard"] = self.hard
 

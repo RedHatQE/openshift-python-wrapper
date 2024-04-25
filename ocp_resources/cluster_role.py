@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class ClusterRole(Resource):
@@ -24,5 +24,5 @@ class ClusterRole(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.rules:
-                raise ValueError("must send rules or yaml_file")
+                raise MissingRequiredArgumentError(argument="rules")
             self.res["rules"] = self.rules

@@ -1,5 +1,5 @@
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Endpoints(NamespacedResource):
@@ -52,7 +52,7 @@ class Endpoints(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.addresses and self.ports):
-                raise ValueError("yaml_file or parameters 'addresses' and 'ports' are required.")
+                raise MissingRequiredArgumentError(argumens="'addresses' and 'ports")
             self.res.update({
                 "subsets": {
                     "addresses": self.addresses,

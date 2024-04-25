@@ -1,6 +1,6 @@
 # API reference: https://tekton.dev/docs/pipelines/pipelineruns/
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class PipelineRun(NamespacedResource):
@@ -42,7 +42,7 @@ class PipelineRun(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.pipelineref:
-                raise ValueError("pipelineref is mandatory")
+                raise MissingRequiredArgumentError(argument="pipelineref")
             self.res["spec"] = {}
             self.res["spec"]["pipelineref"] = {"name": self.pipelineref}
 

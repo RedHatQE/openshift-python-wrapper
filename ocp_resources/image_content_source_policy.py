@@ -1,4 +1,4 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class ImageContentSourcePolicy(Resource):
@@ -27,5 +27,5 @@ class ImageContentSourcePolicy(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.repository_digest_mirrors:
-                raise ValueError("repository_digest_mirrors must be defined")
+                raise MissingRequiredArgumentError(argument="repository_digest_mirrors")
             self.res["spec"] = {"repositoryDigestMirrors": self.repository_digest_mirrors}

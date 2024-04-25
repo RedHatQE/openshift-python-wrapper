@@ -1,4 +1,4 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class ImageDigestMirrorSet(Resource):
@@ -27,5 +27,5 @@ class ImageDigestMirrorSet(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.image_digest_mirrors:
-                raise ValueError("image_digest_mirrors or yaml file must be defined")
+                raise MissingRequiredArgumentError(argument="image_digest_mirrors")
             self.res["spec"] = {"imageDigestMirrors": self.image_digest_mirrors}

@@ -2,7 +2,7 @@
 
 from ocp_resources.constants import TIMEOUT_1MINUTE
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 from ocp_resources.virtual_machine import VirtualMachine
 from ocp_resources.virtual_machine_snapshot import VirtualMachineSnapshot
 
@@ -53,7 +53,7 @@ class VirtualMachineExport(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.source_kind and self.source_name):
-                raise ValueError("source_kind and source_name or a yaml_file is required")
+                raise MissingRequiredArgumentError(argument="'source_kind' and 'source_name'")
             self.res.update({
                 "spec": {
                     "tokenSecretRef": self.token_secret_ref,
