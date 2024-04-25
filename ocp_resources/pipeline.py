@@ -46,7 +46,7 @@ class Pipeline(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.tasks or self.params or self.final_parallel_tasks):
-                raise MissingRequiredArgumentError(argument="tasks or params or final_parallel_tasks")
+                raise MissingRequiredArgumentError(argument="'tasks' or 'params' or 'final_parallel_tasks'")
 
             self.res["spec"] = {}
             if self.params:

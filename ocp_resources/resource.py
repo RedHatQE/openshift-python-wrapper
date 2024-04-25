@@ -146,7 +146,7 @@ class KubeAPIVersion(Version):
             with contextlib.suppress(ValueError):
                 components[idx] = int(obj)
 
-        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning" " guidelines"
+        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
 
         if len(components) not in (2, 4) or components[0] != "v" or not isinstance(components[1], int):
             raise ValueError(errmsg)
@@ -376,9 +376,7 @@ class Resource:
         """
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
-            raise NotImplementedError(
-                "Subclasses of Resource require self.api_group or self.api_version to" " be defined"
-            )
+            raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
         self.namespace = None
         self.name = name
         self.client = client
@@ -389,7 +387,7 @@ class Resource:
         self.context = context
         self.label = label
         if not (self.name or self.yaml_file):
-            raise MissingRequiredArgumentError(argument="'name' or 'yaml_file'")
+            raise MissingRequiredArgumentError(argument="name")
 
         self.teardown = teardown
         self.timeout = timeout

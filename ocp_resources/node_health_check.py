@@ -52,7 +52,7 @@ class NodeHealthCheck(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.selector_match_expressions or self.selector_match_labels):
-                raise MissingRequiredArgumentError(argument="selector_match_expressions or selector_match_labels")
+                raise MissingRequiredArgumentError(argument="'selector_match_expressions' or 'selector_match_labels'")
 
             if self.escalating_remediation and self.remediation_template:
                 raise ValueError("remediation_template and escalating_remediation  usage is mutual exclusive")

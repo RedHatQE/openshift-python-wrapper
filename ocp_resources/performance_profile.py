@@ -55,7 +55,7 @@ class PerformanceProfile(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.cpu and not self.node_selector:
-                raise MissingRequiredArgumentError(argument="cpu and node_selector")
+                raise MissingRequiredArgumentError(argument="'cpu' and 'node_selector'")
 
             manifest_spec = {
                 "cpu": self.cpu,
