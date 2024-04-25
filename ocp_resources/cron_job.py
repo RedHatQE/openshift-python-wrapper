@@ -48,7 +48,7 @@ class CronJob(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.job_template and self.schedule):
-                raise MissingRequiredArgumentError(argument="'job_template', 'schedule'")
+                raise MissingRequiredArgumentError(argument="'job_template' and 'schedule'")
             self.res.update({
                 "spec": {
                     "jobTemplate": self.job_template,

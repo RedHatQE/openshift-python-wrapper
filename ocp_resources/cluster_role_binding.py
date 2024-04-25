@@ -30,7 +30,8 @@ class ClusterRoleBinding(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.cluster_role:
-                raise MissingRequiredArgumentError(argument="Passing")
+                raise MissingRequiredArgumentError(argument="cluster_role")
+
             self.res.setdefault("roleRef", {})
             self.res["roleRef"] = {
                 "apiGroup": self.api_group,
