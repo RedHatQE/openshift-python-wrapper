@@ -1,4 +1,4 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class NodeHealthCheck(Resource):
@@ -52,24 +52,29 @@ class NodeHealthCheck(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.selector_match_expressions or self.selector_match_labels):
-                raise ValueError(
-                    "Mandatory to have Selector either selector_match_expressions or selector_match_labels"
-                )
-            if not (self.escalating_remediation or self.remediation_template):
-                raise ValueError("Mandatory to have either remediation_template or escalating_remediation")
+                raise MissingRequiredArgumentError(argument="selector_match_expressions or selector_match_labels")
+
             if self.escalating_remediation and self.remediation_template:
                 raise ValueError("remediation_template and escalating_remediation  usage is mutual exclusive")
+
             spec = self.res.setdefault("spec", {})
+
             if self.escalating_remediation:
                 spec["escalatingRemediations"] = self.escalating_remediation
+
             if self.remediation_template:
                 spec["remediationTemplate"] = self.remediation_template
+
             if self.min_unhealthy:
                 spec["minHealthy"] = self.min_unhealthy
+
             if self.unhealthy_conditions:
                 spec["unhealthyConditions"] = self.unhealthy_conditions
+
             spec.setdefault("selector", {})
+
             if self.selector_match_expressions:
                 spec["selector"]["matchExpressions"] = self.selector_match_expressions
+
             if self.selector_match_labels:
                 spec["selector"]["matchLabels"] = self.selector_match_labels

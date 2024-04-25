@@ -1,7 +1,7 @@
 from warnings import warn
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 from ocp_resources.volume_snapshot import VolumeSnapshot
 
 
@@ -26,7 +26,7 @@ class DataSource(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self._source:
-                raise ValueError("Passing yaml_file or parameter 'source' is required")
+                raise MissingRequiredArgumentError(argument="source")
 
             self.res.update({"spec": {"source": self._source}})
 

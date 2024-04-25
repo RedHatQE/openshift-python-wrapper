@@ -41,6 +41,14 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
+class MissingRequiredArgumentError(Exception):
+    def __init__(self, argument: str) -> None:
+        self.argument = argument
+
+    def __repr__(self) -> str:
+        return f"Missing required argument/s. Either provide yaml_file or pass {self.argument}"
+
+
 def _find_supported_resource(dyn_client, api_group, kind):
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
@@ -381,7 +389,7 @@ class Resource:
         self.context = context
         self.label = label
         if not (self.name or self.yaml_file):
-            raise ValueError("name or yaml file is required")
+            raise MissingRequiredArgumentError(argument="'name' or 'yaml_file'")
 
         self.teardown = teardown
         self.timeout = timeout
@@ -1137,7 +1145,7 @@ class NamespacedResource(Resource):
         )
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:
-            raise ValueError("name and namespace or yaml file is required")
+            raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
 
     @classmethod
     def get(
@@ -1210,7 +1218,7 @@ class NamespacedResource(Resource):
             self.namespace = self.res["metadata"].get("namespace", self.namespace)
 
         if not self.namespace:
-            raise ValueError("Namespace must be passed or specified in the YAML file.")
+            raise MissingRequiredArgumentError(argument="namespace")
 
         if not self.yaml_file:
             self.res["metadata"]["namespace"] = self.namespace

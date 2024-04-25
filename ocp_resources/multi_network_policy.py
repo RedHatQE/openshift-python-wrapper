@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class MultiNetworkPolicy(NamespacedResource):
@@ -40,10 +40,8 @@ class MultiNetworkPolicy(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            if not self.network_name:
-                raise ValueError("Passing yaml_file or parameter 'network_name' is required")
-            if self.pod_selector is None:
-                raise ValueError("Passing yaml_file or parameter 'pod_selector' is required")
+            if not self.network_name and self.pod_selector is None:
+                raise MissingRequiredArgumentError("'network_name' and 'pod_selector'")
 
             self.res["metadata"]["annotations"] = {
                 f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/policy-for": f"{self.namespace}/{self.network_name}"

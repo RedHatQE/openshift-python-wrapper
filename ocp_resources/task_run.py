@@ -1,6 +1,6 @@
 # API reference: https://tekton.dev/docs/pipelines/taskruns/
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class TaskRun(NamespacedResource):
@@ -40,9 +40,11 @@ class TaskRun(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.task_ref or self.task_spec):
-                raise ValueError("Mandatory to have either task_ref or task_spec")
+                raise MissingRequiredArgumentError(argument="'task_ref' or 'task_spec'")
+
             if self.task_ref and self.task_spec:
-                raise ValueError("Validation failed: expected exactly one either task_ref or" " task_spec, got both")
+                raise ("Validation failed: expected exactly one either task_ref or" " task_spec, got both")
+
             self.res["spec"] = {}
             if self.task_ref:
                 self.res["spec"]["taskRef"] = {"name": self.task_ref}

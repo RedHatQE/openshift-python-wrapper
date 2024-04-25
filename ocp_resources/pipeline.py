@@ -1,6 +1,6 @@
 # API reference: https://tekton.dev/docs/pipelines/pipelines/
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Pipeline(NamespacedResource):
@@ -46,7 +46,8 @@ class Pipeline(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not (self.tasks or self.params or self.final_parallel_tasks):
-                raise ValueError("spec is expected to have at least one of the optional fields, got" " none")
+                raise MissingRequiredArgumentError(argument="tasks or params or final_parallel_tasks")
+
             self.res["spec"] = {}
             if self.params:
                 self.res["spec"]["params"] = self.params

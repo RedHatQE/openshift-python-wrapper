@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 from ocp_resources.storage_profile import StorageProfile
 
 
@@ -93,7 +93,7 @@ class StorageClass(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.provisioner:
-                raise ValueError("provisioner must be specified")
+                raise MissingRequiredArgumentError(argument="provisioner")
             self.res.update({"provisioner": self.provisioner})
             if self.reclaim_policy:
                 self.res.update({"reclaimPolicy": self.reclaim_policy})
