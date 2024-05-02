@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class ControllerRevision(NamespacedResource):
@@ -30,7 +30,7 @@ class ControllerRevision(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.revision:
-                raise ValueError("Passing yaml_file or parameter 'revision' is required.")
+                raise MissingRequiredArgumentError(argument="revision")
             self.res.update({"revision": self.revision})
 
             if self.owner_references:

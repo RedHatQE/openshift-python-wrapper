@@ -1,6 +1,6 @@
 # API reference: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/limit-range-v1/
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class LimitRange(NamespacedResource):
@@ -25,5 +25,6 @@ class LimitRange(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.limits:
-                raise ValueError("yaml_file or parameter 'limits' required.")
+                raise MissingRequiredArgumentError(argument="limits")
+
             self.res.setdefault("spec", {})["limits"] = self.limits

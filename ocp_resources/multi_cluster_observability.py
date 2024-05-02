@@ -1,4 +1,4 @@
-from ocp_resources.resource import Resource
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class MultiClusterObservability(Resource):
@@ -41,7 +41,7 @@ class MultiClusterObservability(Resource):
         super().to_dict()
         if not self.yaml_file:
             if not self.metric_object_storage:
-                raise ValueError("metric_object_storage or yaml file is required")
+                raise MissingRequiredArgumentError(argument="metric_object_storage")
             spec_dict = {"observabilityAddonSpec": self.observability_addon_spec}
             spec_dict.setdefault("storageConfig", {})["metricObjectStorage"] = self.metric_object_storage
 

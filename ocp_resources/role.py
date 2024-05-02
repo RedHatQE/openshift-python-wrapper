@@ -2,7 +2,7 @@
 #  API reference:
 #       https://docs.openshift.com/container-platform/4.11/rest_api/rbac_apis/role-rbac-authorization-k8s-io-v1.html
 from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Role(NamespacedResource):
@@ -49,7 +49,7 @@ class Role(NamespacedResource):
 
     def to_dict(self):
         if not self.rules and not self.yaml_file:
-            raise ValueError("must send rules or yaml_file")
+            raise MissingRequiredArgumentError(argument="rules")
         if not self.res:
             super().to_dict()
         if not self.yaml_file:

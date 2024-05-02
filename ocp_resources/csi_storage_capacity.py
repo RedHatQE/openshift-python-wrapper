@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class CSIStorageCapacity(NamespacedResource):
@@ -36,7 +36,7 @@ class CSIStorageCapacity(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.storage_class_name:
-                raise ValueError("yaml_file or parameter 'storage_class_name' is required.")
+                raise MissingRequiredArgumentError(argument="storage_class_name")
             self.res.update({
                 "storageClassName": self.storage_class_name,
             })
