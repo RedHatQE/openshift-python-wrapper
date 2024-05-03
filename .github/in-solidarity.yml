@@ -1,6 +1,6 @@
 rules:
   master:
-    level: failure  # default rules are set to warning
+    level: failure # default rules are set to warning
   slave:
     level: failure
   blacklist:
@@ -8,9 +8,10 @@ rules:
   whitelist:
     level: failure
 ignore:
- - ".github/in-solidarity.yml"  # default
- - ".github/workflows/*.yml"
- - "**/*.yml"
- - ".release-it.json"
- - "ocp_resources/grafana*"  # TODO: Remove when updated upstream https://github.com/grafana-operator/grafana-operator/issues/898
- - "ocp_resources/rhmi*"
+  - ".github/in-solidarity.yml" # default
+  - ".github/workflows/*.yml"
+  - "**/*.yml"
+  - ".release-it.json"
+  - "ocp_resources/grafana*" # TODO: Remove when updated upstream https://github.com/grafana-operator/grafana-operator/issues/898
+  - "ocp_resources/rhmi*"
+  - "ocp_resources/cluster_claim.py"
