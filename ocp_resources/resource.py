@@ -260,6 +260,7 @@ class Resource:
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         COORDINATION_K8S_IO = "coordination.k8s.io"
+        CSIADDONS_OPENSHIFT_IO = "csiaddons.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
         DISCOVERY_K8S_IO = "discovery.k8s.io"
         EVENTS_K8S_IO = "events.k8s.io"
