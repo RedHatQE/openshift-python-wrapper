@@ -1,6 +1,6 @@
 rules:
   master:
-    level: warning # default rules are set to warning
+    level: off # default rules are set to warning
   slave:
     level: failure
   blacklist:
