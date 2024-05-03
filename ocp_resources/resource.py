@@ -267,6 +267,7 @@ class Resource:
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         INSTANCETYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
+        HIVE_OPENSHIFT_IO = "hive.openshift.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         IMAGE_REGISTRY = "registry.redhat.io"
