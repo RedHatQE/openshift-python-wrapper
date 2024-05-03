@@ -26,4 +26,4 @@ class ClusterClaim(NamespacedResource):
 
         super().to_dict()
         if not self.yaml_file and self.cluster_pool_name:
-            self.res["spec"]["clusterPoolName"] = self.cluster_pool_name
+            self.res.setdefault("spec", {})["clusterPoolName"] = self.cluster_pool_name
