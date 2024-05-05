@@ -43,20 +43,21 @@ class ClusterPool(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             self.res["spec"] = {}
+            _spec = self.res["spec"]
             if self.base_domain:
-                self.res["spec"]["baseDomain"] = self.base_domain
+                _spec["baseDomain"] = self.base_domain
 
             if self.image_set_ref_name:
-                self.res["spec"]["imageSetRef"] = {"name": self.image_set_ref_name}
+                _spec["imageSetRef"] = {"name": self.image_set_ref_name}
 
             if self.platform:
-                self.res["spec"]["platform"] = self.platform
+                _spec["platform"] = self.platform
 
             if self.pull_secret_ref_name:
-                self.res["spec"]["pullSecretRef"] = {"name": self.pull_secret_ref_name}
+                _spec["pullSecretRef"] = {"name": self.pull_secret_ref_name}
 
             if self.running_count:
-                self.res["spec"]["runningCount"] = self.running_count
+                _spec["runningCount"] = self.running_count
 
             if self.size:
-                self.res["spec"]["size"] = self.size
+                _spec["size"] = self.size
