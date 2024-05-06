@@ -19,7 +19,13 @@ class SealedSecret(NamespacedResource):
         template: Dict[str, Any] | None = None,
         data: Dict[str, Any] | None = None,
         **kwargs: Any,
-    ):
+    ) -> None:
+        """
+        Args:
+            encrypted_data (dict): secret encrypted data
+            template (dict): defines the structure of the Secret that will be created from this sealed secret
+            data (dict): secret encrypted data
+        """
         super().__init__(**kwargs)
         self.encrypted_data = encrypted_data
         self.template = template
