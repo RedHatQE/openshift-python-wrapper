@@ -32,8 +32,6 @@ class SealedSecret(NamespacedResource):
         self.data = data
 
     def to_dict(self):
-        self.res: Dict[str, Any]
-
         super().to_dict()
 
         if not self.yaml_file:
