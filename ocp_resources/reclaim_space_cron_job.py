@@ -1,4 +1,5 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from __future__ import annotations
+from typing import Any, Dict
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -7,24 +8,17 @@ class ReclaimSpaceCronJob(NamespacedResource):
     https://github.com/csi-addons/kubernetes-csi-addons/blob/main/docs/reclaimspace.md
     """
 
-    api_group = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
+    api_group: str = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        schedule=None,
-        job_template=None,
-        concurrency_policy=None,
-        successful_jobs_history_limit=None,
-        failed_jobs_history_limit=None,
-        **kwargs,
-    ):
+        schedule: str | None = None,
+        job_template: Dict[str, Any] = None,
+        concurrency_policy: str | None = None,
+        successful_jobs_history_limit: int | None = None,
+        failed_jobs_history_limit: int | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
             schedule (str): schedule of the reclaim space cron job
@@ -36,13 +30,6 @@ class ReclaimSpaceCronJob(NamespacedResource):
             failed_jobs_history_limit (int, optional): number of failed jobs to retain start at scheduled time
         """
         super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
             **kwargs,
         )
         self.job_template = job_template
@@ -51,20 +38,24 @@ class ReclaimSpaceCronJob(NamespacedResource):
         self.successful_jobs_history_limit = successful_jobs_history_limit
         self.failed_jobs_history_limit = failed_jobs_history_limit
 
-    def to_dict(self):
+    def to_dict(self) -> None:
+        self.res: Dict[str, Any]
+
         super().to_dict()
         if not self.yaml_file:
             if not (self.job_template and self.schedule):
                 raise MissingRequiredArgumentError(argument="'job_template' and 'schedule'")
-            self.res.update({
-                "spec": {
-                    "jobTemplate": self.job_template,
-                    "schedule": self.schedule,
-                }
-            })
+            spec_dict = {}
+            if self.job_template:
+                spec_dict["jobTemplate"] = self.job_template
+            if self.schedule:
+                spec_dict["schedule"] = self.schedule
+
             if self.successful_jobs_history_limit:
-                self.res["spec"]["successfulJobsHistoryLimit"] = self.successful_jobs_history_limit
+                spec_dict["successfulJobsHistoryLimit"] = self.successful_jobs_history_limit
             if self.failed_jobs_history_limit:
-                self.res["spec"]["failedJobsHistoryLimit"] = self.failed_jobs_history_limit
+                spec_dict["failedJobsHistoryLimit"] = self.failed_jobs_history_limit
             if self.concurrency_policy:
-                self.res["spec"]["concurrencyPolicy"] = self.concurrency_policy
+                spec_dict["concurrencyPolicy"] = self.concurrency_policy
+
+            self.res.update({"spec": spec_dict})
