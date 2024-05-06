@@ -7,6 +7,8 @@ from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResou
 class SealedSecret(NamespacedResource):
     """
     https://github.com/bitnami-labs/sealed-secrets/blob/main/pkg/apis/sealedsecrets/v1alpha1/types.go
+
+    Requires the Sealed Secrets Operator to be installed.
     """
 
     api_group = NamespacedResource.ApiGroup.BITNAMI_COM
