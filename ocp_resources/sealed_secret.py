@@ -4,7 +4,7 @@ from typing import Any, Dict
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
-class Secret(NamespacedResource):
+class SealedSecret(NamespacedResource):
     """
     https://github.com/bitnami-labs/sealed-secrets/blob/main/pkg/apis/sealedsecrets/v1alpha1/types.go
     """
