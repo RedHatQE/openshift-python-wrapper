@@ -254,6 +254,7 @@ class Resource:
         APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
         BATCH = "batch"
+        BITNAMI_COM = "bitnami.com"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CLONE_KUBEVIRT_IO = "clone.kubevirt.io"
         CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO = "cluster.open-cluster-management.io"
