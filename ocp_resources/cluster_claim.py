@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -22,8 +23,6 @@ class ClusterClaim(NamespacedResource):
         self.cluster_pool_name = cluster_pool_name
 
     def to_dict(self) -> None:
-        self.res: Dict[str, Any]
-
         super().to_dict()
         if not self.yaml_file and self.cluster_pool_name:
             self.res.setdefault("spec", {})["clusterPoolName"] = self.cluster_pool_name
