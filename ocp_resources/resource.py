@@ -1,3 +1,4 @@
+from __future__ import annotations
 import contextlib
 import copy
 import json
@@ -8,6 +9,7 @@ from io import StringIO
 from signal import SIGINT, signal
 
 import kubernetes
+from kubernetes.dynamic import DynamicClient
 import yaml
 from benedict import benedict
 from kubernetes.dynamic.exceptions import (
@@ -18,7 +20,7 @@ from kubernetes.dynamic.exceptions import (
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
-from simple_logger.logger import get_logger
+from simple_logger.logger import Any, Dict, get_logger
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
@@ -338,22 +340,22 @@ class Resource:
 
     def __init__(
         self,
-        name=None,
-        client=None,
-        teardown=True,
-        timeout=TIMEOUT_4MINUTES,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        dry_run=None,
-        node_selector=None,
-        node_selector_labels=None,
-        config_file=None,
-        context=None,
-        label=None,
-        timeout_seconds=TIMEOUT_1MINUTE,
-        api_group=None,
-        hash_log_data=True,
+        name: str = "",
+        client: DynamicClient | None = None,
+        teardown: bool = True,
+        timeout: int = TIMEOUT_4MINUTES,
+        privileged_client: DynamicClient | None = None,
+        yaml_file: str = "",
+        delete_timeout: int = TIMEOUT_4MINUTES,
+        dry_run: bool = False,
+        node_selector: str = "",
+        node_selector_labels: Dict[str, str] | None = None,
+        config_file: str = "",
+        context: str = "",
+        label: Dict[str, str] | None = None,
+        timeout_seconds: int = TIMEOUT_1MINUTE,
+        api_group: str = "",
+        hash_log_data: bool = True,
     ):
         """
         Create an API resource
@@ -362,6 +364,7 @@ class Resource:
             name (str): Resource name
             client (DynamicClient): Dynamic client for connecting to a remote cluster
             teardown (bool): Indicates if this resource would need to be deleted
+            timeout (int): timeout for a get api call
             privileged_client (DynamicClient): Instance of Dynamic client
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
@@ -376,34 +379,37 @@ class Resource:
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
         """
-        self.api_group = api_group or self.api_group
-        if not self.api_group and not self.api_version:
-            raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
-        self.namespace = None
+
         self.name = name
         self.client = client
-        self.privileged_client = privileged_client
-        self.yaml_file = yaml_file
-        self.resource_dict = None  # Filled in case yaml_file is not None
-        self.config_file = config_file
-        self.context = context
-        self.label = label
-        if not (self.name or self.yaml_file):
-            raise MissingRequiredArgumentError(argument="name")
-
         self.teardown = teardown
         self.timeout = timeout
+        self.privileged_client = privileged_client
+        self.yaml_file = yaml_file
         self.delete_timeout = delete_timeout
         self.dry_run = dry_run
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
-        self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res = None
-        self.yaml_file_contents = None
-        self.initial_resource_version = None
-        self.logger = self._set_logger()
+        self.config_file = config_file
+        self.context = context
+        self.label = label
         self.timeout_seconds = timeout_seconds
+        self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
+
+        if not self.api_group and not self.api_version:
+            raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
+
+        if not (self.name or self.yaml_file):
+            raise MissingRequiredArgumentError(argument="name")
+
+        self.namespace: str = ""
+        self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
+        self.node_selector_spec = self._prepare_node_selector_spec()
+        self.res: Dict[str, Any] = {}
+        self.yaml_file_contents: Dict[Any, Any] | None = None
+        self.initial_resource_version: str = ""
+        self.logger = self._set_logger()
         # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
 
@@ -416,11 +422,13 @@ class Resource:
             filename=log_file,
         )
 
-    def _prepare_node_selector_spec(self):
+    def _prepare_node_selector_spec(self) -> Dict[str, str]:
         if self.node_selector:
             return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
-        if self.node_selector_labels:
+        elif self.node_selector_labels:
             return self.node_selector_labels
+        else:
+            return {}
 
     @ClassProperty
     def kind(cls):  # noqa: N805
@@ -729,7 +737,10 @@ class Resource:
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
-        resource_ = self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
+        resource_kwargs = {"body": self.res, "namespace": self.namespace}
+        if self.dry_run:
+            resource_kwargs["dry_run"] = "All"
+        resource_ = self.api.create(**resource_kwargs)
         with contextlib.suppress(ForbiddenError, AttributeError, NotFoundError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
