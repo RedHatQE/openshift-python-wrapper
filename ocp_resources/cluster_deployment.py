@@ -34,8 +34,6 @@ class ClusterDeployment(NamespacedResource):
         self.pull_secret_ref_name = pull_secret_ref_name
 
     def to_dict(self) -> None:
-        self.res: Dict[str, Any]
-
         super().to_dict()
         if not self.yaml_file:
             self.res["spec"] = {}
