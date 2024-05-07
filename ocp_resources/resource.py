@@ -737,7 +737,10 @@ class Resource:
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
-        resource_ = self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
+        resource_kwargs = {"body": self.res, "namespace": self.namespace}
+        if self.dry_run:
+            resource_kwargs["dry_run"] = "All"
+        resource_ = self.api.create(**resource_kwargs)
         with contextlib.suppress(ForbiddenError, AttributeError, NotFoundError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
