@@ -8,7 +8,7 @@ class ReclaimSpaceCronJob(NamespacedResource):
     https://github.com/csi-addons/kubernetes-csi-addons/blob/main/docs/reclaimspace.md
     """
 
-    api_group: str = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
+    api_group = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
 
     def __init__(
         self,
@@ -39,8 +39,6 @@ class ReclaimSpaceCronJob(NamespacedResource):
         self.failed_jobs_history_limit = failed_jobs_history_limit
 
     def to_dict(self) -> None:
-        self.res: Dict[str, Any]
-
         super().to_dict()
         if not self.yaml_file:
             if not (self.job_template and self.schedule):

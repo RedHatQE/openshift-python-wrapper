@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Dict
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -8,7 +8,7 @@ class ReclaimSpaceJob(NamespacedResource):
     https://github.com/csi-addons/kubernetes-csi-addons/blob/main/docs/reclaimspace.md
     """
 
-    api_group: str = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
+    api_group = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
 
     def __init__(
         self,
@@ -26,17 +26,13 @@ class ReclaimSpaceJob(NamespacedResource):
             operation may beretried.
         timeout (int, Optional): specifies the timeout in seconds for the grpc request sent to the CSI driver
         """
-        super().__init__(
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.backoff_limit = backoff_limit
         self.target = target
         self.retry_deadline_seconds = retry_deadline_seconds
         self.timeout = timeout
 
     def to_dict(self) -> None:
-        self.res: Dict[str, Any]
-
         super().to_dict()
         if not self.yaml_file:
             if not self.target:
