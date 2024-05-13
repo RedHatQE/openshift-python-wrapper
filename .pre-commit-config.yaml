@@ -27,17 +27,17 @@ repos:
           ]
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
+    rev: v1.5.0
     hooks:
       - id: detect-secrets
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.2
+    rev: v0.4.4
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 37.329.0
+    rev: 37.358.0
     hooks:
       - id: renovate-config-validator
