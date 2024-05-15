@@ -1,3 +1,4 @@
+from typing import Dict, List
 from kubernetes.dynamic.exceptions import (
     ForbiddenError,
     InternalServerError,
@@ -6,7 +7,7 @@ from kubernetes.dynamic.exceptions import (
 )
 from urllib3.exceptions import MaxRetryError, ProtocolError
 
-DEFAULT_CLUSTER_RETRY_EXCEPTIONS = {
+DEFAULT_CLUSTER_RETRY_EXCEPTIONS: Dict[type[Exception], List[str]] = {
     MaxRetryError: [],
     ConnectionAbortedError: [],
     ConnectionResetError: [],
