@@ -53,6 +53,7 @@ class Endpoints(NamespacedResource):
         if not self.yaml_file:
             if not (self.addresses and self.ports):
                 raise MissingRequiredArgumentError(argument="'addresses' and 'ports")
+
             self.res.update({
                 "subsets": {
                     "addresses": self.addresses,
