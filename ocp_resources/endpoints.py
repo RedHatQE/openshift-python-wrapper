@@ -48,11 +48,11 @@ class Endpoints(NamespacedResource):
         self.addresses = addresses
         self.ports = ports
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not (self.addresses and self.ports):
-                raise MissingRequiredArgumentError(argumens="'addresses' and 'ports")
+                raise MissingRequiredArgumentError(argument="'addresses' and 'ports")
             self.res.update({
                 "subsets": {
                     "addresses": self.addresses,

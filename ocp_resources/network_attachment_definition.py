@@ -47,7 +47,7 @@ class NetworkAttachmentDefinition(NamespacedResource):
         self.cni_version = cni_version
         self.config = config
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.resource_name is not None:
@@ -97,7 +97,7 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         self.macspoofchk = macspoofchk
         self.add_resource_name = add_resource_name
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         spec_config = self.res["spec"]["config"]
         spec_config["name"] = self.bridge_name
@@ -148,7 +148,7 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         )
         self.tuning_type = tuning_type
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if self.tuning_type:
             self.old_nad_format = True
@@ -188,7 +188,7 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
             cni_version=cni_version,
         )
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         self.res["spec"]["config"] = json.dumps(self.res["spec"]["config"])
 
@@ -222,7 +222,7 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         self.network_name = network_name
         self.topology = topology
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.network_name and not self.topology:

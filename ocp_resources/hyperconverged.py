@@ -29,7 +29,7 @@ class HyperConverged(NamespacedResource):
         self.infra = infra
         self.workloads = workloads
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.infra:

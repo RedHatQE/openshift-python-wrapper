@@ -35,7 +35,7 @@ class Backup(NamespacedResource):
         self.snapshot_move_data = snapshot_move_data
         self.storage_location = storage_location
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             spec_dict = {}

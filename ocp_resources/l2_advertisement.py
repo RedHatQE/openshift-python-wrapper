@@ -40,7 +40,7 @@ class L2Advertisement(NamespacedResource):
         self.ip_address_pools = ip_address_pools
         self.ip_address_pools_selectors = ip_address_pools_selectors
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res["spec"] = {}

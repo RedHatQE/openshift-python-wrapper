@@ -38,7 +38,7 @@ class MigrationPolicy(Resource):
         self.namespace_selector = namespace_selector or {}
         self.vmi_selector = vmi_selector or {}
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             spec = self.res.setdefault("spec", {})

@@ -51,7 +51,7 @@ class PerformanceProfile(Resource):
         self.real_time_kernel = real_time_kernel
         self.workload_hints = workload_hints
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.cpu and not self.node_selector:

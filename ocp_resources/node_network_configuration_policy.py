@@ -129,7 +129,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         self.desired_state["interfaces"] = interfaces
         self.res.setdefault("spec", {}).setdefault("desiredState", {})["interfaces"] = self.desired_state["interfaces"]
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.dns_resolver or self.routes or self.iface:

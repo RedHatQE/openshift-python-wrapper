@@ -49,7 +49,7 @@ class VirtualMachineExport(NamespacedResource):
         self.source_kind = source_kind
         self.source_name = source_name
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not (self.source_kind and self.source_name):

@@ -32,7 +32,7 @@ class CSIStorageCapacity(NamespacedResource):
         self.storage_class_name = storage_class_name
         self.maximum_volume_size = maximum_volume_size
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.storage_class_name:

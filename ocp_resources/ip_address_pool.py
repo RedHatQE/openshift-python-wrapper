@@ -39,7 +39,7 @@ class IPAddressPool(NamespacedResource):
         self.auto_assign = auto_assign
         self.avoid_buggy_ips = avoid_buggy_ips
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.addresses:
