@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 
 class ReclaimSpaceCronJob(NamespacedResource):
     """
-    https://github.com/csi-addons/kubernetes-csi-addons/blob/main/docs/reclaimspace.md
+    https://github.com/csi-addons/kubernetes-csi-addons/blob/main/apis/csiaddons/v1alpha1/reclaimspacecronjob_types.go
     """
 
     api_group = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
@@ -44,10 +44,8 @@ class ReclaimSpaceCronJob(NamespacedResource):
             if not (self.job_template and self.schedule):
                 raise MissingRequiredArgumentError(argument="'job_template' and 'schedule'")
             spec_dict = {}
-            if self.job_template:
-                spec_dict["jobTemplate"] = self.job_template
-            if self.schedule:
-                spec_dict["schedule"] = self.schedule
+            spec_dict["jobTemplate"] = self.job_template
+            spec_dict["schedule"] = self.schedule
 
             if self.successful_jobs_history_limit:
                 spec_dict["successfulJobsHistoryLimit"] = self.successful_jobs_history_limit

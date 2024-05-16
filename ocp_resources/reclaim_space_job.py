@@ -5,7 +5,7 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 
 class ReclaimSpaceJob(NamespacedResource):
     """
-    https://github.com/csi-addons/kubernetes-csi-addons/blob/main/docs/reclaimspace.md
+    https://github.com/csi-addons/kubernetes-csi-addons/blob/main/apis/csiaddons/v1alpha1/reclaimspacejob_types.go
     """
 
     api_group = NamespacedResource.ApiGroup.CSIADDONS_OPENSHIFT_IO
@@ -38,8 +38,7 @@ class ReclaimSpaceJob(NamespacedResource):
             if not self.target:
                 raise MissingRequiredArgumentError(argument="target")
             spec_dict = {}
-            if self.target:
-                spec_dict["target"] = self.target
+            spec_dict["target"] = self.target
             if self.retry_deadline_seconds:
                 spec_dict["retryDeadlineSeconds"] = self.retry_deadline_seconds
             if self.timeout:
