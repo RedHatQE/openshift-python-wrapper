@@ -8,6 +8,7 @@ import re
 import sys
 from io import StringIO
 from signal import SIGINT, signal
+from types import TracebackType
 from typing import Optional
 
 import kubernetes
@@ -480,7 +481,12 @@ class Resource:
         signal(SIGINT, self._sigint_handler)
         return self.deploy()
 
-    def __exit__(self) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         if self.teardown:
             self.clean_up()
 
@@ -1368,7 +1374,9 @@ class ResourceEditor:
         self.update(backup_resources=True)
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+    ) -> None:
         # restore backups
         self.restore()
 
