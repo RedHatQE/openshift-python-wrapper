@@ -399,6 +399,11 @@ class Resource:
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
         self.config_file = config_file
+        if not isinstance(config_file, str):
+            # If we pass config_file which isn't a string, get_client will fail and it will be very hard to know why.
+            # Better fail here and let the user know.
+            raise ValueError("config_file must be a string")
+
         self.config_dict = config_dict or {}
         self.context = context
         self.label = label
