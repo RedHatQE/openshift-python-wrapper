@@ -403,7 +403,9 @@ class Resource:
         self.context = context
         self.label = label
         self.timeout_seconds = timeout_seconds
-        self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
+        self.client: DynamicClient = client or get_client(
+            config_file=self.config_file, context=self.context if self.context else None
+        )
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
 
