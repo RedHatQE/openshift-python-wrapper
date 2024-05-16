@@ -20,11 +20,11 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS: Dict[type[Exception], List[str]] = {
     ServerTimeoutError: [],
     ForbiddenError: ["context deadline exceeded"],
 }
-PROTOCOL_ERROR_EXCEPTION_DICT = {ProtocolError: []}
-NOT_FOUND_ERROR_EXCEPTION_DICT = {NotFoundError: []}
+PROTOCOL_ERROR_EXCEPTION_DICT: Dict[type[Exception], List[str]] = {ProtocolError: []}
+NOT_FOUND_ERROR_EXCEPTION_DICT: Dict[type[Exception], List[str]] = {NotFoundError: []}
 
-TIMEOUT_10SEC = 10
-TIMEOUT_1MINUTE = 60
-TIMEOUT_2MINUTES = 2 * 60
-TIMEOUT_4MINUTES = 4 * 60
-TIMEOUT_10MINUTES = 10 * 60
+TIMEOUT_10SEC: int = 10
+TIMEOUT_1MINUTE: int = 60
+TIMEOUT_2MINUTES: int = 2 * 60
+TIMEOUT_4MINUTES: int = 4 * 60
+TIMEOUT_10MINUTES: int = 10 * 60

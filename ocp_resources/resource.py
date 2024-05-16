@@ -59,6 +59,7 @@ def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: st
     for result in sorted_results:
         if KubeAPIVersion(result.api_version) <= KubeAPIVersion(MAX_SUPPORTED_API_VERSION):
             return result
+    return None
 
 
 def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> str:
@@ -131,6 +132,8 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
         if class_iterator not in owner_class.mro() and issubclass(class_iterator, parent_class)
     ]):
         return class_iterator.__name__
+
+    return None
 
 
 class KubeAPIVersion(Version):
@@ -447,7 +450,6 @@ class Resource:
         Returns:
             dict: Resource dict.
         """
-        self.res: Dict[str, Any] = {}
         if self.yaml_file:
             if not self.yaml_file_contents:
                 if isinstance(self.yaml_file, StringIO):
@@ -478,12 +480,12 @@ class Resource:
         signal(SIGINT, self._sigint_handler)
         return self.deploy()
 
-    def __exit__(self, exception_type: Any, exception_value: Any, traceback: Any) -> None:
+    def __exit__(self) -> None:
         if self.teardown:
             self.clean_up()
 
     def _sigint_handler(self, signal_received: int, frame: Any) -> None:
-        self.__exit__(exception_type=None, exception_value=None, traceback=None)
+        self.__exit__()
         sys.exit(signal_received)
 
     def deploy(self, wait: bool = False) -> "Resource":
@@ -757,7 +759,7 @@ class Resource:
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
         if wait and resource_:
-            return self.wait()
+            self.wait()
         return resource_
 
     def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: Dict[str, Any] | None = None) -> bool:
@@ -846,10 +848,11 @@ class Resource:
         context: str = "",
         singular_name: str = "",
         exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[ResourceField, None, None]:
+    ) -> Generator["Resource|ResourceInstance", None, None]:
         """
         Get resources
 
@@ -858,6 +861,7 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
@@ -866,13 +870,20 @@ class Resource:
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
 
-        def _get() -> Generator["Resource", None, None]:
-            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)
+        def _get() -> Generator["Resource|ResourceInstance", None, None]:
+            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
-                    yield cls(client=dyn_client, name=resource_field.metadata.name)
+                    if raw:
+                        yield _resources
+                    else:
+                        yield cls(client=dyn_client, name=resource_field.metadata.name)
+
             except TypeError:
-                yield cls(client=dyn_client, name=_resources.metadata.name)
+                if raw:
+                    yield _resources
+                else:
+                    yield cls(client=dyn_client, name=_resources.metadata.name)
 
         return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
@@ -1102,7 +1113,7 @@ class Resource:
         """
         return []
 
-    def hash_resource_dict(self, resource_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
             resource_dict = benedict(resource_dict, keypath_separator="..")
@@ -1180,11 +1191,12 @@ class NamespacedResource(Resource):
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
+        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator[ResourceField, None, None]:
+    ) -> Generator["NamespacedResource|ResourceInstance", None, None]:
         """
         Get resources
 
@@ -1194,7 +1206,7 @@ class NamespacedResource(Resource):
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
-
+            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -1202,26 +1214,29 @@ class NamespacedResource(Resource):
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
 
-        _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)
-        try:
-            for resource_field in _resources.items:
+        def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
+            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
+            try:
+                for resource_field in _resources.items:
+                    if raw:
+                        yield resource_field
+                    else:
+                        yield cls(
+                            client=dyn_client,
+                            name=resource_field.metadata.name,
+                            namespace=resource_field.metadata.namespace,
+                        )
+            except TypeError:
                 if raw:
-                    yield resource_field
+                    yield _resources
                 else:
                     yield cls(
                         client=dyn_client,
-                        name=resource_field.metadata.name,
-                        namespace=resource_field.metadata.namespace,
+                        name=_resources.metadata.name,
+                        namespace=_resources.metadata.namespace,
                     )
-        except TypeError:
-            if raw:
-                yield _resources
-            else:
-                yield cls(
-                    client=dyn_client,
-                    name=_resources.metadata.name,
-                    namespace=_resources.metadata.namespace,
-                )
+
+        return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
     @property
     def instance(self) -> ResourceInstance:
@@ -1232,7 +1247,7 @@ class NamespacedResource(Resource):
             openshift.dynamic.client.ResourceInstance
         """
 
-        def _instance():
+        def _instance() -> ResourceInstance:
             return self.api.get(name=self.name, namespace=self.namespace)
 
         return self.retry_cluster_exceptions(func=_instance)
@@ -1284,7 +1299,7 @@ class ResourceEditor:
         self._patches = self._dictify_resourcefield(res=patches)
         self.action = action
         self.user_backups = user_backups
-        self._backups = {}
+        self._backups: Dict[Any, Any] = {}
 
     @property
     def backups(self) -> Dict[Any, Any]:
@@ -1394,7 +1409,7 @@ class ResourceEditor:
 
         # when both are dicts, get the diff (recursively if need be)
         if isinstance(original, dict) and isinstance(patch, dict):
-            diff_dict = {}
+            diff_dict: Dict[Any, Any] = {}
             for key, value in patch.items():
                 if key not in original:
                     diff_dict[key] = None
