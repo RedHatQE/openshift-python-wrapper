@@ -75,7 +75,7 @@ class VirtualMachine(NamespacedResource):
     def api_request(self, method, action, **params):
         return super().api_request(method=method, action=action, url=self._subresource_api_url, **params)
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             body_spec = self.body.get("spec") if self.body else None

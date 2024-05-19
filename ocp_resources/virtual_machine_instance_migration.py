@@ -27,7 +27,7 @@ class VirtualMachineInstanceMigration(NamespacedResource):
         )
         self._vmi = vmi
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         # When creating VirtualMachineInstanceMigration vmi is mandatory but when calling get()
         # we cannot pass vmi.
         super().to_dict()

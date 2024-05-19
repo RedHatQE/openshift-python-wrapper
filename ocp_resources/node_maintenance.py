@@ -33,7 +33,7 @@ class NodeMaintenance(Resource):
         self.node = node
         self.reason = reason
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             assert self.node, "node is mandatory for create"

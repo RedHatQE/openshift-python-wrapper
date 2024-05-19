@@ -48,7 +48,7 @@ class KubeDescheduler(NamespacedResource):
         self.mode = mode
         self.operator_log_level = operator_log_level
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

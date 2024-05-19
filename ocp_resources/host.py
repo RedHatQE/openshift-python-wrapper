@@ -43,7 +43,7 @@ class Host(NamespacedResource, MTV):
         self.secret_namespace = secret_namespace or self.namespace
         self.condition_message_ready = self.ConditionMessage.HOST_READY
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

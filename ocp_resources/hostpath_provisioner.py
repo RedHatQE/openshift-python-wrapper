@@ -35,7 +35,7 @@ class HostPathProvisioner(Resource):
         self.path = path
         self.image_pull_policy = image_pull_policy
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             spec = self.res.setdefault("spec", {})

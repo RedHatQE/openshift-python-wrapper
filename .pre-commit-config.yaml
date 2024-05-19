@@ -41,3 +41,15 @@ repos:
     rev: 37.358.0
     hooks:
       - id: renovate-config-validator
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+        exclude: ^(tests/|examples/|docs/)
+        additional_dependencies: [types-all]
