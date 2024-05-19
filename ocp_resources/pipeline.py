@@ -42,7 +42,7 @@ class Pipeline(NamespacedResource):
         self.params = params
         self.final_parallel_tasks = final_parallel_tasks
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not (self.tasks or self.params or self.final_parallel_tasks):

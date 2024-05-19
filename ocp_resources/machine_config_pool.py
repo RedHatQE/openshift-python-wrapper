@@ -55,7 +55,7 @@ class MachineConfigPool(Resource):
         self.max_unavailable = max_unavailable
         self.paused = paused
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update(

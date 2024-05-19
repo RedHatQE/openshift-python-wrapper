@@ -44,7 +44,7 @@ class CronJob(NamespacedResource):
         self.failed_jobs_history_limit = failed_jobs_history_limit
         self.starting_deadline_seconds = starting_deadline_seconds
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not (self.job_template and self.schedule):

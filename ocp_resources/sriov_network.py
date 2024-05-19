@@ -39,7 +39,7 @@ class SriovNetwork(NamespacedResource):
         self.ipam = ipam
         self.macspoofchk = macspoofchk
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res["spec"] = {

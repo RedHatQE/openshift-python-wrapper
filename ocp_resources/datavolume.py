@@ -153,7 +153,7 @@ class DataVolume(NamespacedResource):
         self.api_name = api_name
         self.delete_after_completion = delete_after_completion
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

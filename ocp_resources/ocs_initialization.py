@@ -40,7 +40,7 @@ class OCSInitialization(NamespacedResource):
         )
         self.enable_ceph_tools = enable_ceph_tools
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file and self.enable_ceph_tools is not None:
             self.res.update({

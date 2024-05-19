@@ -58,7 +58,7 @@ class NetworkMap(NamespacedResource, MTV):
         self.destination_provider_namespace = destination_provider_namespace
         self.condition_message_ready = self.ConditionMessage.NETWORK_MAP_READY
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update(self.map_to_dict)
