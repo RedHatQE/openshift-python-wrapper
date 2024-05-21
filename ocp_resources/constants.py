@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, List
 from kubernetes.dynamic.exceptions import (
     ForbiddenError,
