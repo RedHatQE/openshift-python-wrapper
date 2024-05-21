@@ -202,6 +202,8 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         self,
         network_name=None,
         topology=None,
+        vlan=None,
+        mtu=None,
         **kwargs,
     ):
         """
@@ -211,8 +213,11 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         https://docs.openshift.com/container-platform/4.14/networking/multiple_networks/configuring-additional-network.html#configuration-ovnk-additional-networks_configuring-additional-network
 
         Args:
-            network_name (str): The name of the network. This field is mandatory when not using yaml
-                file.
+            network_name (str, optional): The name of the network, used to connect
+                resources created in different namespaces to the same network.
+            vlan (int, optional): A vlan tag ID that will be assigned to traffic from this
+                additional network.
+            mtu (str, optional): The maximum transmission unit (MTU).
             topology (str): The secondary network topology to be created.
         """
         super().__init__(
@@ -221,6 +226,8 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         )
         self.network_name = network_name
         self.topology = topology
+        self.vlan = vlan
+        self.mtu = mtu
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -229,6 +236,10 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
                 raise MissingRequiredArgumentError(argument="'network_name' and 'topology'")
 
             spec_config = self.res["spec"]["config"]
+            if self.vlan:
+                spec_config["vlanID"] = self.vlan
+            if self.mtu:
+                spec_config["mtu"] = self.mtu
             spec_config["name"] = self.network_name
             spec_config["topology"] = self.topology
             spec_config["netAttachDefName"] = f"{self.namespace}/{self.name}"
