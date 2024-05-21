@@ -89,7 +89,7 @@ class StorageClass(Resource):
         self.allowed_topologies = allowed_topologies
         self.mount_options = mount_options
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.provisioner:

@@ -28,7 +28,7 @@ class ServiceAccount(NamespacedResource):
         self.image_pull_secrets = image_pull_secrets
         self.secrets = secrets
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.automount_service_account_token:

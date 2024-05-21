@@ -33,7 +33,7 @@ class OperatorSource(NamespacedResource):
         self.publisher = publisher
         self.secret = secret
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

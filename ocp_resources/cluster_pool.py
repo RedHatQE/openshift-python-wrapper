@@ -38,8 +38,6 @@ class ClusterPool(NamespacedResource):
         self.size = size
 
     def to_dict(self) -> None:
-        self.res: Dict[str, Any]
-
         super().to_dict()
         if not self.yaml_file:
             self.res["spec"] = {}

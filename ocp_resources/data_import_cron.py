@@ -53,7 +53,7 @@ class DataImportCron(NamespacedResource):
         self.imports_to_keep = imports_to_keep
         self.bind_immediate_annotation = bind_immediate_annotation
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.image_stream and self.url:

@@ -22,7 +22,7 @@ class DataSource(NamespacedResource):
         super().__init__(**kwargs)
         self._source = source
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self._source:

@@ -35,7 +35,7 @@ class PodDisruptionBudget(NamespacedResource):
         self.max_unavailable = max_unavailable
         self.selector = selector
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             update_dict = {

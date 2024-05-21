@@ -47,7 +47,7 @@ class Role(NamespacedResource):
         )
         self.rules = rules
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         if not self.rules and not self.yaml_file:
             raise MissingRequiredArgumentError(argument="rules")
         if not self.res:

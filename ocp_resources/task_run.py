@@ -36,7 +36,7 @@ class TaskRun(NamespacedResource):
         self.service_account_name = service_account_name
         self.taskrun_timeout = taskrun_timeout
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not (self.task_ref or self.task_spec):

@@ -77,7 +77,7 @@ class MachineSet(NamespacedResource):
         self.machine_type = machine_type
         self.provider_spec = provider_spec or {}
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             _spec, _metadata, _labels = ("spec", "metadata", "labels")

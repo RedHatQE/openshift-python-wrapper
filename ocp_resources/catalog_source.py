@@ -33,7 +33,7 @@ class CatalogSource(NamespacedResource):
         self.publisher = publisher
         self.update_strategy_registry_poll_interval = update_strategy_registry_poll_interval
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not all([self.source_type, self.image, self.display_name, self.publisher]):

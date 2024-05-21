@@ -43,7 +43,7 @@ class Migration(NamespacedResource, MTV):
         self.cut_over = cut_over
         self.condition_message_succeeded = self.ConditionMessage.MIGRATION_SUCCEEDED
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

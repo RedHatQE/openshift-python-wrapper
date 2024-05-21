@@ -57,7 +57,7 @@ class Lease(NamespacedResource):
         self.acquire_time = acquire_time
         self.renew_time = renew_time
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.acquire_time:

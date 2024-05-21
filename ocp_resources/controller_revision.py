@@ -26,7 +26,7 @@ class ControllerRevision(NamespacedResource):
         self.revision_object = revision_object
         self.revision = revision
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.revision:
