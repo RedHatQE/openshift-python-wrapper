@@ -36,23 +36,16 @@ pre-commit install
 
 ## Adding a new module (resource)
 
-To support working with a new (or missing) resource:
+A new resource must follow rules:
+- A new file named as the resource under `ocp_resources`; If the resource name is composed of multiple words, separate them with an underscore.  
+- A class named as the resource kind.  
+- Inherit from the relevant class; If the resource is cluster-scoped, inherit from `Resource` else from `NamespacedResource`.  
+- API group:
+  - Under `ocp_resources.resource.Resource.ApiGroup`
+  - Resource's apiGroup (`apiVersion` prefix) as `api_group`
+- A link to the resource's API reference.
+- Implement `__init__` function;  
+Define all the required arguments that are **required** to instantiate the new resource. Optional parameters may be added as well.
+- Implement `to_dict` function.
 
-- Add a new file under `ocp_resources`, names as the resource.  
-  If the resource name is composed of multiple words, separate them with an underscore.  
-  For example: `ImageStream` filename is `image_stream.py`
-- Create a class named as the resource kind.  
-  For example: `ImageStream` -> `class ImageStream`
-- Inherit from the relevant class.  
-  If the resource is cluster-scoped, inherit from `Resource` else from `NamespacedResource`.  
-  For example: `class ImageStream(NamespacedResource):`
-- Add the resource's apiGroup (`apiVersion` prefix) as `api_group`.
-  For example: `image.openshift.io`
-- Add a link to the resource's API reference.  
-  For example: [ImageStream API reference](https://docs.openshift.com/container-platform/4.11/rest_api/image_apis/imagestream-image-openshift-io-v1.html#imagestream-image-openshift-io-v1)
-- Add an `__init__` function.  
-Define all the required arguments that are **required** to instantiate the new resource.  
-Optional parameters may be added as well.
-Resource / NamespacedResource base attributes should be referred to by using `kwargs`
-- Use `to_dict` to set the values in the resource body. Make sure you call `super().to_dict()` first.  
-- Check [ConfigMap](ocp_resources/configmap.py) for reference.
+Check [ConfigMap](ocp_resources/configmap.py) and [Backup](ocp_resources/backup.py) for reference.

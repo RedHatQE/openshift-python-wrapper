@@ -14,7 +14,7 @@ class ConfigMap(NamespacedResource):
     def __init__(
         self,
         data: Dict[str, Any] | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         """
         Args:
