@@ -544,7 +544,7 @@ class Resource:
             wait (bool, optional): Wait for resource deletion. Defaults to True.
 
         Returns:
-                bool: True if resource was deleted else False.
+            bool: True if resource was deleted else False.
 
         Examples:
             To skip teardown of all resources by kind:
