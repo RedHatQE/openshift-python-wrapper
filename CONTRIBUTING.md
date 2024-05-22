@@ -31,6 +31,9 @@ pre-commit install
 - If the fix is needed in a released version, once your pull request is merged, cherry-pick it to the relevant branch(s).  
   Add `/cherry-pick <target branch to cherry-pick to>` to the PR comment.
 
+## General
+- Add typing to new code; typing is enforced using [mypy](https://mypy-lang.org/)
+
 ## Adding a new module (resource)
 
 To support working with a new (or missing) resource:
@@ -48,53 +51,8 @@ To support working with a new (or missing) resource:
 - Add a link to the resource's API reference.  
   For example: [ImageStream API reference](https://docs.openshift.com/container-platform/4.11/rest_api/image_apis/imagestream-image-openshift-io-v1.html#imagestream-image-openshift-io-v1)
 - Add an `__init__` function.  
-  Define all the required arguments that are **required** to instantiate a new resource.  
-  Optional parameters may be added as well.  
-  For example:
-
-```
-    def __init__(
-        self,
-        name=None,
-        namespace=None,
-        client=None,
-        lookup_policy=False,
-        tags=None,
-        teardown=True,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
-    ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            privileged_client=privileged_client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
-        self.tags = tags
-        self.lookup_policy = lookup_policy
-```
-
+Define all the required arguments that are **required** to instantiate the new resource.  
+Optional parameters may be added as well.
+Resource / NamespacedResource base attributes should be referred to by using `kwargs`
 - Use `to_dict` to set the values in the resource body. Make sure you call `super().to_dict()` first.  
-  For example:
-
-```
-    def to_dict(self) -> None:
-        super().to_dict()
-        if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "lookupPolicy": {"local": self.lookup_policy},
-                        "tags": self.tags,
-                    }
-                }
-            )
-```
-
-- Check [imageStreams](ocp_resources/image_stream.py) for reference.
+- Check [ConfigMap](ocp_resources/configmap.py) for reference.
