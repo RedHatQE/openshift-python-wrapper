@@ -21,9 +21,10 @@ from kubernetes.dynamic.exceptions import (
     NotFoundError,
     ForbiddenError,
 )
+from typing import Any, Dict, List
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
-from simple_logger.logger import Any, Dict, List, get_logger, logging
+from simple_logger.logger import get_logger, logging
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
