@@ -141,7 +141,7 @@ class IngressController(NamespacedResource):
         self.endpoint_publishing_strategy = endpoint_publishing_strategy
         self.default_certificate = default_certificate
         self.namespace_selector = namespace_selector
-        self.node_selector = node_selector
+        self.node_selector = node_selector  # type: ignore
         self.route_selector = route_selector
         self.tls_security_profile = tls_security_profile
         self.logging = logging
