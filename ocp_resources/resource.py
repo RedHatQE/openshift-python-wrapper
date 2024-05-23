@@ -535,10 +535,16 @@ class Resource:
         self.create(wait=wait)
         return self
 
-    def clean_up(self) -> None:
+    def clean_up(self, wait: bool = True) -> bool:
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
+
+        Args:
+            wait (bool, optional): Wait for resource deletion. Defaults to True.
+
+        Returns:
+            bool: True if resource was deleted else False.
 
         Examples:
             To skip teardown of all resources by kind:
@@ -564,9 +570,9 @@ class Resource:
             self.logger.warning(
                 f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
-            return
+            return False
 
-        self.delete(wait=True, timeout=self.delete_timeout)
+        return self.delete(wait=wait, timeout=self.delete_timeout)
 
     @classmethod
     def _prepare_resources(
@@ -788,7 +794,7 @@ class Resource:
             if wait:
                 self.client_wait_deleted(timeout=timeout)
 
-        except NotFoundError:
+        except (NotFoundError, TimeoutExpiredError):
             return False
 
         return True
