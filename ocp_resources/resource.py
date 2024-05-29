@@ -114,7 +114,7 @@ def get_client(
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context, **kwargs)
+            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
