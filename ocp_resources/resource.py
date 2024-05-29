@@ -360,7 +360,7 @@ class Resource:
         node_selector_labels: Dict[str, str] | None = None,
         config_file: str = "",
         config_dict: Dict[str, Any] | None = None,
-        context: str | None = None,
+        context: str = "",
         label: Dict[str, str] | None = None,
         timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
@@ -405,7 +405,7 @@ class Resource:
             raise ValueError("config_file must be a string")
 
         self.config_dict = config_dict or {}
-        self.context = context
+        self.context = context if context else None
         self.label = label
         self.timeout_seconds = timeout_seconds
         self.client: DynamicClient = client or get_client(
