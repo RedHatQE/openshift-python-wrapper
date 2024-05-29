@@ -77,7 +77,7 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str | None = None, config_dict: Dict[str, Any] | None = None, context: str | None = None, **kwargs: Any
+    config_file: str = "", config_dict: Dict[str, Any] | None = None, context: str = "", **kwargs: Any
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -101,7 +101,9 @@ def get_client(
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config_dict(config_dict=config_dict, context=context, **kwargs)
+            client=kubernetes.config.new_client_from_config_dict(
+                config_dict=config_dict, context=context or None, **kwargs
+            )
         )
     try:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
@@ -411,9 +413,7 @@ class Resource:
         self.context = context
         self.label = label
         self.timeout_seconds = timeout_seconds
-        self.client: DynamicClient = client or get_client(
-            config_file=self.config_file, context=self.context if self.context else None
-        )
+        self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
 
