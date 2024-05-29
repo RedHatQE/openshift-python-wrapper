@@ -360,7 +360,7 @@ class Resource:
         node_selector_labels: Dict[str, str] | None = None,
         config_file: str = "",
         config_dict: Dict[str, Any] | None = None,
-        context: str = "",
+        context: str | None = None,
         label: Dict[str, str] | None = None,
         timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
@@ -864,7 +864,7 @@ class Resource:
     def get(
         cls,
         config_file: str = "",
-        context: str = "",
+        context: str | None = None,
         singular_name: str = "",
         exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
@@ -1077,7 +1077,11 @@ class Resource:
 
     @staticmethod
     def get_all_cluster_resources(
-        config_file: str = "", context: str = "", config_dict: Dict[str, Any] | None = None, *args: Any, **kwargs: Any
+        config_file: str = "",
+        context: str | None = None,
+        config_dict: Dict[str, Any] | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> Generator[ResourceField, None, None]:
         """
         Get all cluster resources
@@ -1208,7 +1212,7 @@ class NamespacedResource(Resource):
     def get(
         cls,
         config_file: str = "",
-        context: str = "",
+        context: str | None = None,
         singular_name: str = "",
         exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
