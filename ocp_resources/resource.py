@@ -20,6 +20,7 @@ from kubernetes.dynamic.exceptions import (
     MethodNotAllowedError,
     NotFoundError,
     ForbiddenError,
+    ResourceNotFoundError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
@@ -365,6 +366,7 @@ class Resource:
         timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
         hash_log_data: bool = True,
+        ensure_exists: bool = False,
     ):
         """
         Create an API resource
@@ -387,6 +389,7 @@ class Resource:
             api_group (str): Resource API group; will overwrite API group definition in resource class
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
+            ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
         """
 
         self.name = name
@@ -427,8 +430,18 @@ class Resource:
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
+
+        if ensure_exists:
+            self._ensure_exists()
+
         # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
+
+    def _ensure_exists(self) -> None:
+        self.logger.error(self.namespace)
+        if not self.exists:
+            _name_for_raise = self.name if not self.namespace else f"{self.namespace}/{self.name}"
+            raise ResourceNotFoundError(f"Resource `{self.kind}` `{_name_for_raise}` does not exist")
 
     def _set_logger(self) -> logging.Logger:
         log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
@@ -1188,6 +1201,7 @@ class NamespacedResource(Resource):
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
         privileged_client: DynamicClient | None = None,
+        ensure_exists: bool = True,
         **kwargs: Any,
     ):
         super().__init__(
@@ -1203,6 +1217,9 @@ class NamespacedResource(Resource):
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:
             raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
+
+        if ensure_exists:
+            self._ensure_exists()
 
     @classmethod
     def get(
