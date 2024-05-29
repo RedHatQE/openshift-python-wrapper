@@ -1201,7 +1201,7 @@ class NamespacedResource(Resource):
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
         privileged_client: DynamicClient | None = None,
-        ensure_exists: bool = True,
+        ensure_exists: bool = False,
         **kwargs: Any,
     ):
         super().__init__(
