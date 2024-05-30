@@ -22,7 +22,6 @@ from kubernetes.dynamic.exceptions import (
     ForbiddenError,
     ResourceNotFoundError,
 )
-from typing import Any, Dict, List
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger, logging
