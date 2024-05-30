@@ -9,7 +9,7 @@ import sys
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Optional
+from typing import Optional, Any, Dict, List
 
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
@@ -20,10 +20,11 @@ from kubernetes.dynamic.exceptions import (
     MethodNotAllowedError,
     NotFoundError,
     ForbiddenError,
+    ResourceNotFoundError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
-from simple_logger.logger import Any, Dict, List, get_logger, logging
+from simple_logger.logger import get_logger, logging
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
@@ -76,7 +77,7 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str | None = None, config_dict: Dict[str, Any] | None = None, context: str | None = None, **kwargs: Any
+    config_file: str = "", config_dict: Dict[str, Any] | None = None, context: str = "", **kwargs: Any
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -100,7 +101,9 @@ def get_client(
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config_dict(config_dict=config_dict, context=context, **kwargs)
+            client=kubernetes.config.new_client_from_config_dict(
+                config_dict=config_dict, context=context or None, **kwargs
+            )
         )
     try:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
@@ -111,7 +114,7 @@ def get_client(
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context, **kwargs)
+            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
@@ -365,6 +368,7 @@ class Resource:
         timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
         hash_log_data: bool = True,
+        ensure_exists: bool = False,
     ):
         """
         Create an API resource
@@ -387,6 +391,7 @@ class Resource:
             api_group (str): Resource API group; will overwrite API group definition in resource class
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
+            ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
         """
 
         self.name = name
@@ -408,9 +413,7 @@ class Resource:
         self.context = context
         self.label = label
         self.timeout_seconds = timeout_seconds
-        self.client: DynamicClient = client or get_client(
-            config_file=self.config_file, context=self.context if self.context else None
-        )
+        self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
 
@@ -427,8 +430,18 @@ class Resource:
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
+
+        if ensure_exists:
+            self._ensure_exists()
+
         # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
+
+    def _ensure_exists(self) -> None:
+        self.logger.error(self.namespace)
+        if not self.exists:
+            _name_for_raise = self.name if not self.namespace else f"{self.namespace}/{self.name}"
+            raise ResourceNotFoundError(f"Resource `{self.kind}` `{_name_for_raise}` does not exist")
 
     def _set_logger(self) -> logging.Logger:
         log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
@@ -1188,6 +1201,7 @@ class NamespacedResource(Resource):
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
         privileged_client: DynamicClient | None = None,
+        ensure_exists: bool = False,
         **kwargs: Any,
     ):
         super().__init__(
@@ -1203,6 +1217,9 @@ class NamespacedResource(Resource):
         self.namespace = namespace
         if not (self.name and self.namespace) and not self.yaml_file:
             raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
+
+        if ensure_exists:
+            self._ensure_exists()
 
     @classmethod
     def get(
