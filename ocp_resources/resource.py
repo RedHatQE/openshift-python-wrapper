@@ -9,7 +9,7 @@ import sys
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Optional
+from typing import Optional, Any, Dict, List
 
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
