@@ -14,7 +14,7 @@ class ReclaimSpaceCronJob(NamespacedResource):
         self,
         schedule: str | None = None,
         job_template: Dict[str, Any] = None,
-        concurrency_policy: str  = "",
+        concurrency_policy: str = "",
         successful_jobs_history_limit: int | None = None,
         failed_jobs_history_limit: int | None = None,
         **kwargs: Any,
