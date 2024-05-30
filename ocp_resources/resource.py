@@ -9,7 +9,7 @@ import sys
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Optional
+from typing import Optional, Any, Dict, List
 
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
@@ -24,7 +24,7 @@ from kubernetes.dynamic.exceptions import (
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
-from simple_logger.logger import Any, Dict, List, get_logger, logging
+from simple_logger.logger import get_logger, logging
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
