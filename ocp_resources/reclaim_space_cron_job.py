@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -12,11 +12,11 @@ class ReclaimSpaceCronJob(NamespacedResource):
 
     def __init__(
         self,
-        schedule: str | None = None,
-        job_template: Dict[str, Any] = None,
-        concurrency_policy: str = "",
-        successful_jobs_history_limit: int | None = None,
-        failed_jobs_history_limit: int | None = None,
+        schedule: Optional[str] = "",
+        job_template: Dict[str, Any] | None = None,
+        concurrency_policy: Optional[str] = "",
+        successful_jobs_history_limit: Optional[int] = None,
+        failed_jobs_history_limit: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -43,15 +43,11 @@ class ReclaimSpaceCronJob(NamespacedResource):
         if not self.yaml_file:
             if not (self.job_template and self.schedule):
                 raise MissingRequiredArgumentError(argument="'job_template' and 'schedule'")
-            spec_dict = {}
-            spec_dict["jobTemplate"] = self.job_template
-            spec_dict["schedule"] = self.schedule
-
+            self.res["spec"] = {"jobTemplate": self.job_template, "schedule": self.schedule}
+            spec_dict = self.res["spec"]
             if self.successful_jobs_history_limit:
                 spec_dict["successfulJobsHistoryLimit"] = self.successful_jobs_history_limit
             if self.failed_jobs_history_limit:
                 spec_dict["failedJobsHistoryLimit"] = self.failed_jobs_history_limit
             if self.concurrency_policy:
                 spec_dict["concurrencyPolicy"] = self.concurrency_policy
-
-            self.res.update({"spec": spec_dict})

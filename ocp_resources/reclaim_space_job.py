@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any
+from typing import Any, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -12,10 +12,10 @@ class ReclaimSpaceJob(NamespacedResource):
 
     def __init__(
         self,
-        backoff_limit: int | None = None,
-        target: dict[str, Any] = None,
-        retry_deadline_seconds: int | None = None,
-        timeout: int | None = None,
+        backoff_limit: Optional[int] = None,
+        target: dict[str, Any] | None = None,
+        retry_deadline_seconds: Optional[int] = None,
+        timeout: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -26,7 +26,9 @@ class ReclaimSpaceJob(NamespacedResource):
             operation may beretried.
         timeout (int, Optional): specifies the timeout in seconds for the grpc request sent to the CSI driver
         """
-        super().__init__(**kwargs)
+        super().__init__(
+            **kwargs,
+        )
         self.backoff_limit = backoff_limit
         self.target = target
         self.retry_deadline_seconds = retry_deadline_seconds
@@ -37,13 +39,11 @@ class ReclaimSpaceJob(NamespacedResource):
         if not self.yaml_file:
             if not self.target:
                 raise MissingRequiredArgumentError(argument="target")
-            spec_dict = {}
-            spec_dict["target"] = self.target
+            self.res["spec"] = {"target": self.target}
+            spec_dict = self.res["spec"]
             if self.retry_deadline_seconds:
                 spec_dict["retryDeadlineSeconds"] = self.retry_deadline_seconds
             if self.timeout:
                 spec_dict["timeout"] = self.timeout
             if self.backoff_limit:
                 spec_dict["backOffLimit"] = self.backoff_limit
-
-            self.res.update({"spec": spec_dict})
