@@ -11,7 +11,7 @@ class IngressController(NamespacedResource):
 
     def __init__(
         self,
-        domain: str | None = None,
+        domain: str = "",
         replicas: int | None = None,
         endpoint_publishing_strategy: Dict[str, Any] | None = None,
         default_certificate: Dict[str, str] | None = None,

@@ -11,9 +11,9 @@ class Proxy(Resource):
 
     def __init__(
         self,
-        http_proxy: str | None = None,
-        https_proxy: str | None = None,
-        no_proxy: str | None = None,
+        http_proxy: str = "",
+        https_proxy: str = "",
+        no_proxy: str = "",
         readiness_endpoints: List[str] | None = None,
         trusted_ca: Dict[str, str] | None = None,
         **kwargs: Any,
