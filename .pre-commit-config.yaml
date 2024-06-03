@@ -32,18 +32,18 @@ repos:
       - id: detect-secrets
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.5
+    rev: v0.4.7
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 37.379.0
+    rev: 37.387.0
     hooks:
       - id: renovate-config-validator
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.2
+    rev: v8.18.3
     hooks:
       - id: gitleaks
 
