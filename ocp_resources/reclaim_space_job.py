@@ -25,7 +25,7 @@ class ReclaimSpaceJob(NamespacedResource):
         retryDeadlineSeconds (int, Optional): Duration in seconds relative to the start time that the
             operation may be retried.
         timeout_seconds_reclaim_job (int, Optional): Specifies the timeout in seconds for the grpc request sent to
-            the CSI driver. If set, minimum allowed value is 60
+            the CSI driver.
         """
         super().__init__(
             **kwargs,
