@@ -20,12 +20,12 @@ class ReclaimSpaceJob(NamespacedResource):
     ) -> None:
         """
         Args:
-        backoff_limit (int, Optional): The number of retries for a reclaim space job.
-        target (dict): Volume target on which the operation would be performed.
-        retryDeadlineSeconds (int, Optional): Duration in seconds relative to the start time that the
-            operation may be retried.
-        timeout_seconds_reclaim_job (int, Optional): Specifies the timeout in seconds for the grpc request sent to
-            the CSI driver.
+            backoff_limit (int, Optional): The number of retries for a reclaim space job.
+            target (dict): Volume target on which the operation would be performed.
+            retryDeadlineSeconds (int, Optional): Duration in seconds relative to the start time that the
+                operation may be retried.
+            timeout_seconds_reclaim_job (int, Optional): Specifies the timeout in seconds for the grpc request sent to
+                the CSI driver.
         """
         super().__init__(
             **kwargs,
