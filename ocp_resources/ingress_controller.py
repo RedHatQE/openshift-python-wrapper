@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from ocp_resources.resource import NamespacedResource
 
 
@@ -11,66 +11,66 @@ class IngressController(NamespacedResource):
 
     def __init__(
         self,
-        domain: str = "",
-        replicas: int | None = None,
-        endpoint_publishing_strategy: Dict[str, Any] | None = None,
-        default_certificate: Dict[str, str] | None = None,
-        namespace_selector: Dict[str, Any] | None = None,
-        node_selector: Dict[str, Any] | None = None,
-        route_selector: Dict[str, Any] | None = None,
-        tls_security_profile: Dict[str, Any] | None = None,
-        logging: Dict[str, Any] | None = None,
-        route_admission: Dict[str, Any] | None = None,
-        client_tls: Dict[str, Any] | None = None,
-        trusted_ca: Dict[str, Any] | None = None,
-        http_compression: Dict[str, str] | None = None,
-        http_empty_requests_policy: str | None = None,
-        http_error_code_pages: Dict[str, Any] | None = None,
-        http_headers: Dict[str, Any] | None = None,
-        node_placement: Dict[str, Any] | None = None,
-        tuning_options: Dict[str, Any] | None = None,
-        unsupported_config_overrides: Dict[str, Any] | None = None,
+        domain: Optional[str] = "",
+        replicas: Optional[int] = None,
+        endpoint_publishing_strategy: Optional[Dict[str, Any]] = None,
+        default_certificate: Optional[Dict[str, str]] = None,
+        namespace_selector: Optional[Dict[str, Any]] = None,
+        node_selector: Optional[Dict[str, Any]] = None,
+        route_selector: Optional[Dict[str, Any]] = None,
+        tls_security_profile: Optional[Dict[str, Any]] = None,
+        logging: Optional[Dict[str, Any]] = None,
+        route_admission: Optional[Dict[str, Any]] = None,
+        client_tls: Optional[Dict[str, Any]] = None,
+        trusted_ca: Optional[Dict[str, Any]] = None,
+        http_compression: Optional[Dict[str, str]] = None,
+        http_empty_requests_policy: Optional[str] = "",
+        http_error_code_pages: Optional[Dict[str, Any]] = None,
+        http_headers: Optional[Dict[str, Any]] = None,
+        node_placement: Optional[Dict[str, Any]] = None,
+        tuning_options: Optional[Dict[str, Any]] = None,
+        unsupported_config_overrides: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            domain (str): The domain for the ingress controller.
-            replicas (int): The number of desired replicas.
-            endpoint_publishing_strategy (dict): The strategy for publishing endpoints.
+            domain (str, optional): The domain for the ingress controller.
+            replicas (int, optional): The number of desired replicas.
+            endpoint_publishing_strategy (dict, optional): The strategy for publishing endpoints.
                 Example: {
                     "type": "LoadBalancerService",
                     "loadBalancer": {
                         "scope": "External"
                     }
                 }
-            default_certificate (dict): A reference to a secret containing the default certificate.
+            default_certificate (dict, optional): A reference to a secret containing the default certificate.
                 Example: {
                     "name": "default-cert-secret",
                     "namespace": "openshift-ingress"
                 }
-            namespace_selector (dict): A selector to select which namespaces the ingress controller should observe.
+            namespace_selector (dict, optional): A selector to select which namespaces the ingress controller should observe.
                 Example: {
                     "matchLabels": {
                         "app": "myapp"
                     }
                 }
-            node_selector (dict): A selector to select nodes the ingress controller should run on.
+            node_selector (dict, optional): A selector to select nodes the ingress controller should run on.
                 Example: {
                     "matchLabels": {
                         "node-role.kubernetes.io/worker": ""
                     }
                 }
-            route_selector (dict): A selector to select which routes the ingress controller should observe.
+            route_selector (dict, optional): A selector to select which routes the ingress controller should observe.
                 Example: {
                     "matchLabels": {
                         "route": "myroute"
                     }
                 }
-            tls_security_profile (dict): Settings for TLS connections.
+            tls_security_profile (dict, optional): Settings for TLS connections.
                 Example: {
                     "type": "Intermediate"
                 }
-            logging (dict): Parameters for logging.
+            logging (dict, optional): Parameters for logging.
                 Example: {
                     "access": {
                         "destination": {
@@ -79,11 +79,11 @@ class IngressController(NamespacedResource):
                         }
                     }
                 }
-            route_admission (dict): Policy for handling new route claims.
+            route_admission (dict, optional): Policy for handling new route claims.
                 Example: {
                     "namespaceOwnership": "InterNamespaceAllowed"
                 }
-            client_tls (dict): Client TLS settings, including `clientCA` and `clientCertificatePolicy`.
+            client_tls (dict, optional): Client TLS settings, including `clientCA` and `clientCertificatePolicy`.
                 Example: {
                     "clientCA": {
                         "name": "client-ca",
@@ -91,28 +91,28 @@ class IngressController(NamespacedResource):
                     },
                     "clientCertificatePolicy": "Required"
                 }
-            trusted_ca (dict): TrustedCA data.
+            trusted_ca (dict, optional): TrustedCA data.
                 Example: {
                     "name": "trusted-ca",
                     "namespace": "openshift-config"
                 }
-            http_compression (dict): Policy for HTTP traffic compression.
+            http_compression (dict, optional): Policy for HTTP traffic compression.
                 Example: {
                     "type": "Gzip"
                 }
-            http_empty_requests_policy (str): Policy for handling HTTP connections if the connection times out.
-            http_error_code_pages (dict): Custom error pages.
+            http_empty_requests_policy (str, optional): Policy for handling HTTP connections if the connection times out.
+            http_error_code_pages (dict, optional): Custom error pages.
                 Example: {
                     "name": "custom-error-pages",
                     "namespace": "openshift-config"
                 }
-            http_headers (dict): Policy for HTTP headers.
+            http_headers (dict, optional): Policy for HTTP headers.
                 Example: {
                     "setHeaders": {
                         "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
                     }
                 }
-            node_placement (dict): Control over the scheduling of the ingress controller.
+            node_placement (dict, optional): Control over the scheduling of the ingress controller.
                 Example: {
                     "nodeSelector": {
                         "matchLabels": {
@@ -126,11 +126,11 @@ class IngressController(NamespacedResource):
                         }
                     ]
                 }
-            tuning_options (dict): Parameters for adjusting the performance of ingress controller pods.
+            tuning_options (dict, optional): Parameters for adjusting the performance of ingress controller pods.
                 Example: {
                     "maxConnections": 10000
                 }
-            unsupported_config_overrides (dict): Unsupported configuration options.
+            unsupported_config_overrides (dict, optional): Unsupported configuration options.
                 Example: {
                     "customConfig": "value"
                 }

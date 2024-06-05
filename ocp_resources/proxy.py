@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -11,20 +11,20 @@ class Proxy(Resource):
 
     def __init__(
         self,
-        http_proxy: str = "",
-        https_proxy: str = "",
-        no_proxy: str = "",
-        readiness_endpoints: List[str] | None = None,
-        trusted_ca: Dict[str, str] | None = None,
+        http_proxy: Optional[str] = "",
+        https_proxy: Optional[str] = "",
+        no_proxy: Optional[str] = "",
+        readiness_endpoints: Optional[List[str]] = None,
+        trusted_ca: Optional[Dict[str, str]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            http_proxy (str): URL of the proxy for HTTP requests.
-            https_proxy (str): URL of the proxy for HTTPS requests.
-            no_proxy (str): Comma-separated list of hostnames for which the proxy should not be used.
-            readiness_endpoints (list): List of endpoints used to verify readiness of the proxy.
-            trusted_ca (dict): Reference to a ConfigMap containing a CA certificate bundle.
+            http_proxy (str, optional): URL of the proxy for HTTP requests.
+            https_proxy (str, optional): URL of the proxy for HTTPS requests.
+            no_proxy (str, optional): Comma-separated list of hostnames for which the proxy should not be used.
+            readiness_endpoints (list, optional): List of endpoints used to verify readiness of the proxy.
+            trusted_ca (dict, optional): Reference to a ConfigMap containing a CA certificate bundle.
                 Example: {
                     "name": "trusted-ca-bundle",
                     "namespace": "openshift-config"
@@ -41,7 +41,8 @@ class Proxy(Resource):
         super().to_dict()
 
         if not self.yaml_file:
-            _spec = self.res.setdefault("spec", {})
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
 
             if self.http_proxy:
                 _spec["httpProxy"] = self.http_proxy
