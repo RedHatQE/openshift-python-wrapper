@@ -325,6 +325,7 @@ class Resource:
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
         SECURITY_ISTIO_IO = "security.istio.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
+        SELF_NODE_REMEDIATION_MEDIK8S_IO = "self-node-remediation.medik8s.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
         SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
         SRIOVNETWORK_OPENSHIFT_IO = "sriovnetwork.openshift.io"
