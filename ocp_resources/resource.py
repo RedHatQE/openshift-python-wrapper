@@ -439,7 +439,6 @@ class Resource:
         self._set_client_and_api_version()
 
     def _ensure_exists(self) -> None:
-        self.logger.error(self.namespace)
         if not self.exists:
             _name_for_raise = self.name if not self.namespace else f"{self.namespace}/{self.name}"
             raise ResourceNotFoundError(f"Resource `{self.kind}` `{_name_for_raise}` does not exist")
