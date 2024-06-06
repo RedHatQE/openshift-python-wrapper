@@ -160,7 +160,8 @@ class IngressController(NamespacedResource):
         super().to_dict()
 
         if not self.yaml_file:
-            _spec = self.res.setdefault("spec", {})
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
 
             if self.domain:
                 _spec["domain"] = self.domain
