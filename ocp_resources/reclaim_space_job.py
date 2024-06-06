@@ -13,7 +13,7 @@ class ReclaimSpaceJob(NamespacedResource):
     def __init__(
         self,
         backoff_limit: Optional[int] = None,
-        target: dict[str, Any] | None = None,
+        target: Optional[dict[str, Any]] = None,
         retry_deadline_seconds: Optional[int] = None,
         timeout_seconds_reclaim_job: int | None = None,
         **kwargs: Any,
@@ -21,7 +21,7 @@ class ReclaimSpaceJob(NamespacedResource):
         """
         Args:
             backoff_limit (int, Optional): The number of retries for a reclaim space job.
-            target (dict): Volume target on which the operation would be performed.
+            target (Optional, dict): Volume target on which the operation would be performed.
             retryDeadlineSeconds (int, Optional): Duration in seconds relative to the start time that the
                 operation may be retried.
             timeout_seconds_reclaim_job (int, Optional): Specifies the timeout in seconds for the grpc request sent to

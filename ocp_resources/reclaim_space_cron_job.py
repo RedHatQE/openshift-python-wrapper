@@ -13,7 +13,7 @@ class ReclaimSpaceCronJob(NamespacedResource):
     def __init__(
         self,
         schedule: Optional[str] = "",
-        job_template: Dict[str, Any] | None = None,
+        job_template: Optional[Dict[str, Any]] = None,
         concurrency_policy: Optional[str] = "",
         successful_jobs_history_limit: Optional[int] = None,
         failed_jobs_history_limit: Optional[int] = None,
@@ -21,8 +21,8 @@ class ReclaimSpaceCronJob(NamespacedResource):
     ) -> None:
         """
         Args:
-            schedule (str): schedule of the reclaim space cron job
-            job_template (dict): describes the reclaim space job that would be created when a reclaim space cronjob
+            schedule (Optional, str): schedule of the reclaim space cron job
+            job_template (Optional, dict): describes the reclaim space job that would be created when a reclaim space cronjob
                 would be executed
                 Example: https://github.com/csi-addons/kubernetes-csi-addons/blob/main/docs/reclaimspace.md
             concurrency_policy (str, optional): indicates how to treat concurrent execution of a job
