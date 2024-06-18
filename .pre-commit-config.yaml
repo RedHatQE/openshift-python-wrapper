@@ -16,7 +16,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/PyCQA/flake8
-    rev: "7.0.0"
+    rev: "7.1.0"
     hooks:
       - id: flake8
         args: [--config=.flake8]
@@ -32,18 +32,18 @@ repos:
       - id: detect-secrets
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.7
+    rev: v0.4.9
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 37.387.0
+    rev: 37.410.1
     hooks:
       - id: renovate-config-validator
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.3
+    rev: v8.18.4
     hooks:
       - id: gitleaks
 
