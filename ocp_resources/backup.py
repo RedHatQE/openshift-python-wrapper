@@ -41,6 +41,7 @@ class Backup(NamespacedResource):
         super().to_dict()
 
         if not self.yaml_file:
+            self.res["spec"] = {}
             spec_dict = self.res["spec"]
 
             if self.included_namespaces:
