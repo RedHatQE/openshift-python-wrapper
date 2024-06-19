@@ -1,28 +1,30 @@
+from typing import List, Optional, Any
+
 from ocp_resources.resource import NamespacedResource
 
 
 class ServingRuntime(NamespacedResource):
     """
-    ServingRuntime object
+    https://kserve.github.io/website/master/modelserving/servingruntimes/
     """
 
-    api_group = NamespacedResource.ApiGroup.SERVING_KSERVE_IO
+    api_group: str = NamespacedResource.ApiGroup.SERVING_KSERVE_IO
 
     def __init__(
         self,
-        supported_model_formats=None,
-        protocol_versions=None,
-        multi_model=None,
-        containers=None,
-        grpc_endpoint=None,
-        grpc_data_endpoint=None,
-        server_type=None,
-        runtime_mgmt_port=None,
-        mem_buffer_bytes=None,
-        model_loading_timeout_millis=None,
-        enable_route=None,
-        **kwargs,
-    ):
+        supported_model_formats: Optional[List[dict]] = None,
+        protocol_versions: Optional[List[str]] = None,
+        multi_model: Optional[bool] = None,
+        containers: Optional[List[dict]] = None,
+        grpc_endpoint: Optional[int] = None,
+        grpc_data_endpoint: Optional[int] = None,
+        server_type: Optional[str] = None,
+        runtime_mgmt_port: Optional[int] = None,
+        mem_buffer_bytes: Optional[int] = None,
+        model_loading_timeout_millis: Optional[int] = None,
+        enable_route: Optional[bool] = None,
+        **kwargs: Any,
+    ) -> None:
         """
         ServingRuntime object
 
@@ -52,41 +54,41 @@ class ServingRuntime(NamespacedResource):
         self.model_loading_timeout_millis = model_loading_timeout_millis
         self.enable_route = enable_route
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
+        if not self.yaml_file:
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
 
-        self.res["spec"] = {}
-        _spec = self.res["spec"]
+            if self.enable_route:
+                self.res["metadata"]["annotations"] = {"enable-route": "true"}
 
-        if self.enable_route:
-            self.res["metadata"]["annotations"] = {"enable-route": "true"}
+            if self.supported_model_formats:
+                _spec["supportedModelFormats"] = self.supported_model_formats
 
-        if self.supported_model_formats:
-            _spec["supportedModelFormats"] = self.supported_model_formats
+            if self.protocol_versions:
+                _spec["protocolVersions"] = self.protocol_versions
 
-        if self.protocol_versions:
-            _spec["protocolVersions"] = self.protocol_versions
+            if self.multi_model:
+                _spec["multiModel"] = True
 
-        if self.multi_model:
-            _spec["multiModel"] = True
+            if self.grpc_endpoint:
+                _spec["grpcEndpoint"] = f"port:{self.grpc_endpoint}"
 
-        if self.grpc_endpoint:
-            _spec["grpcEndpoint"] = f"port:{self.grpc_endpoint}"
+            if self.grpc_data_endpoint:
+                _spec["grpcDataEndpoint"] = f"port:{self.grpc_data_endpoint}"
 
-        if self.grpc_data_endpoint:
-            _spec["grpcDataEndpoint"] = f"port:{self.grpc_data_endpoint}"
+            if self.containers:
+                _spec["containers"] = self.containers
 
-        if self.containers:
-            _spec["containers"] = self.containers
+            if self.server_type:
+                _spec["builtInAdapter"] = {"serverType": self.server_type}
 
-        if self.server_type:
-            _spec.setdefault("builtInAdapter", {})["serverType"] = self.server_type
+            if self.runtime_mgmt_port:
+                _spec["builtInAdapter"] = {"runtimeManagementPort": self.runtime_mgmt_port}
 
-        if self.runtime_mgmt_port:
-            _spec.setdefault("builtInAdapter", {})["runtimeManagementPort"] = self.runtime_mgmt_port
+            if self.mem_buffer_bytes:
+                _spec["builtInAdapter"] = {"memBufferBytes": self.mem_buffer_bytes}
 
-        if self.mem_buffer_bytes:
-            _spec.setdefault("builtInAdapter", {})["memBufferBytes"] = self.mem_buffer_bytes
-
-        if self.model_loading_timeout_millis:
-            _spec.setdefault("builtInAdapter", {})["modelLoadingTimeoutMillis"] = self.model_loading_timeout_millis
+            if self.model_loading_timeout_millis:
+                _spec["builtInAdapter"] = {"modelLoadingTimeoutMillis": self.model_loading_timeout_millis}
