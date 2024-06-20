@@ -279,6 +279,7 @@ class Resource:
         DISCOVERY_K8S_IO = "discovery.k8s.io"
         EVENTS_K8S_IO = "events.k8s.io"
         EXPORT_KUBEVIRT_IO = "export.kubevirt.io"
+        FENCE_AGENTS_REMEDIATION_MEDIK8S_IO = "fence-agents-remediation.medik8s.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         INSTANCETYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
