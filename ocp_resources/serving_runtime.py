@@ -26,18 +26,18 @@ class ServingRuntime(NamespacedResource):
         ServingRuntime object
 
         Args:
-            supported_model_formats (List(dict)): Model formats supported by the serving runtime.
-            protocol_versions (List(str)): List of protocols versions used by the serving runtime.
-            multi_model (bool): Specifies if the model server can serve multiple models.
-            containers (List(dict)): Containers of the serving runtime.
-            grpc_endpoint (int): Port of the gRPC endpoint.
-            grpc_data_endpoint (int): Port of the gRPC data endpoint.
-            built_in_adapter (Dict[str, Any]): Configuration for the built-in adapter.
+            supported_model_formats Optional[List[Dict]]: Model formats supported by the serving runtime.
+            protocol_versions Optional[List[str]]: List of protocols versions used by the serving runtime.
+            multi_model (Optional[bool]): Specifies if the model server can serve multiple models.
+            containers Optional[List[Dict]]: Containers of the serving runtime.
+            grpc_endpoint Optional[int]: Port of the gRPC endpoint.
+            grpc_data_endpoint Optional[int]: Port of the gRPC data endpoint.
+            built_in_adapter Optional[Dict[str, Any]]: Configuration for the built-in adapter.
         """
         super().__init__(**kwargs)
         self.supported_model_formats = supported_model_formats
         self.protocol_versions = protocol_versions
-        self.multi_model = (multi_model,)
+        self.multi_model = multi_model
         self.containers = containers
         self.grpc_endpoint = grpc_endpoint
         self.grpc_data_endpoint = grpc_data_endpoint
@@ -55,8 +55,8 @@ class ServingRuntime(NamespacedResource):
             if self.protocol_versions:
                 _spec["protocolVersions"] = self.protocol_versions
 
-            if self.multi_model:
-                _spec["multiModel"] = True
+            if self.multi_model is not None:
+                _spec["multiModel"] = self.multi_model
 
             if self.grpc_endpoint:
                 _spec["grpcEndpoint"] = f"port:{self.grpc_endpoint}"
