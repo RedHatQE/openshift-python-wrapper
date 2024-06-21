@@ -1,4 +1,4 @@
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 from typing import Optional, Any, Dict
 
 
@@ -11,10 +11,10 @@ class TrustyAIService(NamespacedResource):
 
     def __init__(
         self,
-        storage: Dict[str, Any],
-        data: Dict[str, Any],
-        metrics: Dict[str, Any],
-        replicas: Optional[int] = 1,
+        storage: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, Any]] = None,
+        metrics: Optional[Dict[str, Any]] = None,
+        replicas: Optional[int] = None,
         image: Optional[str] = None,
         tag: Optional[str] = None,
         **kwargs,
@@ -23,9 +23,9 @@ class TrustyAIService(NamespacedResource):
         TrustyAIService object
 
         Args:
-            storage (Dic[str, Any]): TrustyAIService storage config (format, folder and size).
-            data (Dict[str, Any]): TrustyAIService data config (filename and format).
-            metrics (Dict[str, Any]): TrustyAIService metrics config.
+            storage (Optional[Dic[str, Any]]): TrustyAIService storage config (format, folder and size).
+            data (Optional[Dict[str, Any]]): TrustyAIService data config (filename and format).
+            metrics (Optional[Dict[str, Any]]): TrustyAIService metrics config.
             replicas (Optional[int], default: 1): Number of replicas for the TrustyAIService.
             image (Optional[str]): Pull url of the TrustyAIService.
             tag (Optional[str]): Tag of the image.
@@ -42,6 +42,9 @@ class TrustyAIService(NamespacedResource):
         super().to_dict()
 
         if not self.yaml_file:
+            if not (self.storage or self.data or self.metrics):
+                raise MissingRequiredArgumentError(argument="'storage' or 'data' or 'metrics'")
+
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
