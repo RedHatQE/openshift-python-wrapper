@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List, Optional, Any, Dict
 
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class ServingRuntime(NamespacedResource):
@@ -13,10 +13,10 @@ class ServingRuntime(NamespacedResource):
 
     def __init__(
         self,
-        supported_model_formats: Optional[List[Dict]] = None,
+        supported_model_formats: Optional[List[Dict[str, Any]]] = None,
         protocol_versions: Optional[List[str]] = None,
         multi_model: Optional[bool] = None,
-        containers: Optional[List[Dict]] = None,
+        containers: Optional[List[Dict[str, Any]]] = None,
         grpc_endpoint: Optional[int] = None,
         grpc_data_endpoint: Optional[int] = None,
         built_in_adapter: Optional[Dict[str, Any]] = None,
@@ -26,10 +26,10 @@ class ServingRuntime(NamespacedResource):
         ServingRuntime object
 
         Args:
-            supported_model_formats Optional[List[Dict]]: Model formats supported by the serving runtime.
+            supported_model_formats Optional[List[Dict[str, Any]]]: Model formats supported by the serving runtime.
             protocol_versions Optional[List[str]]: List of protocols versions used by the serving runtime.
             multi_model (Optional[bool]): Specifies if the model server can serve multiple models.
-            containers Optional[List[Dict]]: Containers of the serving runtime.
+            containers Optional[List[Dict[str, Any]]]: Containers of the serving runtime.
             grpc_endpoint Optional[int]: Port of the gRPC endpoint.
             grpc_data_endpoint Optional[int]: Port of the gRPC data endpoint.
             built_in_adapter Optional[Dict[str, Any]]: Configuration for the built-in adapter.
@@ -46,6 +46,9 @@ class ServingRuntime(NamespacedResource):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
+            if not self.containers:
+                raise MissingRequiredArgumentError(argument="'containers'")
+
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
