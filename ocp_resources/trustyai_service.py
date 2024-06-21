@@ -18,7 +18,7 @@ class TrustyAIService(NamespacedResource):
         image: Optional[str] = None,
         tag: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> None:
         """
         TrustyAIService object
 
