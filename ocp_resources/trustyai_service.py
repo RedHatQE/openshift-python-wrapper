@@ -38,7 +38,7 @@ class TrustyAIService(NamespacedResource):
         self.image = image
         self.tag = tag
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
 
         if not self.yaml_file:
