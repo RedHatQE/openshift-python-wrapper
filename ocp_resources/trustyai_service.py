@@ -23,10 +23,10 @@ class TrustyAIService(NamespacedResource):
         TrustyAIService object
 
         Args:
-            storage (Optional[Dic[str, Any]]): TrustyAIService storage config (format, folder and size).
-            data (Optional[Dict[str, Any]]): TrustyAIService data config (filename and format).
-            metrics (Optional[Dict[str, Any]]): TrustyAIService metrics config.
-            replicas (Optional[int], default: 1): Number of replicas for the TrustyAIService.
+            storage (Optional[Dic[str, Any]], mandatory if not passing yaml_file): TrustyAIService storage config (format, folder and size).
+            data (Optional[Dict[str, Any]], mandatory if not passing yaml_file): TrustyAIService data config (filename and format).
+            metrics (Optional[Dict[str, Any]], mandatory if not passing yaml_file): TrustyAIService metrics config.
+            replicas (Optional[int]): Number of replicas for the TrustyAIService.
             image (Optional[str]): Pull url of the TrustyAIService.
             tag (Optional[str]): Tag of the image.
         """
