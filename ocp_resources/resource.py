@@ -341,6 +341,7 @@ class Resource:
         TEKTON_DEV = "tekton.dev"
         TEMPLATE_KUBEVIRT_IO = "template.kubevirt.io"
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
+        TRUSTYAI_OPENDATAHUB_IO = "trustyai.opendatahub.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         USER_OPENSHIFT_IO = "user.openshift.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
