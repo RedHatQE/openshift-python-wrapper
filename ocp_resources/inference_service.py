@@ -36,7 +36,7 @@ class InferenceService(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if not self.predictor:
-                raise MissingRequiredArgumentError(argument="'predictor'")
+                raise MissingRequiredArgumentError(argument="predictor")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
