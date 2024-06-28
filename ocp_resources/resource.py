@@ -370,6 +370,7 @@ class Resource:
         config_dict: Dict[str, Any] | None = None,
         context: str = "",
         label: Dict[str, str] | None = None,
+        annotations: Dict[str, str] | None = None,
         timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
         hash_log_data: bool = True,
@@ -393,6 +394,7 @@ class Resource:
             context (str): Context name for connecting to remote cluster.
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
+            annotations (Dict[str, str] | None): Resource annotations
             api_group (str): Resource API group; will overwrite API group definition in resource class
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
@@ -417,6 +419,7 @@ class Resource:
         self.config_dict = config_dict or {}
         self.context = context
         self.label = label
+        self.annotations = annotations
         self.timeout_seconds = timeout_seconds
         self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
@@ -494,6 +497,8 @@ class Resource:
             }
             if self.label:
                 self.res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
+            if self.annotations:
+                self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
 
     def to_dict(self) -> None:
         """
