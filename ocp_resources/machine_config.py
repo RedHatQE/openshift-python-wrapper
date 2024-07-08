@@ -69,7 +69,7 @@ class MachineConfig(Resource):
 
         if not self.yaml_file:
             self.res["spec"] = {}
-            _spec: Dict[str, Any] = self.res["spec"]
+            _spec = self.res["spec"]
 
             if self.os_image_url:
                 _spec["osImageURL"] = self.os_image_url
