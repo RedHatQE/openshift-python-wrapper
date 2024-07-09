@@ -15,7 +15,7 @@ class MachineConfig(Resource):
         config: Optional[Dict[str, Any]] = None,
         kernel_arguments: Optional[List[str]] = None,
         extensions: Optional[List[str]] = None,
-        fips: Optional[bool] = False,
+        fips: Optional[bool] = None,
         kernel_type: Optional[str] = "",
         base_os_extensions_container_image: Optional[str] = "",
         **kwargs: Any,
