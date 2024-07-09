@@ -41,7 +41,7 @@ class Provider(NamespacedResource, MTV):
         self.condition_message_ready = self.ConditionMessage.PROVIDER_READY
         self.vddk_init_image = vddk_init_image
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

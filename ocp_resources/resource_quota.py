@@ -29,7 +29,7 @@ class ResourceQuota(NamespacedResource):
         self.scope_selector = scope_selector
         self.scopes = scopes
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.hard:

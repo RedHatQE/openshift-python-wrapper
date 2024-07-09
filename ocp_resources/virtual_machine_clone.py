@@ -39,7 +39,7 @@ class VirtualMachineClone(NamespacedResource):
         self.new_mac_addresses = new_mac_addresses
         self.new_smbios_serial = new_smbios_serial
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.source_name:

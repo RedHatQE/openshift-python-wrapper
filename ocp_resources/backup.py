@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+from typing import Any, List
 
 from ocp_resources.resource import NamespacedResource
 
@@ -13,11 +15,11 @@ class Backup(NamespacedResource):
 
     def __init__(
         self,
-        included_namespaces=None,
-        excluded_resources=None,
-        snapshot_move_data=False,
-        storage_location=None,
-        **kwargs,
+        included_namespaces: List[str] | None = None,
+        excluded_resources: List[str] | None = None,
+        snapshot_move_data: bool = False,
+        storage_location: str = "",
+        **kwargs: Any,
     ):
         """
         Args:
@@ -35,17 +37,21 @@ class Backup(NamespacedResource):
         self.snapshot_move_data = snapshot_move_data
         self.storage_location = storage_location
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
+
         if not self.yaml_file:
-            spec_dict = {}
+            self.res["spec"] = {}
+            spec_dict = self.res["spec"]
+
             if self.included_namespaces:
-                spec_dict.update({"includedNamespaces": self.included_namespaces})
+                spec_dict["includedNamespaces"] = self.included_namespaces
+
             if self.excluded_resources:
-                spec_dict.update({"excludedResources": self.excluded_resources})
+                spec_dict["excludedResources"] = self.excluded_resources
+
             if self.snapshot_move_data:
-                spec_dict.update({"snapshotMoveData": self.snapshot_move_data})
+                spec_dict["snapshotMoveData"] = self.snapshot_move_data
+
             if self.storage_location:
-                spec_dict.update({"storageLocation": self.storage_location})
-            if spec_dict:
-                self.res.update({"spec": spec_dict})
+                spec_dict["storageLocation"] = self.storage_location

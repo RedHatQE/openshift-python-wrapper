@@ -1,3 +1,5 @@
+from __future__ import annotations
+from collections.abc import Callable, Generator
 import contextlib
 import copy
 import json
@@ -6,8 +8,11 @@ import re
 import sys
 from io import StringIO
 from signal import SIGINT, signal
+from types import TracebackType
+from typing import Optional, Any, Dict, List
 
 import kubernetes
+from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
 from kubernetes.dynamic.exceptions import (
@@ -15,10 +20,11 @@ from kubernetes.dynamic.exceptions import (
     MethodNotAllowedError,
     NotFoundError,
     ForbiddenError,
+    ResourceNotFoundError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
-from simple_logger.logger import get_logger
+from simple_logger.logger import get_logger, logging
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.constants import (
@@ -49,15 +55,16 @@ class MissingRequiredArgumentError(Exception):
         return f"Missing required argument/s. Either provide yaml_file or pass {self.argument}"
 
 
-def _find_supported_resource(dyn_client, api_group, kind):
+def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> Optional[ResourceField]:
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
     for result in sorted_results:
         if KubeAPIVersion(result.api_version) <= KubeAPIVersion(MAX_SUPPORTED_API_VERSION):
             return result
+    return None
 
 
-def _get_api_version(dyn_client, api_group, kind):
+def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> str:
     # Returns api_group/api_version
     res = _find_supported_resource(dyn_client=dyn_client, api_group=api_group, kind=kind)
     if not res:
@@ -69,7 +76,9 @@ def _get_api_version(dyn_client, api_group, kind):
     return res.group_version
 
 
-def get_client(config_file=None, config_dict=None, context=None, **kwargs):
+def get_client(
+    config_file: str = "", config_dict: Dict[str, Any] | None = None, context: str = "", **kwargs: Any
+) -> DynamicClient:
     """
     Get a kubernetes client.
 
@@ -92,7 +101,9 @@ def get_client(config_file=None, config_dict=None, context=None, **kwargs):
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config_dict(config_dict=config_dict, context=context, **kwargs)
+            client=kubernetes.config.new_client_from_config_dict(
+                config_dict=config_dict, context=context or None, **kwargs
+            )
         )
     try:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
@@ -103,7 +114,7 @@ def get_client(config_file=None, config_dict=None, context=None, **kwargs):
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context, **kwargs)
+            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
@@ -116,7 +127,7 @@ def get_client(config_file=None, config_dict=None, context=None, **kwargs):
         )
 
 
-def sub_resource_level(current_class, owner_class, parent_class):
+def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> Optional[str]:
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
     for class_iterator in reversed([
@@ -125,6 +136,8 @@ def sub_resource_level(current_class, owner_class, parent_class):
         if class_iterator not in owner_class.mro() and issubclass(class_iterator, parent_class)
     ]):
         return class_iterator.__name__
+
+    return None
 
 
 class KubeAPIVersion(Version):
@@ -135,12 +148,12 @@ class KubeAPIVersion(Version):
 
     component_re = re.compile(r"(\d+ | [a-z]+)", re.VERBOSE)
 
-    def __init__(self, vstring=None):
+    def __init__(self, vstring: str):
         self.vstring = vstring
-        self.version = None
+        self.version: List[str | Any] = []
         super().__init__(version=vstring)
 
-    def parse(self, vstring):
+    def parse(self, vstring: str):
         components = [comp for comp in self.component_re.split(vstring) if comp]
         for idx, obj in enumerate(components):
             with contextlib.suppress(ValueError):
@@ -181,10 +194,10 @@ class KubeAPIVersion(Version):
 
 
 class ClassProperty:
-    def __init__(self, func):
+    def __init__(self, func: Callable) -> None:
         self.func = func
 
-    def __get__(self, obj, owner):
+    def __get__(self, obj: Any, owner: Any) -> Any:
         return self.func(owner)
 
 
@@ -199,10 +212,10 @@ class Resource:
     Base class for API resources
     """
 
-    api_group = None
-    api_version = None
-    singular_name = None
-    timeout_seconds = TIMEOUT_1MINUTE
+    api_group: str = ""
+    api_version: str = ""
+    singular_name: str = ""
+    timeout_seconds: int = TIMEOUT_1MINUTE
 
     class Status:
         SUCCEEDED = "Succeeded"
@@ -254,19 +267,23 @@ class Resource:
         APP_KUBERNETES_IO = "app.kubernetes.io"
         APPS = "apps"
         BATCH = "batch"
+        BITNAMI_COM = "bitnami.com"
         CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
         CLONE_KUBEVIRT_IO = "clone.kubevirt.io"
         CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO = "cluster.open-cluster-management.io"
         CONFIG_OPENSHIFT_IO = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO = "console.openshift.io"
         COORDINATION_K8S_IO = "coordination.k8s.io"
+        CSIADDONS_OPENSHIFT_IO = "csiaddons.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
         DISCOVERY_K8S_IO = "discovery.k8s.io"
         EVENTS_K8S_IO = "events.k8s.io"
         EXPORT_KUBEVIRT_IO = "export.kubevirt.io"
+        FENCE_AGENTS_REMEDIATION_MEDIK8S_IO = "fence-agents-remediation.medik8s.io"
         FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
         INSTANCETYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO = "hco.kubevirt.io"
+        HIVE_OPENSHIFT_IO = "hive.openshift.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO = "image.openshift.io"
         IMAGE_REGISTRY = "registry.redhat.io"
@@ -310,6 +327,8 @@ class Resource:
         SCHEDULING_K8S_IO = "scheduling.k8s.io"
         SECURITY_ISTIO_IO = "security.istio.io"
         SECURITY_OPENSHIFT_IO = "security.openshift.io"
+        SELF_NODE_REMEDIATION_MEDIK8S_IO = "self-node-remediation.medik8s.io"
+        SERVING_KSERVE_IO = "serving.kserve.io"
         SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
         SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
         SRIOVNETWORK_OPENSHIFT_IO = "sriovnetwork.openshift.io"
@@ -322,6 +341,7 @@ class Resource:
         TEKTON_DEV = "tekton.dev"
         TEMPLATE_KUBEVIRT_IO = "template.kubevirt.io"
         TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
+        TRUSTYAI_OPENDATAHUB_IO = "trustyai.opendatahub.io"
         UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
         USER_OPENSHIFT_IO = "user.openshift.io"
         V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
@@ -336,22 +356,25 @@ class Resource:
 
     def __init__(
         self,
-        name=None,
-        client=None,
-        teardown=True,
-        timeout=TIMEOUT_4MINUTES,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        dry_run=None,
-        node_selector=None,
-        node_selector_labels=None,
-        config_file=None,
-        context=None,
-        label=None,
-        timeout_seconds=TIMEOUT_1MINUTE,
-        api_group=None,
-        hash_log_data=True,
+        name: str = "",
+        client: DynamicClient | None = None,
+        teardown: bool = True,
+        timeout: int = TIMEOUT_4MINUTES,
+        privileged_client: DynamicClient | None = None,
+        yaml_file: str = "",
+        delete_timeout: int = TIMEOUT_4MINUTES,
+        dry_run: bool = False,
+        node_selector: str = "",
+        node_selector_labels: Dict[str, str] | None = None,
+        config_file: str = "",
+        config_dict: Dict[str, Any] | None = None,
+        context: str = "",
+        label: Dict[str, str] | None = None,
+        annotations: Dict[str, str] | None = None,
+        timeout_seconds: int = TIMEOUT_1MINUTE,
+        api_group: str = "",
+        hash_log_data: bool = True,
+        ensure_exists: bool = False,
     ):
         """
         Create an API resource
@@ -360,6 +383,7 @@ class Resource:
             name (str): Resource name
             client (DynamicClient): Dynamic client for connecting to a remote cluster
             teardown (bool): Indicates if this resource would need to be deleted
+            timeout (int): timeout for a get api call
             privileged_client (DynamicClient): Instance of Dynamic client
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
@@ -370,42 +394,63 @@ class Resource:
             context (str): Context name for connecting to remote cluster.
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
+            annotations (Dict[str, str] | None): Resource annotations
             api_group (str): Resource API group; will overwrite API group definition in resource class
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
+            ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
         """
-        self.api_group = api_group or self.api_group
-        if not self.api_group and not self.api_version:
-            raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
-        self.namespace = None
-        self.name = name
-        self.client = client
-        self.privileged_client = privileged_client
-        self.yaml_file = yaml_file
-        self.resource_dict = None  # Filled in case yaml_file is not None
-        self.config_file = config_file
-        self.context = context
-        self.label = label
-        if not (self.name or self.yaml_file):
-            raise MissingRequiredArgumentError(argument="name")
 
+        self.name = name
         self.teardown = teardown
         self.timeout = timeout
+        self.privileged_client = privileged_client
+        self.yaml_file = yaml_file
         self.delete_timeout = delete_timeout
         self.dry_run = dry_run
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
-        self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res = None
-        self.yaml_file_contents = None
-        self.initial_resource_version = None
-        self.logger = self._set_logger()
+        self.config_file = config_file
+        if not isinstance(config_file, str):
+            # If we pass config_file which isn't a string, get_client will fail and it will be very hard to know why.
+            # Better fail here and let the user know.
+            raise ValueError("config_file must be a string")
+
+        self.config_dict = config_dict or {}
+        self.context = context
+        self.label = label
+        self.annotations = annotations
         self.timeout_seconds = timeout_seconds
+        self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
+        self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
+
+        if not self.api_group and not self.api_version:
+            raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
+
+        if not (self.name or self.yaml_file):
+            raise MissingRequiredArgumentError(argument="name")
+
+        self.namespace: str = ""
+        self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
+        self.node_selector_spec = self._prepare_node_selector_spec()
+        self.res: Dict[str, Any] = {}
+        self.yaml_file_contents: str = ""
+        self.initial_resource_version: str = ""
+        self.logger = self._set_logger()
+
+        if ensure_exists:
+            self._ensure_exists()
+
         # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
 
-    def _set_logger(self):
+    def _ensure_exists(self) -> None:
+        if not self.exists:
+            _name_for_raise = self.name if not self.namespace else f"{self.namespace}/{self.name}"
+            raise ResourceNotFoundError(f"Resource `{self.kind}` `{_name_for_raise}` does not exist")
+
+    def _set_logger(self) -> logging.Logger:
         log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
         log_file = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "")
         return get_logger(
@@ -414,17 +459,19 @@ class Resource:
             filename=log_file,
         )
 
-    def _prepare_node_selector_spec(self):
+    def _prepare_node_selector_spec(self) -> Dict[str, str]:
         if self.node_selector:
             return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
-        if self.node_selector_labels:
+        elif self.node_selector_labels:
             return self.node_selector_labels
+        else:
+            return {}
 
     @ClassProperty
-    def kind(cls):  # noqa: N805
+    def kind(cls) -> Optional[str]:  # noqa: N805
         return sub_resource_level(cls, NamespacedResource, Resource)
 
-    def _base_body(self):
+    def _base_body(self) -> None:
         """
         Generate resource dict from yaml if self.yaml_file else return base resource dict.
 
@@ -450,26 +497,33 @@ class Resource:
             }
             if self.label:
                 self.res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
+            if self.annotations:
+                self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         """
         Generate intended dict representation of the resource.
         """
         self._base_body()
 
-    def __enter__(self):
+    def __enter__(self) -> "Resource":
         signal(SIGINT, self._sigint_handler)
         return self.deploy()
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         if self.teardown:
             self.clean_up()
 
-    def _sigint_handler(self, signal_received, frame):
-        self.__exit__(exception_type=None, exception_value=None, traceback=None)
+    def _sigint_handler(self, signal_received: int, frame: Any) -> None:
+        self.__exit__()
         sys.exit(signal_received)
 
-    def deploy(self, wait=False):
+    def deploy(self, wait: bool = False) -> "Resource":
         """
         For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
         Spaces are important in the export dict
@@ -503,10 +557,16 @@ class Resource:
         self.create(wait=wait)
         return self
 
-    def clean_up(self):
+    def clean_up(self, wait: bool = True) -> bool:
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
+
+        Args:
+            wait (bool, optional): Wait for resource deletion. Defaults to True.
+
+        Returns:
+            bool: True if resource was deleted else False.
 
         Examples:
             To skip teardown of all resources by kind:
@@ -530,14 +590,16 @@ class Resource:
             check_exists=False,
         ):
             self.logger.warning(
-                f"Skip resource {self.kind} {self.name} teardown. Got" f" {_export_str}={skip_resource_teardown}"
+                f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
-            return
+            return False
 
-        self.delete(wait=True, timeout=self.delete_timeout)
+        return self.delete(wait=wait, timeout=self.delete_timeout)
 
     @classmethod
-    def _prepare_resources(cls, dyn_client, singular_name, *args, **kwargs):
+    def _prepare_resources(
+        cls, dyn_client: DynamicClient, singular_name: str, *args: Any, **kwargs: Any
+    ) -> ResourceInstance:
         if not cls.api_version:
             cls.api_version = _get_api_version(dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind)
 
@@ -548,21 +610,21 @@ class Resource:
             **get_kwargs,
         ).get(*args, **kwargs, timeout_seconds=cls.timeout_seconds)
 
-    def _prepare_singular_name_kwargs(self, **kwargs):
+    def _prepare_singular_name_kwargs(self, **kwargs: Any) -> Dict[str, Any]:
         kwargs = kwargs if kwargs else {}
         if self.singular_name:
             kwargs["singular_name"] = self.singular_name
 
         return kwargs
 
-    def _set_client_and_api_version(self):
+    def _set_client_and_api_version(self) -> None:
         if not self.client:
             self.client = get_client(config_file=self.config_file, context=self.context)
 
         if not self.api_version:
             self.api_version = _get_api_version(dyn_client=self.client, api_group=self.api_group, kind=self.kind)
 
-    def full_api(self, **kwargs):
+    def full_api(self, **kwargs: Any) -> ResourceInstance:
         """
         Get resource API
 
@@ -588,10 +650,10 @@ class Resource:
         return self.client.resources.get(api_version=self.api_version, kind=self.kind, **kwargs)
 
     @property
-    def api(self):
+    def api(self) -> ResourceInstance:
         return self.full_api()
 
-    def wait(self, timeout=TIMEOUT_4MINUTES, sleep=1):
+    def wait(self, timeout: int = TIMEOUT_4MINUTES, sleep: int = 1) -> None:
         """
         Wait for resource
 
@@ -617,7 +679,7 @@ class Resource:
             if sample:
                 return
 
-    def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
+    def wait_deleted(self, timeout: int = TIMEOUT_4MINUTES) -> None:
         """
         Wait until resource is deleted
 
@@ -631,7 +693,7 @@ class Resource:
         return self.client_wait_deleted(timeout=timeout)
 
     @property
-    def exists(self):
+    def exists(self) -> Optional[ResourceInstance]:
         """
         Whether self exists on the server
         """
@@ -641,10 +703,10 @@ class Resource:
             return None
 
     @property
-    def _kube_v1_api(self):
+    def _kube_v1_api(self) -> kubernetes.client.CoreV1Api:
         return kubernetes.client.CoreV1Api(api_client=self.client.client)
 
-    def client_wait_deleted(self, timeout):
+    def client_wait_deleted(self, timeout: int) -> None:
         """
         client-side Wait until resource is deleted
 
@@ -659,7 +721,9 @@ class Resource:
             if not sample:
                 return
 
-    def wait_for_status(self, status, timeout=TIMEOUT_4MINUTES, stop_status=None, sleep=1):
+    def wait_for_status(
+        self, status: str, timeout: int = TIMEOUT_4MINUTES, stop_status: str | None = None, sleep: int = 1
+    ) -> None:
         """
         Wait for resource to be in status
 
@@ -707,7 +771,7 @@ class Resource:
                 self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
-    def create(self, wait=False):
+    def create(self, wait: bool = False) -> Optional[ResourceInstance]:
         """
         Create resource.
 
@@ -727,34 +791,38 @@ class Resource:
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
-        resource_ = self.api.create(body=self.res, namespace=self.namespace, dry_run=self.dry_run)
+        resource_kwargs = {"body": self.res, "namespace": self.namespace}
+        if self.dry_run:
+            resource_kwargs["dry_run"] = "All"
+        resource_ = self.api.create(**resource_kwargs)
         with contextlib.suppress(ForbiddenError, AttributeError, NotFoundError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
 
         if wait and resource_:
-            return self.wait()
+            self.wait()
         return resource_
 
-    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
+    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: Dict[str, Any] | None = None) -> bool:
         self.logger.info(f"Delete {self.kind} {self.name}")
+
         if self.exists:
             hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
-
             self.logger.info(f"Deleting {hashed_data}")
             self.logger.debug(f"\n{yaml.dump(hashed_data)}")
 
         try:
-            res = self.api.delete(name=self.name, namespace=self.namespace, body=body)
-        except NotFoundError:
+            self.api.delete(name=self.name, namespace=self.namespace, body=body)
+            if wait:
+                self.client_wait_deleted(timeout=timeout)
+
+        except (NotFoundError, TimeoutExpiredError):
             return False
 
-        if wait and res:
-            return self.wait_deleted(timeout=timeout)
-        return res
+        return True
 
     @property
-    def status(self):
+    def status(self) -> str:
         """
         Get resource status
 
@@ -766,7 +834,7 @@ class Resource:
         self.logger.info(f"Get {self.kind} {self.name} status")
         return self.instance.status.phase
 
-    def update(self, resource_dict):
+    def update(self, resource_dict: Dict[str, Any]) -> None:
         """
         Update resource with resource dict
 
@@ -782,7 +850,7 @@ class Resource:
             content_type="application/merge-patch+json",
         )
 
-    def update_replace(self, resource_dict):
+    def update_replace(self, resource_dict: Dict[str, Any]) -> None:
         """
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
@@ -793,7 +861,9 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def retry_cluster_exceptions(func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs):
+    def retry_cluster_exceptions(
+        func, exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs: Any
+    ) -> Any:
         try:
             sampler = TimeoutSampler(
                 wait_timeout=TIMEOUT_10SEC,
@@ -815,14 +885,15 @@ class Resource:
     @classmethod
     def get(
         cls,
-        dyn_client=None,
-        config_file=None,
-        context=None,
-        singular_name=None,
-        exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-        *args,
-        **kwargs,
-    ):
+        config_file: str = "",
+        context: str = "",
+        singular_name: str = "",
+        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        raw: bool = False,
+        dyn_client: DynamicClient | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Generator["Resource|ResourceInstance", None, None]:
         """
         Get resources
 
@@ -831,6 +902,7 @@ class Resource:
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
+            raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
@@ -839,18 +911,25 @@ class Resource:
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
 
-        def _get():
-            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)
+        def _get() -> Generator["Resource|ResourceInstance", None, None]:
+            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
-                    yield cls(client=dyn_client, name=resource_field.metadata.name)
+                    if raw:
+                        yield _resources
+                    else:
+                        yield cls(client=dyn_client, name=resource_field.metadata.name)
+
             except TypeError:
-                yield cls(client=dyn_client, name=_resources.metadata.name)
+                if raw:
+                    yield _resources
+                else:
+                    yield cls(client=dyn_client, name=_resources.metadata.name)
 
         return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
     @property
-    def instance(self):
+    def instance(self) -> ResourceInstance:
         """
         Get resource instance
 
@@ -858,22 +937,22 @@ class Resource:
             openshift.dynamic.client.ResourceInstance
         """
 
-        def _instance():
+        def _instance() -> Optional[ResourceInstance]:
             return self.api.get(name=self.name)
 
         return self.retry_cluster_exceptions(func=_instance)
 
     @property
-    def labels(self):
+    def labels(self) -> ResourceField:
         """
         Method to get labels for this resource
 
         Returns:
            openshift.dynamic.resource.ResourceField: Representation of labels
         """
-        return self.instance["metadata"]["labels"]
+        return self.instance.get("metadata", {})["labels"]
 
-    def watcher(self, timeout, resource_version=None):
+    def watcher(self, timeout: int, resource_version: str = "") -> Generator[Dict[str, Any], None, None]:
         """
         Get resource for a given timeout.
 
@@ -895,7 +974,7 @@ class Resource:
             resource_version=resource_version or self.initial_resource_version,
         )
 
-    def wait_for_condition(self, condition, status, timeout=300):
+    def wait_for_condition(self, condition: str, status: str, timeout: int = 300) -> None:
         """
         Wait for Resource condition to be in desire status.
 
@@ -928,7 +1007,7 @@ class Resource:
                     if cond["type"] == condition and cond["status"] == status:
                         return
 
-    def api_request(self, method, action, url, **params):
+    def api_request(self, method: str, action: str, url: str, **params: Any) -> Dict[str, Any]:
         """
         Handle API requests to resource.
 
@@ -941,11 +1020,11 @@ class Resource:
            data(dict): response data
 
         """
-        client = self.privileged_client or self.client
+        client: DynamicClient = self.privileged_client or self.client
         response = client.client.request(
             method=method,
             url=f"{url}/{action}",
-            headers=self.client.configuration.api_key,
+            headers=client.client.configuration.api_key,
             **params,
         )
 
@@ -954,7 +1033,7 @@ class Resource:
         except json.decoder.JSONDecodeError:
             return response.data
 
-    def wait_for_conditions(self):
+    def wait_for_conditions(self) -> None:
         timeout_watcher = TimeoutWatch(timeout=30)
         for sample in TimeoutSampler(
             wait_timeout=30,
@@ -975,11 +1054,11 @@ class Resource:
 
     def events(
         self,
-        name=None,
-        label_selector=None,
-        field_selector=None,
-        resource_version=None,
-        timeout=None,
+        name: str = "",
+        label_selector: str = "",
+        field_selector: str = "",
+        resource_version: str = "",
+        timeout: int = TIMEOUT_4MINUTES,
     ):
         """
         get - retrieves K8s events.
@@ -1019,7 +1098,9 @@ class Resource:
         )
 
     @staticmethod
-    def get_all_cluster_resources(config_file=None, config_dict=None, context=None, *args, **kwargs):
+    def get_all_cluster_resources(
+        config_file: str = "", context: str = "", config_dict: Dict[str, Any] | None = None, *args: Any, **kwargs: Any
+    ) -> Generator[ResourceField, None, None]:
         """
         Get all cluster resources
 
@@ -1047,7 +1128,7 @@ class Resource:
             except (NotFoundError, TypeError, MethodNotAllowedError):
                 continue
 
-    def to_yaml(self):
+    def to_yaml(self) -> str:
         """
         Get resource as YAML representation.
 
@@ -1061,7 +1142,7 @@ class Resource:
         return resource_yaml
 
     @property
-    def keys_to_hash(self):
+    def keys_to_hash(self) -> List[str]:
         """
         Resource attributes list to hash in the logs.
 
@@ -1073,7 +1154,7 @@ class Resource:
         """
         return []
 
-    def hash_resource_dict(self, resource_dict):
+    def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
             resource_dict = benedict(resource_dict, keypath_separator="..")
@@ -1086,7 +1167,7 @@ class Resource:
 
         return resource_dict
 
-    def get_condition_message(self, condition_type, condition_status=None):
+    def get_condition_message(self, condition_type: str, condition_status: str = "") -> str:
         """
         Get condition message by condition type and condition status
 
@@ -1121,15 +1202,16 @@ class NamespacedResource(Resource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
-        timeout=TIMEOUT_4MINUTES,
-        privileged_client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
+        name: str = "",
+        namespace: str = "",
+        teardown: bool = True,
+        timeout: int = TIMEOUT_4MINUTES,
+        yaml_file: str = "",
+        delete_timeout: int = TIMEOUT_4MINUTES,
+        client: DynamicClient | None = None,
+        privileged_client: DynamicClient | None = None,
+        ensure_exists: bool = False,
+        **kwargs: Any,
     ):
         super().__init__(
             name=name,
@@ -1145,17 +1227,21 @@ class NamespacedResource(Resource):
         if not (self.name and self.namespace) and not self.yaml_file:
             raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
 
+        if ensure_exists:
+            self._ensure_exists()
+
     @classmethod
     def get(
         cls,
-        dyn_client=None,
-        config_file=None,
-        context=None,
-        singular_name=None,
-        raw=False,
-        *args,
-        **kwargs,
-    ):
+        config_file: str = "",
+        context: str = "",
+        singular_name: str = "",
+        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        raw: bool = False,
+        dyn_client: DynamicClient | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Generator["NamespacedResource|ResourceInstance", None, None]:
         """
         Get resources
 
@@ -1165,7 +1251,7 @@ class NamespacedResource(Resource):
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
-
+            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -1173,29 +1259,32 @@ class NamespacedResource(Resource):
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
 
-        _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)
-        try:
-            for resource_field in _resources.items:
+        def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
+            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
+            try:
+                for resource_field in _resources.items:
+                    if raw:
+                        yield resource_field
+                    else:
+                        yield cls(
+                            client=dyn_client,
+                            name=resource_field.metadata.name,
+                            namespace=resource_field.metadata.namespace,
+                        )
+            except TypeError:
                 if raw:
-                    yield resource_field
+                    yield _resources
                 else:
                     yield cls(
                         client=dyn_client,
-                        name=resource_field.metadata.name,
-                        namespace=resource_field.metadata.namespace,
+                        name=_resources.metadata.name,
+                        namespace=_resources.metadata.namespace,
                     )
-        except TypeError:
-            if raw:
-                yield _resources
-            else:
-                yield cls(
-                    client=dyn_client,
-                    name=_resources.metadata.name,
-                    namespace=_resources.metadata.namespace,
-                )
+
+        return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
     @property
-    def instance(self):
+    def instance(self) -> ResourceInstance:
         """
         Get resource instance
 
@@ -1203,12 +1292,12 @@ class NamespacedResource(Resource):
             openshift.dynamic.client.ResourceInstance
         """
 
-        def _instance():
+        def _instance() -> ResourceInstance:
             return self.api.get(name=self.name, namespace=self.namespace)
 
         return self.retry_cluster_exceptions(func=_instance)
 
-    def _base_body(self):
+    def _base_body(self) -> None:
         if not self.res:
             super(NamespacedResource, self)._base_body()
 
@@ -1221,12 +1310,14 @@ class NamespacedResource(Resource):
         if not self.yaml_file:
             self.res["metadata"]["namespace"] = self.namespace
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         self._base_body()
 
 
 class ResourceEditor:
-    def __init__(self, patches, action="update", user_backups=None):
+    def __init__(
+        self, patches: Dict[Any, Any], action: str = "update", user_backups: Dict[Any, Any] | None = None
+    ) -> None:
         """
         Args:
             patches (dict): {<Resource object>: <yaml patch as dict>}
@@ -1253,20 +1344,20 @@ class ResourceEditor:
         self._patches = self._dictify_resourcefield(res=patches)
         self.action = action
         self.user_backups = user_backups
-        self._backups = {}
+        self._backups: Dict[Any, Any] = {}
 
     @property
-    def backups(self):
+    def backups(self) -> Dict[Any, Any]:
         """Returns a dict {<Resource object>: <backup_as_dict>}
         The backup dict kept for each resource edited"""
         return self._backups
 
     @property
-    def patches(self):
+    def patches(self) -> Dict[Any, Any]:
         """Returns the patches dict provided in the constructor"""
         return self._patches
 
-    def update(self, backup_resources=False):
+    def update(self, backup_resources: bool = False) -> None:
         """Prepares backup dicts (where necessary) and applies patches"""
         # prepare update dicts and backups
         resource_to_patch = []
@@ -1315,34 +1406,38 @@ class ResourceEditor:
         # apply changes
         self._apply_patches_sampler(patches=patches_to_apply, action_text="Updating", action=self.action)
 
-    def restore(self):
+    def restore(self) -> None:
         self._apply_patches_sampler(patches=self._backups, action_text="Restoring", action=self.action)
 
-    def __enter__(self):
+    def __enter__(self) -> "ResourceEditor":
         self.update(backup_resources=True)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None
+    ) -> None:
         # restore backups
         self.restore()
 
     @staticmethod
-    def _dictify_resourcefield(res):
+    def _dictify_resourcefield(res: Any) -> Any:
         """Recursively turns any ResourceField objects into dicts to avoid issues caused by appending lists, etc."""
         if isinstance(res, ResourceField):
             return ResourceEditor._dictify_resourcefield(res=dict(res.items()))
+
         elif isinstance(res, dict):
             return {
                 ResourceEditor._dictify_resourcefield(res=key): ResourceEditor._dictify_resourcefield(res=value)
                 for key, value in res.items()
             }
+
         elif isinstance(res, list):
             return [ResourceEditor._dictify_resourcefield(res=x) for x in res]
 
         return res
 
     @staticmethod
-    def _create_backup(original, patch):
+    def _create_backup(original: Dict[Any, Any], patch: Dict[Any, Any]) -> Dict[Any, Any]:
         """
         Args:
             original (dict*): source of values to back up if necessary
@@ -1361,7 +1456,7 @@ class ResourceEditor:
 
         # when both are dicts, get the diff (recursively if need be)
         if isinstance(original, dict) and isinstance(patch, dict):
-            diff_dict = {}
+            diff_dict: Dict[Any, Any] = {}
             for key, value in patch.items():
                 if key not in original:
                     diff_dict[key] = None
@@ -1383,7 +1478,7 @@ class ResourceEditor:
             return None
 
     @staticmethod
-    def _apply_patches(patches, action_text, action):
+    def _apply_patches(patches: Dict[Any, Any], action_text: str, action: str) -> None:
         """
         Updates provided Resource objects with provided yaml patches
 
@@ -1421,8 +1516,8 @@ class ResourceEditor:
 
                 resource.update_replace(resource_dict=patch)  # replace the resource metadata
 
-    def _apply_patches_sampler(self, patches, action_text, action):
-        exceptions_dict = {ConflictError: []}
+    def _apply_patches_sampler(self, patches: Dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
+        exceptions_dict: Dict[type[Exception], List[str]] = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
         return Resource.retry_cluster_exceptions(
             func=self._apply_patches,

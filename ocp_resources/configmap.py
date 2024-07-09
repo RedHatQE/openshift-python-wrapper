@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import Any, Dict
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -10,17 +13,19 @@ class ConfigMap(NamespacedResource):
 
     def __init__(
         self,
-        data=None,
-        **kwargs,
+        data: Dict[str, Any] | None = None,
+        **kwargs: Any,
     ):
         """
         Args:
             data (dict, optional): key-value configuration pairs.
         """
         super().__init__(**kwargs)
+
         self.data = data
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
+
         if not self.yaml_file and self.data:
-            self.res.setdefault("data", {}).update(self.data)
+            self.res["data"] = self.data

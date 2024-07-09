@@ -142,7 +142,7 @@ class VirtualMachineImport(NamespacedResource):
             privileged_client=self.privileged_client or self.client,
         )
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             spec = self.res.setdefault("spec", {})
@@ -261,7 +261,7 @@ class ResourceMapping(NamespacedResource):
         )
         self.mapping = mapping
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             for provider, mapping in self.mapping.items():

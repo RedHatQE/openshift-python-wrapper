@@ -37,7 +37,7 @@ class MultiClusterObservability(Resource):
         self.image_pull_policy = image_pull_policy
         self.image_pull_secret = image_pull_secret
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.metric_object_storage:

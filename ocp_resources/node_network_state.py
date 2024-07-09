@@ -40,7 +40,7 @@ class NodeNetworkState(Resource):
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             self.res.update({

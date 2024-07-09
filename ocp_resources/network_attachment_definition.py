@@ -47,7 +47,7 @@ class NetworkAttachmentDefinition(NamespacedResource):
         self.cni_version = cni_version
         self.config = config
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if self.resource_name is not None:
@@ -97,7 +97,7 @@ class BridgeNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         self.macspoofchk = macspoofchk
         self.add_resource_name = add_resource_name
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         spec_config = self.res["spec"]["config"]
         spec_config["name"] = self.bridge_name
@@ -148,7 +148,7 @@ class LinuxBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
         )
         self.tuning_type = tuning_type
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if self.tuning_type:
             self.old_nad_format = True
@@ -188,7 +188,7 @@ class OvsBridgeNetworkAttachmentDefinition(BridgeNetworkAttachmentDefinition):
             cni_version=cni_version,
         )
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         self.res["spec"]["config"] = json.dumps(self.res["spec"]["config"])
 
@@ -202,6 +202,8 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         self,
         network_name=None,
         topology=None,
+        vlan=None,
+        mtu=None,
         **kwargs,
     ):
         """
@@ -211,8 +213,11 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         https://docs.openshift.com/container-platform/4.14/networking/multiple_networks/configuring-additional-network.html#configuration-ovnk-additional-networks_configuring-additional-network
 
         Args:
-            network_name (str): The name of the network. This field is mandatory when not using yaml
-                file.
+            network_name (str, optional): The name of the network, used to connect
+                resources created in different namespaces to the same network.
+            vlan (int, optional): A vlan tag ID that will be assigned to traffic from this
+                additional network.
+            mtu (str, optional): The maximum transmission unit (MTU).
             topology (str): The secondary network topology to be created.
         """
         super().__init__(
@@ -221,14 +226,20 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
         )
         self.network_name = network_name
         self.topology = topology
+        self.vlan = vlan
+        self.mtu = mtu
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not self.network_name and not self.topology:
                 raise MissingRequiredArgumentError(argument="'network_name' and 'topology'")
 
             spec_config = self.res["spec"]["config"]
+            if self.vlan:
+                spec_config["vlanID"] = self.vlan
+            if self.mtu:
+                spec_config["mtu"] = self.mtu
             spec_config["name"] = self.network_name
             spec_config["topology"] = self.topology
             spec_config["netAttachDefName"] = f"{self.namespace}/{self.name}"

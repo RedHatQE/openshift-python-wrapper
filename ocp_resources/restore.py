@@ -35,7 +35,7 @@ class Restore(NamespacedResource):
         self.included_namespaces = included_namespaces
         self.backup_name = backup_name
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
 
         if not self.yaml_file:

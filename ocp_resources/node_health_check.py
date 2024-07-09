@@ -48,7 +48,7 @@ class NodeHealthCheck(Resource):
         self.escalating_remediation = escalating_remediation
         self.remediation_template = remediation_template
 
-    def to_dict(self):
+    def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
             if not (self.selector_match_expressions or self.selector_match_labels):
