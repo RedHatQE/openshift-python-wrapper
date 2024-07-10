@@ -818,6 +818,8 @@ class Resource:
 
             except (NotFoundError, TimeoutExpiredError):
                 return False
+        else:
+            LOGGER.warning(f"Resource {self.kind} {self.name} does not exist")
 
         return True
 
