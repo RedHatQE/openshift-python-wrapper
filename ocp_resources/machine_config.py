@@ -4,7 +4,7 @@ from ocp_resources.resource import Resource
 
 class MachineConfig(Resource):
     """
-    https://docs.openshift.com/container-platform/4.15/rest_api/machine_apis/machineconfig-machineconfiguration-openshift-io-v1.html
+    https://docs.openshift.com/container-platform/4.16/rest_api/machine_apis/machineconfig-machineconfiguration-openshift-io-v1.html
     """
 
     api_group = Resource.ApiGroup.MACHINECONFIGURATION_OPENSHIFT_IO
