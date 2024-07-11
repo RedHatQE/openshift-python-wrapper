@@ -797,18 +797,19 @@ class Resource:
         self.logger.info(f"Delete {self.kind} {self.name}")
 
         if self.exists:
-            hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
-            self.logger.info(f"Deleting {hashed_data}")
-            self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+            try:
+                hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
+                self.logger.info(f"Deleting {hashed_data}")
+                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+                self.api.delete(name=self.name, namespace=self.namespace, body=body)
+                if wait:
+                    return self.wait_deleted(timeout=timeout)
+                return True
 
-        try:
-            self.api.delete(name=self.name, namespace=self.namespace, body=body)
-            if wait:
-                return self.wait_deleted(timeout=timeout)
+            except (NotFoundError, TimeoutExpiredError):
+                return False
 
-        except (NotFoundError, TimeoutExpiredError):
-            return False
-
+        self.logger.warning(f"Resource {self.kind} {self.name} was not found, and wasn't deleted")
         return True
 
     @property
