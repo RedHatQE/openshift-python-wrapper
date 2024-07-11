@@ -679,7 +679,7 @@ class Resource:
             if sample:
                 return
 
-    def wait_deleted(self, timeout: int = TIMEOUT_4MINUTES) -> None:
+    def wait_deleted(self, timeout: int = TIMEOUT_4MINUTES) -> bool:
         """
         Wait until resource is deleted
 
@@ -706,7 +706,7 @@ class Resource:
     def _kube_v1_api(self) -> kubernetes.client.CoreV1Api:
         return kubernetes.client.CoreV1Api(api_client=self.client.client)
 
-    def client_wait_deleted(self, timeout: int) -> None:
+    def client_wait_deleted(self, timeout: int) -> bool:
         """
         client-side Wait until resource is deleted
 
@@ -719,7 +719,8 @@ class Resource:
         samples = TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists)
         for sample in samples:
             if not sample:
-                return
+                return True
+        return False
 
     def wait_for_status(
         self, status: str, timeout: int = TIMEOUT_4MINUTES, stop_status: str | None = None, sleep: int = 1
@@ -814,13 +815,13 @@ class Resource:
 
                 self.api.delete(name=self.name, namespace=self.namespace, body=body)
                 if wait:
-                    self.client_wait_deleted(timeout=timeout)
+                    return self.wait_deleted(timeout=timeout)
+                return True
 
             except (NotFoundError, TimeoutExpiredError):
                 return False
-        else:
-            LOGGER.warning(f"Resource {self.kind} {self.name} does not exist")
 
+        self.logger.warning(f"Resource {self.kind} {self.name} was not found, and wasn't deleted")
         return True
 
     @property
