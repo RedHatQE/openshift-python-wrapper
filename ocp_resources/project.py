@@ -48,13 +48,3 @@ class ProjectRequest(Resource):
 
     def clean_up(self):
         Project(name=self.name).delete(wait=True)
-
-    def client_wait_deleted(self, timeout):
-        """
-        client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
-        """
-        super().client_wait_deleted(timeout=timeout)
