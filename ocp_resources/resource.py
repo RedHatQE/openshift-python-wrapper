@@ -802,10 +802,11 @@ class Resource:
                 self.logger.info(f"Deleting {hashed_data}")
                 self.logger.debug(f"\n{yaml.dump(hashed_data)}")
                 self.api.delete(name=self.name, namespace=self.namespace, body=body)
+
                 if wait:
                     return self.wait_deleted(timeout=timeout)
-                return True
 
+                return True
             except (NotFoundError, TimeoutExpiredError):
                 return False
 
