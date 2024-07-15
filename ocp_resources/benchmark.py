@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
@@ -16,23 +18,23 @@ class Benchmark(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.RIPSAW_CLOUDBULLDOZER_IO
 
     class Status:
-        NONE = None  # None state is valid for newly created benchmark resources
+        NONE: str = "None"  # None state is valid for newly created benchmark resources
 
     class Workload:
         class Kind:
-            VM = "vm"
-            POD = "pod"
+            VM: str = "vm"
+            POD: str = "pod"
 
-    def _wait_for_instance_key(self, parent, key):
+    def _wait_for_instance_key(self, parent: str, key: str) -> Any:
         """
         Wait for key to exist in parent attribute of instance
 
         Args:
-            parent (str): An attribute of self.instance that should contain key
+            parent (str): An attribute of `self.instance` that should contain key.
             key (str): A dictionary entry within parent
 
         Returns:
-            str or None: Value of key if found, otherwise None
+            Any: Value of key if found, otherwise None
         """
         samples = TimeoutSampler(
             wait_timeout=30,
@@ -45,7 +47,7 @@ class Benchmark(NamespacedResource):
                 return sample.get(key)
 
     @property
-    def uuid(self):
+    def uuid(self) -> str:
         """
         Returns:
             str: UUID string from resource instance
@@ -53,7 +55,7 @@ class Benchmark(NamespacedResource):
         return self._wait_for_instance_key(parent="status", key="uuid")
 
     @property
-    def suuid(self):
+    def suuid(self) -> str:
         """
         Returns:
             str: (short)UUID string from resource instance
@@ -61,7 +63,7 @@ class Benchmark(NamespacedResource):
         return self._wait_for_instance_key(parent="status", key="suuid")
 
     @property
-    def workload_kind(self):
+    def workload_kind(self) -> str:
         """
         Retrieve the value of spec.workload.args.kind
 
@@ -73,7 +75,7 @@ class Benchmark(NamespacedResource):
         """
         return self.workload_arg(arg="kind", default="pod")
 
-    def workload_arg(self, arg, default=None):
+    def workload_arg(self, arg: str, default: Optional[Any] = None) -> Any:
         """
         Retrieve the value of spec.workload.args[arg]
 
@@ -81,12 +83,11 @@ class Benchmark(NamespacedResource):
 
         Args:
             arg (str): Argument to retrieve from spec.workload.args
-            default (any): Default value to return if arg is not found in workload args
+            default (Any): Default value to return if arg is not found in workload args
 
         Returns:
-            any: Value of workload arg or 'default' if does not exist
+            Any: Value of workload arg or 'default' if workload arg does not exist
         """
-        workload = self._wait_for_instance_key(parent="spec", key="workload")
-        if workload:
+        if (workload := self._wait_for_instance_key(parent="spec", key="workload")) and isinstance(workload, dict):
             return workload.get("args", {}).get(arg, default)
         return default
