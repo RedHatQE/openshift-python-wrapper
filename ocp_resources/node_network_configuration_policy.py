@@ -114,29 +114,20 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.node_selector:
             return list(Node.get(dyn_client=self.client, name=self.node_selector))
         if self.node_selector_labels:
-            node_labels = ",".join(
-                [
-                    f"{label_key}={label_value}"
-                    for label_key, label_value in self.node_selector_labels.items()
-                ]
-            )
+            node_labels = ",".join([
+                f"{label_key}={label_value}" for label_key, label_value in self.node_selector_labels.items()
+            ])
             return list(Node.get(dyn_client=self.client, label_selector=node_labels))
 
     def set_interface(self, interface):
         if not self.res:
             super().to_dict()
         # First drop the interface if it's already in the list
-        interfaces = [
-            iface
-            for iface in self.desired_state["interfaces"]
-            if iface["name"] != interface["name"]
-        ]
+        interfaces = [iface for iface in self.desired_state["interfaces"] if iface["name"] != interface["name"]]
         # Add the interface
         interfaces.append(interface)
         self.desired_state["interfaces"] = interfaces
-        self.res.setdefault("spec", {}).setdefault("desiredState", {})["interfaces"] = (
-            self.desired_state["interfaces"]
-        )
+        self.res.setdefault("spec", {}).setdefault("desiredState", {})["interfaces"] = self.desired_state["interfaces"]
 
     def to_dict(self):
         super().to_dict()
@@ -145,9 +136,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
             if self.node_selector_spec:
-                self.res.setdefault("spec", {}).setdefault(
-                    "nodeSelector", self.node_selector_spec
-                )
+                self.res.setdefault("spec", {}).setdefault("nodeSelector", self.node_selector_spec)
 
             if self.capture:
                 self.res["spec"]["capture"] = self.capture
@@ -159,9 +148,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 self.res["spec"]["desiredState"]["routes"] = self.routes
 
             if self.max_unavailable:
-                self.res.setdefault("spec", {}).setdefault(
-                    "maxUnavailable", self.max_unavailable
-                )
+                self.res.setdefault("spec", {}).setdefault("maxUnavailable", self.max_unavailable)
 
             if self.iface:
                 """
@@ -262,9 +249,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 elif ip_family == IPV6_STR:
                     self.ipv6_ports_backup_dict[port] = _port[ip_family]
                 else:
-                    raise ValueError(
-                        f"'ip_family' must be either '{IPV4_STR}' or '{IPV6_STR}'"
-                    )
+                    raise ValueError(f"'ip_family' must be either '{IPV4_STR}' or '{IPV6_STR}'")
 
     def ipv4_ports_backup(self):
         self._ports_backup(ip_family=IPV4_STR)
@@ -339,13 +324,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             self.add_ports()
 
         ResourceEditor(
-            patches={
-                self: {
-                    "spec": {
-                        "desiredState": {"interfaces": self.desired_state["interfaces"]}
-                    }
-                }
-            }
+            patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
 
     @property
@@ -375,8 +354,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 and sample[0]["type"] == self.Conditions.Type.AVAILABLE
                 and (
                     sample[0]["status"] == self.Condition.Status.UNKNOWN
-                    or sample[0]["reason"]
-                    == self.Conditions.Reason.CONFIGURATION_PROGRESSING
+                    or sample[0]["reason"] == self.Conditions.Reason.CONFIGURATION_PROGRESSING
                 )
             ):
                 return sample
@@ -387,15 +365,11 @@ class NodeNetworkConfigurationPolicy(Resource):
             nnce_name = failed_nnce.instance.metadata.name
             nnce_dict = failed_nnce.instance.to_dict()
             for cond in nnce_dict["status"]["conditions"]:
-                err_msg = self._get_nnce_error_msg(
-                    nnce_name=nnce_name, nnce_condition=cond
-                )
+                err_msg = self._get_nnce_error_msg(nnce_name=nnce_name, nnce_condition=cond)
                 if err_msg:
                     last_err_msg = err_msg
 
-        raise NNCPConfigurationFailed(
-            f"Reason: {failed_condition_reason}\n{last_err_msg}"
-        )
+        raise NNCPConfigurationFailed(f"Reason: {failed_condition_reason}\n{last_err_msg}")
 
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
@@ -404,9 +378,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         # if we get here too fast there are no conditions, we need to wait.
         self.wait_for_configuration_conditions_unknown_or_progressing()
 
-        samples = TimeoutSampler(
-            wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status
-        )
+        samples = TimeoutSampler(wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status)
         try:
             for sample in samples:
                 if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
@@ -414,14 +386,10 @@ class NodeNetworkConfigurationPolicy(Resource):
                     return sample
 
                 elif sample == no_match_node_condition_reason:
-                    raise NNCPConfigurationFailed(
-                        f"{self.name}. Reason: {no_match_node_condition_reason}"
-                    )
+                    raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
 
                 elif sample == failed_condition_reason:
-                    self._process_failed_status(
-                        failed_condition_reason=failed_condition_reason
-                    )
+                    self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             self.logger.error(
@@ -439,9 +407,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         return nnces
 
     def node_nnce(self, node_name):
-        nnce = [
-            nnce for nnce in self.nnces if nnce.labels["nmstate.io/node"] == node_name
-        ]
+        nnce = [nnce for nnce in self.nnces if nnce.labels["nmstate.io/node"] == node_name]
         return nnce[0] if nnce else None
 
     @staticmethod
@@ -473,8 +439,5 @@ class NodeNetworkConfigurationPolicy(Resource):
                 continue
 
             for nnce_cond in nnce.instance.status.conditions:
-                if (
-                    nnce_cond.type == "Failing"
-                    and nnce_cond.status == Resource.Condition.Status.TRUE
-                ):
+                if nnce_cond.type == "Failing" and nnce_cond.status == Resource.Condition.Status.TRUE:
                     yield nnce

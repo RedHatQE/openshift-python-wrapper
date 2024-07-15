@@ -40,13 +40,11 @@ class Backup(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "includedNamespaces": self.included_namespaces,
-                    }
+            self.res.update({
+                "spec": {
+                    "includedNamespaces": self.included_namespaces,
                 }
-            )
+            })
 
             if self.excluded_resources:
                 self.res["spec"]["excludedResources"] = self.excluded_resources

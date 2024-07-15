@@ -45,14 +45,12 @@ class Secret(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.accesskeyid:
-                self.res.update(
-                    {
-                        "data": {
-                            "accessKeyId": self.accesskeyid,
-                            "secretKey": self.secretkey,
-                        }
+                self.res.update({
+                    "data": {
+                        "accessKeyId": self.accesskeyid,
+                        "secretKey": self.secretkey,
                     }
-                )
+                })
             if self.htpasswd:
                 self.res.update({"data": {"htpasswd": self.htpasswd}})
             if self.data_dict:
@@ -64,15 +62,11 @@ class Secret(NamespacedResource):
 
     @property
     def certificate_not_after(self):
-        return self.instance.metadata.annotations[
-            "auth.openshift.io/certificate-not-after"
-        ]
+        return self.instance.metadata.annotations["auth.openshift.io/certificate-not-after"]
 
     @property
     def certificate_not_before(self):
-        return self.instance.metadata.annotations[
-            "auth.openshift.io/certificate-not-before"
-        ]
+        return self.instance.metadata.annotations["auth.openshift.io/certificate-not-before"]
 
     @property
     def keys_to_hash(self):
