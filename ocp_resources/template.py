@@ -28,12 +28,8 @@ class Template(NamespacedResource):
     class Annotations:
         DEPRECATED = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/deprecated"
         PROVIDER = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider"
-        PROVIDER_SUPPORT_LEVEL = (
-            f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-support-level"
-        )
-        PROVIDER_URL = (
-            f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-url"
-        )
+        PROVIDER_SUPPORT_LEVEL = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-support-level"
+        PROVIDER_URL = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/provider-url"
 
     class VMAnnotations:
         OS = f"{Resource.ApiGroup.VM_KUBEVIRT_IO}/os"
@@ -53,9 +49,7 @@ class Template(NamespacedResource):
         instance_dict["parameters"] = params
         # namespace label - If not defined, the template is expected to belong to the same namespace as the VM.
         instance_namespace = instance_dict["metadata"]["namespace"]
-        instance_dict["objects"][0]["metadata"]["labels"][
-            "vm.kubevirt.io/template.namespace"
-        ] = instance_namespace
+        instance_dict["objects"][0]["metadata"]["labels"]["vm.kubevirt.io/template.namespace"] = instance_namespace
 
         instance_json = json.dumps(instance_dict)
         body = json.loads(instance_json)
@@ -70,8 +64,6 @@ class Template(NamespacedResource):
     def generate_template_labels(os, workload, flavor):
         return [
             f"{Template.Labels.OS}/{os}",
-            (
-                f"{Template.Labels.WORKLOAD}/{getattr(Template.Workload, workload.upper())}"
-            ),
+            (f"{Template.Labels.WORKLOAD}/{getattr(Template.Workload, workload.upper())}"),
             f"{Template.Labels.FLAVOR}/{getattr(Template.Flavor, flavor.upper())}",
         ]

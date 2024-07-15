@@ -33,11 +33,7 @@ class HyperConverged(NamespacedResource):
         super().to_dict()
         if not self.yaml_file:
             if self.infra:
-                self.res.setdefault("spec", {}).setdefault("infra", {}).update(
-                    self.infra
-                )
+                self.res.setdefault("spec", {}).setdefault("infra", {}).update(self.infra)
 
             if self.workloads:
-                self.res.setdefault("spec", {}).setdefault("workloads", {}).update(
-                    self.workloads
-                )
+                self.res.setdefault("spec", {}).setdefault("workloads", {}).update(self.workloads)

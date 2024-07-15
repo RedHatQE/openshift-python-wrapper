@@ -151,16 +151,14 @@ class DataVolume(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "source": {self.source: {"url": self.url}},
-                        self.api_name: {
-                            "resources": {"requests": {"storage": self.size}},
-                        },
-                    }
+            self.res.update({
+                "spec": {
+                    "source": {self.source: {"url": self.url}},
+                    self.api_name: {
+                        "resources": {"requests": {"storage": self.size}},
+                    },
                 }
-            )
+            })
             if self.access_modes:
                 self.res["spec"][self.api_name]["accessModes"] = [self.access_modes]
             if self.content_type:
@@ -174,31 +172,21 @@ class DataVolume(NamespacedResource):
             if self.source == "http" or "registry":
                 self.res["spec"]["source"][self.source]["url"] = self.url
             if self.cert_configmap:
-                self.res["spec"]["source"][self.source][
-                    "certConfigMap"
-                ] = self.cert_configmap
+                self.res["spec"]["source"][self.source]["certConfigMap"] = self.cert_configmap
             if self.source == "upload" or self.source == "blank":
                 self.res["spec"]["source"][self.source] = {}
             if self.hostpath_node:
-                self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": (
-                            self.hostpath_node
-                        )
-                    }
-                )
+                self.res["metadata"].setdefault("annotations", {}).update({
+                    f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": (self.hostpath_node)
+                })
             if self.multus_annotation:
-                self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": (
-                            self.multus_annotation
-                        )
-                    }
-                )
+                self.res["metadata"].setdefault("annotations", {}).update({
+                    f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": (self.multus_annotation)
+                })
             if self.bind_immediate_annotation:
-                self.res["metadata"].setdefault("annotations", {}).update(
-                    {f"{self.api_group}/storage.bind.immediate.requested": "true"}
-                )
+                self.res["metadata"].setdefault("annotations", {}).update({
+                    f"{self.api_group}/storage.bind.immediate.requested": "true"
+                })
             if self.source == "pvc":
                 self.res["spec"]["source"]["pvc"] = {
                     "name": self.source_pvc or "dv-source",
@@ -207,13 +195,9 @@ class DataVolume(NamespacedResource):
             if self.preallocation is not None:
                 self.res["spec"]["preallocation"] = self.preallocation
             if self.delete_after_completion:
-                self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{self.api_group}/storage.deleteAfterCompletion": (
-                            self.delete_after_completion
-                        )
-                    }
-                )
+                self.res["metadata"].setdefault("annotations", {}).update({
+                    f"{self.api_group}/storage.deleteAfterCompletion": (self.delete_after_completion)
+                })
 
     def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
         """
@@ -233,9 +217,7 @@ class DataVolume(NamespacedResource):
 
         # If DV's status is not Pending, continue with the flow
         self.wait_for_status(status=self.Status.SUCCEEDED, timeout=timeout)
-        self.pvc.wait_for_status(
-            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
-        )
+        self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=timeout)
 
     @property
     def pvc(self):
@@ -281,9 +263,7 @@ class DataVolume(NamespacedResource):
     def wait_for_dv_success(self, timeout=600, failure_timeout=120):
         self.logger.info(f"Wait DV success for {timeout} seconds")
         self._check_none_pending_status(failure_timeout=failure_timeout)
-        self.pvc.wait_for_status(
-            status=PersistentVolumeClaim.Status.BOUND, timeout=timeout
-        )
+        self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=timeout)
         # if garbage collector enabled, the DV deleted once succeeded
         try:
             for sample in TimeoutSampler(

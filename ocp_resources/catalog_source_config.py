@@ -39,17 +39,15 @@ class CatalogSourceConfig(NamespacedResource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "source": self.source,
-                        "targetNamespace": self.target_namespace,
-                        "packages": self.packages,
-                        "csDisplayName": self.cs_display_name,
-                        "csPublisher": self.cs_publisher,
-                    }
+            self.res.update({
+                "spec": {
+                    "source": self.source,
+                    "targetNamespace": self.target_namespace,
+                    "packages": self.packages,
+                    "csDisplayName": self.cs_display_name,
+                    "csPublisher": self.cs_publisher,
                 }
-            )
+            })
 
     def wait_for_csc_status(self, status, timeout=120):
         """
@@ -80,7 +78,5 @@ class CatalogSourceConfig(NamespacedResource):
 
         except TimeoutExpiredError:
             if current_status:
-                self.logger.error(
-                    f"Status of {self.kind} {self.name} is {current_status}"
-                )
+                self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise

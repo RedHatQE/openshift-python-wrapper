@@ -1,20 +1,12 @@
-[tool.black]
-line-length = 88
-target_version = ['py37', 'py38', 'py39', 'py310', "py311"]
-exclude = '''
-(
-  /(
-    | \.git
-    | \.venv
-    | \.mypy_cache
-    | \.tox
-  )/
-)
-'''
+[tool.ruff]
+preview = true
+line-length = 120
+fix = true
+output-format = "grouped"
 
-[tool.isort]
-line_length = 88
-profile = "black"
+[tool.ruff.format]
+exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
+
 
 [tool.poetry]
 name = "openshift-python-wrapper"
@@ -23,13 +15,13 @@ description = "Wrapper around https://github.com/openshift/openshift-restclient-
 authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
-packages = [{include = "ocp_resources"}]
+packages = [{ include = "ocp_resources" }]
 homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
 documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 keywords = ["Openshift", "Kubevirt", "CNV"]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
 ]
 
 [tool.poetry.urls]

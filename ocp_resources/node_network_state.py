@@ -34,11 +34,7 @@ class NodeNetworkState(Resource):
 
     def set_interface(self, interface):
         # First drop the interface is's already in the list
-        interfaces = [
-            iface
-            for iface in self.desired_state["interfaces"]
-            if iface["name"] != interface["name"]
-        ]
+        interfaces = [iface for iface in self.desired_state["interfaces"] if iface["name"] != interface["name"]]
 
         # Add the interface
         interfaces.append(interface)
@@ -47,15 +43,13 @@ class NodeNetworkState(Resource):
     def to_dict(self):
         super().to_dict()
         if not self.yaml_file:
-            self.res.update(
-                {
-                    "spec": {
-                        "nodeName": self.name,
-                        "managed": True,
-                        "desiredState": self.desired_state,
-                    }
+            self.res.update({
+                "spec": {
+                    "nodeName": self.name,
+                    "managed": True,
+                    "desiredState": self.desired_state,
                 }
-            )
+            })
 
     def apply(self):
         retries_on_conflict = 3
@@ -79,9 +73,7 @@ class NodeNetworkState(Resource):
             return None
 
         self.logger.info(f"Checking if interface {name} is up -- {self.name}")
-        samples = TimeoutSampler(
-            wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface
-        )
+        samples = TimeoutSampler(wait_timeout=TIMEOUT_4MINUTES, sleep=SLEEP, func=_find_up_interface)
         for sample in samples:
             if sample:
                 return

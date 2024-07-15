@@ -51,14 +51,10 @@ class MigrationPolicy(Resource):
             if self.bandwidth_per_migration:
                 self.res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
             if self.completion_timeout_per_gb:
-                self.res["spec"][
-                    "completionTimeoutPerGiB"
-                ] = self.completion_timeout_per_gb
+                self.res["spec"]["completionTimeoutPerGiB"] = self.completion_timeout_per_gb
 
             if self.namespace_selector:
                 selectors.setdefault("namespaceSelector", self.namespace_selector)
 
             if self.vmi_selector:
-                selectors.setdefault(
-                    "virtualMachineInstanceSelector", self.vmi_selector
-                )
+                selectors.setdefault("virtualMachineInstanceSelector", self.vmi_selector)

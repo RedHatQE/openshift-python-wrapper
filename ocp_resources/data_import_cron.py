@@ -59,31 +59,21 @@ class DataImportCron(NamespacedResource):
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url can not coexist")
 
-            self.res.update(
-                {
-                    "spec": {
-                        "template": {
-                            "spec": {
-                                "source": {
-                                    "registry": {"pullMethod": self.pull_method}
-                                },
-                                "storage": {
-                                    "resources": {"requests": {"storage": self.size}}
-                                },
-                            }
+            self.res.update({
+                "spec": {
+                    "template": {
+                        "spec": {
+                            "source": {"registry": {"pullMethod": self.pull_method}},
+                            "storage": {"resources": {"requests": {"storage": self.size}}},
                         }
                     }
                 }
-            )
+            })
             spec = self.res["spec"]["template"]["spec"]
             if self.bind_immediate_annotation:
-                self.res["metadata"].setdefault("annotations", {}).update(
-                    {
-                        f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": (
-                            "true"
-                        )
-                    }
-                )
+                self.res["metadata"].setdefault("annotations", {}).update({
+                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": ("true")
+                })
             if self.image_stream:
                 spec["source"]["registry"]["imageStream"] = self.image_stream
             if self.url:
