@@ -9,5 +9,5 @@ class CDI(Resource):
     api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
     class Status(Resource.Status):
-        DEPLOYING = "Deploying"
-        DEPLOYED = "Deployed"
+        DEPLOYING: str = "Deploying"
+        DEPLOYED: str = "Deployed"
