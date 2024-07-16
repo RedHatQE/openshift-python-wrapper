@@ -13,18 +13,18 @@ class CDIConfig(Resource):
     api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
     @property
-    def scratch_space_storage_class_from_spec(self):
+    def scratch_space_storage_class_from_spec(self) -> str:
         return self.instance.spec.scratchSpaceStorageClass
 
     @property
-    def scratch_space_storage_class_from_status(self):
+    def scratch_space_storage_class_from_status(self) -> str:
         return self.instance.status.scratchSpaceStorageClass
 
     @property
-    def upload_proxy_url(self):
+    def upload_proxy_url(self) -> str:
         return self.instance.status.uploadProxyURL
 
-    def wait_until_upload_url_changed(self, uploadproxy_url, timeout=TIMEOUT_4MINUTES):
+    def wait_until_upload_url_changed(self, uploadproxy_url: str, timeout: int = TIMEOUT_4MINUTES) -> bool:
         """
         Wait until upload proxy url is changed
 
@@ -45,6 +45,8 @@ class CDIConfig(Resource):
         for sample in samples:
             if sample.items:
                 status = sample.items[0].status
-                current_url = status.uploadProxyURL
+                current_url: str = status.uploadProxyURL
                 if current_url == uploadproxy_url:
-                    return
+                    return True
+
+        return False
