@@ -434,7 +434,7 @@ class Resource:
         self.namespace: str = ""
         self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
         self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res: Dict[str, Any] = {}
+        self.res: Dict[Any, Any] = {}
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
