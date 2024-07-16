@@ -49,4 +49,4 @@ class CatalogSource(NamespacedResource):
             _spec: Dict[str, Any] = self.res["spec"]
 
             if self.update_strategy_registry_poll_interval:
-                _spec["udateStrategy"] = {"registryPoll": {"interval": self.update_strategy_registry_poll_interval}}
+                _spec["updateStrategy"] = {"registryPoll": {"interval": self.update_strategy_registry_poll_interval}}
