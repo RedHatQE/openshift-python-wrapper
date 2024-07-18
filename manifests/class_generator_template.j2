@@ -17,7 +17,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
     """
 
     {% if GROUP %}
-    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP.upper() }}
+    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP }}
     {% else %}
     api_version: str = "{{ VERSION }}"
     {% endif %}
@@ -57,6 +57,6 @@ class {{ KIND }}({{ BASE_CLASS }}):
             {% endfor %}
 
             {% for attr in optional_attrs %}
-            if self.{{ attr[0] }}{% if attr[0] == "bool"} is not None{% endif %}:
+            if self.{{ attr[0] }}{% if attr[0] == "bool" %} is not None{% endif %}:
                 _spec["{{ attr[0] }}"] = self.{{ attr[0] }}
             {% endfor %}
