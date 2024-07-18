@@ -5,6 +5,9 @@ from typing import Any, Dict, List, Tuple
 import click
 import re
 
+from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
+from simple_logger.logger import get_logger
+
 TYPE_MAPPING: Dict[str, str] = {
     "<integer>": "int",
     "<Object>": "Dict[Any, Any]",
@@ -13,14 +16,19 @@ TYPE_MAPPING: Dict[str, str] = {
     "<map[string]string>": "Dict[Any, Any]",
     "<boolean>": "bool",
 }
+LOGGER = get_logger(name=__name__)
+
+
+def format_resource_kind(resource_kind: str) -> str:
+    """Convert CamelCase to snake_case"""
+    return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
 def name_and_type_from_field(field: str) -> Tuple[str, str, bool]:
     splited_field = field.split()
     _name, _type = splited_field[0], splited_field[1]
 
-    # Convert CamelCase to snake_case
-    name = re.sub(r"(?<!^)(?=[A-Z])", "_", _name).lower().strip()
+    name = format_resource_kind(resource_kind=_name)
     type_ = _type.strip()
     required = "-required-" in splited_field
     type_from_dict = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
@@ -46,15 +54,31 @@ def name_and_type_from_field(field: str) -> Tuple[str, str, bool]:
 
 
 def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
-    pass
+    env = Environment(
+        loader=FileSystemLoader("manifests"),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        undefined=DebugUndefined,
+    )
+
+    template = env.get_template(name="class_generator_template.j2")
+    rendered = template.render(resource_dict)
+    undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
+    if undefined_variables:
+        LOGGER.error(f"The following variables are undefined: {undefined_variables}")
+        raise click.Abort()
+
+    with open(f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py_", "w") as fd:
+        fd.write(rendered)
 
 
 def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
-    resource_dict: Dict[str, Any] = {}
-    resource_dict["BASE_CLASS"] = "NamespacedResource" if namespaced else "Resource"
-    resource_dict["API_LINK"] = api_link
+    resource_dict: Dict[str, Any] = {
+        "BASE_CLASS": "NamespacedResource" if namespaced else "Resource",
+        "API_LINK": api_link,
+    }
     new_sections_words: Tuple[str, str, str] = ("KIND:", "VERSION:", "GROUP:")
 
     with open(file) as fd:
@@ -93,7 +117,6 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
     resource_dict["SPEC"] = []
     first_field_indent: int = 0
     first_field_indent_str: str = ""
-    top_spec_indent: int = 0
     top_spec_indent_str: str = ""
     first_field_spec_found: bool = False
     field_spec_found: bool = False

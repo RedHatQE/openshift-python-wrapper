@@ -1,0 +1,68 @@
+{% set attrs_names = [] %}
+{% set attrs_with_type = [] %}
+{% set required_attrs = [] %}
+{% set optional_attrs = [] %}
+{% for attr in SPEC %}
+  {% set _ = attrs_names.append(attr[0]) %}
+  {% set _ = attrs_with_type.append(attr[1]) %}
+  {% if attr[2] == True %}
+    {% set _ = required_attrs.append(attr[0]) %}
+  {$ else %}
+    {% set _ = optional_attrs.append(attr[0]) %}
+  {% endif %}
+{% endfor %}
+from typing import Any, Dict, List, Optional
+from ocp_resources.resource import {{ BASE_CLASS }}
+
+
+class {{ KIND }}({{ BASE_CLASS }}):
+    """
+    {{ DESCRIPTION }}
+
+    API Link: {{ API_LINK }}
+    """
+
+    {% if GROUP %}
+    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP }}
+    {% else %}
+    api_version: str = "{{ VERSION }}"
+    {% endif %}
+
+    def __init__(
+        self,
+        {{ attrs_with_type|join(",\n        ") }},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Args:
+            {{ attrs_names|join(",\n            ") }}
+        """
+        super().__init__(**kwargs)
+
+        {% for attr in SPEC %}
+        self.{{ attr[0] }} = {{ attr[0] }}
+        {% endfor %}
+
+    def to_dict(self) -> None:
+
+        super().to_dict()
+
+        if not self.yaml_file:
+          {% if required_attrs %}
+            if not all([
+                  {% for attr in required_attrs %}self.{{ attr }}{% endfor %}
+              ]):
+                raise MissingRequiredArgumentError(argument="{{ required_attrs }}")
+          {% endif %}
+
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            {% for attr in required_attrs %}
+            _spec["{{ attr }}"] = self.{{ attr }}
+            {% endfor %}
+
+            {% for attr in optional_attrs %}
+            if self.{{ attr }}:
+                _spec["{{ attr }}"] = self.{{ attr }}
+            {% endfor %}

@@ -48,6 +48,8 @@ fcn_exclude_functions =
     warn,
     pytest,
     json,
+    template,
+    meta,
 
 enable-extensions =
     FCN,
