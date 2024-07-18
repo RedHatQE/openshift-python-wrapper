@@ -59,6 +59,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=DebugUndefined,
+        autoescape=True,
     )
 
     template = env.get_template(name="class_generator_template.j2")
