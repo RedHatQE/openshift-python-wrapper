@@ -5,11 +5,7 @@
 {% for attr in SPEC %}
   {% set _ = attrs_names.append(attr[0]) %}
   {% set _ = attrs_with_type.append(attr[1]) %}
-  {% if attr[2] == True %}
-    {% set _ = required_attrs.append(attr[0]) %}
-  {$ else %}
-    {% set _ = optional_attrs.append(attr[0]) %}
-  {% endif %}
+  {% set _ = required_attrs.append(attr[0]) if attr[2] == True else optional_attrs.append(attr[0]) %}
 {% endfor %}
 from typing import Any, Dict, List, Optional
 from ocp_resources.resource import {{ BASE_CLASS }}
@@ -35,7 +31,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
     ) -> None:
         """
         Args:
-            {{ attrs_names|join(",\n            ") }}
+            {{ attrs_names|join(',\n            ') }}
         """
         super().__init__(**kwargs)
 
@@ -49,10 +45,8 @@ class {{ KIND }}({{ BASE_CLASS }}):
 
         if not self.yaml_file:
           {% if required_attrs %}
-            if not all([
-                  {% for attr in required_attrs %}self.{{ attr }}{% endfor %}
-              ]):
-                raise MissingRequiredArgumentError(argument="{{ required_attrs }}")
+            if not all([{% for attr in required_attrs %}self.{{ attr }}, {% endfor %}]):
+                raise MissingRequiredArgumentError(argument="{{ required_attrs|join(', ') }}")
           {% endif %}
 
             self.res["spec"] = {}
