@@ -117,6 +117,7 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
     resource_dict["SPEC"] = []
     first_field_indent: int = 0
     first_field_indent_str: str = ""
+    top_spec_indent: int = 0
     top_spec_indent_str: str = ""
     first_field_spec_found: bool = False
     field_spec_found: bool = False
