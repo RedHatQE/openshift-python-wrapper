@@ -18,11 +18,14 @@ TYPE_MAPPING: Dict[str, str] = {
 def name_and_type_from_field(field: str) -> Tuple[str, str, bool]:
     splited_field = field.split()
     _name, _type = splited_field[0], splited_field[1]
+
+    # Convert CamelCase to snake_case
     name = re.sub(r"(?<!^)(?=[A-Z])", "_", _name).lower().strip()
     type_ = _type.strip()
     required = "-required-" in splited_field
     type_from_dict = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
 
+    # All non required fields must be set with Optional
     if not required:
         if type_from_dict == "Dict[Any, Any]":
             type_from_dict = "Option[Dict[str, Any]] = None"
@@ -58,6 +61,7 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
         data = fd.read()
 
     for line in data.splitlines():
+        # If line is empty section is done
         if not line.strip():
             if section_data:
                 sections.append(section_data)
@@ -72,6 +76,7 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
                 section_data = ""
             continue
 
+    # Last section data from last iteration
     if section_data:
         sections.append(section_data)
 
@@ -97,6 +102,7 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
         if field.startswith("FIELDS:"):
             continue
 
+        # Find first indent of spec, Needed in order to now when spec is done.
         if not first_field_indent:
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
@@ -111,12 +117,15 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
                     resource_dict["SPEC"].append(name_and_type_from_field(field=field))
+
+                    # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
                     top_spec_indent_str = f"{' ' * top_spec_indent}"
                     first_field_spec_found = False
                     continue
 
                 if top_spec_indent_str:
+                    # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
                         resource_dict["SPEC"].append(name_and_type_from_field(field=field))
                         continue
