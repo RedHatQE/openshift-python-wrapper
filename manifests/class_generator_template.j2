@@ -32,7 +32,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
         """
         Args:
             {% for attr in required_attrs_with_type + optional_attrs_with_type %}
-            {{ attr[0] }} ({{ attr[1]}} ): <manual addition>
+            {{ attr[0] }} ({{ attr[1]}}): <please add description>
             {% endfor %}
         """
         super().__init__(**kwargs)

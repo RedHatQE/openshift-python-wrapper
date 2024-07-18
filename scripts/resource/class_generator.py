@@ -1,10 +1,11 @@
 from __future__ import annotations
 import os
-import pprint
 
 from typing import Any, Dict, List, Tuple
 import click
 import re
+
+import yaml
 
 from ocp_resources.resource import Resource
 
@@ -82,7 +83,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
     output_file = f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
     if os.path.exists(output_file):
         temp_output_file = f"{output_file[:-3]}_TEMP.py"
-        print(f"{output_file} already exists, using {temp_output_file}")
+        LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
 
     with open(temp_output_file or output_file, "w") as fd:
         fd.write(rendered)
@@ -174,17 +175,17 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
                 break
 
     resource_dict["SPEC"].sort(key=lambda x: not x[-1])
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(object=resource_dict)
+    LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
 
-    api_group_real_name = resource_dict["GROUP"]
-    api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
-    missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
+    if api_group_real_name := resource_dict.get("GROUP"):
+        api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
+        missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
 
-    if missing_api_group_in_resource:
-        print(
-            f"Missing API Group in Resource\nPlease add `Resource.ApiGroup.{api_group_real_name} = {api_group_real_name}` manually into ocp_resources/resource.py under Resource class > ApiGroup class."
-        )
+        if missing_api_group_in_resource:
+            LOGGER.warning(
+                f"Missing API Group in Resource\nPlease add `Resource.ApiGroup.{api_group_real_name} = {api_group_real_name}` manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+            )
+
     return resource_dict
 
 
@@ -220,7 +221,10 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
     callback=validate_api_link_schema,
     help="A link to the resource doc/api in the web",
 )
-def main(file, namespaced, api_link):
+@click.option("-v", "--verbose", is_flag=True, help="Pass flag to enable debug logs")
+def main(file, namespaced, api_link, verbose):
+    LOGGER.setLevel("DEBUG" if verbose else "INFO")
+
     resource_dict = resource_from_explain_file(file=file, namespaced=namespaced, api_link=api_link)
     generate_resource_file_from_dict(resource_dict=resource_dict)
 
