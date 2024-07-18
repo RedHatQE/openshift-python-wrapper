@@ -34,30 +34,30 @@ def name_and_type_from_field(field: str) -> Tuple[str, str, bool, str]:
 
     name = format_resource_kind(resource_kind=_name)
     type_ = _type.strip()
-    required = "-required-" in splited_field
+    required: bool = "-required-" in splited_field
     type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
-    type_from_dict_to_use = type_from_dict
+    type_from_dict_for_init = type_from_dict
 
     # All non required fields must be set with Optional
     if not required:
         if type_from_dict == "Dict[Any, Any]":
-            type_from_dict_to_use = "Optional[Dict[str, Any]] = None"
+            type_from_dict_for_init = "Optional[Dict[str, Any]] = None"
 
         if type_from_dict == "List[Any]":
-            type_from_dict_to_use = "Optional[List[Any]] = None"
+            type_from_dict_for_init = "Optional[List[Any]] = None"
 
         if type_from_dict == "str":
-            type_from_dict_to_use = 'Optional[str] = ""'
+            type_from_dict_for_init = 'Optional[str] = ""'
 
         if type_from_dict == "bool":
-            type_from_dict_to_use = "Optional[bool] = None"
+            type_from_dict_for_init = "Optional[bool] = None"
 
         if type_from_dict == "int":
-            type_from_dict_to_use = "Optional[int] = None"
+            type_from_dict_for_init = "Optional[int] = None"
 
     return (
         name,
-        f"{name}: {type_from_dict_to_use}",
+        f"{name}: {type_from_dict_for_init}",
         required,
         type_from_dict,
     )
