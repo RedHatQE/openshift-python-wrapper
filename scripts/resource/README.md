@@ -35,5 +35,7 @@ poetry install
 ###### Call the script
 
 ```bash
-poetry run python scripts/resource/class_generator.py --file deployment.txt -ns --api-link <link to resource API or DOC>
+poetry run python scripts/resource/class_generator.py --file deployment.txt --namespaced --api-link <link to resource API or DOC>
 ```
+
+- Pass --namespaced only if the resource is a namespaced resource
