@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import pprint
 
 from typing import Any, Dict, List, Tuple
@@ -77,7 +78,13 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
         LOGGER.error(f"The following variables are undefined: {undefined_variables}")
         raise click.Abort()
 
-    with open(f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}_TEMP.py", "w") as fd:
+    temp_output_file: str = ""
+    output_file = f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
+    if os.path.exists(output_file):
+        temp_output_file = f"{output_file[:-3]}_TEMP.py"
+        print(f"{output_file} already exists, using {temp_output_file}")
+
+    with open(temp_output_file or output_file, "w") as fd:
         fd.write(rendered)
 
 
