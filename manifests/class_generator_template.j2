@@ -1,11 +1,9 @@
-{% set attrs_names = [] %}
 {% set attrs_with_type = [] %}
 {% set required_attrs = [] %}
 {% set optional_attrs = [] %}
 {% for attr in SPEC %}
-  {% set _ = attrs_names.append(attr[0]) %}
   {% set _ = attrs_with_type.append(attr[1]) %}
-  {% set _ = required_attrs.append(attr[0]) if attr[2] == True else optional_attrs.append(attr[0]) %}
+  {% set _ = required_attrs.append((attr[0], attr[3])) if attr[2] == True else optional_attrs.append((attr[0], attr[3])) %}
 {% endfor %}
 from typing import Any, Dict, List, Optional
 from ocp_resources.resource import {{ BASE_CLASS }}
@@ -19,7 +17,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
     """
 
     {% if GROUP %}
-    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP }}
+    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP.upper() }}
     {% else %}
     api_version: str = "{{ VERSION }}"
     {% endif %}
@@ -31,7 +29,9 @@ class {{ KIND }}({{ BASE_CLASS }}):
     ) -> None:
         """
         Args:
-            {{ attrs_names|join(',\n            ') }}
+            {% for attr in required_attrs + optional_attrs %}
+            {{ attr[0] }} ({{ attr[3] }}): <manual addition>
+            {% endfor %}
         """
         super().__init__(**kwargs)
 
@@ -53,10 +53,10 @@ class {{ KIND }}({{ BASE_CLASS }}):
             _spec = self.res["spec"]
 
             {% for attr in required_attrs %}
-            _spec["{{ attr }}"] = self.{{ attr }}
+            _spec["{{ attr[0] }}"] = self.{{ attr[0] }}
             {% endfor %}
 
             {% for attr in optional_attrs %}
-            if self.{{ attr }}:
-                _spec["{{ attr }}"] = self.{{ attr }}
+            if self.{{ attr[0] }}{% if attr[0] == "bool"} is not None{% endif %}:
+                _spec["{{ attr[0] }}"] = self.{{ attr[0] }}
             {% endfor %}
