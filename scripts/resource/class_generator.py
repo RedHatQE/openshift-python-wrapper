@@ -68,7 +68,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
         LOGGER.error(f"The following variables are undefined: {undefined_variables}")
         raise click.Abort()
 
-    with open(f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py_", "w") as fd:
+    with open(f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py", "w") as fd:
         fd.write(rendered)
 
 
