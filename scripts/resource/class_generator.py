@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Tuple
 import click
 import re
 
+from ocp_resources.resource import Resource
+
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
 
@@ -24,7 +26,8 @@ def format_resource_kind(resource_kind: str) -> str:
     return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
-def name_and_type_from_field(field: str) -> Tuple[str, str, bool]:
+def name_and_type_from_field(field: str) -> Tuple[str, str, bool, str]:
+    type_from_dict_to_use: str = ""
     splited_field = field.split()
     _name, _type = splited_field[0], splited_field[1]
 
@@ -36,21 +39,26 @@ def name_and_type_from_field(field: str) -> Tuple[str, str, bool]:
     # All non required fields must be set with Optional
     if not required:
         if type_from_dict == "Dict[Any, Any]":
-            type_from_dict = "Option[Dict[str, Any]] = None"
+            type_from_dict_to_use = "Option[Dict[str, Any]] = None"
 
         if type_from_dict == "List[Any]":
-            type_from_dict = "Option[List[Any]] = None"
+            type_from_dict_to_use = "Option[List[Any]] = None"
 
         if type_from_dict == "str":
-            type_from_dict = "Option[str] = ''"
+            type_from_dict_to_use = "Option[str] = ''"
 
         if type_from_dict == "bool":
-            type_from_dict = "Option[bool] = None"
+            type_from_dict_to_use = "Option[bool] = None"
 
         if type_from_dict == "int":
-            type_from_dict = "Option[int] = None"
+            type_from_dict_to_use = "Option[int] = None"
 
-    return name, f"{name}: {type_from_dict}", required
+    return (
+        name,
+        f"{name}: {type_from_dict_to_use}",
+        required,
+        type_from_dict,
+    )
 
 
 def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
@@ -69,7 +77,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
         LOGGER.error(f"The following variables are undefined: {undefined_variables}")
         raise click.Abort()
 
-    with open(f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py", "w") as fd:
+    with open(f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}_TEMP.py", "w") as fd:
         fd.write(rendered)
 
 
@@ -161,6 +169,15 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
     resource_dict["SPEC"].sort(key=lambda x: not x[-1])
     pp = pprint.PrettyPrinter(indent=4)
     pp.pprint(object=resource_dict)
+
+    api_group_real_name = resource_dict["GROUP"]
+    api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
+    missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
+
+    if missing_api_group_in_resource:
+        print(
+            f"Missing API Group in Resource\nPlease add `Resource.ApiGroup.{api_group_real_name} = {api_group_real_name}` manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+        )
     return resource_dict
 
 
