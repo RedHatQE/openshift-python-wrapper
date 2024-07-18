@@ -3,7 +3,7 @@
 {% set required_attrs_with_type = [] %}
 {% set optional_attrs_with_type = [] %}
 {% for attr in SPEC %}
-  {% set _ = attrs_with_type.append(attr[1]) %}
+  {% set _ = attrs_with_type.append(attr[1]|safe) %}
   {% set _ = required_attrs.append(attr[0]) if attr[2] == True %}
   {% set _ = required_attrs_with_type.append((attr[0], attr[3])) if attr[2] == True else optional_attrs_with_type.append((attr[0], attr[3])) %}
 {% endfor %}
