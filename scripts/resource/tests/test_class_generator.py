@@ -1,5 +1,9 @@
-from scripts.resource.class_generator import resource_from_explain_file
+from scripts.resource.class_generator import (
+    generate_resource_file_from_dict,
+    resource_from_explain_file,
+)
 from deepdiff import DeepDiff
+import filecmp
 
 POD_RES = {
     "BASE_CLASS": "Resource",
@@ -8,47 +12,153 @@ POD_RES = {
     "VERSION": "v1",
     "DESCRIPTION": "Pod is a collection of containers that can run on a host. This resource is\n     created by clients and scheduled onto hosts.",
     "SPEC": [
-        ("active_deadline_seconds", "active_deadline_seconds: Option[int] = None", False),
-        ("affinity", "affinity: Option[Dict[str, Any]] = None", False),
-        ("automount_service_account_token", "automount_service_account_token: Option[bool] = None", False),
-        ("containers", "containers: Option[List[Any]] = None", False),
-        ("dns_config", "dns_config: Option[Dict[str, Any]] = None", False),
-        ("dns_policy", "dns_policy: Option[str] = ''", False),
-        ("enable_service_links", "enable_service_links: Option[bool] = None", False),
-        ("ephemeral_containers", "ephemeral_containers: Option[List[Any]] = None", False),
-        ("host_aliases", "host_aliases: Option[List[Any]] = None", False),
-        ("host_ipc", "host_ipc: Option[bool] = None", False),
-        ("host_network", "host_network: Option[bool] = None", False),
-        ("host_pid", "host_pid: Option[bool] = None", False),
-        ("host_users", "host_users: Option[bool] = None", False),
-        ("hostname", "hostname: Option[str] = ''", False),
-        ("image_pull_secrets", "image_pull_secrets: Option[List[Any]] = None", False),
-        ("init_containers", "init_containers: Option[List[Any]] = None", False),
-        ("node_name", "node_name: Option[str] = ''", False),
-        ("node_selector", "node_selector: Option[Dict[str, Any]] = None", False),
-        ("os", "os: Option[Dict[str, Any]] = None", False),
-        ("overhead", "overhead: Option[Dict[str, Any]] = None", False),
-        ("preemption_policy", "preemption_policy: Option[str] = ''", False),
-        ("priority", "priority: Option[int] = None", False),
-        ("priority_class_name", "priority_class_name: Option[str] = ''", False),
-        ("readiness_gates", "readiness_gates: Option[List[Any]] = None", False),
-        ("resource_claims", "resource_claims: Option[List[Any]] = None", False),
-        ("restart_policy", "restart_policy: Option[str] = ''", False),
-        ("runtime_class_name", "runtime_class_name: Option[str] = ''", False),
-        ("scheduler_name", "scheduler_name: Option[str] = ''", False),
-        ("scheduling_gates", "scheduling_gates: Option[List[Any]] = None", False),
-        ("security_context", "security_context: Option[Dict[str, Any]] = None", False),
-        ("service_account", "service_account: Option[str] = ''", False),
-        ("service_account_name", "service_account_name: Option[str] = ''", False),
-        ("set_hostname_as_fqdn", "set_hostname_as_fqdn: Option[bool] = None", False),
-        ("share_process_namespace", "share_process_namespace: Option[bool] = None", False),
-        ("subdomain", "subdomain: Option[str] = ''", False),
-        ("termination_grace_period_seconds", "termination_grace_period_seconds: Option[int] = None", False),
-        ("tolerations", "tolerations: Option[List[Any]] = None", False),
-        ("topology_spread_constraints", "topology_spread_constraints: Option[List[Any]] = None", False),
-        ("volumes", "volumes: Option[List[Any]] = None", False),
+        (
+            "active_deadline_seconds",
+            "active_deadline_seconds: Optional[int] = None",
+            False,
+            "int",
+        ),
+        (
+            "affinity",
+            "affinity: Optional[Dict[str, Any]] = None",
+            False,
+            "Dict[Any, Any]",
+        ),
+        (
+            "automount_service_account_token",
+            "automount_service_account_token: Optional[bool] = None",
+            False,
+            "bool",
+        ),
+        ("containers", "containers: Optional[List[Any]] = None", False, "List[Any]"),
+        (
+            "dns_config",
+            "dns_config: Optional[Dict[str, Any]] = None",
+            False,
+            "Dict[Any, Any]",
+        ),
+        ("dns_policy", 'dns_policy: Optional[str] = ""', False, "str"),
+        (
+            "enable_service_links",
+            "enable_service_links: Optional[bool] = None",
+            False,
+            "bool",
+        ),
+        (
+            "ephemeral_containers",
+            "ephemeral_containers: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        (
+            "host_aliases",
+            "host_aliases: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        ("host_ipc", "host_ipc: Optional[bool] = None", False, "bool"),
+        ("host_network", "host_network: Optional[bool] = None", False, "bool"),
+        ("host_pid", "host_pid: Optional[bool] = None", False, "bool"),
+        ("host_users", "host_users: Optional[bool] = None", False, "bool"),
+        ("hostname", 'hostname: Optional[str] = ""', False, "str"),
+        (
+            "image_pull_secrets",
+            "image_pull_secrets: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        (
+            "init_containers",
+            "init_containers: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        ("node_name", 'node_name: Optional[str] = ""', False, "str"),
+        (
+            "node_selector",
+            "node_selector: Optional[Dict[str, Any]] = None",
+            False,
+            "Dict[Any, Any]",
+        ),
+        ("os", "os: Optional[Dict[str, Any]] = None", False, "Dict[Any, Any]"),
+        (
+            "overhead",
+            "overhead: Optional[Dict[str, Any]] = None",
+            False,
+            "Dict[Any, Any]",
+        ),
+        ("preemption_policy", 'preemption_policy: Optional[str] = ""', False, "str"),
+        ("priority", "priority: Optional[int] = None", False, "int"),
+        (
+            "priority_class_name",
+            'priority_class_name: Optional[str] = ""',
+            False,
+            "str",
+        ),
+        (
+            "readiness_gates",
+            "readiness_gates: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        (
+            "resource_claims",
+            "resource_claims: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        ("restart_policy", 'restart_policy: Optional[str] = ""', False, "str"),
+        ("runtime_class_name", 'runtime_class_name: Optional[str] = ""', False, "str"),
+        ("scheduler_name", 'scheduler_name: Optional[str] = ""', False, "str"),
+        (
+            "scheduling_gates",
+            "scheduling_gates: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        (
+            "security_context",
+            "security_context: Optional[Dict[str, Any]] = None",
+            False,
+            "Dict[Any, Any]",
+        ),
+        ("service_account", 'service_account: Optional[str] = ""', False, "str"),
+        (
+            "service_account_name",
+            'service_account_name: Optional[str] = ""',
+            False,
+            "str",
+        ),
+        (
+            "set_hostname_as_fqdn",
+            "set_hostname_as_fqdn: Optional[bool] = None",
+            False,
+            "bool",
+        ),
+        (
+            "share_process_namespace",
+            "share_process_namespace: Optional[bool] = None",
+            False,
+            "bool",
+        ),
+        ("subdomain", 'subdomain: Optional[str] = ""', False, "str"),
+        (
+            "termination_grace_period_seconds",
+            "termination_grace_period_seconds: Optional[int] = None",
+            False,
+            "int",
+        ),
+        ("tolerations", "tolerations: Optional[List[Any]] = None", False, "List[Any]"),
+        (
+            "topology_spread_constraints",
+            "topology_spread_constraints: Optional[List[Any]] = None",
+            False,
+            "List[Any]",
+        ),
+        ("volumes", "volumes: Optional[List[Any]] = None", False, "List[Any]"),
     ],
 }
+
 DEPLOYMENT_RES = {
     "BASE_CLASS": "NamespacedResource",
     "API_LINK": "https://deployment.explain",
@@ -57,25 +167,56 @@ DEPLOYMENT_RES = {
     "VERSION": "v1",
     "DESCRIPTION": "Deployment enables declarative updates for Pods and ReplicaSets.",
     "SPEC": [
-        ("selector", "selector: Dict[Any, Any]", True),
-        ("template", "template: Dict[Any, Any]", True),
-        ("min_ready_seconds", "min_ready_seconds: Option[int] = None", False),
-        ("paused", "paused: Option[bool] = None", False),
-        ("progress_deadline_seconds", "progress_deadline_seconds: Option[int] = None", False),
-        ("replicas", "replicas: Option[int] = None", False),
-        ("revision_history_limit", "revision_history_limit: Option[int] = None", False),
-        ("strategy", "strategy: Option[Dict[str, Any]] = None", False),
+        ("min_ready_seconds", "min_ready_seconds: Optional[int] = None", False, "int"),
+        ("paused", "paused: Optional[bool] = None", False, "bool"),
+        (
+            "progress_deadline_seconds",
+            "progress_deadline_seconds: Optional[int] = None",
+            False,
+            "int",
+        ),
+        ("replicas", "replicas: Optional[int] = None", False, "int"),
+        (
+            "revision_history_limit",
+            "revision_history_limit: Optional[int] = None",
+            False,
+            "int",
+        ),
+        ("selector", "selector: Dict[Any, Any]", True, "Dict[Any, Any]"),
+        (
+            "strategy",
+            "strategy: Optional[Dict[str, Any]] = None",
+            False,
+            "Dict[Any, Any]",
+        ),
+        ("template", "template: Dict[Any, Any]", True, "Dict[Any, Any]"),
     ],
 }
 
 
-def test_resource_from_explain_file():
+def test_resource_from_explain_file(tmp_path_factory):
     manifests_path = "scripts/resource/tests/manifests"
-    pod = resource_from_explain_file(
-        file=f"{manifests_path}/pod.explain", namespaced=False, api_link="https://pod.explain"
+    pod_dict = resource_from_explain_file(
+        file=f"{manifests_path}/pod.explain",
+        namespaced=False,
+        api_link="https://pod.explain",
     )
-    deployment = resource_from_explain_file(
-        file=f"{manifests_path}/deployment.explain", namespaced=True, api_link="https://deployment.explain"
+    deployment_dict = resource_from_explain_file(
+        file=f"{manifests_path}/deployment.explain",
+        namespaced=True,
+        api_link="https://deployment.explain",
     )
-    assert DeepDiff(pod, POD_RES) == {}
-    assert DeepDiff(deployment, DEPLOYMENT_RES) == {}
+
+    assert DeepDiff(pod_dict, POD_RES) == {}
+    assert DeepDiff(deployment_dict, DEPLOYMENT_RES) == {}
+
+    output_dir = tmp_path_factory.mktemp("class_generator")
+
+    pod_res_file = generate_resource_file_from_dict(resource_dict=pod_dict, output_dir=output_dir)
+    deployment_res_file = generate_resource_file_from_dict(resource_dict=deployment_dict, output_dir=output_dir)
+
+    assert filecmp.cmp(pod_res_file, "scripts/resource/tests/manifests/pod_expected_result.py")
+    assert filecmp.cmp(
+        deployment_res_file,
+        "scripts/resource/tests/manifests/deployment_expected_result.py",
+    )

@@ -50,6 +50,7 @@ fcn_exclude_functions =
     json,
     template,
     meta,
+    tmp_path_factory,
 
 enable-extensions =
     FCN,

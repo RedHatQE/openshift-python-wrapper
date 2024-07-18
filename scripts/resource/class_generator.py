@@ -41,19 +41,19 @@ def name_and_type_from_field(field: str) -> Tuple[str, str, bool, str]:
     # All non required fields must be set with Optional
     if not required:
         if type_from_dict == "Dict[Any, Any]":
-            type_from_dict_to_use = "Option[Dict[str, Any]] = None"
+            type_from_dict_to_use = "Optional[Dict[str, Any]] = None"
 
         if type_from_dict == "List[Any]":
-            type_from_dict_to_use = "Option[List[Any]] = None"
+            type_from_dict_to_use = "Optional[List[Any]] = None"
 
         if type_from_dict == "str":
-            type_from_dict_to_use = "Option[str] = ''"
+            type_from_dict_to_use = 'Optional[str] = ""'
 
         if type_from_dict == "bool":
-            type_from_dict_to_use = "Option[bool] = None"
+            type_from_dict_to_use = "Optional[bool] = None"
 
         if type_from_dict == "int":
-            type_from_dict_to_use = "Option[int] = None"
+            type_from_dict_to_use = "Optional[int] = None"
 
     return (
         name,
@@ -63,9 +63,9 @@ def name_and_type_from_field(field: str) -> Tuple[str, str, bool, str]:
     )
 
 
-def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
+def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="ocp_resources") -> str:
     env = Environment(
-        loader=FileSystemLoader("manifests"),
+        loader=FileSystemLoader("scripts/resource/manifests"),
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=DebugUndefined,
@@ -80,13 +80,16 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any]) -> None:
         raise click.Abort()
 
     temp_output_file: str = ""
-    output_file = f"ocp_resources/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
+    output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
     if os.path.exists(output_file):
         temp_output_file = f"{output_file[:-3]}_TEMP.py"
         LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
+        output_file = temp_output_file
 
-    with open(temp_output_file or output_file, "w") as fd:
+    with open(output_file, "w") as fd:
         fd.write(rendered)
+
+    return output_file
 
 
 def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Dict[str, Any]:
