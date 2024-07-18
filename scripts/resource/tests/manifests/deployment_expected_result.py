@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Deployment(NamespacedResource):

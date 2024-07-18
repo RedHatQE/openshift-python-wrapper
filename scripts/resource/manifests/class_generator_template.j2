@@ -8,7 +8,7 @@
   {% set _ = required_attrs_with_type.append((attr[0], attr[3])) if attr[2] == True else optional_attrs_with_type.append((attr[0], attr[3])) %}
 {% endfor %}
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import {{ BASE_CLASS }}
+from ocp_resources.resource import {{ BASE_CLASS }}, MissingRequiredArgumentError
 
 
 class {{ KIND }}({{ BASE_CLASS }}):
