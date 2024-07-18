@@ -1,4 +1,6 @@
 from __future__ import annotations
+import pprint
+
 from typing import Any, Dict, List, Tuple
 import click
 import re
@@ -123,7 +125,8 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
                 break
 
     resource_dict["SPEC"].sort(key=lambda x: not x[-1])
-
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(object=resource_dict)
     return resource_dict
 
 
