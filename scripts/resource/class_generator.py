@@ -27,14 +27,14 @@ def format_resource_kind(resource_kind: str) -> str:
 
 
 def name_and_type_from_field(field: str) -> Tuple[str, str, bool, str]:
-    type_from_dict_to_use: str = ""
     splited_field = field.split()
     _name, _type = splited_field[0], splited_field[1]
 
     name = format_resource_kind(resource_kind=_name)
     type_ = _type.strip()
     required = "-required-" in splited_field
-    type_from_dict = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
+    type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
+    type_from_dict_to_use = type_from_dict
 
     # All non required fields must be set with Optional
     if not required:
