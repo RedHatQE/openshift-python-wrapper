@@ -28,7 +28,7 @@ def format_resource_kind(resource_kind: str) -> str:
     return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
-def get_spec_args_params(field: str) -> Tuple[str, str, bool, str]:
+def get_spec_arg_params(field: str) -> Tuple[str, str, bool, str]:
     splited_field = field.split()
     _name, _type = splited_field[0], splited_field[1]
 
@@ -160,7 +160,7 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
         if field_spec_found:
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
-                    resource_dict["SPEC"].append(get_spec_args_params(field=field))
+                    resource_dict["SPEC"].append(get_spec_arg_params(field=field))
 
                     # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
@@ -171,7 +171,7 @@ def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Di
                 if top_spec_indent_str:
                     # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict["SPEC"].append(get_spec_args_params(field=field))
+                        resource_dict["SPEC"].append(get_spec_arg_params(field=field))
                         continue
 
             else:
