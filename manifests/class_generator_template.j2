@@ -1,9 +1,11 @@
 {% set attrs_with_type = [] %}
 {% set required_attrs = [] %}
-{% set optional_attrs = [] %}
+{% set required_attrs_with_type = [] %}
+{% set optional_attrs_with_type = [] %}
 {% for attr in SPEC %}
   {% set _ = attrs_with_type.append(attr[1]) %}
-  {% set _ = required_attrs.append((attr[0], attr[3])) if attr[2] == True else optional_attrs.append((attr[0], attr[3])) %}
+  {% set _ = required_attrs.append(attr[0]) if attr[2] == True %}
+  {% set _ = required_attrs_with_type.append((attr[0], attr[3])) if attr[2] == True else optional_attrs_with_type.append((attr[0], attr[3])) %}
 {% endfor %}
 from typing import Any, Dict, List, Optional
 from ocp_resources.resource import {{ BASE_CLASS }}
@@ -17,7 +19,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
     """
 
     {% if GROUP %}
-    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP }}
+    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP.upper() }}
     {% else %}
     api_version: str = "{{ VERSION }}"
     {% endif %}
@@ -29,8 +31,8 @@ class {{ KIND }}({{ BASE_CLASS }}):
     ) -> None:
         """
         Args:
-            {% for attr in required_attrs + optional_attrs %}
-            {{ attr[0] }} ({{ attr[3] }}): <manual addition>
+            {% for attr in required_attrs_with_type + optional_attrs_with_type %}
+            {{ attr[0] }} ({{ attr[1]}} ): <manual addition>
             {% endfor %}
         """
         super().__init__(**kwargs)
@@ -53,10 +55,10 @@ class {{ KIND }}({{ BASE_CLASS }}):
             _spec = self.res["spec"]
 
             {% for attr in required_attrs %}
-            _spec["{{ attr[0] }}"] = self.{{ attr[0] }}
+            _spec["{{ attr }}"] = self.{{ attr }}
             {% endfor %}
 
-            {% for attr in optional_attrs %}
-            if self.{{ attr[0] }}{% if attr[0] == "bool" %} is not None{% endif %}:
+            {% for attr in optional_attrs_with_type %}
+            if self.{{ attr[0] }}{% if attr[1] == "bool" %} is not None{% endif %}:
                 _spec["{{ attr[0] }}"] = self.{{ attr[0] }}
             {% endfor %}

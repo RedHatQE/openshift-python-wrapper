@@ -19,7 +19,7 @@ TYPE_MAPPING: Dict[str, str] = {
     "<map[string]string>": "Dict[Any, Any]",
     "<boolean>": "bool",
 }
-LOGGER = get_logger(name=__name__)
+LOGGER = get_logger(name="class_generator")
 
 
 def format_resource_kind(resource_kind: str) -> str:
