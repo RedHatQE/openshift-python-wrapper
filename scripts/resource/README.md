@@ -18,7 +18,7 @@ oc explain deployment --recursive > deployment.txt # Where deployment can be any
 ###### Check if the resource is namespaced or not
 
 ```bash
-oc api-resources --namespaced | grep deployment | wc -l # Where deployment is the same KIND from `oc explain` command
+oc api-resources --namespaced --no-headers | grep deployment | wc -l # Where deployment is the same KIND from `oc explain` command
 
 ```
 
