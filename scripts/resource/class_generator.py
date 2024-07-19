@@ -1,10 +1,12 @@
 from __future__ import annotations
+import shlex
 import os
 
 from typing import Any, Dict, List, Tuple
 import click
 import re
 
+from pyhelper_utils.shell import run_command
 import yaml
 
 from ocp_resources.resource import Resource
@@ -87,6 +89,8 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
 
     with open(output_file, "w") as fd:
         fd.write(rendered)
+
+    run_command(command=shlex.split(f"poetry run ruff format {output_file}"))
 
     return output_file
 
