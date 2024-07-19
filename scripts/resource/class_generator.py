@@ -90,8 +90,6 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
     with open(output_file, "w") as fd:
         fd.write(rendered)
 
-    run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
-
     return output_file
 
 
@@ -233,6 +231,7 @@ def main(file, namespaced, api_link, verbose):
 
     resource_dict = resource_from_explain_file(file=file, namespaced=namespaced, api_link=api_link)
     generate_resource_file_from_dict(resource_dict=resource_dict)
+    run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
 
 
 if __name__ == "__main__":

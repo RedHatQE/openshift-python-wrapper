@@ -96,8 +96,9 @@ def test_resource_from_explain_file(tmp_path_factory):
     pod_res_file = generate_resource_file_from_dict(resource_dict=pod_dict, output_dir=output_dir)
     deployment_res_file = generate_resource_file_from_dict(resource_dict=deployment_dict, output_dir=output_dir)
 
-    assert filecmp.cmp(pod_res_file, "scripts/resource/tests/manifests/pod_expected_result.py")
+    assert filecmp.cmp(pod_res_file, f"{manifests_path}/pod_expected_result.py", shallow=True)
     assert filecmp.cmp(
         deployment_res_file,
-        "scripts/resource/tests/manifests/deployment_expected_result.py",
+        f"{manifests_path}/deployment_expected_result.py",
+        shallow=True,
     )
