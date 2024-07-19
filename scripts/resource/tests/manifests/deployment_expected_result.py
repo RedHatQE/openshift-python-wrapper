@@ -1,5 +1,5 @@
-from typing import Any, Dict, List, Optional
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from typing import Any, Dict, Optional
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class Deployment(NamespacedResource):
@@ -18,9 +18,9 @@ class Deployment(NamespacedResource):
         progress_deadline_seconds: Optional[int] = None,
         replicas: Optional[int] = None,
         revision_history_limit: Optional[int] = None,
-        selector: Dict[Any, Any],
+        selector: Optional[Dict[str, Any]] = None,
         strategy: Optional[Dict[str, Any]] = None,
-        template: Dict[Any, Any],
+        template: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -46,11 +46,13 @@ class Deployment(NamespacedResource):
         self.template = template
 
     def to_dict(self) -> None:
-
         super().to_dict()
 
         if not self.yaml_file:
-            if not all([self.selector, self.template, ]):
+            if not all([
+                self.selector,
+                self.template,
+            ]):
                 raise MissingRequiredArgumentError(argument="selector, template")
 
             self.res["spec"] = {}

@@ -38,22 +38,21 @@ def get_spec_arg_params(field: str) -> Tuple[str, str, bool, str]:
     type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
     type_from_dict_for_init = type_from_dict
 
-    # All non required fields must be set with Optional
-    if not required:
-        if type_from_dict == "Dict[Any, Any]":
-            type_from_dict_for_init = "Optional[Dict[str, Any]] = None"
+    # All fields must be set with Optional since resource can have yaml_file to cover all args.
+    if type_from_dict == "Dict[Any, Any]":
+        type_from_dict_for_init = "Optional[Dict[str, Any]] = None"
 
-        if type_from_dict == "List[Any]":
-            type_from_dict_for_init = "Optional[List[Any]] = None"
+    if type_from_dict == "List[Any]":
+        type_from_dict_for_init = "Optional[List[Any]] = None"
 
-        if type_from_dict == "str":
-            type_from_dict_for_init = 'Optional[str] = ""'
+    if type_from_dict == "str":
+        type_from_dict_for_init = 'Optional[str] = ""'
 
-        if type_from_dict == "bool":
-            type_from_dict_for_init = "Optional[bool] = None"
+    if type_from_dict == "bool":
+        type_from_dict_for_init = "Optional[bool] = None"
 
-        if type_from_dict == "int":
-            type_from_dict_for_init = "Optional[int] = None"
+    if type_from_dict == "int":
+        type_from_dict_for_init = "Optional[int] = None"
 
     return (
         name,
