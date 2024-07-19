@@ -5,14 +5,7 @@ fix = true
 output-format = "grouped"
 
 [tool.ruff.format]
-exclude = [
-  ".git",
-  ".venv",
-  ".mypy_cache",
-  ".tox",
-  "__pycache__",
-  "scripts/resource/tests/manifests/",
-]
+exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.mypy]
 # TODO: enable all once we have typing in all the resources.
@@ -76,3 +69,4 @@ jinja2 = "^3.1.2"
 timeout-sampler = ">=0.0.17"
 click = "^8.1.7"
 pyhelper-utils = "^0.0.27"
+ruff = "^0.5.3"
