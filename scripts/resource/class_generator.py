@@ -91,7 +91,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
         fd.write(rendered)
 
     for op in ("format", "check"):
-        run_command(command=shlex.split(f"poetry run ruff {op} {output_file}"))
+        run_command(command=shlex.split(f"poetry run ruff {op} {output_file}"), verify_stderr=False)
 
     return output_file
 
