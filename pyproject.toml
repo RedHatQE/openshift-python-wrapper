@@ -5,7 +5,14 @@ fix = true
 output-format = "grouped"
 
 [tool.ruff.format]
-exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
+exclude = [
+  ".git",
+  ".venv",
+  ".mypy_cache",
+  ".tox",
+  "__pycache__",
+  "scripts/resource/tests/manifests/",
+]
 
 [tool.mypy]
 # TODO: enable all once we have typing in all the resources.
