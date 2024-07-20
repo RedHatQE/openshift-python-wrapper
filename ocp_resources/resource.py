@@ -466,7 +466,7 @@ class Resource:
                 return self.node_selector
             else:
                 warn(
-                    "node_selector `str` will be deprecated in next release, pass `dict` instead",
+                    "node_selector `str` will be deprecated in next release (4.17), pass `dict` instead",
                     DeprecationWarning,
                     stacklevel=2,
                 )
