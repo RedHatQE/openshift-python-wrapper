@@ -2,7 +2,7 @@ from __future__ import annotations
 import shlex
 import os
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import click
 import re
 
@@ -142,7 +142,9 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
     return output_file
 
 
-def parse_explain(file: str, output: str, namespaced: bool, api_link: str) -> Dict[str, Any]:
+def parse_explain(
+    api_link: str, file: Optional[str] = "", output: Optional[str] = "", namespaced: Optional[bool] = None
+) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
     resource_dict: Dict[str, Any] = {
@@ -154,8 +156,12 @@ def parse_explain(file: str, output: str, namespaced: bool, api_link: str) -> Di
     if file:
         with open(file) as fd:
             data = fd.read()
-    else:
+    elif output:
         data = output
+
+    else:
+        LOGGER.error("Provide file or output")
+        return {}
 
     for line in data.splitlines():
         # If line is empty section is done

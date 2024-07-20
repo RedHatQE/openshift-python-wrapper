@@ -1,3 +1,5 @@
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
 from typing import Any, Dict, List, Optional
 from ocp_resources.resource import Resource
 

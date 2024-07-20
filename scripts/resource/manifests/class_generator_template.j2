@@ -7,6 +7,8 @@
   {% set _ = required_attrs.append(attr[0]) if attr[2] == True %}
   {% set _ = required_attrs_with_type.append((attr[0], attr[3])) if attr[2] == True else optional_attrs_with_type.append((attr[0], attr[3])) %}
 {% endfor %}
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
 from typing import Any, Dict, List, Optional
 from ocp_resources.resource import {{ BASE_CLASS }}, MissingRequiredArgumentError
 
