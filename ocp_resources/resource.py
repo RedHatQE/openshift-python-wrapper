@@ -1,5 +1,6 @@
 from __future__ import annotations
 from collections.abc import Callable, Generator
+from warnings import warn
 import contextlib
 import copy
 import json
@@ -364,7 +365,7 @@ class Resource:
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         dry_run: bool = False,
-        node_selector: str = "",
+        node_selector: Dict[str, Any] | None = None,
         node_selector_labels: Dict[str, str] | None = None,
         config_file: str = "",
         config_dict: Dict[str, Any] | None = None,
@@ -461,9 +462,19 @@ class Resource:
 
     def _prepare_node_selector_spec(self) -> Dict[str, str]:
         if self.node_selector:
-            return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
+            if isinstance(self.node_selector, dict):
+                return self.node_selector
+            else:
+                warn(
+                    "node_selector `str` will be deprecated in next release, pass `dict` instead",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
+
         elif self.node_selector_labels:
             return self.node_selector_labels
+
         else:
             return {}
 
