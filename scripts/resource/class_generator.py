@@ -219,8 +219,8 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
     is_flag=True,
     help="""
     \b
-    Indicate if the resource is nemaspaced or not.
-        Get it by:  `oc api-resources --namespaced | grep <KIND>`
+    Indicate if the resource is nemaspaced.
+        Get it by: `oc api-resources --namespaced | grep -w <KIND>`
     """,
 )
 @click.option(
@@ -231,7 +231,7 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
     callback=validate_api_link_schema,
     help="A link to the resource doc/api in the web",
 )
-@click.option("-v", "--verbose", is_flag=True, help="Pass flag to enable debug logs")
+@click.option("-v", "--verbose", is_flag=True, help="Enable debug logs")
 def main(file, namespaced, api_link, verbose):
     LOGGER.setLevel("DEBUG" if verbose else "INFO")
 
