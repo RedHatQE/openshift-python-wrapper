@@ -9,6 +9,9 @@ class SriovNetworkNodeState(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.SRIOVNETWORK_OPENSHIFT_IO
 
+    class SyncStatus:
+        IN_PROGRESS: str = "InProgress"
+
     @property
     def interfaces(self):
         return self.instance.status.interfaces
