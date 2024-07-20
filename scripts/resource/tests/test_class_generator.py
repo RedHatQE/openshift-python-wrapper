@@ -1,6 +1,6 @@
 from scripts.resource.class_generator import (
     generate_resource_file_from_dict,
-    resource_from_explain_file,
+    parse_explain_file,
 )
 from deepdiff import DeepDiff
 import filecmp
@@ -77,12 +77,12 @@ DEPLOYMENT_RES = {
 
 def test_resource_from_explain_file(tmp_path_factory):
     manifests_path = "scripts/resource/tests/manifests"
-    pod_dict = resource_from_explain_file(
+    pod_dict = parse_explain_file(
         file=f"{manifests_path}/pod.explain",
         namespaced=False,
         api_link="https://pod.explain",
     )
-    deployment_dict = resource_from_explain_file(
+    deployment_dict = parse_explain_file(
         file=f"{manifests_path}/deployment.explain",
         namespaced=True,
         api_link="https://deployment.explain",

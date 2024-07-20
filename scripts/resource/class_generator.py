@@ -99,7 +99,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
     return output_file
 
 
-def resource_from_explain_file(file: str, namespaced: bool, api_link: str) -> Dict[str, Any]:
+def parse_explain_file(file: str, namespaced: bool, api_link: str) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
     resource_dict: Dict[str, Any] = {
@@ -235,7 +235,7 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
 def main(file, namespaced, api_link, verbose):
     LOGGER.setLevel("DEBUG" if verbose else "INFO")
 
-    resource_dict = resource_from_explain_file(file=file, namespaced=namespaced, api_link=api_link)
+    resource_dict = parse_explain_file(file=file, namespaced=namespaced, api_link=api_link)
     generate_resource_file_from_dict(resource_dict=resource_dict)
     run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
 

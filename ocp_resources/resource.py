@@ -1,7 +1,6 @@
 from __future__ import annotations
 from collections.abc import Callable, Generator
 import contextlib
-from warnings import warn
 
 import copy
 import json
@@ -462,22 +461,7 @@ class Resource:
         )
 
     def _prepare_node_selector_spec(self) -> Dict[str, str]:
-        if self.node_selector:
-            if isinstance(self.node_selector, dict):
-                return self.node_selector
-            else:
-                warn(
-                    "node_selector `str` will be deprecated in next release, pass `dict` instead",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
-
-        elif self.node_selector_labels:
-            return self.node_selector_labels
-
-        else:
-            return {}
+        return self.node_selector or self.node_selector_labels or {}
 
     @ClassProperty
     def kind(cls) -> Optional[str]:  # noqa: N805
