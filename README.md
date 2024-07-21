@@ -8,7 +8,11 @@ It standardizes how to work with cluster resources and offers unified resource C
 The wrapper also provides additional capabilities, such as resource-specific functionality that otherwise needs to be implemented by users.  
 The wrapper makes code easier to read and maintain over time.
 
-One example of simplified usage is interacting with a container. Running a command inside a container requires using Kubernetes stream, handling errors, and more. The wrapper handles it all and provides simple and intuitive functionality.
+One example of simplified usage is interacting with a container.  
+Running a command inside a container requires using Kubernetes stream, handling errors, and more.  
+The wrapper handles it all and provides simple and intuitive functionality.
+
+![Alt Text](examples/pod_example.gif)
 
 ## Installation
 From source:
