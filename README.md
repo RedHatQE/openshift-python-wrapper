@@ -1,7 +1,14 @@
-# openshift-python-wrapper
+# openshift-python-wrapper (`wrapper`)
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
-A python wrapper for [kubernetes-python-client](https://github.com/kubernetes-client/python) with support for RedHat Container Virtualization. ([Openshift Virtualization](https://www.openshift.com/learn/topics/virtualization))
+A python wrapper for [kubernetes-python-client](https://github.com/kubernetes-client/python) with support for [RedHat Container Virtualization](https://www.openshift.com/learn/topics/virtualization)  
 Docs: [openshift-python-wrapper docs](https://openshift-python-wrapper.readthedocs.io/en/latest/)
+
+The wrapper offers a simple and intuitive interface for interacting with the API.  
+It standardizes how to work with cluster resources and offers unified resource CRUD (Create, Read, Update, and Delete) flows.  
+The wrapper also provides additional capabilities, such as resource-specific functionality that otherwise needs to be implemented by users.  
+The wrapper makes code easier to read and maintain over time.
+
+One example of simplified usage is interacting with a container. Running a command inside a container requires using Kubernetes stream, handling errors, and more. The wrapper handles it all and provides simple and intuitive functionality.
 
 ## Installation
 From source:
@@ -55,7 +62,7 @@ We use pre-commit for code check.
 pre-commit install
 ```
 
-Some code examples locate at `examples` directory
+Some code examples locate at [examples](examples) directory
 
 ## Contribute to the project
 To contribute new additions or changes to the project, please refer to the [contribution guide](CONTRIBUTING.md) first.
