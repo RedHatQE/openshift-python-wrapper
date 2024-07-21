@@ -81,7 +81,29 @@ def format_resource_kind(resource_kind: str) -> str:
     return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
-def get_arg_params(field: str) -> Dict[str, Any]:
+def get_field_description(kind: str, field_name: str, field_under_spec: bool) -> str:
+    _, _out, _ = run_command(
+        command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
+        check=False,
+        verify_stderr=False,
+    )
+    _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
+    if _description:
+        description: str = ""
+        indent: int = 0
+        for line in _description.group(1).strip().splitlines():
+            if line.strip():
+                description += f"{' ' * indent}{line}\n"
+            else:
+                indent = indent + 4
+                description += f"{' ' * indent}{line}\n"
+
+        return f"{description}\n"
+
+    return "<please add description>"
+
+
+def get_arg_params(field: str, kind: str, field_under_spec: bool = False, use_cluster: bool = False) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
@@ -107,13 +129,18 @@ def get_arg_params(field: str) -> Dict[str, Any]:
     if type_from_dict == "int":
         type_from_dict_for_init = "Optional[int] = None"
 
-    return {
+    _res: Dict[str, Any] = {
         "name-from-explain": _orig_name,
         "name-for-class-arg": name,
         "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
         "required": required,
         "type": type_from_dict,
+        "description": "<please add description>",
     }
+
+    if use_cluster:
+        _res["description"] = get_field_description(kind=kind, field_name=_orig_name, field_under_spec=field_under_spec)
+    return _res
 
 
 def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="ocp_resources") -> str:
@@ -152,7 +179,11 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
 
 
 def parse_explain(
-    api_link: str, file: Optional[str] = "", output: Optional[str] = "", namespaced: Optional[bool] = None
+    api_link: str,
+    use_cluster: bool = False,
+    file: Optional[str] = "",
+    output: Optional[str] = "",
+    namespaced: Optional[bool] = None,
 ) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
@@ -202,6 +233,7 @@ def parse_explain(
         key, val = section.split(":")
         resource_dict[key.strip()] = val.strip()
 
+    kind = resource_dict["KIND"]
     keys_to_ignore = ["metadata", "kind", "apiVersion", "status"]
     resource_dict[SPEC_STR] = []
     resource_dict[FIELDS_STR] = []
@@ -223,13 +255,13 @@ def parse_explain(
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
             if not ignored_field and not start_spec_field:
-                resource_dict[FIELDS_STR].append(get_arg_params(field=field))
+                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, use_cluster=use_cluster))
 
             continue
         else:
             if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
                 if not ignored_field and not start_spec_field:
-                    resource_dict[FIELDS_STR].append(get_arg_params(field=field))
+                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, use_cluster=use_cluster))
 
         if start_spec_field:
             first_field_spec_found = True
@@ -239,7 +271,9 @@ def parse_explain(
         if field_spec_found:
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
-                    resource_dict[SPEC_STR].append(get_arg_params(field=field))
+                    resource_dict[SPEC_STR].append(
+                        get_arg_params(field=field, kind=kind, field_under_spec=True, use_cluster=use_cluster)
+                    )
 
                     # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
@@ -250,14 +284,16 @@ def parse_explain(
                 if top_spec_indent_str:
                     # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict[SPEC_STR].append(get_arg_params(field=field))
+                        resource_dict[SPEC_STR].append(
+                            get_arg_params(field=field, kind=kind, field_under_spec=True, use_cluster=use_cluster)
+                        )
                         continue
 
             else:
                 break
 
     if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
-        LOGGER.error(f"Unable to parse {resource_dict['KIND']} resource.")
+        LOGGER.error(f"Unable to parse {kind} resource.")
         return {}
 
     LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
@@ -327,6 +363,7 @@ def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool) -
     if kind:
         if namespaced:
             LOGGER.warning("`--namespaced` is ignored when `--kind` is provided.")
+
         explain_output = get_kind_data(kind=kind)
         if not explain_output:
             LOGGER.error("Kind not found")
@@ -335,7 +372,9 @@ def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool) -
         namespaced = explain_output["namespaced"]
         kind_data = explain_output["data"]
 
-    resource_dict = parse_explain(file=file, output=kind_data, namespaced=namespaced, api_link=api_link)
+    resource_dict = parse_explain(
+        file=file, output=kind_data, namespaced=namespaced, api_link=api_link, use_cluster=bool(kind)
+    )
     if not resource_dict:
         return
 

@@ -18,6 +18,7 @@ POD_RES = {
             "type-for-class-arg": "active_deadline_seconds: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "affinity",
@@ -25,6 +26,7 @@ POD_RES = {
             "type-for-class-arg": "affinity: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "automountServiceAccountToken",
@@ -32,6 +34,7 @@ POD_RES = {
             "type-for-class-arg": "automount_service_account_token: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "containers",
@@ -39,6 +42,7 @@ POD_RES = {
             "type-for-class-arg": "containers: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "dnsConfig",
@@ -46,6 +50,7 @@ POD_RES = {
             "type-for-class-arg": "dns_config: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "dnsPolicy",
@@ -53,6 +58,7 @@ POD_RES = {
             "type-for-class-arg": 'dns_policy: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "enableServiceLinks",
@@ -60,6 +66,7 @@ POD_RES = {
             "type-for-class-arg": "enable_service_links: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "ephemeralContainers",
@@ -67,6 +74,7 @@ POD_RES = {
             "type-for-class-arg": "ephemeral_containers: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "hostAliases",
@@ -74,6 +82,7 @@ POD_RES = {
             "type-for-class-arg": "host_aliases: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "hostIPC",
@@ -81,6 +90,7 @@ POD_RES = {
             "type-for-class-arg": "host_ipc: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "hostNetwork",
@@ -88,6 +98,7 @@ POD_RES = {
             "type-for-class-arg": "host_network: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "hostPID",
@@ -95,6 +106,7 @@ POD_RES = {
             "type-for-class-arg": "host_pid: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "hostUsers",
@@ -102,6 +114,7 @@ POD_RES = {
             "type-for-class-arg": "host_users: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "hostname",
@@ -109,6 +122,7 @@ POD_RES = {
             "type-for-class-arg": 'hostname: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "imagePullSecrets",
@@ -116,6 +130,7 @@ POD_RES = {
             "type-for-class-arg": "image_pull_secrets: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "initContainers",
@@ -123,6 +138,7 @@ POD_RES = {
             "type-for-class-arg": "init_containers: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "nodeName",
@@ -130,6 +146,7 @@ POD_RES = {
             "type-for-class-arg": 'node_name: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "nodeSelector",
@@ -137,6 +154,7 @@ POD_RES = {
             "type-for-class-arg": "node_selector: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "os",
@@ -144,6 +162,7 @@ POD_RES = {
             "type-for-class-arg": "os: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "overhead",
@@ -151,6 +170,7 @@ POD_RES = {
             "type-for-class-arg": "overhead: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "preemptionPolicy",
@@ -158,6 +178,7 @@ POD_RES = {
             "type-for-class-arg": 'preemption_policy: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "priority",
@@ -165,6 +186,7 @@ POD_RES = {
             "type-for-class-arg": "priority: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "priorityClassName",
@@ -172,6 +194,7 @@ POD_RES = {
             "type-for-class-arg": 'priority_class_name: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "readinessGates",
@@ -179,6 +202,7 @@ POD_RES = {
             "type-for-class-arg": "readiness_gates: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "resourceClaims",
@@ -186,6 +210,7 @@ POD_RES = {
             "type-for-class-arg": "resource_claims: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "restartPolicy",
@@ -193,6 +218,7 @@ POD_RES = {
             "type-for-class-arg": 'restart_policy: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "runtimeClassName",
@@ -200,6 +226,7 @@ POD_RES = {
             "type-for-class-arg": 'runtime_class_name: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "schedulerName",
@@ -207,6 +234,7 @@ POD_RES = {
             "type-for-class-arg": 'scheduler_name: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "schedulingGates",
@@ -214,6 +242,7 @@ POD_RES = {
             "type-for-class-arg": "scheduling_gates: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "securityContext",
@@ -221,6 +250,7 @@ POD_RES = {
             "type-for-class-arg": "security_context: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "serviceAccount",
@@ -228,6 +258,7 @@ POD_RES = {
             "type-for-class-arg": 'service_account: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "serviceAccountName",
@@ -235,6 +266,7 @@ POD_RES = {
             "type-for-class-arg": 'service_account_name: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "setHostnameAsFQDN",
@@ -242,6 +274,7 @@ POD_RES = {
             "type-for-class-arg": "set_hostname_as_fqdn: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "shareProcessNamespace",
@@ -249,6 +282,7 @@ POD_RES = {
             "type-for-class-arg": "share_process_namespace: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "subdomain",
@@ -256,6 +290,7 @@ POD_RES = {
             "type-for-class-arg": 'subdomain: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "terminationGracePeriodSeconds",
@@ -263,6 +298,7 @@ POD_RES = {
             "type-for-class-arg": "termination_grace_period_seconds: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "tolerations",
@@ -270,6 +306,7 @@ POD_RES = {
             "type-for-class-arg": "tolerations: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "topologySpreadConstraints",
@@ -277,6 +314,7 @@ POD_RES = {
             "type-for-class-arg": "topology_spread_constraints: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "volumes",
@@ -284,6 +322,7 @@ POD_RES = {
             "type-for-class-arg": "volumes: Optional[List[Any]] = None",
             "required": False,
             "type": "List[Any]",
+            "description": "<please add description>",
         },
     ],
     "FIELDS": [],
@@ -304,6 +343,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "min_ready_seconds: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "paused",
@@ -311,6 +351,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "paused: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "progressDeadlineSeconds",
@@ -318,6 +359,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "progress_deadline_seconds: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "replicas",
@@ -325,6 +367,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "replicas: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "revisionHistoryLimit",
@@ -332,6 +375,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "revision_history_limit: Optional[int] = None",
             "required": False,
             "type": "int",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "selector",
@@ -339,6 +383,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "selector: Optional[Dict[str, Any]] = None",
             "required": True,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "strategy",
@@ -346,6 +391,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "strategy: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "template",
@@ -353,6 +399,7 @@ DEPLOYMENT_RES = {
             "type-for-class-arg": "template: Optional[Dict[str, Any]] = None",
             "required": True,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
     ],
     "FIELDS": [],
@@ -372,6 +419,7 @@ SECRET_RES = {
             "type-for-class-arg": "data: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "immutable",
@@ -379,6 +427,7 @@ SECRET_RES = {
             "type-for-class-arg": "immutable: Optional[bool] = None",
             "required": False,
             "type": "bool",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "stringData",
@@ -386,6 +435,7 @@ SECRET_RES = {
             "type-for-class-arg": "string_data: Optional[Dict[str, Any]] = None",
             "required": False,
             "type": "Dict[Any, Any]",
+            "description": "<please add description>",
         },
         {
             "name-from-explain": "type",
@@ -393,6 +443,7 @@ SECRET_RES = {
             "type-for-class-arg": 'type: Optional[str] = ""',
             "required": False,
             "type": "str",
+            "description": "<please add description>",
         },
     ],
 }
