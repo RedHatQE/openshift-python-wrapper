@@ -27,14 +27,14 @@ class Deployment(NamespacedResource):
     ) -> None:
         """
         Args:
-            selector (Dict[Any, Any]): <please add description>
-            template (Dict[Any, Any]): <please add description>
-            min_ready_seconds (int): <please add description>
-            paused (bool): <please add description>
-            progress_deadline_seconds (int): <please add description>
-            replicas (int): <please add description>
-            revision_history_limit (int): <please add description>
-            strategy (Dict[Any, Any]): <please add description>
+            min_ready_seconds(int): <please add description>
+            paused(bool): <please add description>
+            progress_deadline_seconds(int): <please add description>
+            replicas(int): <please add description>
+            revision_history_limit(int): <please add description>
+            selector(Dict[Any, Any]): <please add description>
+            strategy(Dict[Any, Any]): <please add description>
+            template(Dict[Any, Any]): <please add description>
         """
         super().__init__(**kwargs)
 
@@ -60,18 +60,23 @@ class Deployment(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            _spec["selector"] = self.selector
-            _spec["template"] = self.template
+            self.res["selector"] = self.selector
+            self.res["template"] = self.template
 
             if self.min_ready_seconds:
-                _spec["min_ready_seconds"] = self.min_ready_seconds
+                self.res["minReadySeconds"] = self.min_ready_seconds
+
             if self.paused is not None:
-                _spec["paused"] = self.paused
+                self.res["paused"] = self.paused
+
             if self.progress_deadline_seconds:
-                _spec["progress_deadline_seconds"] = self.progress_deadline_seconds
+                self.res["progressDeadlineSeconds"] = self.progress_deadline_seconds
+
             if self.replicas:
-                _spec["replicas"] = self.replicas
+                self.res["replicas"] = self.replicas
+
             if self.revision_history_limit:
-                _spec["revision_history_limit"] = self.revision_history_limit
+                self.res["revisionHistoryLimit"] = self.revision_history_limit
+
             if self.strategy:
-                _spec["strategy"] = self.strategy
+                self.res["strategy"] = self.strategy

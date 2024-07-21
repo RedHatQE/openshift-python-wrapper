@@ -61,8 +61,13 @@ def get_kind_data(kind: str) -> Dict[str, Any]:
         LOGGER.error(f"Failed to get explain for {kind}, error: {explain_err}")
         return {}
 
+    resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
+    if not resource_kind:
+        LOGGER.error(f"Failed to get resource kind from explain for {kind}")
+        return {}
+
     _, namespace_out, _ = run_command(
-        command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {kind} | wc -l'"),
+        command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind.group(1)} | wc -l'"),
         check=False,
     )
     if namespace_out.strip() == "1":
@@ -197,7 +202,7 @@ def parse_explain(
         key, val = section.split(":")
         resource_dict[key.strip()] = val.strip()
 
-    keys_to_ignore = ("metadata", "kind", "apiVersion", "status")
+    keys_to_ignore = ["metadata", "kind", "apiVersion", "status"]
     resource_dict[SPEC_STR] = []
     resource_dict[FIELDS_STR] = []
     first_field_indent: int = 0
@@ -211,20 +216,22 @@ def parse_explain(
         if field.startswith(f"{FIELDS_STR}:"):
             continue
 
+        start_spec_field = field.startswith(f"{first_field_indent_str}{SPEC_STR.lower()}")
+        ignored_field = field.split()[0] in keys_to_ignore
         # Find first indent of spec, Needed in order to now when spec is done.
         if not first_field_indent:
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
-            if field.split()[0] not in keys_to_ignore:
+            if not ignored_field and not start_spec_field:
                 resource_dict[FIELDS_STR].append(get_arg_params(field=field))
 
             continue
         else:
             if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
-                if field.split()[0] not in keys_to_ignore:
+                if not ignored_field and not start_spec_field:
                     resource_dict[FIELDS_STR].append(get_arg_params(field=field))
 
-        if field.startswith(f"{first_field_indent_str}{SPEC_STR.lower()}"):
+        if start_spec_field:
             first_field_spec_found = True
             field_spec_found = True
             continue
@@ -249,7 +256,7 @@ def parse_explain(
             else:
                 break
 
-    if not resource_dict[SPEC_STR] or not resource_dict[FIELDS_STR]:
+    if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
         LOGGER.error(f"Unable to parse {resource_dict['KIND']} resource.")
         return {}
 
@@ -318,6 +325,8 @@ def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool) -
         return
 
     if kind:
+        if namespaced:
+            LOGGER.warning("`--namespaced` is ignored when `--kind` is provided.")
         explain_output = get_kind_data(kind=kind)
         if not explain_output:
             LOGGER.error("Kind not found")

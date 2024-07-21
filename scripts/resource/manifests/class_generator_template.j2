@@ -1,11 +1,15 @@
-{% set attrs_with_type = [] %}
-{% set required_attrs = [] %}
-{% set required_attrs_with_type = [] %}
-{% set optional_attrs_with_type = [] %}
-{% for attr in SPEC %}
-  {% set _ = attrs_with_type.append(attr[1]|safe) %}
-  {% set _ = required_attrs.append(attr[0]) if attr[2] == True %}
-  {% set _ = required_attrs_with_type.append((attr[0], attr[3])) if attr[2] == True else optional_attrs_with_type.append((attr[0], attr[3])) %}
+{% set all_types_for_class_args = [] %}
+{% set all_names_types_for_docstring = [] %}
+{% set all_required_args = [] %}
+{% for arg in FIELDS %}
+  {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
+  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type"] + "): <please add description>"|safe ) %}
+  {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
+{% endfor %}
+{% for arg in SPEC %}
+  {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
+  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type"] + "): <please add description>"|safe ) %}
+  {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
@@ -28,19 +32,19 @@ class {{ KIND }}({{ BASE_CLASS }}):
 
     def __init__(
         self,
-        {{ attrs_with_type|join(",\n        ") }},
+        {{ all_types_for_class_args|join(",\n        ") }},
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            {% for attr in required_attrs_with_type + optional_attrs_with_type %}
-            {{ attr[0] }} ({{ attr[1]}}): <please add description>
+            {% for value in all_names_types_for_docstring %}
+            {{ value }}
             {% endfor %}
         """
         super().__init__(**kwargs)
 
-        {% for attr in SPEC %}
-        self.{{ attr[0] }} = {{ attr[0] }}
+        {% for arg in FIELDS + SPEC %}
+        self.{{ arg["name-for-class-arg"] }} = {{ arg["name-for-class-arg"] }}
         {% endfor %}
 
     def to_dict(self) -> None:
@@ -48,19 +52,26 @@ class {{ KIND }}({{ BASE_CLASS }}):
         super().to_dict()
 
         if not self.yaml_file:
-          {% if required_attrs %}
-            if not all([{% for attr in required_attrs %}self.{{ attr }}, {% endfor %}]):
-                raise MissingRequiredArgumentError(argument="{{ required_attrs|join(', ') }}")
+          {% if all_required_args %}
+            if not all([{% for arg in all_required_args %}self.{{ arg }},{% endfor %}]):
+                raise MissingRequiredArgumentError(argument="{{ all_required_args|join(', ') }}")
           {% endif %}
 
+          {% if SPEC %}
             self.res["spec"] = {}
             _spec = self.res["spec"]
+          {% endif %}
 
-            {% for attr in required_attrs %}
-            _spec["{{ attr }}"] = self.{{ attr }}
-            {% endfor %}
+          {% for arg in FIELDS + SPEC %}
+          {% if arg["required"] == True %}
+            self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+          {% endif %}
+          {% endfor %}
 
-            {% for attr in optional_attrs_with_type %}
-            if self.{{ attr[0] }}{% if attr[1] == "bool" %} is not None{% endif %}:
-                _spec["{{ attr[0] }}"] = self.{{ attr[0] }}
-            {% endfor %}
+          {% for arg in FIELDS + SPEC %}
+          {% if arg["required"] == False %}
+            if self.{{ arg["name-for-class-arg"] }}{% if arg["type"] == "bool" %} is not None{% endif %}:
+              self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+
+          {% endif %}
+          {% endfor %}
