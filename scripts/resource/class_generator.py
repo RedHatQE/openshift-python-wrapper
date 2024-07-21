@@ -73,11 +73,11 @@ def format_resource_kind(resource_kind: str) -> str:
     return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
-def get_spec_arg_params(field: str) -> Tuple[str, str, bool, str]:
+def get_arg_params(field: str) -> Dict[str, Any]:
     splited_field = field.split()
-    _name, _type = splited_field[0], splited_field[1]
+    _orig_name, _type = splited_field[0], splited_field[1]
 
-    name = format_resource_kind(resource_kind=_name)
+    name = format_resource_kind(resource_kind=_orig_name)
     type_ = _type.strip()
     required: bool = "-required-" in splited_field
     type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
@@ -99,12 +99,13 @@ def get_spec_arg_params(field: str) -> Tuple[str, str, bool, str]:
     if type_from_dict == "int":
         type_from_dict_for_init = "Optional[int] = None"
 
-    return (
-        name,
-        f"{name}: {type_from_dict_for_init}",
-        required,
-        type_from_dict,
-    )
+    return {
+        "name-from-explain": _orig_name,
+        "name-for-class-arg": name,
+        "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
+        "required": required,
+        "type": type_from_dict,
+    }
 
 
 def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="ocp_resources") -> str:
@@ -193,7 +194,9 @@ def parse_explain(
         key, val = section.split(":")
         resource_dict[key.strip()] = val.strip()
 
+    keys_to_ignore = ("metadata", "kind", "apiVersion", "status")
     resource_dict["SPEC"] = []
+    resource_dict["FIELDS"] = []
     first_field_indent: int = 0
     first_field_indent_str: str = ""
     top_spec_indent: int = 0
@@ -209,7 +212,14 @@ def parse_explain(
         if not first_field_indent:
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
+            if field.split()[0] not in keys_to_ignore:
+                resource_dict["FIELDS"].append(get_arg_params(field=field))
+
             continue
+        else:
+            if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
+                if field.split()[0] not in keys_to_ignore:
+                    resource_dict["FIELDS"].append(get_arg_params(field=field))
 
         if field.startswith(f"{first_field_indent_str}spec"):
             first_field_spec_found = True
@@ -219,7 +229,7 @@ def parse_explain(
         if field_spec_found:
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
-                    resource_dict["SPEC"].append(get_spec_arg_params(field=field))
+                    resource_dict["SPEC"].append(get_arg_params(field=field))
 
                     # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
@@ -230,19 +240,17 @@ def parse_explain(
                 if top_spec_indent_str:
                     # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict["SPEC"].append(get_spec_arg_params(field=field))
+                        resource_dict["SPEC"].append(get_arg_params(field=field))
                         continue
 
             else:
                 break
 
-    if not resource_dict["SPEC"]:
-        LOGGER.error(
-            f"Unable to parse spec in {resource_dict['KIND']} resource. (Kind without `spec` is not supported)"
-        )
+    if not resource_dict["SPEC"] or not resource_dict["FIELDS"]:
+        LOGGER.error(f"Unable to parse {resource_dict['KIND']} resource.")
         return {}
 
-    resource_dict["SPEC"].sort(key=lambda x: not x[-1])
+    __import__("ipdb").set_trace()
     LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
 
     if api_group_real_name := resource_dict.get("GROUP"):
