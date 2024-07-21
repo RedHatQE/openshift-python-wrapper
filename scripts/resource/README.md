@@ -42,4 +42,4 @@ poetry run python scripts/resource/class_generator.py --file deployment.txt --na
 
 ### Limitations
 
-The script only work on Kind that have `spec`, for example, Kind like `secret` will not work
+The script only work on Kind that have `spec`, for example, Kind like `Secret` and `ConfigMap` will not work.
