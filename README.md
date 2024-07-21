@@ -14,6 +14,16 @@ The wrapper handles it all and provides simple and intuitive functionality.
 
 ![Alt Text](examples/pod_example.gif)
 
+Both developers or testers can use the wrapper.  The code is modular and easy to maintain.  
+Instead of writing custom code for every API, you can use the wrapper that provides a consistent interface for interacting with APIs.  
+It saves time, avoids code duplications, and reduces the chance of errors.
+
+Using Python capabilities, context managers can provide out-of-the-box resource creation and deletion,  
+and inheritance can be used to extend functionality for specific use cases.  
+Pytest fixtures can utilize the code for setup and teardown, leaving no leftovers.  
+Resources can even be saved for debugging.  
+Resource manifests and logs can be easily collected.
+
 ## Installation
 From source:
 ```bash
