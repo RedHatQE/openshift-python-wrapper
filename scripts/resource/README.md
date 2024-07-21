@@ -39,7 +39,3 @@ poetry run python scripts/resource/class_generator.py --file deployment.txt --na
 ```
 
 - Pass --namespaced only if the resource is a namespaced resource
-
-### Limitations
-
-The script only work on Kind that have `spec`, for example, Kind like `Secret` and `ConfigMap` will not work.
