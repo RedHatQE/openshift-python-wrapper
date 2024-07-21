@@ -236,6 +236,12 @@ def parse_explain(
             else:
                 break
 
+    if not resource_dict["SPEC"]:
+        LOGGER.error(
+            f"Unable to parse spec in {resource_dict['KIND']} resource. (Kind without `spec` is not supported)"
+        )
+        return {}
+
     resource_dict["SPEC"].sort(key=lambda x: not x[-1])
     LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
 
@@ -311,6 +317,9 @@ def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool) -
         kind_data = explain_output["data"]
 
     resource_dict = parse_explain(file=file, output=kind_data, namespaced=namespaced, api_link=api_link)
+    if not resource_dict:
+        return
+
     generate_resource_file_from_dict(resource_dict=resource_dict)
     run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
 
