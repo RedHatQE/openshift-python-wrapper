@@ -1,14 +1,9 @@
 {% set all_types_for_class_args = [] %}
 {% set all_names_types_for_docstring = [] %}
 {% set all_required_args = [] %}
-{% for arg in FIELDS %}
+{% for arg in FIELDS + SPEC %}
   {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
   {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type"] + "): " +  arg["description"]|indent(10)|safe ) %}
-  {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
-{% endfor %}
-{% for arg in SPEC %}
-  {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
-  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type"] + "): " + arg["description"]|indent(10)|safe) %}
   {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
@@ -38,8 +33,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
         """
         Args:
             {% for value in all_names_types_for_docstring %}
-            {{ value }}
-            {% endfor %}
+            {{ value }}{% endfor %}
         """
         super().__init__(**kwargs)
 
