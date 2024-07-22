@@ -163,10 +163,13 @@ def generate_resource_file_from_dict(
 
     temp_output_file: str = ""
     output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
-    if os.path.exists(output_file) and not overwrite:
-        temp_output_file = f"{output_file[:-3]}_TEMP.py"
-        LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
-        output_file = temp_output_file
+    if os.path.exists(output_file):
+        if overwrite:
+            LOGGER.warning(f"Overwriting {output_file}")
+        else:
+            temp_output_file = f"{output_file[:-3]}_TEMP.py"
+            LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
+            output_file = temp_output_file
 
     with open(output_file, "w") as fd:
         fd.write(rendered)
