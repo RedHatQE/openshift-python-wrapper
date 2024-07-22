@@ -24,11 +24,7 @@ class Secret(NamespacedResource):
     ) -> None:
         """
         Args:
-            data(Dict[Any, Any]): <please add description>
-            immutable(bool): <please add description>
-            string_data(Dict[Any, Any]): <please add description>
-            type(str): <please add description>
-        """
+            data(Dict[Any, Any]): <please add description>            immutable(bool): <please add description>            string_data(Dict[Any, Any]): <please add description>            type(str): <please add description>"""
         super().__init__(**kwargs)
 
         self.data = data

@@ -27,15 +27,7 @@ class Deployment(NamespacedResource):
     ) -> None:
         """
         Args:
-            min_ready_seconds(int): <please add description>
-            paused(bool): <please add description>
-            progress_deadline_seconds(int): <please add description>
-            replicas(int): <please add description>
-            revision_history_limit(int): <please add description>
-            selector(Dict[Any, Any]): <please add description>
-            strategy(Dict[Any, Any]): <please add description>
-            template(Dict[Any, Any]): <please add description>
-        """
+            min_ready_seconds(int): <please add description>            paused(bool): <please add description>            progress_deadline_seconds(int): <please add description>            replicas(int): <please add description>            revision_history_limit(int): <please add description>            selector(Dict[Any, Any]): <please add description>            strategy(Dict[Any, Any]): <please add description>            template(Dict[Any, Any]): <please add description>"""
         super().__init__(**kwargs)
 
         self.min_ready_seconds = min_ready_seconds
