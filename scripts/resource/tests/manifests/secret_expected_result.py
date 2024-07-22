@@ -9,7 +9,7 @@ class Secret(NamespacedResource):
     Secret holds secret data of a certain type. The total bytes of the values in
     the Data field must be less than MaxSecretSize bytes.
 
-    API Link: https://secret.explain
+    API Link: https://example.explain
     """
 
     api_version: str = "v1"

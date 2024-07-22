@@ -8,7 +8,7 @@ class Deployment(NamespacedResource):
     """
     Deployment enables declarative updates for Pods and ReplicaSets.
 
-    API Link: https://deployment.explain
+    API Link: https://example.explain
     """
 
     api_group: str = NamespacedResource.ApiGroup.APPS
