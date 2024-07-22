@@ -33,8 +33,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
         """
         Args:
             {% for value in all_names_types_for_docstring %}
-            {{ value }}
-            {% endfor %}
+            {{ value }}{% endfor %}
         """
         super().__init__(**kwargs)
 

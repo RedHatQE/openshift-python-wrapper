@@ -143,7 +143,9 @@ def get_arg_params(field: str, kind: str, field_under_spec: bool = False, use_cl
     return _res
 
 
-def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="ocp_resources") -> str:
+def generate_resource_file_from_dict(
+    resource_dict: Dict[str, Any], output_dir="ocp_resources", overwrite: bool = False
+) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
         trim_blocks=True,
@@ -161,7 +163,7 @@ def generate_resource_file_from_dict(resource_dict: Dict[str, Any], output_dir="
 
     temp_output_file: str = ""
     output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
-    if os.path.exists(output_file):
+    if os.path.exists(output_file) and not overwrite:
         temp_output_file = f"{output_file[:-3]}_TEMP.py"
         LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
         output_file = temp_output_file
@@ -348,8 +350,14 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
     callback=validate_api_link_schema,
     help="A link to the resource doc/api in the web",
 )
+@click.option(
+    "-o",
+    "--overwrite",
+    is_flag=True,
+    help="Output file overwrite existing file if passed",
+)
 @click.option("-v", "--verbose", is_flag=True, help="Enable debug logs")
-def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool) -> None:
+def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool, overwrite: bool) -> None:
     """
     Generates a class for a given Kind.
     Either pass --file or --kind (When passing --kind a working cluster is required)
@@ -373,12 +381,16 @@ def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool) -
         kind_data = explain_output["data"]
 
     resource_dict = parse_explain(
-        file=file, output=kind_data, namespaced=namespaced, api_link=api_link, use_cluster=bool(kind)
+        file=file,
+        output=kind_data,
+        namespaced=namespaced,
+        api_link=api_link,
+        use_cluster=bool(kind),
     )
     if not resource_dict:
         return
 
-    generate_resource_file_from_dict(resource_dict=resource_dict)
+    generate_resource_file_from_dict(resource_dict=resource_dict, overwrite=overwrite)
     run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
 
 
