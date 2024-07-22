@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections.abc import Callable, Generator
 import contextlib
+
 import copy
 import json
 import os
@@ -364,7 +365,7 @@ class Resource:
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         dry_run: bool = False,
-        node_selector: str = "",
+        node_selector: Dict[str, Any] | None = None,
         node_selector_labels: Dict[str, str] | None = None,
         config_file: str = "",
         config_dict: Dict[str, Any] | None = None,
@@ -388,7 +389,7 @@ class Resource:
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
             dry_run (bool): dry run
-            node_selector (str): node selector
+            node_selector (dict): node selector
             node_selector_labels (str): node selector labels
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
@@ -460,12 +461,7 @@ class Resource:
         )
 
     def _prepare_node_selector_spec(self) -> Dict[str, str]:
-        if self.node_selector:
-            return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
-        elif self.node_selector_labels:
-            return self.node_selector_labels
-        else:
-            return {}
+        return self.node_selector or self.node_selector_labels or {}
 
     @ClassProperty
     def kind(cls) -> Optional[str]:  # noqa: N805

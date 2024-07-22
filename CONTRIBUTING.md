@@ -37,6 +37,12 @@ pre-commit install
 
 ## Adding a new module (resource)
 
+##### Using generator script
+
+- [class_generator README](scripts/resource/class_generator.py)
+
+##### Manual
+
 A new resource must follow rules:
 
 - A new file named as the resource under `ocp_resources`; If the resource name is composed of multiple words, separate them with an underscore.

@@ -1,0 +1,71 @@
+{% set all_types_for_class_args = [] %}
+{% set all_names_types_for_docstring = [] %}
+{% set all_required_args = [] %}
+{% for arg in FIELDS + SPEC %}
+  {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
+  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type"] + "): " +  arg["description"]|indent(10)|safe ) %}
+  {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
+{% endfor %}
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
+from typing import Any, Dict, List, Optional
+from ocp_resources.resource import {{ BASE_CLASS }}, MissingRequiredArgumentError
+
+
+class {{ KIND }}({{ BASE_CLASS }}):
+    """
+    {{ DESCRIPTION }}
+
+    API Link: {{ API_LINK }}
+    """
+
+    {% if GROUP %}
+    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP.upper() }}
+    {% else %}
+    api_version: str = "{{ VERSION }}"
+    {% endif %}
+
+    def __init__(
+        self,
+        {{ all_types_for_class_args|join(",\n        ") }},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Args:
+            {% for value in all_names_types_for_docstring %}
+            {{ value }}{% endfor %}
+        """
+        super().__init__(**kwargs)
+
+        {% for arg in FIELDS + SPEC %}
+        self.{{ arg["name-for-class-arg"] }} = {{ arg["name-for-class-arg"] }}
+        {% endfor %}
+
+    def to_dict(self) -> None:
+
+        super().to_dict()
+
+        if not self.yaml_file:
+          {% if all_required_args %}
+            if not all([{% for arg in all_required_args %}self.{{ arg }},{% endfor %}]):
+                raise MissingRequiredArgumentError(argument="{{ all_required_args|join(', ') }}")
+          {% endif %}
+
+          {% if SPEC %}
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+          {% endif %}
+
+          {% for arg in FIELDS + SPEC %}
+          {% if arg["required"] == True %}
+            self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+          {% endif %}
+          {% endfor %}
+
+          {% for arg in FIELDS + SPEC %}
+          {% if arg["required"] == False %}
+            if self.{{ arg["name-for-class-arg"] }}{% if arg["type"] == "bool" %} is not None{% endif %}:
+              self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+
+          {% endif %}
+          {% endfor %}
