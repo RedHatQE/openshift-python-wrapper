@@ -288,20 +288,24 @@ def parse_explain(
 
     LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
 
-    if (api_group_real_name := resource_dict.get("GROUP")) or (
-        api_group_real_name := resource_dict["VERSION"].split("/")[0]
-    ):
+    api_group_real_name = resource_dict.get("GROUP")
+    # If API Group is not present in resource, try to get it from VERSION
+    if not api_group_real_name and (api_group_match := re.match(r"(\w+)/", resource_dict["VERSION"])):
+        api_group_real_name = api_group_match.group(1)  # noqa FCN001
+
+    if api_group_real_name:
         api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
+        resource_dict["GROUP"] = api_group_for_resource_api_group
         missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
 
         if missing_api_group_in_resource:
             LOGGER.warning(
                 f"Missing API Group in Resource\n"
-                f"Please add `Resource.ApiGroup.{api_group_real_name} = {api_group_real_name}` "
+                f"Please add `Resource.ApiGroup.{api_group_for_resource_api_group} = {api_group_real_name}` "
                 "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
             )
 
-    if not api_group_real_name:
+    else:
         api_version_for_resource_api_version = resource_dict["VERSION"].upper()
         missing_api_version_in_resource: bool = not hasattr(Resource.ApiVersion, api_version_for_resource_api_version)
 
