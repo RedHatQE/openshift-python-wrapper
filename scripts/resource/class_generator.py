@@ -7,6 +7,7 @@ import click
 import re
 
 from pyhelper_utils.shell import run_command
+from rich.console import Console
 import yaml
 
 from rich.prompt import Prompt
@@ -135,7 +136,7 @@ def get_arg_params(field: str, kind: str, field_under_spec: bool = False) -> Dic
 
 
 def generate_resource_file_from_dict(
-    resource_dict: Dict[str, Any], output_dir="ocp_resources", overwrite: bool = False
+    resource_dict: Dict[str, Any], output_dir="ocp_resources", overwrite: bool = False, dry_run: bool = False
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
@@ -162,14 +163,18 @@ def generate_resource_file_from_dict(
             LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
             output_file = temp_output_file
 
-    with open(output_file, "w") as fd:
-        fd.write(rendered)
+    if dry_run:
+        Console().print(rendered)
 
-    for op in ("format", "check"):
-        run_command(
-            command=shlex.split(f"poetry run ruff {op} {output_file}"),
-            verify_stderr=False,
-        )
+    else:
+        with open(output_file, "w") as fd:
+            fd.write(rendered)
+
+        for op in ("format", "check"):
+            run_command(
+                command=shlex.split(f"poetry run ruff {op} {output_file}"),
+                verify_stderr=False,
+            )
 
     return output_file
 
@@ -336,7 +341,8 @@ def get_user_args_from_interactive() -> Tuple[str, str]:
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable debug logs")
 @click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
-def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: bool) -> None:
+@click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
+def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: bool, dry_run: bool) -> None:
     """
     Generates a class for a given Kind.
     """
@@ -374,8 +380,10 @@ def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: 
     if not resource_dict:
         return
 
-    generate_resource_file_from_dict(resource_dict=resource_dict, overwrite=overwrite)
-    run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
+    generate_resource_file_from_dict(resource_dict=resource_dict, overwrite=overwrite, dry_run=dry_run)
+
+    if not dry_run:
+        run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
 
 
 if __name__ == "__main__":
