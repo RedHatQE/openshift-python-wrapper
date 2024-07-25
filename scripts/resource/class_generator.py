@@ -9,6 +9,7 @@ import re
 from pyhelper_utils.shell import run_command
 import yaml
 
+from rich.prompt import Prompt
 from ocp_resources.resource import Resource
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
@@ -29,10 +30,10 @@ LOGGER = get_logger(name="class_generator")
 
 
 def get_oc_or_kubectl() -> str:
-    if os.system("which oc") == 0:
+    if run_command(command=shlex.split("which oc"))[0]:
         return "oc"
 
-    elif os.system("which kubectl") == 0:
+    elif run_command(command=shlex.split("which kubectl"))[0]:
         return "kubectl"
 
     else:
@@ -45,22 +46,14 @@ def check_cluster_available() -> bool:
     if not _exec:
         return False
 
-    return os.system(f"{_exec} version") == 0
+    return run_command(command=shlex.split(f"{_exec} version"))[0]
 
 
 def get_kind_data(kind: str) -> Dict[str, Any]:
     """
     Get oc/kubectl explain output for given kind and if kind is namespaced
     """
-    if not check_cluster_available():
-        LOGGER.error("Cluster not available")
-        return {}
-
-    explain_rc, explain_out, explain_err = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
-    if not explain_rc:
-        LOGGER.error(f"Failed to get explain for {kind}, error: {explain_err}")
-        return {}
-
+    _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
     if not resource_kind:
         LOGGER.error(f"Failed to get resource kind from explain for {kind}")
@@ -103,7 +96,7 @@ def get_field_description(kind: str, field_name: str, field_under_spec: bool) ->
     return "<please add description>"
 
 
-def get_arg_params(field: str, kind: str, field_under_spec: bool = False, use_cluster: bool = False) -> Dict[str, Any]:
+def get_arg_params(field: str, kind: str, field_under_spec: bool = False) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
@@ -135,11 +128,9 @@ def get_arg_params(field: str, kind: str, field_under_spec: bool = False, use_cl
         "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
         "required": required,
         "type": type_from_dict,
-        "description": "<please add description>",
+        "description": get_field_description(kind=kind, field_name=_orig_name, field_under_spec=field_under_spec),
     }
 
-    if use_cluster:
-        _res["description"] = get_field_description(kind=kind, field_name=_orig_name, field_under_spec=field_under_spec)
     return _res
 
 
@@ -185,9 +176,7 @@ def generate_resource_file_from_dict(
 
 def parse_explain(
     api_link: str,
-    use_cluster: bool = False,
-    file: Optional[str] = "",
-    output: Optional[str] = "",
+    output: str,
     namespaced: Optional[bool] = None,
 ) -> Dict[str, Any]:
     section_data: str = ""
@@ -198,17 +187,7 @@ def parse_explain(
     }
     new_sections_words: Tuple[str, str, str] = ("KIND:", "VERSION:", "GROUP:")
 
-    if file:
-        with open(file) as fd:
-            data = fd.read()
-    elif output:
-        data = output
-
-    else:
-        LOGGER.error("Provide file or output")
-        return {}
-
-    for line in data.splitlines():
+    for line in output.splitlines():
         # If line is empty section is done
         if not line.strip():
             if section_data:
@@ -260,13 +239,13 @@ def parse_explain(
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
             if not ignored_field and not start_spec_field:
-                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, use_cluster=use_cluster))
+                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind))
 
             continue
         else:
             if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
                 if not ignored_field and not start_spec_field:
-                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, use_cluster=use_cluster))
+                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind))
 
         if start_spec_field:
             first_field_spec_found = True
@@ -276,9 +255,7 @@ def parse_explain(
         if field_spec_found:
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
-                    resource_dict[SPEC_STR].append(
-                        get_arg_params(field=field, kind=kind, field_under_spec=True, use_cluster=use_cluster)
-                    )
+                    resource_dict[SPEC_STR].append(get_arg_params(field=field, kind=kind, field_under_spec=True))
 
                     # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
@@ -289,9 +266,7 @@ def parse_explain(
                 if top_spec_indent_str:
                     # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict[SPEC_STR].append(
-                            get_arg_params(field=field, kind=kind, field_under_spec=True, use_cluster=use_cluster)
-                        )
+                        resource_dict[SPEC_STR].append(get_arg_params(field=field, kind=kind, field_under_spec=True))
                         continue
 
             else:
@@ -315,20 +290,33 @@ def parse_explain(
     return resource_dict
 
 
-def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Parameter, value: Any) -> Any:
+def validate_api_link_schema(value: str) -> str:
     if not value.startswith("https://"):
         raise click.BadParameter("Resource API linkn must start with https://")
 
     return value
 
 
+def check_kind_exists(kind: str) -> bool:
+    return run_command(
+        command=shlex.split(f"oc explain {kind}"),
+        check=False,
+    )[0]
+
+
+def get_user_args_from_interactive() -> Tuple[str, str]:
+    kind = Prompt.ask(prompt="Enter the resource kind to generate class for")
+    if not kind:
+        return "", ""
+
+    api_link = Prompt.ask(prompt="Enter the resource API link")
+    if not api_link:
+        return "", ""
+
+    return kind, api_link
+
+
 @click.command("Resource class generator")
-@click.option(
-    "-f",
-    "--file",
-    type=click.Path(),
-    help="File containing the content of: `oc explain <KIND> --recursive`",
-)
 @click.option(
     "-k",
     "--kind",
@@ -336,21 +324,8 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
     help="The Kind to generate the class for, Needs working cluster with admin privileges",
 )
 @click.option(
-    "-ns",
-    "--namespaced",
-    is_flag=True,
-    help="""
-    \b
-    Indicate if the resource is nemaspaced.
-        Get it by: `oc api-resources --namespaced | grep -w <KIND>`
-    """,
-)
-@click.option(
     "-l",
     "--api-link",
-    required=True,
-    type=click.UNPROCESSED,
-    callback=validate_api_link_schema,
     help="A link to the resource doc/api in the web",
 )
 @click.option(
@@ -360,35 +335,41 @@ def validate_api_link_schema(ctx: click.Context, param: click.Option | click.Par
     help="Output file overwrite existing file if passed",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable debug logs")
-def main(file: str, kind: str, namespaced: bool, api_link: str, verbose: bool, overwrite: bool) -> None:
+@click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
+def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: bool) -> None:
     """
     Generates a class for a given Kind.
-    Either pass --file or --kind (When passing --kind a working cluster is required)
     """
-    kind_data: str = ""
     LOGGER.setLevel("DEBUG" if verbose else "INFO")
-    if file and kind:
-        LOGGER.error("Please pass either --file or --kind")
+    if not check_cluster_available():
+        LOGGER.error(
+            "Cluster not available, The script needs a running cluster and admin privileges to get the explain output"
+        )
         return
 
-    if kind:
-        if namespaced:
-            LOGGER.warning("`--namespaced` is ignored when `--kind` is provided.")
+    if interactive:
+        kind, api_link = get_user_args_from_interactive()
 
-        explain_output = get_kind_data(kind=kind)
-        if not explain_output:
-            LOGGER.error("Kind not found")
-            return
+    if not kind or not api_link:
+        LOGGER.error("Kind or API link not provided")
+        return
 
-        namespaced = explain_output["namespaced"]
-        kind_data = explain_output["data"]
+    validate_api_link_schema(value=api_link)
+
+    if not check_kind_exists(kind=kind):
+        return
+
+    explain_output = get_kind_data(kind=kind)
+    if not explain_output:
+        return
+
+    namespaced = explain_output["namespaced"]
+    kind_data = explain_output["data"]
 
     resource_dict = parse_explain(
-        file=file,
         output=kind_data,
         namespaced=namespaced,
         api_link=api_link,
-        use_cluster=bool(kind),
     )
     if not resource_dict:
         return
