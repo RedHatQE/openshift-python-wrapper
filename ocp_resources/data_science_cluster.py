@@ -20,7 +20,9 @@ class DataScienceCluster(Resource):
     ) -> None:
         """
         Args:
-            components(Dict[Any, Any]): Components of the DataScienceCluster"""
+            components(Dict[Any, Any]): Components of the DataScienceCluster
+        """
+
         super().__init__(**kwargs)
 
         self.components = components
