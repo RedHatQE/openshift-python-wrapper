@@ -84,12 +84,17 @@ def get_field_description(kind: str, field_name: str, field_under_spec: bool) ->
     _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
     if _description:
         description: str = ""
-        indent: int = 0
+        _fields_found = False
         for line in _description.group(1).strip().splitlines():
             if line.strip():
-                description += f"{' ' * indent}{line}\n"
+                if line.startswith("FIELDS:"):
+                    _fields_found = True
+                    description += f"{' ' * 4}{line}\n"
+                else:
+                    indent = 4 if _fields_found else 0
+                    description += f"{' ' * indent}{line}\n"
             else:
-                indent = indent + 4
+                indent = 8 if _fields_found else 4
                 description += f"{' ' * indent}{line}\n"
 
         return f"{description}\n"
