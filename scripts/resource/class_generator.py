@@ -290,8 +290,10 @@ def parse_explain(
 
     api_group_real_name = resource_dict.get("GROUP")
     # If API Group is not present in resource, try to get it from VERSION
-    if not api_group_real_name and (api_group_match := re.match(r"(\w+)/", resource_dict["VERSION"])):
-        api_group_real_name = api_group_match.group(1)  # noqa FCN001
+    if not api_group_real_name:
+        version_splited = resource_dict["VERSION"].split("/")
+        if len(version_splited) == 2:
+            api_group_real_name = version_splited[0]
 
     if api_group_real_name:
         api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
