@@ -6,6 +6,7 @@ from scripts.resource.tests.manifests.results import DATASCIENCECLUSTER, DEPLOYM
 MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
 
 
+# TODO: Fix tests to work without cluster
 @pytest.mark.parametrize(
     "explain_file, result_dict",
     (

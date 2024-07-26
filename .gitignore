@@ -123,3 +123,6 @@ local-cluster/_hco/
 node_modules/
 package.json
 package-lock.json
+
+# script generator
+*-debug.json

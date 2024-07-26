@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 import shlex
 import os
 
@@ -50,11 +51,26 @@ def check_cluster_available() -> bool:
     return run_command(command=shlex.split(f"{_exec} version"))[0]
 
 
-def get_kind_data(kind: str) -> Dict[str, Any]:
+def write_to_file(kind: str, data: Dict[str, Any]) -> None:
+    _file = f"{kind}-debug.json"
+    content = {}
+    if os.path.isfile(_file):
+        with open(_file) as fd:
+            content = json.load(fd)
+
+    content.update(data)
+    with open(_file, "w") as fd:
+        json.dump(content, fd, indent=4)
+
+
+def get_kind_data(kind: str, debug: bool = False) -> Dict[str, Any]:
     """
     Get oc/kubectl explain output for given kind and if kind is namespaced
     """
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
+    if debug:
+        write_to_file(kind=kind, data={"explain": explain_out})
+
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
     if not resource_kind:
         LOGGER.error(f"Failed to get resource kind from explain for {kind}")
@@ -64,6 +80,9 @@ def get_kind_data(kind: str) -> Dict[str, Any]:
         command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind.group(1)} | wc -l'"),
         check=False,
     )
+    if debug:
+        write_to_file(kind=kind, data={"namespace": namespace_out})
+
     if namespace_out.strip() == "1":
         return {"data": explain_out, "namespaced": True}
 
@@ -75,12 +94,15 @@ def format_resource_kind(resource_kind: str) -> str:
     return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
-def get_field_description(kind: str, field_name: str, field_under_spec: bool) -> str:
+def get_field_description(kind: str, field_name: str, field_under_spec: bool, debug: bool) -> str:
     _, _out, _ = run_command(
         command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
         check=False,
         verify_stderr=False,
     )
+    if debug:
+        write_to_file(kind=kind, data={f"explain-{field_name}": _out})
+
     _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
     if _description:
         description: str = ""
@@ -102,7 +124,7 @@ def get_field_description(kind: str, field_name: str, field_under_spec: bool) ->
     return "<please add description>"
 
 
-def get_arg_params(field: str, kind: str, field_under_spec: bool = False) -> Dict[str, Any]:
+def get_arg_params(field: str, kind: str, field_under_spec: bool = False, debug: bool = False) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
@@ -134,7 +156,9 @@ def get_arg_params(field: str, kind: str, field_under_spec: bool = False) -> Dic
         "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
         "required": required,
         "type": type_from_dict,
-        "description": get_field_description(kind=kind, field_name=_orig_name, field_under_spec=field_under_spec),
+        "description": get_field_description(
+            kind=kind, field_name=_orig_name, field_under_spec=field_under_spec, debug=debug
+        ),
     }
 
     return _res
@@ -188,6 +212,7 @@ def parse_explain(
     api_link: str,
     output: str,
     namespaced: Optional[bool] = None,
+    debug: bool = False,
 ) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
@@ -249,13 +274,13 @@ def parse_explain(
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
             if not ignored_field and not start_spec_field:
-                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind))
+                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, debug=debug))
 
             continue
         else:
             if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
                 if not ignored_field and not start_spec_field:
-                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind))
+                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, debug=debug))
 
         if start_spec_field:
             first_field_spec_found = True
@@ -265,7 +290,9 @@ def parse_explain(
         if field_spec_found:
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
-                    resource_dict[SPEC_STR].append(get_arg_params(field=field, kind=kind, field_under_spec=True))
+                    resource_dict[SPEC_STR].append(
+                        get_arg_params(field=field, kind=kind, field_under_spec=True, debug=debug)
+                    )
 
                     # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
@@ -276,7 +303,9 @@ def parse_explain(
                 if top_spec_indent_str:
                     # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict[SPEC_STR].append(get_arg_params(field=field, kind=kind, field_under_spec=True))
+                        resource_dict[SPEC_STR].append(
+                            get_arg_params(field=field, kind=kind, field_under_spec=True, debug=debug)
+                        )
                         continue
 
             else:
@@ -365,14 +394,13 @@ def get_user_args_from_interactive() -> Tuple[str, str]:
     is_flag=True,
     help="Output file overwrite existing file if passed",
 )
-@click.option("-v", "--verbose", is_flag=True, help="Enable debug logs")
+@click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
 @click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
 @click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
-def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: bool, dry_run: bool) -> None:
+def main(kind: str, api_link: str, overwrite: bool, interactive: bool, dry_run: bool, debug: bool) -> None:
     """
     Generates a class for a given Kind.
     """
-    LOGGER.setLevel("DEBUG" if verbose else "INFO")
     if not check_cluster_available():
         LOGGER.error(
             "Cluster not available, The script needs a running cluster and admin privileges to get the explain output"
@@ -391,7 +419,7 @@ def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: 
     if not check_kind_exists(kind=kind):
         return
 
-    explain_output = get_kind_data(kind=kind)
+    explain_output = get_kind_data(kind=kind, debug=debug)
     if not explain_output:
         return
 
@@ -402,6 +430,7 @@ def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: 
         output=kind_data,
         namespaced=namespaced,
         api_link=api_link,
+        debug=debug,
     )
     if not resource_dict:
         return
