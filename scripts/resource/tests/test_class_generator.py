@@ -1,24 +1,21 @@
-from scripts.resource.class_generator import parse_explain
-from deepdiff import DeepDiff
+import os
+import filecmp
+
 import pytest
-from scripts.resource.tests.manifests.results import DATASCIENCECLUSTER, DEPLOYMENT, POD
+
+from scripts.resource.class_generator import class_generator
 
 MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
 
 
-# TODO: Fix tests to work without cluster
 @pytest.mark.parametrize(
-    "explain_file, result_dict",
+    "debug_file, result_file",
     (
-        ("DataScienceCluster.explain", DATASCIENCECLUSTER),
-        ("Deployment.explain", DEPLOYMENT),
-        ("Pod.explain", POD),
+        (os.path.join(MANIFESTS_PATH, "Deployment-debug.json"), os.path.join(MANIFESTS_PATH, "deployment-res.py")),
+        (os.path.join(MANIFESTS_PATH, "Pod-debug.json"), os.path.join(MANIFESTS_PATH, "pod-res.py")),
     ),
 )
-def test_parse_explain(explain_file, result_dict):
-    output: str = ""
-    with open(f"{MANIFESTS_PATH}/{explain_file}") as fd:
-        output = fd.read()
-
-    res = parse_explain(api_link="https://test.explain", output=output, namespaced=True)
-    assert not DeepDiff(res, result_dict)
+def test_parse_explain(tmpdir_factory, debug_file, result_file):
+    output_dir = tmpdir_factory.mktemp("output-dir")
+    output_file = class_generator(process_debug_file=debug_file, generated_file_output_dir=str(output_dir))
+    assert filecmp.cmp(output_file, result_file)
