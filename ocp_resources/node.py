@@ -12,7 +12,7 @@ class Node(Resource):
     API Link: https://docs.openshift.com/container-platform/4.16/rest_api/node_apis/node-v1.html
     """
 
-    api_version: str = "v1"
+    api_version: str = Resource.ApiVersion.V1
 
     def __init__(
         self,
@@ -27,28 +27,62 @@ class Node(Resource):
     ) -> None:
         """
         Args:
-            config_source(Dict[str, Any]): The source to get node configuration parameters from. Example:
-                {
-                    "configMap": {
-                        "name": "node-config",
-                        "namespace": "default"
-                    }
-                }
-            external_id(str): Deprecated field, external ID of the node.
-            pod_cidr(str): The CIDR block for Pods on this node.
-            pod_cidrs(Dict[str, Any]): The list of CIDR blocks for Pods on this node. Example:
-                {
-                    "cidr": "192.168.0.0/16"
-                }
-            provider_id(str): Identifier of the node assigned by the cloud provider.
-            taints(Dict[str, Any]): List of taints applied to the node to prevent certain pods from being scheduled on it. Example:
-                {
-                    "key": "example-key",
-                    "value": "example-value",
-                    "effect": "NoSchedule"
-                }
-                This taint would prevent pods that do not tolerate the taint from being scheduled on this node.
-            unschedulable(bool): If true, the node is marked as unschedulable to prevent new pods from being scheduled on it.
+            config_source(Dict[Any, Any]): Deprecated: Previously used to specify the source of the node's
+              configuration for the DynamicKubeletConfig feature. This feature is removed.
+              NodeConfigSource specifies a source of node configuration. Exactly one
+              subfield (excluding metadata) must be non-nil. This API is deprecated since
+              1.22
+
+              FIELDS:
+                configMap	<ConfigMapNodeConfigSource>
+                  ConfigMap is a reference to a Node's ConfigMap
+
+            external_id(str): Deprecated. Not all kubelets will set this field. Remove field after 1.13.
+              see: https://issues.k8s.io/61966
+
+            pod_cidr(str): PodCIDR represents the pod IP range assigned to the node.
+
+            pod_cidrs(Dict[Any, Any]): podCIDRs represents the IP ranges assigned to the node for usage by Pods on
+              that node. If this field is specified, the 0th entry must match the podCIDR
+              field. It may contain at most 1 value for each of IPv4 and IPv6.
+
+            provider_id(str): ID of the node assigned by the cloud provider in the format:
+              <ProviderName>://<ProviderSpecificNodeID>
+
+            taints(Dict[Any, Any]): If specified, the node's taints.
+              The node this Taint is attached to has the "effect" on any pod that does not
+              tolerate the Taint.
+
+              FIELDS:
+                effect	<string> -required-
+                  Required. The effect of the taint on pods that do not tolerate the taint.
+                  Valid effects are NoSchedule, PreferNoSchedule and NoExecute.
+
+                  Possible enum values:
+                   - `"NoExecute"` Evict any already-running pods that do not tolerate the
+                  taint. Currently enforced by NodeController.
+                   - `"NoSchedule"` Do not allow new pods to schedule onto the node unless
+                  they tolerate the taint, but allow all pods submitted to Kubelet without
+                  going through the scheduler to start, and allow all already-running pods to
+                  continue running. Enforced by the scheduler.
+                   - `"PreferNoSchedule"` Like TaintEffectNoSchedule, but the scheduler tries
+                  not to schedule new pods onto the node, rather than prohibiting new pods
+                  from scheduling onto the node entirely. Enforced by the scheduler.
+
+                key	<string> -required-
+                  Required. The taint key to be applied to a node.
+
+                timeAdded	<string>
+                  TimeAdded represents the time at which the taint was added. It is only
+                  written for NoExecute taints.
+
+                value	<string>
+                  The taint value corresponding to the taint key.
+
+            unschedulable(bool): Unschedulable controls node schedulability of new pods. By default, node is
+              schedulable. More info:
+              https://kubernetes.io/docs/concepts/nodes/node/#manual-node-administration
+
         """
         super().__init__(**kwargs)
 
