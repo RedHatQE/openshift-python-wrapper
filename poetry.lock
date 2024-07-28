@@ -931,12 +931,12 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "0.0.29"
+version = "0.0.30"
 description = "Collective utility functions for python projects"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pyhelper_utils-0.0.29.tar.gz", hash = "sha256:e5d5b25c6fbfaf13ce296b8a11c0fded6e49210ce90cff2095171d8923a8ff11"},
+    {file = "pyhelper_utils-0.0.30.tar.gz", hash = "sha256:16279389fe869080b2418e387ca0ea91144732f2543a987a4b0d76281bca1700"},
 ]
 
 [package.dependencies]
@@ -1064,12 +1064,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.33"
+version = "1.0.34"
 description = "A simple logger for python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.33.tar.gz", hash = "sha256:fa34931dd16a16972a327c140fc6f0f0549915e58952994a5a2cad73c4f70423"},
+    {file = "python_simple_logger-1.0.34.tar.gz", hash = "sha256:66d00ee02b07e41e7b0c4349ffa63fdf0d01caf68f1f71d302e5e13968de62a4"},
 ]
 
 [package.dependencies]
@@ -1294,12 +1294,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.37"
+version = "0.0.38"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.37.tar.gz", hash = "sha256:4f6a0f6c5f46c647600fbcc46ab4b2d84bf897baa7a4b32cd54afc7293a72832"},
+    {file = "timeout_sampler-0.0.38.tar.gz", hash = "sha256:e2b2873ccde830d802fde2b545f385a3b60f47970c4e354f5e6fc976f616a690"},
 ]
 
 [package.dependencies]
@@ -1400,4 +1400,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "9d8a8bb050a4ba3aee785f91d77958fcc6dc30a86589b406e99afe5a85d8c315"
+content-hash = "f8442a7373fa727d12f227c187d8b4aa952a7acc365fcbcd877634469ac9810e"
