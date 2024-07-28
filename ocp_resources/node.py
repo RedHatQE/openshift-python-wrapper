@@ -14,6 +14,9 @@ class Node(Resource):
 
     api_version: str = Resource.ApiVersion.V1
 
+    class Status(Resource.Status):
+        SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
+
     def __init__(
         self,
         config_source: Optional[Dict[str, Any]] = None,
@@ -91,8 +94,33 @@ class Node(Resource):
         self.pod_cidr = pod_cidr
         self.pod_cidrs = pod_cidrs
         self.provider_id = provider_id
-        self.taints = taints
+        self._taints = taints
         self.unschedulable = unschedulable
+
+    @property
+    def kubelet_ready(self):
+        return any(
+            stat["reason"] == "KubeletReady" and stat["status"] == self.Condition.Status.TRUE
+            for stat in self.instance.status.conditions
+        )
+
+    @property
+    def machine_name(self):
+        return self.instance.metadata.annotations[f"{self.ApiGroup.MACHINE_OPENSHIFT_IO}/machine"].split("/")[-1]
+
+    @property
+    def internal_ip(self):
+        for addr in self.instance.status.addresses:
+            if addr.type == "InternalIP":
+                return addr.address
+
+    @property
+    def hostname(self):
+        return self.labels["kubernetes.io/hostname"]
+
+    @property
+    def taints(self):
+        return self.instance.get("spec", {}).get("taints")
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -117,7 +145,7 @@ class Node(Resource):
                 self.res["providerID"] = self.provider_id
 
             if self.taints:
-                self.res["taints"] = self.taints
+                self.res["taints"] = self._taints
 
             if self.unschedulable is not None:
                 self.res["unschedulable"] = self.unschedulable
