@@ -48,7 +48,7 @@ def check_cluster_available() -> bool:
     if not _exec:
         return False
 
-    return run_command(command=shlex.split(f"{_exec} version"))[0]
+    return run_command(command=shlex.split(f"{_exec} version"), check=False)[0]
 
 
 def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) -> None:
