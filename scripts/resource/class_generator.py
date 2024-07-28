@@ -51,25 +51,24 @@ def check_cluster_available() -> bool:
     return run_command(command=shlex.split(f"{_exec} version"))[0]
 
 
-def write_to_file(kind: str, data: Dict[str, Any]) -> None:
-    _file = os.path.join(os.path.dirname(__file__), "debug", f"{kind}-debug.json")
+def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) -> None:
     content = {}
-    if os.path.isfile(_file):
-        with open(_file) as fd:
+    if os.path.isfile(output_debug_file_path):
+        with open(output_debug_file_path) as fd:
             content = json.load(fd)
 
     content.update(data)
-    with open(_file, "w") as fd:
+    with open(output_debug_file_path, "w") as fd:
         json.dump(content, fd, indent=4)
 
 
-def get_kind_data(kind: str, debug: bool = False) -> Dict[str, Any]:
+def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = "") -> Dict[str, Any]:
     """
     Get oc/kubectl explain output for given kind and if kind is namespaced
     """
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
     if debug:
-        write_to_file(kind=kind, data={"explain": explain_out})
+        write_to_file(kind=kind, data={"explain": explain_out}, output_debug_file_path=output_debug_file_path)
 
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
     if not resource_kind:
@@ -81,7 +80,7 @@ def get_kind_data(kind: str, debug: bool = False) -> Dict[str, Any]:
         check=False,
     )
     if debug:
-        write_to_file(kind=kind, data={"namespace": namespace_out})
+        write_to_file(kind=kind, data={"namespace": namespace_out}, output_debug_file_path=output_debug_file_path)
 
     if namespace_out.strip() == "1":
         return {"data": explain_out, "namespaced": True}
@@ -95,7 +94,12 @@ def format_resource_kind(resource_kind: str) -> str:
 
 
 def get_field_description(
-    kind: str, field_name: str, field_under_spec: bool, debug: bool, debug_content: Optional[Dict[str, str]] = None
+    kind: str,
+    field_name: str,
+    field_under_spec: bool,
+    debug: bool,
+    output_debug_file_path: str = "",
+    debug_content: Optional[Dict[str, str]] = None,
 ) -> str:
     if debug_content:
         _out = debug_content[f"explain-{field_name}"]
@@ -108,7 +112,7 @@ def get_field_description(
         )
 
     if debug:
-        write_to_file(kind=kind, data={f"explain-{field_name}": _out})
+        write_to_file(kind=kind, data={f"explain-{field_name}": _out}, output_debug_file_path=output_debug_file_path)
 
     _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
     if _description:
@@ -136,6 +140,7 @@ def get_arg_params(
     kind: str,
     field_under_spec: bool = False,
     debug: bool = False,
+    output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     splited_field = field.split()
@@ -174,6 +179,7 @@ def get_arg_params(
             field_name=_orig_name,
             field_under_spec=field_under_spec,
             debug=debug,
+            output_debug_file_path=output_debug_file_path,
             debug_content=debug_content,
         ),
     }
@@ -230,6 +236,7 @@ def parse_explain(
     output: str,
     namespaced: Optional[bool] = None,
     debug: bool = False,
+    output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     section_data: str = ""
@@ -292,13 +299,19 @@ def parse_explain(
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
             if not ignored_field and not start_spec_field:
-                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, debug=debug))
+                resource_dict[FIELDS_STR].append(
+                    get_arg_params(field=field, kind=kind, debug=debug, output_debug_file_path=output_debug_file_path)
+                )
 
             continue
         else:
             if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
                 if not ignored_field and not start_spec_field:
-                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind, debug=debug))
+                    resource_dict[FIELDS_STR].append(
+                        get_arg_params(
+                            field=field, kind=kind, debug=debug, output_debug_file_path=output_debug_file_path
+                        )
+                    )
 
         if start_spec_field:
             first_field_spec_found = True
@@ -310,7 +323,12 @@ def parse_explain(
                 if first_field_spec_found:
                     resource_dict[SPEC_STR].append(
                         get_arg_params(
-                            field=field, kind=kind, field_under_spec=True, debug=debug, debug_content=debug_content
+                            field=field,
+                            kind=kind,
+                            field_under_spec=True,
+                            debug=debug,
+                            debug_content=debug_content,
+                            output_debug_file_path=output_debug_file_path,
                         )
                     )
 
@@ -325,7 +343,12 @@ def parse_explain(
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
                         resource_dict[SPEC_STR].append(
                             get_arg_params(
-                                field=field, kind=kind, field_under_spec=True, debug=debug, debug_content=debug_content
+                                field=field,
+                                kind=kind,
+                                field_under_spec=True,
+                                debug=debug,
+                                debug_content=debug_content,
+                                output_debug_file_path=output_debug_file_path,
                             )
                         )
                         continue
@@ -427,6 +450,7 @@ def main(
     Generates a class for a given Kind.
     """
     debug_content: Dict[str, str] = {}
+    output_debug_file_path = os.path.join(os.path.dirname(__file__), "debug", f"{kind}-debug.json")
 
     if debug_file:
         dry_run = True
@@ -457,7 +481,7 @@ def main(
         if not check_kind_exists(kind=kind):
             return
 
-        explain_output = get_kind_data(kind=kind, debug=debug)
+        explain_output = get_kind_data(kind=kind, debug=debug, output_debug_file_path=output_debug_file_path)
         if not explain_output:
             return
 
@@ -469,6 +493,7 @@ def main(
         namespaced=namespaced,
         api_link=api_link,
         debug=debug,
+        output_debug_file_path=output_debug_file_path,
         debug_content=debug_content,
     )
     if not resource_dict:
@@ -478,6 +503,9 @@ def main(
 
     if not dry_run:
         run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
+
+    if debug:
+        LOGGER.info(f"Debug output saved to {output_debug_file_path}")
 
 
 if __name__ == "__main__":
