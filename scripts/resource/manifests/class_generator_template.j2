@@ -22,7 +22,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
     {% if GROUP %}
     api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP.upper() }}
     {% else %}
-    api_version: str = "{{ VERSION }}"
+    api_version: str = {{ BASE_CLASS }}.ApiVersion.{{ VERSION.upper() }}
     {% endif %}
 
     def __init__(

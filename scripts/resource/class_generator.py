@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 import shlex
 import os
 
@@ -7,6 +8,7 @@ import click
 import re
 
 from pyhelper_utils.shell import run_command
+from rich.console import Console
 import yaml
 
 from rich.prompt import Prompt
@@ -49,11 +51,25 @@ def check_cluster_available() -> bool:
     return run_command(command=shlex.split(f"{_exec} version"))[0]
 
 
-def get_kind_data(kind: str) -> Dict[str, Any]:
+def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) -> None:
+    content = {}
+    if os.path.isfile(output_debug_file_path):
+        with open(output_debug_file_path) as fd:
+            content = json.load(fd)
+
+    content.update(data)
+    with open(output_debug_file_path, "w") as fd:
+        json.dump(content, fd, indent=4)
+
+
+def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = "") -> Dict[str, Any]:
     """
     Get oc/kubectl explain output for given kind and if kind is namespaced
     """
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
+    if debug:
+        write_to_file(kind=kind, data={"explain": explain_out}, output_debug_file_path=output_debug_file_path)
+
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
     if not resource_kind:
         LOGGER.error(f"Failed to get resource kind from explain for {kind}")
@@ -63,6 +79,9 @@ def get_kind_data(kind: str) -> Dict[str, Any]:
         command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind.group(1)} | wc -l'"),
         check=False,
     )
+    if debug:
+        write_to_file(kind=kind, data={"namespace": namespace_out}, output_debug_file_path=output_debug_file_path)
+
     if namespace_out.strip() == "1":
         return {"data": explain_out, "namespaced": True}
 
@@ -74,21 +93,41 @@ def format_resource_kind(resource_kind: str) -> str:
     return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
 
 
-def get_field_description(kind: str, field_name: str, field_under_spec: bool) -> str:
-    _, _out, _ = run_command(
-        command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
-        check=False,
-        verify_stderr=False,
-    )
+def get_field_description(
+    kind: str,
+    field_name: str,
+    field_under_spec: bool,
+    debug: bool,
+    output_debug_file_path: str = "",
+    debug_content: Optional[Dict[str, str]] = None,
+) -> str:
+    if debug_content:
+        _out = debug_content[f"explain-{field_name}"]
+
+    else:
+        _, _out, _ = run_command(
+            command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
+            check=False,
+            verify_stderr=False,
+        )
+
+    if debug:
+        write_to_file(kind=kind, data={f"explain-{field_name}": _out}, output_debug_file_path=output_debug_file_path)
+
     _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
     if _description:
         description: str = ""
-        indent: int = 0
+        _fields_found = False
         for line in _description.group(1).strip().splitlines():
             if line.strip():
-                description += f"{' ' * indent}{line}\n"
+                if line.startswith("FIELDS:"):
+                    _fields_found = True
+                    description += f"{' ' * 4}{line}\n"
+                else:
+                    indent = 4 if _fields_found else 0
+                    description += f"{' ' * indent}{line}\n"
             else:
-                indent = indent + 4
+                indent = 8 if _fields_found else 4
                 description += f"{' ' * indent}{line}\n"
 
         return f"{description}\n"
@@ -96,7 +135,14 @@ def get_field_description(kind: str, field_name: str, field_under_spec: bool) ->
     return "<please add description>"
 
 
-def get_arg_params(field: str, kind: str, field_under_spec: bool = False) -> Dict[str, Any]:
+def get_arg_params(
+    field: str,
+    kind: str,
+    field_under_spec: bool = False,
+    debug: bool = False,
+    output_debug_file_path: str = "",
+    debug_content: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
@@ -128,14 +174,21 @@ def get_arg_params(field: str, kind: str, field_under_spec: bool = False) -> Dic
         "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
         "required": required,
         "type": type_from_dict,
-        "description": get_field_description(kind=kind, field_name=_orig_name, field_under_spec=field_under_spec),
+        "description": get_field_description(
+            kind=kind,
+            field_name=_orig_name,
+            field_under_spec=field_under_spec,
+            debug=debug,
+            output_debug_file_path=output_debug_file_path,
+            debug_content=debug_content,
+        ),
     }
 
     return _res
 
 
 def generate_resource_file_from_dict(
-    resource_dict: Dict[str, Any], output_dir="ocp_resources", overwrite: bool = False
+    resource_dict: Dict[str, Any], output_dir="ocp_resources", overwrite: bool = False, dry_run: bool = False
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
@@ -162,14 +215,18 @@ def generate_resource_file_from_dict(
             LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
             output_file = temp_output_file
 
-    with open(output_file, "w") as fd:
-        fd.write(rendered)
+    if dry_run:
+        Console().print(rendered)
 
-    for op in ("format", "check"):
-        run_command(
-            command=shlex.split(f"poetry run ruff {op} {output_file}"),
-            verify_stderr=False,
-        )
+    else:
+        with open(output_file, "w") as fd:
+            fd.write(rendered)
+
+        for op in ("format", "check"):
+            run_command(
+                command=shlex.split(f"poetry run ruff {op} {output_file}"),
+                verify_stderr=False,
+            )
 
     return output_file
 
@@ -178,6 +235,9 @@ def parse_explain(
     api_link: str,
     output: str,
     namespaced: Optional[bool] = None,
+    debug: bool = False,
+    output_debug_file_path: str = "",
+    debug_content: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
@@ -239,13 +299,19 @@ def parse_explain(
             first_field_indent = len(re.findall(r" +", field)[0])
             first_field_indent_str = f"{' ' * first_field_indent}"
             if not ignored_field and not start_spec_field:
-                resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind))
+                resource_dict[FIELDS_STR].append(
+                    get_arg_params(field=field, kind=kind, debug=debug, output_debug_file_path=output_debug_file_path)
+                )
 
             continue
         else:
             if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
                 if not ignored_field and not start_spec_field:
-                    resource_dict[FIELDS_STR].append(get_arg_params(field=field, kind=kind))
+                    resource_dict[FIELDS_STR].append(
+                        get_arg_params(
+                            field=field, kind=kind, debug=debug, output_debug_file_path=output_debug_file_path
+                        )
+                    )
 
         if start_spec_field:
             first_field_spec_found = True
@@ -255,7 +321,16 @@ def parse_explain(
         if field_spec_found:
             if not re.findall(rf"^{first_field_indent_str}\w", field):
                 if first_field_spec_found:
-                    resource_dict[SPEC_STR].append(get_arg_params(field=field, kind=kind, field_under_spec=True))
+                    resource_dict[SPEC_STR].append(
+                        get_arg_params(
+                            field=field,
+                            kind=kind,
+                            field_under_spec=True,
+                            debug=debug,
+                            debug_content=debug_content,
+                            output_debug_file_path=output_debug_file_path,
+                        )
+                    )
 
                     # Get top level keys inside spec indent, need to match only once.
                     top_spec_indent = len(re.findall(r" +", field)[0])
@@ -266,7 +341,16 @@ def parse_explain(
                 if top_spec_indent_str:
                     # Get only top level keys from inside spec
                     if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict[SPEC_STR].append(get_arg_params(field=field, kind=kind, field_under_spec=True))
+                        resource_dict[SPEC_STR].append(
+                            get_arg_params(
+                                field=field,
+                                kind=kind,
+                                field_under_spec=True,
+                                debug=debug,
+                                debug_content=debug_content,
+                                output_debug_file_path=output_debug_file_path,
+                            )
+                        )
                         continue
 
             else:
@@ -278,13 +362,34 @@ def parse_explain(
 
     LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
 
-    if api_group_real_name := resource_dict.get("GROUP"):
+    api_group_real_name = resource_dict.get("GROUP")
+    # If API Group is not present in resource, try to get it from VERSION
+    if not api_group_real_name:
+        version_splited = resource_dict["VERSION"].split("/")
+        if len(version_splited) == 2:
+            api_group_real_name = version_splited[0]
+
+    if api_group_real_name:
         api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
+        resource_dict["GROUP"] = api_group_for_resource_api_group
         missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
 
         if missing_api_group_in_resource:
             LOGGER.warning(
-                f"Missing API Group in Resource\nPlease add `Resource.ApiGroup.{api_group_real_name} = {api_group_real_name}` manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+                f"Missing API Group in Resource\n"
+                f"Please add `Resource.ApiGroup.{api_group_for_resource_api_group} = {api_group_real_name}` "
+                "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+            )
+
+    else:
+        api_version_for_resource_api_version = resource_dict["VERSION"].upper()
+        missing_api_version_in_resource: bool = not hasattr(Resource.ApiVersion, api_version_for_resource_api_version)
+
+        if missing_api_version_in_resource:
+            LOGGER.warning(
+                f"Missing API Version in Resource\n"
+                f"Please add `Resource.ApiVersion.{api_version_for_resource_api_version} = {resource_dict['VERSION']}` "
+                "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
             )
 
     return resource_dict
@@ -334,48 +439,73 @@ def get_user_args_from_interactive() -> Tuple[str, str]:
     is_flag=True,
     help="Output file overwrite existing file if passed",
 )
-@click.option("-v", "--verbose", is_flag=True, help="Enable debug logs")
+@click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
 @click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
-def main(kind: str, api_link: str, verbose: bool, overwrite: bool, interactive: bool) -> None:
+@click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
+@click.option("--debug-file", type=click.Path(exists=True), help="Run the script from debug file. (generated by -d)")
+def main(
+    kind: str, api_link: str, overwrite: bool, interactive: bool, dry_run: bool, debug: bool, debug_file: str
+) -> None:
     """
     Generates a class for a given Kind.
     """
-    LOGGER.setLevel("DEBUG" if verbose else "INFO")
-    if not check_cluster_available():
-        LOGGER.error(
-            "Cluster not available, The script needs a running cluster and admin privileges to get the explain output"
-        )
-        return
+    debug_content: Dict[str, str] = {}
+    output_debug_file_path = os.path.join(os.path.dirname(__file__), "debug", f"{kind}-debug.json")
 
-    if interactive:
-        kind, api_link = get_user_args_from_interactive()
+    if debug_file:
+        dry_run = True
+        debug = False
+        with open(debug_file) as fd:
+            debug_content = json.load(fd)
 
-    if not kind or not api_link:
-        LOGGER.error("Kind or API link not provided")
-        return
+        kind_data = debug_content["explain"]
+        namespaced = debug_content["namespace"] == "1"
+        api_link = "https://debug.explain"
 
-    validate_api_link_schema(value=api_link)
+    else:
+        if not check_cluster_available():
+            LOGGER.error(
+                "Cluster not available, The script needs a running cluster and admin privileges to get the explain output"
+            )
+            return
 
-    if not check_kind_exists(kind=kind):
-        return
+        if interactive:
+            kind, api_link = get_user_args_from_interactive()
 
-    explain_output = get_kind_data(kind=kind)
-    if not explain_output:
-        return
+        if not kind or not api_link:
+            LOGGER.error("Kind or API link not provided")
+            return
 
-    namespaced = explain_output["namespaced"]
-    kind_data = explain_output["data"]
+        validate_api_link_schema(value=api_link)
+
+        if not check_kind_exists(kind=kind):
+            return
+
+        explain_output = get_kind_data(kind=kind, debug=debug, output_debug_file_path=output_debug_file_path)
+        if not explain_output:
+            return
+
+        namespaced = explain_output["namespaced"]
+        kind_data = explain_output["data"]
 
     resource_dict = parse_explain(
         output=kind_data,
         namespaced=namespaced,
         api_link=api_link,
+        debug=debug,
+        output_debug_file_path=output_debug_file_path,
+        debug_content=debug_content,
     )
     if not resource_dict:
         return
 
-    generate_resource_file_from_dict(resource_dict=resource_dict, overwrite=overwrite)
-    run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
+    generate_resource_file_from_dict(resource_dict=resource_dict, overwrite=overwrite, dry_run=dry_run)
+
+    if not dry_run:
+        run_command(command=shlex.split("pre-commit run --all-files"), verify_stderr=False, check=False)
+
+    if debug:
+        LOGGER.info(f"Debug output saved to {output_debug_file_path}")
 
 
 if __name__ == "__main__":
