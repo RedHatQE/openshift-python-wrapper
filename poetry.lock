@@ -709,12 +709,12 @@ files = [
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.33"
+version = "1.0.34"
 description = "A simple logger for python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.33.tar.gz", hash = "sha256:fa34931dd16a16972a327c140fc6f0f0549915e58952994a5a2cad73c4f70423"},
+    {file = "python_simple_logger-1.0.34.tar.gz", hash = "sha256:66d00ee02b07e41e7b0c4349ffa63fdf0d01caf68f1f71d302e5e13968de62a4"},
 ]
 
 [package.dependencies]
@@ -893,12 +893,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.37"
+version = "0.0.38"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.37.tar.gz", hash = "sha256:4f6a0f6c5f46c647600fbcc46ab4b2d84bf897baa7a4b32cd54afc7293a72832"},
+    {file = "timeout_sampler-0.0.38.tar.gz", hash = "sha256:e2b2873ccde830d802fde2b545f385a3b60f47970c4e354f5e6fc976f616a690"},
 ]
 
 [package.dependencies]
