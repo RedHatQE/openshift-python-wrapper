@@ -124,5 +124,5 @@ node_modules/
 package.json
 package-lock.json
 
-# script generator
+# class generator script
 *-debug.json
