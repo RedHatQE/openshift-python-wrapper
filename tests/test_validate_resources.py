@@ -49,7 +49,11 @@ def _process_api_type(api_type, api_value, resource_dict, cls):
 
 def _get_api_group_and_version(bodies):
     for targets in bodies:
-        api_type = targets.targets[0].id
+        if isinstance(targets, ast.AnnAssign):
+            api_type = targets.target.id
+        else:
+            api_type = targets.targets[0].id
+
         return api_type, getattr(targets.value, "attr", getattr(targets.value, "value", None))
 
 
@@ -120,7 +124,7 @@ def resources_definitions_errors(resources_definitions):
                     #   need to be updated using 'update_resources_definitions' script
                     continue
 
-                bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, ast.Assign)]
+                bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, (ast.Assign, ast.AnnAssign))]
                 api_type, api_value = _get_api_group_and_version(bodies=bodies)
                 errors.extend(_get_namespaced(cls=cls, resource_dict=resource_dict, api_value=api_value))
                 errors.extend(
