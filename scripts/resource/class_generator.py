@@ -2,6 +2,7 @@ from __future__ import annotations
 import json
 import shlex
 import os
+import sys
 
 from typing import Any, Dict, List, Optional, Tuple
 import click
@@ -32,15 +33,15 @@ LOGGER = get_logger(name="class_generator")
 
 
 def get_oc_or_kubectl() -> str:
-    if run_command(command=shlex.split("which oc"))[0]:
+    if run_command(command=shlex.split("which oc"), check=False)[0]:
         return "oc"
 
-    elif run_command(command=shlex.split("which kubectl"))[0]:
+    elif run_command(command=shlex.split("which kubectl"), check=False)[0]:
         return "kubectl"
 
     else:
         LOGGER.error("oc or kubectl not available")
-        return ""
+        sys.exit(1)
 
 
 def check_cluster_available() -> bool:
@@ -48,7 +49,7 @@ def check_cluster_available() -> bool:
     if not _exec:
         return False
 
-    return run_command(command=shlex.split(f"{_exec} version"))[0]
+    return run_command(command=shlex.split(f"{_exec} version"), check=False)[0]
 
 
 def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) -> None:
@@ -68,7 +69,11 @@ def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = 
     """
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
     if debug:
-        write_to_file(kind=kind, data={"explain": explain_out}, output_debug_file_path=output_debug_file_path)
+        write_to_file(
+            kind=kind,
+            data={"explain": explain_out},
+            output_debug_file_path=output_debug_file_path,
+        )
 
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
     if not resource_kind:
@@ -80,7 +85,11 @@ def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = 
         check=False,
     )
     if debug:
-        write_to_file(kind=kind, data={"namespace": namespace_out}, output_debug_file_path=output_debug_file_path)
+        write_to_file(
+            kind=kind,
+            data={"namespace": namespace_out},
+            output_debug_file_path=output_debug_file_path,
+        )
 
     if namespace_out.strip() == "1":
         return {"data": explain_out, "namespaced": True}
@@ -112,7 +121,11 @@ def get_field_description(
         )
 
     if debug:
-        write_to_file(kind=kind, data={f"explain-{field_name}": _out}, output_debug_file_path=output_debug_file_path)
+        write_to_file(
+            kind=kind,
+            data={f"explain-{field_name}": _out},
+            output_debug_file_path=output_debug_file_path,
+        )
 
     _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
     if _description:
@@ -188,7 +201,10 @@ def get_arg_params(
 
 
 def generate_resource_file_from_dict(
-    resource_dict: Dict[str, Any], output_dir="ocp_resources", overwrite: bool = False, dry_run: bool = False
+    resource_dict: Dict[str, Any],
+    output_dir="ocp_resources",
+    overwrite: bool = False,
+    dry_run: bool = False,
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
@@ -226,6 +242,7 @@ def generate_resource_file_from_dict(
             run_command(
                 command=shlex.split(f"poetry run ruff {op} {output_file}"),
                 verify_stderr=False,
+                check=False,
             )
 
     return output_file
@@ -300,7 +317,12 @@ def parse_explain(
             first_field_indent_str = f"{' ' * first_field_indent}"
             if not ignored_field and not start_spec_field:
                 resource_dict[FIELDS_STR].append(
-                    get_arg_params(field=field, kind=kind, debug=debug, output_debug_file_path=output_debug_file_path)
+                    get_arg_params(
+                        field=field,
+                        kind=kind,
+                        debug=debug,
+                        output_debug_file_path=output_debug_file_path,
+                    )
                 )
 
             continue
@@ -309,7 +331,10 @@ def parse_explain(
                 if not ignored_field and not start_spec_field:
                     resource_dict[FIELDS_STR].append(
                         get_arg_params(
-                            field=field, kind=kind, debug=debug, output_debug_file_path=output_debug_file_path
+                            field=field,
+                            kind=kind,
+                            debug=debug,
+                            output_debug_file_path=output_debug_file_path,
                         )
                     )
 
@@ -484,12 +509,17 @@ def class_generator(
         return ""
 
     generated_py_file = generate_resource_file_from_dict(
-        resource_dict=resource_dict, overwrite=overwrite, dry_run=dry_run, output_dir=generated_file_output_dir
+        resource_dict=resource_dict,
+        overwrite=overwrite,
+        dry_run=dry_run,
+        output_dir=generated_file_output_dir,
     )
 
     if not dry_run:
         run_command(
-            command=shlex.split(f"pre-commit run --files {generated_py_file}"), verify_stderr=False, check=False
+            command=shlex.split(f"pre-commit run --files {generated_py_file}"),
+            verify_stderr=False,
+            check=False,
         )
 
     if debug:
@@ -519,8 +549,20 @@ def class_generator(
 @click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
 @click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
 @click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
-@click.option("--debug-file", type=click.Path(exists=True), help="Run the script from debug file. (generated by -d)")
-def main(kind: str, api_link: str, overwrite: bool, interactive: bool, dry_run: bool, debug: bool, debug_file: str):
+@click.option(
+    "--debug-file",
+    type=click.Path(exists=True),
+    help="Run the script from debug file. (generated by -d)",
+)
+def main(
+    kind: str,
+    api_link: str,
+    overwrite: bool,
+    interactive: bool,
+    dry_run: bool,
+    debug: bool,
+    debug_file: str,
+):
     return class_generator(
         kind=kind,
         api_link=api_link,
