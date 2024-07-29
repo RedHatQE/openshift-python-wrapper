@@ -10,7 +10,6 @@ import re
 
 from pyhelper_utils.shell import run_command
 from rich.console import Console
-import yaml
 
 from rich.prompt import Prompt
 from ocp_resources.resource import Resource
@@ -384,8 +383,6 @@ def parse_explain(
     if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
         LOGGER.error(f"Unable to parse {kind} resource.")
         return {}
-
-    LOGGER.debug(f"\n{yaml.dump(resource_dict)}")
 
     api_group_real_name = resource_dict.get("GROUP")
     # If API Group is not present in resource, try to get it from VERSION
