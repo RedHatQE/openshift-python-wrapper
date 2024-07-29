@@ -71,6 +71,7 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
 
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
+    resource_kind_str: str = ""
 
     if resource_kind:
         resource_kind_str = resource_kind.group(1)  # noqa FCN001
@@ -289,6 +290,7 @@ def generate_resource_file_from_dict(
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
+    interactive: bool = False,
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
@@ -301,11 +303,13 @@ def generate_resource_file_from_dict(
     template = env.get_template(name="class_generator_template.j2")
     rendered = template.render(resource_dict)
     undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
+
     if undefined_variables:
         LOGGER.error(f"The following variables are undefined: {undefined_variables}")
-        raise click.Abort()
+        sys.exit(1)
 
     temp_output_file: str = ""
+
     if output_file:
         _output_file = output_file
     else:
@@ -314,6 +318,15 @@ def generate_resource_file_from_dict(
     if os.path.exists(_output_file):
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
+
+        elif interactive:
+            if Prompt.ask(prompt=f"Overwrite {_output_file}?", choices=["y", "n"]) == "n":
+                if user_file_name := Prompt.ask(prompt="Provide file name"):
+                    _output_file = user_file_name
+                else:
+                    LOGGER.error("No file name provided")
+                    sys.exit(1)
+
         else:
             temp_output_file = f"{_output_file[:-3]}_TEMP.py"
             LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
@@ -604,6 +617,7 @@ def class_generator(
         overwrite=overwrite,
         dry_run=dry_run,
         output_file=output_file,
+        interactive=interactive,
     )
 
     if not dry_run:
