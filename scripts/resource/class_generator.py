@@ -226,6 +226,7 @@ def generate_resource_file_from_dict(
         _output_file = f"{output_dir}/{output_file}"
     else:
         _output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
+
     if os.path.exists(_output_file):
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
