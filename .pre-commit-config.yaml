@@ -33,13 +33,13 @@ repos:
         args: [--exclude-files=scripts/resource/tests/manifests/pod_debug.json]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.4
+    rev: v0.5.5
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 37.438.4
+    rev: 38.9.3
     hooks:
       - id: renovate-config-validator
 
