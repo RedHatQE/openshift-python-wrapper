@@ -1383,115 +1383,115 @@ class Pod(NamespacedResource):
             self.res["containers"] = self.containers
 
             if self.active_deadline_seconds:
-                self.res["activeDeadlineSeconds"] = self.active_deadline_seconds
+                _spec["activeDeadlineSeconds"] = self.active_deadline_seconds
 
             if self.affinity:
-                self.res["affinity"] = self.affinity
+                _spec["affinity"] = self.affinity
 
             if self.automount_service_account_token is not None:
-                self.res["automountServiceAccountToken"] = self.automount_service_account_token
+                _spec["automountServiceAccountToken"] = self.automount_service_account_token
 
             if self.dns_config:
-                self.res["dnsConfig"] = self.dns_config
+                _spec["dnsConfig"] = self.dns_config
 
             if self.dns_policy:
-                self.res["dnsPolicy"] = self.dns_policy
+                _spec["dnsPolicy"] = self.dns_policy
 
             if self.enable_service_links is not None:
-                self.res["enableServiceLinks"] = self.enable_service_links
+                _spec["enableServiceLinks"] = self.enable_service_links
 
             if self.ephemeral_containers:
-                self.res["ephemeralContainers"] = self.ephemeral_containers
+                _spec["ephemeralContainers"] = self.ephemeral_containers
 
             if self.host_aliases:
-                self.res["hostAliases"] = self.host_aliases
+                _spec["hostAliases"] = self.host_aliases
 
             if self.host_ipc is not None:
-                self.res["hostIPC"] = self.host_ipc
+                _spec["hostIPC"] = self.host_ipc
 
             if self.host_network is not None:
-                self.res["hostNetwork"] = self.host_network
+                _spec["hostNetwork"] = self.host_network
 
             if self.host_pid is not None:
-                self.res["hostPID"] = self.host_pid
+                _spec["hostPID"] = self.host_pid
 
             if self.host_users is not None:
-                self.res["hostUsers"] = self.host_users
+                _spec["hostUsers"] = self.host_users
 
             if self.hostname:
-                self.res["hostname"] = self.hostname
+                _spec["hostname"] = self.hostname
 
             if self.image_pull_secrets:
-                self.res["imagePullSecrets"] = self.image_pull_secrets
+                _spec["imagePullSecrets"] = self.image_pull_secrets
 
             if self.init_containers:
-                self.res["initContainers"] = self.init_containers
+                _spec["initContainers"] = self.init_containers
 
             if self.node_name:
-                self.res["nodeName"] = self.node_name
+                _spec["nodeName"] = self.node_name
 
             if self.node_selector:
-                self.res["nodeSelector"] = self.node_selector
+                _spec["nodeSelector"] = self.node_selector
 
             if self.os:
-                self.res["os"] = self.os
+                _spec["os"] = self.os
 
             if self.overhead:
-                self.res["overhead"] = self.overhead
+                _spec["overhead"] = self.overhead
 
             if self.preemption_policy:
-                self.res["preemptionPolicy"] = self.preemption_policy
+                _spec["preemptionPolicy"] = self.preemption_policy
 
             if self.priority:
-                self.res["priority"] = self.priority
+                _spec["priority"] = self.priority
 
             if self.priority_class_name:
-                self.res["priorityClassName"] = self.priority_class_name
+                _spec["priorityClassName"] = self.priority_class_name
 
             if self.readiness_gates:
-                self.res["readinessGates"] = self.readiness_gates
+                _spec["readinessGates"] = self.readiness_gates
 
             if self.resource_claims:
-                self.res["resourceClaims"] = self.resource_claims
+                _spec["resourceClaims"] = self.resource_claims
 
             if self.restart_policy:
-                self.res["restartPolicy"] = self.restart_policy
+                _spec["restartPolicy"] = self.restart_policy
 
             if self.runtime_class_name:
-                self.res["runtimeClassName"] = self.runtime_class_name
+                _spec["runtimeClassName"] = self.runtime_class_name
 
             if self.scheduler_name:
-                self.res["schedulerName"] = self.scheduler_name
+                _spec["schedulerName"] = self.scheduler_name
 
             if self.scheduling_gates:
-                self.res["schedulingGates"] = self.scheduling_gates
+                _spec["schedulingGates"] = self.scheduling_gates
 
             if self.security_context:
-                self.res["securityContext"] = self.security_context
+                _spec["securityContext"] = self.security_context
 
             if self.service_account:
-                self.res["serviceAccount"] = self.service_account
+                _spec["serviceAccount"] = self.service_account
 
             if self.service_account_name:
-                self.res["serviceAccountName"] = self.service_account_name
+                _spec["serviceAccountName"] = self.service_account_name
 
             if self.set_hostname_as_fqdn is not None:
-                self.res["setHostnameAsFQDN"] = self.set_hostname_as_fqdn
+                _spec["setHostnameAsFQDN"] = self.set_hostname_as_fqdn
 
             if self.share_process_namespace is not None:
-                self.res["shareProcessNamespace"] = self.share_process_namespace
+                _spec["shareProcessNamespace"] = self.share_process_namespace
 
             if self.subdomain:
-                self.res["subdomain"] = self.subdomain
+                _spec["subdomain"] = self.subdomain
 
             if self.termination_grace_period_seconds:
-                self.res["terminationGracePeriodSeconds"] = self.termination_grace_period_seconds
+                _spec["terminationGracePeriodSeconds"] = self.termination_grace_period_seconds
 
             if self.tolerations:
-                self.res["tolerations"] = self.tolerations
+                _spec["tolerations"] = self.tolerations
 
             if self.topology_spread_constraints:
-                self.res["topologySpreadConstraints"] = self.topology_spread_constraints
+                _spec["topologySpreadConstraints"] = self.topology_spread_constraints
 
             if self.volumes:
-                self.res["volumes"] = self.volumes
+                _spec["volumes"] = self.volumes

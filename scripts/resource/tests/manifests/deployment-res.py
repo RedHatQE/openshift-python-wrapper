@@ -124,19 +124,19 @@ class Deployment(NamespacedResource):
             self.res["template"] = self.template
 
             if self.min_ready_seconds:
-                self.res["minReadySeconds"] = self.min_ready_seconds
+                _spec["minReadySeconds"] = self.min_ready_seconds
 
             if self.paused is not None:
-                self.res["paused"] = self.paused
+                _spec["paused"] = self.paused
 
             if self.progress_deadline_seconds:
-                self.res["progressDeadlineSeconds"] = self.progress_deadline_seconds
+                _spec["progressDeadlineSeconds"] = self.progress_deadline_seconds
 
             if self.replicas:
-                self.res["replicas"] = self.replicas
+                _spec["replicas"] = self.replicas
 
             if self.revision_history_limit:
-                self.res["revisionHistoryLimit"] = self.revision_history_limit
+                _spec["revisionHistoryLimit"] = self.revision_history_limit
 
             if self.strategy:
-                self.res["strategy"] = self.strategy
+                _spec["strategy"] = self.strategy
