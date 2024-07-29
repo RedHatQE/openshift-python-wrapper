@@ -14,6 +14,7 @@ MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
         (os.path.join(MANIFESTS_PATH, "Deployment-debug.json"), os.path.join(MANIFESTS_PATH, "deployment-res.py")),
         (os.path.join(MANIFESTS_PATH, "Pod-debug.json"), os.path.join(MANIFESTS_PATH, "pod-res.py")),
         (os.path.join(MANIFESTS_PATH, "ConfigMap-debug.json"), os.path.join(MANIFESTS_PATH, "config_map-res.py")),
+        (os.path.join(MANIFESTS_PATH, "APIServer-debug.json"), os.path.join(MANIFESTS_PATH, "apiserver-res.py")),
     ),
 )
 def test_parse_explain(tmpdir_factory, debug_file, result_file):
