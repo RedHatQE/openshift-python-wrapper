@@ -355,60 +355,61 @@ class Service(NamespacedResource):
 
         if not self.yaml_file:
             self.res["spec"] = {}
+            _spec = self.res["spec"]
 
             if self.allocate_load_balancer_node_ports is not None:
-                self.res["allocateLoadBalancerNodePorts"] = self.allocate_load_balancer_node_ports
+                _spec["allocateLoadBalancerNodePorts"] = self.allocate_load_balancer_node_ports
 
             if self.cluster_ip:
-                self.res["clusterIP"] = self.cluster_ip
+                _spec["clusterIP"] = self.cluster_ip
 
             if self.cluster_ips:
-                self.res["clusterIPs"] = self.cluster_ips
+                _spec["clusterIPs"] = self.cluster_ips
 
             if self.external_ips:
-                self.res["externalIPs"] = self.external_ips
+                _spec["externalIPs"] = self.external_ips
 
             if self.external_name:
-                self.res["externalName"] = self.external_name
+                _spec["externalName"] = self.external_name
 
             if self.external_traffic_policy:
-                self.res["externalTrafficPolicy"] = self.external_traffic_policy
+                _spec["externalTrafficPolicy"] = self.external_traffic_policy
 
             if self.health_check_node_port:
-                self.res["healthCheckNodePort"] = self.health_check_node_port
+                _spec["healthCheckNodePort"] = self.health_check_node_port
 
             if self.internal_traffic_policy:
-                self.res["internalTrafficPolicy"] = self.internal_traffic_policy
+                _spec["internalTrafficPolicy"] = self.internal_traffic_policy
 
             if self.ip_families:
-                self.res["ipFamilies"] = self.ip_families
+                _spec["ipFamilies"] = self.ip_families
 
             if self.ip_family_policy:
-                self.res["ipFamilyPolicy"] = self.ip_family_policy
+                _spec["ipFamilyPolicy"] = self.ip_family_policy
 
             if self.load_balancer_class:
-                self.res["loadBalancerClass"] = self.load_balancer_class
+                _spec["loadBalancerClass"] = self.load_balancer_class
 
             if self.load_balancer_ip:
-                self.res["loadBalancerIP"] = self.load_balancer_ip
+                _spec["loadBalancerIP"] = self.load_balancer_ip
 
             if self.load_balancer_source_ranges:
-                self.res["loadBalancerSourceRanges"] = self.load_balancer_source_ranges
+                _spec["loadBalancerSourceRanges"] = self.load_balancer_source_ranges
 
             if self.ports:
-                self.res["ports"] = self.ports
+                _spec["ports"] = self.ports
 
             if self.publish_not_ready_addresses is not None:
-                self.res["publishNotReadyAddresses"] = self.publish_not_ready_addresses
+                _spec["publishNotReadyAddresses"] = self.publish_not_ready_addresses
 
             if self.selector:
-                self.res["selector"] = self.selector
+                _spec["selector"] = self.selector
 
             if self.session_affinity:
-                self.res["sessionAffinity"] = self.session_affinity
+                _spec["sessionAffinity"] = self.session_affinity
 
             if self.session_affinity_config:
-                self.res["sessionAffinityConfig"] = self.session_affinity_config
+                _spec["sessionAffinityConfig"] = self.session_affinity_config
 
             if self.type:
-                self.res["type"] = self.type
+                _spec["type"] = self.type
