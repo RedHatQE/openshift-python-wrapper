@@ -211,7 +211,7 @@ def generate_resource_file_from_dict(
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=DebugUndefined,
-        autoescape=True,
+        autoescape=False,
     )
 
     template = env.get_template(name="class_generator_template.j2")
@@ -295,7 +295,7 @@ def parse_explain(
             start_fields_section = section
             continue
 
-        key, val = section.split(":")
+        key, val = section.split(":", 1)
         resource_dict[key.strip()] = val.strip()
 
     kind = resource_dict["KIND"]
