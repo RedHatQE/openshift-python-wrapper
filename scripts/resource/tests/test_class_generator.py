@@ -66,6 +66,4 @@ def test_parse_explain(tmpdir_factory, kind, debug_file, result_file):
     ],
 )
 def test_convert_camel_case_to_snake_case(request, camel_case_str, expected):
-    assert (
-        convert_camel_case_to_snake_case(string_=camel_case_str) == expected
-    ), f"Failed {request.node.callspec.idrequest.node.callspec.id}"
+    assert convert_camel_case_to_snake_case(string_=camel_case_str) == expected, f"Failed {request.node.callspec.id}"
