@@ -324,6 +324,7 @@ def parse_explain(
                         field=field,
                         kind=kind,
                         debug=debug,
+                        debug_content=debug_content,
                         output_debug_file_path=output_debug_file_path,
                     )
                 )
@@ -337,6 +338,7 @@ def parse_explain(
                             field=field,
                             kind=kind,
                             debug=debug,
+                            debug_content=debug_content,
                             output_debug_file_path=output_debug_file_path,
                         )
                     )
