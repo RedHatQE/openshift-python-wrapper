@@ -204,6 +204,7 @@ def generate_resource_file_from_dict(
     output_dir="ocp_resources",
     overwrite: bool = False,
     dry_run: bool = False,
+    output_file: str = "",
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
@@ -221,30 +222,33 @@ def generate_resource_file_from_dict(
         raise click.Abort()
 
     temp_output_file: str = ""
-    output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
-    if os.path.exists(output_file):
+    if output_file:
+        _output_file = f"{output_dir}/{output_file}"
+    else:
+        _output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
+    if os.path.exists(_output_file):
         if overwrite:
-            LOGGER.warning(f"Overwriting {output_file}")
+            LOGGER.warning(f"Overwriting {_output_file}")
         else:
-            temp_output_file = f"{output_file[:-3]}_TEMP.py"
-            LOGGER.warning(f"{output_file} already exists, using {temp_output_file}")
-            output_file = temp_output_file
+            temp_output_file = f"{_output_file[:-3]}_TEMP.py"
+            LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
+            _output_file = temp_output_file
 
     if dry_run:
         Console().print(rendered)
 
     else:
-        with open(output_file, "w") as fd:
+        with open(_output_file, "w") as fd:
             fd.write(rendered)
 
         for op in ("format", "check"):
             run_command(
-                command=shlex.split(f"poetry run ruff {op} {output_file}"),
+                command=shlex.split(f"poetry run ruff {op} {_output_file}"),
                 verify_stderr=False,
                 check=False,
             )
 
-    return output_file
+    return _output_file
 
 
 def parse_explain(
@@ -452,6 +456,7 @@ def class_generator(
     debug: bool = False,
     process_debug_file: str = "",
     generated_file_output_dir: str = "ocp_resources",
+    output_file: str = "",
 ) -> str:
     """
     Generates a class for a given Kind.
@@ -510,6 +515,7 @@ def class_generator(
         overwrite=overwrite,
         dry_run=dry_run,
         output_dir=generated_file_output_dir,
+        output_file=output_file,
     )
 
     if not dry_run:
@@ -546,6 +552,7 @@ def class_generator(
 @click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
 @click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
 @click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
+@click.option("-o", "--output-file", help="The output python class file name to use, is nt sent kind will be used")
 @click.option(
     "--debug-file",
     type=click.Path(exists=True),
@@ -559,6 +566,7 @@ def main(
     dry_run: bool,
     debug: bool,
     debug_file: str,
+    output_file: str,
 ):
     return class_generator(
         kind=kind,
@@ -568,6 +576,7 @@ def main(
         dry_run=dry_run,
         debug=debug,
         process_debug_file=debug_file,
+        output_file=output_file,
     )
 
 
