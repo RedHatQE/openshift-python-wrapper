@@ -14,6 +14,11 @@ class Service(NamespacedResource):
     API Link: https://kubernetes.io/docs/concepts/services-networking/service/
     """
 
+    class Type:
+        CLUSTER_IP = "ClusterIP"
+        NODE_PORT = "NodePort"
+        LOAD_BALANCER = "LoadBalancer"
+
     api_version: str = NamespacedResource.ApiVersion.V1
 
     def __init__(
