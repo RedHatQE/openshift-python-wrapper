@@ -29,6 +29,27 @@ Run in interactive mode:
 poetry run python scripts/resource/class_generator.py --interactive
 ```
 
+#### Adding tests
+
+- Generate the resource file the debug file by adding `--debug` flag
+- Replace `Pod` with the kind you want to test
+- `--api-link` must be `https://debug.explain`
+
+```bash
+poetry run python scripts/resource/class_generator.py --api-link https://debug.explain --kind Pod --output-file /tmp/pod_res.py --debug
+```
+
+- Move the resource file under [tests manifests dir](scripts/resource/tests/manifests/)
+
+```bash
+mv /tmp/pod_res.py scripts/resource/tests/manifests/
+```
+
+- Move the debug file under [tests manifests dir](scripts/resource/tests/manifests/)
+```bash
+mv scripts/resource/debug/Pod_debug.json scripts/resource/tests/manifests/
+```
+
 ## Reporting an issue
 
 - Running with debug mode and `--debug` flag:
