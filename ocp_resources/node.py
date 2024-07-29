@@ -9,7 +9,7 @@ class Node(Resource):
     Node is a worker node in Kubernetes. Each node will have a unique identifier
     in the cache (i.e. in etcd).
 
-    API Link: https://docs.openshift.com/container-platform/4.16/rest_api/node_apis/node-v1.html
+    API Link: https://kubernetes.io/docs/reference/kubernetes-api/cluster-resources/node-v1/
     """
 
     api_version: str = Resource.ApiVersion.V1
@@ -97,31 +97,6 @@ class Node(Resource):
         self._taints = taints
         self.unschedulable = unschedulable
 
-    @property
-    def kubelet_ready(self):
-        return any(
-            stat["reason"] == "KubeletReady" and stat["status"] == self.Condition.Status.TRUE
-            for stat in self.instance.status.conditions
-        )
-
-    @property
-    def machine_name(self):
-        return self.instance.metadata.annotations[f"{self.ApiGroup.MACHINE_OPENSHIFT_IO}/machine"].split("/")[-1]
-
-    @property
-    def internal_ip(self):
-        for addr in self.instance.status.addresses:
-            if addr.type == "InternalIP":
-                return addr.address
-
-    @property
-    def hostname(self):
-        return self.labels["kubernetes.io/hostname"]
-
-    @property
-    def taints(self):
-        return self.instance.get("spec", {}).get("taints")
-
     def to_dict(self) -> None:
         super().to_dict()
 
@@ -149,3 +124,28 @@ class Node(Resource):
 
             if self.unschedulable is not None:
                 self.res["unschedulable"] = self.unschedulable
+
+    @property
+    def kubelet_ready(self):
+        return any(
+            stat["reason"] == "KubeletReady" and stat["status"] == self.Condition.Status.TRUE
+            for stat in self.instance.status.conditions
+        )
+
+    @property
+    def machine_name(self):
+        return self.instance.metadata.annotations[f"{self.ApiGroup.MACHINE_OPENSHIFT_IO}/machine"].split("/")[-1]
+
+    @property
+    def internal_ip(self):
+        for addr in self.instance.status.addresses:
+            if addr.type == "InternalIP":
+                return addr.address
+
+    @property
+    def hostname(self):
+        return self.labels["kubernetes.io/hostname"]
+
+    @property
+    def taints(self):
+        return self.instance.get("spec", {}).get("taints")
