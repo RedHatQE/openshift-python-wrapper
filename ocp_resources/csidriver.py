@@ -47,7 +47,7 @@ class CSIDriver(Resource):
               and permission of the volume before being mounted. Refer to the specific
               FSGroupPolicy values for additional details.
 
-              This field is immutable.
+              This field was immutable in Kubernetes < 1.29 and now is mutable.
 
               Defaults to ReadWriteOnceWithFSType, which will examine each volume to
               determine if Kubernetes should modify ownership and permissions of the
@@ -64,7 +64,7 @@ class CSIDriver(Resource):
               NodePublishVolume() calls. The CSI driver is responsible for parsing and
               validating the information passed in as VolumeContext.
 
-              The following VolumeConext will be passed if podInfoOnMount is set to true.
+              The following VolumeContext will be passed if podInfoOnMount is set to true.
               This list might grow, but the prefix will be used.
               "csi.storage.k8s.io/pod.name": pod.Name "csi.storage.k8s.io/pod.namespace":
               pod.Namespace "csi.storage.k8s.io/pod.uid": string(pod.UID)
@@ -81,7 +81,7 @@ class CSIDriver(Resource):
               deployment determines which mode that is, for example via a command line
               parameter of the driver.
 
-              This field is immutable.
+              This field was immutable in Kubernetes < 1.29 and now is mutable.
 
             requires_republish(bool): requiresRepublish indicates the CSI driver wants `NodePublishVolume` being
               periodically called to reflect any possible change in the mounted volume.
