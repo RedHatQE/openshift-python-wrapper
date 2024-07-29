@@ -535,6 +535,7 @@ def class_generator(
 
 
 @click.command("Resource class generator")
+@click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
 @click.option(
     "-k",
     "--kind",
@@ -546,16 +547,15 @@ def class_generator(
     "--api-link",
     help="A link to the resource doc/api in the web",
 )
+@click.option("-o", "--output-file", help="The output python class file name to use, is nt sent kind will be used")
 @click.option(
     "-o",
     "--overwrite",
     is_flag=True,
     help="Output file overwrite existing file if passed",
 )
-@click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
-@click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
 @click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
-@click.option("-o", "--output-file", help="The output python class file name to use, is nt sent kind will be used")
+@click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
 @click.option(
     "--debug-file",
     type=click.Path(exists=True),
