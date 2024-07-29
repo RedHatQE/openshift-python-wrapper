@@ -71,6 +71,7 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
 
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
+    resource_kind_str: str = ""
 
     if resource_kind:
         resource_kind_str = resource_kind.group(1)  # noqa FCN001
