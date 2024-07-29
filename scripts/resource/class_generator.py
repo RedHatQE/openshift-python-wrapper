@@ -110,7 +110,80 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
-    return re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", string_).lower().strip()
+    """
+    Converts a camel case string to snake case.
+
+    Args:
+        string_ (str): The camel case string to convert.
+
+    Returns:
+        str: The snake case representation of the input string.
+
+    Examples:
+        >>> convert_camel_case_to_snake_case(string_="allocateLoadBalancerNodePorts")
+        'allocate_load_balancer_node_ports'
+        >>> convert_camel_case_to_snake_case(string_="clusterIPs")
+        'cluster_ips'
+        >>> convert_camel_case_to_snake_case(string_="additionalCORSAllowedOS")
+        'additional_cors_allowed_os'
+
+    Notes:
+        - This function assumes that the input string adheres to camel case conventions.
+        - If the input string contains acronyms (e.g., "XMLHttpRequest"), they will be treated as separate words
+          (e.g., "xml_http_request").
+        - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
+          (e.g., "myCamelCaseString").
+    """
+    formatted_str: str = ""
+
+    # For single words, e.g "Service"
+    if string_.islower():
+        return string_
+
+    if string_.istitle() or string_.isupper():
+        return string_.lower()
+
+    # To decide if underscore is needed before a char, keep the last char format.
+    # If previous char is uppercase, underscode should not be added. Also applied for the first char in the string.
+    last_capital_char: bool | None = None
+
+    # To decide if there are additional words ahead; if found, there is at least one more word ahead, else this is the
+    # last word. Underscore should be added before it and all chars from here should be lowercase.
+    following_capital_chars: re.Match | None = None
+
+    str_len_for_idx_check = len(string_) - 1
+
+    for idx, char in enumerate(string_):
+        # If lower case, append to formatted string
+        if char.islower():
+            formatted_str += char
+            last_capital_char = False
+
+        # If first char is uppercase
+        elif idx == 0:
+            formatted_str += char.lower()
+            last_capital_char = True
+
+        else:
+            if idx < str_len_for_idx_check:
+                following_capital_chars = re.search(r"[A-Z]", "".join(string_[idx + 1 :]))
+            if last_capital_char:
+                if idx < str_len_for_idx_check and string_[idx + 1].islower():
+                    if following_capital_chars:
+                        formatted_str += f"_{char.lower()}"
+                        last_capital_char = True
+                    else:
+                        formatted_str += char.lower()
+                        last_capital_char = True
+                else:
+                    formatted_str += char.lower()
+                    last_capital_char = True
+
+            else:
+                formatted_str += f"_{char.lower()}"
+                last_capital_char = True
+
+    return formatted_str
 
 
 def get_field_description(
