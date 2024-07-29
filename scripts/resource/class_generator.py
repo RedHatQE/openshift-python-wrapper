@@ -16,6 +16,8 @@ from ocp_resources.resource import Resource
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
+from pyhelper_utils.runners import function_runner_with_pdb
+
 
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
@@ -62,11 +64,22 @@ def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) 
         json.dump(content, fd, indent=4)
 
 
-def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = "") -> Dict[str, Any]:
+def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, Any]:
     """
-    Get oc/kubectl explain output for given kind and if kind is namespaced
+    Get oc/kubectl explain output for given kind, if kind is namespaced and debug filepath
     """
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
+
+    resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
+
+    if resource_kind:
+        resource_kind_str = resource_kind.group(1)  # noqa FCN001
+        formatted_kind_name = convert_camel_case_to_snake_case(string_=resource_kind_str)
+    else:
+        formatted_kind_name = convert_camel_case_to_snake_case(string_=kind)
+
+    output_debug_file_path = os.path.join(os.path.dirname(__file__), "debug", f"{formatted_kind_name}_debug.json")
+
     if debug:
         write_to_file(
             kind=kind,
@@ -74,13 +87,12 @@ def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = 
             output_debug_file_path=output_debug_file_path,
         )
 
-    resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
     if not resource_kind:
         LOGGER.error(f"Failed to get resource kind from explain for {kind}")
         return {}
 
     _, namespace_out, _ = run_command(
-        command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind.group(1)} | wc -l'"),
+        command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind_str} | wc -l'"),
         check=False,
     )
     if debug:
@@ -90,15 +102,15 @@ def get_kind_data(kind: str, debug: bool = False, output_debug_file_path: str = 
             output_debug_file_path=output_debug_file_path,
         )
 
-    if namespace_out.strip() == "1":
-        return {"data": explain_out, "namespaced": True}
+    return {
+        "data": explain_out,
+        "namespaced": namespace_out.strip() == "1",
+        "debug_file": output_debug_file_path,
+    }
 
-    return {"data": explain_out, "namespaced": False}
 
-
-def format_resource_kind(resource_kind: str) -> str:
-    """Convert CamelCase to snake_case"""
-    return re.sub(r"(?<!^)(?<=[a-z])(?=[A-Z])", "_", resource_kind).lower().strip()
+def convert_camel_case_to_snake_case(string_: str) -> str:
+    return re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", string_).lower().strip()
 
 
 def get_field_description(
@@ -158,7 +170,7 @@ def get_arg_params(
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
-    name = format_resource_kind(resource_kind=_orig_name)
+    name = convert_camel_case_to_snake_case(string_=_orig_name)
     type_ = _type.strip()
     required: bool = "-required-" in splited_field
     type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
@@ -201,7 +213,6 @@ def get_arg_params(
 
 def generate_resource_file_from_dict(
     resource_dict: Dict[str, Any],
-    output_dir="ocp_resources",
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
@@ -211,7 +222,7 @@ def generate_resource_file_from_dict(
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=DebugUndefined,
-        autoescape=True,
+        autoescape=False,
     )
 
     template = env.get_template(name="class_generator_template.j2")
@@ -223,9 +234,9 @@ def generate_resource_file_from_dict(
 
     temp_output_file: str = ""
     if output_file:
-        _output_file = f"{output_dir}/{output_file}"
+        _output_file = output_file
     else:
-        _output_file = f"{output_dir}/{format_resource_kind(resource_kind=resource_dict['KIND'])}.py"
+        _output_file = f"ocp_resources/{convert_camel_case_to_snake_case(string_=resource_dict['KIND'])}.py"
 
     if os.path.exists(_output_file):
         if overwrite:
@@ -295,7 +306,7 @@ def parse_explain(
             start_fields_section = section
             continue
 
-        key, val = section.split(":")
+        key, val = section.split(":", 1)
         resource_dict[key.strip()] = val.strip()
 
     kind = resource_dict["KIND"]
@@ -458,22 +469,22 @@ def class_generator(
     dry_run: bool = False,
     debug: bool = False,
     process_debug_file: str = "",
-    generated_file_output_dir: str = "ocp_resources",
     output_file: str = "",
 ) -> str:
     """
     Generates a class for a given Kind.
     """
     debug_content: Dict[str, str] = {}
-    output_debug_file_path = os.path.join(os.path.dirname(__file__), "debug", f"{kind}-debug.json")
 
     if process_debug_file:
         debug = False
         with open(process_debug_file) as fd:
             debug_content = json.load(fd)
 
-        kind_data = debug_content["explain"]
-        namespaced = debug_content["namespace"].strip() == "1"
+        kind_data: Dict[str, Any] = {
+            "data": debug_content["explain"],
+            "namespaced": debug_content["namespace"].strip() == "1",
+        }
         api_link = "https://debug.explain"
 
     else:
@@ -495,16 +506,18 @@ def class_generator(
         if not check_kind_exists(kind=kind):
             return ""
 
-        explain_output = get_kind_data(kind=kind, debug=debug, output_debug_file_path=output_debug_file_path)
-        if not explain_output:
+        kind_data = get_kind_data_and_debug_file(
+            kind=kind,
+            debug=debug,
+        )
+        if not kind_data:
             return ""
 
-        namespaced = explain_output["namespaced"]
-        kind_data = explain_output["data"]
+    output_debug_file_path = kind_data.get("debug_file", "")
 
     resource_dict = parse_explain(
-        output=kind_data,
-        namespaced=namespaced,
+        output=kind_data["data"],
+        namespaced=kind_data["namespaced"],
         api_link=api_link,
         debug=debug,
         output_debug_file_path=output_debug_file_path,
@@ -517,7 +530,6 @@ def class_generator(
         resource_dict=resource_dict,
         overwrite=overwrite,
         dry_run=dry_run,
-        output_dir=generated_file_output_dir,
         output_file=output_file,
     )
 
@@ -547,7 +559,12 @@ def class_generator(
     "--api-link",
     help="A link to the resource doc/api in the web",
 )
-@click.option("-o", "--output-file", help="The output python class file name to use, is nt sent kind will be used")
+@click.option(
+    "-o",
+    "--output-file",
+    help="The full filename path to generate a python resourece file. If not sent, resourece kind will be used",
+    type=click.Path(),
+)
 @click.option(
     "-o",
     "--overwrite",
@@ -561,6 +578,12 @@ def class_generator(
     type=click.Path(exists=True),
     help="Run the script from debug file. (generated by --debug)",
 )
+@click.option(
+    "--pdb",
+    help="Drop to `ipdb` shell on exception",
+    is_flag=True,
+    show_default=True,
+)
 def main(
     kind: str,
     api_link: str,
@@ -570,7 +593,9 @@ def main(
     debug: bool,
     debug_file: str,
     output_file: str,
+    pdb: bool,
 ):
+    _ = pdb
     return class_generator(
         kind=kind,
         api_link=api_link,
@@ -584,4 +609,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main()
+    function_runner_with_pdb(func=main)

@@ -172,6 +172,23 @@ class Pod(NamespacedResource):
                   Compute Resources required by this container. Cannot be updated. More info:
                   https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 
+                restartPolicy	<string>
+                  RestartPolicy defines the restart behavior of individual containers in a
+                  pod. This field may only be set for init containers, and the only allowed
+                  value is "Always". For non-init containers or when this field is not
+                  specified, the restart behavior is defined by the Pod's restart policy and
+                  the container type. Setting the RestartPolicy as "Always" for the init
+                  container will have the following effect: this init container will be
+                  continually restarted on exit until all regular containers have terminated.
+                  Once all regular containers have completed, all init containers with
+                  restartPolicy "Always" will be shut down. This lifecycle differs from normal
+                  init containers and is often referred to as a "sidecar" container. Although
+                  this init container still starts in the init container sequence, it does not
+                  wait for the container to complete before proceeding to the next init
+                  container. Instead, the next init container starts immediately after this
+                  init container is started, or after any startupProbe has successfully
+                  completed.
+
                 securityContext	<SecurityContext>
                   SecurityContext defines the security options the container should be run
                   with. If set, the fields of SecurityContext override the equivalent fields
@@ -376,6 +393,11 @@ class Pod(NamespacedResource):
                   Resources are not allowed for ephemeral containers. Ephemeral containers use
                   spare resources already allocated to the pod.
 
+                restartPolicy	<string>
+                  Restart policy for the container to manage the restart behavior of each
+                  container within a pod. This may only be set for init containers. You cannot
+                  set this field on ephemeral containers.
+
                 securityContext	<SecurityContext>
                   Optional: SecurityContext defines the security options the ephemeral
                   container should be run with. If set, the fields of SecurityContext override
@@ -450,8 +472,7 @@ class Pod(NamespacedResource):
                   Cannot be updated.
 
             host_aliases(Dict[Any, Any]): HostAliases is an optional list of hosts and IPs that will be injected into
-              the pod's hosts file if specified. This is only valid for non-hostNetwork
-              pods.
+              the pod's hosts file if specified.
               HostAlias holds the mapping between IP and hostnames that will be injected
               as an entry in the pod's hosts file.
 
@@ -459,7 +480,7 @@ class Pod(NamespacedResource):
                 hostnames	<[]string>
                   Hostnames for the above IP address.
 
-                ip	<string>
+                ip	<string> -required-
                   IP address of the host file entry.
 
             host_ipc(bool): Use the host's ipc namespace. Optional: Default to false.
@@ -493,7 +514,9 @@ class Pod(NamespacedResource):
 
               FIELDS:
                 name	<string>
-                  Name of the referent. More info:
+                  Name of the referent. This field is effectively required, but due to
+                  backwards compatibility is allowed to be empty. Instances of this type with
+                  an empty value here are almost certainly wrong. More info:
                   https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
 
             init_containers(Dict[Any, Any]): List of initialization containers belonging to the pod. Init containers are
@@ -596,6 +619,23 @@ class Pod(NamespacedResource):
                   Compute Resources required by this container. Cannot be updated. More info:
                   https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 
+                restartPolicy	<string>
+                  RestartPolicy defines the restart behavior of individual containers in a
+                  pod. This field may only be set for init containers, and the only allowed
+                  value is "Always". For non-init containers or when this field is not
+                  specified, the restart behavior is defined by the Pod's restart policy and
+                  the container type. Setting the RestartPolicy as "Always" for the init
+                  container will have the following effect: this init container will be
+                  continually restarted on exit until all regular containers have terminated.
+                  Once all regular containers have completed, all init containers with
+                  restartPolicy "Always" will be shut down. This lifecycle differs from normal
+                  init containers and is often referred to as a "sidecar" container. Although
+                  this init container still starts in the init container sequence, it does not
+                  wait for the container to complete before proceeding to the next init
+                  container. Instead, the next init container starts immediately after this
+                  init container is started, or after any startupProbe has successfully
+                  completed.
+
                 securityContext	<SecurityContext>
                   SecurityContext defines the security options the container should be run
                   with. If set, the fields of SecurityContext override the equivalent fields
@@ -683,11 +723,12 @@ class Pod(NamespacedResource):
 
               If the OS field is set to windows, following fields must be unset: -
               spec.hostPID - spec.hostIPC - spec.hostUsers -
-              spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile -
-              spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy -
-              spec.securityContext.sysctls - spec.shareProcessNamespace -
-              spec.securityContext.runAsUser - spec.securityContext.runAsGroup -
-              spec.securityContext.supplementalGroups -
+              spec.securityContext.appArmorProfile - spec.securityContext.seLinuxOptions -
+              spec.securityContext.seccompProfile - spec.securityContext.fsGroup -
+              spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls -
+              spec.shareProcessNamespace - spec.securityContext.runAsUser -
+              spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups -
+              spec.containers[*].securityContext.appArmorProfile -
               spec.containers[*].securityContext.seLinuxOptions -
               spec.containers[*].securityContext.seccompProfile -
               spec.containers[*].securityContext.capabilities -
@@ -856,8 +897,6 @@ class Pod(NamespacedResource):
 
               SchedulingGates can only be set at pod creation time, and be removed only
               afterwards.
-
-              This is a beta feature enabled by the PodSchedulingReadiness feature gate.
               PodSchedulingGate is associated to a Pod to guard its scheduling.
 
               FIELDS:
@@ -874,6 +913,10 @@ class Pod(NamespacedResource):
               PodSecurityContext.
 
               FIELDS:
+                appArmorProfile	<AppArmorProfile>
+                  appArmorProfile is the AppArmor options to use by the containers in this
+                  pod. Note that this field cannot be set when spec.os.name is windows.
+
                 fsGroup	<integer>
                   A special supplemental group that applies to all containers in a pod. Some
                   volume types allow the Kubelet to change the ownership of that volume to be
@@ -960,7 +1003,7 @@ class Pod(NamespacedResource):
                   SecurityContext takes precedence. Note that this field cannot be set when
                   spec.os.name is linux.
 
-            service_account(str): DeprecatedServiceAccount is a depreciated alias for ServiceAccountName.
+            service_account(str): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
               Deprecated: Use serviceAccountName instead.
 
             service_account_name(str): ServiceAccountName is the name of the ServiceAccount to use to run this pod.
@@ -1101,9 +1144,6 @@ class Pod(NamespacedResource):
                   pod with the same labelSelector cannot be scheduled, because computed skew
                   will be 3(3 - 0) if new Pod is scheduled to any of the three zones, it will
                   violate MaxSkew.
-
-                  This is a beta field and requires the MinDomainsInPodTopologySpread feature
-                  gate to be enabled (enabled by default).
 
                 nodeAffinityPolicy	<string>
                   NodeAffinityPolicy indicates how we will treat Pod's
