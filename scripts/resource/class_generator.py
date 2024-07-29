@@ -139,7 +139,7 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
     if string_.islower():
         return string_
 
-    # For single words, e.g "Service"
+    # For single words, e.g "Service" or "SERVICE"
     if string_.istitle() or string_.isupper():
         return string_.lower()
 

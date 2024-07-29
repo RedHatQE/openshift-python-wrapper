@@ -46,18 +46,26 @@ def test_parse_explain(tmpdir_factory, kind, debug_file, result_file):
 
 
 @pytest.mark.parametrize(
-    "description, camel_case_str, expected",
-    (
-        ("Title word", "Title", "title"),
-        ("Lower case word", "tolerations", "tolerations"),
-        ("Upper case word", "UPPERCASEWORD", "uppercaseword"),
-        ("Combined - basic with 2 words", "ipFamilies", "ip_families"),
-        ("Combined - basic with mutliple words", "allocateLoadBalancerNodePorts", "allocate_load_balancer_node_ports"),
-        ("Combined - upper case word is first", "XMLHttpRequest", "xml_http_request"),
-        ("Combined - upper case word is in the middle", "additionalCORSAllowedOS", "additional_cors_allowed_os"),
-        ("Combined - upper case word is last", "hostIPC", "host_ipc"),
-        ("Combined - upper case word is last, ends with lowercase", "clusterIPs", "cluster_ips"),
-    ),
+    "camel_case_str, expected",
+    [
+        pytest.param("Title", "title", id="title-word"),
+        pytest.param("tolerations", "tolerations", id="lowercase-word"),
+        pytest.param("UPPERCASEWORD", "uppercaseword", id="uppercase-word"),
+        pytest.param("ipFamilies", "ip_families", id="combined-basic-with-two-words"),
+        pytest.param(
+            "allocateLoadBalancerNodePorts",
+            "allocate_load_balancer_node_ports",
+            id="combined-basic-with-mutliple-words",
+        ),
+        pytest.param("XMLHttpRequest", "xml_http_request", id="combined-uppercase-word-is-first"),
+        pytest.param(
+            "additionalCORSAllowedOS", "additional_cors_allowed_os", id="combined-uppercase-word-in-the-middle"
+        ),
+        pytest.param("hostIPC", "host_ipc", id="combined-uppercase-word-is-last"),
+        pytest.param("clusterIPs", "cluster_ips", id="combined-uppercase-word-is-last-ends-with-lowercase"),
+    ],
 )
-def test_convert_camel_case_to_snake_case(description, camel_case_str, expected):
-    assert convert_camel_case_to_snake_case(string_=camel_case_str) == expected, f"Failed {description}"
+def test_convert_camel_case_to_snake_case(request, camel_case_str, expected):
+    assert (
+        convert_camel_case_to_snake_case(string_=camel_case_str) == expected
+    ), f"Failed {request.node.callspec.idrequest.node.callspec.id}"
