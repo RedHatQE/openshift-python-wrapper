@@ -30,7 +30,7 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: [--exclude-files=scripts/resource/tests/manifests/Pod-debug.json]
+        args: [--exclude-files=scripts/resource/tests/manifests/pod_debug.json]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.4
