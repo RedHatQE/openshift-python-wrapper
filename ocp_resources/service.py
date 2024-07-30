@@ -41,6 +41,7 @@ class Service(NamespacedResource):
         selector: Optional[Dict[str, Any]] = None,
         session_affinity: Optional[str] = "",
         session_affinity_config: Optional[Dict[str, Any]] = None,
+        traffic_distribution: Optional[str] = "",
         type: Optional[str] = "",
         **kwargs: Any,
     ) -> None:
@@ -121,9 +122,7 @@ class Service(NamespacedResource):
               traffic policy into account when picking a node.
 
               Possible enum values:
-               - `"Cluster"`
                - `"Cluster"` routes traffic to all endpoints.
-               - `"Local"`
                - `"Local"` preserves the source IP of the traffic by routing only to
               endpoints on the same node as the traffic was received on (dropping the
               traffic if there are no local endpoints).
@@ -211,10 +210,9 @@ class Service(NamespacedResource):
               the underlying cloud-provider supports specifying the loadBalancerIP when a
               load balancer is created. This field will be ignored if the cloud-provider
               does not support the feature. Deprecated: This field was under-specified and
-              its meaning varies across implementations, and it cannot support dual-stack.
-              As of Kubernetes v1.24, users are encouraged to use implementation-specific
-              annotations when available. This field may be removed in a future API
-              version.
+              its meaning varies across implementations. Using it is non-portable and it
+              may not support dual-stack. Users are encouraged to use
+              implementation-specific annotations when available.
 
             load_balancer_source_ranges(Dict[Any, Any]): If specified and supported by the platform, this will restrict traffic
               through the cloud-provider load-balancer will be restricted to the specified
@@ -228,11 +226,25 @@ class Service(NamespacedResource):
 
               FIELDS:
                 appProtocol	<string>
-                  The application protocol for this port. This field follows standard
-                  Kubernetes label syntax. Un-prefixed names are reserved for IANA standard
-                  service names (as per RFC-6335 and
-                  https://www.iana.org/assignments/service-names). Non-standard protocols
-                  should use prefixed names such as mycompany.com/my-custom-protocol.
+                  The application protocol for this port. This is used as a hint for
+                  implementations to offer richer behavior for protocols that they understand.
+                  This field follows standard Kubernetes label syntax. Valid values are
+                  either:
+
+                  * Un-prefixed protocol names - reserved for IANA standard service names (as
+                  per RFC-6335 and https://www.iana.org/assignments/service-names).
+
+                  * Kubernetes-defined prefixed names:
+                    * 'kubernetes.io/h2c' - HTTP/2 prior knowledge over cleartext as described
+                  in
+                  https://www.rfc-editor.org/rfc/rfc9113.html#name-starting-http-2-with-prior-
+                    * 'kubernetes.io/ws'  - WebSocket over cleartext as described in
+                  https://www.rfc-editor.org/rfc/rfc6455
+                    * 'kubernetes.io/wss' - WebSocket over TLS as described in
+                  https://www.rfc-editor.org/rfc/rfc6455
+
+                  * Other protocols should use implementation-defined prefixed names such as
+                  mycompany.com/my-custom-protocol.
 
                 name	<string>
                   The name of this port within the service. This must be a DNS_LABEL. All
@@ -305,6 +317,14 @@ class Service(NamespacedResource):
                 clientIP	<ClientIPConfig>
                   clientIP contains the configurations of Client IP based session affinity.
 
+            traffic_distribution(str): TrafficDistribution offers a way to express preferences for how traffic is
+              distributed to Service endpoints. Implementations can use this field as a
+              hint, but are not required to guarantee strict adherence. If the field is
+              not set, the implementation will apply its default routing strategy. If set
+              to "PreferClose", implementations should prioritize endpoints that are
+              topologically close (e.g., same zone). This is an alpha field and requires
+              enabling ServiceTrafficDistribution feature.
+
             type(str): type determines how the Service is exposed. Defaults to ClusterIP. Valid
               options are ExternalName, ClusterIP, NodePort, and LoadBalancer. "ClusterIP"
               allocates a cluster-internal IP address for load-balancing to endpoints.
@@ -353,6 +373,7 @@ class Service(NamespacedResource):
         self.selector = selector
         self.session_affinity = session_affinity
         self.session_affinity_config = session_affinity_config
+        self.traffic_distribution = traffic_distribution
         self.type = type
 
     def to_dict(self) -> None:
@@ -415,6 +436,9 @@ class Service(NamespacedResource):
 
             if self.session_affinity_config:
                 _spec["sessionAffinityConfig"] = self.session_affinity_config
+
+            if self.traffic_distribution:
+                _spec["trafficDistribution"] = self.traffic_distribution
 
             if self.type:
                 _spec["type"] = self.type
