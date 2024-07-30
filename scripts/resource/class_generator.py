@@ -646,7 +646,6 @@ def class_generator(
     type=click.Path(),
 )
 @click.option(
-    "-o",
     "--overwrite",
     is_flag=True,
     help="Output file overwrite existing file if passed",
