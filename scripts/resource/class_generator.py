@@ -54,7 +54,7 @@ def check_cluster_available() -> bool:
     return run_command(command=shlex.split(f"{_exec} version"), check=False)[0]
 
 
-def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) -> None:
+def write_to_file(data: Dict[str, Any], output_debug_file_path: str) -> None:
     content = {}
     if os.path.isfile(output_debug_file_path):
         with open(output_debug_file_path) as fd:
@@ -80,12 +80,11 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool
     else:
         formatted_kind_name = convert_camel_case_to_snake_case(string_=kind)
 
-    output_debug_dir = TESTS_OUTPUT_DIR if add_tests else os.path.dirname(__file__)
-    output_debug_file_path = os.path.join(output_debug_dir, "debug", f"{formatted_kind_name}_debug.json")
+    output_debug_dir = TESTS_OUTPUT_DIR if add_tests else os.path.join(os.path.dirname(__file__), "debug")
+    output_debug_file_path = os.path.join(output_debug_dir, f"{formatted_kind_name}_debug.json")
 
     if debug or add_tests:
         write_to_file(
-            kind=kind,
             data={"explain": explain_out},
             output_debug_file_path=output_debug_file_path,
         )
@@ -100,7 +99,6 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool
     )
     if debug:
         write_to_file(
-            kind=kind,
             data={"namespace": namespace_out},
             output_debug_file_path=output_debug_file_path,
         )
@@ -226,7 +224,6 @@ def get_field_description(
 
     if debug or add_tests:
         write_to_file(
-            kind=kind,
             data={f"explain-{field_name}": _out},
             output_debug_file_path=output_debug_file_path,
         )
@@ -607,6 +604,7 @@ def class_generator(
         kind_data = get_kind_data_and_debug_file(
             kind=kind,
             debug=debug,
+            add_tests=add_tests,
         )
         if not kind_data:
             return ""
@@ -640,7 +638,7 @@ def class_generator(
             check=False,
         )
 
-    if debug:
+    if debug or add_tests:
         LOGGER.info(f"Debug output saved to {output_debug_file_path}")
 
     return generated_py_file
