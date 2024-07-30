@@ -5,9 +5,7 @@ import filecmp
 
 import pytest
 
-from scripts.resource.class_generator import class_generator
-
-MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
+from scripts.resource.class_generator import TESTS_MANIFESTS_DIR, class_generator
 
 
 @pytest.mark.parametrize(
@@ -15,28 +13,28 @@ MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
     (
         (
             "secret",
-            os.path.join(MANIFESTS_PATH, "secret", "secret_debug.json"),
-            os.path.join(MANIFESTS_PATH, "secret", "secret_res.py"),
+            os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_res.py"),
         ),
         (
             "api_server",
-            os.path.join(MANIFESTS_PATH, "api_server", "api_server_debug.json"),
-            os.path.join(MANIFESTS_PATH, "api_server", "api_server_res.py"),
+            os.path.join(TESTS_MANIFESTS_DIR, "api_server", "api_server_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "api_server", "api_server_res.py"),
         ),
         (
             "config_map",
-            os.path.join(MANIFESTS_PATH, "config_map", "config_map_debug.json"),
-            os.path.join(MANIFESTS_PATH, "config_map", "config_map_res.py"),
+            os.path.join(TESTS_MANIFESTS_DIR, "config_map", "config_map_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "config_map", "config_map_res.py"),
         ),
         (
             "deployment",
-            os.path.join(MANIFESTS_PATH, "deployment", "deployment_debug.json"),
-            os.path.join(MANIFESTS_PATH, "deployment", "deployment_res.py"),
+            os.path.join(TESTS_MANIFESTS_DIR, "deployment", "deployment_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "deployment", "deployment_res.py"),
         ),
         (
             "pod",
-            os.path.join(MANIFESTS_PATH, "pod", "pod_debug.json"),
-            os.path.join(MANIFESTS_PATH, "pod", "pod_res.py"),
+            os.path.join(TESTS_MANIFESTS_DIR, "pod", "pod_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "pod", "pod_res.py"),
         ),
     ),
 )

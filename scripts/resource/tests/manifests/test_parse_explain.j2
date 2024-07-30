@@ -5,9 +5,7 @@ import filecmp
 
 import pytest
 
-from scripts.resource.class_generator import class_generator
-
-MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
+from scripts.resource.class_generator import TESTS_MANIFESTS_DIR, class_generator
 
 
 @pytest.mark.parametrize(
@@ -15,8 +13,8 @@ MANIFESTS_PATH: str = "scripts/resource/tests/manifests"
     ({% for test_info in template %}
         (
             "{{ test_info["kind"] }}",
-            os.path.join(MANIFESTS_PATH, "{{ test_info["kind"] }}", "{{ test_info["debug_file"] }}"),
-            os.path.join(MANIFESTS_PATH, "{{ test_info["kind"] }}", "{{ test_info["res_file"] }}"),
+            os.path.join(TESTS_MANIFESTS_DIR, "{{ test_info["kind"] }}", "{{ test_info["debug_file"] }}"),
+            os.path.join(TESTS_MANIFESTS_DIR, "{{ test_info["kind"] }}", "{{ test_info["res_file"] }}"),
         ),
     {% endfor %}),
 )
