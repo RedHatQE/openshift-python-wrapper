@@ -366,7 +366,6 @@ def generate_resource_file_from_dict(
 
 
 def parse_explain(
-    api_link: str,
     output: str,
     namespaced: Optional[bool] = None,
     debug: bool = False,
@@ -377,7 +376,6 @@ def parse_explain(
     sections: List[str] = []
     resource_dict: Dict[str, Any] = {
         "BASE_CLASS": "NamespacedResource" if namespaced else "Resource",
-        "API_LINK": api_link,
     }
     new_sections_words: Tuple[str, str, str] = ("KIND:", "VERSION:", "GROUP:")
 
@@ -537,13 +535,6 @@ def parse_explain(
     return resource_dict
 
 
-def validate_api_link_schema(value: str) -> str:
-    if not value.startswith("https://"):
-        raise click.BadParameter("Resource API linkn must start with https://")
-
-    return value
-
-
 def check_kind_exists(kind: str) -> bool:
     return run_command(
         command=shlex.split(f"oc explain {kind}"),
@@ -551,21 +542,16 @@ def check_kind_exists(kind: str) -> bool:
     )[0]
 
 
-def get_user_args_from_interactive() -> Tuple[str, str]:
+def get_user_args_from_interactive() -> str:
     kind = Prompt.ask(prompt="Enter the resource kind to generate class for")
     if not kind:
-        return "", ""
+        return ""
 
-    api_link = Prompt.ask(prompt="Enter the resource API link")
-    if not api_link:
-        return "", ""
-
-    return kind, api_link
+    return kind
 
 
 def class_generator(
     kind: str = "",
-    api_link: str = "",
     overwrite: bool = False,
     interactive: bool = False,
     dry_run: bool = False,
@@ -587,7 +573,6 @@ def class_generator(
             "data": debug_content["explain"],
             "namespaced": debug_content["namespace"].strip() == "1",
         }
-        api_link = "https://debug.explain"
 
     else:
         if not check_cluster_available():
@@ -597,13 +582,11 @@ def class_generator(
             return ""
 
         if interactive:
-            kind, api_link = get_user_args_from_interactive()
+            kind = get_user_args_from_interactive()
 
-        if not kind or not api_link:
+        if not kind:
             LOGGER.error("Kind or API link not provided")
             return ""
-
-        validate_api_link_schema(value=api_link)
 
         if not check_kind_exists(kind=kind):
             return ""
@@ -620,7 +603,6 @@ def class_generator(
     resource_dict = parse_explain(
         output=kind_data["data"],
         namespaced=kind_data["namespaced"],
-        api_link=api_link,
         debug=debug,
         output_debug_file_path=output_debug_file_path,
         debug_content=debug_content,
@@ -658,18 +640,12 @@ def class_generator(
     help="The Kind to generate the class for, Needs working cluster with admin privileges",
 )
 @click.option(
-    "-l",
-    "--api-link",
-    help="A link to the resource doc/api in the web",
-)
-@click.option(
     "-o",
     "--output-file",
     help="The full filename path to generate a python resourece file. If not sent, resourece kind will be used",
     type=click.Path(),
 )
 @click.option(
-    "-o",
     "--overwrite",
     is_flag=True,
     help="Output file overwrite existing file if passed",
@@ -689,7 +665,6 @@ def class_generator(
 )
 def main(
     kind: str,
-    api_link: str,
     overwrite: bool,
     interactive: bool,
     dry_run: bool,
@@ -701,7 +676,6 @@ def main(
     _ = pdb
     return class_generator(
         kind=kind,
-        api_link=api_link,
         overwrite=overwrite,
         interactive=interactive,
         dry_run=dry_run,

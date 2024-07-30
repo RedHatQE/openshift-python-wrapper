@@ -8,8 +8,6 @@ class Pod(NamespacedResource):
     """
     Pod is a collection of containers that can run on a host. This resource is
     created by clients and scheduled onto hosts.
-
-    API Link: https://debug.explain
     """
 
     api_version: str = NamespacedResource.ApiVersion.V1
