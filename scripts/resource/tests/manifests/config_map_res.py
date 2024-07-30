@@ -7,8 +7,6 @@ from ocp_resources.resource import NamespacedResource
 class ConfigMap(NamespacedResource):
     """
     ConfigMap holds configuration data for pods to consume.
-
-    API Link: https://debug.explain
     """
 
     api_version: str = NamespacedResource.ApiVersion.V1
