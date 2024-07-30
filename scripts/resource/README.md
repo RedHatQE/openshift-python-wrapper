@@ -16,10 +16,10 @@ poetry install
 
 ###### Call the script
 
-- Running in normal mode with `--kind` and `--api-link` flags:
+- Running in normal mode with `--kind` flags:
 
 ```bash
-poetry run python scripts/resource/class_generator.py --kind <kind> --api-link <link to resource API or DOC>
+poetry run python scripts/resource/class_generator.py --kind <kind>
 
 ```
 
@@ -33,10 +33,9 @@ poetry run python scripts/resource/class_generator.py --interactive
 
 - Generate the resource file the debug file by adding `--debug` flag
 - Replace `Pod` with the kind you want to test
-- `--api-link` must be `https://debug.explain`
 
 ```bash
-poetry run python scripts/resource/class_generator.py --api-link https://debug.explain --kind Pod --output-file /tmp/pod_res.py --debug
+poetry run python scripts/resource/class_generator.py --kind Pod --output-file /tmp/pod_res.py --debug
 ```
 
 - Move the resource file under [tests manifests dir](scripts/resource/tests/manifests/)
@@ -46,6 +45,7 @@ mv /tmp/pod_res.py scripts/resource/tests/manifests/
 ```
 
 - Move the debug file under [tests manifests dir](scripts/resource/tests/manifests/)
+
 ```bash
 mv scripts/resource/debug/Pod_debug.json scripts/resource/tests/manifests/
 ```
@@ -55,7 +55,7 @@ mv scripts/resource/debug/Pod_debug.json scripts/resource/tests/manifests/
 - Running with debug mode and `--debug` flag:
 
 ```bash
-poetry run python scripts/resource/class_generator.py --kind <kind> --api-link <link to resource API or DOC> --debug
+poetry run python scripts/resource/class_generator.py --kind <kind> --debug
 ```
 
 `<kind>-debug.json` will be located under `scripts/resource/debug`
