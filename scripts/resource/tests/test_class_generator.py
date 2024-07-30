@@ -1,3 +1,5 @@
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md#adding-tests
+
 import os
 import filecmp
 

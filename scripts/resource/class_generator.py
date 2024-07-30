@@ -314,7 +314,7 @@ def get_arg_params(
     return _res
 
 
-def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, template_name: str):
+def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, template_name: str) -> str:
     env = Environment(
         loader=FileSystemLoader(template_dir),
         trim_blocks=True,
@@ -659,7 +659,7 @@ def class_generator(
     return generated_py_file
 
 
-def write_and_format_rendered(filepath, data):
+def write_and_format_rendered(filepath: str, data: str) -> None:
     with open(filepath, "w") as fd:
         fd.write(data)
 
@@ -671,7 +671,7 @@ def write_and_format_rendered(filepath, data):
         )
 
 
-def generate_class_generator_tests():
+def generate_class_generator_tests() -> None:
     tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
 
     for _dir in os.listdir(TESTS_MANIFESTS_DIR):
