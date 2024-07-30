@@ -7,8 +7,6 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 class SSP(NamespacedResource):
     """
     SSP is the Schema for the ssps API
-
-    API Link: https://github.com/kubevirt/ssp-operator/blob/main/docs/configuration.md
     """
 
     api_group: str = NamespacedResource.ApiGroup.SSP_KUBEVIRT_IO
