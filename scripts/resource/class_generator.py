@@ -16,6 +16,8 @@ from ocp_resources.resource import Resource
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
+from pyhelper_utils.runners import function_runner_with_pdb
+
 
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
@@ -69,6 +71,7 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
     _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind} --recursive"))
 
     resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
+    resource_kind_str: str = ""
 
     if resource_kind:
         resource_kind_str = resource_kind.group(1)  # noqa FCN001
@@ -108,7 +111,80 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
-    return re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", string_).lower().strip()
+    """
+    Converts a camel case string to snake case.
+
+    Args:
+        string_ (str): The camel case string to convert.
+
+    Returns:
+        str: The snake case representation of the input string.
+
+    Examples:
+        >>> convert_camel_case_to_snake_case(string_="allocateLoadBalancerNodePorts")
+        'allocate_load_balancer_node_ports'
+        >>> convert_camel_case_to_snake_case(string_="clusterIPs")
+        'cluster_ips'
+        >>> convert_camel_case_to_snake_case(string_="additionalCORSAllowedOS")
+        'additional_cors_allowed_os'
+
+    Notes:
+        - This function assumes that the input string adheres to camel case conventions.
+        - If the input string contains acronyms (e.g., "XMLHttpRequest"), they will be treated as separate words
+          (e.g., "xml_http_request").
+        - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
+          (e.g., "myCamelCaseString").
+    """
+    formatted_str: str = ""
+
+    if string_.islower():
+        return string_
+
+    # For single words, e.g "Service" or "SERVICE"
+    if string_.istitle() or string_.isupper():
+        return string_.lower()
+
+    # To decide if underscore is needed before a char, keep the last char format.
+    # If previous char is uppercase, underscode should not be added. Also applied for the first char in the string.
+    last_capital_char: bool | None = None
+
+    # To decide if there are additional words ahead; if found, there is at least one more word ahead, else this is the
+    # last word. Underscore should be added before it and all chars from here should be lowercase.
+    following_capital_chars: re.Match | None = None
+
+    str_len_for_idx_check = len(string_) - 1
+
+    for idx, char in enumerate(string_):
+        # If lower case, append to formatted string
+        if char.islower():
+            formatted_str += char
+            last_capital_char = False
+
+        # If first char is uppercase
+        elif idx == 0:
+            formatted_str += char.lower()
+            last_capital_char = True
+
+        else:
+            if idx < str_len_for_idx_check:
+                following_capital_chars = re.search(r"[A-Z]", "".join(string_[idx + 1 :]))
+            if last_capital_char:
+                if idx < str_len_for_idx_check and string_[idx + 1].islower():
+                    if following_capital_chars:
+                        formatted_str += f"_{char.lower()}"
+                        last_capital_char = True
+                    else:
+                        formatted_str += char.lower()
+                        last_capital_char = True
+                else:
+                    formatted_str += char.lower()
+                    last_capital_char = True
+
+            else:
+                formatted_str += f"_{char.lower()}"
+                last_capital_char = True
+
+    return formatted_str
 
 
 def get_field_description(
@@ -214,6 +290,7 @@ def generate_resource_file_from_dict(
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
+    interactive: bool = False,
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
@@ -226,11 +303,13 @@ def generate_resource_file_from_dict(
     template = env.get_template(name="class_generator_template.j2")
     rendered = template.render(resource_dict)
     undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
+
     if undefined_variables:
         LOGGER.error(f"The following variables are undefined: {undefined_variables}")
-        raise click.Abort()
+        sys.exit(1)
 
     temp_output_file: str = ""
+
     if output_file:
         _output_file = output_file
     else:
@@ -239,6 +318,15 @@ def generate_resource_file_from_dict(
     if os.path.exists(_output_file):
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
+
+        elif interactive:
+            if Prompt.ask(prompt=f"Overwrite {_output_file}?", choices=["y", "n"]) == "n":
+                if user_file_name := Prompt.ask(prompt="Provide file name"):
+                    _output_file = user_file_name
+                else:
+                    LOGGER.error("No file name provided")
+                    sys.exit(1)
+
         else:
             temp_output_file = f"{_output_file[:-3]}_TEMP.py"
             LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
@@ -529,6 +617,7 @@ def class_generator(
         overwrite=overwrite,
         dry_run=dry_run,
         output_file=output_file,
+        interactive=interactive,
     )
 
     if not dry_run:
@@ -576,6 +665,12 @@ def class_generator(
     type=click.Path(exists=True),
     help="Run the script from debug file. (generated by --debug)",
 )
+@click.option(
+    "--pdb",
+    help="Drop to `ipdb` shell on exception",
+    is_flag=True,
+    show_default=True,
+)
 def main(
     kind: str,
     api_link: str,
@@ -585,7 +680,9 @@ def main(
     debug: bool,
     debug_file: str,
     output_file: str,
+    pdb: bool,
 ):
+    _ = pdb
     return class_generator(
         kind=kind,
         api_link=api_link,
@@ -599,4 +696,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main()
+    function_runner_with_pdb(func=main)
