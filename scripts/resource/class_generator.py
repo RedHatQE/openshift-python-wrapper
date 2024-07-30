@@ -83,7 +83,7 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool
     output_debug_dir = TESTS_OUTPUT_DIR if add_tests else os.path.dirname(__file__)
     output_debug_file_path = os.path.join(output_debug_dir, "debug", f"{formatted_kind_name}_debug.json")
 
-    if debug:
+    if debug or add_tests:
         write_to_file(
             kind=kind,
             data={"explain": explain_out},
