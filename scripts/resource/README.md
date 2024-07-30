@@ -31,23 +31,11 @@ poetry run python scripts/resource/class_generator.py --interactive
 
 #### Adding tests
 
-- Generate the resource file the debug file by adding `--debug` flag
-- Replace `Pod` with the kind you want to test
+- Generate the resource file and json file by adding `--add-tests` flag
+- Replace `Pod` with the kind you want to add to the tests
 
 ```bash
-poetry run python scripts/resource/class_generator.py --kind Pod --output-file /tmp/pod_res.py --debug
-```
-
-- Move the resource file under [tests manifests dir](scripts/resource/tests/manifests/)
-
-```bash
-mv /tmp/pod_res.py scripts/resource/tests/manifests/
-```
-
-- Move the debug file under [tests manifests dir](scripts/resource/tests/manifests/)
-
-```bash
-mv scripts/resource/debug/Pod_debug.json scripts/resource/tests/manifests/
+poetry run python scripts/resource/class_generator.py --kind Pod --add-tests
 ```
 
 ## Reporting an issue

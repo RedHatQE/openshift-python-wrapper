@@ -83,14 +83,16 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool
     else:
         formatted_kind_name = convert_camel_case_to_snake_case(string_=kind)
 
-    output_debug_dir = (
-        os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_name)
-        if add_tests
-        else os.path.join(os.path.dirname(__file__), "debug")
-    )
-    output_debug_file_path = os.path.join(output_debug_dir, f"{formatted_kind_name}_debug.json")
-
+    output_debug_file_path: str = ""
     if debug or add_tests:
+        output_debug_dir = (
+            os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_name)
+            if add_tests
+            else os.path.join(os.path.dirname(__file__), "debug")
+        )
+        output_debug_file_path = os.path.join(output_debug_dir, f"{formatted_kind_name}_debug.json")
+
+    if output_debug_file_path:
         write_to_file(
             data={"explain": explain_out},
             output_debug_file_path=output_debug_file_path,
@@ -104,7 +106,7 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool
         command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind_str} | wc -l'"),
         check=False,
     )
-    if debug or add_tests:
+    if output_debug_file_path:
         write_to_file(
             data={"namespace": namespace_out},
             output_debug_file_path=output_debug_file_path,
@@ -375,7 +377,7 @@ def generate_resource_file_from_dict(
         Console().print(rendered)
 
     else:
-        format_and_write_rendered_to_file(filepath=_output_file, data=rendered)
+        write_and_format_rendered(filepath=_output_file, data=rendered)
 
     return _output_file
 
@@ -655,7 +657,7 @@ def class_generator(
     return generated_py_file
 
 
-def format_and_write_rendered_to_file(filepath, data):
+def write_and_format_rendered(filepath, data):
     with open(filepath, "w") as fd:
         fd.write(data)
 
@@ -689,7 +691,7 @@ def generate_class_generator_tests():
         template_name="test_parse_explain.j2",
     )
 
-    format_and_write_rendered_to_file(
+    write_and_format_rendered(
         filepath=os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py"),
         data=rendered,
     )
@@ -729,7 +731,7 @@ def generate_class_generator_tests():
 )
 @click.option(
     "--add-tests",
-    help="Add a test and test files to `test_parse_explain`",
+    help=f"Add a test to `test_class_generator.py` and test files to `{TESTS_MANIFESTS_DIR}` dir",
     is_flag=True,
     show_default=True,
 )
