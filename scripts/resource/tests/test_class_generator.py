@@ -59,10 +59,21 @@ def test_parse_explain(tmpdir_factory, kind, debug_file, result_file):
         ),
         pytest.param("XMLHttpRequest", "xml_http_request", id="combined_uppercase_word_is_first"),
         pytest.param(
-            "additionalCORSAllowedOS", "additional_cors_allowed_os", id="combined_uppercase_word_in_the_middle"
+            "additionalCORSAllowedOS",
+            "additional_cors_allowed_os",
+            id="combined_uppercase_word_in_the_middle",
         ),
         pytest.param("hostIPC", "host_ipc", id="combined_uppercase_word_is_last"),
-        pytest.param("clusterIPs", "cluster_ips", id="combined_uppercase_word_is_last_ends_with_lowercase"),
+        pytest.param(
+            "clusterIPs",
+            "cluster_ips",
+            id="combined_uppercase_word_is_last_ends_with_one_lowercase_char",
+        ),
+        pytest.param(
+            "dataVolumeTTLSeconds",
+            "data_volume_ttl_seconds",
+            id="combined_uppercase_word_followed_by_uppercase_word_is_last_ends_with_lowercase",
+        ),
     ],
 )
 def test_convert_camel_case_to_snake_case(camel_case_str, expected):
