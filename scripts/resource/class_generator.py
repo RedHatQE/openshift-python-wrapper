@@ -173,16 +173,18 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
                     if following_capital_chars:
                         formatted_str += f"_{char.lower()}"
                         last_capital_char = True
+                        continue
 
+                    remaining_str = "".join(string_[idx:])
                     # The 2 letters in the string; uppercase char followed by lowercase char.
                     # Example: `clusterIPs`, handle `Ps` at this point
-                    elif idx + 1 == str_len_for_idx_check:
-                        formatted_str += f"{''.join(string_[idx:]).lower()}"
+                    if idx + 1 == str_len_for_idx_check:
+                        formatted_str += remaining_str.lower()
                         break
 
                     # The last word in the string; uppercase followed by multiple lowercase chars
                     # Example: `dataVolumeTTLSeconds`, handle `Seconds` at this point
-                    elif (remaining_str := "".join(string_[idx:])).istitle():
+                    elif remaining_str.istitle():
                         formatted_str += f"_{remaining_str.lower()}"
                         break
 
