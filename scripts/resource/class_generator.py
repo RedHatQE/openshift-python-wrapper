@@ -31,6 +31,7 @@ TYPE_MAPPING: Dict[str, str] = {
     "<boolean>": "bool",
 }
 LOGGER = get_logger(name="class_generator")
+TESTS_OUTPUT_DIR = "scripts/resource/tests/manifests"
 
 
 def get_oc_or_kubectl() -> str:
@@ -64,7 +65,7 @@ def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) 
         json.dump(content, fd, indent=4)
 
 
-def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, Any]:
+def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool = False) -> Dict[str, Any]:
     """
     Get oc/kubectl explain output for given kind, if kind is namespaced and debug filepath
     """
@@ -79,7 +80,8 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
     else:
         formatted_kind_name = convert_camel_case_to_snake_case(string_=kind)
 
-    output_debug_file_path = os.path.join(os.path.dirname(__file__), "debug", f"{formatted_kind_name}_debug.json")
+    output_debug_dir = TESTS_OUTPUT_DIR if add_tests else os.path.dirname(__file__)
+    output_debug_file_path = os.path.join(output_debug_dir, "debug", f"{formatted_kind_name}_debug.json")
 
     if debug:
         write_to_file(
@@ -210,6 +212,7 @@ def get_field_description(
     debug: bool,
     output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
+    add_tests: bool = False,
 ) -> str:
     if debug_content:
         _out = debug_content[f"explain-{field_name}"]
@@ -221,7 +224,7 @@ def get_field_description(
             verify_stderr=False,
         )
 
-    if debug:
+    if debug or add_tests:
         write_to_file(
             kind=kind,
             data={f"explain-{field_name}": _out},
@@ -256,6 +259,7 @@ def get_arg_params(
     debug: bool = False,
     output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
+    add_tests: bool = False,
 ) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
@@ -295,6 +299,7 @@ def get_arg_params(
             debug=debug,
             output_debug_file_path=output_debug_file_path,
             debug_content=debug_content,
+            add_tests=add_tests,
         ),
     }
 
@@ -307,13 +312,13 @@ def generate_resource_file_from_dict(
     dry_run: bool = False,
     output_file: str = "",
     interactive: bool = False,
+    add_tests: bool = False,
 ) -> str:
     env = Environment(
         loader=FileSystemLoader("scripts/resource/manifests"),
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=DebugUndefined,
-        autoescape=False,
     )
 
     template = env.get_template(name="class_generator_template.j2")
@@ -326,7 +331,9 @@ def generate_resource_file_from_dict(
 
     temp_output_file: str = ""
 
-    if output_file:
+    if add_tests:
+        _output_file = f"{TESTS_OUTPUT_DIR}/{convert_camel_case_to_snake_case(string_=resource_dict['KIND'])}-res.py"
+    elif output_file:
         _output_file = output_file
     else:
         _output_file = f"ocp_resources/{convert_camel_case_to_snake_case(string_=resource_dict['KIND'])}.py"
@@ -371,6 +378,7 @@ def parse_explain(
     debug: bool = False,
     output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
+    add_tests: bool = False,
 ) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
@@ -438,6 +446,7 @@ def parse_explain(
                         debug=debug,
                         debug_content=debug_content,
                         output_debug_file_path=output_debug_file_path,
+                        add_tests=add_tests,
                     )
                 )
 
@@ -452,6 +461,7 @@ def parse_explain(
                             debug=debug,
                             debug_content=debug_content,
                             output_debug_file_path=output_debug_file_path,
+                            add_tests=add_tests,
                         )
                     )
 
@@ -471,6 +481,7 @@ def parse_explain(
                             debug=debug,
                             debug_content=debug_content,
                             output_debug_file_path=output_debug_file_path,
+                            add_tests=add_tests,
                         )
                     )
 
@@ -491,6 +502,7 @@ def parse_explain(
                                 debug=debug,
                                 debug_content=debug_content,
                                 output_debug_file_path=output_debug_file_path,
+                                add_tests=add_tests,
                             )
                         )
                         continue
@@ -558,6 +570,7 @@ def class_generator(
     debug: bool = False,
     process_debug_file: str = "",
     output_file: str = "",
+    add_tests: bool = False,
 ) -> str:
     """
     Generates a class for a given Kind.
@@ -606,6 +619,7 @@ def class_generator(
         debug=debug,
         output_debug_file_path=output_debug_file_path,
         debug_content=debug_content,
+        add_tests=add_tests,
     )
     if not resource_dict:
         return ""
@@ -616,6 +630,7 @@ def class_generator(
         dry_run=dry_run,
         output_file=output_file,
         interactive=interactive,
+        add_tests=add_tests,
     )
 
     if not dry_run:
@@ -663,6 +678,12 @@ def class_generator(
     is_flag=True,
     show_default=True,
 )
+@click.option(
+    "--add-tests",
+    help="Add a test and test files to `test_parse_explain`",
+    is_flag=True,
+    show_default=True,
+)
 def main(
     kind: str,
     overwrite: bool,
@@ -672,8 +693,14 @@ def main(
     debug_file: str,
     output_file: str,
     pdb: bool,
+    add_tests: bool,
 ):
     _ = pdb
+
+    if add_tests and debug:
+        LOGGER.error("`--add-tests` and `--debug` are mutually exclusive")
+        sys.exit(1)
+
     return class_generator(
         kind=kind,
         overwrite=overwrite,
@@ -682,6 +709,7 @@ def main(
         debug=debug,
         process_debug_file=debug_file,
         output_file=output_file,
+        add_tests=add_tests,
     )
 
 
