@@ -7,8 +7,6 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 class Deployment(NamespacedResource):
     """
     Deployment enables declarative updates for Pods and ReplicaSets.
-
-    API Link: https://debug.explain
     """
 
     api_group: str = NamespacedResource.ApiGroup.APPS
