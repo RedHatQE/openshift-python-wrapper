@@ -8,8 +8,6 @@ class Node(Resource):
     """
     Node is a worker node in Kubernetes. Each node will have a unique identifier
     in the cache (i.e. in etcd).
-
-    API Link: https://kubernetes.io/docs/reference/kubernetes-api/cluster-resources/node-v1/
     """
 
     api_version: str = Resource.ApiVersion.V1
@@ -105,25 +103,25 @@ class Node(Resource):
             _spec = self.res["spec"]
 
             if self.config_source:
-                self.res["configSource"] = self.config_source
+                _spec["configSource"] = self.config_source
 
             if self.external_id:
-                self.res["externalID"] = self.external_id
+                _spec["externalID"] = self.external_id
 
             if self.pod_cidr:
-                self.res["podCIDR"] = self.pod_cidr
+                _spec["podCIDR"] = self.pod_cidr
 
             if self.pod_cidrs:
-                self.res["podCIDRs"] = self.pod_cidrs
+                _spec["podCIDRs"] = self.pod_cidrs
 
             if self.provider_id:
-                self.res["providerID"] = self.provider_id
+                _spec["providerID"] = self.provider_id
 
             if self.taints:
-                self.res["taints"] = self._taints
+                _spec["taints"] = self._taints
 
             if self.unschedulable is not None:
-                self.res["unschedulable"] = self.unschedulable
+                _spec["unschedulable"] = self.unschedulable
 
     @property
     def kubelet_ready(self):
