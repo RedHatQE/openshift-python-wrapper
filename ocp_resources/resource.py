@@ -278,6 +278,7 @@ class Resource:
         CSIADDONS_OPENSHIFT_IO: str = "csiaddons.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO: str = "dataimportcrontemplate.kubevirt.io"
         DISCOVERY_K8S_IO: str = "discovery.k8s.io"
+        DATASCIENCECLUSTER_OPENDATAHUB_IO: str = "datasciencecluster.opendatahub.io"
         DSCINITIALIZATION_OPENDATAHUB_IO: str = "dscinitialization.opendatahub.io"
         EVENTS_K8S_IO: str = "events.k8s.io"
         EXPORT_KUBEVIRT_IO: str = "export.kubevirt.io"
