@@ -2,10 +2,9 @@
 
 from typing import Any, Dict, List, Optional
 
-from timeout_sampler import TimeoutSampler
-
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
+from timeout_sampler import TimeoutSampler
 
 
 class CDIConfig(Resource):
