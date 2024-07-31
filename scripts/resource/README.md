@@ -31,7 +31,7 @@ poetry run python scripts/resource/class_generator.py --interactive
 
 #### Adding tests
 
-- Generate the resource file and json file by adding `--add-tests` flag
+- Add a new test for the provided `kind` by passing `--add-tests` flag
 - Replace `Pod` with the kind you want to add to the tests
 
 ```bash
