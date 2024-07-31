@@ -112,7 +112,9 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def _nodes(self):
         if self.node_selector:
-            return list(Node.get(dyn_client=self.client, name=self.node_selector))
+            return list(
+                Node.get(dyn_client=self.client, name=self.node_selector[f"{self.ApiGroup.KUBERNETES_IO}/hostname"])
+            )
         if self.node_selector_labels:
             node_labels = ",".join([
                 f"{label_key}={label_value}" for label_key, label_value in self.node_selector_labels.items()
