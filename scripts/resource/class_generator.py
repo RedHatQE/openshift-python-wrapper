@@ -3,11 +3,14 @@ import json
 import shlex
 import os
 import sys
+from pathlib import Path
 
 from typing import Any, Dict, List, Optional, Tuple
 import click
 import re
 
+import cloup
+from cloup.constraints import If, accept_none, mutually_exclusive, require_any
 from pyhelper_utils.shell import run_command
 from rich.console import Console
 
@@ -31,6 +34,7 @@ TYPE_MAPPING: Dict[str, str] = {
     "<boolean>": "bool",
 }
 LOGGER = get_logger(name="class_generator")
+TESTS_MANIFESTS_DIR = "scripts/resource/tests/manifests"
 
 
 def get_oc_or_kubectl() -> str:
@@ -53,18 +57,20 @@ def check_cluster_available() -> bool:
     return run_command(command=shlex.split(f"{_exec} version"), check=False)[0]
 
 
-def write_to_file(kind: str, data: Dict[str, Any], output_debug_file_path: str) -> None:
+def write_to_file(data: Dict[str, Any], output_debug_file_path: str) -> None:
     content = {}
     if os.path.isfile(output_debug_file_path):
         with open(output_debug_file_path) as fd:
             content = json.load(fd)
 
     content.update(data)
+
+    Path(output_debug_file_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_debug_file_path, "w") as fd:
         json.dump(content, fd, indent=4)
 
 
-def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, Any]:
+def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool = False) -> Dict[str, Any]:
     """
     Get oc/kubectl explain output for given kind, if kind is namespaced and debug filepath
     """
@@ -79,11 +85,17 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
     else:
         formatted_kind_name = convert_camel_case_to_snake_case(string_=kind)
 
-    output_debug_file_path = os.path.join(os.path.dirname(__file__), "debug", f"{formatted_kind_name}_debug.json")
+    output_debug_file_path: str = ""
+    if debug or add_tests:
+        output_debug_dir = (
+            os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_name)
+            if add_tests
+            else os.path.join(os.path.dirname(__file__), "debug")
+        )
+        output_debug_file_path = os.path.join(output_debug_dir, f"{formatted_kind_name}_debug.json")
 
-    if debug:
+    if output_debug_file_path:
         write_to_file(
-            kind=kind,
             data={"explain": explain_out},
             output_debug_file_path=output_debug_file_path,
         )
@@ -96,9 +108,8 @@ def get_kind_data_and_debug_file(kind: str, debug: bool = False) -> Dict[str, An
         command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind_str} | wc -l'"),
         check=False,
     )
-    if debug:
+    if output_debug_file_path:
         write_to_file(
-            kind=kind,
             data={"namespace": namespace_out},
             output_debug_file_path=output_debug_file_path,
         )
@@ -210,6 +221,7 @@ def get_field_description(
     debug: bool,
     output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
+    add_tests: bool = False,
 ) -> str:
     if debug_content:
         _out = debug_content[f"explain-{field_name}"]
@@ -221,9 +233,8 @@ def get_field_description(
             verify_stderr=False,
         )
 
-    if debug:
+    if debug or add_tests:
         write_to_file(
-            kind=kind,
             data={f"explain-{field_name}": _out},
             output_debug_file_path=output_debug_file_path,
         )
@@ -256,6 +267,7 @@ def get_arg_params(
     debug: bool = False,
     output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
+    add_tests: bool = False,
 ) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
@@ -295,10 +307,30 @@ def get_arg_params(
             debug=debug,
             output_debug_file_path=output_debug_file_path,
             debug_content=debug_content,
+            add_tests=add_tests,
         ),
     }
 
     return _res
+
+
+def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, template_name: str) -> str:
+    env = Environment(
+        loader=FileSystemLoader(template_dir),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        undefined=DebugUndefined,
+    )
+
+    template = env.get_template(name=template_name)
+    rendered = template.render(template_dict)
+    undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
+
+    if undefined_variables:
+        LOGGER.error(f"The following variables are undefined: {undefined_variables}")
+        sys.exit(1)
+
+    return rendered
 
 
 def generate_resource_file_from_dict(
@@ -307,29 +339,24 @@ def generate_resource_file_from_dict(
     dry_run: bool = False,
     output_file: str = "",
     interactive: bool = False,
+    add_tests: bool = False,
 ) -> str:
-    env = Environment(
-        loader=FileSystemLoader("scripts/resource/manifests"),
-        trim_blocks=True,
-        lstrip_blocks=True,
-        undefined=DebugUndefined,
-        autoescape=False,
+    rendered = render_jinja_template(
+        template_dict=resource_dict,
+        template_dir="scripts/resource/manifests",
+        template_name="class_generator_template.j2",
     )
-
-    template = env.get_template(name="class_generator_template.j2")
-    rendered = template.render(resource_dict)
-    undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
-
-    if undefined_variables:
-        LOGGER.error(f"The following variables are undefined: {undefined_variables}")
-        sys.exit(1)
 
     temp_output_file: str = ""
 
-    if output_file:
+    formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["KIND"])
+    if add_tests:
+        overwrite = True
+        _output_file = os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_str, f"{formatted_kind_str}_res.py")
+    elif output_file:
         _output_file = output_file
     else:
-        _output_file = f"ocp_resources/{convert_camel_case_to_snake_case(string_=resource_dict['KIND'])}.py"
+        _output_file = os.path.join("ocp_resources", f"{formatted_kind_str}.py")
 
     if os.path.exists(_output_file):
         if overwrite:
@@ -352,15 +379,7 @@ def generate_resource_file_from_dict(
         Console().print(rendered)
 
     else:
-        with open(_output_file, "w") as fd:
-            fd.write(rendered)
-
-        for op in ("format", "check"):
-            run_command(
-                command=shlex.split(f"poetry run ruff {op} {_output_file}"),
-                verify_stderr=False,
-                check=False,
-            )
+        write_and_format_rendered(filepath=_output_file, data=rendered)
 
     return _output_file
 
@@ -371,6 +390,7 @@ def parse_explain(
     debug: bool = False,
     output_debug_file_path: str = "",
     debug_content: Optional[Dict[str, str]] = None,
+    add_tests: bool = False,
 ) -> Dict[str, Any]:
     section_data: str = ""
     sections: List[str] = []
@@ -438,6 +458,7 @@ def parse_explain(
                         debug=debug,
                         debug_content=debug_content,
                         output_debug_file_path=output_debug_file_path,
+                        add_tests=add_tests,
                     )
                 )
 
@@ -452,6 +473,7 @@ def parse_explain(
                             debug=debug,
                             debug_content=debug_content,
                             output_debug_file_path=output_debug_file_path,
+                            add_tests=add_tests,
                         )
                     )
 
@@ -471,6 +493,7 @@ def parse_explain(
                             debug=debug,
                             debug_content=debug_content,
                             output_debug_file_path=output_debug_file_path,
+                            add_tests=add_tests,
                         )
                     )
 
@@ -491,6 +514,7 @@ def parse_explain(
                                 debug=debug,
                                 debug_content=debug_content,
                                 output_debug_file_path=output_debug_file_path,
+                                add_tests=add_tests,
                             )
                         )
                         continue
@@ -558,6 +582,7 @@ def class_generator(
     debug: bool = False,
     process_debug_file: str = "",
     output_file: str = "",
+    add_tests: bool = False,
 ) -> str:
     """
     Generates a class for a given Kind.
@@ -579,24 +604,25 @@ def class_generator(
             LOGGER.error(
                 "Cluster not available, The script needs a running cluster and admin privileges to get the explain output"
             )
-            return ""
+            sys.exit(1)
 
         if interactive:
             kind = get_user_args_from_interactive()
 
         if not kind:
             LOGGER.error("Kind or API link not provided")
-            return ""
+            sys.exit(1)
 
         if not check_kind_exists(kind=kind):
-            return ""
+            sys.exit(1)
 
         kind_data = get_kind_data_and_debug_file(
             kind=kind,
             debug=debug,
+            add_tests=add_tests,
         )
         if not kind_data:
-            return ""
+            sys.exit(1)
 
     output_debug_file_path = kind_data.get("debug_file", "")
 
@@ -606,6 +632,7 @@ def class_generator(
         debug=debug,
         output_debug_file_path=output_debug_file_path,
         debug_content=debug_content,
+        add_tests=add_tests,
     )
     if not resource_dict:
         return ""
@@ -616,6 +643,7 @@ def class_generator(
         dry_run=dry_run,
         output_file=output_file,
         interactive=interactive,
+        add_tests=add_tests,
     )
 
     if not dry_run:
@@ -625,44 +653,96 @@ def class_generator(
             check=False,
         )
 
-    if debug:
+    if debug or add_tests:
         LOGGER.info(f"Debug output saved to {output_debug_file_path}")
 
     return generated_py_file
 
 
-@click.command("Resource class generator")
-@click.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
-@click.option(
+def write_and_format_rendered(filepath: str, data: str) -> None:
+    with open(filepath, "w") as fd:
+        fd.write(data)
+
+    for op in ("format", "check"):
+        run_command(
+            command=shlex.split(f"poetry run ruff {op} {filepath}"),
+            verify_stderr=False,
+            check=False,
+        )
+
+
+def generate_class_generator_tests() -> None:
+    tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
+
+    for _dir in os.listdir(TESTS_MANIFESTS_DIR):
+        dir_path = os.path.join(TESTS_MANIFESTS_DIR, _dir)
+        if os.path.isdir(dir_path):
+            test_data = {"kind": _dir}
+
+            for _file in os.listdir(dir_path):
+                if _file.endswith("_debug.json"):
+                    test_data["debug_file"] = _file
+                elif _file.endswith("_res.py"):
+                    test_data["res_file"] = _file
+
+            tests_info["template"].append(test_data)
+
+    rendered = render_jinja_template(
+        template_dict=tests_info,
+        template_dir=TESTS_MANIFESTS_DIR,
+        template_name="test_parse_explain.j2",
+    )
+
+    write_and_format_rendered(
+        filepath=os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py"),
+        data=rendered,
+    )
+
+
+@cloup.command("Resource class generator")
+@cloup.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
+@cloup.option(
     "-k",
     "--kind",
     type=click.STRING,
     help="The Kind to generate the class for, Needs working cluster with admin privileges",
 )
-@click.option(
+@cloup.option(
     "-o",
     "--output-file",
-    help="The full filename path to generate a python resourece file. If not sent, resourece kind will be used",
+    help="The full filename path to generate a python resource file. If not sent, resource kind will be used",
     type=click.Path(),
 )
-@click.option(
+@cloup.option(
     "--overwrite",
     is_flag=True,
     help="Output file overwrite existing file if passed",
 )
-@click.option("--dry-run", is_flag=True, help="Run the script without writing to file")
-@click.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
-@click.option(
+@cloup.option("--dry-run", is_flag=True, help="Run the script without writing to file")
+@cloup.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
+@cloup.option(
     "--debug-file",
     type=click.Path(exists=True),
     help="Run the script from debug file. (generated by --debug)",
 )
-@click.option(
+@cloup.option(
     "--pdb",
     help="Drop to `ipdb` shell on exception",
     is_flag=True,
     show_default=True,
 )
+@cloup.option(
+    "--add-tests",
+    help=f"Add a test to `test_class_generator.py` and test files to `{TESTS_MANIFESTS_DIR}` dir",
+    is_flag=True,
+    show_default=True,
+)
+@cloup.constraint(mutually_exclusive, ["add_tests", "debug"])
+@cloup.constraint(mutually_exclusive, ["add_tests", "output_file"])
+@cloup.constraint(mutually_exclusive, ["add_tests", "dry_run"])
+@cloup.constraint(mutually_exclusive, ["interactive", "kind"])
+@cloup.constraint(If("debug_file", then=accept_none), ["interactive", "kind"])
+@cloup.constraint(require_any, ["interactive", "kind"])
 def main(
     kind: str,
     overwrite: bool,
@@ -672,9 +752,11 @@ def main(
     debug_file: str,
     output_file: str,
     pdb: bool,
+    add_tests: bool,
 ):
     _ = pdb
-    return class_generator(
+
+    class_generator(
         kind=kind,
         overwrite=overwrite,
         interactive=interactive,
@@ -682,7 +764,11 @@ def main(
         debug=debug,
         process_debug_file=debug_file,
         output_file=output_file,
+        add_tests=add_tests,
     )
+
+    if add_tests:
+        generate_class_generator_tests()
 
 
 if __name__ == "__main__":
