@@ -7,8 +7,6 @@ from ocp_resources.resource import Resource
 class CDI(Resource):
     """
     CDI is the Containerized Data Importer Operator CRD
-
-    API Link: https://github.com/kubevirt/containerized-data-importer/blob/1ac608717e3cb50d306e92ba1aabaeb804b2e5eb/api/openapi-spec/swagger.json
     """
 
     api_group: str = Resource.ApiGroup.CDI_KUBEVIRT_IO
