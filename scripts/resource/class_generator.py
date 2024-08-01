@@ -469,6 +469,7 @@ def parse_explain(
                     )
                 )
 
+    # TODO: Do we have resources without `spec` or user configurable fields?
     if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
         LOGGER.error(f"Unable to parse {kind} resource.")
         return {}
