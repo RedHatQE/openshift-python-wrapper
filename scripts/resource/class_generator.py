@@ -472,8 +472,29 @@ def parse_explain(
                             )
                         )
 
-                if not re.findall(rf"^{first_field_indent_str}\w", field):
-                    if first_field_spec_found:
+            if not re.findall(rf"^{first_field_indent_str}\w", field):
+                if first_field_spec_found:
+                    resource_dict[SPEC_STR].append(
+                        get_arg_params(
+                            field=field,
+                            kind=kind,
+                            field_under_spec=True,
+                            debug=debug,
+                            debug_content=debug_content,
+                            output_debug_file_path=output_debug_file_path,
+                            add_tests=add_tests,
+                        )
+                    )
+
+                    # Get top level keys inside spec indent, need to match only once.
+                    top_spec_indent = len(re.findall(r" +", field)[0])
+                    top_spec_indent_str = f"{' ' * top_spec_indent}"
+                    first_field_spec_found = False
+                    continue
+
+                if top_spec_indent_str:
+                    # Get only top level keys from inside spec
+                    if re.findall(rf"^{top_spec_indent_str}\w", field):
                         resource_dict[SPEC_STR].append(
                             get_arg_params(
                                 field=field,
@@ -485,31 +506,10 @@ def parse_explain(
                                 add_tests=add_tests,
                             )
                         )
-
-                        # Get top level keys inside spec indent, need to match only once.
-                        top_spec_indent = len(re.findall(r" +", field)[0])
-                        top_spec_indent_str = f"{' ' * top_spec_indent}"
-                        first_field_spec_found = False
                         continue
 
-                    if top_spec_indent_str:
-                        # Get only top level keys from inside spec
-                        if re.findall(rf"^{top_spec_indent_str}\w", field):
-                            resource_dict[SPEC_STR].append(
-                                get_arg_params(
-                                    field=field,
-                                    kind=kind,
-                                    field_under_spec=True,
-                                    debug=debug,
-                                    debug_content=debug_content,
-                                    output_debug_file_path=output_debug_file_path,
-                                    add_tests=add_tests,
-                                )
-                            )
-                            continue
-
-                else:
-                    break
+            else:
+                break
 
     # for field in start_fields_section.splitlines():
     #     if field.startswith(f"{FIELDS_STR}:"):
