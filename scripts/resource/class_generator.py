@@ -400,7 +400,7 @@ def parse_explain(
     raw_resource_dict: Dict[str, str] = {}
 
     # Get all sections from output, section is [A-Z]: for example `KIND:`
-    sections = re.findall(r"([A-Z]+:).*", output)
+    sections = re.findall(r"([A-Z]+):.*", output)
 
     # Get all sections indexes to be able to get needed test from output by indexes later
     sections_indexes = [output.index(section) for section in sections]
@@ -437,7 +437,7 @@ def parse_explain(
     # ```
     if _spec_fields := re.findall(rf"  {SPEC_STR.lower()}.*(?=\n  [a-z])", raw_resource_dict[FIELDS_STR], re.DOTALL):
         for field in [_field for _field in _spec_fields[0].splitlines() if _field]:
-            # If line is indented 4 spaces we know that this is a field under space
+            # If line is indented 4 spaces we know that this is a field under spec
             if len(re.findall(r" +", field)[0]) == 4:
                 resource_dict[SPEC_STR].append(
                     get_arg_params(
