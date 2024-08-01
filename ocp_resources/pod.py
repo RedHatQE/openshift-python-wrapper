@@ -1036,7 +1036,7 @@ class Pod(NamespacedResource):
               FQDN in the hostname field of the kernel (the nodename field of struct
               utsname). In Windows containers, this means setting the registry value of
               hostname for the registry key
-              HKEY_LOCAL_MACHINE,SYSTEM,CurrentControlSet,Services,Tcpip,Parameters to
+              HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters to
               FQDN. If a pod does not have FQDN, this has no effect. Default to false.
 
             share_process_namespace(bool): Share a single process namespace between all of the containers in a pod.
