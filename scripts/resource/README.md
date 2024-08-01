@@ -23,6 +23,10 @@ poetry run python scripts/resource/class_generator.py --kind <kind>
 
 ```
 
+- Review the resource file; make sure that the filename and attribute names are named correctly. For example:
+  - `OATH` -> `oath`
+  - `CDIConfig` -> `cdi_config`
+
 Run in interactive mode:
 
 ```bash
