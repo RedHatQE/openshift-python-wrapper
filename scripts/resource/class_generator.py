@@ -428,8 +428,16 @@ def parse_explain(
     resource_dict[SPEC_STR] = []
     resource_dict[FIELDS_STR] = []
 
+    # Get all spec fields till spec indent is done, section indent is 2 empty spaces
+    # ```
+    #  spec  <ServiceSpec>
+    #    allocateLoadBalancerNodePorts       <boolean>
+    #    type        <string>
+    #  status        <ServiceStatus>
+    # ```
     if _spec_fields := re.findall(rf"  {SPEC_STR.lower()}.*(?=\n  [a-z])", raw_resource_dict[FIELDS_STR], re.DOTALL):
-        for field in [_field for _field in _spec_fields[0].split("\n") if _field]:
+        for field in [_field for _field in _spec_fields[0].splitlines() if _field]:
+            # If line is indented 4 spaces we know that this is a field under space
             if len(re.findall(r" +", field)[0]) == 4:
                 resource_dict[SPEC_STR].append(
                     get_arg_params(
@@ -443,26 +451,23 @@ def parse_explain(
                     )
                 )
 
-    for line in raw_resource_dict[FIELDS_STR].splitlines():
-        if not line:
-            continue
+    if _fields := re.findall(r"  .*", raw_resource_dict[FIELDS_STR], re.DOTALL):
+        for line in [_line for _line in _fields[0].splitlines() if _line]:
+            if line.split()[0] in keys_to_ignore:
+                continue
 
-        line_indent = re.findall(r" +", line)
-        field_name = line.split()[0]
-        if field_name in keys_to_ignore:
-            continue
-
-        if len(line_indent[0]) == 2:
-            resource_dict[FIELDS_STR].append(
-                get_arg_params(
-                    field=line,
-                    kind=kind,
-                    debug=debug,
-                    debug_content=debug_content,
-                    output_debug_file_path=output_debug_file_path,
-                    add_tests=add_tests,
+            # Process only top level fields with 2 spaces indent
+            if len(re.findall(r" +", line)[0]) == 2:
+                resource_dict[FIELDS_STR].append(
+                    get_arg_params(
+                        field=line,
+                        kind=kind,
+                        debug=debug,
+                        debug_content=debug_content,
+                        output_debug_file_path=output_debug_file_path,
+                        add_tests=add_tests,
+                    )
                 )
-            )
 
     if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
         LOGGER.error(f"Unable to parse {kind} resource.")
