@@ -12,11 +12,6 @@ from scripts.resource.class_generator import TESTS_MANIFESTS_DIR, class_generato
     "kind, debug_file, result_file",
     (
         (
-            "secret",
-            os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_debug.json"),
-            os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_res.py"),
-        ),
-        (
             "api_server",
             os.path.join(TESTS_MANIFESTS_DIR, "api_server", "api_server_debug.json"),
             os.path.join(TESTS_MANIFESTS_DIR, "api_server", "api_server_res.py"),
@@ -35,6 +30,16 @@ from scripts.resource.class_generator import TESTS_MANIFESTS_DIR, class_generato
             "pod",
             os.path.join(TESTS_MANIFESTS_DIR, "pod", "pod_debug.json"),
             os.path.join(TESTS_MANIFESTS_DIR, "pod", "pod_res.py"),
+        ),
+        (
+            "secret",
+            os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_res.py"),
+        ),
+        (
+            "cluster_operator",
+            os.path.join(TESTS_MANIFESTS_DIR, "cluster_operator", "cluster_operator_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "cluster_operator", "cluster_operator_res.py"),
         ),
     ),
 )

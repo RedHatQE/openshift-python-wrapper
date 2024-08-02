@@ -420,8 +420,8 @@ def parse_explain(
 
     resource_dict["KIND"] = raw_resource_dict["KIND"].strip()
     resource_dict["DESCRIPTION"] = raw_resource_dict["DESCRIPTION"].strip()
-    resource_dict["GROUP"] = raw_resource_dict.get("GROUP", "")
-    resource_dict["VERSION"] = raw_resource_dict.get("VERSION", "")
+    resource_dict["GROUP"] = raw_resource_dict.get("GROUP", "").strip()
+    resource_dict["VERSION"] = raw_resource_dict.get("VERSION", "").strip()
 
     kind = resource_dict["KIND"]
     keys_to_ignore = ["metadata", "kind", "apiVersion", "status", SPEC_STR.lower()]
@@ -468,11 +468,6 @@ def parse_explain(
                         add_tests=add_tests,
                     )
                 )
-
-    # TODO: Do we have resources without `spec` or user configurable fields?
-    if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
-        LOGGER.error(f"Unable to parse {kind} resource.")
-        return {}
 
     api_group_real_name = resource_dict.get("GROUP")
     # If API Group is not present in resource, try to get it from VERSION
@@ -621,8 +616,12 @@ def write_and_format_rendered(filepath: str, data: str) -> None:
 
 def generate_class_generator_tests() -> None:
     tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
+    dirs_to_ignore: List[str] = ["__pycache__"]
 
     for _dir in os.listdir(TESTS_MANIFESTS_DIR):
+        if _dir in dirs_to_ignore:
+            continue
+
         dir_path = os.path.join(TESTS_MANIFESTS_DIR, _dir)
         if os.path.isdir(dir_path):
             test_data = {"kind": _dir}
