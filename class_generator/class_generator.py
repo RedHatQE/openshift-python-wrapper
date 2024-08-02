@@ -34,7 +34,7 @@ TYPE_MAPPING: Dict[str, str] = {
     "<boolean>": "bool",
 }
 LOGGER = get_logger(name="class_generator")
-TESTS_MANIFESTS_DIR = "scripts/resource/tests/manifests"
+TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
 
 def get_oc_or_kubectl() -> str:
@@ -343,7 +343,7 @@ def generate_resource_file_from_dict(
 ) -> str:
     rendered = render_jinja_template(
         template_dict=resource_dict,
-        template_dir="scripts/resource/manifests",
+        template_dir="class_generator/manifests",
         template_name="class_generator_template.j2",
     )
 
