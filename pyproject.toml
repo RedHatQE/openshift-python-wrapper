@@ -75,3 +75,9 @@ pyhelper-utils = "^0.0.31"
 ruff = "^0.5.3"
 rich = "^13.7.1"
 cloup = "^3.0.5"
+
+[tool.pytest.ini_options]
+markers = [
+  "incremental: Mark tests as incremental",
+  "kubevirt: Mark tests as kubevirt tests",
+]

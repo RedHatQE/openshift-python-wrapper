@@ -12,6 +12,7 @@ import re
 import cloup
 from cloup.constraints import If, accept_none, mutually_exclusive, require_any
 from pyhelper_utils.shell import run_command
+import pytest
 from rich.console import Console
 
 from rich.prompt import Prompt
@@ -716,7 +717,7 @@ def main(
 
     if add_tests:
         generate_class_generator_tests()
-        os.system("poetry run pytest -k test_class_generator")
+        pytest.main(["-k", "test_class_generator"])
 
 
 if __name__ == "__main__":
