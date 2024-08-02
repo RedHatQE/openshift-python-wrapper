@@ -716,6 +716,7 @@ def main(
 
     if add_tests:
         generate_class_generator_tests()
+        os.system("poetry run pytest -k test_class_generator")
 
 
 if __name__ == "__main__":
