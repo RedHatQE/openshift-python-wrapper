@@ -25,7 +25,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
 
     def __init__(
         self,
-        {% if FIELDS or SPEC %}
+        {% if all_types_for_class_args %}
         {{ all_types_for_class_args|join(",\n        ") }},
         {% endif %}
         **kwargs: Any,
