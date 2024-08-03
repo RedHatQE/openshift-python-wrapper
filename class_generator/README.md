@@ -14,12 +14,18 @@
 poetry install
 ```
 
+For shell completion Add this to ~/.bashrc or ~/.zshrc:
+
+```bash
+if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_source class-generator)"; fi
+```
+
 ###### Call the script
 
 - Running in normal mode with `--kind` flags:
 
 ```bash
-poetry run python scripts/resource/class_generator.py --kind <kind>
+class-generator --kind <kind>
 
 ```
 
@@ -30,7 +36,7 @@ poetry run python scripts/resource/class_generator.py --kind <kind>
 Run in interactive mode:
 
 ```bash
-poetry run python scripts/resource/class_generator.py --interactive
+class-generator --interactive
 ```
 
 #### Adding tests
@@ -39,7 +45,7 @@ poetry run python scripts/resource/class_generator.py --interactive
 - Replace `Pod` with the kind you want to add to the tests
 
 ```bash
-poetry run python scripts/resource/class_generator.py --kind Pod --add-tests
+class-generator --kind Pod --add-tests
 ```
 
 ## Reporting an issue
@@ -47,7 +53,7 @@ poetry run python scripts/resource/class_generator.py --kind Pod --add-tests
 - Running with debug mode and `--debug` flag:
 
 ```bash
-poetry run python scripts/resource/class_generator.py --kind <kind> --debug
+class-generator --kind <kind> --debug
 ```
 
 `<kind>-debug.json` will be located under `scripts/resource/debug`

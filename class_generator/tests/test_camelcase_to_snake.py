@@ -1,6 +1,6 @@
 import pytest
 
-from scripts.resource.class_generator import (
+from class_generator.class_generator import (
     convert_camel_case_to_snake_case,
 )
 

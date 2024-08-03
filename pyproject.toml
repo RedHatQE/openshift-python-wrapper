@@ -24,7 +24,7 @@ description = "Wrapper around https://github.com/kubernetes-client/python"
 authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
-packages = [{ include = "ocp_resources" }]
+packages = [{ include = "ocp_resources" }, { include = "class_generator" }]
 homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
 documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 keywords = ["Openshift", "Kubevirt", "Openshift Virtualization"]
@@ -32,6 +32,9 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
 ]
+
+[tool.poetry.scripts]
+class-generator = "class_generator.class_generator:main"
 
 [tool.poetry.urls]
 Download = "https://pypi.org/project/openshift-python-wrapper/"
@@ -72,3 +75,9 @@ pyhelper-utils = "^0.0.31"
 ruff = "^0.5.3"
 rich = "^13.7.1"
 cloup = "^3.0.5"
+
+[tool.pytest.ini_options]
+markers = [
+  "incremental: Mark tests as incremental",
+  "kubevirt: Mark tests as kubevirt tests",
+]
