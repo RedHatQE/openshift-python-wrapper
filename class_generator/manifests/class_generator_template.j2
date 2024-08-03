@@ -25,20 +25,25 @@ class {{ KIND }}({{ BASE_CLASS }}):
 
     def __init__(
         self,
+        {% if all_types_for_class_args %}
         {{ all_types_for_class_args|join(",\n        ") }},
+        {% endif %}
         **kwargs: Any,
     ) -> None:
+        {% if all_types_for_class_args %}
         """
         Args:
             {% for value in all_names_types_for_docstring %}
             {{ value }}{% endfor %}
         """
+        {% endif %}
         super().__init__(**kwargs)
 
         {% for arg in FIELDS + SPEC %}
         self.{{ arg["name-for-class-arg"] }} = {{ arg["name-for-class-arg"] }}
         {% endfor %}
 
+    {% if FIELDS or SPEC %}
     def to_dict(self) -> None:
 
         super().to_dict()
@@ -74,3 +79,4 @@ class {{ KIND }}({{ BASE_CLASS }}):
 
           {% endif %}
           {% endfor %}
+    {% endif %}

@@ -5,13 +5,14 @@ import os
 import sys
 from pathlib import Path
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 import click
 import re
 
 import cloup
 from cloup.constraints import If, accept_none, mutually_exclusive, require_any
 from pyhelper_utils.shell import run_command
+import pytest
 from rich.console import Console
 
 from rich.prompt import Prompt
@@ -34,7 +35,7 @@ TYPE_MAPPING: Dict[str, str] = {
     "<boolean>": "bool",
 }
 LOGGER = get_logger(name="class_generator")
-TESTS_MANIFESTS_DIR = "scripts/resource/tests/manifests"
+TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
 
 def get_oc_or_kubectl() -> str:
@@ -343,7 +344,7 @@ def generate_resource_file_from_dict(
 ) -> str:
     rendered = render_jinja_template(
         template_dict=resource_dict,
-        template_dir="scripts/resource/manifests",
+        template_dir="class_generator/manifests",
         template_name="class_generator_template.j2",
     )
 
@@ -392,69 +393,58 @@ def parse_explain(
     debug_content: Optional[Dict[str, str]] = None,
     add_tests: bool = False,
 ) -> Dict[str, Any]:
-    section_data: str = ""
     sections: List[str] = []
     resource_dict: Dict[str, Any] = {
         "BASE_CLASS": "NamespacedResource" if namespaced else "Resource",
     }
-    new_sections_words: Tuple[str, str, str] = ("KIND:", "VERSION:", "GROUP:")
 
-    for line in output.splitlines():
-        # If line is empty section is done
-        if not line.strip():
-            if section_data:
-                sections.append(section_data)
-                section_data = ""
+    raw_resource_dict: Dict[str, str] = {}
 
-            continue
+    # Get all sections from output, section is [A-Z]: for example `KIND:`
+    sections = re.findall(r"([A-Z]+):.*", output)
 
-        section_data += f"{line}\n"
-        if line.startswith(new_sections_words):
-            if section_data:
-                sections.append(section_data)
-                section_data = ""
-            continue
+    # Get all sections indexes to be able to get needed test from output by indexes later
+    sections_indexes = [output.index(section) for section in sections]
 
-    # Last section data from last iteration
-    if section_data:
-        sections.append(section_data)
+    for idx, section_idx in enumerate(sections_indexes):
+        _section_name = sections[idx].strip(":")
 
-    start_fields_section: str = ""
+        # Get the end index of the section name, add +1 since we strip the `:`
+        _end_of_section_name_idx = section_idx + len(_section_name) + 1
 
-    for section in sections:
-        if section.startswith(f"{FIELDS_STR}:"):
-            start_fields_section = section
-            continue
+        try:
+            # If we have next section we get the string from output till the next section
+            raw_resource_dict[_section_name] = output[_end_of_section_name_idx : output.index(sections[idx + 1])]
+        except IndexError:
+            # If this is the last section get the rest of output
+            raw_resource_dict[_section_name] = output[_end_of_section_name_idx:]
 
-        key, val = section.split(":", 1)
-        resource_dict[key.strip()] = val.strip()
+    resource_dict["KIND"] = raw_resource_dict["KIND"].strip()
+    resource_dict["DESCRIPTION"] = raw_resource_dict["DESCRIPTION"].strip()
+    resource_dict["GROUP"] = raw_resource_dict.get("GROUP", "").strip()
+    resource_dict["VERSION"] = raw_resource_dict.get("VERSION", "").strip()
 
     kind = resource_dict["KIND"]
-    keys_to_ignore = ["metadata", "kind", "apiVersion", "status"]
+    keys_to_ignore = ["metadata", "kind", "apiVersion", "status", SPEC_STR.lower()]
     resource_dict[SPEC_STR] = []
     resource_dict[FIELDS_STR] = []
-    first_field_indent: int = 0
-    first_field_indent_str: str = ""
-    top_spec_indent: int = 0
-    top_spec_indent_str: str = ""
-    first_field_spec_found: bool = False
-    field_spec_found: bool = False
 
-    for field in start_fields_section.splitlines():
-        if field.startswith(f"{FIELDS_STR}:"):
-            continue
-
-        start_spec_field = field.startswith(f"{first_field_indent_str}{SPEC_STR.lower()}")
-        ignored_field = field.split()[0] in keys_to_ignore
-        # Find first indent of spec, Needed in order to now when spec is done.
-        if not first_field_indent:
-            first_field_indent = len(re.findall(r" +", field)[0])
-            first_field_indent_str = f"{' ' * first_field_indent}"
-            if not ignored_field and not start_spec_field:
-                resource_dict[FIELDS_STR].append(
+    # Get all spec fields till spec indent is done, section indent is 2 empty spaces
+    # ```
+    #  spec  <ServiceSpec>
+    #    allocateLoadBalancerNodePorts       <boolean>
+    #    type        <string>
+    #  status        <ServiceStatus>
+    # ```
+    if _spec_fields := re.findall(rf"  {SPEC_STR.lower()}.*(?=\n  [a-z])", raw_resource_dict[FIELDS_STR], re.DOTALL):
+        for field in [_field for _field in _spec_fields[0].splitlines() if _field]:
+            # If line is indented 4 spaces we know that this is a field under spec
+            if len(re.findall(r" +", field)[0]) == 4:
+                resource_dict[SPEC_STR].append(
                     get_arg_params(
-                        field=field,
+                        field=field.strip(),
                         kind=kind,
+                        field_under_spec=True,
                         debug=debug,
                         debug_content=debug_content,
                         output_debug_file_path=output_debug_file_path,
@@ -462,69 +452,23 @@ def parse_explain(
                     )
                 )
 
-            continue
-        else:
-            if len(re.findall(r" +", field)[0]) == len(first_field_indent_str):
-                if not ignored_field and not start_spec_field:
-                    resource_dict[FIELDS_STR].append(
-                        get_arg_params(
-                            field=field,
-                            kind=kind,
-                            debug=debug,
-                            debug_content=debug_content,
-                            output_debug_file_path=output_debug_file_path,
-                            add_tests=add_tests,
-                        )
+    if _fields := re.findall(r"  .*", raw_resource_dict[FIELDS_STR], re.DOTALL):
+        for line in [_line for _line in _fields[0].splitlines() if _line]:
+            if line.split()[0] in keys_to_ignore:
+                continue
+
+            # Process only top level fields with 2 spaces indent
+            if len(re.findall(r" +", line)[0]) == 2:
+                resource_dict[FIELDS_STR].append(
+                    get_arg_params(
+                        field=line,
+                        kind=kind,
+                        debug=debug,
+                        debug_content=debug_content,
+                        output_debug_file_path=output_debug_file_path,
+                        add_tests=add_tests,
                     )
-
-        if start_spec_field:
-            first_field_spec_found = True
-            field_spec_found = True
-            continue
-
-        if field_spec_found:
-            if not re.findall(rf"^{first_field_indent_str}\w", field):
-                if first_field_spec_found:
-                    resource_dict[SPEC_STR].append(
-                        get_arg_params(
-                            field=field,
-                            kind=kind,
-                            field_under_spec=True,
-                            debug=debug,
-                            debug_content=debug_content,
-                            output_debug_file_path=output_debug_file_path,
-                            add_tests=add_tests,
-                        )
-                    )
-
-                    # Get top level keys inside spec indent, need to match only once.
-                    top_spec_indent = len(re.findall(r" +", field)[0])
-                    top_spec_indent_str = f"{' ' * top_spec_indent}"
-                    first_field_spec_found = False
-                    continue
-
-                if top_spec_indent_str:
-                    # Get only top level keys from inside spec
-                    if re.findall(rf"^{top_spec_indent_str}\w", field):
-                        resource_dict[SPEC_STR].append(
-                            get_arg_params(
-                                field=field,
-                                kind=kind,
-                                field_under_spec=True,
-                                debug=debug,
-                                debug_content=debug_content,
-                                output_debug_file_path=output_debug_file_path,
-                                add_tests=add_tests,
-                            )
-                        )
-                        continue
-
-            else:
-                break
-
-    if not resource_dict[SPEC_STR] and not resource_dict[FIELDS_STR]:
-        LOGGER.error(f"Unable to parse {kind} resource.")
-        return {}
+                )
 
     api_group_real_name = resource_dict.get("GROUP")
     # If API Group is not present in resource, try to get it from VERSION
@@ -673,8 +617,12 @@ def write_and_format_rendered(filepath: str, data: str) -> None:
 
 def generate_class_generator_tests() -> None:
     tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
+    dirs_to_ignore: List[str] = ["__pycache__"]
 
     for _dir in os.listdir(TESTS_MANIFESTS_DIR):
+        if _dir in dirs_to_ignore:
+            continue
+
         dir_path = os.path.join(TESTS_MANIFESTS_DIR, _dir)
         if os.path.isdir(dir_path):
             test_data = {"kind": _dir}
@@ -769,6 +717,7 @@ def main(
 
     if add_tests:
         generate_class_generator_tests()
+        pytest.main(["-k", "test_class_generator"])
 
 
 if __name__ == "__main__":

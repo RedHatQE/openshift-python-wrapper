@@ -5,7 +5,7 @@ import filecmp
 
 import pytest
 
-from scripts.resource.class_generator import TESTS_MANIFESTS_DIR, class_generator
+from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
 
 
 @pytest.mark.parametrize(
