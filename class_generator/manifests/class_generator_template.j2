@@ -30,7 +30,7 @@ class {{ KIND }}({{ BASE_CLASS }}):
         {% endif %}
         **kwargs: Any,
     ) -> None:
-        {% if FIELDS or SPEC %}
+        {% if all_types_for_class_args %}
         """
         Args:
             {% for value in all_names_types_for_docstring %}
