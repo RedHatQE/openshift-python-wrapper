@@ -421,6 +421,10 @@ def parse_explain(
 
     resource_dict["KIND"] = raw_resource_dict["KIND"].strip()
     resource_dict["DESCRIPTION"] = raw_resource_dict["DESCRIPTION"].strip()
+    if resource_dict["DESCRIPTION"] == "<empty>":
+        LOGGER.error("Empty description for resource, exiting")
+        sys.exit(1)
+
     resource_dict["GROUP"] = raw_resource_dict.get("GROUP", "").strip()
     resource_dict["VERSION"] = raw_resource_dict.get("VERSION", "").strip()
 
