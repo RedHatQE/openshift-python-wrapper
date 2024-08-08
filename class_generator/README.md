@@ -22,6 +22,12 @@ if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_
 
 ###### Call the script
 
+- Calling the script with poetry
+
+```bash
+poetry run class-generator --kind <kind>
+```
+
 - Running in normal mode with `--kind` flags:
 
 ```bash
