@@ -4,12 +4,13 @@ from typing import Any
 from ocp_resources.resource import Resource
 
 
-class Operator(Resource):
+class VirtualMachineClusterInstancetype(Resource):
     """
-    Operator represents a cluster operator.
+    VirtualMachineClusterInstancetype is a cluster scoped version of
+    VirtualMachineInstancetype resource.
     """
 
-    api_group: str = Resource.ApiGroup.OPERATORS_COREOS_COM
+    api_group: str = Resource.ApiGroup.INSTANCETYPE_KUBEVIRT_IO
 
     def __init__(
         self,

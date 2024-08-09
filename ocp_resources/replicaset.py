@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
+from warnings import warn
+from ocp_resources.replica_set import ReplicaSet  # noqa: F401
 
-from ocp_resources.resource import NamespacedResource
-
-
-class ReplicaSet(NamespacedResource):
-    """
-    OpenShift Service object.
-    """
-
-    api_group = NamespacedResource.ApiGroup.APPS
+warn(
+    f"The module {__name__} is deprecated and will be removed in version 4.17, `ReplicaSet` should be imported from `ocp_resources.replica_set`",
+    DeprecationWarning,
+    stacklevel=2,
+)
