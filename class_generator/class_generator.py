@@ -39,6 +39,39 @@ LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
 
+def process_fields_args(
+    fields_output: str,
+    output_dict: Dict[str, Any],
+    dict_key: str,
+    kind: str,
+    debug: bool,
+    output_debug_file_path: str,
+    add_tests: bool,
+    debug_content: Optional[Dict[str, str]] = None,
+    args_to_ignore: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    if _fields_args := re.findall(r"  .*", fields_output, re.DOTALL):
+        for field in [_field for _field in _fields_args[0].splitlines() if _field]:
+            if args_to_ignore and field.split()[0] in args_to_ignore:
+                continue
+
+            # If line is indented 4 spaces we know that this is a field under spec
+            if len(re.findall(r" +", field)[0]) == 2:
+                output_dict[dict_key].append(
+                    get_arg_params(
+                        field=field.strip(),
+                        kind=kind,
+                        field_under_spec=True if dict_key == SPEC_STR else False,
+                        debug=debug,
+                        debug_content=debug_content,
+                        output_debug_file_path=output_debug_file_path,
+                        add_tests=add_tests,
+                    )
+                )
+
+    return output_dict
+
+
 def get_sections_dict(output: str) -> Dict[str, str]:
     raw_resource_dict: Dict[str, str] = {}
 
@@ -452,45 +485,34 @@ def parse_explain(
 
     _spec_sections_dict = get_sections_dict(output=spec_out)
     if _spec_fields := _spec_sections_dict.get(FIELDS_STR):
-        _spec_fields_args = re.findall(r"  .*", _spec_fields, re.DOTALL)
         if output_debug_file_path:
             write_to_file(
                 data={"explain-spec": spec_out},
                 output_debug_file_path=output_debug_file_path,
             )
 
-        for field in [_field for _field in _spec_fields_args[0].splitlines() if _field]:
-            # If line is indented 4 spaces we know that this is a field under spec
-            if len(re.findall(r" +", field)[0]) == 2:
-                resource_dict[SPEC_STR].append(
-                    get_arg_params(
-                        field=field.strip(),
-                        kind=kind,
-                        field_under_spec=True,
-                        debug=debug,
-                        debug_content=debug_content,
-                        output_debug_file_path=output_debug_file_path,
-                        add_tests=add_tests,
-                    )
-                )
+        resource_dict = process_fields_args(
+            fields_output=_spec_fields,
+            output_dict=resource_dict,
+            dict_key=SPEC_STR,
+            kind=kind,
+            add_tests=add_tests,
+            debug=debug,
+            debug_content=debug_content,
+            output_debug_file_path=output_debug_file_path,
+        )
 
-    if _fields := re.findall(r"  .*", raw_resource_dict[FIELDS_STR], re.DOTALL):
-        for line in [_line for _line in _fields[0].splitlines() if _line]:
-            if line.split()[0] in keys_to_ignore:
-                continue
-
-            # Process only top level fields with 2 spaces indent
-            if len(re.findall(r" +", line)[0]) == 2:
-                resource_dict[FIELDS_STR].append(
-                    get_arg_params(
-                        field=line,
-                        kind=kind,
-                        debug=debug,
-                        debug_content=debug_content,
-                        output_debug_file_path=output_debug_file_path,
-                        add_tests=add_tests,
-                    )
-                )
+    resource_dict = process_fields_args(
+        fields_output=raw_resource_dict[FIELDS_STR],
+        output_dict=resource_dict,
+        dict_key=FIELDS_STR,
+        kind=kind,
+        add_tests=add_tests,
+        debug=debug,
+        debug_content=debug_content,
+        output_debug_file_path=output_debug_file_path,
+        args_to_ignore=keys_to_ignore,
+    )
 
     api_group_real_name = resource_dict.get("GROUP")
     # If API Group is not present in resource, try to get it from VERSION
