@@ -1,16 +1,17 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import Resource, MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
-class VirtualMachineClusterInstancetype(Resource):
+class VirtualMachineInstancetype(NamespacedResource):
     """
-    VirtualMachineClusterInstancetype is a cluster scoped version of
-    VirtualMachineInstancetype resource.
+    VirtualMachineInstancetype resource contains quantitative and resource
+    related VirtualMachine configuration that can be used by multiple
+    VirtualMachine resources.
     """
 
-    api_group: str = Resource.ApiGroup.INSTANCETYPE_KUBEVIRT_IO
+    api_group: str = NamespacedResource.ApiGroup.INSTANCETYPE_KUBEVIRT_IO
 
     def __init__(
         self,
