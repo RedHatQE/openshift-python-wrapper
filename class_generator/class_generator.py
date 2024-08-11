@@ -14,6 +14,7 @@ from cloup.constraints import If, accept_none, mutually_exclusive, require_any
 from pyhelper_utils.shell import run_command
 import pytest
 from rich.console import Console
+from rich.syntax import Syntax
 
 from rich.prompt import Prompt
 from ocp_resources.resource import Resource
@@ -377,7 +378,8 @@ def generate_resource_file_from_dict(
             _output_file = temp_output_file
 
     if dry_run:
-        Console().print(rendered)
+        _code = Syntax(code=rendered, lexer="python", line_numbers=True)
+        Console().print(_code)
 
     else:
         write_and_format_rendered(filepath=_output_file, data=rendered)
