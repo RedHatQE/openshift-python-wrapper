@@ -27,13 +27,43 @@ from pyhelper_utils.runners import function_runner_with_pdb
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
 
-TYPE_MAPPING: Dict[str, str] = {
-    "<integer>": "int",
-    "<Object>": "Dict[Any, Any]",
-    "<[]Object>": "List[Any]",
-    "<string>": "str",
-    "<map[string]string>": "Dict[Any, Any]",
-    "<boolean>": "bool",
+PYTHON_TYPE_MAPPING: Dict[Any, str] = {
+    "int": "int",
+    "dict": "Dict[str, Any]",
+    "str": "str",
+    "bool": "bool",
+    "list": "List[Any]",
+}
+# All fields must be set with Optional since resource can have yaml_file to cover all args.
+TYPE_MAPPING: Dict[str, Dict[str, str]] = {
+    "<integer>": {
+        "type": PYTHON_TYPE_MAPPING["int"],
+        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['int']}] = None",
+    },
+    "<Object>": {
+        "type": PYTHON_TYPE_MAPPING["dict"],
+        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['dict']}] = None",
+    },
+    "<[]Object>": {
+        "type": PYTHON_TYPE_MAPPING["list"],
+        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['list']}] = None",
+    },
+    "<string>": {
+        "type": PYTHON_TYPE_MAPPING["str"],
+        "type_for_init": f'Optional[{PYTHON_TYPE_MAPPING["str"]}] = ""',
+    },
+    "<[]string>": {
+        "type": PYTHON_TYPE_MAPPING["list"],
+        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['list']}] = None",
+    },
+    "<map[string]string>": {
+        "type": PYTHON_TYPE_MAPPING["dict"],
+        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['dict']}] = None",
+    },
+    "<boolean>": {
+        "type": PYTHON_TYPE_MAPPING["bool"],
+        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['bool']}] = None",
+    },
 }
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
@@ -337,31 +367,14 @@ def get_arg_params(
     name = convert_camel_case_to_snake_case(string_=_orig_name)
     type_ = _type.strip()
     required: bool = "-required-" in splited_field
-    type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
-    type_from_dict_for_init = type_from_dict
-
-    # All fields must be set with Optional since resource can have yaml_file to cover all args.
-    if type_from_dict == "Dict[Any, Any]":
-        type_from_dict_for_init = "Optional[Dict[str, Any]] = None"
-
-    if type_from_dict == "List[Any]":
-        type_from_dict_for_init = "Optional[List[Any]] = None"
-
-    if type_from_dict == "str":
-        type_from_dict_for_init = 'Optional[str] = ""'
-
-    if type_from_dict == "bool":
-        type_from_dict_for_init = "Optional[bool] = None"
-
-    if type_from_dict == "int":
-        type_from_dict_for_init = "Optional[int] = None"
+    type_from_dict: Dict[str, str] = TYPE_MAPPING.get(type_, TYPE_MAPPING["<Object>"])
 
     _res: Dict[str, Any] = {
         "name-from-explain": _orig_name,
         "name-for-class-arg": name,
-        "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
+        "type-for-class-arg": f"{name}: {type_from_dict['type_for_init']}",
         "required": required,
-        "type": type_from_dict,
+        "type": type_from_dict["type"],
         "description": get_field_description(
             kind=kind,
             field_name=_orig_name,
@@ -481,7 +494,11 @@ def parse_explain(
         if debug_content:
             spec_out = debug_content.get("explain-spec", "")
     else:
-        rc, spec_out, _ = run_command(command=shlex.split(f"oc explain {kind}.spec"), check=False, log_errors=False)
+        rc, spec_out, _ = run_command(
+            command=shlex.split(f"oc explain {kind}.spec"),
+            check=False,
+            log_errors=False,
+        )
         if not rc:
             LOGGER.warning(f"{kind} spec not found, skipping")
 

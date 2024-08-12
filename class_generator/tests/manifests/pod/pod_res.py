@@ -61,7 +61,7 @@ class Pod(NamespacedResource):
               StartTime before the system will actively try to mark it failed and kill
               associated containers. Value must be a positive integer.
 
-            affinity(Dict[Any, Any]): If specified, the pod's scheduling constraints
+            affinity(Dict[str, Any]): If specified, the pod's scheduling constraints
               Affinity is a group of affinity scheduling rules.
 
               FIELDS:
@@ -79,7 +79,7 @@ class Pod(NamespacedResource):
             automount_service_account_token(bool): AutomountServiceAccountToken indicates whether a service account token
               should be automatically mounted.
 
-            containers(Dict[Any, Any]): List of containers belonging to the pod. Containers cannot currently be
+            containers(Dict[str, Any]): List of containers belonging to the pod. Containers cannot currently be
               added or removed. There must be at least one container in a Pod. Cannot be
               updated.
               A single application container that you want to run within a pod.
@@ -257,7 +257,7 @@ class Pod(NamespacedResource):
                   default will be used, which might be configured in the container image.
                   Cannot be updated.
 
-            dns_config(Dict[Any, Any]): Specifies the DNS parameters of a pod. Parameters specified here will be
+            dns_config(Dict[str, Any]): Specifies the DNS parameters of a pod. Parameters specified here will be
               merged to the generated DNS configuration based on DNSPolicy.
               PodDNSConfig defines the DNS parameters of a pod in addition to those
               generated from DNSPolicy.
@@ -302,7 +302,7 @@ class Pod(NamespacedResource):
               injected into pod's environment variables, matching the syntax of Docker
               links. Optional: Defaults to true.
 
-            ephemeral_containers(Dict[Any, Any]): List of ephemeral containers run in this pod. Ephemeral containers may be
+            ephemeral_containers(Dict[str, Any]): List of ephemeral containers run in this pod. Ephemeral containers may be
               run in an existing pod to perform user-initiated actions such as debugging.
               This list cannot be specified when creating a pod, and it cannot be modified
               by updating the pod spec. In order to add an ephemeral container to an
@@ -469,8 +469,9 @@ class Pod(NamespacedResource):
                   default will be used, which might be configured in the container image.
                   Cannot be updated.
 
-            host_aliases(Dict[Any, Any]): HostAliases is an optional list of hosts and IPs that will be injected into
-              the pod's hosts file if specified.
+            host_aliases(Dict[str, Any]): HostAliases is an optional list of hosts and IPs that will be injected into
+              the pod's hosts file if specified. This is only valid for non-hostNetwork
+              pods.
               HostAlias holds the mapping between IP and hostnames that will be injected
               as an entry in the pod's hosts file.
 
@@ -478,7 +479,7 @@ class Pod(NamespacedResource):
                 hostnames	<[]string>
                   Hostnames for the above IP address.
 
-                ip	<string> -required-
+                ip	<string>
                   IP address of the host file entry.
 
             host_ipc(bool): Use the host's ipc namespace. Optional: Default to false.
@@ -502,7 +503,7 @@ class Pod(NamespacedResource):
             hostname(str): Specifies the hostname of the Pod If not specified, the pod's hostname will
               be set to a system-defined value.
 
-            image_pull_secrets(Dict[Any, Any]): ImagePullSecrets is an optional list of references to secrets in the same
+            image_pull_secrets(Dict[str, Any]): ImagePullSecrets is an optional list of references to secrets in the same
               namespace to use for pulling any of the images used by this PodSpec. If
               specified, these secrets will be passed to individual puller implementations
               for them to use. More info:
@@ -512,12 +513,10 @@ class Pod(NamespacedResource):
 
               FIELDS:
                 name	<string>
-                  Name of the referent. This field is effectively required, but due to
-                  backwards compatibility is allowed to be empty. Instances of this type with
-                  an empty value here are almost certainly wrong. More info:
+                  Name of the referent. More info:
                   https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
 
-            init_containers(Dict[Any, Any]): List of initialization containers belonging to the pod. Init containers are
+            init_containers(Dict[str, Any]): List of initialization containers belonging to the pod. Init containers are
               executed in order prior to containers being started. If any init container
               fails, the pod is considered to have failed and is handled according to its
               restartPolicy. The name for an init container or normal container must be
@@ -708,12 +707,12 @@ class Pod(NamespacedResource):
               non-empty, the scheduler simply schedules this pod onto that node, assuming
               that it fits resource requirements.
 
-            node_selector(Dict[Any, Any]): NodeSelector is a selector which must be true for the pod to fit on a node.
+            node_selector(Dict[str, Any]): NodeSelector is a selector which must be true for the pod to fit on a node.
               Selector which must match a node's labels for the pod to be scheduled on
               that node. More info:
               https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 
-            os(Dict[Any, Any]): Specifies the OS of the containers in the pod. Some pod and container fields
+            os(Dict[str, Any]): Specifies the OS of the containers in the pod. Some pod and container fields
               are restricted if this is set.
 
               If the OS field is set to linux, the following fields must be unset:
@@ -721,12 +720,11 @@ class Pod(NamespacedResource):
 
               If the OS field is set to windows, following fields must be unset: -
               spec.hostPID - spec.hostIPC - spec.hostUsers -
-              spec.securityContext.appArmorProfile - spec.securityContext.seLinuxOptions -
-              spec.securityContext.seccompProfile - spec.securityContext.fsGroup -
-              spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls -
-              spec.shareProcessNamespace - spec.securityContext.runAsUser -
-              spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups -
-              spec.containers[*].securityContext.appArmorProfile -
+              spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile -
+              spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy -
+              spec.securityContext.sysctls - spec.shareProcessNamespace -
+              spec.securityContext.runAsUser - spec.securityContext.runAsGroup -
+              spec.securityContext.supplementalGroups -
               spec.containers[*].securityContext.seLinuxOptions -
               spec.containers[*].securityContext.seccompProfile -
               spec.containers[*].securityContext.capabilities -
@@ -747,7 +745,7 @@ class Pod(NamespacedResource):
                   Clients should expect to handle additional values and treat unrecognized
                   values in this field as os: null
 
-            overhead(Dict[Any, Any]): Overhead represents the resource overhead associated with running a pod for
+            overhead(Dict[str, Any]): Overhead represents the resource overhead associated with running a pod for
               a given RuntimeClass. This field will be autopopulated at admission time by
               the RuntimeClass admission controller. If the RuntimeClass admission
               controller is enabled, overhead must not be set in Pod create requests. The
@@ -836,7 +834,7 @@ class Pod(NamespacedResource):
               not specified, the pod priority will be default or zero if there is no
               default.
 
-            readiness_gates(Dict[Any, Any]): If specified, all readiness gates will be evaluated for pod readiness. A pod
+            readiness_gates(Dict[str, Any]): If specified, all readiness gates will be evaluated for pod readiness. A pod
               is ready when all its containers are ready AND all conditions specified in
               the readiness gates have status equal to "True" More info:
               https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
@@ -847,7 +845,7 @@ class Pod(NamespacedResource):
                   ConditionType refers to a condition in the pod's condition list with
                   matching type.
 
-            resource_claims(Dict[Any, Any]): ResourceClaims defines which ResourceClaims must be allocated and reserved
+            resource_claims(Dict[str, Any]): ResourceClaims defines which ResourceClaims must be allocated and reserved
               before the Pod is allowed to start. The resources will be made available to
               those containers which consume them by name.
 
@@ -888,13 +886,15 @@ class Pod(NamespacedResource):
             scheduler_name(str): If specified, the pod will be dispatched by specified scheduler. If not
               specified, the pod will be dispatched by default scheduler.
 
-            scheduling_gates(Dict[Any, Any]): SchedulingGates is an opaque list of values that if specified will block
+            scheduling_gates(Dict[str, Any]): SchedulingGates is an opaque list of values that if specified will block
               scheduling the pod. If schedulingGates is not empty, the pod will stay in
               the SchedulingGated state and the scheduler will not attempt to schedule the
               pod.
 
               SchedulingGates can only be set at pod creation time, and be removed only
               afterwards.
+
+              This is a beta feature enabled by the PodSchedulingReadiness feature gate.
               PodSchedulingGate is associated to a Pod to guard its scheduling.
 
               FIELDS:
@@ -902,7 +902,7 @@ class Pod(NamespacedResource):
                   Name of the scheduling gate. Each scheduling gate must have a unique name
                   field.
 
-            security_context(Dict[Any, Any]): SecurityContext holds pod-level security attributes and common container
+            security_context(Dict[str, Any]): SecurityContext holds pod-level security attributes and common container
               settings. Optional: Defaults to empty.  See type description for default
               values of each field.
               PodSecurityContext holds pod-level security attributes and common container
@@ -911,10 +911,6 @@ class Pod(NamespacedResource):
               PodSecurityContext.
 
               FIELDS:
-                appArmorProfile	<AppArmorProfile>
-                  appArmorProfile is the AppArmor options to use by the containers in this
-                  pod. Note that this field cannot be set when spec.os.name is windows.
-
                 fsGroup	<integer>
                   A special supplemental group that applies to all containers in a pod. Some
                   volume types allow the Kubelet to change the ownership of that volume to be
@@ -1001,7 +997,7 @@ class Pod(NamespacedResource):
                   SecurityContext takes precedence. Note that this field cannot be set when
                   spec.os.name is linux.
 
-            service_account(str): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
+            service_account(str): DeprecatedServiceAccount is a depreciated alias for ServiceAccountName.
               Deprecated: Use serviceAccountName instead.
 
             service_account_name(str): ServiceAccountName is the name of the ServiceAccount to use to run this pod.
@@ -1035,7 +1031,7 @@ class Pod(NamespacedResource):
               forcibly halted with a kill signal. Set this value longer than the expected
               cleanup time for your process. Defaults to 30 seconds.
 
-            tolerations(Dict[Any, Any]): If specified, the pod's tolerations.
+            tolerations(Dict[str, Any]): If specified, the pod's tolerations.
               The pod this Toleration is attached to tolerates any taint that matches the
               triple <key,value,effect> using the matching operator <operator>.
 
@@ -1081,7 +1077,7 @@ class Pod(NamespacedResource):
                   Value is the taint value the toleration matches to. If the operator is
                   Exists, the value should be empty, otherwise just a regular string.
 
-            topology_spread_constraints(Dict[Any, Any]): TopologySpreadConstraints describes how a group of pods ought to spread
+            topology_spread_constraints(Dict[str, Any]): TopologySpreadConstraints describes how a group of pods ought to spread
               across topology domains. Scheduler will schedule pods in a way which abides
               by the constraints. All topologySpreadConstraints are ANDed.
               TopologySpreadConstraint specifies how to spread matching pods among the
@@ -1142,6 +1138,9 @@ class Pod(NamespacedResource):
                   pod with the same labelSelector cannot be scheduled, because computed skew
                   will be 3(3 - 0) if new Pod is scheduled to any of the three zones, it will
                   violate MaxSkew.
+
+                  This is a beta field and requires the MinDomainsInPodTopologySpread feature
+                  gate to be enabled (enabled by default).
 
                 nodeAffinityPolicy	<string>
                   NodeAffinityPolicy indicates how we will treat Pod's
@@ -1210,7 +1209,7 @@ class Pod(NamespacedResource):
                    - `"ScheduleAnyway"` instructs the scheduler to schedule the pod even if
                   constraints are not satisfied.
 
-            volumes(Dict[Any, Any]): List of volumes that can be mounted by containers belonging to the pod. More
+            volumes(Dict[str, Any]): List of volumes that can be mounted by containers belonging to the pod. More
               info: https://kubernetes.io/docs/concepts/storage/volumes
               Volume represents a named volume in a pod that may be accessed by any
               container in the pod.
