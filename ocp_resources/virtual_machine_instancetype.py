@@ -7,8 +7,8 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 class VirtualMachineInstancetype(NamespacedResource):
     """
     VirtualMachineInstancetype resource contains quantitative and resource
-    related VirtualMachine configuration that can be used by multiple
-    VirtualMachine resources.
+    related VirtualMachine configuration
+    that can be used by multiple VirtualMachine resources.
     """
 
     api_group: str = NamespacedResource.ApiGroup.INSTANCETYPE_KUBEVIRT_IO
@@ -36,25 +36,33 @@ class VirtualMachineInstancetype(NamespacedResource):
               FIELDS:
                 dedicatedCPUPlacement	<boolean>
                   DedicatedCPUPlacement requests the scheduler to place the
-                  VirtualMachineInstance on a node with enough dedicated pCPUs and pin the
-                  vCPUs to it.
+                  VirtualMachineInstance on a node
+                  with enough dedicated pCPUs and pin the vCPUs to it.
 
                 guest	<integer> -required-
                   Required number of vCPUs to expose to the guest.
-                   The resulting CPU topology being derived from the optional
+
+
+                  The resulting CPU topology being derived from the optional
                   PreferredCPUTopology attribute of CPUPreferences that itself defaults to
                   PreferSockets.
 
                 isolateEmulatorThread	<boolean>
                   IsolateEmulatorThread requests one more dedicated pCPU to be allocated for
-                  the VMI to place the emulator thread on it.
+                  the VMI to place
+                  the emulator thread on it.
+
+                maxSockets	<integer>
+                  MaxSockets specifies the maximum amount of sockets that can be hotplugged
 
                 model	<string>
-                  Model specifies the CPU model inside the VMI. List of available models
-                  https://github.com/libvirt/libvirt/tree/master/src/cpu_map. It is possible
-                  to specify special cases like "host-passthrough" to get the same CPU as the
-                  node and "host-model" to get CPU closest to the node one. Defaults to
-                  host-model.
+                  Model specifies the CPU model inside the VMI.
+                  List of available models
+                  https://github.com/libvirt/libvirt/tree/master/src/cpu_map.
+                  It is possible to specify special cases like "host-passthrough" to get the
+                  same CPU as the node
+                  and "host-model" to get CPU closest to the node one.
+                  Defaults to host-model.
 
                 numa	<Object>
                   NUMA allows specifying settings for the guest NUMA topology
@@ -111,22 +119,35 @@ class VirtualMachineInstancetype(NamespacedResource):
                   Optionally enables the use of hugepages for the VirtualMachineInstance
                   instead of regular memory.
 
+                maxGuest	<Object>
+                  MaxGuest allows to specify the maximum amount of memory which is visible
+                  inside the Guest OS.
+                  The delta between MaxGuest and Guest is the amount of memory that can be
+                  hot(un)plugged.
+
                 overcommitPercent	<integer>
                   OvercommitPercent is the percentage of the guest memory which will be
-                  overcommitted. This means that the VMIs parent pod (virt-launcher) will
-                  request less physical memory by a factor specified by the OvercommitPercent.
+                  overcommitted.
+                  This means that the VMIs parent pod (virt-launcher) will request less
+                  physical memory by a factor specified by the OvercommitPercent.
                   Overcommits can lead to memory exhaustion, which in turn can lead to
-                  crashes. Use carefully. Defaults to 0
+                  crashes. Use carefully.
+                  Defaults to 0
 
             node_selector(Dict[Any, Any]): NodeSelector is a selector which must be true for the vmi to fit on a node.
               Selector which must match a node's labels for the vmi to be scheduled on
-              that node. More info:
+              that node.
+              More info:
               https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-               NodeSelector is the name of the custom node selector for the instancetype.
 
-            scheduler_name(str): If specified, the VMI will be dispatched by specified scheduler. If not
-              specified, the VMI will be dispatched by default scheduler.
-               SchedulerName is the name of the custom K8s scheduler for the instancetype.
+
+              NodeSelector is the name of the custom node selector for the instancetype.
+
+            scheduler_name(str): If specified, the VMI will be dispatched by specified scheduler.
+              If not specified, the VMI will be dispatched by default scheduler.
+
+
+              SchedulerName is the name of the custom K8s scheduler for the instancetype.
 
         """
         super().__init__(**kwargs)
@@ -154,8 +175,8 @@ class VirtualMachineInstancetype(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["cpu"] = self.cpu
-            self.res["memory"] = self.memory
+            _spec["cpu"] = self.cpu
+            _spec["memory"] = self.memory
 
             if self.annotations:
                 _spec["annotations"] = self.annotations

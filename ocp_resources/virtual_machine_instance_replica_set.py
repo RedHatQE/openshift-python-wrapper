@@ -27,8 +27,8 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
             replicas(int): Number of desired pods. This is a pointer to distinguish between explicit
               zero and not specified. Defaults to 1.
 
-            selector(Dict[Any, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected by
-              this will be the ones affected by this deployment.
+            selector(Dict[Any, Any]): Label selector for pods. Existing ReplicaSets whose pods are
+              selected by this will be the ones affected by this deployment.
 
               FIELDS:
                 matchExpressions	<[]Object>
@@ -37,9 +37,11 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
 
                 matchLabels	<map[string]string>
                   matchLabels is a map of {key,value} pairs. A single {key,value} in the
-                  matchLabels map is equivalent to an element of matchExpressions, whose key
-                  field is "key", the operator is "In", and the values array contains only
-                  "value". The requirements are ANDed.
+                  matchLabels
+                  map is equivalent to an element of matchExpressions, whose key field is
+                  "key", the
+                  operator is "In", and the values array contains only "value". The
+                  requirements are ANDed.
 
             template(Dict[Any, Any]): Template describes the pods that will be created.
 
@@ -72,8 +74,8 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["selector"] = self.selector
-            self.res["template"] = self.template
+            _spec["selector"] = self.selector
+            _spec["template"] = self.template
 
             if self.paused is not None:
                 _spec["paused"] = self.paused

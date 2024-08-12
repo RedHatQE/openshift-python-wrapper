@@ -84,7 +84,7 @@ class ReplicaSet(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["selector"] = self.selector
+            _spec["selector"] = self.selector
 
             if self.min_ready_seconds:
                 _spec["minReadySeconds"] = self.min_ready_seconds
