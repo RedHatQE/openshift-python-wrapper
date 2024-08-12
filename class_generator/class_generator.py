@@ -57,7 +57,7 @@ def process_fields_args(
             if field.strip() and field.split()[0] in _args_to_ignore:
                 continue
 
-            # If line is indented 4 spaces we know that this is a field under spec
+            # If line is indented 4 spaces we know that this is a top-level arg that will be added
             if len(re.findall(r" +", field)[0]) == 2:
                 output_dict[dict_key].append(
                     get_arg_params(
