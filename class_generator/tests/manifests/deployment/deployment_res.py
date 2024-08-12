@@ -118,8 +118,8 @@ class Deployment(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["selector"] = self.selector
-            self.res["template"] = self.template
+            _spec["selector"] = self.selector
+            _spec["template"] = self.template
 
             if self.min_ready_seconds:
                 _spec["minReadySeconds"] = self.min_ready_seconds

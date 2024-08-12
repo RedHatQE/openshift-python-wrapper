@@ -12,8 +12,6 @@ class APIServer(Resource):
     'cluster'.
      Compatibility level 1: Stable within a major release for a minimum of 12
     months or 3 minor releases (whichever is longer).
-
-    API Link: https://docs.openshift.com/container-platform/4.16/rest_api/config_apis/apiserver-config-openshift-io-v1.html
     """
 
     api_group: str = Resource.ApiGroup.CONFIG_OPENSHIFT_IO

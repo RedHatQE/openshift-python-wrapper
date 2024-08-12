@@ -1,16 +1,14 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
-
+import json
 from warnings import warn
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import NamespacedResource
-
-import json
 
 import kubernetes
+from timeout_sampler import TimeoutWatch
 
 from ocp_resources.node import Node
-from timeout_sampler import TimeoutWatch
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class ExecOnPodError(Exception):
@@ -1430,6 +1428,134 @@ class Pod(NamespacedResource):
         self.tolerations = tolerations
         self.topology_spread_constraints = topology_spread_constraints
         self.volumes = volumes
+
+    def to_dict(self) -> None:
+        super().to_dict()
+
+        if not self.yaml_file:
+            if not all([
+                self.containers,
+            ]):
+                raise MissingRequiredArgumentError(argument="containers")
+
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            _spec["containers"] = self.containers
+
+            if self.active_deadline_seconds:
+                _spec["activeDeadlineSeconds"] = self.active_deadline_seconds
+
+            if self.affinity:
+                _spec["affinity"] = self.affinity
+
+            if self.automount_service_account_token is not None:
+                _spec["automountServiceAccountToken"] = self.automount_service_account_token
+
+            if self.dns_config:
+                _spec["dnsConfig"] = self.dns_config
+
+            if self.dns_policy:
+                _spec["dnsPolicy"] = self.dns_policy
+
+            if self.enable_service_links is not None:
+                _spec["enableServiceLinks"] = self.enable_service_links
+
+            if self.ephemeral_containers:
+                _spec["ephemeralContainers"] = self.ephemeral_containers
+
+            if self.host_aliases:
+                _spec["hostAliases"] = self.host_aliases
+
+            if self.host_ipc is not None:
+                _spec["hostIPC"] = self.host_ipc
+
+            if self.host_network is not None:
+                _spec["hostNetwork"] = self.host_network
+
+            if self.host_pid is not None:
+                _spec["hostPID"] = self.host_pid
+
+            if self.host_users is not None:
+                _spec["hostUsers"] = self.host_users
+
+            if self.hostname:
+                _spec["hostname"] = self.hostname
+
+            if self.image_pull_secrets:
+                _spec["imagePullSecrets"] = self.image_pull_secrets
+
+            if self.init_containers:
+                _spec["initContainers"] = self.init_containers
+
+            if self.node_name:
+                _spec["nodeName"] = self.node_name
+
+            if self.node_selector:
+                _spec["nodeSelector"] = self.node_selector
+
+            if self.os:
+                _spec["os"] = self.os
+
+            if self.overhead:
+                _spec["overhead"] = self.overhead
+
+            if self.preemption_policy:
+                _spec["preemptionPolicy"] = self.preemption_policy
+
+            if self.priority:
+                _spec["priority"] = self.priority
+
+            if self.priority_class_name:
+                _spec["priorityClassName"] = self.priority_class_name
+
+            if self.readiness_gates:
+                _spec["readinessGates"] = self.readiness_gates
+
+            if self.resource_claims:
+                _spec["resourceClaims"] = self.resource_claims
+
+            if self.restart_policy:
+                _spec["restartPolicy"] = self.restart_policy
+
+            if self.runtime_class_name:
+                _spec["runtimeClassName"] = self.runtime_class_name
+
+            if self.scheduler_name:
+                _spec["schedulerName"] = self.scheduler_name
+
+            if self.scheduling_gates:
+                _spec["schedulingGates"] = self.scheduling_gates
+
+            if self.security_context:
+                _spec["securityContext"] = self.security_context
+
+            if self.service_account:
+                _spec["serviceAccount"] = self.service_account
+
+            if self.service_account_name:
+                _spec["serviceAccountName"] = self.service_account_name
+
+            if self.set_hostname_as_fqdn is not None:
+                _spec["setHostnameAsFQDN"] = self.set_hostname_as_fqdn
+
+            if self.share_process_namespace is not None:
+                _spec["shareProcessNamespace"] = self.share_process_namespace
+
+            if self.subdomain:
+                _spec["subdomain"] = self.subdomain
+
+            if self.termination_grace_period_seconds:
+                _spec["terminationGracePeriodSeconds"] = self.termination_grace_period_seconds
+
+            if self.tolerations:
+                _spec["tolerations"] = self.tolerations
+
+            if self.topology_spread_constraints:
+                _spec["topologySpreadConstraints"] = self.topology_spread_constraints
+
+            if self.volumes:
+                _spec["volumes"] = self.volumes
 
     def get_containers(self) -> List[Any]:
         """
