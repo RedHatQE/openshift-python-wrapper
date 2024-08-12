@@ -50,11 +50,10 @@ def process_fields_args(
     debug_content: Optional[Dict[str, str]] = None,
     args_to_ignore: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    _splited_field = ""
-
+    _args_to_ignore = args_to_ignore or []
     if _fields_args := re.findall(r"  .*", fields_output, re.DOTALL):
         for field in [_field for _field in _fields_args[0].splitlines() if _field]:
-            if args_to_ignore and (_splited_field := field.split()) and _splited_field[0] in args_to_ignore:
+            if (_splited_field := field.split()) and _splited_field[0] in _args_to_ignore:
                 continue
 
             # If line is indented 4 spaces we know that this is a field under spec
