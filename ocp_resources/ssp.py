@@ -20,6 +20,7 @@ class SSP(NamespacedResource):
         tekton_tasks: Optional[Dict[str, Any]] = None,
         template_validator: Optional[Dict[str, Any]] = None,
         tls_security_profile: Optional[Dict[str, Any]] = None,
+        token_generation_service: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -79,7 +80,7 @@ class SSP(NamespacedResource):
                   Deprecated: This field is ignored.
 
                 deployVmConsoleProxy	<boolean>
-                  <no description>
+                  Deprecated: This field is ignored.
 
             tekton_pipelines(Dict[Any, Any]): TektonPipelines is the configuration of the tekton-pipelines operand
               Deprecated: This field is ignored.
@@ -325,6 +326,13 @@ class SSP(NamespacedResource):
                   Note that the Modern profile is currently not supported because it is not
                   yet well adopted by common software libraries.
 
+            token_generation_service(Dict[Any, Any]): TokenGenerationService configures the service for generating tokens to
+              access VNC for a VM.
+
+              FIELDS:
+                enabled	<boolean>
+                  <no description>
+
         """
         super().__init__(**kwargs)
 
@@ -335,6 +343,7 @@ class SSP(NamespacedResource):
         self.tekton_tasks = tekton_tasks
         self.template_validator = template_validator
         self.tls_security_profile = tls_security_profile
+        self.token_generation_service = token_generation_service
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -348,7 +357,7 @@ class SSP(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["commonTemplates"] = self.common_templates
+            _spec["commonTemplates"] = self.common_templates
 
             if self.common_instancetypes:
                 _spec["commonInstancetypes"] = self.common_instancetypes
@@ -367,3 +376,6 @@ class SSP(NamespacedResource):
 
             if self.tls_security_profile:
                 _spec["tlsSecurityProfile"] = self.tls_security_profile
+
+            if self.token_generation_service:
+                _spec["tokenGenerationService"] = self.token_generation_service

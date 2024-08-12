@@ -1418,7 +1418,7 @@ class Pod(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["containers"] = self.containers
+            _spec["containers"] = self.containers
 
             if self.active_deadline_seconds:
                 _spec["activeDeadlineSeconds"] = self.active_deadline_seconds

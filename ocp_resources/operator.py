@@ -1,7 +1,18 @@
-# https://docs.openshift.com/container-platform/4.12/operators/operator-reference.html
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
+from typing import Any
 from ocp_resources.resource import Resource
 
 
 class Operator(Resource):
-    api_group = Resource.ApiGroup.OPERATORS_COREOS_COM
+    """
+    Operator represents a cluster operator.
+    """
+
+    api_group: str = Resource.ApiGroup.OPERATORS_COREOS_COM
+
+    def __init__(
+        self,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)

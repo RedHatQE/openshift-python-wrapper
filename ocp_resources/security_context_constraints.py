@@ -12,7 +12,8 @@ class SecurityContextConstraints(Resource):
     is deprecated and will be removed in a future release - users should instead
     use the security.openshift.io group to manage SecurityContextConstraints.
 
-    API Link: https://docs.openshift.com/container-platform/4.16/rest_api/security_apis/securitycontextconstraints-security-openshift-io-v1.html
+    Compatibility level 1: Stable within a major release for a minimum of 12
+    months or 3 minor releases (whichever is longer).
     """
 
     api_group: str = Resource.ApiGroup.SECURITY_OPENSHIFT_IO

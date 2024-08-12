@@ -6,7 +6,7 @@ from ocp_resources.resource import Resource
 
 class CDI(Resource):
     """
-    CDI is the Containerized Data Importer Operator CRD
+    CDI is the CDI Operator CRD
     """
 
     api_group: str = Resource.ApiGroup.CDI_KUBEVIRT_IO
