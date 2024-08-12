@@ -722,6 +722,7 @@ def delete_unchanged_files(updated_files: List[str]) -> List[str]:
 def update_ocp_resources() -> None:
     futures: List[Future] = []
     updated_files: List[str] = []
+    exceptions: List[BaseException] = []
 
     with ThreadPoolExecutor() as executor:
         for obj in os.listdir(OCP_RESOURCES_STR):
@@ -754,13 +755,16 @@ def update_ocp_resources() -> None:
             for result in as_completed(futures):
                 _exception = result.exception()
                 if _exception:
-                    LOGGER.error(f"Failed to update {obj}: {_exception}")
+                    exceptions.append(_exception)
 
         updated_files_to_review = "\n".join(delete_unchanged_files(updated_files=updated_files))
         LOGGER.warning(
             f"The following files were updated:\n{updated_files_to_review}.\n"
             "Please review the changes before commiting."
         )
+
+        if exceptions:
+            LOGGER.error(f"Failed to update resources: {exceptions}")
 
 
 @cloup.command("Resource class generator")
