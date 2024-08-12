@@ -27,7 +27,7 @@ from pyhelper_utils.runners import function_runner_with_pdb
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
 
-PYTHON_TYPE_MAPPING: Dict[Any, str] = {
+PYTHON_TYPE_MAPPING: Dict[str, str] = {
     "int": "int",
     "dict": "Dict[str, Any]",
     "str": "str",
