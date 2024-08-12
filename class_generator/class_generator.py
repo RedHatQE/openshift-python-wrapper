@@ -735,7 +735,7 @@ def update_ocp_resources() -> None:
                     data = fd.read()
 
                 if data.startswith("# Generated using"):
-                    kind = re.search(r"class\s+(.*?)\([Resource|NamespacedResource]", data)
+                    kind = re.search(r"class\s+(.*?)\((Namespaced)?Resource", data)
                     if kind:
                         updated_files.append(filepath)
                         futures.append(
