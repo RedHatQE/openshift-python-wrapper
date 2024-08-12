@@ -14,7 +14,13 @@ import click
 import re
 
 import cloup
-from cloup.constraints import If, accept_none, mutually_exclusive
+from cloup.constraints import (
+    AnySet,
+    If,
+    accept_none,
+    mutually_exclusive,
+    require_any,
+)
 from pyhelper_utils.shell import run_command
 import pytest
 from rich.console import Console
@@ -702,15 +708,18 @@ def generate_class_generator_tests() -> None:
     )
 
 
-def delete_unchanged_files(updated_files):
+def delete_unchanged_files(updated_files: List[str]) -> List[str]:
     for file_ in updated_files:
-        updated_file = file_.replace(".py", "_TEMP.py")
+        updated_file: str = file_.replace(".py", "_TEMP.py")
         if os.path.exists(updated_file) and filecmp.cmp(file_, updated_file):
             LOGGER.info(f"{file_} does not have any changes, deleting {updated_file} file.")
-            Path.unlink(updated_file)
+            Path.unlink(Path(updated_file))
+            updated_files.remove(file_)
+
+    return updated_files
 
 
-def update_ocp_resources():
+def update_ocp_resources() -> None:
     futures: List[Future] = []
     updated_files: List[str] = []
 
@@ -726,20 +735,20 @@ def update_ocp_resources():
                     data = fd.read()
 
                 if data.startswith("# Generated using"):
-                    kind = re.search(r"class\s+(.*?)\(", data)
-                    updated_files.append(filepath)
-                    futures.append(
-                        executor.submit(
-                            run_command,
-                            **{
-                                "command": shlex.split(
-                                    f"poetry run python class_generator/class_generator.py --kind {kind.group(1)}"
-                                ),
-                                "check": False,
-                                "log_errors": False,
-                            },
+                    kind = re.search(r"class\s+(.*?)\([Resource|NamespacedResource]", data)
+                    if kind:
+                        updated_files.append(filepath)
+                        futures.append(
+                            executor.submit(
+                                run_command,
+                                **{
+                                    "command": shlex.split(
+                                        f"poetry run python class_generator/class_generator.py --kind {kind.group(1)}"
+                                    ),
+                                    "log_errors": False,
+                                },
+                            )
                         )
-                    )
 
         if futures:
             for result in as_completed(futures):
@@ -747,7 +756,11 @@ def update_ocp_resources():
                 if _exception:
                     LOGGER.error(f"Failed to update {obj}: {_exception}")
 
-        delete_unchanged_files(updated_files=updated_files)
+        updated_files_to_review = "\n".join(delete_unchanged_files(updated_files=updated_files))
+        LOGGER.warning(
+            f"The following files were updated:\n{updated_files_to_review}.\n"
+            "Please review the changes before commiting."
+        )
 
 
 @cloup.command("Resource class generator")
@@ -801,9 +814,14 @@ def update_ocp_resources():
 @cloup.constraint(mutually_exclusive, ["update_resources", "dry_run"])
 @cloup.constraint(mutually_exclusive, ["update_resources", "output_file"])
 @cloup.constraint(mutually_exclusive, ["interactive", "kind"])
-# @cloup.constraint(require_any, ["interactive", "kind"])
-@cloup.constraint(If("debug_file", then=accept_none), ["interactive", "kind"])
-@cloup.constraint(If("update_resources", then=accept_none), ["interactive", "kind"])
+@cloup.constraint(
+    If(
+        AnySet("debug_file", "update_resources"),
+        then=accept_none,
+        else_=require_any,
+    ),
+    ["interactive", "kind"],
+)
 def main(
     kind: str,
     overwrite: bool,
