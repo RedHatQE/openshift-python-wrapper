@@ -8,8 +8,11 @@ class VirtualMachineInstancePreset(NamespacedResource):
     """
     Deprecated for removal in v2, please use VirtualMachineInstanceType and
     VirtualMachinePreference instead.
-     VirtualMachineInstancePreset defines a VMI spec.domain to be applied to all
-    VMIs that match the provided label selector More info:
+
+
+    VirtualMachineInstancePreset defines a VMI spec.domain to be applied to all
+    VMIs that match the provided label selector
+    More info:
     https://kubevirt.io/user-guide/virtual_machines/presets/#overrides
     """
 
@@ -45,8 +48,9 @@ class VirtualMachineInstancePreset(NamespacedResource):
                   Firmware.
 
                 ioThreadsPolicy	<string>
-                  Controls whether or not disks will share IOThreads. Omitting IOThreadsPolicy
-                  disables use of IOThreads. One of: shared, auto
+                  Controls whether or not disks will share IOThreads.
+                  Omitting IOThreadsPolicy disables use of IOThreads.
+                  One of: shared, auto
 
                 launchSecurity	<Object>
                   Launch Security setting of the vmi.
@@ -60,7 +64,8 @@ class VirtualMachineInstancePreset(NamespacedResource):
                 resources	<Object>
                   Resources describes the Compute Resources required by this vmi.
 
-            selector(Dict[Any, Any]): Selector is a label query over a set of VMIs. Required.
+            selector(Dict[Any, Any]): Selector is a label query over a set of VMIs.
+              Required.
 
               FIELDS:
                 matchExpressions	<[]Object>
@@ -69,9 +74,11 @@ class VirtualMachineInstancePreset(NamespacedResource):
 
                 matchLabels	<map[string]string>
                   matchLabels is a map of {key,value} pairs. A single {key,value} in the
-                  matchLabels map is equivalent to an element of matchExpressions, whose key
-                  field is "key", the operator is "In", and the values array contains only
-                  "value". The requirements are ANDed.
+                  matchLabels
+                  map is equivalent to an element of matchExpressions, whose key field is
+                  "key", the
+                  operator is "In", and the values array contains only "value". The
+                  requirements are ANDed.
 
         """
         super().__init__(**kwargs)
@@ -91,7 +98,7 @@ class VirtualMachineInstancePreset(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["selector"] = self.selector
+            _spec["selector"] = self.selector
 
             if self.domain:
                 _spec["domain"] = self.domain

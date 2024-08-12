@@ -50,12 +50,14 @@ def process_fields_args(
     debug_content: Optional[Dict[str, str]] = None,
     args_to_ignore: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
+    _args_to_ignore = args_to_ignore or []
+
     if _fields_args := re.findall(r"  .*", fields_output, re.DOTALL):
         for field in [_field for _field in _fields_args[0].splitlines() if _field]:
-            if args_to_ignore and field.split()[0] in args_to_ignore:
+            if field.strip() and field.split()[0] in _args_to_ignore:
                 continue
 
-            # If line is indented 4 spaces we know that this is a field under spec
+            # If line is indented 4 spaces we know that this is a top-level arg that will be added
             if len(re.findall(r" +", field)[0]) == 2:
                 output_dict[dict_key].append(
                     get_arg_params(

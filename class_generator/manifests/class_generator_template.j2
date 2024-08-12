@@ -59,9 +59,15 @@ class {{ KIND }}({{ BASE_CLASS }}):
             _spec = self.res["spec"]
           {% endif %}
 
-          {% for arg in FIELDS + SPEC %}
+          {% for arg in FIELDS %}
           {% if arg["required"] == True %}
             self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+          {% endif %}
+          {% endfor %}
+
+          {% for arg in SPEC %}
+          {% if arg["required"] == True %}
+            _spec["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
           {% endif %}
           {% endfor %}
 

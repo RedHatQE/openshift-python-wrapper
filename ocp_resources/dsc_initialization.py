@@ -103,7 +103,7 @@ class DSCInitialization(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            self.res["applicationsNamespace"] = self.applications_namespace
+            _spec["applicationsNamespace"] = self.applications_namespace
 
             if self.dev_flags:
                 _spec["devFlags"] = self.dev_flags
