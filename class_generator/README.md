@@ -48,6 +48,14 @@ class-generator --interactive
 class-generator --kind Pod --add-tests
 ```
 
+### Updating existing resources
+
+To update existing resources which were generated with the script, pass `--update-resources`
+
+```bash
+class-generator --update-resources
+```
+
 ## Reporting an issue
 
 - Running with debug mode and `--debug` flag:

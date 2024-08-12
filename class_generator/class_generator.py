@@ -753,8 +753,7 @@ def update_ocp_resources() -> None:
 
         if futures:
             for result in as_completed(futures):
-                _exception = result.exception()
-                if _exception:
+                if _exception := result.exception():
                     exceptions.append(_exception)
 
         updated_files_to_review = "\n".join(delete_unchanged_files(updated_files=updated_files))
@@ -764,7 +763,8 @@ def update_ocp_resources() -> None:
         )
 
         if exceptions:
-            LOGGER.error(f"Failed to update resources: {exceptions}")
+            exceptions_str = ", ".join(ex.args[1][-1] for ex in exceptions)
+            LOGGER.error(f"Failed to update resources:\n{exceptions_str}")
 
 
 @cloup.command("Resource class generator")
