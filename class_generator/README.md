@@ -28,13 +28,11 @@ python3 -m pip install openshift-python-wrapper
 poetry install
 ```
 
-````
-
 For shell completion Add this to ~/.bashrc or ~/.zshrc:
 
 ```bash
 if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_source class-generator)"; fi
-````
+```
 
 ###### Call the script
 
