@@ -70,11 +70,11 @@ python-simple-logger = ">=1.0.6"
 jinja2 = "^3.1.2"
 timeout-sampler = ">=0.0.17"
 click = "^8.1.7"
+pyhelper-utils = "^0.0.34"
 ruff = "^0.5.3"
 rich = "^13.7.1"
 cloup = "^3.0.5"
 pytest = "^8.0.0"
-pyhelper-utils = "^0.0.34"
 
 [tool.pytest.ini_options]
 markers = [
