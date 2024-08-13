@@ -14,15 +14,15 @@ class Secret(NamespacedResource):
 
     def __init__(
         self,
-        data: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, str]] = None,
         immutable: Optional[bool] = None,
-        string_data: Optional[Dict[str, Any]] = None,
+        string_data: Optional[Dict[str, str]] = None,
         type: Optional[str] = "",
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            data(Dict[str, Any]): Data contains the secret data. Each key must consist of alphanumeric
+            data(Dict[str, str]): Data contains the secret data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. The serialized form of the secret data is a
               base64 encoded string, representing the arbitrary (possibly non-string) data
               value here. Described in https://tools.ietf.org/html/rfc4648#section-4
@@ -31,7 +31,7 @@ class Secret(NamespacedResource):
               updated (only object metadata can be modified). If not set to true, the
               field can be modified at any time. Defaulted to nil.
 
-            string_data(Dict[str, Any]): stringData allows specifying non-binary secret data in string form. It is
+            string_data(Dict[str, str]): stringData allows specifying non-binary secret data in string form. It is
               provided as a write-only input field for convenience. All keys and values
               are merged into the data field on write, overwriting any existing values.
               The stringData field is never output when reading from the API.

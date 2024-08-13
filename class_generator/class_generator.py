@@ -10,7 +10,7 @@ import click
 import re
 
 import cloup
-from cloup.constraints import If, accept_none, mutually_exclusive, require_any
+from cloup.constraints import If, IsSet, accept_none, require_one
 from pyhelper_utils.shell import run_command
 import pytest
 from rich.console import Console
@@ -322,60 +322,44 @@ def get_arg_params(
     debug_content: Optional[Dict[str, str]] = None,
     add_tests: bool = False,
 ) -> Dict[str, Any]:
-    python_type_mapping: Dict[str, str] = {
-        "int": "int",
-        "dict": "Dict[str, Any]",
-        "str": "str",
-        "bool": "bool",
-        "list_any": "List[Any]",
-        "list_str": "List[str]",
-    }
-    # All fields must be set with Optional since resource can have yaml_file to cover all args.
-    type_mapping: Dict[str, Dict[str, str]] = {
-        "<integer>": {
-            "type": python_type_mapping["int"],
-            "type_for_init": f"Optional[{python_type_mapping['int']}] = None",
-        },
-        "<Object>": {
-            "type": python_type_mapping["dict"],
-            "type_for_init": f"Optional[{python_type_mapping['dict']}] = None",
-        },
-        "<[]Object>": {
-            "type": python_type_mapping["list_any"],
-            "type_for_init": f"Optional[{python_type_mapping['list_any']}] = None",
-        },
-        "<string>": {
-            "type": python_type_mapping["str"],
-            "type_for_init": f'Optional[{python_type_mapping["str"]}] = ""',
-        },
-        "<[]string>": {
-            "type": python_type_mapping["list_str"],
-            "type_for_init": f"Optional[{python_type_mapping['list_str']}] = None",
-        },
-        "<map[string]string>": {
-            "type": python_type_mapping["dict"],
-            "type_for_init": f"Optional[{python_type_mapping['dict']}] = None",
-        },
-        "<boolean>": {
-            "type": python_type_mapping["bool"],
-            "type_for_init": f"Optional[{python_type_mapping['bool']}] = None",
-        },
-    }
-
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
     name = convert_camel_case_to_snake_case(string_=_orig_name)
     type_ = _type.strip()
     required: bool = "-required-" in splited_field
-    type_from_dict: Dict[str, str] = type_mapping.get(type_, type_mapping["<Object>"])
+    type_for_docstring: str = "Dict[str, Any]"
+    type_from_dict_for_init: str = ""
+
+    # All fields must be set with Optional since resource can have yaml_file to cover all args.
+    if _type == "<[]Object>":
+        type_for_docstring = "List[Any]"
+
+    elif type_ == "<map[string]string>":
+        type_for_docstring = "Dict[str, str]"
+
+    elif _type == "<[]string>":
+        type_for_docstring = "List[str]"
+
+    elif _type == "<string>":
+        type_for_docstring = "str"
+        type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
+
+    elif _type == "<boolean>":
+        type_for_docstring = "bool"
+
+    elif type_ == "<integer>":
+        type_for_docstring = "int"
+
+    if not type_from_dict_for_init:
+        type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
 
     _res: Dict[str, Any] = {
         "name-from-explain": _orig_name,
         "name-for-class-arg": name,
-        "type-for-class-arg": f"{name}: {type_from_dict['type_for_init']}",
+        "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
         "required": required,
-        "type": type_from_dict["type"],
+        "type": type_for_docstring,
         "description": get_field_description(
             kind=kind,
             field_name=_orig_name,
@@ -495,11 +479,7 @@ def parse_explain(
         if debug_content:
             spec_out = debug_content.get("explain-spec", "")
     else:
-        rc, spec_out, _ = run_command(
-            command=shlex.split(f"oc explain {kind}.spec"),
-            check=False,
-            log_errors=False,
-        )
+        rc, spec_out, _ = run_command(command=shlex.split(f"oc explain {kind}.spec"), check=False, log_errors=False)
         if not rc:
             LOGGER.warning(f"{kind} spec not found, skipping")
 
@@ -749,12 +729,21 @@ def generate_class_generator_tests() -> None:
     is_flag=True,
     show_default=True,
 )
-@cloup.constraint(mutually_exclusive, ["add_tests", "debug"])
-@cloup.constraint(mutually_exclusive, ["add_tests", "output_file"])
-@cloup.constraint(mutually_exclusive, ["add_tests", "dry_run"])
-@cloup.constraint(mutually_exclusive, ["interactive", "kind"])
-@cloup.constraint(If("debug_file", then=accept_none), ["interactive", "kind"])
-@cloup.constraint(require_any, ["interactive", "kind"])
+@cloup.constraint(
+    If(
+        IsSet("add_tests"),
+        then=accept_none,
+    ),
+    ["debug", "output_file", "dry_run"],
+)
+@cloup.constraint(
+    If(
+        IsSet("debug_file"),
+        then=accept_none,
+        else_=require_one,
+    ),
+    ["interactive", "kind"],
+)
 def main(
     kind: str,
     overwrite: bool,

@@ -31,7 +31,7 @@ class Pod(NamespacedResource):
         image_pull_secrets: Optional[Dict[str, Any]] = None,
         init_containers: Optional[Dict[str, Any]] = None,
         node_name: Optional[str] = "",
-        node_selector: Optional[Dict[str, Any]] = None,
+        node_selector: Optional[Dict[str, str]] = None,
         os: Optional[Dict[str, Any]] = None,
         overhead: Optional[Dict[str, Any]] = None,
         preemption_policy: Optional[str] = "",
@@ -470,8 +470,7 @@ class Pod(NamespacedResource):
                   Cannot be updated.
 
             host_aliases(Dict[str, Any]): HostAliases is an optional list of hosts and IPs that will be injected into
-              the pod's hosts file if specified. This is only valid for non-hostNetwork
-              pods.
+              the pod's hosts file if specified.
               HostAlias holds the mapping between IP and hostnames that will be injected
               as an entry in the pod's hosts file.
 
@@ -479,7 +478,7 @@ class Pod(NamespacedResource):
                 hostnames	<[]string>
                   Hostnames for the above IP address.
 
-                ip	<string>
+                ip	<string> -required-
                   IP address of the host file entry.
 
             host_ipc(bool): Use the host's ipc namespace. Optional: Default to false.
@@ -513,7 +512,9 @@ class Pod(NamespacedResource):
 
               FIELDS:
                 name	<string>
-                  Name of the referent. More info:
+                  Name of the referent. This field is effectively required, but due to
+                  backwards compatibility is allowed to be empty. Instances of this type with
+                  an empty value here are almost certainly wrong. More info:
                   https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
 
             init_containers(Dict[str, Any]): List of initialization containers belonging to the pod. Init containers are
@@ -707,7 +708,7 @@ class Pod(NamespacedResource):
               non-empty, the scheduler simply schedules this pod onto that node, assuming
               that it fits resource requirements.
 
-            node_selector(Dict[str, Any]): NodeSelector is a selector which must be true for the pod to fit on a node.
+            node_selector(Dict[str, str]): NodeSelector is a selector which must be true for the pod to fit on a node.
               Selector which must match a node's labels for the pod to be scheduled on
               that node. More info:
               https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -720,11 +721,12 @@ class Pod(NamespacedResource):
 
               If the OS field is set to windows, following fields must be unset: -
               spec.hostPID - spec.hostIPC - spec.hostUsers -
-              spec.securityContext.seLinuxOptions - spec.securityContext.seccompProfile -
-              spec.securityContext.fsGroup - spec.securityContext.fsGroupChangePolicy -
-              spec.securityContext.sysctls - spec.shareProcessNamespace -
-              spec.securityContext.runAsUser - spec.securityContext.runAsGroup -
-              spec.securityContext.supplementalGroups -
+              spec.securityContext.appArmorProfile - spec.securityContext.seLinuxOptions -
+              spec.securityContext.seccompProfile - spec.securityContext.fsGroup -
+              spec.securityContext.fsGroupChangePolicy - spec.securityContext.sysctls -
+              spec.shareProcessNamespace - spec.securityContext.runAsUser -
+              spec.securityContext.runAsGroup - spec.securityContext.supplementalGroups -
+              spec.containers[*].securityContext.appArmorProfile -
               spec.containers[*].securityContext.seLinuxOptions -
               spec.containers[*].securityContext.seccompProfile -
               spec.containers[*].securityContext.capabilities -
@@ -893,8 +895,6 @@ class Pod(NamespacedResource):
 
               SchedulingGates can only be set at pod creation time, and be removed only
               afterwards.
-
-              This is a beta feature enabled by the PodSchedulingReadiness feature gate.
               PodSchedulingGate is associated to a Pod to guard its scheduling.
 
               FIELDS:
@@ -911,6 +911,10 @@ class Pod(NamespacedResource):
               PodSecurityContext.
 
               FIELDS:
+                appArmorProfile	<AppArmorProfile>
+                  appArmorProfile is the AppArmor options to use by the containers in this
+                  pod. Note that this field cannot be set when spec.os.name is windows.
+
                 fsGroup	<integer>
                   A special supplemental group that applies to all containers in a pod. Some
                   volume types allow the Kubelet to change the ownership of that volume to be
@@ -997,7 +1001,7 @@ class Pod(NamespacedResource):
                   SecurityContext takes precedence. Note that this field cannot be set when
                   spec.os.name is linux.
 
-            service_account(str): DeprecatedServiceAccount is a depreciated alias for ServiceAccountName.
+            service_account(str): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
               Deprecated: Use serviceAccountName instead.
 
             service_account_name(str): ServiceAccountName is the name of the ServiceAccount to use to run this pod.
@@ -1138,9 +1142,6 @@ class Pod(NamespacedResource):
                   pod with the same labelSelector cannot be scheduled, because computed skew
                   will be 3(3 - 0) if new Pod is scheduled to any of the three zones, it will
                   violate MaxSkew.
-
-                  This is a beta field and requires the MinDomainsInPodTopologySpread feature
-                  gate to be enabled (enabled by default).
 
                 nodeAffinityPolicy	<string>
                   NodeAffinityPolicy indicates how we will treat Pod's
