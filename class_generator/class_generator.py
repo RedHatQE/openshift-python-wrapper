@@ -26,15 +26,6 @@ from pyhelper_utils.runners import function_runner_with_pdb
 
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
-
-TYPE_MAPPING: Dict[str, str] = {
-    "<integer>": "int",
-    "<Object>": "Dict[Any, Any]",
-    "<[]Object>": "List[Any]",
-    "<string>": "str",
-    "<map[string]string>": "Dict[Any, Any]",
-    "<boolean>": "bool",
-}
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
@@ -337,31 +328,38 @@ def get_arg_params(
     name = convert_camel_case_to_snake_case(string_=_orig_name)
     type_ = _type.strip()
     required: bool = "-required-" in splited_field
-    type_from_dict: str = TYPE_MAPPING.get(type_, "Dict[Any, Any]")
-    type_from_dict_for_init = type_from_dict
+    type_for_docstring: str = "Dict[str, Any]"
+    type_from_dict_for_init: str = ""
 
     # All fields must be set with Optional since resource can have yaml_file to cover all args.
-    if type_from_dict == "Dict[Any, Any]":
-        type_from_dict_for_init = "Optional[Dict[str, Any]] = None"
+    if _type == "<[]Object>":
+        type_for_docstring = "List[Any]"
 
-    if type_from_dict == "List[Any]":
-        type_from_dict_for_init = "Optional[List[Any]] = None"
+    elif type_ == "<map[string]string>":
+        type_for_docstring = "Dict[str, str]"
 
-    if type_from_dict == "str":
-        type_from_dict_for_init = 'Optional[str] = ""'
+    elif _type == "<[]string>":
+        type_for_docstring = "List[str]"
 
-    if type_from_dict == "bool":
-        type_from_dict_for_init = "Optional[bool] = None"
+    elif _type == "<string>":
+        type_for_docstring = "str"
+        type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
 
-    if type_from_dict == "int":
-        type_from_dict_for_init = "Optional[int] = None"
+    elif _type == "<boolean>":
+        type_for_docstring = "bool"
+
+    elif type_ == "<integer>":
+        type_for_docstring = "int"
+
+    if not type_from_dict_for_init:
+        type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
 
     _res: Dict[str, Any] = {
         "name-from-explain": _orig_name,
         "name-for-class-arg": name,
         "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
         "required": required,
-        "type": type_from_dict,
+        "type": type_for_docstring,
         "description": get_field_description(
             kind=kind,
             field_name=_orig_name,

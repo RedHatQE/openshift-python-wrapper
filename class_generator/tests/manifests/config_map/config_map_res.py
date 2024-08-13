@@ -13,20 +13,20 @@ class ConfigMap(NamespacedResource):
 
     def __init__(
         self,
-        binary_data: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any]] = None,
+        binary_data: Optional[Dict[str, str]] = None,
+        data: Optional[Dict[str, str]] = None,
         immutable: Optional[bool] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            binary_data(Dict[Any, Any]): BinaryData contains the binary data. Each key must consist of alphanumeric
+            binary_data(Dict[str, str]): BinaryData contains the binary data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. BinaryData can contain byte sequences that are
               not in the UTF-8 range. The keys stored in BinaryData must not overlap with
               the ones in the Data field, this is enforced during validation process.
               Using this field will require 1.10+ apiserver and kubelet.
 
-            data(Dict[Any, Any]): Data contains the configuration data. Each key must consist of alphanumeric
+            data(Dict[str, str]): Data contains the configuration data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. Values with non-UTF-8 byte sequences must use
               the BinaryData field. The keys stored in Data must not overlap with the keys
               in the BinaryData field, this is enforced during validation process.
