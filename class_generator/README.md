@@ -10,19 +10,42 @@
 
 ###### Install poetry environment
 
+- Using [pipx](https://github.com/pypa/pipx) (recommended)
+
+```bash
+ pipx install openshift-python-wrapper
+```
+
+- Using `pip`
+
+```bash
+python3 -m pip install openshift-python-wrapper
+```
+
+- Using [poetry](https://python-poetry.org/) (For development)
+
 ```bash
 poetry install
 ```
+
+````
 
 For shell completion Add this to ~/.bashrc or ~/.zshrc:
 
 ```bash
 if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_source class-generator)"; fi
-```
+````
 
 ###### Call the script
 
+- All available options:
+
+```bash
+class-generator --help
+```
+
 - Running in normal mode with `--kind` flags:
+  - `--kind` can process multiple kinds at the same command, pass `--kind <kind1>,<kind2>,<kind3>`
 
 ```bash
 class-generator --kind <kind>
