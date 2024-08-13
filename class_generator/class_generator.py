@@ -396,17 +396,6 @@ def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, temp
     return rendered
 
 
-def check_if_resource_changed(new_data: str, resource_file: str) -> bool:
-    with open(resource_file) as fd:
-        data = fd.read()
-
-    if new_data == data:
-        LOGGER.info(f"File {resource_file} is not updated.")
-        return False
-
-    return True
-
-
 def generate_resource_file_from_dict(
     resource_dict: Dict[str, Any],
     overwrite: bool = False,
