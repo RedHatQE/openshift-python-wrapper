@@ -37,6 +37,7 @@ TYPE_MAPPING: Dict[str, str] = {
 }
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
+TEMP_FILE_SUFFIX = "_TEMP.py"
 
 
 def process_fields_args(
@@ -395,6 +396,17 @@ def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, temp
     return rendered
 
 
+def check_if_resource_changed(new_data: str, resource_file: str) -> bool:
+    with open(resource_file) as fd:
+        data = fd.read()
+
+    if new_data == data:
+        LOGGER.info(f"File {resource_file} is not updated.")
+        return False
+
+    return True
+
+
 def generate_resource_file_from_dict(
     resource_dict: Dict[str, Any],
     overwrite: bool = False,
@@ -408,8 +420,6 @@ def generate_resource_file_from_dict(
         template_dir="class_generator/manifests",
         template_name="class_generator_template.j2",
     )
-
-    temp_output_file: str = ""
 
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["KIND"])
     if add_tests:
@@ -433,7 +443,10 @@ def generate_resource_file_from_dict(
                     sys.exit(1)
 
         else:
-            temp_output_file = f"{_output_file[:-3]}_TEMP.py"
+            temp_output_file = _output_file.replace(".py", TEMP_FILE_SUFFIX)
+            if not check_if_resource_changed(new_data=rendered, resource_file=_output_file):
+                return ""
+
             LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
             _output_file = temp_output_file
 
