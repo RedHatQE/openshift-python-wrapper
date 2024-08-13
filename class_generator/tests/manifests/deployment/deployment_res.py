@@ -43,7 +43,7 @@ class Deployment(NamespacedResource):
             revision_history_limit(int): The number of old ReplicaSets to retain to allow rollback. This is a pointer
               to distinguish between explicit zero and not specified. Defaults to 10.
 
-            selector(Dict[Any, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected by
+            selector(Dict[str, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected by
               this will be the ones affected by this deployment. It must match the pod
               template's labels.
               A label selector is a label query over a set of resources. The result of
@@ -61,7 +61,7 @@ class Deployment(NamespacedResource):
                   field is "key", the operator is "In", and the values array contains only
                   "value". The requirements are ANDed.
 
-            strategy(Dict[Any, Any]): The deployment strategy to use to replace existing pods with new ones.
+            strategy(Dict[str, Any]): The deployment strategy to use to replace existing pods with new ones.
               DeploymentStrategy describes how to replace existing pods with new ones.
 
               FIELDS:
@@ -79,7 +79,7 @@ class Deployment(NamespacedResource):
                   update i.e gradually scale down the old ReplicaSets and scale up the new
                   one.
 
-            template(Dict[Any, Any]): Template describes the pods that will be created. The only allowed
+            template(Dict[str, Any]): Template describes the pods that will be created. The only allowed
               template.spec.restartPolicy value is "Always".
               PodTemplateSpec describes the data a pod should have when created from a
               template
