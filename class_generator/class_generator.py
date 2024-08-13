@@ -762,9 +762,8 @@ def main(
     add_tests: bool,
 ):
     _ = pdb  # Used by `function_runner_with_pdb`
-    kinds: List[str] = kind.split(",")
+
     _kwargs: Dict[str, Any] = {
-        "kind": kinds[0],
         "overwrite": overwrite,
         "interactive": interactive,
         "dry_run": dry_run,
@@ -774,18 +773,24 @@ def main(
         "add_tests": add_tests,
     }
 
-    if pdb or len(kinds) == 1:
+    if interactive or debug_file:
         class_generator(**_kwargs)
 
     else:
+        kinds: List[str] = kind.split(",")
         futures: List[Future] = []
+
         with ThreadPoolExecutor() as executor:
             for _kind in kinds:
                 _kwargs["kind"] = _kind
-                executor.submit(
-                    class_generator,
-                    **_kwargs,
-                )
+                if pdb or len(kinds) == 1:
+                    class_generator(**_kwargs)
+
+                else:
+                    executor.submit(
+                        class_generator,
+                        **_kwargs,
+                    )
 
         for _ in as_completed(futures):
             # wait for all tasks to complete
