@@ -440,8 +440,6 @@ class MariaDB(NamespacedResource):
                   index 2 in this pod). This syntax is chosen only to have some well-defined
                   way of
                   referencing a part of an object.
-                  TODO: this design is not final and this field is subject to change in the
-                  future.
 
                 kind	<string>
                   Kind of the referent.
@@ -507,7 +505,6 @@ class MariaDB(NamespacedResource):
                   Name of the referent.
                   More info:
                   https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                  TODO: Add other useful fields. apiVersion, kind, uid?
 
                 optional	<boolean>
                   Specify whether the ConfigMap or its key must be defined
@@ -531,7 +528,6 @@ class MariaDB(NamespacedResource):
                   Name of the referent.
                   More info:
                   https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                  TODO: Add other useful fields. apiVersion, kind, uid?
 
                 optional	<boolean>
                   Specify whether the Secret or its key must be defined
@@ -836,7 +832,6 @@ class MariaDB(NamespacedResource):
                   Name of the referent.
                   More info:
                   https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                  TODO: Add other useful fields. apiVersion, kind, uid?
 
                 optional	<boolean>
                   Specify whether the Secret or its key must be defined
@@ -1421,9 +1416,7 @@ class MariaDB(NamespacedResource):
                   to see the host machine. Most containers will NOT need this.
                   More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath
                   ---
-                  TODO(jonesdl) We need to restrict who can use host directory mounts and who
-                  can/can not
-                  mount host directories as read/write.
+
 
                 iscsi	<Object>
                   iscsi represents an ISCSI Disk resource that is attached to a
