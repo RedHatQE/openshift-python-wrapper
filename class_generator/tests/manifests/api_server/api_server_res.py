@@ -18,7 +18,7 @@ class APIServer(Resource):
 
     def __init__(
         self,
-        additional_cors_allowed_origins: Optional[List[Any]] = None,
+        additional_cors_allowed_origins: Optional[List[str]] = None,
         audit: Optional[Dict[str, Any]] = None,
         client_ca: Optional[Dict[str, Any]] = None,
         encryption: Optional[Dict[str, Any]] = None,
@@ -28,7 +28,7 @@ class APIServer(Resource):
     ) -> None:
         """
         Args:
-            additional_cors_allowed_origins(List[Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
+            additional_cors_allowed_origins(List[str]): additionalCORSAllowedOrigins lists additional, user-defined regular
               expressions describing hosts for which the API server allows access using
               the CORS headers. This may be needed to access the API and the integrated
               OAuth server from JavaScript applications. The values are regular

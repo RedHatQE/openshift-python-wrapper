@@ -26,45 +26,6 @@ from pyhelper_utils.runners import function_runner_with_pdb
 
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
-
-PYTHON_TYPE_MAPPING: Dict[str, str] = {
-    "int": "int",
-    "dict": "Dict[str, Any]",
-    "str": "str",
-    "bool": "bool",
-    "list": "List[Any]",
-}
-# All fields must be set with Optional since resource can have yaml_file to cover all args.
-TYPE_MAPPING: Dict[str, Dict[str, str]] = {
-    "<integer>": {
-        "type": PYTHON_TYPE_MAPPING["int"],
-        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['int']}] = None",
-    },
-    "<Object>": {
-        "type": PYTHON_TYPE_MAPPING["dict"],
-        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['dict']}] = None",
-    },
-    "<[]Object>": {
-        "type": PYTHON_TYPE_MAPPING["list"],
-        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['list']}] = None",
-    },
-    "<string>": {
-        "type": PYTHON_TYPE_MAPPING["str"],
-        "type_for_init": f'Optional[{PYTHON_TYPE_MAPPING["str"]}] = ""',
-    },
-    "<[]string>": {
-        "type": PYTHON_TYPE_MAPPING["list"],
-        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['list']}] = None",
-    },
-    "<map[string]string>": {
-        "type": PYTHON_TYPE_MAPPING["dict"],
-        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['dict']}] = None",
-    },
-    "<boolean>": {
-        "type": PYTHON_TYPE_MAPPING["bool"],
-        "type_for_init": f"Optional[{PYTHON_TYPE_MAPPING['bool']}] = None",
-    },
-}
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
@@ -361,13 +322,53 @@ def get_arg_params(
     debug_content: Optional[Dict[str, str]] = None,
     add_tests: bool = False,
 ) -> Dict[str, Any]:
+    python_type_mapping: Dict[str, str] = {
+        "int": "int",
+        "dict": "Dict[str, Any]",
+        "str": "str",
+        "bool": "bool",
+        "list_any": "List[Any]",
+        "list_str": "List[str]",
+    }
+    # All fields must be set with Optional since resource can have yaml_file to cover all args.
+    type_mapping: Dict[str, Dict[str, str]] = {
+        "<integer>": {
+            "type": python_type_mapping["int"],
+            "type_for_init": f"Optional[{python_type_mapping['int']}] = None",
+        },
+        "<Object>": {
+            "type": python_type_mapping["dict"],
+            "type_for_init": f"Optional[{python_type_mapping['dict']}] = None",
+        },
+        "<[]Object>": {
+            "type": python_type_mapping["list_any"],
+            "type_for_init": f"Optional[{python_type_mapping['list_any']}] = None",
+        },
+        "<string>": {
+            "type": python_type_mapping["str"],
+            "type_for_init": f'Optional[{python_type_mapping["str"]}] = ""',
+        },
+        "<[]string>": {
+            "type": python_type_mapping["list_str"],
+            "type_for_init": f"Optional[{python_type_mapping['list_str']}] = None",
+        },
+        "<map[string]string>": {
+            "type": python_type_mapping["dict"],
+            "type_for_init": f"Optional[{python_type_mapping['dict']}] = None",
+        },
+        "<boolean>": {
+            "type": python_type_mapping["bool"],
+            "type_for_init": f"Optional[{python_type_mapping['bool']}] = None",
+        },
+    }
+
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
 
     name = convert_camel_case_to_snake_case(string_=_orig_name)
     type_ = _type.strip()
     required: bool = "-required-" in splited_field
-    type_from_dict: Dict[str, str] = TYPE_MAPPING.get(type_, TYPE_MAPPING["<Object>"])
+    type_from_dict: Dict[str, str] = type_mapping.get(type_, type_mapping["<Object>"])
 
     _res: Dict[str, Any] = {
         "name-from-explain": _orig_name,
