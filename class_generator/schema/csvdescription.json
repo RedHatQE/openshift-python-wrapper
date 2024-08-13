@@ -1,0 +1,93 @@
+{
+  "description": "CSVDescription defines a description of a CSV",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "x-kubernetes-list-type": "map"
+    },
+    "apiservicedefinitions": {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.APIServiceDefinitions"
+    },
+    "customresourcedefinitions": {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.CustomResourceDefinitions"
+    },
+    "description": {
+      "description": "LongDescription is the CSV's description",
+      "type": "string"
+    },
+    "displayName": {
+      "description": "DisplayName is the CSV's display name",
+      "type": "string"
+    },
+    "icon": {
+      "description": "Icon is the CSV's base64 encoded icon",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.Icon"
+      },
+      "x-kubernetes-list-type": "set"
+    },
+    "installModes": {
+      "description": "InstallModes specify supported installation types",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.InstallMode"
+      },
+      "x-kubernetes-list-type": "set"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "x-kubernetes-list-type": "set"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.AppLink"
+      },
+      "x-kubernetes-list-type": "set"
+    },
+    "maintainers": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.Maintainer"
+      },
+      "x-kubernetes-list-type": "set"
+    },
+    "maturity": {
+      "type": "string"
+    },
+    "minKubeVersion": {
+      "description": "Minimum Kubernetes version for operator installation",
+      "type": "string"
+    },
+    "nativeApis": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionKind"
+      }
+    },
+    "provider": {
+      "description": "Provider is the CSV's provider",
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.AppLink"
+    },
+    "relatedImages": {
+      "description": "List of related images",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "version": {
+      "description": "Version is the CSV's semantic version",
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.lib.version.OperatorVersion"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

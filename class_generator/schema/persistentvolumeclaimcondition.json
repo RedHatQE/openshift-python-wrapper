@@ -1,0 +1,33 @@
+{
+  "description": "PersistentVolumeClaimCondition contains details about state of pvc",
+  "type": "object",
+  "required": [
+    "type",
+    "status"
+  ],
+  "properties": {
+    "lastProbeTime": {
+      "description": "lastProbeTime is the time we probed the condition.",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
+    },
+    "lastTransitionTime": {
+      "description": "lastTransitionTime is the time the condition transitioned from one status to another.",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
+    },
+    "message": {
+      "description": "message is the human-readable message indicating details about last transition.",
+      "type": "string"
+    },
+    "reason": {
+      "description": "reason is a unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports \"ResizeStarted\" that means the underlying persistent volume is being resized.",
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

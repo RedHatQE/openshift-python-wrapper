@@ -1,0 +1,84 @@
+{
+  "description": "IPAddress is the Schema for the ipaddress API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "IPAddressSpec is the desired state of an IPAddress.",
+      "type": "object",
+      "required": [
+        "address",
+        "claimRef",
+        "poolRef",
+        "prefix"
+      ],
+      "properties": {
+        "address": {
+          "description": "Address is the IP address.",
+          "type": "string"
+        },
+        "claimRef": {
+          "description": "ClaimRef is a reference to the claim this IPAddress was created for.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "gateway": {
+          "description": "Gateway is the network gateway of the network the address is from.",
+          "type": "string"
+        },
+        "poolRef": {
+          "description": "PoolRef is a reference to the pool that this IPAddress was created from.",
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "apiGroup": {
+              "description": "APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind is the type of resource being referenced",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of resource being referenced",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "prefix": {
+          "description": "Prefix is the prefix of the address.",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ipam.cluster.x-k8s.io",
+      "kind": "IPAddress",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

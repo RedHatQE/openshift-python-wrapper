@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "triggers.tekton.dev",
+      "kind": "ClusterInterceptor",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

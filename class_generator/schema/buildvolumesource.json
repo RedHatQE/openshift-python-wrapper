@@ -1,0 +1,26 @@
+{
+  "description": "BuildVolumeSource represents the source of a volume to mount Only one of its supported types may be specified at any given time.",
+  "type": "object",
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "configMap": {
+      "description": "configMap represents a ConfigMap that should populate this volume",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapVolumeSource"
+    },
+    "csi": {
+      "description": "csi represents ephemeral storage provided by external CSI drivers which support this capability",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CSIVolumeSource"
+    },
+    "secret": {
+      "description": "secret represents a Secret that should populate this volume. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretVolumeSource"
+    },
+    "type": {
+      "description": "type is the BuildVolumeSourceType for the volume source. Type must match the populated volume source. Valid types are: Secret, ConfigMap",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

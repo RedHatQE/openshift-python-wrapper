@@ -1,0 +1,236 @@
+{
+  "description": "HardwareData is the Schema for the hardwaredata API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "HardwareDataSpec defines the desired state of HardwareData.",
+      "type": "object",
+      "properties": {
+        "hardware": {
+          "description": "The hardware discovered on the host during its inspection.",
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "description": "CPU describes one processor on the host.",
+              "type": "object",
+              "properties": {
+                "arch": {
+                  "type": "string"
+                },
+                "clockMegahertz": {
+                  "description": "ClockSpeed is a clock speed in MHz",
+                  "type": "number",
+                  "format": "double"
+                },
+                "count": {
+                  "type": "integer"
+                },
+                "flags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "model": {
+                  "type": "string"
+                }
+              }
+            },
+            "firmware": {
+              "description": "Firmware describes the firmware on the host.",
+              "type": "object",
+              "properties": {
+                "bios": {
+                  "description": "The BIOS for this firmware",
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "description": "The release/build date for this BIOS",
+                      "type": "string"
+                    },
+                    "vendor": {
+                      "description": "The vendor name for this BIOS",
+                      "type": "string"
+                    },
+                    "version": {
+                      "description": "The version of the BIOS",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "hostname": {
+              "type": "string"
+            },
+            "nics": {
+              "type": "array",
+              "items": {
+                "description": "NIC describes one network interface on the host.",
+                "type": "object",
+                "properties": {
+                  "ip": {
+                    "description": "The IP address of the interface. This will be an IPv4 or IPv6 address if one is present.  If both IPv4 and IPv6 addresses are present in a dual-stack environment, two nics will be output, one with each IP.",
+                    "type": "string"
+                  },
+                  "mac": {
+                    "description": "The device MAC address",
+                    "type": "string",
+                    "pattern": "[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}"
+                  },
+                  "model": {
+                    "description": "The vendor and product IDs of the NIC, e.g. \"0x8086 0x1572\"",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "The name of the network interface, e.g. \"en0\"",
+                    "type": "string"
+                  },
+                  "pxe": {
+                    "description": "Whether the NIC is PXE Bootable",
+                    "type": "boolean"
+                  },
+                  "speedGbps": {
+                    "description": "The speed of the device in Gigabits per second",
+                    "type": "integer"
+                  },
+                  "vlanId": {
+                    "description": "The untagged VLAN ID",
+                    "type": "integer",
+                    "format": "int32",
+                    "maximum": 4094,
+                    "minimum": 0
+                  },
+                  "vlans": {
+                    "description": "The VLANs available",
+                    "type": "array",
+                    "items": {
+                      "description": "VLAN represents the name and ID of a VLAN.",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "VLANID is a 12-bit 802.1Q VLAN identifier",
+                          "type": "integer",
+                          "format": "int32",
+                          "maximum": 4094,
+                          "minimum": 0
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ramMebibytes": {
+              "type": "integer"
+            },
+            "storage": {
+              "type": "array",
+              "items": {
+                "description": "Storage describes one storage device (disk, SSD, etc.) on the host.",
+                "type": "object",
+                "properties": {
+                  "alternateNames": {
+                    "description": "A list of alternate Linux device names of the disk, e.g. \"/dev/sda\". Note that this list is not exhaustive, and names may not be stable across reboots.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "hctl": {
+                    "description": "The SCSI location of the device",
+                    "type": "string"
+                  },
+                  "model": {
+                    "description": "Hardware model",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "A Linux device name of the disk, e.g. \"/dev/disk/by-path/pci-0000:01:00.0-scsi-0:2:0:0\". This will be a name that is stable across reboots if one is available.",
+                    "type": "string"
+                  },
+                  "rotational": {
+                    "description": "Whether this disk represents rotational storage. This field is not recommended for usage, please prefer using 'Type' field instead, this field will be deprecated eventually.",
+                    "type": "boolean"
+                  },
+                  "serialNumber": {
+                    "description": "The serial number of the device",
+                    "type": "string"
+                  },
+                  "sizeBytes": {
+                    "description": "The size of the disk in Bytes",
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "type": {
+                    "description": "Device type, one of: HDD, SSD, NVME.",
+                    "type": "string",
+                    "enum": [
+                      "HDD",
+                      "SSD",
+                      "NVME"
+                    ]
+                  },
+                  "vendor": {
+                    "description": "The name of the vendor of the device",
+                    "type": "string"
+                  },
+                  "wwn": {
+                    "description": "The WWN of the device",
+                    "type": "string"
+                  },
+                  "wwnVendorExtension": {
+                    "description": "The WWN Vendor extension of the device",
+                    "type": "string"
+                  },
+                  "wwnWithExtension": {
+                    "description": "The WWN with the extension",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "systemVendor": {
+              "description": "HardwareSystemVendor stores details about the whole hardware system.",
+              "type": "object",
+              "properties": {
+                "manufacturer": {
+                  "type": "string"
+                },
+                "productName": {
+                  "type": "string"
+                },
+                "serialNumber": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "metal3.io",
+      "kind": "HardwareData",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,41 @@
+{
+  "description": "VirtualMachineMemoryDumpRequest represent the memory dump request phase and info",
+  "type": "object",
+  "required": [
+    "claimName",
+    "phase"
+  ],
+  "properties": {
+    "claimName": {
+      "description": "ClaimName is the name of the pvc that will contain the memory dump",
+      "type": "string",
+      "default": ""
+    },
+    "endTimestamp": {
+      "description": "EndTimestamp represents the time the memory dump was completed",
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Time"
+    },
+    "fileName": {
+      "description": "FileName represents the name of the output file",
+      "type": "string"
+    },
+    "message": {
+      "description": "Message is a detailed message about failure of the memory dump",
+      "type": "string"
+    },
+    "phase": {
+      "description": "Phase represents the memory dump phase",
+      "type": "string",
+      "default": ""
+    },
+    "remove": {
+      "description": "Remove represents request of dissociating the memory dump pvc",
+      "type": "boolean"
+    },
+    "startTimestamp": {
+      "description": "StartTimestamp represents the time the memory dump started",
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Time"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

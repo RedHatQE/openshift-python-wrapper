@@ -1,0 +1,69 @@
+{
+  "description": "StorageClaim is the Schema for the storageclaims API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "StorageClaimSpec defines the desired state of StorageClaim",
+      "type": "object",
+      "required": [
+        "storageClient",
+        "type"
+      ],
+      "properties": {
+        "encryptionMethod": {
+          "type": "string"
+        },
+        "storageClient": {
+          "type": "string"
+        },
+        "storageProfile": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "value should be either 'sharedfile' or 'block'",
+              "rule": "self.lowerAscii()=='block'||self.lowerAscii()=='sharedfile'"
+            }
+          ]
+        }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "spec is immutable",
+          "rule": "oldSelf == self"
+        }
+      ]
+    },
+    "status": {
+      "description": "StorageClaimStatus defines the observed state of StorageClaim",
+      "type": "object",
+      "properties": {
+        "phase": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ocs.openshift.io",
+      "kind": "StorageClaim",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

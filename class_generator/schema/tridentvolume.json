@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "trident.netapp.io",
+      "kind": "TridentVolume",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

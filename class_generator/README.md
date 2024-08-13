@@ -69,6 +69,26 @@ class-generator --interactive
 class-generator --kind Pod --add-tests
 ```
 
+#### Update schema files
+
+- Install [openapi2jsonschema](https://github.com/instrumenta/openapi2jsonschema)
+
+```bash
+pipx install --python python3.9 openapi2jsonschema
+```
+
+- Login to the cluster use admin user and password.
+
+```bash
+oc login <clster api URL> -u <username> -p <password>
+```
+
+- Execute the command:
+
+```bash
+class-generator --update-schema
+```
+
 ## Reporting an issue
 
 - Running with debug mode and `--debug` flag:

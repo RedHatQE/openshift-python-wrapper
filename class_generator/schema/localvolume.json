@@ -1,0 +1,279 @@
+{
+  "description": "LocalVolume is the Schema for the localvolumes API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "LocalVolumeSpec defines the desired state of LocalVolume",
+      "type": "object",
+      "properties": {
+        "logLevel": {
+          "description": "logLevel is an intent based logging for an overall component.  It does not give fine grained control, but it is a simple way to manage coarse grained logging choices that operators have to interpret for their operands.",
+          "type": "string",
+          "enum": [
+            "",
+            "Normal",
+            "Debug",
+            "Trace",
+            "TraceAll"
+          ]
+        },
+        "managementState": {
+          "description": "managementState indicates whether and how the operator should manage the component",
+          "type": "string",
+          "pattern": "^(Managed|Unmanaged|Force|Removed)$"
+        },
+        "nodeSelector": {
+          "description": "Nodes on which the provisoner must run",
+          "type": "object",
+          "required": [
+            "nodeSelectorTerms"
+          ],
+          "properties": {
+            "nodeSelectorTerms": {
+              "description": "Required. A list of node selector terms. The terms are ORed.",
+              "type": "array",
+              "items": {
+                "description": "A null or empty node selector term matches no objects. The requirements of them are ANDed. The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.",
+                "type": "object",
+                "properties": {
+                  "matchExpressions": {
+                    "description": "A list of node selector requirements by node's labels.",
+                    "type": "array",
+                    "items": {
+                      "description": "A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                      "type": "object",
+                      "required": [
+                        "key",
+                        "operator"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The label key that the selector applies to.",
+                          "type": "string"
+                        },
+                        "operator": {
+                          "description": "Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                          "type": "string"
+                        },
+                        "values": {
+                          "description": "An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "matchFields": {
+                    "description": "A list of node selector requirements by node's fields.",
+                    "type": "array",
+                    "items": {
+                      "description": "A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                      "type": "object",
+                      "required": [
+                        "key",
+                        "operator"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The label key that the selector applies to.",
+                          "type": "string"
+                        },
+                        "operator": {
+                          "description": "Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.",
+                          "type": "string"
+                        },
+                        "values": {
+                          "description": "An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "x-kubernetes-map-type": "atomic"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "storageClassDevices": {
+          "description": "List of storage class and devices they can match",
+          "type": "array",
+          "items": {
+            "description": "StorageClassDevice returns device configuration",
+            "type": "object",
+            "required": [
+              "storageClassName"
+            ],
+            "properties": {
+              "devicePaths": {
+                "description": "A list of device paths which would be chosen for local storage. For example - [\"/dev/sda\", \"/dev/sdb\", \"/dev/disk/by-id/ata-crucial\"]",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "forceWipeDevicesAndDestroyAllData": {
+                "description": "This option will destroy all leftover data on the devices before they're used as PersistentVolumes. Use with care.",
+                "type": "boolean"
+              },
+              "fsType": {
+                "description": "File system type",
+                "type": "string"
+              },
+              "storageClassName": {
+                "description": "StorageClass name to use for set of matched devices",
+                "type": "string"
+              },
+              "volumeMode": {
+                "description": "Volume mode. Raw or with file system",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tolerations": {
+          "description": "If specified, a list of tolerations to pass to the diskmaker and provisioner DaemonSets.",
+          "type": "array",
+          "items": {
+            "description": "The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.",
+            "type": "object",
+            "properties": {
+              "effect": {
+                "description": "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+                "type": "string"
+              },
+              "key": {
+                "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys. If the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+                "type": "string"
+              },
+              "operator": {
+                "description": "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.",
+                "type": "string"
+              },
+              "tolerationSeconds": {
+                "description": "TolerationSeconds represents the period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default, it is not set, which means tolerate the taint forever (do not evict). Zero and negative values will be treated as 0 (evict immediately) by the system.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "value": {
+                "description": "Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "LocalVolumeStatus defines the observed state of LocalVolume",
+      "type": "object",
+      "required": [
+        "readyReplicas"
+      ],
+      "properties": {
+        "conditions": {
+          "description": "Conditions is a list of conditions and their status.",
+          "type": "array",
+          "items": {
+            "description": "OperatorCondition is just the standard condition fields.",
+            "type": "object",
+            "properties": {
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "generations": {
+          "description": "generations are used to determine when an item needs to be reconciled or has changed in a way that needs a reaction.",
+          "type": "array",
+          "items": {
+            "description": "GenerationStatus keeps track of the generation for a given resource so that decisions about forced updates can be made.",
+            "type": "object",
+            "properties": {
+              "group": {
+                "description": "group is the group of the thing you're tracking",
+                "type": "string"
+              },
+              "hash": {
+                "description": "hash is an optional field set for resources without generation that are content sensitive like secrets and configmaps",
+                "type": "string"
+              },
+              "lastGeneration": {
+                "description": "lastGeneration is the last generation of the workload controller involved",
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "description": "name is the name of the thing you're tracking",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "namespace is where the thing you're tracking is",
+                "type": "string"
+              },
+              "resource": {
+                "description": "resource is the resource type of the thing you're tracking",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "managementState": {
+          "description": "state indicates what the operator has observed to be its current operational status.",
+          "type": "string",
+          "pattern": "^(Managed|Unmanaged|Force|Removed)$"
+        },
+        "observedGeneration": {
+          "description": "ObservedGeneration is the last generation of this object that the operator has acted on.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "readyReplicas": {
+          "description": "readyReplicas indicates how many replicas are ready and at the desired state",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "local.storage.openshift.io",
+      "kind": "LocalVolume",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

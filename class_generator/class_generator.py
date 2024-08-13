@@ -34,7 +34,7 @@ TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
 
 def update_kind_schema():
-    openapi2jsonschema_str = "openapi2jsonschema"
+    openapi2jsonschema_str: str = "openapi2jsonschema"
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
             f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"

@@ -1,0 +1,50 @@
+{
+  "description": "SourceBuildStrategy defines input parameters specific to an Source build.",
+  "type": "object",
+  "required": [
+    "from"
+  ],
+  "properties": {
+    "env": {
+      "description": "env contains additional environment variables you want to pass into a builder container.",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EnvVar"
+      }
+    },
+    "forcePull": {
+      "description": "forcePull describes if the builder should pull the images from registry prior to building.",
+      "type": "boolean"
+    },
+    "from": {
+      "description": "from is reference to an DockerImage, ImageStreamTag, or ImageStreamImage from which the container image should be pulled",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ObjectReference"
+    },
+    "incremental": {
+      "description": "incremental flag forces the Source build to do incremental builds if true.",
+      "type": "boolean"
+    },
+    "pullSecret": {
+      "description": "pullSecret is the name of a Secret that would be used for setting up the authentication for pulling the container images from the private Docker registries",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference"
+    },
+    "scripts": {
+      "description": "scripts is the location of Source scripts",
+      "type": "string"
+    },
+    "volumes": {
+      "description": "volumes is a list of input volumes that can be mounted into the builds runtime environment. Only a subset of Kubernetes Volume sources are supported by builds. More info: https://kubernetes.io/docs/concepts/storage/volumes",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildVolume"
+      },
+      "x-kubernetes-list-map-keys": [
+        "name"
+      ],
+      "x-kubernetes-list-type": "map",
+      "x-kubernetes-patch-merge-key": "name",
+      "x-kubernetes-patch-strategy": "merge"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

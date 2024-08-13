@@ -1,0 +1,58 @@
+{
+  "description": "VirtualMachineInstanceGuestAgentInfo represents information from the installed guest agent",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "fsFreezeStatus": {
+      "description": "FSFreezeStatus is the state of the fs of the guest it can be either frozen or thawed",
+      "type": "string"
+    },
+    "fsInfo": {
+      "description": "FSInfo is a guest os filesystem information containing the disk mapping and disk mounts with usage",
+      "default": {},
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceFileSystemInfo"
+    },
+    "guestAgentVersion": {
+      "description": "GAVersion is a version of currently installed guest agent",
+      "type": "string"
+    },
+    "hostname": {
+      "description": "Hostname represents FQDN of a guest",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "os": {
+      "description": "OS contains the guest operating system information",
+      "default": {},
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceGuestOSInfo"
+    },
+    "supportedCommands": {
+      "description": "Return command list the guest agent supports",
+      "type": "array",
+      "items": {
+        "default": {},
+        "$ref": "_definitions.json#/definitions/v1.GuestAgentCommandInfo"
+      },
+      "x-kubernetes-list-type": "atomic"
+    },
+    "timezone": {
+      "description": "Timezone is guest os current timezone",
+      "type": "string"
+    },
+    "userList": {
+      "description": "UserList is a list of active guest OS users",
+      "type": "array",
+      "items": {
+        "default": {},
+        "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceGuestOSUser"
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,33 @@
+{
+  "description": "BuildVolume describes a volume that is made available to build pods, such that it can be mounted into buildah's runtime environment. Only a subset of Kubernetes Volume sources are supported.",
+  "type": "object",
+  "required": [
+    "name",
+    "source",
+    "mounts"
+  ],
+  "properties": {
+    "mounts": {
+      "description": "mounts represents the location of the volume in the image build container",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildVolumeMount"
+      },
+      "x-kubernetes-list-map-keys": [
+        "destinationPath"
+      ],
+      "x-kubernetes-list-type": "map",
+      "x-kubernetes-patch-merge-key": "destinationPath",
+      "x-kubernetes-patch-strategy": "merge"
+    },
+    "name": {
+      "description": "name is a unique identifier for this BuildVolume. It must conform to the Kubernetes DNS label standard and be unique within the pod. Names that collide with those added by the build controller will result in a failed build with an error message detailing which name caused the error. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+      "type": "string"
+    },
+    "source": {
+      "description": "source represents the location and type of the mounted volume.",
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildVolumeSource"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}
