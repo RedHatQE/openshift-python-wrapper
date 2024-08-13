@@ -34,13 +34,10 @@ TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
 
 
 def update_kind_schema():
-    """
-    curl -kL -H "Authorization: Bearer $(oc whoami -t)" "$(oc whoami --show-server)/openapi/v2 > class_generator/ocp-openapi.json"
-    openapi2jsonschema class_generator/ocp-openapi.json -o class_generator/schema
-    """
+    openapi2jsonschema_str = "openapi2jsonschema"
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
-            "openapi2jsonschema not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
+            f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
         )
         sys.exit(1)
 
@@ -61,7 +58,9 @@ def update_kind_schema():
     with open("class_generator/ocp-openapi.json", "w") as fd:
         fd.write(data.text)
 
-    run_command(command=shlex.split("openapi2jsonschema class_generator/ocp-openapi.json -o class_generator/schema"))
+    run_command(
+        command=shlex.split(f"{openapi2jsonschema_str}class_generator/ocp-openapi.json -o class_generator/schema")
+    )
 
 
 def process_fields_args(
