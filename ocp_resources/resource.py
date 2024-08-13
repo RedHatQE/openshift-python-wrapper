@@ -286,6 +286,7 @@ class Resource:
         FORKLIFT_KONVEYOR_IO: str = "forklift.konveyor.io"
         INSTANCETYPE_KUBEVIRT_IO: str = "instancetype.kubevirt.io"
         HCO_KUBEVIRT_IO: str = "hco.kubevirt.io"
+        HELM_MARIADB_MMONTES_IO: str = "helm.mariadb.mmontes.io/v1alpha1"
         HIVE_OPENSHIFT_IO: str = "hive.openshift.io"
         HOSTPATHPROVISIONER_KUBEVIRT_IO: str = "hostpathprovisioner.kubevirt.io"
         IMAGE_OPENSHIFT_IO: str = "image.openshift.io"
