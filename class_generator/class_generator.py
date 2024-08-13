@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import click
 import re
-
+import requests
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
@@ -31,6 +31,37 @@ SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
+
+
+def update_kind_schema():
+    """
+    curl -kL -H "Authorization: Bearer $(oc whoami -t)" "$(oc whoami --show-server)/openapi/v2 > class_generator/ocp-openapi.json"
+    openapi2jsonschema class_generator/ocp-openapi.json -o class_generator/schema
+    """
+    if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
+        LOGGER.error(
+            "openapi2jsonschema not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
+        )
+        sys.exit(1)
+
+    rc, token, _ = run_command(command=shlex.split("oc whoami -t"), check=False, log_errors=False)
+    if not rc:
+        LOGGER.error(
+            "Failed to get token.\nMake sure you are logged in to the cluster using user and password using `oc login`"
+        )
+        sys.exit(1)
+
+    api_url = run_command(command=shlex.split("oc whoami --show-server"), check=False, log_errors=False)[1].strip()
+
+    data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
+    if not data.ok:
+        LOGGER.error("Failed to get openapi schema.")
+        sys.exit(1)
+
+    with open("class_generator/ocp-openapi.json", "w") as fd:
+        fd.write(data.text)
+
+    run_command(command=shlex.split("openapi2jsonschema class_generator/ocp-openapi.json -o class_generator/schema"))
 
 
 def process_fields_args(
@@ -740,6 +771,16 @@ def generate_class_generator_tests() -> None:
     is_flag=True,
     show_default=True,
 )
+@cloup.option(
+    "--update-schema",
+    help="Update kind schema files",
+    is_flag=True,
+    show_default=True,
+)
+@cloup.constraint(
+    If("update_schema", then=accept_none),
+    ["add_tests", "interactive", "dry_run", "debug", "kind", "output_file", "overwrite"],
+)
 @cloup.constraint(
     If(
         IsSet("add_tests"),
@@ -753,7 +794,7 @@ def generate_class_generator_tests() -> None:
         then=accept_none,
         else_=require_one,
     ),
-    ["interactive", "kind"],
+    ["interactive", "kind", "update_schema"],
 )
 def main(
     kind: str,
@@ -765,8 +806,12 @@ def main(
     output_file: str,
     pdb: bool,
     add_tests: bool,
-):
+    update_schema: bool,
+) -> None:
     _ = pdb  # Used by `function_runner_with_pdb`
+
+    if update_schema:
+        return update_kind_schema()
 
     _kwargs: Dict[str, Any] = {
         "overwrite": overwrite,
