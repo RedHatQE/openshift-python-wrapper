@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -18,7 +18,7 @@ class APIServer(Resource):
 
     def __init__(
         self,
-        additional_cors_allowed_origins: Optional[Dict[str, Any]] = None,
+        additional_cors_allowed_origins: Optional[List[str]] = None,
         audit: Optional[Dict[str, Any]] = None,
         client_ca: Optional[Dict[str, Any]] = None,
         encryption: Optional[Dict[str, Any]] = None,
@@ -28,13 +28,13 @@ class APIServer(Resource):
     ) -> None:
         """
         Args:
-            additional_cors_allowed_origins(Dict[Any, Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
+            additional_cors_allowed_origins(List[str]): additionalCORSAllowedOrigins lists additional, user-defined regular
               expressions describing hosts for which the API server allows access using
               the CORS headers. This may be needed to access the API and the integrated
               OAuth server from JavaScript applications. The values are regular
               expressions that correspond to the Golang regular expression language.
 
-            audit(Dict[Any, Any]): audit specifies the settings for audit configuration to be applied to all
+            audit(Dict[str, Any]): audit specifies the settings for audit configuration to be applied to all
               OpenShift-provided API servers in the cluster.
 
               FIELDS:
@@ -63,7 +63,7 @@ class APIServer(Resource):
                   reproduce the issue in order to troubleshoot properly.
                    If unset, the 'Default' profile is used as the default.
 
-            client_ca(Dict[Any, Any]): clientCA references a ConfigMap containing a certificate bundle for the
+            client_ca(Dict[str, Any]): clientCA references a ConfigMap containing a certificate bundle for the
               signers that will be recognized for incoming client certificates in addition
               to the operator managed signers. If this is empty, then only operator
               managed signers are valid. You usually only have to set this if you have
@@ -75,7 +75,7 @@ class APIServer(Resource):
                 name	<string> -required-
                   name is the metadata.name of the referenced config map
 
-            encryption(Dict[Any, Any]): encryption allows the configuration of encryption of resources at the
+            encryption(Dict[str, Any]): encryption allows the configuration of encryption of resources at the
               datastore layer.
 
               FIELDS:
@@ -92,7 +92,7 @@ class APIServer(Resource):
                   oauthaccesstokens.oauth.openshift.io 5.
                   oauthauthorizetokens.oauth.openshift.io
 
-            serving_certs(Dict[Any, Any]): servingCert is the TLS cert info for serving secure traffic. If not
+            serving_certs(Dict[str, Any]): servingCert is the TLS cert info for serving secure traffic. If not
               specified, operator managed certificates will be used for serving secure
               traffic.
 
@@ -103,7 +103,7 @@ class APIServer(Resource):
                   provided, or no named certificates match the server name as understood by a
                   client, the defaultServingCertificate will be used.
 
-            tls_security_profile(Dict[Any, Any]): tlsSecurityProfile specifies settings for TLS connections for externally
+            tls_security_profile(Dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for externally
               exposed servers.
                If unset, a default (which may change between releases) is chosen. Note
               that only Old, Intermediate and Custom profiles are currently supported, and
