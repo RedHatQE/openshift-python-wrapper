@@ -10,7 +10,7 @@ import click
 import re
 
 import cloup
-from cloup.constraints import If, accept_none, mutually_exclusive, require_any
+from cloup.constraints import If, IsSet, accept_none, require_one
 from pyhelper_utils.shell import run_command
 import pytest
 from rich.console import Console
@@ -731,12 +731,21 @@ def generate_class_generator_tests() -> None:
     is_flag=True,
     show_default=True,
 )
-@cloup.constraint(mutually_exclusive, ["add_tests", "debug"])
-@cloup.constraint(mutually_exclusive, ["add_tests", "output_file"])
-@cloup.constraint(mutually_exclusive, ["add_tests", "dry_run"])
-@cloup.constraint(mutually_exclusive, ["interactive", "kind"])
-@cloup.constraint(If("debug_file", then=accept_none), ["interactive", "kind"])
-@cloup.constraint(require_any, ["interactive", "kind"])
+@cloup.constraint(
+    If(
+        IsSet("add_tests"),
+        then=accept_none,
+    ),
+    ["debug", "output_file", "dry_run"],
+)
+@cloup.constraint(
+    If(
+        IsSet("debug_file"),
+        then=accept_none,
+        else_=require_one,
+    ),
+    ["interactive", "kind"],
+)
 def main(
     kind: str,
     overwrite: bool,
