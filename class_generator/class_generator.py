@@ -7,7 +7,7 @@ import os
 import sys
 from pathlib import Path
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 import click
 import re
 import requests
@@ -30,11 +30,67 @@ from pyhelper_utils.runners import function_runner_with_pdb
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
 LOGGER = get_logger(name="class_generator")
-TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
+TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
+SCHEMA_DIR: str = "class_generator/schema"
+RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "reousrces-mappings.json")
+
+
+def map_kind_to_namespaced():
+    not_kind_file: str = os.path.join(SCHEMA_DIR, "not-kind.txt")
+    if os.path.isfile(not_kind_file):
+        with open(not_kind_file) as fd:
+            not_kind_list = fd.readlines()
+    else:
+        not_kind_list: List[str] = []
+
+    with open(os.path.join(f"{SCHEMA_DIR}/all.json")) as fd:
+        all_json_data = json.load(fd)
+
+    if os.path.isfile(RESOURCES_MAPPING_FILE):
+        resources_mapping = read_resources_mapping_file()
+
+    else:
+        resources_mapping: Dict[str, bool] = {}
+
+    kind_set: Set[str] = set()
+    for _def in all_json_data["oneOf"]:
+        _kind = _def["$ref"].rsplit(".", 1)[-1]
+        if _kind in not_kind_list:
+            continue
+
+        kind_set.add(_kind)
+
+    for _kind in kind_set:
+        if resources_mapping.get(_kind):
+            continue
+
+        if not run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0]:
+            not_kind_list.append(_kind)
+            continue
+
+        resources_mapping[_kind] = (
+            run_command(
+                command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {_kind} | wc -l'"),
+                check=False,
+            )[1]
+            == "1"
+        )
+
+    with open(RESOURCES_MAPPING_FILE, "w") as fd:
+        json.dump(resources_mapping, fd)
+
+    with open(not_kind_file, "w") as fd:
+        fd.writelines(not_kind_list)
+
+
+def read_resources_mapping_file() -> Dict[Any, Any]:
+    with open(RESOURCES_MAPPING_FILE) as fd:
+        return json.load(fd)
 
 
 def update_kind_schema():
     openapi2jsonschema_str: str = "openapi2jsonschema"
+
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
             f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
@@ -49,8 +105,8 @@ def update_kind_schema():
         sys.exit(1)
 
     api_url = run_command(command=shlex.split("oc whoami --show-server"), check=False, log_errors=False)[1].strip()
-
     data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
+
     if not data.ok:
         LOGGER.error("Failed to get openapi schema.")
         sys.exit(1)
@@ -58,9 +114,13 @@ def update_kind_schema():
     with open("class_generator/ocp-openapi.json", "w") as fd:
         fd.write(data.text)
 
-    run_command(
-        command=shlex.split(f"{openapi2jsonschema_str}class_generator/ocp-openapi.json -o class_generator/schema")
-    )
+    if not run_command(
+        command=shlex.split(f"{openapi2jsonschema_str} class_generator/ocp-openapi.json -o {SCHEMA_DIR}")
+    )[0]:
+        LOGGER.error("Failed to generate schema.")
+        sys.exit(1)
+
+    map_kind_to_namespaced()
 
 
 def process_fields_args(
@@ -579,19 +639,13 @@ def parse_explain(
     return resource_dict
 
 
-def check_kind_exists(kind: str) -> bool:
-    return run_command(
-        command=shlex.split(f"oc explain {kind}"),
-        check=False,
-    )[0]
+def get_kind_schema_file(kind: str) -> str:
+    kind_file = os.path.join("class_generator/schemas", f"{kind}.json")
+    if os.path.isfile(kind_file):
+        return kind_file
 
-
-def get_user_args_from_interactive() -> str:
-    kind = Prompt.ask(prompt="Enter the resource kind to generate class for")
-    if not kind:
-        return ""
-
-    return kind
+    LOGGER.error(f"{kind} schema not found, please run with `--update-schema`")
+    sys.exit(1)
 
 
 def class_generator(
@@ -599,59 +653,28 @@ def class_generator(
     overwrite: bool = False,
     interactive: bool = False,
     dry_run: bool = False,
-    debug: bool = False,
-    process_debug_file: str = "",
     output_file: str = "",
     add_tests: bool = False,
 ) -> str:
     """
     Generates a class for a given Kind.
     """
-    debug_content: Dict[str, str] = {}
+    if interactive:
+        kind = Prompt.ask(prompt="Enter the resource kind to generate class for")
 
-    if process_debug_file:
-        debug = False
-        with open(process_debug_file) as fd:
-            debug_content = json.load(fd)
+    if not kind:
+        LOGGER.error("Kind not provided")
+        sys.exit(1)
 
-        kind_data: Dict[str, Any] = {
-            "data": debug_content["explain"],
-            "namespaced": debug_content["namespace"].strip() == "1",
-        }
+    namespaced = read_resources_mapping_file().get(kind)
 
-    else:
-        if not check_cluster_available():
-            LOGGER.error(
-                "Cluster not available, The script needs a running cluster and admin privileges to get the explain output"
-            )
-            sys.exit(1)
-
-        if interactive:
-            kind = get_user_args_from_interactive()
-
-        if not kind:
-            LOGGER.error("Kind or API link not provided")
-            sys.exit(1)
-
-        if not check_kind_exists(kind=kind):
-            sys.exit(1)
-
-        kind_data = get_kind_data_and_debug_file(
-            kind=kind,
-            debug=debug,
-            add_tests=add_tests,
-        )
-        if not kind_data:
-            sys.exit(1)
-
-    output_debug_file_path = kind_data.get("debug_file", "")
+    if not namespaced:
+        LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run with --update-schema")
+        sys.exit(1)
 
     resource_dict = parse_explain(
-        output=kind_data["data"],
-        namespaced=kind_data["namespaced"],
-        debug=debug,
-        output_debug_file_path=output_debug_file_path,
-        debug_content=debug_content,
+        output=get_kind_schema_file(kind=kind),
+        namespaced=namespaced,
         add_tests=add_tests,
     )
     if not resource_dict:
@@ -676,9 +699,6 @@ def class_generator(
     if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
         LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
         Path.unlink(Path(generated_py_file))
-
-    if debug or add_tests:
-        LOGGER.info(f"Debug output saved to {output_debug_file_path}")
 
     return generated_py_file
 

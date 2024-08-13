@@ -53,6 +53,7 @@ fcn_exclude_functions =
     tmp_path_factory,
     tmpdir_factory,
     Path,
+    writelines,
 
 enable-extensions =
     FCN,
