@@ -1,0 +1,83 @@
+{
+  "description": "StorageProfile is the Schema for the storageprofiles API",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "StorageProfileSpec defines the desired state of StorageProfile",
+      "type": "object",
+      "required": [
+        "deviceClass"
+      ],
+      "properties": {
+        "blockPoolConfiguration": {
+          "description": "configurations to use for  profile specific blockpool.",
+          "type": "object",
+          "properties": {
+            "parameters": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "deviceClass": {
+          "description": "DeviceClass is the deviceclass name.",
+          "type": "string",
+          "maxLength": 512
+        },
+        "sharedFilesystemConfiguration": {
+          "description": "configurations to use for cephfilesystem.",
+          "type": "object",
+          "properties": {
+            "parameters": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "spec is immutable",
+          "rule": "oldSelf == self"
+        }
+      ]
+    },
+    "status": {
+      "description": "StorageProfileStatus defines the observed state of StorageProfile",
+      "type": "object",
+      "properties": {
+        "phase": {
+          "description": "Phase describes the Phase of StorageProfile\nThis is used by OLM UI to provide status information\nto the user",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ocs.openshift.io",
+      "kind": "StorageProfile",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

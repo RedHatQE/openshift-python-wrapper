@@ -1,0 +1,132 @@
+{
+  "description": "VolumeGroupReplicationContent is the Schema for the volumegroupreplicationcontents API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "VolumeGroupReplicationContentSpec defines the desired state of VolumeGroupReplicationContent",
+      "type": "object",
+      "required": [
+        "provisioner",
+        "source",
+        "volumeGroupReplicationHandle",
+        "volumeGroupReplicationRef"
+      ],
+      "properties": {
+        "provisioner": {
+          "description": "provisioner is the name of the CSI driver used to create the physical\nvolume group on\nthe underlying storage system.\nThis MUST be the same as the name returned by the CSI GetPluginName() call for\nthat driver.\nRequired.",
+          "type": "string"
+        },
+        "source": {
+          "description": "Source specifies whether the snapshot is (or should be) dynamically provisioned\nor already exists, and just requires a Kubernetes object representation.\nThis field is immutable after creation.\nRequired.",
+          "type": "object",
+          "required": [
+            "volumeHandles"
+          ],
+          "properties": {
+            "volumeHandles": {
+              "description": "VolumeHandles is a list of volume handles on the backend to be grouped\nand replicated.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "volumeGroupReplicationClassName": {
+          "description": "VolumeGroupReplicationClassName is the name of the VolumeGroupReplicationClass from\nwhich this group replication was (or will be) created.",
+          "type": "string"
+        },
+        "volumeGroupReplicationHandle": {
+          "description": "VolumeGroupReplicationHandle is a unique id returned by the CSI driver\nto identify the VolumeGroupReplication on the storage system.",
+          "type": "string"
+        },
+        "volumeGroupReplicationRef": {
+          "description": "VolumeGroupreplicationRef specifies the VolumeGroupReplication object to which this\nVolumeGroupReplicationContent object is bound.\nVolumeGroupReplication.Spec.VolumeGroupReplicationContentName field must reference to\nthis VolumeGroupReplicationContent's name for the bidirectional binding to be valid.\nFor a pre-existing VolumeGroupReplicationContent object, name and namespace of the\nVolumeGroupReplication object MUST be provided for binding to happen.\nThis field is immutable after creation.\nRequired.",
+          "type": "object",
+          "properties": {
+            "apiVersion": {
+              "description": "API version of the referent.",
+              "type": "string"
+            },
+            "fieldPath": {
+              "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.\nTODO: this design is not final and this field is subject to change in the future.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+              "type": "string"
+            },
+            "resourceVersion": {
+              "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+              "type": "string"
+            },
+            "uid": {
+              "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic",
+          "x-kubernetes-validations": [
+            {
+              "message": "both volumeGroupReplicationRef.name and volumeGroupReplicationRef.namespace must be set",
+              "rule": "has(self.name) && has(self.__namespace__)"
+            },
+            {
+              "message": "volumeGroupReplicationRef is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "VolumeGroupReplicationContentStatus defines the status of VolumeGroupReplicationContent",
+      "type": "object",
+      "properties": {
+        "persistentVolumeRefList": {
+          "description": "PersistentVolumeRefList is the list of of PV for the group replication\nThe maximum number of allowed PV in the group is 100.",
+          "type": "array",
+          "items": {
+            "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nTODO: Add other useful fields. apiVersion, kind, uid?\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.",
+                "type": "string"
+              }
+            },
+            "x-kubernetes-map-type": "atomic"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "replication.storage.openshift.io",
+      "kind": "VolumeGroupReplicationContent",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

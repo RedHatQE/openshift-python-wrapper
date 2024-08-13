@@ -1,0 +1,78 @@
+{
+  "description": "DataImage is the Schema for the dataimages API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "DataImageSpec defines the desired state of DataImage.",
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "description": "Url is the address of the dataImage that we want to attach to a BareMetalHost",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "DataImageStatus defines the observed state of DataImage.",
+      "type": "object",
+      "properties": {
+        "attachedImage": {
+          "description": "Currently attached DataImage",
+          "type": "object",
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        "error": {
+          "description": "Error count and message when attaching/detaching",
+          "type": "object",
+          "required": [
+            "count",
+            "message"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        },
+        "lastReconciled": {
+          "description": "Time of last reconciliation",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "metal3.io",
+      "kind": "DataImage",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

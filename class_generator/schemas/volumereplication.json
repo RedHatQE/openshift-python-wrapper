@@ -1,0 +1,189 @@
+{
+  "description": "VolumeReplication is the Schema for the volumereplications API.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "VolumeReplicationSpec defines the desired state of VolumeReplication.",
+      "type": "object",
+      "required": [
+        "autoResync",
+        "dataSource",
+        "replicationState",
+        "volumeReplicationClass"
+      ],
+      "properties": {
+        "autoResync": {
+          "description": "AutoResync represents the volume to be auto resynced when\nReplicationState is \"secondary\"",
+          "type": "boolean"
+        },
+        "dataSource": {
+          "description": "DataSource represents the object associated with the volume",
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "apiGroup": {
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind is the type of resource being referenced",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of resource being referenced",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic",
+          "x-kubernetes-validations": [
+            {
+              "message": "dataSource is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "replicationHandle": {
+          "description": "replicationHandle represents an existing (but new) replication id",
+          "type": "string"
+        },
+        "replicationState": {
+          "description": "ReplicationState represents the replication operation to be performed on the volume.\nSupported operations are \"primary\", \"secondary\" and \"resync\"",
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "resync"
+          ]
+        },
+        "volumeReplicationClass": {
+          "description": "VolumeReplicationClass is the VolumeReplicationClass name for this VolumeReplication resource",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "volumeReplicationClass is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "VolumeReplicationStatus defines the observed state of VolumeReplication.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions are the list of conditions and their status.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "lastCompletionTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastStartTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastSyncBytes": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "lastSyncDuration": {
+          "type": "string"
+        },
+        "lastSyncTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string"
+        },
+        "observedGeneration": {
+          "description": "observedGeneration is the last generation change the operator has dealt with",
+          "type": "integer",
+          "format": "int64"
+        },
+        "state": {
+          "description": "State captures the latest state of the replication operation.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "replication.storage.openshift.io",
+      "kind": "VolumeReplication",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

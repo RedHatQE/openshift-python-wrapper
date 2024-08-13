@@ -1,0 +1,153 @@
+{
+  "description": "VirtualMachineRestore defines the operation of restoring a VM",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "VirtualMachineRestoreSpec is the spec for a VirtualMachineRestoreresource",
+      "type": "object",
+      "required": [
+        "target",
+        "virtualMachineSnapshotName"
+      ],
+      "properties": {
+        "patches": {
+          "description": "If the target for the restore does not exist, it will be created. Patches holds JSON patches that would be\napplied to the target manifest before it's created. Patches should fit the target's Kind.\n\n\nExample for a patch: {\"op\": \"replace\", \"path\": \"/metadata/name\", \"value\": \"new-vm-name\"}",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "atomic"
+        },
+        "target": {
+          "description": "initially only VirtualMachine type supported",
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "apiGroup": {
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind is the type of resource being referenced",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of resource being referenced",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "virtualMachineSnapshotName": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "VirtualMachineRestoreStatus is the spec for a VirtualMachineRestoreresource",
+      "type": "object",
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition defines conditions",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastProbeTime": {
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ConditionType is the const type for Conditions",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        },
+        "deletedDataVolumes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "set"
+        },
+        "restoreTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "restores": {
+          "type": "array",
+          "items": {
+            "description": "VolumeRestore contains the data neeed to restore a PVC",
+            "type": "object",
+            "required": [
+              "persistentVolumeClaim",
+              "volumeName",
+              "volumeSnapshotName"
+            ],
+            "properties": {
+              "dataVolumeName": {
+                "type": "string"
+              },
+              "persistentVolumeClaim": {
+                "type": "string"
+              },
+              "volumeName": {
+                "type": "string"
+              },
+              "volumeSnapshotName": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "snapshot.kubevirt.io",
+      "kind": "VirtualMachineRestore",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

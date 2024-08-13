@@ -1,0 +1,89 @@
+{
+  "description": "StorageRequest is the Schema for the StorageRequests API",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "StorageRequestSpec defines the desired state of StorageRequest",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "encryptionMethod": {
+          "type": "string"
+        },
+        "storageProfile": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "block",
+            "sharedfile"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "StorageRequestStatus defines the observed state of StorageRequest",
+      "type": "object",
+      "properties": {
+        "cephResources": {
+          "description": "CephResources provide details of created ceph resources required for external storage",
+          "type": "array",
+          "items": {
+            "description": "CephResourcesSpec hold details of created ceph resources required for external storage",
+            "type": "object",
+            "properties": {
+              "cephClients": {
+                "description": "CephClients holds the name of CephClients mapped to the created ceph resource",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "kind": {
+                "description": "Kind describes the kind of created ceph resource",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name describes the name of created ceph resource",
+                "type": "string"
+              },
+              "status": {
+                "description": "Phase describes the phase of created ceph resource",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "phase": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ocs.openshift.io",
+      "kind": "StorageRequest",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,13 @@
+{
+  "description": "BlockSize provides the option to change the block size presented to the VM for a disk. Only one of its members may be specified.",
+  "type": "object",
+  "properties": {
+    "custom": {
+      "$ref": "_definitions.json#/definitions/v1.CustomBlockSize"
+    },
+    "matchVolume": {
+      "$ref": "_definitions.json#/definitions/v1.FeatureState"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

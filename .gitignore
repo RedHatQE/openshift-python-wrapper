@@ -126,3 +126,4 @@ package-lock.json
 
 # class generator script
 script/resource/debug/*
+class_generator_openapi.json

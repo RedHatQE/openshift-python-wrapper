@@ -1,0 +1,15 @@
+{
+  "description": "SEVSessionOptions is used to provide SEV session parameters.",
+  "type": "object",
+  "properties": {
+    "dhCert": {
+      "description": "Base64 encoded guest owner's Diffie-Hellman key.",
+      "type": "string"
+    },
+    "session": {
+      "description": "Base64 encoded session blob.",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

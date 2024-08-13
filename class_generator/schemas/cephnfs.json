@@ -1,0 +1,195 @@
+{
+  "type": "object",
+  "required": [
+    "metadata",
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "server"
+      ],
+      "properties": {
+        "rados": {},
+        "security": {},
+        "server": {
+          "type": "object",
+          "required": [
+            "active"
+          ],
+          "properties": {
+            "active": {
+              "type": "integer"
+            },
+            "annotations": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "x-kubernetes-preserve-unknown-fields": true
+            },
+            "hostNetwork": {},
+            "labels": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "x-kubernetes-preserve-unknown-fields": true
+            },
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "disabled": {
+                  "type": "boolean"
+                },
+                "probe": {
+                  "type": "object",
+                  "properties": {
+                    "exec": {
+                      "type": "object",
+                      "properties": {
+                        "command": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "x-kubernetes-list-type": "atomic"
+                        }
+                      }
+                    },
+                    "failureThreshold": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "grpc": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "port": {
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "service": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "httpGet": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "httpHeaders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "value"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "x-kubernetes-list-type": "atomic"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "x-kubernetes-int-or-string": true
+                        },
+                        "scheme": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "initialDelaySeconds": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "periodSeconds": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "successThreshold": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "tcpSocket": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "x-kubernetes-int-or-string": true
+                        }
+                      }
+                    },
+                    "terminationGracePeriodSeconds": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "timeoutSeconds": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+              }
+            },
+            "logLevel": {
+              "type": "string"
+            },
+            "placement": {
+              "x-kubernetes-preserve-unknown-fields": true
+            },
+            "priorityClassName": {
+              "type": "string"
+            },
+            "resources": {
+              "x-kubernetes-preserve-unknown-fields": true
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "x-kubernetes-preserve-unknown-fields": true
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ceph.rook.io",
+      "kind": "CephNFS",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
