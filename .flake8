@@ -52,6 +52,7 @@ fcn_exclude_functions =
     meta,
     tmp_path_factory,
     tmpdir_factory,
+    Path,
 
 enable-extensions =
     FCN,

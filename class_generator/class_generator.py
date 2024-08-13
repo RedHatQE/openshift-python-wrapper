@@ -1,11 +1,13 @@
 from __future__ import annotations
+
+import filecmp
 import json
 import shlex
 import os
 import sys
 from pathlib import Path
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import click
 import re
 
@@ -37,7 +39,6 @@ TYPE_MAPPING: Dict[str, str] = {
 }
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR = "class_generator/tests/manifests"
-TEMP_FILE_SUFFIX = "_TEMP.py"
 
 
 def process_fields_args(
@@ -414,7 +415,7 @@ def generate_resource_file_from_dict(
     output_file: str = "",
     interactive: bool = False,
     add_tests: bool = False,
-) -> str:
+) -> Tuple[str, str]:
     rendered = render_jinja_template(
         template_dict=resource_dict,
         template_dir="class_generator/manifests",
@@ -430,6 +431,7 @@ def generate_resource_file_from_dict(
     else:
         _output_file = os.path.join("ocp_resources", f"{formatted_kind_str}.py")
 
+    orig_filename = _output_file
     if os.path.exists(_output_file):
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
@@ -443,10 +445,7 @@ def generate_resource_file_from_dict(
                     sys.exit(1)
 
         else:
-            temp_output_file = _output_file.replace(".py", TEMP_FILE_SUFFIX)
-            if not check_if_resource_changed(new_data=rendered, resource_file=_output_file):
-                return ""
-
+            temp_output_file = _output_file.replace(".py", "_TEMP.py")
             LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
             _output_file = temp_output_file
 
@@ -457,7 +456,7 @@ def generate_resource_file_from_dict(
     else:
         write_and_format_rendered(filepath=_output_file, data=rendered)
 
-    return _output_file
+    return orig_filename, _output_file
 
 
 def parse_explain(
@@ -640,7 +639,7 @@ def class_generator(
     if not resource_dict:
         return ""
 
-    generated_py_file = generate_resource_file_from_dict(
+    orig_filename, generated_py_file = generate_resource_file_from_dict(
         resource_dict=resource_dict,
         overwrite=overwrite,
         dry_run=dry_run,
@@ -655,6 +654,10 @@ def class_generator(
             verify_stderr=False,
             check=False,
         )
+
+    if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
+        LOGGER.info(f"File {orig_filename} was not updated, deleting {generated_py_file}")
+        Path.unlink(Path(generated_py_file))
 
     if debug or add_tests:
         LOGGER.info(f"Debug output saved to {output_debug_file_path}")
