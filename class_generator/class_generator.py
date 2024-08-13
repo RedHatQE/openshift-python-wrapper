@@ -644,7 +644,7 @@ def class_generator(
         )
 
     if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
-        LOGGER.info(f"File {orig_filename} was not updated, deleting {generated_py_file}")
+        LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
         Path.unlink(Path(generated_py_file))
 
     if debug or add_tests:
