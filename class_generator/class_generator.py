@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 import re
 
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
 from pyhelper_utils.shell import run_command
@@ -713,7 +714,12 @@ def generate_class_generator_tests() -> None:
     "-k",
     "--kind",
     type=click.STRING,
-    help="The Kind to generate the class for, Needs working cluster with admin privileges",
+    help="""
+    \b
+    The Kind to generate the class for, Needs working cluster with admin privileges.
+    multiple kinds can be sent separated by comma (without psaces)
+    Example: -k Deployment,Pod,ConfigMap
+""",
 )
 @cloup.option(
     "-o",
@@ -771,18 +777,40 @@ def main(
     pdb: bool,
     add_tests: bool,
 ):
-    _ = pdb
+    _ = pdb  # Used by `function_runner_with_pdb`
 
-    class_generator(
-        kind=kind,
-        overwrite=overwrite,
-        interactive=interactive,
-        dry_run=dry_run,
-        debug=debug,
-        process_debug_file=debug_file,
-        output_file=output_file,
-        add_tests=add_tests,
-    )
+    _kwargs: Dict[str, Any] = {
+        "overwrite": overwrite,
+        "interactive": interactive,
+        "dry_run": dry_run,
+        "debug": debug,
+        "process_debug_file": debug_file,
+        "output_file": output_file,
+        "add_tests": add_tests,
+    }
+
+    if interactive or debug_file:
+        class_generator(**_kwargs)
+
+    else:
+        kinds: List[str] = kind.split(",")
+        futures: List[Future] = []
+
+        with ThreadPoolExecutor() as executor:
+            for _kind in kinds:
+                _kwargs["kind"] = _kind
+                if pdb or len(kinds) == 1:
+                    class_generator(**_kwargs)
+
+                else:
+                    executor.submit(
+                        class_generator,
+                        **_kwargs,
+                    )
+
+        for _ in as_completed(futures):
+            # wait for all tasks to complete
+            pass
 
     if add_tests:
         generate_class_generator_tests()

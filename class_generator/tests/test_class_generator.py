@@ -32,6 +32,11 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
             os.path.join(TESTS_MANIFESTS_DIR, "deployment", "deployment_res.py"),
         ),
         (
+            "image_content_source_policy",
+            os.path.join(TESTS_MANIFESTS_DIR, "image_content_source_policy", "image_content_source_policy_debug.json"),
+            os.path.join(TESTS_MANIFESTS_DIR, "image_content_source_policy", "image_content_source_policy_res.py"),
+        ),
+        (
             "pod",
             os.path.join(TESTS_MANIFESTS_DIR, "pod", "pod_debug.json"),
             os.path.join(TESTS_MANIFESTS_DIR, "pod", "pod_res.py"),
@@ -40,11 +45,6 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
             "secret",
             os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_debug.json"),
             os.path.join(TESTS_MANIFESTS_DIR, "secret", "secret_res.py"),
-        ),
-        (
-            "image_content_source_policy",
-            os.path.join(TESTS_MANIFESTS_DIR, "image_content_source_policy", "image_content_source_policy_debug.json"),
-            os.path.join(TESTS_MANIFESTS_DIR, "image_content_source_policy", "image_content_source_policy_res.py"),
         ),
     ),
 )
