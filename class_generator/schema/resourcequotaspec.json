@@ -17,8 +17,17 @@
       "description": "A collection of filters that must match each object tracked by a quota. If not specified, the quota matches all objects.",
       "type": "array",
       "items": {
-        "type": "string"
-      }
+        "type": "string",
+        "enum": [
+          "BestEffort",
+          "CrossNamespacePodAffinity",
+          "NotBestEffort",
+          "NotTerminating",
+          "PriorityClass",
+          "Terminating"
+        ]
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "$schema": "http://json-schema.org/schema#"

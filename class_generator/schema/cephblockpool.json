@@ -34,6 +34,9 @@
         },
         "crushRoot": {},
         "deviceClass": {},
+        "enableCrushUpdates": {
+          "type": "boolean"
+        },
         "enableRBDStats": {
           "type": "boolean"
         },

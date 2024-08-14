@@ -1,5 +1,5 @@
 {
-  "description": "VirtualMachineInstancetype resource contains quantitative and resource related VirtualMachine configuration that can be used by multiple VirtualMachine resources.",
+  "description": "VirtualMachineInstancetype resource contains quantitative and resource related VirtualMachine configuration\nthat can be used by multiple VirtualMachine resources.",
   "type": "object",
   "required": [
     "spec"
@@ -40,20 +40,25 @@
           ],
           "properties": {
             "dedicatedCPUPlacement": {
-              "description": "DedicatedCPUPlacement requests the scheduler to place the VirtualMachineInstance on a node with enough dedicated pCPUs and pin the vCPUs to it.",
+              "description": "DedicatedCPUPlacement requests the scheduler to place the VirtualMachineInstance on a node\nwith enough dedicated pCPUs and pin the vCPUs to it.",
               "type": "boolean"
             },
             "guest": {
-              "description": "Required number of vCPUs to expose to the guest. \n The resulting CPU topology being derived from the optional PreferredCPUTopology attribute of CPUPreferences that itself defaults to PreferSockets.",
+              "description": "Required number of vCPUs to expose to the guest.\n\n\nThe resulting CPU topology being derived from the optional PreferredCPUTopology attribute of CPUPreferences that itself defaults to PreferSockets.",
               "type": "integer",
               "format": "int32"
             },
             "isolateEmulatorThread": {
-              "description": "IsolateEmulatorThread requests one more dedicated pCPU to be allocated for the VMI to place the emulator thread on it.",
+              "description": "IsolateEmulatorThread requests one more dedicated pCPU to be allocated for the VMI to place\nthe emulator thread on it.",
               "type": "boolean"
             },
+            "maxSockets": {
+              "description": "MaxSockets specifies the maximum amount of sockets that can be hotplugged",
+              "type": "integer",
+              "format": "int32"
+            },
             "model": {
-              "description": "Model specifies the CPU model inside the VMI. List of available models https://github.com/libvirt/libvirt/tree/master/src/cpu_map. It is possible to specify special cases like \"host-passthrough\" to get the same CPU as the node and \"host-model\" to get CPU closest to the node one. Defaults to host-model.",
+              "description": "Model specifies the CPU model inside the VMI.\nList of available models https://github.com/libvirt/libvirt/tree/master/src/cpu_map.\nIt is possible to specify special cases like \"host-passthrough\" to get the same CPU as the node\nand \"host-model\" to get CPU closest to the node one.\nDefaults to host-model.",
               "type": "string"
             },
             "numa": {
@@ -61,7 +66,7 @@
               "type": "object",
               "properties": {
                 "guestMappingPassthrough": {
-                  "description": "GuestMappingPassthrough will create an efficient guest topology based on host CPUs exclusively assigned to a pod. The created topology ensures that memory and CPUs on the virtual numa nodes never cross boundaries of host numa nodes.",
+                  "description": "GuestMappingPassthrough will create an efficient guest topology based on host CPUs exclusively assigned to a pod.\nThe created topology ensures that memory and CPUs on the virtual numa nodes never cross boundaries of host numa nodes.",
                   "type": "object"
                 }
               }
@@ -71,7 +76,7 @@
               "type": "object",
               "properties": {
                 "mask": {
-                  "description": "Mask defines the vcpu mask expression that defines which vcpus are used for realtime. Format matches libvirt's expressions. Example: \"0-3,^1\",\"0,2,3\",\"2-3\"",
+                  "description": "Mask defines the vcpu mask expression that defines which vcpus are used for realtime. Format matches libvirt's expressions.\nExample: \"0-3,^1\",\"0,2,3\",\"2-3\"",
                   "type": "string"
                 }
               }
@@ -106,15 +111,15 @@
                     "type": "object",
                     "properties": {
                       "enabled": {
-                        "description": "Enabled determines if a display addapter backed by a vGPU should be enabled or disabled on the guest. Defaults to true.",
+                        "description": "Enabled determines if a display addapter backed by a vGPU should be enabled or disabled on the guest.\nDefaults to true.",
                         "type": "boolean"
                       },
                       "ramFB": {
-                        "description": "Enables a boot framebuffer, until the guest OS loads a real GPU driver Defaults to true.",
+                        "description": "Enables a boot framebuffer, until the guest OS loads a real GPU driver\nDefaults to true.",
                         "type": "object",
                         "properties": {
                           "enabled": {
-                            "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                            "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                             "type": "boolean"
                           }
                         }
@@ -173,11 +178,11 @@
                   "type": "string"
                 },
                 "policy": {
-                  "description": "Guest policy flags as defined in AMD SEV API specification. Note: due to security reasons it is not allowed to enable guest debugging. Therefore NoDebug flag is not exposed to users and is always true.",
+                  "description": "Guest policy flags as defined in AMD SEV API specification.\nNote: due to security reasons it is not allowed to enable guest debugging. Therefore NoDebug flag is not exposed to users and is always true.",
                   "type": "object",
                   "properties": {
                     "encryptedState": {
-                      "description": "SEV-ES is required. Defaults to false.",
+                      "description": "SEV-ES is required.\nDefaults to false.",
                       "type": "boolean"
                     }
                   }
@@ -212,8 +217,13 @@
                 }
               }
             },
+            "maxGuest": {
+              "description": "MaxGuest allows to specify the maximum amount of memory which is visible inside the Guest OS.\nThe delta between MaxGuest and Guest is the amount of memory that can be hot(un)plugged.",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "x-kubernetes-int-or-string": true
+            },
             "overcommitPercent": {
-              "description": "OvercommitPercent is the percentage of the guest memory which will be overcommitted. This means that the VMIs parent pod (virt-launcher) will request less physical memory by a factor specified by the OvercommitPercent. Overcommits can lead to memory exhaustion, which in turn can lead to crashes. Use carefully. Defaults to 0",
+              "description": "OvercommitPercent is the percentage of the guest memory which will be overcommitted.\nThis means that the VMIs parent pod (virt-launcher) will request less\nphysical memory by a factor specified by the OvercommitPercent.\nOvercommits can lead to memory exhaustion, which in turn can lead to crashes. Use carefully.\nDefaults to 0",
               "type": "integer",
               "maximum": 100,
               "minimum": 0
@@ -221,14 +231,14 @@
           }
         },
         "nodeSelector": {
-          "description": "NodeSelector is a selector which must be true for the vmi to fit on a node. Selector which must match a node's labels for the vmi to be scheduled on that node. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ \n NodeSelector is the name of the custom node selector for the instancetype.",
+          "description": "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/\n\n\nNodeSelector is the name of the custom node selector for the instancetype.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "schedulerName": {
-          "description": "If specified, the VMI will be dispatched by specified scheduler. If not specified, the VMI will be dispatched by default scheduler. \n SchedulerName is the name of the custom K8s scheduler for the instancetype.",
+          "description": "If specified, the VMI will be dispatched by specified scheduler.\nIf not specified, the VMI will be dispatched by default scheduler.\n\n\nSchedulerName is the name of the custom K8s scheduler for the instancetype.",
           "type": "string"
         }
       }

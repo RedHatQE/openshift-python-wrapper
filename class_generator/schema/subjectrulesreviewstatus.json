@@ -20,14 +20,16 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.NonResourceRule"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "resourceRules": {
       "description": "ResourceRules is the list of actions the subject is allowed to perform on resources. The list ordering isn't significant, may contain duplicates, and possibly be incomplete.",
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.ResourceRule"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "$schema": "http://json-schema.org/schema#"

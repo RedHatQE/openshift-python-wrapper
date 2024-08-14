@@ -22,7 +22,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "$schema": "http://json-schema.org/schema#"

@@ -1,5 +1,5 @@
 {
-  "description": "VolumeCloneSource refers to a PVC/VolumeSnapshot of any storageclass/volumemode to be used as the source of a new PVC",
+  "description": "VolumeCloneSource refers to a PVC/VolumeSnapshot of any storageclass/volumemode\nto be used as the source of a new PVC",
   "type": "object",
   "required": [
     "spec"
@@ -41,7 +41,7 @@
           ],
           "properties": {
             "apiGroup": {
-              "description": "APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.",
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
               "type": "string"
             },
             "kind": {

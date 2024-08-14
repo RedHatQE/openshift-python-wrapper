@@ -24,7 +24,7 @@
       ],
       "properties": {
         "annotationFilters": {
-          "description": "Example use: \"!some/key*\". For a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
+          "description": "Example use: \"!some/key*\".\nFor a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
           "type": "array",
           "items": {
             "type": "string"
@@ -32,7 +32,7 @@
           "x-kubernetes-list-type": "atomic"
         },
         "labelFilters": {
-          "description": "Example use: \"!some/key*\". For a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
+          "description": "Example use: \"!some/key*\".\nFor a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
           "type": "array",
           "items": {
             "type": "string"
@@ -40,18 +40,18 @@
           "x-kubernetes-list-type": "atomic"
         },
         "newMacAddresses": {
-          "description": "NewMacAddresses manually sets that target interfaces' mac addresses. The key is the interface name and the value is the new mac address. If this field is not specified, a new MAC address will be generated automatically, as for any interface that is not included in this map.",
+          "description": "NewMacAddresses manually sets that target interfaces' mac addresses. The key is the interface name and the\nvalue is the new mac address. If this field is not specified, a new MAC address will\nbe generated automatically, as for any interface that is not included in this map.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "newSMBiosSerial": {
-          "description": "NewSMBiosSerial manually sets that target's SMbios serial. If this field is not specified, a new serial will be generated automatically.",
+          "description": "NewSMBiosSerial manually sets that target's SMbios serial. If this field is not specified, a new serial will\nbe generated automatically.",
           "type": "string"
         },
         "source": {
-          "description": "Source is the object that would be cloned. Currently supported source types are: VirtualMachine of kubevirt.io API group, VirtualMachineSnapshot of snapshot.kubevirt.io API group",
+          "description": "Source is the object that would be cloned. Currently supported source types are:\nVirtualMachine of kubevirt.io API group,\nVirtualMachineSnapshot of snapshot.kubevirt.io API group",
           "type": "object",
           "required": [
             "kind",
@@ -59,7 +59,7 @@
           ],
           "properties": {
             "apiGroup": {
-              "description": "APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.",
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
               "type": "string"
             },
             "kind": {
@@ -70,10 +70,11 @@
               "description": "Name is the name of resource being referenced",
               "type": "string"
             }
-          }
+          },
+          "x-kubernetes-map-type": "atomic"
         },
         "target": {
-          "description": "Target is the outcome of the cloning process. Currently supported source types are: - VirtualMachine of kubevirt.io API group - Empty (nil). If the target is not provided, the target type would default to VirtualMachine and a random name would be generated for the target. The target's name can be viewed by inspecting status \"TargetName\" field below.",
+          "description": "Target is the outcome of the cloning process.\nCurrently supported source types are:\n- VirtualMachine of kubevirt.io API group\n- Empty (nil).\nIf the target is not provided, the target type would default to VirtualMachine and a random\nname would be generated for the target. The target's name can be viewed by\ninspecting status \"TargetName\" field below.",
           "type": "object",
           "required": [
             "kind",
@@ -81,7 +82,7 @@
           ],
           "properties": {
             "apiGroup": {
-              "description": "APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.",
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
               "type": "string"
             },
             "kind": {
@@ -92,14 +93,15 @@
               "description": "Name is the name of resource being referenced",
               "type": "string"
             }
-          }
+          },
+          "x-kubernetes-map-type": "atomic"
         },
         "template": {
           "description": "For a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
           "type": "object",
           "properties": {
             "annotationFilters": {
-              "description": "Example use: \"!some/key*\". For a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
+              "description": "Example use: \"!some/key*\".\nFor a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
               "type": "array",
               "items": {
                 "type": "string"
@@ -107,7 +109,7 @@
               "x-kubernetes-list-type": "atomic"
             },
             "labelFilters": {
-              "description": "Example use: \"!some/key*\". For a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
+              "description": "Example use: \"!some/key*\".\nFor a detailed description, please refer to https://kubevirt.io/user-guide/operations/clone_api/#label-annotation-filters.",
               "type": "array",
               "items": {
                 "type": "string"

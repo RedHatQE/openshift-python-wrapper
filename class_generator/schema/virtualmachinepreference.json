@@ -37,15 +37,15 @@
               "type": "object",
               "properties": {
                 "timezone": {
-                  "description": "Timezone sets the guest clock to the specified timezone. Zone name follows the TZ environment variable format (e.g. 'America/New_York').",
+                  "description": "Timezone sets the guest clock to the specified timezone.\nZone name follows the TZ environment variable format (e.g. 'America/New_York').",
                   "type": "string"
                 },
                 "utc": {
-                  "description": "UTC sets the guest clock to UTC on each boot. If an offset is specified, guest changes to the clock will be kept during reboots and are not reset.",
+                  "description": "UTC sets the guest clock to UTC on each boot. If an offset is specified,\nguest changes to the clock will be kept during reboots and are not reset.",
                   "type": "object",
                   "properties": {
                     "offsetSeconds": {
-                      "description": "OffsetSeconds specifies an offset in seconds, relative to UTC. If set, guest changes to the clock will be kept during reboots and not reset.",
+                      "description": "OffsetSeconds specifies an offset in seconds, relative to UTC. If set,\nguest changes to the clock will be kept during reboots and not reset.",
                       "type": "integer"
                     }
                   }
@@ -61,11 +61,11 @@
                   "type": "object",
                   "properties": {
                     "present": {
-                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer. Defaults to true.",
+                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer.\nDefaults to true.",
                       "type": "boolean"
                     },
                     "tickPolicy": {
-                      "description": "TickPolicy determines what happens when QEMU misses a deadline for injecting a tick to the guest. One of \"delay\", \"catchup\", \"merge\", \"discard\".",
+                      "description": "TickPolicy determines what happens when QEMU misses a deadline for injecting a tick to the guest.\nOne of \"delay\", \"catchup\", \"merge\", \"discard\".",
                       "type": "string"
                     }
                   }
@@ -75,7 +75,7 @@
                   "type": "object",
                   "properties": {
                     "present": {
-                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer. Defaults to true.",
+                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
@@ -85,7 +85,7 @@
                   "type": "object",
                   "properties": {
                     "present": {
-                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer. Defaults to true.",
+                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
@@ -95,11 +95,11 @@
                   "type": "object",
                   "properties": {
                     "present": {
-                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer. Defaults to true.",
+                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer.\nDefaults to true.",
                       "type": "boolean"
                     },
                     "tickPolicy": {
-                      "description": "TickPolicy determines what happens when QEMU misses a deadline for injecting a tick to the guest. One of \"delay\", \"catchup\", \"discard\".",
+                      "description": "TickPolicy determines what happens when QEMU misses a deadline for injecting a tick to the guest.\nOne of \"delay\", \"catchup\", \"discard\".",
                       "type": "string"
                     }
                   }
@@ -109,11 +109,11 @@
                   "type": "object",
                   "properties": {
                     "present": {
-                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer. Defaults to true.",
+                      "description": "Enabled set to false makes sure that the machine type or a preset can't add the timer.\nDefaults to true.",
                       "type": "boolean"
                     },
                     "tickPolicy": {
-                      "description": "TickPolicy determines what happens when QEMU misses a deadline for injecting a tick to the guest. One of \"delay\", \"catchup\".",
+                      "description": "TickPolicy determines what happens when QEMU misses a deadline for injecting a tick to the guest.\nOne of \"delay\", \"catchup\".",
                       "type": "string"
                     },
                     "track": {
@@ -145,7 +145,7 @@
                     "type": "string"
                   },
                   "policy": {
-                    "description": "Policy is the CPU feature attribute which can have the following attributes: force    - The virtual CPU will claim the feature is supported regardless of it being supported by host CPU. require  - Guest creation will fail unless the feature is supported by the host CPU or the hypervisor is able to emulate it. optional - The feature will be supported by virtual CPU if and only if it is supported by host CPU. disable  - The feature will not be supported by virtual CPU. forbid   - Guest creation will fail if the feature is supported by host CPU. Defaults to require",
+                    "description": "Policy is the CPU feature attribute which can have the following attributes:\nforce    - The virtual CPU will claim the feature is supported regardless of it being supported by host CPU.\nrequire  - Guest creation will fail unless the feature is supported by the host CPU or the hypervisor is able to emulate it.\noptional - The feature will be supported by virtual CPU if and only if it is supported by host CPU.\ndisable  - The feature will not be supported by virtual CPU.\nforbid   - Guest creation will fail if the feature is supported by host CPU.\nDefaults to require",
                     "type": "string"
                   }
                 }
@@ -154,6 +154,20 @@
             "preferredCPUTopology": {
               "description": "PreferredCPUTopology optionally defines the preferred guest visible CPU topology, defaults to PreferSockets.",
               "type": "string"
+            },
+            "spreadOptions": {
+              "type": "object",
+              "properties": {
+                "across": {
+                  "description": "Across optionally defines how to spread vCPUs across the guest visible topology.\nDefault: SocketsCores",
+                  "type": "string"
+                },
+                "ratio": {
+                  "description": "Ratio optionally defines the ratio to spread vCPUs across the guest visible topology:\n\n\nCoresThreads        - 1:2   - Controls the ratio of cores to threads. Only a ratio of 2 is currently accepted.\nSocketsCores        - 1:N   - Controls the ratio of socket to cores.\nSocketsCoresThreads - 1:N:2 - Controls the ratio of socket to cores. Each core providing 2 threads.\n\n\nDefault: 2",
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
             }
           }
         },
@@ -218,7 +232,7 @@
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
@@ -278,7 +292,7 @@
               "type": "object",
               "properties": {
                 "persistent": {
-                  "description": "Persistent indicates the state of the TPM device should be kept accross reboots Defaults to false",
+                  "description": "Persistent indicates the state of the TPM device should be kept accross reboots\nDefaults to false",
                   "type": "boolean"
                 }
               }
@@ -295,15 +309,15 @@
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if a display addapter backed by a vGPU should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if a display addapter backed by a vGPU should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     },
                     "ramFB": {
-                      "description": "Enables a boot framebuffer, until the guest OS loads a real GPU driver Defaults to true.",
+                      "description": "Enables a boot framebuffer, until the guest OS loads a real GPU driver\nDefaults to true.",
                       "type": "object",
                       "properties": {
                         "enabled": {
-                          "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                          "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                           "type": "boolean"
                         }
                       }
@@ -323,7 +337,7 @@
               "type": "object",
               "properties": {
                 "enabled": {
-                  "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                  "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                   "type": "boolean"
                 }
               }
@@ -333,11 +347,11 @@
               "type": "object",
               "properties": {
                 "enabled": {
-                  "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                  "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                   "type": "boolean"
                 },
                 "endOfInterrupt": {
-                  "description": "EndOfInterrupt enables the end of interrupt notification in the guest. Defaults to false.",
+                  "description": "EndOfInterrupt enables the end of interrupt notification in the guest.\nDefaults to false.",
                   "type": "boolean"
                 }
               }
@@ -347,71 +361,71 @@
               "type": "object",
               "properties": {
                 "evmcs": {
-                  "description": "EVMCS Speeds up L2 vmexits, but disables other virtualization features. Requires vapic. Defaults to the machine type setting.",
+                  "description": "EVMCS Speeds up L2 vmexits, but disables other virtualization features. Requires vapic.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "frequencies": {
-                  "description": "Frequencies improves the TSC clock source handling for Hyper-V on KVM. Defaults to the machine type setting.",
+                  "description": "Frequencies improves the TSC clock source handling for Hyper-V on KVM.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "ipi": {
-                  "description": "IPI improves performances in overcommited environments. Requires vpindex. Defaults to the machine type setting.",
+                  "description": "IPI improves performances in overcommited environments. Requires vpindex.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "reenlightenment": {
-                  "description": "Reenlightenment enables the notifications on TSC frequency changes. Defaults to the machine type setting.",
+                  "description": "Reenlightenment enables the notifications on TSC frequency changes.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "relaxed": {
-                  "description": "Relaxed instructs the guest OS to disable watchdog timeouts. Defaults to the machine type setting.",
+                  "description": "Relaxed instructs the guest OS to disable watchdog timeouts.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "reset": {
-                  "description": "Reset enables Hyperv reboot/reset for the vmi. Requires synic. Defaults to the machine type setting.",
+                  "description": "Reset enables Hyperv reboot/reset for the vmi. Requires synic.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "runtime": {
-                  "description": "Runtime improves the time accounting to improve scheduling in the guest. Defaults to the machine type setting.",
+                  "description": "Runtime improves the time accounting to improve scheduling in the guest.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
@@ -421,28 +435,28 @@
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     },
                     "spinlocks": {
-                      "description": "Retries indicates the number of retries. Must be a value greater or equal 4096. Defaults to 4096.",
+                      "description": "Retries indicates the number of retries.\nMust be a value greater or equal 4096.\nDefaults to 4096.",
                       "type": "integer",
                       "format": "int32"
                     }
                   }
                 },
                 "synic": {
-                  "description": "SyNIC enables the Synthetic Interrupt Controller. Defaults to the machine type setting.",
+                  "description": "SyNIC enables the Synthetic Interrupt Controller.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "synictimer": {
-                  "description": "SyNICTimer enables Synthetic Interrupt Controller Timers, reducing CPU load. Defaults to the machine type setting.",
+                  "description": "SyNICTimer enables Synthetic Interrupt Controller Timers, reducing CPU load.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "direct": {
@@ -450,7 +464,7 @@
                       "type": "object",
                       "properties": {
                         "enabled": {
-                          "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                          "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                           "type": "boolean"
                         }
                       }
@@ -461,45 +475,45 @@
                   }
                 },
                 "tlbflush": {
-                  "description": "TLBFlush improves performances in overcommited environments. Requires vpindex. Defaults to the machine type setting.",
+                  "description": "TLBFlush improves performances in overcommited environments. Requires vpindex.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "vapic": {
-                  "description": "VAPIC improves the paravirtualized handling of interrupts. Defaults to the machine type setting.",
+                  "description": "VAPIC improves the paravirtualized handling of interrupts.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
                 },
                 "vendorid": {
-                  "description": "VendorID allows setting the hypervisor vendor id. Defaults to the machine type setting.",
+                  "description": "VendorID allows setting the hypervisor vendor id.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     },
                     "vendorid": {
-                      "description": "VendorID sets the hypervisor vendor id, visible to the vmi. String up to twelve characters.",
+                      "description": "VendorID sets the hypervisor vendor id, visible to the vmi.\nString up to twelve characters.",
                       "type": "string"
                     }
                   }
                 },
                 "vpindex": {
-                  "description": "VPIndex enables the Virtual Processor Index to help windows identifying virtual processors. Defaults to the machine type setting.",
+                  "description": "VPIndex enables the Virtual Processor Index to help windows identifying virtual processors.\nDefaults to the machine type setting.",
                   "type": "object",
                   "properties": {
                     "enabled": {
-                      "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                      "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                       "type": "boolean"
                     }
                   }
@@ -511,7 +525,7 @@
               "type": "object",
               "properties": {
                 "hidden": {
-                  "description": "Hide the KVM hypervisor from standard MSR based discovery. Defaults to false",
+                  "description": "Hide the KVM hypervisor from standard MSR based discovery.\nDefaults to false",
                   "type": "boolean"
                 }
               }
@@ -521,7 +535,7 @@
               "type": "object",
               "properties": {
                 "enabled": {
-                  "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                  "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                   "type": "boolean"
                 }
               }
@@ -531,7 +545,7 @@
               "type": "object",
               "properties": {
                 "enabled": {
-                  "description": "Enabled determines if the feature should be enabled or disabled on the guest. Defaults to true.",
+                  "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
                   "type": "boolean"
                 }
               }
@@ -547,7 +561,7 @@
               "type": "boolean"
             },
             "preferredUseBiosSerial": {
-              "description": "PreferredUseBiosSerial optionally transmitts BIOS output over the serial. \n Requires PreferredUseBios to be enabled.",
+              "description": "PreferredUseBiosSerial optionally transmitts BIOS output over the serial.\n\n\nRequires PreferredUseBios to be enabled.",
               "type": "boolean"
             },
             "preferredUseEfi": {
@@ -555,7 +569,7 @@
               "type": "boolean"
             },
             "preferredUseSecureBoot": {
-              "description": "PreferredUseSecureBoot optionally enables SecureBoot and the OVMF roms will be swapped for SecureBoot-enabled ones. \n Requires PreferredUseEfi and PreferredSmm to be enabled.",
+              "description": "PreferredUseSecureBoot optionally enables SecureBoot and the OVMF roms will be swapped for SecureBoot-enabled ones.\n\n\nRequires PreferredUseEfi and PreferredSmm to be enabled.",
               "type": "boolean"
             }
           }

@@ -63,7 +63,7 @@
           "type": "object",
           "properties": {
             "name": {
-              "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+              "description": "Name of the referent. This field is effectively required, but due to backwards compatibility is allowed to be empty. Instances of this type with an empty value here are almost certainly wrong. TODO: Add other useful fields. apiVersion, kind, uid? More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.",
               "type": "string"
             }
           },
@@ -125,7 +125,8 @@
               ],
               "properties": {
                 "allowedSourceRanges": {
-                  "description": "allowedSourceRanges specifies an allowlist of IP address ranges to which access to the load balancer should be restricted.  Each range must be specified using CIDR notation (e.g. \"10.0.0.0/8\" or \"fd00::/8\"). If no range is specified, \"0.0.0.0/0\" for IPv4 and \"::/0\" for IPv6 are used by default, which allows all source addresses. \n To facilitate migration from earlier versions of OpenShift that did not have the allowedSourceRanges field, you may set the service.beta.kubernetes.io/load-balancer-source-ranges annotation on the \"router-<ingresscontroller name>\" service in the \"openshift-ingress\" namespace, and this annotation will take effect if allowedSourceRanges is empty on OpenShift 4.12."
+                  "description": "allowedSourceRanges specifies an allowlist of IP address ranges to which access to the load balancer should be restricted.  Each range must be specified using CIDR notation (e.g. \"10.0.0.0/8\" or \"fd00::/8\"). If no range is specified, \"0.0.0.0/0\" for IPv4 and \"::/0\" for IPv6 are used by default, which allows all source addresses. \n To facilitate migration from earlier versions of OpenShift that did not have the allowedSourceRanges field, you may set the service.beta.kubernetes.io/load-balancer-source-ranges annotation on the \"router-<ingresscontroller name>\" service in the \"openshift-ingress\" namespace, and this annotation will take effect if allowedSourceRanges is empty on OpenShift 4.12.",
+                  "x-kubernetes-list-type": "atomic"
                 },
                 "dnsManagementPolicy": {
                   "description": "dnsManagementPolicy indicates if the lifecycle of the wildcard DNS record associated with the load balancer service will be managed by the ingress operator. It defaults to Managed. Valid values are: Managed and Unmanaged.",
@@ -157,12 +158,140 @@
                               "description": "connectionIdleTimeout specifies the maximum time period that a connection may be idle before the load balancer closes the connection.  The value must be parseable as a time duration value; see <https://pkg.go.dev/time#ParseDuration>.  A nil or zero value means no opinion, in which case a default value is used.  The default value for this field is 60s.  This default is subject to change.",
                               "type": "string",
                               "format": "duration"
+                            },
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will attach. The subnets may be specified by either their ID or name. The total number of subnets is limited to 10. \n In order for the load balancer to be provisioned with subnets, each subnet must exist, each subnet must be from a different availability zone, and the load balancer service must be recreated to pick up new values. \n When omitted from the spec, the subnets will be auto-discovered for each availability zone. Auto-discovered subnets are not reported in the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID. Subnet IDs must start with \"subnet-\", consist only of alphanumeric characters, must be exactly 24 characters long, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name. Subnet names must not start with \"subnet-\", must not include commas, must be under 256 characters in length, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
                             }
                           }
                         },
                         "networkLoadBalancer": {
                           "description": "networkLoadBalancerParameters holds configuration parameters for an AWS network load balancer. Present only if type is NLB.",
-                          "type": "object"
+                          "type": "object",
+                          "properties": {
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will attach. The subnets may be specified by either their ID or name. The total number of subnets is limited to 10. \n In order for the load balancer to be provisioned with subnets, each subnet must exist, each subnet must be from a different availability zone, and the load balancer service must be recreated to pick up new values. \n When omitted from the spec, the subnets will be auto-discovered for each availability zone. Auto-discovered subnets are not reported in the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID. Subnet IDs must start with \"subnet-\", consist only of alphanumeric characters, must be exactly 24 characters long, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name. Subnet names must not start with \"subnet-\", must not include commas, must be under 256 characters in length, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
+                            }
+                          }
                         },
                         "type": {
                           "description": "type is the type of AWS load balancer to instantiate for an ingresscontroller. \n Valid values are: \n * \"Classic\": A Classic Load Balancer that makes routing decisions at either the transport layer (TCP/SSL) or the application layer (HTTP/HTTPS). See the following for additional details: \n https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#clb \n * \"NLB\": A Network Load Balancer that makes routing decisions at the transport layer (TCP/SSL). See the following for additional details: \n https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#nlb",
@@ -513,7 +642,8 @@
               ]
             },
             "headerNameCaseAdjustments": {
-              "description": "headerNameCaseAdjustments specifies case adjustments that can be applied to HTTP header names.  Each adjustment is specified as an HTTP header name with the desired capitalization.  For example, specifying \"X-Forwarded-For\" indicates that the \"x-forwarded-for\" HTTP header should be adjusted to have the specified capitalization. \n These adjustments are only applied to cleartext, edge-terminated, and re-encrypt routes, and only when using HTTP/1. \n For request headers, these adjustments are applied only for routes that have the haproxy.router.openshift.io/h1-adjust-case=true annotation.  For response headers, these adjustments are applied to all HTTP responses. \n If this field is empty, no request headers are adjusted."
+              "description": "headerNameCaseAdjustments specifies case adjustments that can be applied to HTTP header names.  Each adjustment is specified as an HTTP header name with the desired capitalization.  For example, specifying \"X-Forwarded-For\" indicates that the \"x-forwarded-for\" HTTP header should be adjusted to have the specified capitalization. \n These adjustments are only applied to cleartext, edge-terminated, and re-encrypt routes, and only when using HTTP/1. \n For request headers, these adjustments are applied only for routes that have the haproxy.router.openshift.io/h1-adjust-case=true annotation.  For response headers, these adjustments are applied to all HTTP responses. \n If this field is empty, no request headers are adjusted.",
+              "x-kubernetes-list-type": "atomic"
             },
             "uniqueId": {
               "description": "uniqueId describes configuration for a custom HTTP header that the ingress controller should inject into incoming HTTP requests. Typically, this header is configured to have a value that is unique to the HTTP request.  The header can be used by applications or included in access logs to facilitate tracing individual HTTP requests. \n If this field is empty, no such header is injected into requests.",
@@ -638,17 +768,20 @@
                 },
                 "httpCaptureCookies": {
                   "description": "httpCaptureCookies specifies HTTP cookies that should be captured in access logs.  If this field is empty, no cookies are captured.",
-                  "maxItems": 1
+                  "maxItems": 1,
+                  "x-kubernetes-list-type": "atomic"
                 },
                 "httpCaptureHeaders": {
                   "description": "httpCaptureHeaders defines HTTP headers that should be captured in access logs.  If this field is empty, no headers are captured. \n Note that this option only applies to cleartext HTTP connections and to secure HTTP connections for which the ingress controller terminates encryption (that is, edge-terminated or reencrypt connections).  Headers cannot be captured for TLS passthrough connections.",
                   "type": "object",
                   "properties": {
                     "request": {
-                      "description": "request specifies which HTTP request headers to capture. \n If this field is empty, no request headers are captured."
+                      "description": "request specifies which HTTP request headers to capture. \n If this field is empty, no request headers are captured.",
+                      "x-kubernetes-list-type": "atomic"
                     },
                     "response": {
-                      "description": "response specifies which HTTP response headers to capture. \n If this field is empty, no response headers are captured."
+                      "description": "response specifies which HTTP response headers to capture. \n If this field is empty, no response headers are captured.",
+                      "x-kubernetes-list-type": "atomic"
                     }
                   }
                 },
@@ -696,10 +829,12 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -743,10 +878,12 @@
                         "type": "array",
                         "items": {
                           "type": "string"
-                        }
+                        },
+                        "x-kubernetes-list-type": "atomic"
                       }
                     }
-                  }
+                  },
+                  "x-kubernetes-list-type": "atomic"
                 },
                 "matchLabels": {
                   "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -787,7 +924,8 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             }
           }
         },
@@ -846,10 +984,12 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -1006,7 +1146,11 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
         },
         "domain": {
           "description": "domain is the actual domain in use.",
@@ -1064,7 +1208,8 @@
               ],
               "properties": {
                 "allowedSourceRanges": {
-                  "description": "allowedSourceRanges specifies an allowlist of IP address ranges to which access to the load balancer should be restricted.  Each range must be specified using CIDR notation (e.g. \"10.0.0.0/8\" or \"fd00::/8\"). If no range is specified, \"0.0.0.0/0\" for IPv4 and \"::/0\" for IPv6 are used by default, which allows all source addresses. \n To facilitate migration from earlier versions of OpenShift that did not have the allowedSourceRanges field, you may set the service.beta.kubernetes.io/load-balancer-source-ranges annotation on the \"router-<ingresscontroller name>\" service in the \"openshift-ingress\" namespace, and this annotation will take effect if allowedSourceRanges is empty on OpenShift 4.12."
+                  "description": "allowedSourceRanges specifies an allowlist of IP address ranges to which access to the load balancer should be restricted.  Each range must be specified using CIDR notation (e.g. \"10.0.0.0/8\" or \"fd00::/8\"). If no range is specified, \"0.0.0.0/0\" for IPv4 and \"::/0\" for IPv6 are used by default, which allows all source addresses. \n To facilitate migration from earlier versions of OpenShift that did not have the allowedSourceRanges field, you may set the service.beta.kubernetes.io/load-balancer-source-ranges annotation on the \"router-<ingresscontroller name>\" service in the \"openshift-ingress\" namespace, and this annotation will take effect if allowedSourceRanges is empty on OpenShift 4.12.",
+                  "x-kubernetes-list-type": "atomic"
                 },
                 "dnsManagementPolicy": {
                   "description": "dnsManagementPolicy indicates if the lifecycle of the wildcard DNS record associated with the load balancer service will be managed by the ingress operator. It defaults to Managed. Valid values are: Managed and Unmanaged.",
@@ -1096,12 +1241,140 @@
                               "description": "connectionIdleTimeout specifies the maximum time period that a connection may be idle before the load balancer closes the connection.  The value must be parseable as a time duration value; see <https://pkg.go.dev/time#ParseDuration>.  A nil or zero value means no opinion, in which case a default value is used.  The default value for this field is 60s.  This default is subject to change.",
                               "type": "string",
                               "format": "duration"
+                            },
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will attach. The subnets may be specified by either their ID or name. The total number of subnets is limited to 10. \n In order for the load balancer to be provisioned with subnets, each subnet must exist, each subnet must be from a different availability zone, and the load balancer service must be recreated to pick up new values. \n When omitted from the spec, the subnets will be auto-discovered for each availability zone. Auto-discovered subnets are not reported in the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID. Subnet IDs must start with \"subnet-\", consist only of alphanumeric characters, must be exactly 24 characters long, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name. Subnet names must not start with \"subnet-\", must not include commas, must be under 256 characters in length, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
                             }
                           }
                         },
                         "networkLoadBalancer": {
                           "description": "networkLoadBalancerParameters holds configuration parameters for an AWS network load balancer. Present only if type is NLB.",
-                          "type": "object"
+                          "type": "object",
+                          "properties": {
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will attach. The subnets may be specified by either their ID or name. The total number of subnets is limited to 10. \n In order for the load balancer to be provisioned with subnets, each subnet must exist, each subnet must be from a different availability zone, and the load balancer service must be recreated to pick up new values. \n When omitted from the spec, the subnets will be auto-discovered for each availability zone. Auto-discovered subnets are not reported in the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID. Subnet IDs must start with \"subnet-\", consist only of alphanumeric characters, must be exactly 24 characters long, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name. Subnet names must not start with \"subnet-\", must not include commas, must be under 256 characters in length, must be unique, and the total number of subnets specified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
+                            }
+                          }
                         },
                         "type": {
                           "description": "type is the type of AWS load balancer to instantiate for an ingresscontroller. \n Valid values are: \n * \"Classic\": A Classic Load Balancer that makes routing decisions at either the transport layer (TCP/SSL) or the application layer (HTTP/HTTPS). See the following for additional details: \n https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#clb \n * \"NLB\": A Network Load Balancer that makes routing decisions at the transport layer (TCP/SSL). See the following for additional details: \n https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#nlb",
@@ -1238,10 +1511,12 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -1286,10 +1561,12 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -1314,7 +1591,8 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "minTLSVersion": {
               "description": "minTLSVersion is used to specify the minimal version of the TLS protocol that is negotiated during the TLS handshake. For example, to use TLS versions 1.1, 1.2 and 1.3 (yaml): \n minTLSVersion: VersionTLS11 \n NOTE: currently the highest minTLSVersion allowed is VersionTLS12",

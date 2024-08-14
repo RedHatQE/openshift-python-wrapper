@@ -14,7 +14,8 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HTTPHeader"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "path": {
       "description": "Path to access on the HTTP server.",

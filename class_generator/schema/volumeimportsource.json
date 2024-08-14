@@ -1,5 +1,5 @@
 {
-  "description": "VolumeImportSource works as a specification to populate PersistentVolumeClaims with data imported from an HTTP/S3/Registry/Blank/ImageIO/VDDK source",
+  "description": "VolumeImportSource works as a specification to populate PersistentVolumeClaims with data\nimported from an HTTP/S3/Registry/Blank/ImageIO/VDDK source",
   "type": "object",
   "required": [
     "spec"

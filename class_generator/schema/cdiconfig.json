@@ -46,7 +46,7 @@
               "description": "StorageClass specifies how much space of a Filesystem volume should be reserved for safety. The keys are the storageClass and the values are the overhead. This value overrides the global value",
               "type": "object",
               "additionalProperties": {
-                "description": "Percent is a string that can only be a value between [0,1) (Note: we actually rely on reconcile to reject invalid values)",
+                "description": "Percent is a string that can only be a value between [0,1)\n(Note: we actually rely on reconcile to reject invalid values)",
                 "type": "string",
                 "pattern": "^(0(?:\\.\\d{1,3})?|1)$"
               }
@@ -57,11 +57,11 @@
           "description": "The imagePullSecrets used to pull the container images",
           "type": "array",
           "items": {
-            "description": "LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.",
+            "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
             "type": "object",
             "properties": {
               "name": {
-                "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nTODO: Add other useful fields. apiVersion, kind, uid?\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.",
                 "type": "string"
               }
             },
@@ -85,7 +85,7 @@
               "type": "string"
             },
             "trustedCAProxy": {
-              "description": "TrustedCAProxy is the name of a ConfigMap in the cdi namespace that contains a user-provided trusted certificate authority (CA) bundle. The TrustedCAProxy ConfigMap is consumed by the DataImportCron controller for creating cronjobs, and by the import controller referring a copy of the ConfigMap in the import namespace. Here is an example of the ConfigMap (in yaml): \n apiVersion: v1 kind: ConfigMap metadata: name: my-ca-proxy-cm namespace: cdi data: ca.pem: | -----BEGIN CERTIFICATE----- ... <base64 encoded cert> ... -----END CERTIFICATE-----",
+              "description": "TrustedCAProxy is the name of a ConfigMap in the cdi namespace that contains a user-provided trusted certificate authority (CA) bundle.\nThe TrustedCAProxy ConfigMap is consumed by the DataImportCron controller for creating cronjobs, and by the import controller referring a copy of the ConfigMap in the import namespace.\nHere is an example of the ConfigMap (in yaml):\n\n\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: my-ca-proxy-cm\n  namespace: cdi\ndata:\n  ca.pem: |\n    -----BEGIN CERTIFICATE-----\n\t   ... <base64 encoded cert> ...\n\t   -----END CERTIFICATE-----",
               "type": "string"
             }
           }
@@ -107,7 +107,7 @@
           "type": "object",
           "properties": {
             "claims": {
-              "description": "Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container. \n This is an alpha field and requires enabling the DynamicResourceAllocation feature gate. \n This field is immutable. It can only be set for containers.",
+              "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\n\nThis field is immutable. It can only be set for containers.",
               "type": "array",
               "items": {
                 "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
@@ -117,7 +117,7 @@
                 ],
                 "properties": {
                   "name": {
-                    "description": "Name must match the name of one entry in pod.spec.resourceClaims of the Pod where this field is used. It makes that resource available inside a container.",
+                    "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
                     "type": "string"
                   }
                 }
@@ -128,7 +128,7 @@
               "x-kubernetes-list-type": "map"
             },
             "limits": {
-              "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+              "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
               "type": "object",
               "additionalProperties": {
                 "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
@@ -136,7 +136,7 @@
               }
             },
             "requests": {
-              "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+              "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
               "type": "object",
               "additionalProperties": {
                 "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
@@ -158,23 +158,23 @@
           "type": "object",
           "properties": {
             "custom": {
-              "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom profile as invalid configurations can be catastrophic. An example custom profile looks like this: \n ciphers: - ECDHE-ECDSA-CHACHA20-POLY1305 - ECDHE-RSA-CHACHA20-POLY1305 - ECDHE-RSA-AES128-GCM-SHA256 - ECDHE-ECDSA-AES128-GCM-SHA256 minTLSVersion: VersionTLS11",
+              "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n\n  ciphers:\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n  minTLSVersion: VersionTLS11",
               "required": [
                 "ciphers",
                 "minTLSVersion"
               ]
             },
             "intermediate": {
-              "description": "intermediate is a TLS security profile based on: \n https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29 \n and looks like this (yaml): \n ciphers: - TLS_AES_128_GCM_SHA256 - TLS_AES_256_GCM_SHA384 - TLS_CHACHA20_POLY1305_SHA256 - ECDHE-ECDSA-AES128-GCM-SHA256 - ECDHE-RSA-AES128-GCM-SHA256 - ECDHE-ECDSA-AES256-GCM-SHA384 - ECDHE-RSA-AES256-GCM-SHA384 - ECDHE-ECDSA-CHACHA20-POLY1305 - ECDHE-RSA-CHACHA20-POLY1305 - DHE-RSA-AES128-GCM-SHA256 - DHE-RSA-AES256-GCM-SHA384 minTLSVersion: VersionTLS12"
+              "description": "intermediate is a TLS security profile based on:\n\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29\n\n\nand looks like this (yaml):\n\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - DHE-RSA-AES128-GCM-SHA256\n    - DHE-RSA-AES256-GCM-SHA384\n  minTLSVersion: VersionTLS12"
             },
             "modern": {
-              "description": "modern is a TLS security profile based on: \n https://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility \n and looks like this (yaml): \n ciphers: - TLS_AES_128_GCM_SHA256 - TLS_AES_256_GCM_SHA384 - TLS_CHACHA20_POLY1305_SHA256 minTLSVersion: VersionTLS13 \n NOTE: Currently unsupported."
+              "description": "modern is a TLS security profile based on:\n\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility\n\n\nand looks like this (yaml):\n\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n  minTLSVersion: VersionTLS13\n\n\nNOTE: Currently unsupported."
             },
             "old": {
-              "description": "old is a TLS security profile based on: \n https://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility \n and looks like this (yaml): \n ciphers: - TLS_AES_128_GCM_SHA256 - TLS_AES_256_GCM_SHA384 - TLS_CHACHA20_POLY1305_SHA256 - ECDHE-ECDSA-AES128-GCM-SHA256 - ECDHE-RSA-AES128-GCM-SHA256 - ECDHE-ECDSA-AES256-GCM-SHA384 - ECDHE-RSA-AES256-GCM-SHA384 - ECDHE-ECDSA-CHACHA20-POLY1305 - ECDHE-RSA-CHACHA20-POLY1305 - DHE-RSA-AES128-GCM-SHA256 - DHE-RSA-AES256-GCM-SHA384 - DHE-RSA-CHACHA20-POLY1305 - ECDHE-ECDSA-AES128-SHA256 - ECDHE-RSA-AES128-SHA256 - ECDHE-ECDSA-AES128-SHA - ECDHE-RSA-AES128-SHA - ECDHE-ECDSA-AES256-SHA384 - ECDHE-RSA-AES256-SHA384 - ECDHE-ECDSA-AES256-SHA - ECDHE-RSA-AES256-SHA - DHE-RSA-AES128-SHA256 - DHE-RSA-AES256-SHA256 - AES128-GCM-SHA256 - AES256-GCM-SHA384 - AES128-SHA256 - AES256-SHA256 - AES128-SHA - AES256-SHA - DES-CBC3-SHA minTLSVersion: VersionTLS10"
+              "description": "old is a TLS security profile based on:\n\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility\n\n\nand looks like this (yaml):\n\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - DHE-RSA-AES128-GCM-SHA256\n    - DHE-RSA-AES256-GCM-SHA384\n    - DHE-RSA-CHACHA20-POLY1305\n    - ECDHE-ECDSA-AES128-SHA256\n    - ECDHE-RSA-AES128-SHA256\n    - ECDHE-ECDSA-AES128-SHA\n    - ECDHE-RSA-AES128-SHA\n    - ECDHE-ECDSA-AES256-SHA384\n    - ECDHE-RSA-AES256-SHA384\n    - ECDHE-ECDSA-AES256-SHA\n    - ECDHE-RSA-AES256-SHA\n    - DHE-RSA-AES128-SHA256\n    - DHE-RSA-AES256-SHA256\n    - AES128-GCM-SHA256\n    - AES256-GCM-SHA384\n    - AES128-SHA256\n    - AES256-SHA256\n    - AES128-SHA\n    - AES256-SHA\n    - DES-CBC3-SHA\n  minTLSVersion: VersionTLS10"
             },
             "type": {
-              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides the ability to specify individual TLS security profile parameters. Old, Intermediate and Modern are TLS security profiles based on: \n https://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations \n The profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers are found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be reduced. \n Note that the Modern profile is currently not supported because it is not yet well adopted by common software libraries.",
+              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides\nthe ability to specify individual TLS security profile parameters.\nOld, Intermediate and Modern are TLS security profiles based on:\n\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations\n\n\nThe profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers\nare found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be\nreduced.\n\n\nNote that the Modern profile is currently not supported because it is not\nyet well adopted by common software libraries.",
               "type": "string",
               "enum": [
                 "Old",
@@ -200,7 +200,7 @@
           "type": "object",
           "properties": {
             "claims": {
-              "description": "Claims lists the names of resources, defined in spec.resourceClaims, that are used by this container. \n This is an alpha field and requires enabling the DynamicResourceAllocation feature gate. \n This field is immutable. It can only be set for containers.",
+              "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\n\nThis field is immutable. It can only be set for containers.",
               "type": "array",
               "items": {
                 "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
@@ -210,7 +210,7 @@
                 ],
                 "properties": {
                   "name": {
-                    "description": "Name must match the name of one entry in pod.spec.resourceClaims of the Pod where this field is used. It makes that resource available inside a container.",
+                    "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
                     "type": "string"
                   }
                 }
@@ -221,7 +221,7 @@
               "x-kubernetes-list-type": "map"
             },
             "limits": {
-              "description": "Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+              "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
               "type": "object",
               "additionalProperties": {
                 "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
@@ -229,7 +229,7 @@
               }
             },
             "requests": {
-              "description": "Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+              "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
               "type": "object",
               "additionalProperties": {
                 "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
@@ -251,7 +251,7 @@
               "description": "StorageClass specifies how much space of a Filesystem volume should be reserved for safety. The keys are the storageClass and the values are the overhead. This value overrides the global value",
               "type": "object",
               "additionalProperties": {
-                "description": "Percent is a string that can only be a value between [0,1) (Note: we actually rely on reconcile to reject invalid values)",
+                "description": "Percent is a string that can only be a value between [0,1)\n(Note: we actually rely on reconcile to reject invalid values)",
                 "type": "string",
                 "pattern": "^(0(?:\\.\\d{1,3})?|1)$"
               }
@@ -262,11 +262,11 @@
           "description": "The imagePullSecrets used to pull the container images",
           "type": "array",
           "items": {
-            "description": "LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.",
+            "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
             "type": "object",
             "properties": {
               "name": {
-                "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nTODO: Add other useful fields. apiVersion, kind, uid?\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.",
                 "type": "string"
               }
             },
@@ -290,7 +290,7 @@
               "type": "string"
             },
             "trustedCAProxy": {
-              "description": "TrustedCAProxy is the name of a ConfigMap in the cdi namespace that contains a user-provided trusted certificate authority (CA) bundle. The TrustedCAProxy ConfigMap is consumed by the DataImportCron controller for creating cronjobs, and by the import controller referring a copy of the ConfigMap in the import namespace. Here is an example of the ConfigMap (in yaml): \n apiVersion: v1 kind: ConfigMap metadata: name: my-ca-proxy-cm namespace: cdi data: ca.pem: | -----BEGIN CERTIFICATE----- ... <base64 encoded cert> ... -----END CERTIFICATE-----",
+              "description": "TrustedCAProxy is the name of a ConfigMap in the cdi namespace that contains a user-provided trusted certificate authority (CA) bundle.\nThe TrustedCAProxy ConfigMap is consumed by the DataImportCron controller for creating cronjobs, and by the import controller referring a copy of the ConfigMap in the import namespace.\nHere is an example of the ConfigMap (in yaml):\n\n\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: my-ca-proxy-cm\n  namespace: cdi\ndata:\n  ca.pem: |\n    -----BEGIN CERTIFICATE-----\n\t   ... <base64 encoded cert> ...\n\t   -----END CERTIFICATE-----",
               "type": "string"
             }
           }
@@ -301,6 +301,10 @@
         },
         "scratchSpaceStorageClass": {
           "description": "The calculated storage class to be used for scratch space",
+          "type": "string"
+        },
+        "uploadProxyCA": {
+          "description": "UploadProxyCA is the certificate authority of the upload proxy",
           "type": "string"
         },
         "uploadProxyURL": {

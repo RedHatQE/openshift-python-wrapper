@@ -25,7 +25,8 @@
       "items": {
         "default": {},
         "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.APIResource"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "$schema": "http://json-schema.org/schema#"

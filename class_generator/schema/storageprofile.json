@@ -66,7 +66,7 @@
       "type": "object",
       "properties": {
         "phase": {
-          "description": "Phase describes the Phase of StorageProfile This is used by OLM UI to provide status information to the user",
+          "description": "Phase describes the Phase of StorageProfile\nThis is used by OLM UI to provide status information\nto the user",
           "type": "string"
         }
       }

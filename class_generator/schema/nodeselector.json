@@ -10,7 +10,8 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorTerm"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "x-kubernetes-map-type": "atomic",

@@ -768,6 +768,20 @@
             }
           }
         },
+        "bucketLogging": {
+          "description": "BucketLogging sets the configuration for bucket logging",
+          "type": "object",
+          "properties": {
+            "bucketLoggingPVC": {
+              "description": "BucketLoggingPVC (optional) specifies the name of the Persistent Volume Claim (PVC) to be used\nfor guaranteed logging when the logging type is set to 'guaranteed'. The PVC must support\nReadWriteMany (RWX) access mode to ensure reliable logging.\nFor ODF: If not provided, the default CephFS storage class will be used to create the PVC.",
+              "type": "string"
+            },
+            "loggingType": {
+              "description": "LoggingType specifies the type of logging for the bucket\nThere are two types available: best-effort and guaranteed logging\n- best-effort(default) - less immune to failures but with better performance\n- guaranteed - much more reliable but need to provide a storage class that supports RWX PVs",
+              "type": "string"
+            }
+          }
+        },
         "cleanupPolicy": {
           "description": "CleanupPolicy (optional) Indicates user's policy for deletion",
           "type": "object",
@@ -1375,7 +1389,7 @@
           }
         },
         "manualDefaultBackingStore": {
-          "description": "ManualDefaultBackingStore (optional - default value is false) if true the default backingstore will\nnot be reconciled by the operator and it should be manually handled by the user. It will allow the\nuser to  delete DefaultBackingStore, user needs to delete associated buckets and update the admin\naccount with new BackingStore in order to delete the DefaultBackingStore"
+          "description": "ManualDefaultBackingStore (optional - default value is false) if true the default backingstore/namespacestore\nwill not be reconciled by the operator and it should be manually handled by the user. It will allow the\nuser to  delete DefaultBackingStore/DefaultNamespaceStore, user needs to delete associated buckets and\nupdate the admin account with new BackingStore/NamespaceStore in order to delete the DefaultBackingStore/DefaultNamespaceStore"
         },
         "pvPoolDefaultStorageClass": {
           "description": "PVPoolDefaultStorageClass (optional) overrides the default cluster StorageClass for the pv-pool volumes.\nThis affects where the system stores data chunks (encrypted).\nUpdates to this field will only affect new pv-pools,\nbut updates to existing pools are not supported by the operator.",

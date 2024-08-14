@@ -66,10 +66,12 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -195,10 +197,12 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               },
                               "id": {
                                 "description": "ID of resource.",
@@ -230,7 +234,8 @@
                             ]
                           }
                         }
-                      }
+                      },
+                      "x-kubernetes-list-type": "atomic"
                     },
                     "azure": {
                       "description": "Azure configures failure domain information for the Azure platform.",
@@ -253,7 +258,8 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "x-kubernetes-list-type": "atomic"
                     },
                     "gcp": {
                       "description": "GCP configures failure domain information for the GCP platform.",
@@ -270,7 +276,8 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "x-kubernetes-list-type": "atomic"
                     },
                     "nutanix": {
                       "description": "nutanix configures failure domain information for the Nutanix platform.",
@@ -340,7 +347,8 @@
                             "rule": "!has(self.availabilityZone) || !has(self.rootVolume) || has(self.rootVolume.availabilityZone)"
                           }
                         ]
-                      }
+                      },
+                      "x-kubernetes-list-type": "atomic"
                     },
                     "platform": {
                       "description": "Platform identifies the platform for which the FailureDomain represents. Currently supported values are AWS, Azure, GCP, OpenStack, VSphere and Nutanix.",
@@ -591,7 +599,11 @@
                                 "type": "string"
                               }
                             }
-                          }
+                          },
+                          "x-kubernetes-list-map-keys": [
+                            "uid"
+                          ],
+                          "x-kubernetes-list-type": "map"
                         }
                       }
                     },
@@ -638,7 +650,8 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "x-kubernetes-list-type": "atomic"
                     }
                   }
                 }

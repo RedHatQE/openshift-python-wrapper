@@ -25,7 +25,7 @@
     },
     "pullSecret": {
       "description": "pullSecret is a reference to a secret to be used to pull the image from a registry If the image is pulled from the OpenShift registry, this field does not need to be set.",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference"
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference_v2"
     }
   },
   "$schema": "http://json-schema.org/schema#"

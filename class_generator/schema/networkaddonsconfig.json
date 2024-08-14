@@ -50,6 +50,10 @@
             }
           }
         },
+        "kubevirtIpamController": {
+          "description": "KubevirtIpamController plugin allows to support IPAM for secondary networks",
+          "type": "object"
+        },
         "linuxBridge": {
           "description": "LinuxBridge plugin allows users to create a bridge and add the host and the container to it",
           "type": "object"

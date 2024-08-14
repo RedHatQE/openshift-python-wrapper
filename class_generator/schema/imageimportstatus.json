@@ -18,7 +18,7 @@
     },
     "status": {
       "description": "Status is the status of the image import, including errors encountered while retrieving the image",
-      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v5"
     },
     "tag": {
       "description": "Tag is the tag this image was located under, if any",

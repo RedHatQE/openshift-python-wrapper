@@ -13,7 +13,7 @@
       "description": "List of virtualmachinesnapshots. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineSnapshot"
+        "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineSnapshot"
       }
     },
     "kind": {
@@ -29,7 +29,7 @@
     {
       "group": "snapshot.kubevirt.io",
       "kind": "VirtualMachineSnapshotList",
-      "version": "v1alpha1"
+      "version": "v1beta1"
     }
   ],
   "$schema": "http://json-schema.org/schema#"

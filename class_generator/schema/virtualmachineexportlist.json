@@ -13,7 +13,7 @@
       "description": "List of virtualmachineexports. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1alpha1.VirtualMachineExport"
+        "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1beta1.VirtualMachineExport"
       }
     },
     "kind": {
@@ -29,7 +29,7 @@
     {
       "group": "export.kubevirt.io",
       "kind": "VirtualMachineExportList",
-      "version": "v1alpha1"
+      "version": "v1beta1"
     }
   ],
   "$schema": "http://json-schema.org/schema#"

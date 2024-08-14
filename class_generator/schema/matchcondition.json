@@ -1,5 +1,5 @@
 {
-  "description": "MatchCondition represents a condition which must by fulfilled for a request to be sent to a webhook.",
+  "description": "MatchCondition represents a condition which must be fulfilled for a request to be sent to a webhook.",
   "type": "object",
   "required": [
     "name",

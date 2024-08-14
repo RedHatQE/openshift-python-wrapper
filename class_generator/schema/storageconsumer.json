@@ -21,6 +21,10 @@
         "enable": {
           "description": "Enable flag ignores a reconcile if set to false",
           "type": "boolean"
+        },
+        "storageQuotaInGiB": {
+          "description": "StorageQuotaInGiB describes quota for the consumer",
+          "type": "integer"
         }
       }
     },

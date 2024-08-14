@@ -29,17 +29,7 @@
         "dataPool": {},
         "gateway": {},
         "healthCheck": {},
-        "hosting": {
-          "type": "object",
-          "properties": {
-            "dnsNames": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
+        "hosting": {},
         "metadataPool": {},
         "preservePoolsOnDelete": {
           "type": "boolean"

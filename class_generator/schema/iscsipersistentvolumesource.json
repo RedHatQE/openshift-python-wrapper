@@ -41,7 +41,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "readOnly": {
       "description": "readOnly here will force the ReadOnly setting in VolumeMounts. Defaults to false.",

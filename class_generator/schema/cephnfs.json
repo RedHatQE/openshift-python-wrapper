@@ -63,7 +63,8 @@
                           "type": "array",
                           "items": {
                             "type": "string"
-                          }
+                          },
+                          "x-kubernetes-list-type": "atomic"
                         }
                       }
                     },
@@ -111,7 +112,8 @@
                                 "type": "string"
                               }
                             }
-                          }
+                          },
+                          "x-kubernetes-list-type": "atomic"
                         },
                         "path": {
                           "type": "string"

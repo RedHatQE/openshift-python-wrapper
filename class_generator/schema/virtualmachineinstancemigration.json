@@ -1,5 +1,5 @@
 {
-  "description": "VirtualMachineInstanceMigration represents the object tracking a VMI's migration to another host in the cluster",
+  "description": "VirtualMachineInstanceMigration represents the object tracking a VMI's migration\nto another host in the cluster",
   "type": "object",
   "required": [
     "spec"
@@ -93,56 +93,56 @@
               "type": "object",
               "properties": {
                 "allowAutoConverge": {
-                  "description": "AllowAutoConverge allows the platform to compromise performance/availability of VMIs to guarantee successful VMI live migrations. Defaults to false",
+                  "description": "AllowAutoConverge allows the platform to compromise performance/availability of VMIs to\nguarantee successful VMI live migrations. Defaults to false",
                   "type": "boolean"
                 },
                 "allowPostCopy": {
-                  "description": "AllowPostCopy enables post-copy live migrations. Such migrations allow even the busiest VMIs to successfully live-migrate. However, events like a network failure can cause a VMI crash. If set to true, migrations will still start in pre-copy, but switch to post-copy when CompletionTimeoutPerGiB triggers. Defaults to false",
+                  "description": "AllowPostCopy enables post-copy live migrations. Such migrations allow even the busiest VMIs\nto successfully live-migrate. However, events like a network failure can cause a VMI crash.\nIf set to true, migrations will still start in pre-copy, but switch to post-copy when\nCompletionTimeoutPerGiB triggers. Defaults to false",
                   "type": "boolean"
                 },
                 "bandwidthPerMigration": {
-                  "description": "BandwidthPerMigration limits the amount of network bandwidth live migrations are allowed to use. The value is in quantity per second. Defaults to 0 (no limit)",
+                  "description": "BandwidthPerMigration limits the amount of network bandwidth live migrations are allowed to use.\nThe value is in quantity per second. Defaults to 0 (no limit)",
                   "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
                   "x-kubernetes-int-or-string": true
                 },
                 "completionTimeoutPerGiB": {
-                  "description": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800",
+                  "description": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take.\nIf a live-migration takes longer to migrate than this value multiplied by the size of the VMI,\nthe migration will be cancelled, unless AllowPostCopy is true. Defaults to 800",
                   "type": "integer",
                   "format": "int64"
                 },
                 "disableTLS": {
-                  "description": "When set to true, DisableTLS will disable the additional layer of live migration encryption provided by KubeVirt. This is usually a bad idea. Defaults to false",
+                  "description": "When set to true, DisableTLS will disable the additional layer of live migration encryption\nprovided by KubeVirt. This is usually a bad idea. Defaults to false",
                   "type": "boolean"
                 },
                 "matchSELinuxLevelOnMigration": {
-                  "description": "By default, the SELinux level of target virt-launcher pods is forced to the level of the source virt-launcher. When set to true, MatchSELinuxLevelOnMigration lets the CRI auto-assign a random level to the target. That will ensure the target virt-launcher doesn't share categories with another pod on the node. However, migrations will fail when using RWX volumes that don't automatically deal with SELinux levels.",
+                  "description": "By default, the SELinux level of target virt-launcher pods is forced to the level of the source virt-launcher.\nWhen set to true, MatchSELinuxLevelOnMigration lets the CRI auto-assign a random level to the target.\nThat will ensure the target virt-launcher doesn't share categories with another pod on the node.\nHowever, migrations will fail when using RWX volumes that don't automatically deal with SELinux levels.",
                   "type": "boolean"
                 },
                 "network": {
-                  "description": "Network is the name of the CNI network to use for live migrations. By default, migrations go through the pod network.",
+                  "description": "Network is the name of the CNI network to use for live migrations. By default, migrations go\nthrough the pod network.",
                   "type": "string"
                 },
                 "nodeDrainTaintKey": {
-                  "description": "NodeDrainTaintKey defines the taint key that indicates a node should be drained. Note: this option relies on the deprecated node taint feature. Default: kubevirt.io/drain",
+                  "description": "NodeDrainTaintKey defines the taint key that indicates a node should be drained.\nNote: this option relies on the deprecated node taint feature. Default: kubevirt.io/drain",
                   "type": "string"
                 },
                 "parallelMigrationsPerCluster": {
-                  "description": "ParallelMigrationsPerCluster is the total number of concurrent live migrations allowed cluster-wide. Defaults to 5",
+                  "description": "ParallelMigrationsPerCluster is the total number of concurrent live migrations\nallowed cluster-wide. Defaults to 5",
                   "type": "integer",
                   "format": "int32"
                 },
                 "parallelOutboundMigrationsPerNode": {
-                  "description": "ParallelOutboundMigrationsPerNode is the maximum number of concurrent outgoing live migrations allowed per node. Defaults to 2",
+                  "description": "ParallelOutboundMigrationsPerNode is the maximum number of concurrent outgoing live migrations\nallowed per node. Defaults to 2",
                   "type": "integer",
                   "format": "int32"
                 },
                 "progressTimeout": {
-                  "description": "ProgressTimeout is the maximum number of seconds a live migration is allowed to make no progress. Hitting this timeout means a migration transferred 0 data for that many seconds. The migration is then considered stuck and therefore cancelled. Defaults to 150",
+                  "description": "ProgressTimeout is the maximum number of seconds a live migration is allowed to make no progress.\nHitting this timeout means a migration transferred 0 data for that many seconds. The migration is\nthen considered stuck and therefore cancelled. Defaults to 150",
                   "type": "integer",
                   "format": "int64"
                 },
                 "unsafeMigrationOverride": {
-                  "description": "UnsafeMigrationOverride allows live migrations to occur even if the compatibility check indicates the migration will be unsafe to the guest. Defaults to false",
+                  "description": "UnsafeMigrationOverride allows live migrations to occur even if the compatibility check\nindicates the migration will be unsafe to the guest. Defaults to false",
                   "type": "boolean"
                 }
               }
@@ -175,7 +175,7 @@
               "type": "string"
             },
             "targetCPUSet": {
-              "description": "If the VMI requires dedicated CPUs, this field will hold the dedicated CPU set on the target node",
+              "description": "If the VMI requires dedicated CPUs, this field will\nhold the dedicated CPU set on the target node",
               "type": "array",
               "items": {
                 "type": "integer"
@@ -207,7 +207,7 @@
               "format": "date-time"
             },
             "targetNodeTopology": {
-              "description": "If the VMI requires dedicated CPUs, this field will hold the numa topology on the target node",
+              "description": "If the VMI requires dedicated CPUs, this field will\nhold the numa topology on the target node",
               "type": "string"
             },
             "targetPod": {

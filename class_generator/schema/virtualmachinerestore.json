@@ -26,7 +26,7 @@
       ],
       "properties": {
         "patches": {
-          "description": "If the target for the restore does not exist, it will be created. Patches holds JSON patches that would be applied to the target manifest before it's created. Patches should fit the target's Kind. \n Example for a patch: {\"op\": \"replace\", \"path\": \"/metadata/name\", \"value\": \"new-vm-name\"}",
+          "description": "If the target for the restore does not exist, it will be created. Patches holds JSON patches that would be\napplied to the target manifest before it's created. Patches should fit the target's Kind.\n\n\nExample for a patch: {\"op\": \"replace\", \"path\": \"/metadata/name\", \"value\": \"new-vm-name\"}",
           "type": "array",
           "items": {
             "type": "string"
@@ -42,7 +42,7 @@
           ],
           "properties": {
             "apiGroup": {
-              "description": "APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.",
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
               "type": "string"
             },
             "kind": {
@@ -53,7 +53,8 @@
               "description": "Name is the name of resource being referenced",
               "type": "string"
             }
-          }
+          },
+          "x-kubernetes-map-type": "atomic"
         },
         "virtualMachineSnapshotName": {
           "type": "string"
@@ -97,13 +98,15 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "deletedDataVolumes": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-kubernetes-list-type": "set"
         },
         "restoreTime": {
           "type": "string",
@@ -133,7 +136,8 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         }
       }
     }
@@ -142,7 +146,7 @@
     {
       "group": "snapshot.kubevirt.io",
       "kind": "VirtualMachineRestore",
-      "version": "v1alpha1"
+      "version": "v1beta1"
     }
   ],
   "$schema": "http://json-schema.org/schema#"
