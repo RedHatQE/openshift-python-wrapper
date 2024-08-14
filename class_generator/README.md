@@ -1,14 +1,8 @@
 # Resource class generator
 
-## prerequisites
-
-- [poetry](https://python-poetry.org/)
-- [oc](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/) or [kubectl](https://kubernetes.io/docs/tasks/tools/) (latest version)
-- Kubernetes/Openshift cluster
-
 ## Usage
 
-###### Install poetry environment
+###### Installation
 
 - Using [pipx](https://github.com/pypa/pipx) (recommended)
 
@@ -25,6 +19,7 @@ python3 -m pip install openshift-python-wrapper
 - Using [poetry](https://python-poetry.org/) (For development)
 
 ```bash
+pipx install poetry
 poetry install
 ```
 
@@ -54,12 +49,6 @@ class-generator --kind <kind>
   - `OATH` -> `oath`
   - `CDIConfig` -> `cdi_config`
 
-Run in interactive mode:
-
-```bash
-class-generator --interactive
-```
-
 #### Adding tests
 
 - Add a new test for the provided `kind` by passing `--add-tests` flag
@@ -71,10 +60,28 @@ class-generator --kind Pod --add-tests
 
 #### Update schema files
 
-- Install [openapi2jsonschema](https://github.com/instrumenta/openapi2jsonschema)
+- Dependencies
+  - Kubernetes/Openshift cluster
+  - [oc](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/) or [kubectl](https://kubernetes.io/docs/tasks/tools/) (latest version)
+  - [openapi2jsonschema](https://github.com/instrumenta/openapi2jsonschema)
+  - [poetry](https://python-poetry.org/)
 
 ```bash
+pipx install poetry
 pipx install --python python3.9 openapi2jsonschema
+```
+
+- Clone this repository
+
+```bash
+got clone https://github.com/RedHatQE/openshift-python-wrapper.git
+cd openshift-python-wrapper
+```
+
+- Install dependencies
+
+```bash
+poetry install
 ```
 
 - Login to the cluster use admin user and password.
@@ -86,7 +93,7 @@ oc login <clster api URL> -u <username> -p <password>
 - Execute the command:
 
 ```bash
-class-generator --update-schema
+poetry run python class_generator/class-generator --update-schema
 ```
 
 ## Reporting an issue

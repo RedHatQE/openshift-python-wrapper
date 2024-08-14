@@ -7,6 +7,7 @@ import os
 import sys
 from pathlib import Path
 
+import textwrap
 from typing import Any, Dict, List, Optional, Set, Tuple
 import click
 import re
@@ -19,12 +20,10 @@ import pytest
 from rich.console import Console
 from rich.syntax import Syntax
 
-from rich.prompt import Prompt
 from ocp_resources.resource import Resource
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
-from pyhelper_utils.runners import function_runner_with_pdb
 
 
 SPEC_STR: str = "SPEC"
@@ -32,14 +31,15 @@ FIELDS_STR: str = "FIELDS"
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
-RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "reousrces-mappings.json")
+RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 
 
 def map_kind_to_namespaced():
-    not_kind_file: str = os.path.join(SCHEMA_DIR, "not-kind.txt")
+    not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
+
     if os.path.isfile(not_kind_file):
         with open(not_kind_file) as fd:
-            not_kind_list = fd.readlines()
+            not_kind_list = fd.read().split("\n")
     else:
         not_kind_list: List[str] = []
 
@@ -50,8 +50,9 @@ def map_kind_to_namespaced():
         resources_mapping = read_resources_mapping_file()
 
     else:
-        resources_mapping: Dict[str, bool] = {}
+        resources_mapping: Dict[str, Dict[str, bool]] = {}
 
+    # `all.json` list all files that `openapi2jsonschema` generated which include duplication
     kind_set: Set[str] = set()
     for _def in all_json_data["oneOf"]:
         _kind = _def["$ref"].rsplit(".", 1)[-1]
@@ -60,27 +61,50 @@ def map_kind_to_namespaced():
 
         kind_set.add(_kind)
 
-    for _kind in kind_set:
-        if resources_mapping.get(_kind):
-            continue
+    def _is_resource(_kind: str) -> Tuple[bool, str]:
+        return run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0], _kind
 
-        if not run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0]:
-            not_kind_list.append(_kind)
-            continue
+    kind_list: List[str] = []
+    is_kind_futures: List[Future] = []
+    with ThreadPoolExecutor() as executor:
+        for _kind in kind_set:
+            if resources_mapping.get(_kind):
+                continue
 
-        resources_mapping[_kind] = (
+            # Check if the kind we work on is a real kind
+            is_kind_futures.append(executor.submit(_is_resource, _kind=_kind))
+
+    for _res in as_completed(is_kind_futures):
+        res = _res.result()
+
+        if res[0]:
+            kind_list.append(res[1])
+        else:
+            not_kind_list.append(res[1])
+
+    def map_kind_to_namespaced(_kind: str) -> Tuple[bool, str]:
+        return (
             run_command(
                 command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {_kind} | wc -l'"),
                 check=False,
-            )[1]
+            )[1].strip()
             == "1"
-        )
+        ), _kind
+
+    mapping_kind_futures: List[Future] = []
+    with ThreadPoolExecutor() as executor:
+        for _kind in kind_list:
+            mapping_kind_futures.append(executor.submit(map_kind_to_namespaced, _kind=_kind))
+
+    for _res in as_completed(mapping_kind_futures):
+        res = _res.result()
+        resources_mapping[res[1].lower()] = {"namespaced": res[0]}
 
     with open(RESOURCES_MAPPING_FILE, "w") as fd:
         json.dump(resources_mapping, fd)
 
     with open(not_kind_file, "w") as fd:
-        fd.writelines(not_kind_list)
+        fd.writelines("\n".join(not_kind_list))
 
 
 def read_resources_mapping_file() -> Dict[Any, Any]:
@@ -111,12 +135,11 @@ def update_kind_schema():
         LOGGER.error("Failed to get openapi schema.")
         sys.exit(1)
 
-    with open("class_generator/ocp-openapi.json", "w") as fd:
+    ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
+    with open(ocp_openapi_json_file, "w") as fd:
         fd.write(data.text)
 
-    if not run_command(
-        command=shlex.split(f"{openapi2jsonschema_str} class_generator/ocp-openapi.json -o {SCHEMA_DIR}")
-    )[0]:
+    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
         LOGGER.error("Failed to generate schema.")
         sys.exit(1)
 
@@ -128,10 +151,6 @@ def process_fields_args(
     output_dict: Dict[str, Any],
     dict_key: str,
     kind: str,
-    debug: bool,
-    output_debug_file_path: str,
-    add_tests: bool,
-    debug_content: Optional[Dict[str, str]] = None,
     args_to_ignore: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     _args_to_ignore = args_to_ignore or []
@@ -148,10 +167,6 @@ def process_fields_args(
                         field=field.strip(),
                         kind=kind,
                         field_under_spec=True if dict_key == SPEC_STR else False,
-                        debug=debug,
-                        debug_content=debug_content,
-                        output_debug_file_path=output_debug_file_path,
-                        add_tests=add_tests,
                     )
                 )
 
@@ -364,26 +379,12 @@ def get_field_description(
     kind: str,
     field_name: str,
     field_under_spec: bool,
-    debug: bool,
-    output_debug_file_path: str = "",
-    debug_content: Optional[Dict[str, str]] = None,
-    add_tests: bool = False,
 ) -> str:
-    if debug_content:
-        _out = debug_content[f"explain-{field_name}"]
-
-    else:
-        _, _out, _ = run_command(
-            command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
-            check=False,
-            verify_stderr=False,
-        )
-
-    if debug or add_tests:
-        write_to_file(
-            data={f"explain-{field_name}": _out},
-            output_debug_file_path=output_debug_file_path,
-        )
+    _, _out, _ = run_command(
+        command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
+        check=False,
+        verify_stderr=False,
+    )
 
     _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
     if _description:
@@ -410,10 +411,6 @@ def get_arg_params(
     field: str,
     kind: str,
     field_under_spec: bool = False,
-    debug: bool = False,
-    output_debug_file_path: str = "",
-    debug_content: Optional[Dict[str, str]] = None,
-    add_tests: bool = False,
 ) -> Dict[str, Any]:
     splited_field = field.split()
     _orig_name, _type = splited_field[0], splited_field[1]
@@ -457,10 +454,6 @@ def get_arg_params(
             kind=kind,
             field_name=_orig_name,
             field_under_spec=field_under_spec,
-            debug=debug,
-            output_debug_file_path=output_debug_file_path,
-            debug_content=debug_content,
-            add_tests=add_tests,
         ),
     }
 
@@ -491,7 +484,6 @@ def generate_resource_file_from_dict(
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
-    interactive: bool = False,
     add_tests: bool = False,
 ) -> Tuple[str, str]:
     rendered = render_jinja_template(
@@ -500,7 +492,7 @@ def generate_resource_file_from_dict(
         template_name="class_generator_template.j2",
     )
 
-    formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["KIND"])
+    formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
     if add_tests:
         overwrite = True
         _output_file = os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_str, f"{formatted_kind_str}_res.py")
@@ -513,14 +505,6 @@ def generate_resource_file_from_dict(
     if os.path.exists(_output_file):
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
-
-        elif interactive:
-            if Prompt.ask(prompt=f"Overwrite {_output_file}?", choices=["y", "n"]) == "n":
-                if user_file_name := Prompt.ask(prompt="Provide file name"):
-                    _output_file = user_file_name
-                else:
-                    LOGGER.error("No file name provided")
-                    sys.exit(1)
 
         else:
             temp_output_file = _output_file.replace(".py", "_TEMP.py")
@@ -537,85 +521,113 @@ def generate_resource_file_from_dict(
     return orig_filename, _output_file
 
 
-def parse_explain(
-    output: str,
-    namespaced: Optional[bool] = None,
-    debug: bool = False,
-    output_debug_file_path: str = "",
-    debug_content: Optional[Dict[str, str]] = None,
-    add_tests: bool = False,
+def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
+    type_for_docstring: str = "Dict[str, Any]"
+    type_from_dict_for_init: str = ""
+
+    # All fields must be set with Optional since resource can have yaml_file to cover all args.
+    if key_dict["type"] == "array":
+        type_for_docstring = "List[Any]"
+
+    elif key_dict == "string":
+        type_for_docstring = "str"
+        type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
+
+    elif key_dict == "boolean":
+        type_for_docstring = "bool"
+
+    elif key_dict == "integer":
+        type_for_docstring = "int"
+
+    if not type_from_dict_for_init:
+        type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
+
+    return {"type-for-init": type_from_dict_for_init, "type-for-doc": type_for_docstring}
+
+
+def get_property_schema(property: Dict[str, Any]) -> Dict[str, Any]:
+    if _ref := property.get("$ref"):
+        with open(f"{SCHEMA_DIR}/{_ref.rsplit('.')[-1].lower()}.json") as fd:
+            return json.load(fd)
+    return property
+
+
+def format_description(description: str) -> str:
+    _res = ""
+    _text = textwrap.wrap(text=description, subsequent_indent="    ")
+    for _txt in _text:
+        _res += f"{_txt}\n"
+
+    return _res
+
+
+def prepare_property_dict(
+    schema: Dict[str, Any],
+    requeired: List[str],
+    resource_dict: Dict[str, Any],
+    dict_key: str,
 ) -> Dict[str, Any]:
+    for key, val in schema.items():
+        if key in {"metadata", "kind", "apiVersion", "status", SPEC_STR.lower()}:
+            continue
+
+        val_schema = get_property_schema(property=val)
+        type_dict = types_generator(key_dict=val_schema)
+        python_name = convert_camel_case_to_snake_case(string_=key)
+        resource_dict[dict_key].append({
+            "name-for-class-arg": python_name,
+            "property-name": key,
+            "required": key in requeired,
+            "description": format_description(description=val_schema["description"]),
+            "type-for-docstring": type_dict["type-for-doc"],
+            "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
+        })
+
+    return resource_dict
+
+
+def parse_explain(
+    kind_schema_file: str,
+    namespaced: Optional[bool] = None,
+) -> Dict[str, Any]:
+    with open(kind_schema_file) as fd:
+        kind_schema = json.load(fd)
+
     resource_dict: Dict[str, Any] = {
-        "BASE_CLASS": "NamespacedResource" if namespaced else "Resource",
+        "base_class": "NamespacedResource" if namespaced else "Resource",
+        "description": kind_schema["description"],
+        "fields": [],
+        "spec": [],
     }
 
-    raw_resource_dict = get_sections_dict(output=output)
+    schema_properties: Dict[str, Any] = kind_schema["properties"]
+    fields_requeired = kind_schema.get("required", [])
+    resource_dict.update(kind_schema["x-kubernetes-group-version-kind"][0])
 
-    resource_dict["KIND"] = raw_resource_dict["KIND"].strip()
-    resource_dict["DESCRIPTION"] = raw_resource_dict["DESCRIPTION"].strip()
-    if resource_dict["DESCRIPTION"] == "<empty>":
-        LOGGER.error("Empty description for resource, exiting")
-        sys.exit(1)
-
-    resource_dict["GROUP"] = raw_resource_dict.get("GROUP", "").strip()
-    resource_dict["VERSION"] = raw_resource_dict.get("VERSION", "").strip()
-
-    kind = resource_dict["KIND"]
-    keys_to_ignore = ["metadata", "kind", "apiVersion", "status", SPEC_STR.lower()]
-    resource_dict[SPEC_STR] = []
-    resource_dict[FIELDS_STR] = []
-
-    # Get kind spec
-    spec_out: str = ""
-    if debug_content:
-        if debug_content:
-            spec_out = debug_content.get("explain-spec", "")
-    else:
-        rc, spec_out, _ = run_command(command=shlex.split(f"oc explain {kind}.spec"), check=False, log_errors=False)
-        if not rc:
-            LOGGER.warning(f"{kind} spec not found, skipping")
-
-    _spec_sections_dict = get_sections_dict(output=spec_out)
-    if _spec_fields := _spec_sections_dict.get(FIELDS_STR):
-        if output_debug_file_path:
-            write_to_file(
-                data={"explain-spec": spec_out},
-                output_debug_file_path=output_debug_file_path,
-            )
-
-        resource_dict = process_fields_args(
-            fields_output=_spec_fields,
-            output_dict=resource_dict,
-            dict_key=SPEC_STR,
-            kind=kind,
-            add_tests=add_tests,
-            debug=debug,
-            debug_content=debug_content,
-            output_debug_file_path=output_debug_file_path,
+    if spec_schema := schema_properties.get("spec", {}):
+        spec_schema = get_property_schema(property=spec_schema)
+        spec_requeired = spec_schema.get("required", [])
+        resource_dict = prepare_property_dict(
+            schema=spec_schema["properties"], requeired=spec_requeired, resource_dict=resource_dict, dict_key="spec"
         )
 
-    resource_dict = process_fields_args(
-        fields_output=raw_resource_dict[FIELDS_STR],
-        output_dict=resource_dict,
-        dict_key=FIELDS_STR,
-        kind=kind,
-        add_tests=add_tests,
-        debug=debug,
-        debug_content=debug_content,
-        output_debug_file_path=output_debug_file_path,
-        args_to_ignore=keys_to_ignore,
+    resource_dict = prepare_property_dict(
+        schema=schema_properties,
+        requeired=fields_requeired,
+        resource_dict=resource_dict,
+        dict_key="fields",
     )
 
-    api_group_real_name = resource_dict.get("GROUP")
+    api_group_real_name = resource_dict.get("group")
     # If API Group is not present in resource, try to get it from VERSION
     if not api_group_real_name:
-        version_splited = resource_dict["VERSION"].split("/")
+        version_splited = resource_dict["version"].split("/")
         if len(version_splited) == 2:
             api_group_real_name = version_splited[0]
 
     if api_group_real_name:
         api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
-        resource_dict["GROUP"] = api_group_for_resource_api_group
+        resource_dict["group"] = api_group_for_resource_api_group
         missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
 
         if missing_api_group_in_resource:
@@ -626,13 +638,13 @@ def parse_explain(
             )
 
     else:
-        api_version_for_resource_api_version = resource_dict["VERSION"].upper()
+        api_version_for_resource_api_version = resource_dict["version"].upper()
         missing_api_version_in_resource: bool = not hasattr(Resource.ApiVersion, api_version_for_resource_api_version)
 
         if missing_api_version_in_resource:
             LOGGER.warning(
                 f"Missing API Version in Resource\n"
-                f"Please add `Resource.ApiVersion.{api_version_for_resource_api_version} = {resource_dict['VERSION']}` "
+                f"Please add `Resource.ApiVersion.{api_version_for_resource_api_version} = {resource_dict['version']}` "
                 "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
             )
 
@@ -640,7 +652,7 @@ def parse_explain(
 
 
 def get_kind_schema_file(kind: str) -> str:
-    kind_file = os.path.join("class_generator/schemas", f"{kind}.json")
+    kind_file = os.path.join(SCHEMA_DIR, f"{kind.lower()}.json")
     if os.path.isfile(kind_file):
         return kind_file
 
@@ -649,9 +661,8 @@ def get_kind_schema_file(kind: str) -> str:
 
 
 def class_generator(
-    kind: str = "",
+    kind: str,
     overwrite: bool = False,
-    interactive: bool = False,
     dry_run: bool = False,
     output_file: str = "",
     add_tests: bool = False,
@@ -659,23 +670,15 @@ def class_generator(
     """
     Generates a class for a given Kind.
     """
-    if interactive:
-        kind = Prompt.ask(prompt="Enter the resource kind to generate class for")
+    kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
 
-    if not kind:
-        LOGGER.error("Kind not provided")
-        sys.exit(1)
-
-    namespaced = read_resources_mapping_file().get(kind)
-
-    if not namespaced:
+    if not kind_and_namespaced_mappings:
         LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run with --update-schema")
         sys.exit(1)
 
     resource_dict = parse_explain(
-        output=get_kind_schema_file(kind=kind),
-        namespaced=namespaced,
-        add_tests=add_tests,
+        kind_schema_file=get_kind_schema_file(kind=kind),
+        namespaced=kind_and_namespaced_mappings["namespaced"],
     )
     if not resource_dict:
         return ""
@@ -685,7 +688,6 @@ def class_generator(
         overwrite=overwrite,
         dry_run=dry_run,
         output_file=output_file,
-        interactive=interactive,
         add_tests=add_tests,
     )
 
@@ -696,9 +698,9 @@ def class_generator(
             check=False,
         )
 
-    if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
-        LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
-        Path.unlink(Path(generated_py_file))
+        if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
+            LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
+            Path.unlink(Path(generated_py_file))
 
     return generated_py_file
 
@@ -747,8 +749,7 @@ def generate_class_generator_tests() -> None:
     )
 
 
-@cloup.command("Resource class generator")
-@cloup.option("-i", "--interactive", is_flag=True, help="Enable interactive mode")
+@cloup.command("Resource class generator", show_constraints=True)
 @cloup.option(
     "-k",
     "--kind",
@@ -798,14 +799,14 @@ def generate_class_generator_tests() -> None:
 )
 @cloup.constraint(
     If("update_schema", then=accept_none),
-    ["add_tests", "interactive", "dry_run", "debug", "kind", "output_file", "overwrite"],
+    ["add_tests", "dry_run", "debug", "kind", "output_file", "overwrite"],
 )
 @cloup.constraint(
     If(
         IsSet("add_tests"),
         then=accept_none,
     ),
-    ["debug", "output_file", "dry_run"],
+    ["debug", "output_file", "dry_run", "update_schema", "overwrite"],
 )
 @cloup.constraint(
     If(
@@ -813,12 +814,11 @@ def generate_class_generator_tests() -> None:
         then=accept_none,
         else_=require_one,
     ),
-    ["interactive", "kind", "update_schema"],
+    ["kind", "update_schema"],
 )
 def main(
     kind: str,
     overwrite: bool,
-    interactive: bool,
     dry_run: bool,
     debug: bool,
     debug_file: str,
@@ -834,15 +834,12 @@ def main(
 
     _kwargs: Dict[str, Any] = {
         "overwrite": overwrite,
-        "interactive": interactive,
         "dry_run": dry_run,
-        "debug": debug,
-        "process_debug_file": debug_file,
         "output_file": output_file,
         "add_tests": add_tests,
     }
 
-    if interactive or debug_file:
+    if debug_file:
         class_generator(**_kwargs)
 
     else:
@@ -851,7 +848,7 @@ def main(
 
         with ThreadPoolExecutor() as executor:
             for _kind in kinds:
-                _kwargs["kind"] = _kind
+                _kwargs["kind"] = _kind.lower()
                 if pdb or len(kinds) == 1:
                     class_generator(**_kwargs)
 
@@ -871,4 +868,6 @@ def main(
 
 
 if __name__ == "__main__":
-    function_runner_with_pdb(func=main)
+    # function_runner_with_pdb(func=main)
+
+    main()
