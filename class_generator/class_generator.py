@@ -276,9 +276,11 @@ def generate_resource_file_from_dict(
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
     if add_tests:
         overwrite = True
-        _output_file = os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_str, f"{formatted_kind_str}_res.py")
+        _output_file = os.path.join(TESTS_MANIFESTS_DIR, resource_dict["kind"], f"{formatted_kind_str}_res.py")
+
     elif output_file:
         _output_file = output_file
+
     else:
         _output_file = os.path.join("ocp_resources", f"{formatted_kind_str}.py")
 
@@ -389,7 +391,10 @@ def parse_explain(
         spec_schema = get_property_schema(property=spec_schema)
         spec_requeired = spec_schema.get("required", [])
         resource_dict = prepare_property_dict(
-            schema=spec_schema["properties"], requeired=spec_requeired, resource_dict=resource_dict, dict_key="spec"
+            schema=spec_schema.get("properties", {}),
+            requeired=spec_requeired,
+            resource_dict=resource_dict,
+            dict_key="spec",
         )
 
     resource_dict = prepare_property_dict(
@@ -451,6 +456,7 @@ def class_generator(
     """
     Generates a class for a given Kind.
     """
+    kind = kind.lower()
     kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
 
     if not kind_and_namespaced_mappings:
@@ -511,9 +517,7 @@ def generate_class_generator_tests() -> None:
             test_data = {"kind": _dir}
 
             for _file in os.listdir(dir_path):
-                if _file.endswith("_debug.json"):
-                    test_data["debug_file"] = _file
-                elif _file.endswith("_res.py"):
+                if _file.endswith("_res.py"):
                     test_data["res_file"] = _file
 
             tests_info["template"].append(test_data)
@@ -601,7 +605,8 @@ def main(
 
     with ThreadPoolExecutor() as executor:
         for _kind in kinds:
-            _kwargs["kind"] = _kind.lower()
+            _kwargs["kind"] = _kind
+
             if len(kinds) == 1:
                 class_generator(**_kwargs)
 

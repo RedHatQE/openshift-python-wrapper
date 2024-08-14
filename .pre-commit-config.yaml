@@ -32,7 +32,6 @@ repos:
       - id: detect-secrets
         args:
           [
-            --exclude-files=class_generator/tests/manifests/pod/pod_debug.json,
             --exclude-files=class_generator/schema/*,
             --exclude-files=class_generator/__ocp-openapi.json,
           ]
