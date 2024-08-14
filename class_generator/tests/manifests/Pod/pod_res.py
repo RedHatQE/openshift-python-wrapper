@@ -102,8 +102,7 @@ class Pod(NamespacedResource):
               ephemeralcontainers subresource.
 
             host_aliases(List[Any]): HostAliases is an optional list of hosts and IPs that will be injected
-              into the pod's hosts file if specified. This is only valid for
-              non-hostNetwork pods.
+              into the pod's hosts file if specified.
 
             host_ipc(Dict[str, Any]): Use the host's ipc namespace. Optional: Default to false.
 
@@ -227,8 +226,7 @@ class Pod(NamespacedResource):
               block scheduling the pod. If schedulingGates is not empty, the pod
               will stay in the SchedulingGated state and the scheduler will not
               attempt to schedule the pod.  SchedulingGates can only be set at
-              pod creation time, and be removed only afterwards.  This is a beta
-              feature enabled by the PodSchedulingReadiness feature gate.
+              pod creation time, and be removed only afterwards.
 
             security_context(Dict[str, Any]): PodSecurityContext holds pod-level security attributes and common
               container settings. Some fields are also present in
@@ -236,8 +234,8 @@ class Pod(NamespacedResource):
               container.securityContext take precedence over field values of
               PodSecurityContext.
 
-            service_account(Dict[str, Any]): DeprecatedServiceAccount is a depreciated alias for
-              ServiceAccountName. Deprecated: Use serviceAccountName instead.
+            service_account(Dict[str, Any]): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
+              Deprecated: Use serviceAccountName instead.
 
             service_account_name(Dict[str, Any]): ServiceAccountName is the name of the ServiceAccount to use to run
               this pod. More info: https://kubernetes.io/docs/tasks/configure-
