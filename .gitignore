@@ -125,5 +125,4 @@ package.json
 package-lock.json
 
 # class generator script
-script/resource/debug/*
-class_generator/ocp-openapi.json
+class_generator/__ocp-openapi.json
