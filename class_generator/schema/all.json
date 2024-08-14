@@ -3100,6 +3100,42 @@
       "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineList"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationTemplate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationTemplateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.remediation.v1alpha1.NodeHealthCheck"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.remediation.v1alpha1.NodeHealthCheckList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationTemplate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationTemplateList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.BMCEventSubscription"
     },
     {
