@@ -34,6 +34,20 @@ SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 
 
+def _is_kind_is_namespaced(_kind: str) -> Tuple[bool, str]:
+    return (
+        run_command(
+            command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {_kind} | wc -l'"),
+            check=False,
+        )[1].strip()
+        == "1"
+    ), _kind
+
+
+def _is_resource(_kind: str) -> Tuple[bool, str]:
+    return run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0], _kind
+
+
 def map_kind_to_namespaced():
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
@@ -61,9 +75,6 @@ def map_kind_to_namespaced():
 
         kind_set.add(_kind)
 
-    def _is_resource(_kind: str) -> Tuple[bool, str]:
-        return run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0], _kind
-
     kind_list: List[str] = []
     is_kind_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
@@ -82,19 +93,10 @@ def map_kind_to_namespaced():
         else:
             not_kind_list.append(res[1])
 
-    def map_kind_to_namespaced(_kind: str) -> Tuple[bool, str]:
-        return (
-            run_command(
-                command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {_kind} | wc -l'"),
-                check=False,
-            )[1].strip()
-            == "1"
-        ), _kind
-
     mapping_kind_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
         for _kind in kind_list:
-            mapping_kind_futures.append(executor.submit(map_kind_to_namespaced, _kind=_kind))
+            mapping_kind_futures.append(executor.submit(_is_kind_is_namespaced, _kind=_kind))
 
     for _res in as_completed(mapping_kind_futures):
         res = _res.result()
@@ -144,142 +146,6 @@ def update_kind_schema():
         sys.exit(1)
 
     map_kind_to_namespaced()
-
-
-def process_fields_args(
-    fields_output: str,
-    output_dict: Dict[str, Any],
-    dict_key: str,
-    kind: str,
-    args_to_ignore: Optional[List[str]] = None,
-) -> Dict[str, Any]:
-    _args_to_ignore = args_to_ignore or []
-
-    if _fields_args := re.findall(r"  .*", fields_output, re.DOTALL):
-        for field in [_field for _field in _fields_args[0].splitlines() if _field]:
-            if field.strip() and field.split()[0] in _args_to_ignore:
-                continue
-
-            # If line is indented 4 spaces we know that this is a top-level arg that will be added
-            if len(re.findall(r" +", field)[0]) == 2:
-                output_dict[dict_key].append(
-                    get_arg_params(
-                        field=field.strip(),
-                        kind=kind,
-                        field_under_spec=True if dict_key == SPEC_STR else False,
-                    )
-                )
-
-    return output_dict
-
-
-def get_sections_dict(output: str) -> Dict[str, str]:
-    raw_resource_dict: Dict[str, str] = {}
-
-    # Get all sections from output, section is [A-Z]: for example `KIND:`
-    sections = re.findall(r"([A-Z]+):.*", output)
-
-    # Get all sections indexes to be able to get needed test from output by indexes later
-    sections_indexes = [output.index(section) for section in sections]
-
-    for idx, section_idx in enumerate(sections_indexes):
-        _section_name = sections[idx].strip(":")
-
-        # Get the end index of the section name, add +1 since we strip the `:`
-        _end_of_section_name_idx = section_idx + len(_section_name) + 1
-
-        try:
-            # If we have next section we get the string from output till the next section
-            raw_resource_dict[_section_name] = output[_end_of_section_name_idx : output.index(sections[idx + 1])]
-        except IndexError:
-            # If this is the last section get the rest of output
-            raw_resource_dict[_section_name] = output[_end_of_section_name_idx:]
-
-    return raw_resource_dict
-
-
-def get_oc_or_kubectl() -> str:
-    if run_command(command=shlex.split("which oc"), check=False)[0]:
-        return "oc"
-
-    elif run_command(command=shlex.split("which kubectl"), check=False)[0]:
-        return "kubectl"
-
-    else:
-        LOGGER.error("oc or kubectl not available")
-        sys.exit(1)
-
-
-def check_cluster_available() -> bool:
-    _exec = get_oc_or_kubectl()
-    if not _exec:
-        return False
-
-    return run_command(command=shlex.split(f"{_exec} version"), check=False)[0]
-
-
-def write_to_file(data: Dict[str, Any], output_debug_file_path: str) -> None:
-    content = {}
-    if os.path.isfile(output_debug_file_path):
-        with open(output_debug_file_path) as fd:
-            content = json.load(fd)
-
-    content.update(data)
-
-    Path(output_debug_file_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(output_debug_file_path, "w") as fd:
-        json.dump(content, fd, indent=4)
-
-
-def get_kind_data_and_debug_file(kind: str, debug: bool = False, add_tests: bool = False) -> Dict[str, Any]:
-    """
-    Get oc/kubectl explain output for given kind, if kind is namespaced and debug filepath
-    """
-    _, explain_out, _ = run_command(command=shlex.split(f"oc explain {kind}"))
-
-    resource_kind = re.search(r".*?KIND:\s+(.*?)\n", explain_out)
-    resource_kind_str: str = ""
-
-    if resource_kind:
-        resource_kind_str = resource_kind.group(1)  # noqa FCN001
-        formatted_kind_name = convert_camel_case_to_snake_case(string_=resource_kind_str)
-    else:
-        formatted_kind_name = convert_camel_case_to_snake_case(string_=kind)
-
-    output_debug_file_path: str = ""
-    if debug or add_tests:
-        output_debug_dir = (
-            os.path.join(TESTS_MANIFESTS_DIR, formatted_kind_name)
-            if add_tests
-            else os.path.join(os.path.dirname(__file__), "debug")
-        )
-        output_debug_file_path = os.path.join(output_debug_dir, f"{formatted_kind_name}_debug.json")
-
-    if output_debug_file_path:
-        write_to_file(
-            data={"explain": explain_out},
-            output_debug_file_path=output_debug_file_path,
-        )
-
-    if not resource_kind:
-        LOGGER.error(f"Failed to get resource kind from explain for {kind}")
-        return {}
-
-    _, namespace_out, _ = run_command(
-        command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {resource_kind_str} | wc -l'"),
-        check=False,
-    )
-    if output_debug_file_path:
-        write_to_file(
-            data={"namespace": namespace_out},
-            output_debug_file_path=output_debug_file_path,
-        )
-
-    return {
-        "data": explain_out,
-        "namespaced": namespace_out.strip() == "1",
-        "debug_file": output_debug_file_path,
-    }
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
@@ -373,91 +239,6 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
                 last_capital_char = True
 
     return formatted_str
-
-
-def get_field_description(
-    kind: str,
-    field_name: str,
-    field_under_spec: bool,
-) -> str:
-    _, _out, _ = run_command(
-        command=shlex.split(f"oc explain {kind}{'.spec' if field_under_spec else ''}.{field_name}"),
-        check=False,
-        verify_stderr=False,
-    )
-
-    _description = re.search(r"DESCRIPTION:\n\s*(.*)", _out, re.DOTALL)
-    if _description:
-        description: str = ""
-        _fields_found = False
-        for line in _description.group(1).strip().splitlines():
-            if line.strip():
-                if line.startswith("FIELDS:"):
-                    _fields_found = True
-                    description += f"{' ' * 4}{line}\n"
-                else:
-                    indent = 4 if _fields_found else 0
-                    description += f"{' ' * indent}{line}\n"
-            else:
-                indent = 8 if _fields_found else 4
-                description += f"{' ' * indent}{line}\n"
-
-        return f"{description}\n"
-
-    return "<please add description>"
-
-
-def get_arg_params(
-    field: str,
-    kind: str,
-    field_under_spec: bool = False,
-) -> Dict[str, Any]:
-    splited_field = field.split()
-    _orig_name, _type = splited_field[0], splited_field[1]
-
-    name = convert_camel_case_to_snake_case(string_=_orig_name)
-    type_ = _type.strip()
-    required: bool = "-required-" in splited_field
-    type_for_docstring: str = "Dict[str, Any]"
-    type_from_dict_for_init: str = ""
-
-    # All fields must be set with Optional since resource can have yaml_file to cover all args.
-    if _type == "<[]Object>":
-        type_for_docstring = "List[Any]"
-
-    elif type_ == "<map[string]string>":
-        type_for_docstring = "Dict[str, str]"
-
-    elif _type == "<[]string>":
-        type_for_docstring = "List[str]"
-
-    elif _type == "<string>":
-        type_for_docstring = "str"
-        type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
-
-    elif _type == "<boolean>":
-        type_for_docstring = "bool"
-
-    elif type_ == "<integer>":
-        type_for_docstring = "int"
-
-    if not type_from_dict_for_init:
-        type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
-
-    _res: Dict[str, Any] = {
-        "name-from-explain": _orig_name,
-        "name-for-class-arg": name,
-        "type-for-class-arg": f"{name}: {type_from_dict_for_init}",
-        "required": required,
-        "type": type_for_docstring,
-        "description": get_field_description(
-            kind=kind,
-            field_name=_orig_name,
-            field_under_spec=field_under_spec,
-        ),
-    }
-
-    return _res
 
 
 def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, template_name: str) -> str:
@@ -773,18 +554,6 @@ def generate_class_generator_tests() -> None:
     help="Output file overwrite existing file if passed",
 )
 @cloup.option("--dry-run", is_flag=True, help="Run the script without writing to file")
-@cloup.option("-d", "--debug", is_flag=True, help="Save all command output to debug file")
-@cloup.option(
-    "--debug-file",
-    type=click.Path(exists=True),
-    help="Run the script from debug file. (generated by --debug)",
-)
-@cloup.option(
-    "--pdb",
-    help="Drop to `ipdb` shell on exception",
-    is_flag=True,
-    show_default=True,
-)
 @cloup.option(
     "--add-tests",
     help=f"Add a test to `test_class_generator.py` and test files to `{TESTS_MANIFESTS_DIR}` dir",
@@ -799,36 +568,24 @@ def generate_class_generator_tests() -> None:
 )
 @cloup.constraint(
     If("update_schema", then=accept_none),
-    ["add_tests", "dry_run", "debug", "kind", "output_file", "overwrite"],
+    ["add_tests", "dry_run", "kind", "output_file", "overwrite"],
 )
 @cloup.constraint(
     If(
         IsSet("add_tests"),
         then=accept_none,
     ),
-    ["debug", "output_file", "dry_run", "update_schema", "overwrite"],
+    ["output_file", "dry_run", "update_schema", "overwrite"],
 )
-@cloup.constraint(
-    If(
-        IsSet("debug_file"),
-        then=accept_none,
-        else_=require_one,
-    ),
-    ["kind", "update_schema"],
-)
+@cloup.constraint(require_one, ["kind", "update_schema"])
 def main(
     kind: str,
     overwrite: bool,
     dry_run: bool,
-    debug: bool,
-    debug_file: str,
     output_file: str,
-    pdb: bool,
     add_tests: bool,
     update_schema: bool,
 ) -> None:
-    _ = pdb  # Used by `function_runner_with_pdb`
-
     if update_schema:
         return update_kind_schema()
 
@@ -839,24 +596,20 @@ def main(
         "add_tests": add_tests,
     }
 
-    if debug_file:
-        class_generator(**_kwargs)
+    kinds: List[str] = kind.split(",")
+    futures: List[Future] = []
 
-    else:
-        kinds: List[str] = kind.split(",")
-        futures: List[Future] = []
+    with ThreadPoolExecutor() as executor:
+        for _kind in kinds:
+            _kwargs["kind"] = _kind.lower()
+            if len(kinds) == 1:
+                class_generator(**_kwargs)
 
-        with ThreadPoolExecutor() as executor:
-            for _kind in kinds:
-                _kwargs["kind"] = _kind.lower()
-                if pdb or len(kinds) == 1:
-                    class_generator(**_kwargs)
-
-                else:
-                    executor.submit(
-                        class_generator,
-                        **_kwargs,
-                    )
+            else:
+                executor.submit(
+                    class_generator,
+                    **_kwargs,
+                )
 
         for _ in as_completed(futures):
             # wait for all tasks to complete
@@ -868,6 +621,4 @@ def main(
 
 
 if __name__ == "__main__":
-    # function_runner_with_pdb(func=main)
-
     main()
