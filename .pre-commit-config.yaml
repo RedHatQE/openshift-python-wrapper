@@ -34,6 +34,7 @@ repos:
           [
             --exclude-files=class_generator/tests/manifests/pod/pod_debug.json,
             --exclude-files=class_generator/schema/*,
+            --exclude-files=class_generator/__ocp-openapi.json,
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
