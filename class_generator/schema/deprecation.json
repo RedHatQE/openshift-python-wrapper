@@ -1,0 +1,14 @@
+{
+  "description": "Deprecation conveys information regarding a deprecated resource.",
+  "type": "object",
+  "required": [
+    "message"
+  ],
+  "properties": {
+    "message": {
+      "description": "Message is a human readable message describing the deprecation.",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

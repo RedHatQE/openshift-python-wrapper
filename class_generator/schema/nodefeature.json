@@ -1,0 +1,123 @@
+{
+  "description": "NodeFeature resource holds the features discovered for one node in the cluster.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "NodeFeatureSpec describes a NodeFeature object.",
+      "type": "object",
+      "required": [
+        "features"
+      ],
+      "properties": {
+        "features": {
+          "description": "Features is the full \"raw\" features data that has been discovered.",
+          "type": "object",
+          "required": [
+            "attributes",
+            "flags",
+            "instances"
+          ],
+          "properties": {
+            "attributes": {
+              "type": "object",
+              "additionalProperties": {
+                "description": "AttributeFeatureSet is a set of features having string value.",
+                "type": "object",
+                "required": [
+                  "elements"
+                ],
+                "properties": {
+                  "elements": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "flags": {
+              "type": "object",
+              "additionalProperties": {
+                "description": "FlagFeatureSet is a set of simple features only containing names without values.",
+                "type": "object",
+                "required": [
+                  "elements"
+                ],
+                "properties": {
+                  "elements": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "Nil is a dummy empty struct for protobuf compatibility",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "instances": {
+              "type": "object",
+              "additionalProperties": {
+                "description": "InstanceFeatureSet is a set of features each of which is an instance having multiple attributes.",
+                "type": "object",
+                "required": [
+                  "elements"
+                ],
+                "properties": {
+                  "elements": {
+                    "type": "array",
+                    "items": {
+                      "description": "InstanceFeature represents one instance of a complex features, e.g. a device.",
+                      "type": "object",
+                      "required": [
+                        "attributes"
+                      ],
+                      "properties": {
+                        "attributes": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "labels": {
+          "description": "Labels is the set of node labels that are requested to be created.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "nfd.openshift.io",
+      "kind": "NodeFeature",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

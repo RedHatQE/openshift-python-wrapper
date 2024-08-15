@@ -1,0 +1,146 @@
+{
+  "description": "NMState is the Schema for the nmstates API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "NMStateSpec defines the desired state of NMState",
+      "type": "object",
+      "properties": {
+        "infraNodeSelector": {
+          "description": "InfraNodeSelector is an optional selector that will be added to webhook & certmanager Deployment manifests\nIf InfraNodeSelector is specified, the webhook and certmanager will run only on nodes that have each of the indicated\nkey-value pairs as labels applied to the node.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "infraTolerations": {
+          "description": "InfraTolerations is an optional list of tolerations to be added to webhook & certmanager Deployment manifests\nIf InfraTolerations is specified, the webhook and certmanager will be able to be scheduled on nodes with corresponding taints",
+          "type": "array",
+          "items": {
+            "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
+            "type": "object",
+            "properties": {
+              "effect": {
+                "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+                "type": "string"
+              },
+              "key": {
+                "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+                "type": "string"
+              },
+              "operator": {
+                "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.",
+                "type": "string"
+              },
+              "tolerationSeconds": {
+                "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "value": {
+                "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "nodeSelector": {
+          "description": "NodeSelector is an optional selector that will be added to handler DaemonSet manifest\nfor both workers and control-plane (https://github.com/nmstate/kubernetes-nmstate/blob/main/deploy/handler/operator.yaml).\nIf NodeSelector is specified, the handler will run only on nodes that have each of the indicated key-value pairs\nas labels applied to the node.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "tolerations": {
+          "description": "Tolerations is an optional list of tolerations to be added to handler DaemonSet manifest\nIf Tolerations is specified, the handler daemonset will be also scheduled on nodes with corresponding taints",
+          "type": "array",
+          "items": {
+            "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
+            "type": "object",
+            "properties": {
+              "effect": {
+                "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+                "type": "string"
+              },
+              "key": {
+                "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+                "type": "string"
+              },
+              "operator": {
+                "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.",
+                "type": "string"
+              },
+              "tolerationSeconds": {
+                "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "value": {
+                "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "NMStateStatus defines the observed state of NMState",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "nmstate.io",
+      "kind": "NMState",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

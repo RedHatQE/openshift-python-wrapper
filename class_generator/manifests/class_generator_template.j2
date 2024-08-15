@@ -1,26 +1,26 @@
 {% set all_types_for_class_args = [] %}
 {% set all_names_types_for_docstring = [] %}
 {% set all_required_args = [] %}
-{% for arg in FIELDS + SPEC %}
+{% for arg in fields + spec %}
   {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
-  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type"] + "): " +  arg["description"]|indent(10)|safe ) %}
+  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe ) %}
   {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import {{ BASE_CLASS }}, MissingRequiredArgumentError
+from ocp_resources.resource import {{ base_class }}, MissingRequiredArgumentError
 
 
-class {{ KIND }}({{ BASE_CLASS }}):
+class {{ kind }}({{ base_class }}):
     """
-    {{ DESCRIPTION }}
+    {{ description }}
     """
 
-    {% if GROUP %}
-    api_group: str = {{ BASE_CLASS }}.ApiGroup.{{ GROUP.upper() }}
+    {% if group %}
+    api_group: str = {{ base_class }}.ApiGroup.{{ group.upper() }}
     {% else %}
-    api_version: str = {{ BASE_CLASS }}.ApiVersion.{{ VERSION.upper() }}
+    api_version: str = {{ base_class }}.ApiVersion.{{ version.upper() }}
     {% endif %}
 
     def __init__(
@@ -34,16 +34,18 @@ class {{ KIND }}({{ BASE_CLASS }}):
         """
         Args:
             {% for value in all_names_types_for_docstring %}
-            {{ value }}{% endfor %}
+            {{ value }}
+            {% endfor %}
         """
         {% endif %}
+
         super().__init__(**kwargs)
 
-        {% for arg in FIELDS + SPEC %}
+        {% for arg in fields + spec %}
         self.{{ arg["name-for-class-arg"] }} = {{ arg["name-for-class-arg"] }}
         {% endfor %}
 
-    {% if FIELDS or SPEC %}
+    {% if fields or spec %}
     def to_dict(self) -> None:
 
         super().to_dict()
@@ -54,34 +56,34 @@ class {{ KIND }}({{ BASE_CLASS }}):
                 raise MissingRequiredArgumentError(argument="{{ all_required_args|join(', ') }}")
           {% endif %}
 
-          {% if SPEC %}
+          {% if spec %}
             self.res["spec"] = {}
             _spec = self.res["spec"]
           {% endif %}
 
-          {% for arg in FIELDS %}
+          {% for arg in fields %}
           {% if arg["required"] == True %}
-            self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+            self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
           {% endif %}
           {% endfor %}
 
-          {% for arg in SPEC %}
+          {% for arg in spec %}
           {% if arg["required"] == True %}
-            _spec["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+            _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
           {% endif %}
           {% endfor %}
 
-          {% for arg in FIELDS %}
+          {% for arg in fields %}
           {% if arg["required"] == False %}
             if self.{{ arg["name-for-class-arg"] }}{% if arg["type"] == "bool" %} is not None{% endif %}:
-              self.res["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+              self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
 
           {% endif %}
           {% endfor %}
-          {% for arg in SPEC %}
+          {% for arg in spec %}
           {% if arg["required"] == False %}
             if self.{{ arg["name-for-class-arg"] }}{% if arg["type"] == "bool" %} is not None{% endif %}:
-              _spec["{{ arg["name-from-explain"] }}"] = self.{{ arg["name-for-class-arg"] }}
+              _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
 
           {% endif %}
           {% endfor %}

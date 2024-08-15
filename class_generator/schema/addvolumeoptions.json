@@ -1,0 +1,34 @@
+{
+  "description": "AddVolumeOptions is provided when dynamically hot plugging a volume and disk",
+  "type": "object",
+  "required": [
+    "name",
+    "disk",
+    "volumeSource"
+  ],
+  "properties": {
+    "disk": {
+      "description": "Disk represents the hotplug disk that will be plugged into the running VMI",
+      "$ref": "_definitions.json#/definitions/v1.Disk"
+    },
+    "dryRun": {
+      "description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "default": ""
+      },
+      "x-kubernetes-list-type": "atomic"
+    },
+    "name": {
+      "description": "Name represents the name that will be used to map the disk to the corresponding volume. This overrides any name set inside the Disk struct itself.",
+      "type": "string",
+      "default": ""
+    },
+    "volumeSource": {
+      "description": "VolumeSource represents the source of the volume to map to the disk.",
+      "$ref": "_definitions.json#/definitions/v1.HotplugVolumeSource"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,17 @@
+{
+  "description": "VirtualMachineInstanceFileSystemInfo represents information regarding single guest os filesystem",
+  "type": "object",
+  "required": [
+    "disks"
+  ],
+  "properties": {
+    "disks": {
+      "type": "array",
+      "items": {
+        "default": {},
+        "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceFileSystem"
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

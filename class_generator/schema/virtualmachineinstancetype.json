@@ -1,0 +1,255 @@
+{
+  "description": "VirtualMachineInstancetype resource contains quantitative and resource related VirtualMachine configuration\nthat can be used by multiple VirtualMachine resources.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Required spec describing the instancetype",
+      "type": "object",
+      "required": [
+        "cpu",
+        "memory"
+      ],
+      "properties": {
+        "annotations": {
+          "description": "Optionally defines the required Annotations to be used by the instance type and applied to the VirtualMachineInstance",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "cpu": {
+          "description": "Required CPU related attributes of the instancetype.",
+          "type": "object",
+          "required": [
+            "guest"
+          ],
+          "properties": {
+            "dedicatedCPUPlacement": {
+              "description": "DedicatedCPUPlacement requests the scheduler to place the VirtualMachineInstance on a node\nwith enough dedicated pCPUs and pin the vCPUs to it.",
+              "type": "boolean"
+            },
+            "guest": {
+              "description": "Required number of vCPUs to expose to the guest.\n\n\nThe resulting CPU topology being derived from the optional PreferredCPUTopology attribute of CPUPreferences that itself defaults to PreferSockets.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "isolateEmulatorThread": {
+              "description": "IsolateEmulatorThread requests one more dedicated pCPU to be allocated for the VMI to place\nthe emulator thread on it.",
+              "type": "boolean"
+            },
+            "maxSockets": {
+              "description": "MaxSockets specifies the maximum amount of sockets that can be hotplugged",
+              "type": "integer",
+              "format": "int32"
+            },
+            "model": {
+              "description": "Model specifies the CPU model inside the VMI.\nList of available models https://github.com/libvirt/libvirt/tree/master/src/cpu_map.\nIt is possible to specify special cases like \"host-passthrough\" to get the same CPU as the node\nand \"host-model\" to get CPU closest to the node one.\nDefaults to host-model.",
+              "type": "string"
+            },
+            "numa": {
+              "description": "NUMA allows specifying settings for the guest NUMA topology",
+              "type": "object",
+              "properties": {
+                "guestMappingPassthrough": {
+                  "description": "GuestMappingPassthrough will create an efficient guest topology based on host CPUs exclusively assigned to a pod.\nThe created topology ensures that memory and CPUs on the virtual numa nodes never cross boundaries of host numa nodes.",
+                  "type": "object"
+                }
+              }
+            },
+            "realtime": {
+              "description": "Realtime instructs the virt-launcher to tune the VMI for lower latency, optional for real time workloads",
+              "type": "object",
+              "properties": {
+                "mask": {
+                  "description": "Mask defines the vcpu mask expression that defines which vcpus are used for realtime. Format matches libvirt's expressions.\nExample: \"0-3,^1\",\"0,2,3\",\"2-3\"",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "gpus": {
+          "description": "Optionally defines any GPU devices associated with the instancetype.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "deviceName",
+              "name"
+            ],
+            "properties": {
+              "deviceName": {
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the GPU device as exposed by a device plugin",
+                "type": "string"
+              },
+              "tag": {
+                "description": "If specified, the virtual network interface address and its tag will be provided to the guest via config drive",
+                "type": "string"
+              },
+              "virtualGPUOptions": {
+                "type": "object",
+                "properties": {
+                  "display": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "description": "Enabled determines if a display addapter backed by a vGPU should be enabled or disabled on the guest.\nDefaults to true.",
+                        "type": "boolean"
+                      },
+                      "ramFB": {
+                        "description": "Enables a boot framebuffer, until the guest OS loads a real GPU driver\nDefaults to true.",
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "description": "Enabled determines if the feature should be enabled or disabled on the guest.\nDefaults to true.",
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        },
+        "hostDevices": {
+          "description": "Optionally defines any HostDevices associated with the instancetype.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "deviceName",
+              "name"
+            ],
+            "properties": {
+              "deviceName": {
+                "description": "DeviceName is the resource name of the host device exposed by a device plugin",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "tag": {
+                "description": "If specified, the virtual network interface address and its tag will be provided to the guest via config drive",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        },
+        "ioThreadsPolicy": {
+          "description": "Optionally defines the IOThreadsPolicy to be used by the instancetype.",
+          "type": "string"
+        },
+        "launchSecurity": {
+          "description": "Optionally defines the LaunchSecurity to be used by the instancetype.",
+          "type": "object",
+          "properties": {
+            "sev": {
+              "description": "AMD Secure Encrypted Virtualization (SEV).",
+              "type": "object",
+              "properties": {
+                "attestation": {
+                  "description": "If specified, run the attestation process for a vmi.",
+                  "type": "object"
+                },
+                "dhCert": {
+                  "description": "Base64 encoded guest owner's Diffie-Hellman key.",
+                  "type": "string"
+                },
+                "policy": {
+                  "description": "Guest policy flags as defined in AMD SEV API specification.\nNote: due to security reasons it is not allowed to enable guest debugging. Therefore NoDebug flag is not exposed to users and is always true.",
+                  "type": "object",
+                  "properties": {
+                    "encryptedState": {
+                      "description": "SEV-ES is required.\nDefaults to false.",
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "session": {
+                  "description": "Base64 encoded session blob.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "memory": {
+          "description": "Required Memory related attributes of the instancetype.",
+          "type": "object",
+          "required": [
+            "guest"
+          ],
+          "properties": {
+            "guest": {
+              "description": "Required amount of memory which is visible inside the guest OS.",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "x-kubernetes-int-or-string": true
+            },
+            "hugepages": {
+              "description": "Optionally enables the use of hugepages for the VirtualMachineInstance instead of regular memory.",
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "description": "PageSize specifies the hugepage size, for x86_64 architecture valid values are 1Gi and 2Mi.",
+                  "type": "string"
+                }
+              }
+            },
+            "maxGuest": {
+              "description": "MaxGuest allows to specify the maximum amount of memory which is visible inside the Guest OS.\nThe delta between MaxGuest and Guest is the amount of memory that can be hot(un)plugged.",
+              "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+              "x-kubernetes-int-or-string": true
+            },
+            "overcommitPercent": {
+              "description": "OvercommitPercent is the percentage of the guest memory which will be overcommitted.\nThis means that the VMIs parent pod (virt-launcher) will request less\nphysical memory by a factor specified by the OvercommitPercent.\nOvercommits can lead to memory exhaustion, which in turn can lead to crashes. Use carefully.\nDefaults to 0",
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 0
+            }
+          }
+        },
+        "nodeSelector": {
+          "description": "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/\n\n\nNodeSelector is the name of the custom node selector for the instancetype.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "schedulerName": {
+          "description": "If specified, the VMI will be dispatched by specified scheduler.\nIf not specified, the VMI will be dispatched by default scheduler.\n\n\nSchedulerName is the name of the custom K8s scheduler for the instancetype.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "instancetype.kubevirt.io",
+      "kind": "VirtualMachineInstancetype",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

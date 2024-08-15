@@ -1,0 +1,39 @@
+{
+  "description": "DeploymentConfigRollbackSpec represents the options for rollback generation.",
+  "type": "object",
+  "required": [
+    "from",
+    "includeTriggers",
+    "includeTemplate",
+    "includeReplicationMeta",
+    "includeStrategy"
+  ],
+  "properties": {
+    "from": {
+      "description": "From points to a ReplicationController which is a deployment.",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ObjectReference"
+    },
+    "includeReplicationMeta": {
+      "description": "IncludeReplicationMeta specifies whether to include the replica count and selector.",
+      "type": "boolean"
+    },
+    "includeStrategy": {
+      "description": "IncludeStrategy specifies whether to include the deployment Strategy.",
+      "type": "boolean"
+    },
+    "includeTemplate": {
+      "description": "IncludeTemplate specifies whether to include the PodTemplateSpec.",
+      "type": "boolean"
+    },
+    "includeTriggers": {
+      "description": "IncludeTriggers specifies whether to include config Triggers.",
+      "type": "boolean"
+    },
+    "revision": {
+      "description": "Revision to rollback to. If set to 0, rollback to the last revision.",
+      "type": "integer",
+      "format": "int64"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

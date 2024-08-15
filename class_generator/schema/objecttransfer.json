@@ -1,0 +1,134 @@
+{
+  "description": "ObjectTransfer is the cluster scoped object transfer resource",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ObjectTransferSpec specifies the source/target of the transfer",
+      "type": "object",
+      "required": [
+        "source",
+        "target"
+      ],
+      "properties": {
+        "parentName": {
+          "type": "string"
+        },
+        "source": {
+          "description": "TransferSource is the source of a ObjectTransfer",
+          "type": "object",
+          "required": [
+            "kind",
+            "name",
+            "namespace"
+          ],
+          "properties": {
+            "apiVersion": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            },
+            "requiredAnnotations": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "target": {
+          "description": "TransferTarget is the target of an ObjectTransfer",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "ObjectTransferStatus is the status of the ObjectTransfer",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "ObjectTransferCondition contains condition data",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ObjectTransferConditionType is the type of ObjectTransferCondition",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "data": {
+          "description": "Data is a place for intermediary state.  Or anything really.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "phase": {
+          "description": "Phase is the current phase of the transfer",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "cdi.kubevirt.io",
+      "kind": "ObjectTransfer",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

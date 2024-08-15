@@ -1,0 +1,341 @@
+{
+  "description": "NamespaceStore is the Schema for the namespacestores API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Specification of the desired behavior of the noobaa NamespaceStore.",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "accessMode": {
+          "description": "AccessMode is an enum of supported access modes",
+          "type": "string"
+        },
+        "awsS3": {
+          "description": "AWSS3Spec specifies a namespace store of type aws-s3",
+          "type": "object",
+          "required": [
+            "targetBucket"
+          ],
+          "properties": {
+            "awsSTSRoleARN": {
+              "description": "AWSSTSRoleARN allows to Assume Role and use AssumeRoleWithWebIdentity",
+              "type": "string"
+            },
+            "region": {
+              "description": "Region is the AWS region",
+              "type": "string"
+            },
+            "secret": {
+              "description": "Secret refers to a secret that provides the credentials\nThe secret should define AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY",
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "name is unique within a namespace to reference a secret resource.",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "namespace defines the space within which the secret name must be unique.",
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "sslDisabled": {
+              "description": "SSLDisabled allows to disable SSL and use plain http",
+              "type": "boolean"
+            },
+            "targetBucket": {
+              "description": "TargetBucket is the name of the target S3 bucket",
+              "type": "string"
+            }
+          }
+        },
+        "azureBlob": {
+          "description": "AzureBlob specifies a namespace store of type azure-blob",
+          "type": "object",
+          "required": [
+            "secret",
+            "targetBlobContainer"
+          ],
+          "properties": {
+            "secret": {
+              "description": "Secret refers to a secret that provides the credentials\nThe secret should define AccountName and AccountKey as provided by Azure Blob.",
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "name is unique within a namespace to reference a secret resource.",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "namespace defines the space within which the secret name must be unique.",
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "targetBlobContainer": {
+              "description": "TargetBlobContainer is the name of the target Azure Blob container",
+              "type": "string"
+            }
+          }
+        },
+        "googleCloudStorage": {
+          "description": "GoogleCloudStorage specifies a namespace store of type google-cloud-storage",
+          "type": "object",
+          "required": [
+            "secret",
+            "targetBucket"
+          ],
+          "properties": {
+            "secret": {
+              "description": "Secret refers to a secret that provides the credentials\nThe secret should define GoogleServiceAccountPrivateKeyJson containing the entire json string as provided by Google.",
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "name is unique within a namespace to reference a secret resource.",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "namespace defines the space within which the secret name must be unique.",
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "targetBucket": {
+              "description": "TargetBucket is the name of the target S3 bucket",
+              "type": "string"
+            }
+          }
+        },
+        "ibmCos": {
+          "description": "IBMCos specifies a namespace store of type ibm-cos",
+          "type": "object",
+          "required": [
+            "endpoint",
+            "secret",
+            "targetBucket"
+          ],
+          "properties": {
+            "endpoint": {
+              "description": "Endpoint is the IBM COS compatible endpoint: http(s)://host:port",
+              "type": "string"
+            },
+            "secret": {
+              "description": "Secret refers to a secret that provides the credentials\nThe secret should define IBM_COS_ACCESS_KEY_ID and IBM_COS_SECRET_ACCESS_KEY",
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "name is unique within a namespace to reference a secret resource.",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "namespace defines the space within which the secret name must be unique.",
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "signatureVersion": {
+              "description": "SignatureVersion specifies the client signature version to use when signing requests.",
+              "type": "string"
+            },
+            "targetBucket": {
+              "description": "TargetBucket is the name of the target IBM COS bucket",
+              "type": "string"
+            }
+          }
+        },
+        "nsfs": {
+          "description": "NSFS specifies a namespace store of type nsfs",
+          "type": "object",
+          "required": [
+            "pvcName"
+          ],
+          "properties": {
+            "fsBackend": {
+              "description": "FsBackend is the backend type of the file system",
+              "type": "string",
+              "enum": [
+                "CEPH_FS",
+                "GPFS",
+                "NFSv4"
+              ]
+            },
+            "pvcName": {
+              "description": "PvcName is the name of the pvc in which the file system resides",
+              "type": "string"
+            },
+            "subPath": {
+              "description": "SubPath is a path to a sub directory in the pvc file system",
+              "type": "string"
+            }
+          }
+        },
+        "s3Compatible": {
+          "description": "S3Compatible specifies a namespace store of type s3-compatible",
+          "type": "object",
+          "required": [
+            "endpoint",
+            "secret",
+            "targetBucket"
+          ],
+          "properties": {
+            "endpoint": {
+              "description": "Endpoint is the S3 compatible endpoint: http(s)://host:port",
+              "type": "string"
+            },
+            "secret": {
+              "description": "Secret refers to a secret that provides the credentials\nThe secret should define AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY",
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "name is unique within a namespace to reference a secret resource.",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "namespace defines the space within which the secret name must be unique.",
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "signatureVersion": {
+              "description": "SignatureVersion specifies the client signature version to use when signing requests.",
+              "type": "string"
+            },
+            "targetBucket": {
+              "description": "TargetBucket is the name of the target S3 bucket",
+              "type": "string"
+            }
+          }
+        },
+        "type": {
+          "description": "Type is an enum of supported types",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "Most recently observed status of the noobaa NamespaceStore.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions is a list of conditions related to operator reconciliation",
+          "type": "array",
+          "items": {
+            "description": "Condition represents the state of the operator's\nreconciliation functionality.",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ConditionType is the state of the operator's reconciliation functionality.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "mode": {
+          "description": "Mode specifies the updating mode of a NamespaceStore",
+          "type": "object",
+          "properties": {
+            "modeCode": {
+              "description": "ModeCode specifies the updated mode of namespacestore",
+              "type": "string"
+            },
+            "timeStamp": {
+              "description": "TimeStamp specifies the update time of namespacestore new mode",
+              "type": "string"
+            }
+          }
+        },
+        "phase": {
+          "description": "Phase is a simple, high-level summary of where the namespace store is in its lifecycle",
+          "type": "string"
+        },
+        "relatedObjects": {
+          "description": "RelatedObjects is a list of objects related to this operator.",
+          "type": "array",
+          "items": {
+            "description": "ObjectReference contains enough information to let you inspect or modify the referred object.\n---\nNew uses of this type are discouraged because of difficulty describing its usage when embedded in APIs.\n 1. Ignored fields.  It includes many fields which are not generally honored.  For instance, ResourceVersion and FieldPath are both very rarely valid in actual usage.\n 2. Invalid usage help.  It is impossible to add specific help for individual usage.  In most embedded usages, there are particular\n    restrictions like, \"must refer only to types A and B\" or \"UID not honored\" or \"name must be restricted\".\n    Those cannot be well described when embedded.\n 3. Inconsistent validation.  Because the usages are different, the validation rules are different by usage, which makes it hard for users to predict what will happen.\n 4. The fields are both imprecise and overly precise.  Kind is not a precise mapping to a URL. This can produce ambiguity\n    during interpretation and require a REST mapping.  In most cases, the dependency is on the group,resource tuple\n    and the version of the actual struct is irrelevant.\n 5. We cannot easily change it.  Because this type is embedded in many locations, updates to this type\n    will affect numerous schemas.  Don't make new APIs embed an underspecified API type they do not control.\n\n\nInstead of using this type, create a locally provided and used type that is well-focused on your reference.\nFor example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 .",
+            "type": "object",
+            "properties": {
+              "apiVersion": {
+                "description": "API version of the referent.",
+                "type": "string"
+              },
+              "fieldPath": {
+                "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.\nTODO: this design is not final and this field is subject to change in the future.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                "type": "string"
+              },
+              "resourceVersion": {
+                "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                "type": "string"
+              },
+              "uid": {
+                "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                "type": "string"
+              }
+            },
+            "x-kubernetes-map-type": "atomic"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "noobaa.io",
+      "kind": "NamespaceStore",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

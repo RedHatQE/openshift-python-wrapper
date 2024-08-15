@@ -1,0 +1,162 @@
+{
+  "description": "DataSource references an import/clone source for a DataVolume",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "DataSourceSpec defines specification for DataSource",
+      "type": "object",
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "description": "Source is the source of the data referenced by the DataSource",
+          "type": "object",
+          "properties": {
+            "pvc": {
+              "description": "DataVolumeSourcePVC provides the parameters to create a Data Volume from an existing PVC",
+              "type": "object",
+              "required": [
+                "name",
+                "namespace"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The name of the source PVC",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "The namespace of the source PVC",
+                  "type": "string"
+                }
+              }
+            },
+            "snapshot": {
+              "description": "DataVolumeSourceSnapshot provides the parameters to create a Data Volume from an existing VolumeSnapshot",
+              "type": "object",
+              "required": [
+                "name",
+                "namespace"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The name of the source VolumeSnapshot",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "The namespace of the source VolumeSnapshot",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "DataSourceStatus provides the most recently observed status of the DataSource",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "DataSourceCondition represents the state of a data source condition",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "DataSourceConditionType is the string representation of known condition types",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "source": {
+          "description": "Source is the current source of the data referenced by the DataSource",
+          "type": "object",
+          "properties": {
+            "pvc": {
+              "description": "DataVolumeSourcePVC provides the parameters to create a Data Volume from an existing PVC",
+              "type": "object",
+              "required": [
+                "name",
+                "namespace"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The name of the source PVC",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "The namespace of the source PVC",
+                  "type": "string"
+                }
+              }
+            },
+            "snapshot": {
+              "description": "DataVolumeSourceSnapshot provides the parameters to create a Data Volume from an existing VolumeSnapshot",
+              "type": "object",
+              "required": [
+                "name",
+                "namespace"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The name of the source VolumeSnapshot",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "The namespace of the source VolumeSnapshot",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "cdi.kubevirt.io",
+      "kind": "DataSource",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

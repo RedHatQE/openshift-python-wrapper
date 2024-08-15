@@ -1,0 +1,71 @@
+{
+  "description": "VolumeReplicationClass is the Schema for the volumereplicationclasses API.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "VolumeReplicationClassSpec specifies parameters that an underlying storage system uses\nwhen creating a volume replica. A specific VolumeReplicationClass is used by specifying\nits name in a VolumeReplication object.",
+      "type": "object",
+      "required": [
+        "provisioner"
+      ],
+      "properties": {
+        "parameters": {
+          "description": "Parameters is a key-value map with storage provisioner specific configurations for\ncreating volume replicas",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "parameters are immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "provisioner": {
+          "description": "Provisioner is the name of storage provisioner",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "provisioner is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "parameters are immutable",
+          "rule": "has(self.parameters) == has(oldSelf.parameters)"
+        }
+      ]
+    },
+    "status": {
+      "description": "VolumeReplicationClassStatus defines the observed state of VolumeReplicationClass.",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "replication.storage.openshift.io",
+      "kind": "VolumeReplicationClass",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

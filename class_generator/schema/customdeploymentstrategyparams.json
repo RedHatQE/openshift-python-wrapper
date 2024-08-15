@@ -1,0 +1,25 @@
+{
+  "description": "CustomDeploymentStrategyParams are the input to the Custom deployment strategy.",
+  "type": "object",
+  "properties": {
+    "command": {
+      "description": "Command is optional and overrides CMD in the container Image.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "environment": {
+      "description": "Environment holds the environment which will be given to the container for Image.",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EnvVar"
+      }
+    },
+    "image": {
+      "description": "Image specifies a container image which can carry out a deployment.",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

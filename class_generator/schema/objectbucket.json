@@ -1,0 +1,106 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Specification of the desired behavior of the bucket.",
+      "type": "object",
+      "required": [
+        "storageClassName"
+      ],
+      "properties": {
+        "additionalState": {
+          "description": "additionalState gives providers a location to set proprietary config values (tenant, namespace, etc)",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "claimRef": {
+          "description": "ObjectReference to ObjectBucketClaim",
+          "type": "object"
+        },
+        "endpoint": {
+          "description": "Endpoint contains all connection relevant data that an app may require for accessing the bucket",
+          "type": "object",
+          "properties": {
+            "additionalConfig": {
+              "description": "AdditionalConfig gives providers a location to set proprietary config values (tenant, namespace, etc)",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "bucketHost": {
+              "description": "Bucket address hostname",
+              "type": "string"
+            },
+            "bucketName": {
+              "description": "Bucket name",
+              "type": "string"
+            },
+            "bucketPort": {
+              "description": "Bucket address port",
+              "type": "integer"
+            },
+            "region": {
+              "description": "Bucket region",
+              "type": "string"
+            },
+            "subRegion": {
+              "description": "Bucket sub-region",
+              "type": "string"
+            }
+          }
+        },
+        "reclaimPolicy": {
+          "description": "Describes a policy for end-of-life maintenance of ObjectBucket.",
+          "type": "string",
+          "enum": [
+            "Delete",
+            "Retain",
+            "Recycle"
+          ]
+        },
+        "storageClassName": {
+          "description": "StorageClass names the StorageClass object representing the desired provisioner and parameters",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "Most recently observed status of the bucket.",
+      "type": "object",
+      "properties": {
+        "phase": {
+          "description": "ObjectBucketStatusPhase is set by the controller to save the state of the provisioning process",
+          "type": "string",
+          "enum": [
+            "Bound",
+            "Released",
+            "Failed"
+          ]
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "objectbucket.io",
+      "kind": "ObjectBucket",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

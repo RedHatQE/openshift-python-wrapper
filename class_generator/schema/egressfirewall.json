@@ -1,0 +1,159 @@
+{
+  "description": "EgressFirewall describes the current egress firewall for a Namespace. Traffic from a pod to an IP address outside the cluster will be checked against each EgressFirewallRule in the pod's namespace's EgressFirewall, in order. If no rule matches (or no EgressFirewall is present) then the traffic will be allowed by default.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Specification of the desired behavior of EgressFirewall.",
+      "type": "object",
+      "required": [
+        "egress"
+      ],
+      "properties": {
+        "egress": {
+          "description": "a collection of egress firewall rule objects",
+          "type": "array",
+          "items": {
+            "description": "EgressFirewallRule is a single egressfirewall rule object",
+            "type": "object",
+            "required": [
+              "to",
+              "type"
+            ],
+            "properties": {
+              "ports": {
+                "description": "ports specify what ports and protocols the rule applies to",
+                "type": "array",
+                "items": {
+                  "description": "EgressFirewallPort specifies the port to allow or deny traffic to",
+                  "type": "object",
+                  "required": [
+                    "port",
+                    "protocol"
+                  ],
+                  "properties": {
+                    "port": {
+                      "description": "port that the traffic must match",
+                      "type": "integer",
+                      "format": "int32",
+                      "maximum": 65535,
+                      "minimum": 1
+                    },
+                    "protocol": {
+                      "description": "protocol (tcp, udp, sctp) that the traffic must match.",
+                      "type": "string",
+                      "pattern": "^TCP|UDP|SCTP$"
+                    }
+                  }
+                }
+              },
+              "to": {
+                "description": "to is the target that traffic is allowed/denied to",
+                "type": "object",
+                "maxProperties": 1,
+                "minProperties": 1,
+                "properties": {
+                  "cidrSelector": {
+                    "description": "cidrSelector is the CIDR range to allow/deny traffic to. If this is set, dnsName and nodeSelector must be unset.",
+                    "type": "string"
+                  },
+                  "dnsName": {
+                    "description": "dnsName is the domain name to allow/deny traffic to. If this is set, cidrSelector and nodeSelector must be unset. For a wildcard DNS name, the '*' will match only one label. Additionally, only a single '*' can be used at the beginning of the wildcard DNS name. For example, '*.example.com' will match 'sub1.example.com' but won't match 'sub2.sub1.example.com'",
+                    "type": "string",
+                    "pattern": "^(\\*\\.)?([a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?\\.)+[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?\\.?$"
+                  },
+                  "nodeSelector": {
+                    "description": "nodeSelector will allow/deny traffic to the Kubernetes node IP of selected nodes. If this is set, cidrSelector and DNSName must be unset.",
+                    "type": "object",
+                    "properties": {
+                      "matchExpressions": {
+                        "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                        "type": "array",
+                        "items": {
+                          "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                          "type": "object",
+                          "required": [
+                            "key",
+                            "operator"
+                          ],
+                          "properties": {
+                            "key": {
+                              "description": "key is the label key that the selector applies to.",
+                              "type": "string"
+                            },
+                            "operator": {
+                              "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                              "type": "string"
+                            },
+                            "values": {
+                              "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "matchLabels": {
+                        "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "x-kubernetes-map-type": "atomic"
+                  }
+                }
+              },
+              "type": {
+                "description": "type marks this as an \"Allow\" or \"Deny\" rule",
+                "type": "string",
+                "pattern": "^Allow|Deny$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "Observed status of EgressFirewall",
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "set"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "k8s.ovn.org",
+      "kind": "EgressFirewall",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
