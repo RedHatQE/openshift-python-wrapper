@@ -55,6 +55,8 @@ fcn_exclude_functions =
     Path,
     writelines,
     submit,
+    astor,
+    ast,
 
 enable-extensions =
     FCN,

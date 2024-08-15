@@ -6,7 +6,6 @@ import json
 import shlex
 import os
 import sys
-from _ast import AST
 from pathlib import Path
 
 import textwrap
@@ -57,20 +56,17 @@ def _is_resource(_kind: str) -> Tuple[bool, str]:
 def map_kind_to_namespaced():
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
+    not_kind_list: List[str] = []
     if os.path.isfile(not_kind_file):
         with open(not_kind_file) as fd:
             not_kind_list = fd.read().split("\n")
-    else:
-        not_kind_list: List[str] = []
 
     with open(os.path.join(f"{SCHEMA_DIR}/all.json")) as fd:
         all_json_data = json.load(fd)
 
+    resources_mapping: Dict[str, Dict[str, bool]] = {}
     if os.path.isfile(RESOURCES_MAPPING_FILE):
         resources_mapping = read_resources_mapping_file()
-
-    else:
-        resources_mapping: Dict[str, Dict[str, bool]] = {}
 
     # `all.json` list all files that `openapi2jsonschema` generated which include duplication
     kind_set: Set[str] = set()
@@ -335,10 +331,6 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     if not type_from_dict_for_init:
         type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
 
-    import ipdb
-
-    ipdb.set_trace()
-
     return {
         "type-for-init": type_from_dict_for_init,
         "type-for-doc": type_for_docstring,
@@ -514,10 +506,10 @@ def class_generator(
 
 def combine_python_files(original_file: str, generated_file: str) -> None:
     with open(original_file) as file:
-        original_tree = ast.parse(file.read())
+        original_tree: ast.Module = ast.parse(file.read())
 
     with open(generated_file) as file:
-        generated_tree = ast.parse(file.read())
+        generated_tree: ast.Module = ast.parse(file.read())
 
     original_nodes: List[Any] = [
         node for node in original_tree.body if not isinstance(node, (ast.Import, ast.ImportFrom))
@@ -532,13 +524,13 @@ def combine_python_files(original_file: str, generated_file: str) -> None:
 
     for node in original_nodes:
         # If the node is the resource class, we need to reconstruct it
-        if isinstance(node, ast.ClassDef) and node.bases[0].id in (
+        if isinstance(node, ast.ClassDef) and node.bases[0].id in (  # type: ignore[attr-defined]
             "Resource",
             "NamespacedResource",
         ):
             for index, sub_node in enumerate(node.body):
                 for generated_node in generated_nodes:
-                    if isinstance(generated_node, ast.ClassDef) and generated_node.bases[0].id in (
+                    if isinstance(generated_node, ast.ClassDef) and generated_node.bases[0].id in (  # type: ignore[attr-defined]
                         "Resource",
                         "NamespacedResource",
                     ):
@@ -556,15 +548,11 @@ def combine_python_files(original_file: str, generated_file: str) -> None:
                                     node.body[index] = _sub_node
                                     break
 
-                                elif isinstance(_sub_node, ast.FunctionDef) and _sub_node.name == sub_node.name:
+                                elif isinstance(_sub_node, ast.FunctionDef) and _sub_node.name == sub_node.name:  # type: ignore[attr-defined]
                                     node.body[index] = _sub_node
                                     break
 
     new_tree = ast.Module(body=combined_imported_comments + original_nodes, type_ignores=[])
-
-    import ipdb
-
-    ipdb.set_trace()
 
     new_code = astor.to_source(new_tree)
 
@@ -578,11 +566,14 @@ def combine_python_files(original_file: str, generated_file: str) -> None:
     )
 
 
-def _get_combined_imports_comments(generated_tree: AST, original_tree: AST) -> List[AST]:
-    original_imports = [node for node in original_tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
-    generated_imports = [node for node in generated_tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
+def _get_combined_imports_comments(
+    generated_tree: ast.Module, original_tree: ast.Module
+) -> List[ast.Import | ast.ImportFrom]:
+    imports = [node for node in generated_tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
 
-    return generated_imports + original_imports
+    imports.extend([node for node in original_tree.body if isinstance(node, (ast.Import, ast.ImportFrom))])
+
+    return imports
 
 
 def write_and_format_rendered(filepath: str, data: str) -> None:
