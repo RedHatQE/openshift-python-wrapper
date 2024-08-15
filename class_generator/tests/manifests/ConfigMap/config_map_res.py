@@ -15,7 +15,7 @@ class ConfigMap(NamespacedResource):
         self,
         binary_data: Optional[Dict[str, Any]] = None,
         data: Optional[Dict[str, Any]] = None,
-        immutable: Optional[Dict[str, Any]] = None,
+        immutable: Optional[bool] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -33,7 +33,7 @@ class ConfigMap(NamespacedResource):
               Data must not overlap with the keys in the BinaryData field, this
               is enforced during validation process.
 
-            immutable(Dict[str, Any]): Immutable, if set to true, ensures that data stored in the ConfigMap
+            immutable(bool): Immutable, if set to true, ensures that data stored in the ConfigMap
               cannot be updated (only object metadata can be modified). If not
               set to true, the field can be modified at any time. Defaulted to
               nil.
