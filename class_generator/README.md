@@ -2,7 +2,7 @@
 
 ## Usage
 
-###### Installation
+### Installation
 
 - Using [pipx](https://github.com/pypa/pipx) (recommended)
 
@@ -29,7 +29,7 @@ For shell completion Add this to ~/.bashrc or ~/.zshrc:
 if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_source class-generator)"; fi
 ```
 
-###### Call the script
+#### Usage
 
 - All available options:
 
@@ -74,7 +74,7 @@ pipx install --python python3.9 openapi2jsonschema
 - Clone this repository
 
 ```bash
-got clone https://github.com/RedHatQE/openshift-python-wrapper.git
+git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
 ```
 
@@ -95,18 +95,3 @@ oc login <clster api URL> -u <username> -p <password>
 ```bash
 poetry run python class_generator/class-generator --update-schema
 ```
-
-## Reporting an issue
-
-- Running with debug mode and `--debug` flag:
-
-```bash
-class-generator --kind <kind> --debug
-```
-
-`<kind>-debug.json` will be located under `scripts/resource/debug`
-Issue should include:
-
-- The script executed command
-- debug file from the above command
-- oc/kubectl version
