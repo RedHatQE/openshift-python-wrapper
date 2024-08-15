@@ -79,7 +79,7 @@ def map_kind_to_namespaced():
     is_kind_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
         for _kind in kind_set:
-            if resources_mapping.get(_kind):
+            if resources_mapping.get(_kind.lower()):  # resource_mappings store all keys in lowercase
                 continue
 
             # Check if the kind we work on is a real kind
