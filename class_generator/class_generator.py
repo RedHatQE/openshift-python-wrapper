@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import ast
 import filecmp
 import json
 import shlex
 import os
 import sys
+from _ast import AST
 from pathlib import Path
 
 import textwrap
@@ -19,6 +21,7 @@ from pyhelper_utils.shell import run_command
 import pytest
 from rich.console import Console
 from rich.syntax import Syntax
+import astor
 
 from ocp_resources.resource import Resource
 
@@ -45,7 +48,10 @@ def _is_kind_is_namespaced(_kind: str) -> Tuple[bool, str]:
 
 
 def _is_resource(_kind: str) -> Tuple[bool, str]:
-    return run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0], _kind
+    return (
+        run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0],
+        _kind,
+    )
 
 
 def map_kind_to_namespaced():
@@ -131,7 +137,11 @@ def update_kind_schema():
         sys.exit(1)
 
     api_url = run_command(command=shlex.split("oc whoami --show-server"), check=False, log_errors=False)[1].strip()
-    data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
+    data = requests.get(
+        f"{api_url}/openapi/v2",
+        headers={"Authorization": f"Bearer {token.strip()}"},
+        verify=False,
+    )
 
     if not data.ok:
         LOGGER.error("Failed to get openapi schema.")
@@ -325,7 +335,14 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     if not type_from_dict_for_init:
         type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
 
-    return {"type-for-init": type_from_dict_for_init, "type-for-doc": type_for_docstring}
+    import ipdb
+
+    ipdb.set_trace()
+
+    return {
+        "type-for-init": type_from_dict_for_init,
+        "type-for-doc": type_for_docstring,
+    }
 
 
 def get_property_schema(property: Dict[str, Any]) -> Dict[str, Any]:
@@ -346,7 +363,7 @@ def format_description(description: str) -> str:
 
 def prepare_property_dict(
     schema: Dict[str, Any],
-    requeired: List[str],
+    required: List[str],
     resource_dict: Dict[str, Any],
     dict_key: str,
 ) -> Dict[str, Any]:
@@ -360,7 +377,7 @@ def prepare_property_dict(
         resource_dict[dict_key].append({
             "name-for-class-arg": python_name,
             "property-name": key,
-            "required": key in requeired,
+            "required": key in required,
             "description": format_description(description=val_schema["description"]),
             "type-for-docstring": type_dict["type-for-doc"],
             "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
@@ -392,14 +409,14 @@ def parse_explain(
         spec_requeired = spec_schema.get("required", [])
         resource_dict = prepare_property_dict(
             schema=spec_schema.get("properties", {}),
-            requeired=spec_requeired,
+            required=spec_requeired,
             resource_dict=resource_dict,
             dict_key="spec",
         )
 
     resource_dict = prepare_property_dict(
         schema=schema_properties,
-        requeired=fields_requeired,
+        required=fields_requeired,
         resource_dict=resource_dict,
         dict_key="fields",
     )
@@ -485,11 +502,87 @@ def class_generator(
             check=False,
         )
 
-        if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
-            LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
-            Path.unlink(Path(generated_py_file))
+        if orig_filename != generated_py_file:
+            if filecmp.cmp(orig_filename, generated_py_file):
+                LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
+                Path.unlink(Path(generated_py_file))
+            else:
+                combine_python_files(original_file=orig_filename, generated_file=generated_py_file)
 
     return generated_py_file
+
+
+def combine_python_files(original_file: str, generated_file: str) -> None:
+    with open(original_file) as file:
+        original_tree = ast.parse(file.read())
+
+    with open(generated_file) as file:
+        generated_tree = ast.parse(file.read())
+
+    original_nodes: List[Any] = [
+        node for node in original_tree.body if not isinstance(node, (ast.Import, ast.ImportFrom))
+    ]
+    generated_nodes: List[Any] = [
+        node for node in generated_tree.body if not isinstance(node, (ast.Import, ast.ImportFrom))
+    ]
+
+    combined_imported_comments: List[Any] = _get_combined_imports_comments(
+        generated_tree=generated_tree, original_tree=original_tree
+    )
+
+    for node in original_nodes:
+        # If the node is the resource class, we need to reconstruct it
+        if isinstance(node, ast.ClassDef) and node.bases[0].id in (
+            "Resource",
+            "NamespacedResource",
+        ):
+            for index, sub_node in enumerate(node.body):
+                for generated_node in generated_nodes:
+                    if isinstance(generated_node, ast.ClassDef) and generated_node.bases[0].id in (
+                        "Resource",
+                        "NamespacedResource",
+                    ):
+                        for _sub_node in generated_node.body:
+                            if isinstance(_sub_node, type(sub_node)):
+                                if isinstance(_sub_node, ast.AnnAssign):
+                                    node.body[index] = _sub_node
+                                    break
+
+                                elif isinstance(_sub_node, ast.Expr):
+                                    node.body[index] = _sub_node
+                                    break
+
+                                elif isinstance(_sub_node, ast.Attribute):
+                                    node.body[index] = _sub_node
+                                    break
+
+                                elif isinstance(_sub_node, ast.FunctionDef) and _sub_node.name == sub_node.name:
+                                    node.body[index] = _sub_node
+                                    break
+
+    new_tree = ast.Module(body=combined_imported_comments + original_nodes, type_ignores=[])
+
+    import ipdb
+
+    ipdb.set_trace()
+
+    new_code = astor.to_source(new_tree)
+
+    with open(generated_file, "w") as file:
+        file.write(new_code)
+
+    run_command(
+        command=shlex.split(f"poetry run ruff format {generated_file}"),
+        verify_stderr=False,
+        check=False,
+    )
+
+
+def _get_combined_imports_comments(generated_tree: AST, original_tree: AST) -> List[AST]:
+    original_imports = [node for node in original_tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
+    generated_imports = [node for node in generated_tree.body if isinstance(node, (ast.Import, ast.ImportFrom))]
+
+    return generated_imports + original_imports
 
 
 def write_and_format_rendered(filepath: str, data: str) -> None:

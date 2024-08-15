@@ -75,6 +75,7 @@ ruff = "^0.5.3"
 rich = "^13.7.1"
 cloup = "^3.0.5"
 pytest = "^8.0.0"
+astor = "^0.8.1"
 
 [tool.pytest.ini_options]
 markers = [
