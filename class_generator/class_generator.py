@@ -505,6 +505,7 @@ def class_generator(
 
 
 def combine_python_files(original_file: str, generated_file: str) -> None:
+    # TODO: address comments, and astor_to_source - do not apply formatting
     with open(original_file) as file:
         original_tree: ast.Module = ast.parse(file.read())
 
