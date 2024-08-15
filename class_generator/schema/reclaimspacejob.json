@@ -1,0 +1,161 @@
+{
+  "description": "ReclaimSpaceJob is the Schema for the reclaimspacejobs API",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ReclaimSpaceJobSpec defines the desired state of ReclaimSpaceJob",
+      "type": "object",
+      "required": [
+        "target"
+      ],
+      "properties": {
+        "backOffLimit": {
+          "description": "BackOffLimit specifies the number of retries allowed before marking reclaim\nspace operation as failed. If not specified, defaults to 6. Maximum allowed\nvalue is 60 and minimum allowed value is 0.",
+          "type": "integer",
+          "format": "int32",
+          "maximum": 60,
+          "minimum": 0
+        },
+        "retryDeadlineSeconds": {
+          "description": "RetryDeadlineSeconds specifies the duration in seconds relative to the\nstart time that the operation may be retried; value MUST be positive integer.\nIf not specified, defaults to 600 seconds. Maximum allowed\nvalue is 1800.",
+          "type": "integer",
+          "format": "int64",
+          "maximum": 1800,
+          "minimum": 0
+        },
+        "target": {
+          "description": "Target represents volume target on which the operation will be\nperformed.",
+          "type": "object",
+          "properties": {
+            "persistentVolumeClaim": {
+              "description": "PersistentVolumeClaim specifies the target PersistentVolumeClaim name.",
+              "type": "string",
+              "x-kubernetes-validations": [
+                {
+                  "message": "persistentVolumeClaim is immutable",
+                  "rule": "self == oldSelf"
+                }
+              ]
+            }
+          }
+        },
+        "timeout": {
+          "description": "Timeout specifies the timeout in seconds for the grpc request sent to the\nCSI driver. If not specified, defaults to global reclaimspace timeout.\nMinimum allowed value is 60.",
+          "type": "integer",
+          "format": "int64",
+          "minimum": 60
+        }
+      }
+    },
+    "status": {
+      "description": "ReclaimSpaceJobStatus defines the observed state of ReclaimSpaceJob",
+      "type": "object",
+      "properties": {
+        "completionTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "conditions": {
+          "description": "Conditions are the list of conditions and their status.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "message": {
+          "description": "Message contains any message from the ReclaimSpaceJob.",
+          "type": "string"
+        },
+        "reclaimedSpace": {
+          "description": "ReclaimedSpace indicates the amount of space reclaimed.",
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "x-kubernetes-int-or-string": true
+        },
+        "result": {
+          "description": "Result indicates the result of ReclaimSpaceJob.",
+          "type": "string"
+        },
+        "retries": {
+          "description": "Retries indicates the number of times the operation is retried.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "csiaddons.openshift.io",
+      "kind": "ReclaimSpaceJob",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

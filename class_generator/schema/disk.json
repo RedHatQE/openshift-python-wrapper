@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "blockSize": {
+      "description": "If specified, the virtual disk will be presented with the given block sizes.",
+      "$ref": "_definitions.json#/definitions/v1.BlockSize"
+    },
+    "bootOrder": {
+      "description": "BootOrder is an integer value > 0, used to determine ordering of boot devices. Lower values take precedence. Each disk or interface that has a boot order must have a unique value. Disks without a boot order are not tried if a disk with a boot order exists.",
+      "type": "integer",
+      "format": "int32"
+    },
+    "cache": {
+      "description": "Cache specifies which kvm disk cache mode should be used. Supported values are: CacheNone, CacheWriteThrough.",
+      "type": "string"
+    },
+    "cdrom": {
+      "description": "Attach a volume as a cdrom to the vmi.",
+      "$ref": "_definitions.json#/definitions/v1.CDRomTarget"
+    },
+    "dedicatedIOThread": {
+      "description": "dedicatedIOThread indicates this disk should have an exclusive IO Thread. Enabling this implies useIOThreads = true. Defaults to false.",
+      "type": "boolean"
+    },
+    "disk": {
+      "description": "Attach a volume as a disk to the vmi.",
+      "$ref": "_definitions.json#/definitions/v1.DiskTarget"
+    },
+    "errorPolicy": {
+      "description": "If specified, it can change the default error policy (stop) for the disk",
+      "type": "string"
+    },
+    "io": {
+      "description": "IO specifies which QEMU disk IO mode should be used. Supported values are: native, default, threads.",
+      "type": "string"
+    },
+    "lun": {
+      "description": "Attach a volume as a LUN to the vmi.",
+      "$ref": "_definitions.json#/definitions/v1.LunTarget"
+    },
+    "name": {
+      "description": "Name is the device name",
+      "type": "string",
+      "default": ""
+    },
+    "serial": {
+      "description": "Serial provides the ability to specify a serial number for the disk device.",
+      "type": "string"
+    },
+    "shareable": {
+      "description": "If specified the disk is made sharable and multiple write from different VMs are permitted",
+      "type": "boolean"
+    },
+    "tag": {
+      "description": "If specified, disk address and its tag will be provided to the guest via config drive metadata",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

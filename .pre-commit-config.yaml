@@ -1,3 +1,5 @@
+exclude: "class_generator/schema/*"
+
 default_language_version:
   python: python3
 
@@ -30,8 +32,6 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args:
-          [--exclude-files=class_generator/tests/manifests/pod/pod_debug.json]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.5.7
@@ -54,4 +54,4 @@ repos:
     hooks:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)
-        additional_dependencies: ["types-PyYAML"]
+        additional_dependencies: ["types-PyYAML", "types-requests"]

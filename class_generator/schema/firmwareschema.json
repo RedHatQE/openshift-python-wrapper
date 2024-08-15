@@ -1,0 +1,95 @@
+{
+  "description": "FirmwareSchema is the Schema for the firmwareschemas API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "FirmwareSchemaSpec defines the desired state of FirmwareSchema.",
+      "type": "object",
+      "required": [
+        "schema"
+      ],
+      "properties": {
+        "hardwareModel": {
+          "description": "The hardware model associated with this schema",
+          "type": "string"
+        },
+        "hardwareVendor": {
+          "description": "The hardware vendor associated with this schema",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Map of firmware name to schema",
+          "type": "object",
+          "additionalProperties": {
+            "description": "Additional data describing the firmware setting.",
+            "type": "object",
+            "properties": {
+              "allowable_values": {
+                "description": "The allowable value for an Enumeration type setting.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "attribute_type": {
+                "description": "The type of setting.",
+                "type": "string",
+                "enum": [
+                  "Enumeration",
+                  "String",
+                  "Integer",
+                  "Boolean",
+                  "Password"
+                ]
+              },
+              "lower_bound": {
+                "description": "The lowest value for an Integer type setting.",
+                "type": "integer"
+              },
+              "max_length": {
+                "description": "Maximum length for a String type setting.",
+                "type": "integer"
+              },
+              "min_length": {
+                "description": "Minimum length for a String type setting.",
+                "type": "integer"
+              },
+              "read_only": {
+                "description": "Whether or not this setting is read only.",
+                "type": "boolean"
+              },
+              "unique": {
+                "description": "Whether or not this setting's value is unique to this node, e.g. a serial number.",
+                "type": "boolean"
+              },
+              "upper_bound": {
+                "description": "The highest value for an Integer type setting.",
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "metal3.io",
+      "kind": "FirmwareSchema",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

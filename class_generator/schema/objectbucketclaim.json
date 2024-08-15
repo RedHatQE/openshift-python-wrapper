@@ -1,0 +1,73 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Specification of the desired behavior of the claim.",
+      "type": "object",
+      "required": [
+        "storageClassName"
+      ],
+      "properties": {
+        "additionalConfig": {
+          "description": "AdditionalConfig gives providers a location to set proprietary config values (tenant, namespace, etc)",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "bucketName": {
+          "description": "BucketName (not recommended) the name of the bucket. Caution! In-store bucket names may collide across namespaces.  If you define the name yourself, try to make it as unique as possible.",
+          "type": "string"
+        },
+        "generateBucketName": {
+          "description": "GenerateBucketName (recommended) a prefix for a bucket name to be followed by a hyphen and 5 random characters. Protects against in-store name collisions.",
+          "type": "string"
+        },
+        "objectBucketName": {
+          "description": "ObjectBucketName is the name of the object bucket resource. This is the authoritative determination for binding.",
+          "type": "string"
+        },
+        "storageClassName": {
+          "description": "StorageClass names the StorageClass object representing the desired provisioner and parameters",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "Most recently observed status of the claim.",
+      "type": "object",
+      "properties": {
+        "phase": {
+          "description": "ObjectBucketClaimStatusPhase is set by the controller to save the state of the provisioning process",
+          "type": "string",
+          "enum": [
+            "Pending",
+            "Bound",
+            "Released",
+            "Failed"
+          ]
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "objectbucket.io",
+      "kind": "ObjectBucketClaim",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

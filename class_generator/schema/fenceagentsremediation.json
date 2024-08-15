@@ -1,0 +1,149 @@
+{
+  "description": "FenceAgentsRemediation is the Schema for the fenceagentsremediations API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "FenceAgentsRemediationSpec defines the desired state of FenceAgentsRemediation",
+      "type": "object",
+      "required": [
+        "agent"
+      ],
+      "properties": {
+        "agent": {
+          "description": "Agent is the name of fence agent that will be used.\nIt should have a fence_ prefix.",
+          "type": "string",
+          "pattern": "fence_.+"
+        },
+        "nodeparameters": {
+          "description": "NodeParameters are passed to the fencing agent according to the node that is fenced, since they are node specific",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "remediationStrategy": {
+          "description": "RemediationStrategy is the remediation method for unhealthy nodes.\nCurrently, it could be either \"OutOfServiceTaint\" or \"ResourceDeletion\".\nResourceDeletion will iterate over all pods related to the unhealthy node and delete them.\nOutOfServiceTaint will add the out-of-service taint which is a new well-known taint \"node.kubernetes.io/out-of-service\"\nthat enables automatic deletion of pv-attached pods on failed nodes, \"out-of-service\" taint is only supported on clusters with k8s version 1.26+ or OCP/OKD version 4.13+.",
+          "type": "string",
+          "enum": [
+            "ResourceDeletion",
+            "OutOfServiceTaint"
+          ]
+        },
+        "retrycount": {
+          "description": "RetryCount is the number of times the fencing agent will be executed",
+          "type": "integer"
+        },
+        "retryinterval": {
+          "description": "RetryInterval is the interval between each fencing agent execution",
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|ms|s|m|h))+$"
+        },
+        "sharedparameters": {
+          "description": "SharedParameters are passed to the fencing agent regardless of which node is about to be fenced (i.e., they are common for all the nodes)",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "timeout": {
+          "description": "Timeout is the timeout for each fencing agent execution",
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|ms|s|m|h))+$"
+        }
+      }
+    },
+    "status": {
+      "description": "FenceAgentsRemediationStatus defines the observed state of FenceAgentsRemediation",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Represents the observations of a FenceAgentsRemediation's current state.\nKnown .status.conditions.type are: \"Processing\", \"FenceAgentActionSucceeded\", and \"Succeeded\".",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "lastUpdateTime": {
+          "description": "LastUpdateTime is the last time the status was updated.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "fence-agents-remediation.medik8s.io",
+      "kind": "FenceAgentsRemediation",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
