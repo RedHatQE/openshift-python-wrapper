@@ -13,11 +13,11 @@ class Deployment(NamespacedResource):
 
     def __init__(
         self,
-        min_ready_seconds: Optional[Dict[str, Any]] = None,
-        paused: Optional[Dict[str, Any]] = None,
-        progress_deadline_seconds: Optional[Dict[str, Any]] = None,
-        replicas: Optional[Dict[str, Any]] = None,
-        revision_history_limit: Optional[Dict[str, Any]] = None,
+        min_ready_seconds: Optional[int] = None,
+        paused: Optional[bool] = None,
+        progress_deadline_seconds: Optional[int] = None,
+        replicas: Optional[int] = None,
+        revision_history_limit: Optional[int] = None,
         selector: Optional[Dict[str, Any]] = None,
         strategy: Optional[Dict[str, Any]] = None,
         template: Optional[Dict[str, Any]] = None,
@@ -25,24 +25,24 @@ class Deployment(NamespacedResource):
     ) -> None:
         """
         Args:
-            min_ready_seconds(Dict[str, Any]): Minimum number of seconds for which a newly created pod should be
+            min_ready_seconds(int): Minimum number of seconds for which a newly created pod should be
               ready without any of its container crashing, for it to be
               considered available. Defaults to 0 (pod will be considered
               available as soon as it is ready)
 
-            paused(Dict[str, Any]): Indicates that the deployment is paused.
+            paused(bool): Indicates that the deployment is paused.
 
-            progress_deadline_seconds(Dict[str, Any]): The maximum time in seconds for a deployment to make progress before
+            progress_deadline_seconds(int): The maximum time in seconds for a deployment to make progress before
               it is considered to be failed. The deployment controller will
               continue to process failed deployments and a condition with a
               ProgressDeadlineExceeded reason will be surfaced in the deployment
               status. Note that progress will not be estimated during the time a
               deployment is paused. Defaults to 600s.
 
-            replicas(Dict[str, Any]): Number of desired pods. This is a pointer to distinguish between
+            replicas(int): Number of desired pods. This is a pointer to distinguish between
               explicit zero and not specified. Defaults to 1.
 
-            revision_history_limit(Dict[str, Any]): The number of old ReplicaSets to retain to allow rollback. This is a
+            revision_history_limit(int): The number of old ReplicaSets to retain to allow rollback. This is a
               pointer to distinguish between explicit zero and not specified.
               Defaults to 10.
 

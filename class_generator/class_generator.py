@@ -312,14 +312,14 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     if key_dict["type"] == "array":
         type_for_docstring = "List[Any]"
 
-    elif key_dict == "string":
+    elif key_dict["type"] == "string":
         type_for_docstring = "str"
         type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
 
-    elif key_dict == "boolean":
+    elif key_dict["type"] == "boolean":
         type_for_docstring = "bool"
 
-    elif key_dict == "integer":
+    elif key_dict["type"] == "integer":
         type_for_docstring = "int"
 
     if not type_from_dict_for_init:
