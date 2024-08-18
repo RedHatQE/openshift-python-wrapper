@@ -38,7 +38,6 @@ class {{ kind }}({{ base_class }}):
             {% endfor %}
         """
         {% endif %}
-
         super().__init__(**kwargs)
 
         {% for arg in fields + spec %}
@@ -61,28 +60,37 @@ class {{ kind }}({{ base_class }}):
             _spec = self.res["spec"]
           {% endif %}
 
+          {# Add required args under `self.res` #}
           {% for arg in fields %}
           {% if arg["required"] == True %}
-            self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
-          {% endif %}
-          {% endfor %}
-
-          {% for arg in spec %}
-          {% if arg["required"] == True %}
-            _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
-          {% endif %}
-          {% endfor %}
-
-          {% for arg in fields %}
-          {% if arg["required"] == False %}
-            if self.{{ arg["name-for-class-arg"] }}{% if arg["type"] == "bool" %} is not None{% endif %}:
+            if self.{{ arg["name-for-class-arg"] }}{% if arg["type-for-docstring"] == "bool" %} is not None{% endif %}:
               self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
 
           {% endif %}
           {% endfor %}
+
+          {# Add required args under `_spec` #}
+          {% for arg in spec %}
+          {% if arg["required"] == True %}
+            if self.{{ arg["name-for-class-arg"] }}{% if arg["type-for-docstring"] == "bool" %} is not None{% endif %}:
+              _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
+
+          {% endif %}
+          {% endfor %}
+
+          {# Add optional args under `self.res` #}
+          {% for arg in fields %}
+          {% if arg["required"] == False %}
+            if self.{{ arg["name-for-class-arg"] }}{% if arg["type-for-docstring"] == "bool" %} is not None{% endif %}:
+              self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
+
+          {% endif %}
+          {% endfor %}
+
+          {# Add optional args under `_spec` #}
           {% for arg in spec %}
           {% if arg["required"] == False %}
-            if self.{{ arg["name-for-class-arg"] }}{% if arg["type"] == "bool" %} is not None{% endif %}:
+            if self.{{ arg["name-for-class-arg"] }}{% if arg["type-for-docstring"] == "bool" %} is not None{% endif %}:
               _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
 
           {% endif %}
