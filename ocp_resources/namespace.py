@@ -1,13 +1,12 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from typing import Any, List, Optional
 from ocp_resources.resource import Resource
 
 
 class Namespace(Resource):
     """
-    Namespace provides a scope for Names. Use of multiple namespaces is
-    optional.
+    Namespace provides a scope for Names. Use of multiple namespaces is optional.
     """
 
     api_version: str = Resource.ApiVersion.V1
@@ -17,13 +16,13 @@ class Namespace(Resource):
 
     def __init__(
         self,
-        finalizers: Optional[Dict[str, Any]] = None,
+        finalizers: Optional[List[Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            finalizers(Dict[Any, Any]): Finalizers is an opaque list of values that must be empty to permanently
-              remove object from storage. More info:
+            finalizers(List[Any]): Finalizers is an opaque list of values that must be empty to
+              permanently remove object from storage. More info:
               https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
 
         """

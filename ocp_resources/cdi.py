@@ -30,152 +30,26 @@ class CDI(Resource):
     ) -> None:
         """
         Args:
-            cert_config(Dict[Any, Any]): certificate configuration
-
-              FIELDS:
-                ca	<Object>
-                  CA configuration
-                  CA certs are kept in the CA bundle as long as they are valid
-
-                client	<Object>
-                  Client configuration
-                  Certs are rotated and discarded
-
-                server	<Object>
-                  Server configuration
-                  Certs are rotated and discarded
+            cert_config(Dict[str, Any]): certificate configuration
 
             clone_strategy_override(str): Clone strategy override: should we use a host-assisted copy even if
               snapshots are available?
 
-            config(Dict[Any, Any]): CDIConfig at CDI level
+            config(Dict[str, Any]): CDIConfig at CDI level
 
-              FIELDS:
-                dataVolumeTTLSeconds	<integer>
-                  DataVolumeTTLSeconds is the time in seconds after DataVolume completion it
-                  can be garbage collected. Disabled by default.
-
-                featureGates	<[]string>
-                  FeatureGates are a list of specific enabled feature gates
-
-                filesystemOverhead	<Object>
-                  FilesystemOverhead describes the space reserved for overhead when using
-                  Filesystem volumes. A value is between 0 and 1, if not defined it is 0.055
-                  (5.5% overhead)
-
-                imagePullSecrets	<[]Object>
-                  The imagePullSecrets used to pull the container images
-
-                importProxy	<Object>
-                  ImportProxy contains importer pod proxy configuration.
-
-                insecureRegistries	<[]string>
-                  InsecureRegistries is a list of TLS disabled registries
-
-                logVerbosity	<integer>
-                  LogVerbosity overrides the default verbosity level used to initialize
-                  loggers
-
-                podResourceRequirements	<Object>
-                  ResourceRequirements describes the compute resource requirements.
-
-                preallocation	<boolean>
-                  Preallocation controls whether storage for DataVolumes should be allocated
-                  in advance.
-
-                scratchSpaceStorageClass	<string>
-                  Override the storage class to used for scratch space during transfer
-                  operations. The scratch space storage class is determined in the following
-                  order: 1. value of scratchSpaceStorageClass, if that doesn't exist, use the
-                  default storage class, if there is no default storage class, use the storage
-                  class of the DataVolume, if no storage class specified, use no storage class
-                  for scratch space
-
-                tlsSecurityProfile	<Object>
-                  TLSSecurityProfile is used by operators to apply cluster-wide TLS security
-                  settings to operands.
-
-                uploadProxyURLOverride	<string>
-                  Override the URL used when uploading to a DataVolume
-
-            customize_components(Dict[Any, Any]): CustomizeComponents defines patches for components deployed by the CDI
+            customize_components(Dict[str, Any]): CustomizeComponents defines patches for components deployed by the CDI
               operator.
-
-              FIELDS:
-                flags	<Object>
-                  Configure the value used for deployment and daemonset resources
-
-                patches	<[]Object>
-                  <no description>
 
             image_pull_policy(str): PullPolicy describes a policy for if/when to pull a container image
 
-            infra(Dict[Any, Any]): Selectors and tolerations that should apply to cdi infrastructure components
-
-              FIELDS:
-                affinity	<Object>
-                  affinity enables pod affinity/anti-affinity placement expanding the types of
-                  constraints
-                  that can be expressed with nodeSelector.
-                  affinity is going to be applied to the relevant kind of pods in parallel
-                  with nodeSelector
-                  See
-                  https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
-
-                apiServerReplicas	<integer>
-                  ApiserverReplicas set Replicas for cdi-apiserver
-
-                deploymentReplicas	<integer>
-                  DeploymentReplicas set Replicas for cdi-deployment
-
-                nodeSelector	<map[string]string>
-                  nodeSelector is the node selector applied to the relevant kind of pods
-                  It specifies a map of key-value pairs: for the pod to be eligible to run on
-                  a node,
-                  the node must have each of the indicated key-value pairs as labels
-                  (it can have additional labels as well).
-                  See
-                  https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-
-                tolerations	<[]Object>
-                  tolerations is a list of tolerations applied to the relevant kind of pods
-                  See https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-                  for more info.
-                  These are additional tolerations other than default ones.
-
-                uploadProxyReplicas	<integer>
-                  UploadproxyReplicas set Replicas for cdi-uploadproxy
+            infra(Dict[str, Any]): Selectors and tolerations that should apply to cdi infrastructure
+              components
 
             priority_class(str): PriorityClass of the CDI control plane
 
             uninstall_strategy(str): CDIUninstallStrategy defines the state to leave CDI on uninstall
 
-            workload(Dict[Any, Any]): Restrict on which nodes CDI workload pods will be scheduled
-
-              FIELDS:
-                affinity	<Object>
-                  affinity enables pod affinity/anti-affinity placement expanding the types of
-                  constraints
-                  that can be expressed with nodeSelector.
-                  affinity is going to be applied to the relevant kind of pods in parallel
-                  with nodeSelector
-                  See
-                  https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
-
-                nodeSelector	<map[string]string>
-                  nodeSelector is the node selector applied to the relevant kind of pods
-                  It specifies a map of key-value pairs: for the pod to be eligible to run on
-                  a node,
-                  the node must have each of the indicated key-value pairs as labels
-                  (it can have additional labels as well).
-                  See
-                  https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-
-                tolerations	<[]Object>
-                  tolerations is a list of tolerations applied to the relevant kind of pods
-                  See https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-                  for more info.
-                  These are additional tolerations other than default ones.
+            workload(Dict[str, Any]): Restrict on which nodes CDI workload pods will be scheduled
 
         """
         super().__init__(**kwargs)

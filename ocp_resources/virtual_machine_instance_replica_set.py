@@ -6,8 +6,7 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 
 class VirtualMachineInstanceReplicaSet(NamespacedResource):
     """
-    VirtualMachineInstance is *the* VirtualMachineInstance Definition. It
-    represents a virtual machine in the runtime environment of kubernetes.
+    VirtualMachineInstance is *the* VirtualMachineInstance Definition. It represents a virtual machine in the runtime environment of kubernetes.
     """
 
     api_group: str = NamespacedResource.ApiGroup.KUBEVIRT_IO
@@ -24,34 +23,13 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
         Args:
             paused(bool): Indicates that the replica set is paused.
 
-            replicas(int): Number of desired pods. This is a pointer to distinguish between explicit
-              zero and not specified. Defaults to 1.
+            replicas(int): Number of desired pods. This is a pointer to distinguish between
+              explicit zero and not specified. Defaults to 1.
 
-            selector(Dict[Any, Any]): Label selector for pods. Existing ReplicaSets whose pods are
-              selected by this will be the ones affected by this deployment.
+            selector(Dict[str, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected
+              by this will be the ones affected by this deployment.
 
-              FIELDS:
-                matchExpressions	<[]Object>
-                  matchExpressions is a list of label selector requirements. The requirements
-                  are ANDed.
-
-                matchLabels	<map[string]string>
-                  matchLabels is a map of {key,value} pairs. A single {key,value} in the
-                  matchLabels
-                  map is equivalent to an element of matchExpressions, whose key field is
-                  "key", the
-                  operator is "In", and the values array contains only "value". The
-                  requirements are ANDed.
-
-            template(Dict[Any, Any]): Template describes the pods that will be created.
-
-              FIELDS:
-                metadata	<Object>
-                  <no description>
-
-                spec	<Object>
-                  VirtualMachineInstance Spec contains the VirtualMachineInstance
-                  specification.
+            template(Dict[str, Any]): Template describes the pods that will be created.
 
         """
         super().__init__(**kwargs)
