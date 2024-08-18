@@ -6,8 +6,8 @@ from ocp_resources.resource import NamespacedResource
 
 class VirtualMachineInstanceMigration(NamespacedResource):
     """
-    VirtualMachineInstanceMigration represents the object tracking a VMI's
-    migration to another host in the cluster
+        VirtualMachineInstanceMigration represents the object tracking a VMI's migration
+    to another host in the cluster
     """
 
     api_group: str = NamespacedResource.ApiGroup.KUBEVIRT_IO
