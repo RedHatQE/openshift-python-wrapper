@@ -86,19 +86,3 @@ class Machine(NamespacedResource):
 
             if self.taints:
                 _spec["taints"] = self.taints
-
-    @property
-    def cluster_name(self):
-        return self.instance.metadata.labels[f"{self.api_group}/cluster-api-cluster"]
-
-    @property
-    def machine_role(self):
-        return self.instance.metadata.labels[f"{self.api_group}/cluster-api-machine-role"]
-
-    @property
-    def machine_type(self):
-        return self.instance.metadata.labels[f"{self.api_group}/cluster-api-machine-type"]
-
-    @property
-    def machineset_name(self):
-        return self.instance.metadata.labels[f"{self.api_group}/cluster-api-machineset"]
