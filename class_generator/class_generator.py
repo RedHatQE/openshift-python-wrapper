@@ -4,15 +4,13 @@ import filecmp
 import json
 import shlex
 import os
-import shutil
 import sys
 from pathlib import Path
 
 import textwrap
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Tuple
 import click
 import re
-from jinja2.nodes import Impossible
 import requests
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import cloup
