@@ -58,7 +58,6 @@ class Deployment(NamespacedResource):
               a template
 
         """
-
         super().__init__(**kwargs)
 
         self.min_ready_seconds = min_ready_seconds
@@ -89,7 +88,7 @@ class Deployment(NamespacedResource):
             if self.min_ready_seconds:
                 _spec["minReadySeconds"] = self.min_ready_seconds
 
-            if self.paused:
+            if self.paused is not None:
                 _spec["paused"] = self.paused
 
             if self.progress_deadline_seconds:

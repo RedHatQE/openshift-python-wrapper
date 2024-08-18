@@ -39,7 +39,6 @@ class ConfigMap(NamespacedResource):
               nil.
 
         """
-
         super().__init__(**kwargs)
 
         self.binary_data = binary_data
@@ -56,5 +55,5 @@ class ConfigMap(NamespacedResource):
             if self.data:
                 self.res["data"] = self.data
 
-            if self.immutable:
+            if self.immutable is not None:
                 self.res["immutable"] = self.immutable
