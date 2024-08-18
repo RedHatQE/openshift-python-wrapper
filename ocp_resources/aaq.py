@@ -24,91 +24,21 @@ class AAQ(Resource):
     ) -> None:
         """
         Args:
-            cert_config(Dict[Any, Any]): certificate configuration
+            cert_config(Dict[str, Any]): certificate configuration
 
-              FIELDS:
-                ca	<Object>
-                  CA configuration CA certs are kept in the CA bundle as long as they are
-                  valid
-
-                server	<Object>
-                  Server configuration Certs are rotated and discarded
-
-            configuration(Dict[Any, Any]): holds aaq configurations.
-
-              FIELDS:
-                allowApplicationAwareClusterResourceQuota	<boolean>
-                  AllowApplicationAwareClusterResourceQuota can be set to true to allow
-                  creation and management of ApplicationAwareClusterResourceQuota. Defaults to
-                  false
-
-                sidecarEvaluators	<[]Object>
-                  SidecarEvaluators allow custom quota counting for external operator
-
-                vmiCalculatorConfiguration	<Object>
-                  VmiCalculatorConfiguration determine how resource allocation will be done
-                  with ApplicationAwareResourceQuota
+            configuration(Dict[str, Any]): holds aaq configurations.
 
             image_pull_policy(str): PullPolicy describes a policy for if/when to pull a container image
 
-            infra(Dict[Any, Any]): Rules on which nodes AAQ infrastructure pods will be scheduled
+            infra(Dict[str, Any]): Rules on which nodes AAQ infrastructure pods will be scheduled
 
-              FIELDS:
-                affinity	<Object>
-                  affinity enables pod affinity/anti-affinity placement expanding the types of
-                  constraints that can be expressed with nodeSelector. affinity is going to be
-                  applied to the relevant kind of pods in parallel with nodeSelector See
-                  https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
-
-                nodeSelector	<map[string]string>
-                  nodeSelector is the node selector applied to the relevant kind of pods It
-                  specifies a map of key-value pairs: for the pod to be eligible to run on a
-                  node, the node must have each of the indicated key-value pairs as labels (it
-                  can have additional labels as well). See
-                  https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-
-                tolerations	<[]Object>
-                  tolerations is a list of tolerations applied to the relevant kind of pods
-                  See https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-                  for more info. These are additional tolerations other than default ones.
-
-            namespace_selector(Dict[Any, Any]): namespaces where pods should be gated before scheduling Defaults to
-              targeting namespaces with an "application-aware-quota/enable-gating" label
-              key.
-
-              FIELDS:
-                matchExpressions	<[]Object>
-                  matchExpressions is a list of label selector requirements. The requirements
-                  are ANDed.
-
-                matchLabels	<map[string]string>
-                  matchLabels is a map of {key,value} pairs. A single {key,value} in the
-                  matchLabels map is equivalent to an element of matchExpressions, whose key
-                  field is "key", the operator is "In", and the values array contains only
-                  "value". The requirements are ANDed.
+            namespace_selector(Dict[str, Any]): namespaces where pods should be gated before scheduling Defaults to
+              targeting namespaces with an "application-aware-quota/enable-
+              gating" label key.
 
             priority_class(str): PriorityClass of the AAQ control plane
 
-            workload(Dict[Any, Any]): Restrict on which nodes AAQ workload pods will be scheduled
-
-              FIELDS:
-                affinity	<Object>
-                  affinity enables pod affinity/anti-affinity placement expanding the types of
-                  constraints that can be expressed with nodeSelector. affinity is going to be
-                  applied to the relevant kind of pods in parallel with nodeSelector See
-                  https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
-
-                nodeSelector	<map[string]string>
-                  nodeSelector is the node selector applied to the relevant kind of pods It
-                  specifies a map of key-value pairs: for the pod to be eligible to run on a
-                  node, the node must have each of the indicated key-value pairs as labels (it
-                  can have additional labels as well). See
-                  https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
-
-                tolerations	<[]Object>
-                  tolerations is a list of tolerations applied to the relevant kind of pods
-                  See https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-                  for more info. These are additional tolerations other than default ones.
+            workload(Dict[str, Any]): Restrict on which nodes AAQ workload pods will be scheduled
 
         """
         super().__init__(**kwargs)
