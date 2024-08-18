@@ -2,54 +2,31 @@
 
 import os
 import filecmp
-
+from pathlib import Path
 import pytest
 
 from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
 
 
 @pytest.mark.parametrize(
-    "kind, result_file",
+    "kind",
     (
-        (
-            "ClusterOperator",
-            os.path.join(TESTS_MANIFESTS_DIR, "ClusterOperator", "cluster_operator_res.py"),
-        ),
-        (
-            "ConfigMap",
-            os.path.join(TESTS_MANIFESTS_DIR, "ConfigMap", "config_map_res.py"),
-        ),
-        (
-            "Deployment",
-            os.path.join(TESTS_MANIFESTS_DIR, "Deployment", "deployment_res.py"),
-        ),
-        (
-            "ImageContentSourcePolicy",
-            os.path.join(TESTS_MANIFESTS_DIR, "ImageContentSourcePolicy", "image_content_source_policy_res.py"),
-        ),
-        (
-            "Pod",
-            os.path.join(TESTS_MANIFESTS_DIR, "Pod", "pod_res.py"),
-        ),
-        (
-            "Secret",
-            os.path.join(TESTS_MANIFESTS_DIR, "Secret", "secret_res.py"),
-        ),
-        (
-            "APIServer",
-            os.path.join(TESTS_MANIFESTS_DIR, "APIServer", "api_server_res.py"),
-        ),
-        (
-            "Machine",
-            os.path.join(TESTS_MANIFESTS_DIR, "Machine", "machine_res.py"),
-        ),
+        "APIServer",
+        "ClusterOperator",
+        "ConfigMap",
+        "Deployment",
+        "ImageContentSourcePolicy",
+        "Machine",
+        "Pod",
+        "Secret",
+        "DNS",
     ),
 )
-def test_parse_explain(tmpdir_factory, kind, result_file):
+def test_parse_explain(tmpdir_factory, kind):
     output_dir = tmpdir_factory.mktemp("output-dir")
     output_files = class_generator(
         kind=kind,
-        output_file=os.path.join(output_dir, f"{kind}.py"),
+        output_dir=output_dir,
     )
     for output_file in output_files:
-        assert filecmp.cmp(output_file, result_file)
+        assert filecmp.cmp(output_file, f"{os.path.join(TESTS_MANIFESTS_DIR, kind, Path(output_file).parts[-1])}")

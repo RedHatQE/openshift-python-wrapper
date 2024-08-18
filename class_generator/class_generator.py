@@ -40,7 +40,7 @@ def _is_kind_and_namespaced(_data: Dict[str, Any]) -> Dict[str, Any]:
     _kind = x_kubernetes_group_version_kind["kind"]
     _group = x_kubernetes_group_version_kind.get("group")
     _version = x_kubernetes_group_version_kind.get("version")
-    _group_and_version = f"{_version if not _group else f'{_group}/{_version}'}"
+    _group_and_version = f"{_group}/{_version}" if _group else _version
 
     if run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0]:
         namespaced = (
@@ -256,7 +256,10 @@ def generate_resource_file_from_dict(
     output_file: str = "",
     add_tests: bool = False,
     output_file_prefix: str = "",
+    output_dir: str = "",
 ) -> Tuple[str, str]:
+    base_dir = output_dir or "ocp_resources"
+
     rendered = render_jinja_template(
         template_dict=resource_dict,
         template_dir="class_generator/manifests",
@@ -264,6 +267,7 @@ def generate_resource_file_from_dict(
     )
 
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
+    _file_prefix = f"{'_' + output_file_prefix if output_file_prefix else ''}"
 
     if add_tests:
         overwrite = True
@@ -271,13 +275,13 @@ def generate_resource_file_from_dict(
         if not os.path.exists(tests_path):
             os.makedirs(tests_path)
 
-        _output_file = os.path.join(tests_path, f"{output_file_prefix}{formatted_kind_str}_res.py")
+        _output_file = os.path.join(tests_path, f"{formatted_kind_str}{_file_prefix}.py")
 
     elif output_file:
         _output_file = output_file
 
     else:
-        _output_file = os.path.join("ocp_resources", f"{output_file_prefix}{formatted_kind_str}.py")
+        _output_file = os.path.join(base_dir, f"{formatted_kind_str}{_file_prefix}.py")
 
     orig_filename = _output_file
     if os.path.exists(_output_file):
@@ -385,22 +389,22 @@ def parse_explain(
         }
 
         schema_properties: Dict[str, Any] = _kind_schema["properties"]
-        fields_requeired = _kind_schema.get("required", [])
+        fields_required = _kind_schema.get("required", [])
         resource_dict.update(_kind_schema["x-kubernetes-group-version-kind"][0])
 
         if spec_schema := schema_properties.get("spec", {}):
             spec_schema = get_property_schema(property=spec_schema)
-            spec_requeired = spec_schema.get("required", [])
+            spec_required = spec_schema.get("required", [])
             resource_dict = prepare_property_dict(
                 schema=spec_schema.get("properties", {}),
-                required=spec_requeired,
+                required=spec_required,
                 resource_dict=resource_dict,
                 dict_key="spec",
             )
 
         resource_dict = prepare_property_dict(
             schema=schema_properties,
-            required=fields_requeired,
+            required=fields_required,
             resource_dict=resource_dict,
             dict_key="fields",
         )
@@ -447,6 +451,7 @@ def class_generator(
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
+    output_dir: str = "",
     add_tests: bool = False,
 ) -> List[str]:
     """
@@ -461,11 +466,9 @@ def class_generator(
         sys.exit(1)
 
     resources = parse_explain(kind=kind)
-    if not resources:
-        return []
 
     use_output_file_prefix: bool = len(resources) > 1
-    generatrd_files: List[str] = []
+    generated_files: List[str] = []
     for resource_dict in resources:
         output_file_prefix = resource_dict["group"].lower() if use_output_file_prefix else ""
 
@@ -476,6 +479,7 @@ def class_generator(
             output_file=output_file,
             add_tests=add_tests,
             output_file_prefix=output_file_prefix,
+            output_dir=output_dir,
         )
 
         if not dry_run:
@@ -489,9 +493,9 @@ def class_generator(
                 LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
                 Path.unlink(Path(generated_py_file))
 
-        generatrd_files.append(generated_py_file)
+        generated_files.append(generated_py_file)
 
-    return generatrd_files
+    return generated_files
 
 
 def write_and_format_rendered(filepath: str, data: str) -> None:
