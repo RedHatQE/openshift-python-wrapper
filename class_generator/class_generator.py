@@ -6,6 +6,7 @@ import shlex
 import os
 import sys
 from pathlib import Path
+from packaging.version import Version
 
 import textwrap
 from typing import Any, Dict, List, Tuple
@@ -35,18 +36,18 @@ SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 
 
-def _is_kind_and_namespaced(_data: Dict[str, Any]) -> Dict[str, Any]:
+def _is_kind_and_namespaced(client: str, _data: Dict[str, Any]) -> Dict[str, Any]:
     x_kubernetes_group_version_kind = _data["x-kubernetes-group-version-kind"][0]
     _kind = x_kubernetes_group_version_kind["kind"]
     _group = x_kubernetes_group_version_kind.get("group")
     _version = x_kubernetes_group_version_kind.get("version")
     _group_and_version = f"{_group}/{_version}" if _group else _version
 
-    if run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0]:
+    if run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
         namespaced = (
             run_command(
                 command=shlex.split(
-                    f"bash -c 'oc api-resources --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
+                    f"bash -c '{client} api-resources --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
                 ),
                 check=False,
             )[1].strip()
@@ -58,14 +59,14 @@ def _is_kind_and_namespaced(_data: Dict[str, Any]) -> Dict[str, Any]:
     return {"is_kind": False, "kind": _kind}
 
 
-def map_kind_to_namespaced():
+def map_kind_to_namespaced(client: str):
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     if os.path.isfile(not_kind_file):
         with open(not_kind_file) as fd:
             not_kind_list = fd.read().split("\n")
     else:
-        not_kind_list: List[Any] = []
+        not_kind_list = []
 
     with open(SCHEMA_DEFINITION_FILE) as fd:
         _definitions_json_data = json.load(fd)
@@ -82,7 +83,7 @@ def map_kind_to_namespaced():
             if _group_version_kind[0]["kind"] in not_kind_list:
                 continue
 
-            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, _data=_data))
+            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _data=_data))
 
     for res in as_completed(_kind_data_futures):
         _res = res.result()
@@ -103,8 +104,41 @@ def read_resources_mapping_file() -> Dict[Any, Any]:
         return json.load(fd)
 
 
+def get_server_version(client: str):
+    rc, out, _ = run_command(command=shlex.split(f"{client} version -o json"), check=False)
+    if not rc:
+        LOGGER.error("Failed to get server version")
+        sys.exit(1)
+
+    json_out = json.loads(out)
+    return json_out["serverVersion"]["gitVersion"]
+
+
+def get_client_binary() -> str:
+    if os.system("which oc") == 0:
+        return "oc"
+
+    elif os.system("which kubectl") == 0:
+        return "kubectl"
+    else:
+        LOGGER.error("Failed to find oc or kubectl")
+        sys.exit(1)
+
+
+def check_minimum_cluster_version(client) -> None:
+    cluster_version = get_server_version(client=client)
+    minimum_server_version = "v1.30.0"
+    if Version(cluster_version) < Version(minimum_server_version):
+        LOGGER.error(
+            f"Server version {cluster_version} is not supported. Minimum supported version is {minimum_server_version}"
+        )
+        sys.exit(1)
+
+
 def update_kind_schema():
     openapi2jsonschema_str: str = "openapi2jsonschema"
+    client = get_client_binary()
+    check_minimum_cluster_version(client=client)
 
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
@@ -112,14 +146,16 @@ def update_kind_schema():
         )
         sys.exit(1)
 
-    rc, token, _ = run_command(command=shlex.split("oc whoami -t"), check=False, log_errors=False)
+    rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
     if not rc:
         LOGGER.error(
-            "Failed to get token.\nMake sure you are logged in to the cluster using user and password using `oc login`"
+            f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
         )
         sys.exit(1)
 
-    api_url = run_command(command=shlex.split("oc whoami --show-server"), check=False, log_errors=False)[1].strip()
+    api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
+        1
+    ].strip()
     data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
 
     if not data.ok:
@@ -134,7 +170,7 @@ def update_kind_schema():
         LOGGER.error("Failed to generate schema.")
         sys.exit(1)
 
-    map_kind_to_namespaced()
+    map_kind_to_namespaced(client=client)
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
