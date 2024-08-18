@@ -36,8 +36,8 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
             os.path.join(TESTS_MANIFESTS_DIR, "Secret", "secret_res.py"),
         ),
         (
-            "APIServeR",
-            os.path.join(TESTS_MANIFESTS_DIR, "APIServeR", "api_server_res.py"),
+            "APIServer",
+            os.path.join(TESTS_MANIFESTS_DIR, "APIServer", "api_server_res.py"),
         ),
     ),
 )
