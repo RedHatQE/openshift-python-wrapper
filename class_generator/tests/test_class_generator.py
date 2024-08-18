@@ -47,8 +47,9 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
 )
 def test_parse_explain(tmpdir_factory, kind, result_file):
     output_dir = tmpdir_factory.mktemp("output-dir")
-    output_file = class_generator(
+    output_files = class_generator(
         kind=kind,
         output_file=os.path.join(output_dir, f"{kind}.py"),
     )
-    assert filecmp.cmp(output_file, result_file)
+    for output_file in output_files:
+        assert filecmp.cmp(output_file, result_file)
