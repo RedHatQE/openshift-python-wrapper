@@ -456,6 +456,7 @@ def class_generator(
     """
     Generates a class for a given Kind.
     """
+    LOGGER.info(f"Generating class for {kind}")
     kind = kind.lower()
     kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
 

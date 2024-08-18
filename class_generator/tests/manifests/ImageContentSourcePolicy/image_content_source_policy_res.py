@@ -40,7 +40,6 @@ class ImageContentSourcePolicy(Resource):
               resulting order is unspecified.
 
         """
-
         super().__init__(**kwargs)
 
         self.repository_digest_mirrors = repository_digest_mirrors

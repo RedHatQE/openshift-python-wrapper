@@ -283,7 +283,6 @@ class Pod(NamespacedResource):
               https://kubernetes.io/docs/concepts/storage/volumes
 
         """
-
         super().__init__(**kwargs)
 
         self.active_deadline_seconds = active_deadline_seconds
@@ -346,7 +345,7 @@ class Pod(NamespacedResource):
             if self.affinity:
                 _spec["affinity"] = self.affinity
 
-            if self.automount_service_account_token:
+            if self.automount_service_account_token is not None:
                 _spec["automountServiceAccountToken"] = self.automount_service_account_token
 
             if self.dns_config:
@@ -355,7 +354,7 @@ class Pod(NamespacedResource):
             if self.dns_policy:
                 _spec["dnsPolicy"] = self.dns_policy
 
-            if self.enable_service_links:
+            if self.enable_service_links is not None:
                 _spec["enableServiceLinks"] = self.enable_service_links
 
             if self.ephemeral_containers:
@@ -364,16 +363,16 @@ class Pod(NamespacedResource):
             if self.host_aliases:
                 _spec["hostAliases"] = self.host_aliases
 
-            if self.host_ipc:
+            if self.host_ipc is not None:
                 _spec["hostIPC"] = self.host_ipc
 
-            if self.host_network:
+            if self.host_network is not None:
                 _spec["hostNetwork"] = self.host_network
 
-            if self.host_pid:
+            if self.host_pid is not None:
                 _spec["hostPID"] = self.host_pid
 
-            if self.host_users:
+            if self.host_users is not None:
                 _spec["hostUsers"] = self.host_users
 
             if self.hostname:
@@ -433,10 +432,10 @@ class Pod(NamespacedResource):
             if self.service_account_name:
                 _spec["serviceAccountName"] = self.service_account_name
 
-            if self.set_hostname_as_fqdn:
+            if self.set_hostname_as_fqdn is not None:
                 _spec["setHostnameAsFQDN"] = self.set_hostname_as_fqdn
 
-            if self.share_process_namespace:
+            if self.share_process_namespace is not None:
                 _spec["shareProcessNamespace"] = self.share_process_namespace
 
             if self.subdomain:

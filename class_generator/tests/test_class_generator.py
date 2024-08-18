@@ -12,10 +12,6 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
     "kind, result_file",
     (
         (
-            "ApiServer",
-            os.path.join(TESTS_MANIFESTS_DIR, "ApiServer", "api_server_res.py"),
-        ),
-        (
             "ClusterOperator",
             os.path.join(TESTS_MANIFESTS_DIR, "ClusterOperator", "cluster_operator_res.py"),
         ),
@@ -38,6 +34,10 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
         (
             "Secret",
             os.path.join(TESTS_MANIFESTS_DIR, "Secret", "secret_res.py"),
+        ),
+        (
+            "APIServer",
+            os.path.join(TESTS_MANIFESTS_DIR, "APIServer", "api_server_res.py"),
         ),
     ),
 )

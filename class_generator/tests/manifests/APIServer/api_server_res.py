@@ -57,7 +57,6 @@ class APIServer(Resource):
               maximum available minTLSVersion is VersionTLS12.
 
         """
-
         super().__init__(**kwargs)
 
         self.additional_cors_allowed_origins = additional_cors_allowed_origins
