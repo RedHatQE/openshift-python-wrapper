@@ -43,7 +43,6 @@ class Secret(NamespacedResource):
               types
 
         """
-
         super().__init__(**kwargs)
 
         self.data = data
@@ -58,7 +57,7 @@ class Secret(NamespacedResource):
             if self.data:
                 self.res["data"] = self.data
 
-            if self.immutable:
+            if self.immutable is not None:
                 self.res["immutable"] = self.immutable
 
             if self.string_data:
