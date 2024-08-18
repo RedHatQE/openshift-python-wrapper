@@ -274,9 +274,14 @@ def generate_resource_file_from_dict(
     )
 
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
+
     if add_tests:
         overwrite = True
-        _output_file = os.path.join(TESTS_MANIFESTS_DIR, resource_dict["kind"], f"{formatted_kind_str}_res.py")
+        tests_path = os.path.join(TESTS_MANIFESTS_DIR, resource_dict["kind"])
+        if not os.path.exists(tests_path):
+            os.makedirs(tests_path)
+
+        _output_file = os.path.join(tests_path, f"{formatted_kind_str}_res.py")
 
     elif output_file:
         _output_file = output_file

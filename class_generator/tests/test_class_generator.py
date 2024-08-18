@@ -39,6 +39,10 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
             "APIServer",
             os.path.join(TESTS_MANIFESTS_DIR, "APIServer", "api_server_res.py"),
         ),
+        (
+            "Machine",
+            os.path.join(TESTS_MANIFESTS_DIR, "Machine", "machine_res.py"),
+        ),
     ),
 )
 def test_parse_explain(tmpdir_factory, kind, result_file):
