@@ -346,12 +346,16 @@ def format_description(description: str) -> str:
 
 def prepare_property_dict(
     schema: Dict[str, Any],
-    requeired: List[str],
+    required: List[str],
     resource_dict: Dict[str, Any],
     dict_key: str,
 ) -> Dict[str, Any]:
+    keys_to_ignore = ["kind", "apiVersion", "status", SPEC_STR.lower()]
+    if dict_key != SPEC_STR.lower():
+        keys_to_ignore.append("metadata")
+
     for key, val in schema.items():
-        if key in {"metadata", "kind", "apiVersion", "status", SPEC_STR.lower()}:
+        if key in keys_to_ignore:
             continue
 
         val_schema = get_property_schema(property=val)
@@ -360,7 +364,7 @@ def prepare_property_dict(
         resource_dict[dict_key].append({
             "name-for-class-arg": python_name,
             "property-name": key,
-            "required": key in requeired,
+            "required": key in required,
             "description": format_description(description=val_schema["description"]),
             "type-for-docstring": type_dict["type-for-doc"],
             "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
@@ -392,14 +396,14 @@ def parse_explain(
         spec_requeired = spec_schema.get("required", [])
         resource_dict = prepare_property_dict(
             schema=spec_schema.get("properties", {}),
-            requeired=spec_requeired,
+            required=spec_requeired,
             resource_dict=resource_dict,
             dict_key="spec",
         )
 
     resource_dict = prepare_property_dict(
         schema=schema_properties,
-        requeired=fields_requeired,
+        required=fields_requeired,
         resource_dict=resource_dict,
         dict_key="fields",
     )
