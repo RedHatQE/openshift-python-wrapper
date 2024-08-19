@@ -291,10 +291,12 @@ def generate_resource_file_from_dict(
     dry_run: bool = False,
     output_file: str = "",
     add_tests: bool = False,
-    output_file_prefix: str = "",
+    output_file_suffix: str = "",
     output_dir: str = "",
 ) -> Tuple[str, str]:
     base_dir = output_dir or "ocp_resources"
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
 
     rendered = render_jinja_template(
         template_dict=resource_dict,
@@ -303,7 +305,7 @@ def generate_resource_file_from_dict(
     )
 
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
-    _file_prefix = f"{'_' + output_file_prefix if output_file_prefix else ''}"
+    _file_suffix = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
     if add_tests:
         overwrite = True
@@ -311,13 +313,13 @@ def generate_resource_file_from_dict(
         if not os.path.exists(tests_path):
             os.makedirs(tests_path)
 
-        _output_file = os.path.join(tests_path, f"{formatted_kind_str}{_file_prefix}.py")
+        _output_file = os.path.join(tests_path, f"{formatted_kind_str}{_file_suffix}.py")
 
     elif output_file:
         _output_file = output_file
 
     else:
-        _output_file = os.path.join(base_dir, f"{formatted_kind_str}{_file_prefix}.py")
+        _output_file = os.path.join(base_dir, f"{formatted_kind_str}{_file_suffix}.py")
 
     orig_filename = _output_file
     if os.path.exists(_output_file):
@@ -503,10 +505,10 @@ def class_generator(
 
     resources = parse_explain(kind=kind)
 
-    use_output_file_prefix: bool = len(resources) > 1
+    use_output_file_suffix: bool = len(resources) > 1
     generated_files: List[str] = []
     for resource_dict in resources:
-        output_file_prefix = resource_dict["group"].lower() if use_output_file_prefix else ""
+        output_file_suffix = resource_dict["group"].lower() if use_output_file_suffix else ""
 
         orig_filename, generated_py_file = generate_resource_file_from_dict(
             resource_dict=resource_dict,
@@ -514,7 +516,7 @@ def class_generator(
             dry_run=dry_run,
             output_file=output_file,
             add_tests=add_tests,
-            output_file_prefix=output_file_prefix,
+            output_file_suffix=output_file_suffix,
             output_dir=output_dir,
         )
 
