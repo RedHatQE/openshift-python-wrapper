@@ -6,9 +6,10 @@ import shlex
 import os
 import sys
 from pathlib import Path
+from packaging.version import Version
 
 import textwrap
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Tuple
 import click
 import re
 import requests
@@ -31,76 +32,65 @@ FIELDS_STR: str = "FIELDS"
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
+SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 
 
-def _is_kind_is_namespaced(_kind: str) -> Tuple[bool, str]:
-    return (
-        run_command(
-            command=shlex.split(f"bash -c 'oc api-resources --namespaced | grep -w {_kind} | wc -l'"),
-            check=False,
-        )[1].strip()
-        == "1"
-    ), _kind
+def _is_kind_and_namespaced(client: str, _data: Dict[str, Any]) -> Dict[str, Any]:
+    x_kubernetes_group_version_kind = _data["x-kubernetes-group-version-kind"][0]
+    _kind = x_kubernetes_group_version_kind["kind"]
+    _group = x_kubernetes_group_version_kind.get("group")
+    _version = x_kubernetes_group_version_kind.get("version")
+    _group_and_version = f"{_group}/{_version}" if _group else _version
+
+    if run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
+        namespaced = (
+            run_command(
+                command=shlex.split(
+                    f"bash -c '{client} api-resources --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
+                ),
+                check=False,
+            )[1].strip()
+            == "1"
+        )
+        _data["namespaced"] = namespaced
+        return {"is_kind": True, "kind": _kind, "data": _data}
+
+    return {"is_kind": False, "kind": _kind}
 
 
-def _is_resource(_kind: str) -> Tuple[bool, str]:
-    return run_command(command=shlex.split(f"oc explain {_kind}"), check=False, log_errors=False)[0], _kind
-
-
-def map_kind_to_namespaced():
+def map_kind_to_namespaced(client: str):
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     if os.path.isfile(not_kind_file):
         with open(not_kind_file) as fd:
             not_kind_list = fd.read().split("\n")
     else:
-        not_kind_list: List[str] = []
+        not_kind_list = []
 
-    with open(os.path.join(f"{SCHEMA_DIR}/all.json")) as fd:
-        all_json_data = json.load(fd)
+    with open(SCHEMA_DEFINITION_FILE) as fd:
+        _definitions_json_data = json.load(fd)
 
-    if os.path.isfile(RESOURCES_MAPPING_FILE):
-        resources_mapping = read_resources_mapping_file()
+    resources_mapping: Dict[Any, List[Any]] = {}
 
-    else:
-        resources_mapping: Dict[str, Dict[str, bool]] = {}
-
-    # `all.json` list all files that `openapi2jsonschema` generated which include duplication
-    kind_set: Set[str] = set()
-    for _def in all_json_data["oneOf"]:
-        _kind = _def["$ref"].rsplit(".", 1)[-1]
-        if _kind in not_kind_list:
-            continue
-
-        kind_set.add(_kind)
-
-    kind_list: List[str] = []
-    is_kind_futures: List[Future] = []
+    _kind_data_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
-        for _kind in kind_set:
-            if resources_mapping.get(_kind.lower()):  # resource_mappings store all keys in lowercase
+        for _data in _definitions_json_data["definitions"].values():
+            _group_version_kind = _data.get("x-kubernetes-group-version-kind")
+            if not _group_version_kind:
                 continue
 
-            # Check if the kind we work on is a real kind
-            is_kind_futures.append(executor.submit(_is_resource, _kind=_kind))
+            if _group_version_kind[0]["kind"] in not_kind_list:
+                continue
 
-    for _res in as_completed(is_kind_futures):
-        res = _res.result()
+            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _data=_data))
 
-        if res[0]:
-            kind_list.append(res[1])
+    for res in as_completed(_kind_data_futures):
+        _res = res.result()
+        if _res["is_kind"]:
+            resources_mapping.setdefault(_res["kind"].lower(), []).append(_res["data"])
         else:
-            not_kind_list.append(res[1])
-
-    mapping_kind_futures: List[Future] = []
-    with ThreadPoolExecutor() as executor:
-        for _kind in kind_list:
-            mapping_kind_futures.append(executor.submit(_is_kind_is_namespaced, _kind=_kind))
-
-    for _res in as_completed(mapping_kind_futures):
-        res = _res.result()
-        resources_mapping[res[1].lower()] = {"namespaced": res[0]}
+            not_kind_list.append(_res["kind"])
 
     with open(RESOURCES_MAPPING_FILE, "w") as fd:
         json.dump(resources_mapping, fd)
@@ -114,8 +104,41 @@ def read_resources_mapping_file() -> Dict[Any, Any]:
         return json.load(fd)
 
 
+def get_server_version(client: str):
+    rc, out, _ = run_command(command=shlex.split(f"{client} version -o json"), check=False)
+    if not rc:
+        LOGGER.error("Failed to get server version")
+        sys.exit(1)
+
+    json_out = json.loads(out)
+    return json_out["serverVersion"]["gitVersion"]
+
+
+def get_client_binary() -> str:
+    if os.system("which oc") == 0:
+        return "oc"
+
+    elif os.system("which kubectl") == 0:
+        return "kubectl"
+    else:
+        LOGGER.error("Failed to find oc or kubectl")
+        sys.exit(1)
+
+
+def check_minimum_cluster_version(client) -> None:
+    cluster_version = get_server_version(client=client)
+    minimum_server_version = "v1.30.0"
+    if Version(cluster_version) < Version(minimum_server_version):
+        LOGGER.error(
+            f"Server version {cluster_version} is not supported. Minimum supported version is {minimum_server_version}"
+        )
+        sys.exit(1)
+
+
 def update_kind_schema():
     openapi2jsonschema_str: str = "openapi2jsonschema"
+    client = get_client_binary()
+    check_minimum_cluster_version(client=client)
 
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
@@ -123,14 +146,16 @@ def update_kind_schema():
         )
         sys.exit(1)
 
-    rc, token, _ = run_command(command=shlex.split("oc whoami -t"), check=False, log_errors=False)
+    rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
     if not rc:
         LOGGER.error(
-            "Failed to get token.\nMake sure you are logged in to the cluster using user and password using `oc login`"
+            f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
         )
         sys.exit(1)
 
-    api_url = run_command(command=shlex.split("oc whoami --show-server"), check=False, log_errors=False)[1].strip()
+    api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
+        1
+    ].strip()
     data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
 
     if not data.ok:
@@ -145,7 +170,7 @@ def update_kind_schema():
         LOGGER.error("Failed to generate schema.")
         sys.exit(1)
 
-    map_kind_to_namespaced()
+    map_kind_to_namespaced(client=client)
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
@@ -266,7 +291,13 @@ def generate_resource_file_from_dict(
     dry_run: bool = False,
     output_file: str = "",
     add_tests: bool = False,
+    output_file_suffix: str = "",
+    output_dir: str = "",
 ) -> Tuple[str, str]:
+    base_dir = output_dir or "ocp_resources"
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+
     rendered = render_jinja_template(
         template_dict=resource_dict,
         template_dir="class_generator/manifests",
@@ -274,6 +305,7 @@ def generate_resource_file_from_dict(
     )
 
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
+    _file_suffix = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
     if add_tests:
         overwrite = True
@@ -281,13 +313,13 @@ def generate_resource_file_from_dict(
         if not os.path.exists(tests_path):
             os.makedirs(tests_path)
 
-        _output_file = os.path.join(tests_path, f"{formatted_kind_str}_res.py")
+        _output_file = os.path.join(tests_path, f"{formatted_kind_str}{_file_suffix}.py")
 
     elif output_file:
         _output_file = output_file
 
     else:
-        _output_file = os.path.join("ocp_resources", f"{formatted_kind_str}.py")
+        _output_file = os.path.join(base_dir, f"{formatted_kind_str}{_file_suffix}.py")
 
     orig_filename = _output_file
     if os.path.exists(_output_file):
@@ -379,80 +411,77 @@ def prepare_property_dict(
 
 
 def parse_explain(
-    kind_schema_file: str,
-    namespaced: Optional[bool] = None,
-) -> Dict[str, Any]:
-    with open(kind_schema_file) as fd:
-        kind_schema = json.load(fd)
+    kind: str,
+) -> List[Dict[str, Any]]:
+    _schema_definition = read_resources_mapping_file()
+    _resources: List[Dict[str, Any]] = []
 
-    resource_dict: Dict[str, Any] = {
-        "base_class": "NamespacedResource" if namespaced else "Resource",
-        "description": kind_schema["description"],
-        "fields": [],
-        "spec": [],
-    }
+    _kinds_schema = _schema_definition[kind.lower()]
+    for _kind_schema in _kinds_schema:
+        namespaced = _kind_schema["namespaced"]
+        resource_dict: Dict[str, Any] = {
+            "base_class": "NamespacedResource" if namespaced else "Resource",
+            "description": _kind_schema["description"],
+            "fields": [],
+            "spec": [],
+        }
 
-    schema_properties: Dict[str, Any] = kind_schema["properties"]
-    fields_requeired = kind_schema.get("required", [])
-    resource_dict.update(kind_schema["x-kubernetes-group-version-kind"][0])
+        schema_properties: Dict[str, Any] = _kind_schema["properties"]
+        fields_required = _kind_schema.get("required", [])
+        resource_dict.update(_kind_schema["x-kubernetes-group-version-kind"][0])
 
-    if spec_schema := schema_properties.get("spec", {}):
-        spec_schema = get_property_schema(property=spec_schema)
-        spec_requeired = spec_schema.get("required", [])
+        if spec_schema := schema_properties.get("spec", {}):
+            spec_schema = get_property_schema(property=spec_schema)
+            spec_required = spec_schema.get("required", [])
+            resource_dict = prepare_property_dict(
+                schema=spec_schema.get("properties", {}),
+                required=spec_required,
+                resource_dict=resource_dict,
+                dict_key="spec",
+            )
+
         resource_dict = prepare_property_dict(
-            schema=spec_schema.get("properties", {}),
-            required=spec_requeired,
+            schema=schema_properties,
+            required=fields_required,
             resource_dict=resource_dict,
-            dict_key="spec",
+            dict_key="fields",
         )
 
-    resource_dict = prepare_property_dict(
-        schema=schema_properties,
-        required=fields_requeired,
-        resource_dict=resource_dict,
-        dict_key="fields",
-    )
+        api_group_real_name = resource_dict.get("group")
+        # If API Group is not present in resource, try to get it from VERSION
+        if not api_group_real_name:
+            version_splited = resource_dict["version"].split("/")
+            if len(version_splited) == 2:
+                api_group_real_name = version_splited[0]
 
-    api_group_real_name = resource_dict.get("group")
-    # If API Group is not present in resource, try to get it from VERSION
-    if not api_group_real_name:
-        version_splited = resource_dict["version"].split("/")
-        if len(version_splited) == 2:
-            api_group_real_name = version_splited[0]
+        if api_group_real_name:
+            api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
+            resource_dict["group"] = api_group_for_resource_api_group
+            missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
 
-    if api_group_real_name:
-        api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
-        resource_dict["group"] = api_group_for_resource_api_group
-        missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
+            if missing_api_group_in_resource:
+                LOGGER.warning(
+                    f"Missing API Group in Resource\n"
+                    f"Please add `Resource.ApiGroup.{api_group_for_resource_api_group} = {api_group_real_name}` "
+                    "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+                )
 
-        if missing_api_group_in_resource:
-            LOGGER.warning(
-                f"Missing API Group in Resource\n"
-                f"Please add `Resource.ApiGroup.{api_group_for_resource_api_group} = {api_group_real_name}` "
-                "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+        else:
+            api_version_for_resource_api_version = resource_dict["version"].upper()
+            missing_api_version_in_resource: bool = not hasattr(
+                Resource.ApiVersion, api_version_for_resource_api_version
             )
 
-    else:
-        api_version_for_resource_api_version = resource_dict["version"].upper()
-        missing_api_version_in_resource: bool = not hasattr(Resource.ApiVersion, api_version_for_resource_api_version)
+            if missing_api_version_in_resource:
+                LOGGER.warning(
+                    f"Missing API Version in Resource\n"
+                    f"Please add `Resource.ApiVersion.{api_version_for_resource_api_version} = {resource_dict['version']}` "
+                    "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+                )
 
-        if missing_api_version_in_resource:
-            LOGGER.warning(
-                f"Missing API Version in Resource\n"
-                f"Please add `Resource.ApiVersion.{api_version_for_resource_api_version} = {resource_dict['version']}` "
-                "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
-            )
+        _resources.append(resource_dict)
 
-    return resource_dict
-
-
-def get_kind_schema_file(kind: str) -> str:
-    kind_file = os.path.join(SCHEMA_DIR, f"{kind.lower()}.json")
-    if os.path.isfile(kind_file):
-        return kind_file
-
-    LOGGER.error(f"{kind} schema not found, please run with `--update-schema`")
-    sys.exit(1)
+    return _resources
 
 
 def class_generator(
@@ -460,8 +489,9 @@ def class_generator(
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
+    output_dir: str = "",
     add_tests: bool = False,
-) -> str:
+) -> List[str]:
     """
     Generates a class for a given Kind.
     """
@@ -473,33 +503,37 @@ def class_generator(
         LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run with --update-schema")
         sys.exit(1)
 
-    resource_dict = parse_explain(
-        kind_schema_file=get_kind_schema_file(kind=kind),
-        namespaced=kind_and_namespaced_mappings["namespaced"],
-    )
-    if not resource_dict:
-        return ""
+    resources = parse_explain(kind=kind)
 
-    orig_filename, generated_py_file = generate_resource_file_from_dict(
-        resource_dict=resource_dict,
-        overwrite=overwrite,
-        dry_run=dry_run,
-        output_file=output_file,
-        add_tests=add_tests,
-    )
+    use_output_file_suffix: bool = len(resources) > 1
+    generated_files: List[str] = []
+    for resource_dict in resources:
+        output_file_suffix = resource_dict["group"].lower() if use_output_file_suffix else ""
 
-    if not dry_run:
-        run_command(
-            command=shlex.split(f"pre-commit run --files {generated_py_file}"),
-            verify_stderr=False,
-            check=False,
+        orig_filename, generated_py_file = generate_resource_file_from_dict(
+            resource_dict=resource_dict,
+            overwrite=overwrite,
+            dry_run=dry_run,
+            output_file=output_file,
+            add_tests=add_tests,
+            output_file_suffix=output_file_suffix,
+            output_dir=output_dir,
         )
 
-        if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
-            LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
-            Path.unlink(Path(generated_py_file))
+        if not dry_run:
+            run_command(
+                command=shlex.split(f"pre-commit run --files {generated_py_file}"),
+                verify_stderr=False,
+                check=False,
+            )
 
-    return generated_py_file
+            if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
+                LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
+                Path.unlink(Path(generated_py_file))
+
+        generated_files.append(generated_py_file)
+
+    return generated_files
 
 
 def write_and_format_rendered(filepath: str, data: str) -> None:

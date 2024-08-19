@@ -1,5 +1,14 @@
 # Resource class generator
 
+Utility to add a python module with class resources to openshift-python-wrapper based on `kind`
+
+Some resources have the same kind, in this case the script will create two files.
+For example `DNS` kind have two CRDs, one from `config.openshift.io` and one from `operator.openshift.io`
+The output will be:
+
+- dns_operator_openshift_io.py
+- dns_config_openshift_io.py
+
 ## Usage
 
 ### Installation
