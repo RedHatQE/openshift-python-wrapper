@@ -5,6 +5,7 @@ import json
 import shlex
 import os
 import sys
+import requests
 from pathlib import Path
 from packaging.version import Version
 
@@ -138,39 +139,39 @@ def check_minimum_cluster_version(client) -> None:
 
 
 def update_kind_schema():
-    # openapi2jsonschema_str: str = "openapi2jsonschema"
+    openapi2jsonschema_str: str = "openapi2jsonschema"
     client = get_client_binary()
-    # check_minimum_cluster_version(client=client)
-    #
-    # if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
-    #     LOGGER.error(
-    #         f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
-    #     )
-    #     sys.exit(1)
-    #
-    # rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
-    # if not rc:
-    #     LOGGER.error(
-    #         f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
-    #     )
-    #     sys.exit(1)
-    #
-    # api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
-    #     1
-    # ].strip()
-    # data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
-    #
-    # if not data.ok:
-    #     LOGGER.error("Failed to get openapi schema.")
-    #     sys.exit(1)
-    #
-    # ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
-    # with open(ocp_openapi_json_file, "w") as fd:
-    #     fd.write(data.text)
-    #
-    # if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
-    #     LOGGER.error("Failed to generate schema.")
-    #     sys.exit(1)
+    check_minimum_cluster_version(client=client)
+
+    if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
+        LOGGER.error(
+            f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
+        )
+        sys.exit(1)
+
+    rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
+    if not rc:
+        LOGGER.error(
+            f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
+        )
+        sys.exit(1)
+
+    api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
+        1
+    ].strip()
+    data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
+
+    if not data.ok:
+        LOGGER.error("Failed to get openapi schema.")
+        sys.exit(1)
+
+    ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
+    with open(ocp_openapi_json_file, "w") as fd:
+        fd.write(data.text)
+
+    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
+        LOGGER.error("Failed to generate schema.")
+        sys.exit(1)
 
     map_kind_to_namespaced(client=client)
 
