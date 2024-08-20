@@ -1,15 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class Machine(NamespacedResource):
+class Machine(Resource):
     """
     Machine is the Schema for the machines API Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
     """
 
-    api_group: str = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
+    api_group: str = Resource.ApiGroup.MACHINE_OPENSHIFT_IO
 
     def __init__(
         self,

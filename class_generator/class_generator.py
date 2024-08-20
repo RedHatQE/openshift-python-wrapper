@@ -12,7 +12,6 @@ import textwrap
 from typing import Any, Dict, List, Tuple
 import click
 import re
-import requests
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
@@ -36,7 +35,7 @@ SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 
 
-def _is_kind_and_namespaced(client: str, _data: Dict[str, Any]) -> Dict[str, Any]:
+def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Dict[str, Any]:
     x_kubernetes_group_version_kind = _data["x-kubernetes-group-version-kind"][0]
     _kind = x_kubernetes_group_version_kind["kind"]
     _group = x_kubernetes_group_version_kind.get("group")
@@ -44,19 +43,17 @@ def _is_kind_and_namespaced(client: str, _data: Dict[str, Any]) -> Dict[str, Any
     _group_and_version = f"{_group}/{_version}" if _group else _version
 
     if run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
-        namespaced = (
-            run_command(
-                command=shlex.split(
-                    f"bash -c '{client} api-resources --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
-                ),
-                check=False,
-            )[1].strip()
-            == "1"
+        rc, out, _ = run_command(
+            command=shlex.split(f"bash -c '{client} api-resources | grep -w {_kind} | grep {_group_and_version}'"),
+            check=False,
+            log_errors=False,
         )
-        _data["namespaced"] = namespaced
-        return {"is_kind": True, "kind": _kind, "data": _data}
+        if rc:
+            # If command successful, namespaced is the 4th word
+            _data["namespaced"] = out.split()[3] == "true"
+            return {"is_kind": True, "kind": _key, "data": _data}
 
-    return {"is_kind": False, "kind": _kind}
+    return {"is_kind": False, "kind": _key}
 
 
 def map_kind_to_namespaced(client: str):
@@ -75,28 +72,33 @@ def map_kind_to_namespaced(client: str):
 
     _kind_data_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
-        for _data in _definitions_json_data["definitions"].values():
+        for _key, _data in _definitions_json_data["definitions"].items():
             _group_version_kind = _data.get("x-kubernetes-group-version-kind")
             if not _group_version_kind:
                 continue
 
-            if _group_version_kind[0]["kind"] in not_kind_list:
+            if _key in not_kind_list:
                 continue
 
-            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _data=_data))
+            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _key=_key, _data=_data))
 
     for res in as_completed(_kind_data_futures):
         _res = res.result()
+        # _res["kind"] is group.version.kind, set only kind as key in the final dict
+        kind_key = _res["kind"].rsplit(".", 1)[-1].lower()
+
         if _res["is_kind"]:
-            resources_mapping.setdefault(_res["kind"].lower(), []).append(_res["data"])
+            resources_mapping.setdefault(kind_key, []).append(_res["data"])
         else:
             not_kind_list.append(_res["kind"])
 
     with open(RESOURCES_MAPPING_FILE, "w") as fd:
-        json.dump(resources_mapping, fd)
+        json.dump(resources_mapping, fd, indent=4)
 
     with open(not_kind_file, "w") as fd:
         fd.writelines("\n".join(not_kind_list))
+
+    __import__("ipdb").set_trace()
 
 
 def read_resources_mapping_file() -> Dict[Any, Any]:
@@ -136,39 +138,39 @@ def check_minimum_cluster_version(client) -> None:
 
 
 def update_kind_schema():
-    openapi2jsonschema_str: str = "openapi2jsonschema"
+    # openapi2jsonschema_str: str = "openapi2jsonschema"
     client = get_client_binary()
-    check_minimum_cluster_version(client=client)
-
-    if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
-        LOGGER.error(
-            f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
-        )
-        sys.exit(1)
-
-    rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
-    if not rc:
-        LOGGER.error(
-            f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
-        )
-        sys.exit(1)
-
-    api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
-        1
-    ].strip()
-    data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
-
-    if not data.ok:
-        LOGGER.error("Failed to get openapi schema.")
-        sys.exit(1)
-
-    ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
-    with open(ocp_openapi_json_file, "w") as fd:
-        fd.write(data.text)
-
-    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
-        LOGGER.error("Failed to generate schema.")
-        sys.exit(1)
+    # check_minimum_cluster_version(client=client)
+    #
+    # if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
+    #     LOGGER.error(
+    #         f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
+    #     )
+    #     sys.exit(1)
+    #
+    # rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
+    # if not rc:
+    #     LOGGER.error(
+    #         f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
+    #     )
+    #     sys.exit(1)
+    #
+    # api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
+    #     1
+    # ].strip()
+    # data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
+    #
+    # if not data.ok:
+    #     LOGGER.error("Failed to get openapi schema.")
+    #     sys.exit(1)
+    #
+    # ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
+    # with open(ocp_openapi_json_file, "w") as fd:
+    #     fd.write(data.text)
+    #
+    # if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
+    #     LOGGER.error("Failed to generate schema.")
+    #     sys.exit(1)
 
     map_kind_to_namespaced(client=client)
 

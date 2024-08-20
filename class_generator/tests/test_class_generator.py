@@ -14,12 +14,13 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
         "APIServer",
         "ClusterOperator",
         "ConfigMap",
+        "DNS",
         "Deployment",
         "ImageContentSourcePolicy",
         "Machine",
         "Pod",
         "Secret",
-        "DNS",
+        "NMState",
     ),
 )
 def test_parse_explain(tmpdir_factory, kind):
