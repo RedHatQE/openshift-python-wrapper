@@ -293,6 +293,7 @@ class Resource:
         IMAGE_REGISTRY: str = "registry.redhat.io"
         INTEGREATLY_ORG: str = "integreatly.org"
         K8S_CNI_CNCF_IO: str = "k8s.cni.cncf.io"
+        K8S_MARIADB_COM: str = "k8s.mariadb.com"
         K8S_V1_CNI_CNCF_IO: str = "k8s.v1.cni.cncf.io"
         KUBERNETES_IO: str = "kubernetes.io"
         KUBEVIRT_IO: str = "kubevirt.io"
