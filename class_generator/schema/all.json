@@ -775,6 +775,36 @@
       "$ref": "_definitions.json#/definitions/com.nvidia.v1alpha1.NVIDIADriverList"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.CephConnection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.CephConnectionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfileMapping"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfileMappingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.Driver"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.DriverList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.OperatorConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.OperatorConfigList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.cncf.cni.k8s.v1.NetworkAttachmentDefinition"
     },
     {

@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 import json
-from warnings import warn
 
 from typing import Any, Dict, List, Optional
 
@@ -476,21 +475,6 @@ class Pod(NamespacedResource):
             if self.volumes:
                 _spec["volumes"] = self.volumes
 
-    def get_containers(self) -> List[Any]:
-        """
-        Get Pod containers
-
-        Returns:
-            list: List of Pod containers
-        """
-        warn(
-            "containers will be deprecated in v4.17.0, use get_containers() instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        return self.instance.spec.containers
-
     def execute(self, command: List[str], timeout: int = 60, container: str = "", ignore_rc: bool = False) -> str:
         """
         Run command on Pod
@@ -515,7 +499,7 @@ class Pod(NamespacedResource):
             name=self.name,
             namespace=self.namespace,
             command=command,
-            container=container or self.get_containers()[0].name,
+            container=container or self.instance.spec.containers[0].name,
             stderr=True,
             stdin=False,
             stdout=True,
