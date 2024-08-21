@@ -43,18 +43,34 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
     _version = x_kubernetes_group_version_kind.get("version")
     _group_and_version = f"{_group}/{_version}" if _group else _version
 
-    if run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
-        rc, out, _ = run_command(
-            command=shlex.split(f"bash -c '{client} api-resources | grep -w {_kind} | grep {_group_and_version}'"),
-            check=False,
-            log_errors=False,
-        )
-        if rc:
-            # If command successful, namespaced is the 3th word
-            _data["namespaced"] = out.split()[2] == "true"
-            return {"is_kind": True, "kind": _key, "data": _data}
+    not_resource_dict = {"is_kind": False, "kind": _key}
 
-    return {"is_kind": False, "kind": _key}
+    # if explain command failed, this is not a resource
+    if not run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
+        return not_resource_dict
+
+    # check if this as a valid version for the resource.
+    api_resources_base_cmd = f"bash -c '{client} api-resources"
+
+    if run_command(
+        command=shlex.split(f"{api_resources_base_cmd} | grep -w {_kind} | grep {_group_and_version}'"),
+        check=False,
+        log_errors=False,
+    )[0]:
+        # Check if the resource if namespaced.
+        _data["namespaced"] = (
+            run_command(
+                command=shlex.split(
+                    f"{api_resources_base_cmd} --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
+                ),
+                check=False,
+                log_errors=False,
+            )[1].strip()
+            == "1"
+        )
+        return {"is_kind": True, "kind": _key, "data": _data}
+
+    return not_resource_dict
 
 
 def map_kind_to_namespaced(client: str):
@@ -83,15 +99,19 @@ def map_kind_to_namespaced(client: str):
 
             _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _key=_key, _data=_data))
 
+    _temp_resources_mappings: Dict[Any, Any] = {}
     for res in as_completed(_kind_data_futures):
         _res = res.result()
         # _res["kind"] is group.version.kind, set only kind as key in the final dict
         kind_key = _res["kind"].rsplit(".", 1)[-1].lower()
 
         if _res["is_kind"]:
-            resources_mapping.setdefault(kind_key, []).append(_res["data"])
+            _temp_resources_mappings.setdefault(kind_key, []).append(_res["data"])
         else:
             not_kind_list.append(_res["kind"])
+
+    # Update the resources mapping dict with the one that we filled to avoid duplication in the lists
+    resources_mapping.update(_temp_resources_mappings)
 
     with open(RESOURCES_MAPPING_FILE, "w") as fd:
         json.dump(resources_mapping, fd, indent=4)
@@ -146,7 +166,7 @@ def update_kind_schema():
 
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
-            f"{openapi2jsonschema_str}not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
+            f"{openapi2jsonschema_str} not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
         )
         sys.exit(1)
 

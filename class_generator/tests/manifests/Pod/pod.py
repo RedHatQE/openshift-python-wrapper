@@ -1,15 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import Resource, MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
-class Pod(Resource):
+class Pod(NamespacedResource):
     """
     Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
     """
 
-    api_version: str = Resource.ApiVersion.V1
+    api_version: str = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,
