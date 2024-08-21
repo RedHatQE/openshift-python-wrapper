@@ -50,8 +50,8 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
             log_errors=False,
         )
         if rc:
-            # If command successful, namespaced is the 4th word
-            _data["namespaced"] = out.split()[3] == "true"
+            # If command successful, namespaced is the 3th word
+            _data["namespaced"] = out.split()[2] == "true"
             return {"is_kind": True, "kind": _key, "data": _data}
 
     return {"is_kind": False, "kind": _key}
@@ -59,6 +59,8 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
 
 def map_kind_to_namespaced(client: str):
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
+
+    resources_mapping = read_resources_mapping_file()
 
     if os.path.isfile(not_kind_file):
         with open(not_kind_file) as fd:
@@ -68,8 +70,6 @@ def map_kind_to_namespaced(client: str):
 
     with open(SCHEMA_DEFINITION_FILE) as fd:
         _definitions_json_data = json.load(fd)
-
-    resources_mapping: Dict[Any, List[Any]] = {}
 
     _kind_data_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
@@ -99,12 +99,13 @@ def map_kind_to_namespaced(client: str):
     with open(not_kind_file, "w") as fd:
         fd.writelines("\n".join(not_kind_list))
 
-    __import__("ipdb").set_trace()
-
 
 def read_resources_mapping_file() -> Dict[Any, Any]:
-    with open(RESOURCES_MAPPING_FILE) as fd:
-        return json.load(fd)
+    try:
+        with open(RESOURCES_MAPPING_FILE) as fd:
+            return json.load(fd)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 
 def get_server_version(client: str):

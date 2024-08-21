@@ -1,15 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import Resource, MissingRequiredArgumentError
 
 
-class Deployment(NamespacedResource):
+class Deployment(Resource):
     """
     Deployment enables declarative updates for Pods and ReplicaSets.
     """
 
-    api_group: str = NamespacedResource.ApiGroup.APPS
+    api_group: str = Resource.ApiGroup.APPS
 
     def __init__(
         self,

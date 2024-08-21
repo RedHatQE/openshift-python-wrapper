@@ -1,15 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, Optional
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class Secret(Resource):
+class Secret(NamespacedResource):
     """
     Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
     """
 
-    api_version: str = Resource.ApiVersion.V1
+    api_version: str = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,
