@@ -1,0 +1,90 @@
+{
+  "description": "ClientProfile is the Schema for the clientprofiles API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ClientProfileSpec defines the desired state of Ceph CSI\nconfiguration for volumes and snapshots configured to use\nthis profile",
+      "type": "object",
+      "required": [
+        "cephConnectionRef"
+      ],
+      "properties": {
+        "cephConnectionRef": {
+          "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nTODO: Add other useful fields. apiVersion, kind, uid?\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic",
+          "x-kubernetes-validations": [
+            {
+              "message": "'.name' cannot be empty",
+              "rule": "self.name != \"\""
+            }
+          ]
+        },
+        "cephFs": {
+          "description": "CephFsConfigSpec defines the desired CephFs configuration",
+          "type": "object",
+          "properties": {
+            "fuseMountOptions": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "kernelMountOptions": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "subVolumeGroup": {
+              "type": "string"
+            }
+          }
+        },
+        "nfs": {
+          "description": "NfsConfigSpec cdefines the desired NFS configuration",
+          "type": "object"
+        },
+        "rbd": {
+          "description": "RbdConfigSpec defines the desired RBD configuration",
+          "type": "object",
+          "properties": {
+            "radosNamespace": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "ClientProfileStatus defines the observed state of Ceph CSI\nconfiguration for volumes and snapshots configured to use\nthis profile",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "csi.ceph.io",
+      "kind": "ClientProfile",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
