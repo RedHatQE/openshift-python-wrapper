@@ -1,0 +1,63 @@
+{
+  "description": "CephConnection is the Schema for the cephconnections API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "CephConnectionSpec defines the desired state of CephConnection",
+      "type": "object",
+      "required": [
+        "monitors"
+      ],
+      "properties": {
+        "monitors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "rbdMirrorDaemonCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "readAffinity": {
+          "description": "ReadAffinitySpec capture Ceph CSI read affinity settings",
+          "type": "object",
+          "properties": {
+            "crushLocationLabels": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "CephConnectionStatus defines the observed state of CephConnection",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "csi.ceph.io",
+      "kind": "CephConnection",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
