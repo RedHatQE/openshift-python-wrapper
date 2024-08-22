@@ -385,6 +385,9 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     elif resource_type == "integer":
         type_for_docstring = "int"
 
+    elif resource_type == "object":
+        type_for_docstring = "Dict[str, Any]"
+
     if not type_from_dict_for_init:
         type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
 

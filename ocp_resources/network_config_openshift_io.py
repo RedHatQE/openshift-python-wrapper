@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -15,8 +15,8 @@ class Network(Resource):
     def __init__(
         self,
         cluster_network: Optional[List[Any]] = None,
-        external_ip: Optional[Any] = None,
-        network_diagnostics: Optional[Any] = None,
+        external_ip: Optional[Dict[str, Any]] = None,
+        network_diagnostics: Optional[Dict[str, Any]] = None,
         network_type: Optional[str] = "",
         service_network: Optional[List[Any]] = None,
         service_node_port_range: Optional[str] = "",
@@ -27,11 +27,11 @@ class Network(Resource):
             cluster_network(List[Any]): IP address pool to use for pod IPs. This field is immutable after
               installation.
 
-            external_ip(Any): externalIP defines configuration for controllers that affect
+            external_ip(Dict[str, Any]): externalIP defines configuration for controllers that affect
               Service.ExternalIP. If nil, then ExternalIP is not allowed to be
               set.
 
-            network_diagnostics(Any): networkDiagnostics defines network diagnostics configuration.   Takes
+            network_diagnostics(Dict[str, Any]): networkDiagnostics defines network diagnostics configuration.   Takes
               precedence over spec.disableNetworkDiagnostics in
               network.operator.openshift.io. If networkDiagnostics is not
               specified or is empty, and the spec.disableNetworkDiagnostics flag
