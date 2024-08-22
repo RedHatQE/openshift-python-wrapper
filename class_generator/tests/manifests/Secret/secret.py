@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,15 +13,15 @@ class Secret(NamespacedResource):
 
     def __init__(
         self,
-        data: Optional[Dict[str, Any]] = None,
+        data: Optional[Any] = None,
         immutable: Optional[bool] = None,
-        string_data: Optional[Dict[str, Any]] = None,
+        string_data: Optional[Any] = None,
         type: Optional[str] = "",
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            data(Dict[str, Any]): Data contains the secret data. Each key must consist of alphanumeric
+            data(Any): Data contains the secret data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. The serialized form of the secret
               data is a base64 encoded string, representing the arbitrary
               (possibly non-string) data value here. Described in
@@ -32,7 +32,7 @@ class Secret(NamespacedResource):
               set to true, the field can be modified at any time. Defaulted to
               nil.
 
-            string_data(Dict[str, Any]): stringData allows specifying non-binary secret data in string form. It
+            string_data(Any): stringData allows specifying non-binary secret data in string form. It
               is provided as a write-only input field for convenience. All keys
               and values are merged into the data field on write, overwriting
               any existing values. The stringData field is never output when

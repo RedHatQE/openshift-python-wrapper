@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -18,9 +18,9 @@ class Deployment(NamespacedResource):
         progress_deadline_seconds: Optional[int] = None,
         replicas: Optional[int] = None,
         revision_history_limit: Optional[int] = None,
-        selector: Optional[Dict[str, Any]] = None,
-        strategy: Optional[Dict[str, Any]] = None,
-        template: Optional[Dict[str, Any]] = None,
+        selector: Optional[Any] = None,
+        strategy: Optional[Any] = None,
+        template: Optional[Any] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -46,15 +46,15 @@ class Deployment(NamespacedResource):
               pointer to distinguish between explicit zero and not specified.
               Defaults to 10.
 
-            selector(Dict[str, Any]): A label selector is a label query over a set of resources. The result
+            selector(Any): A label selector is a label query over a set of resources. The result
               of matchLabels and matchExpressions are ANDed. An empty label
               selector matches all objects. A null label selector matches no
               objects.
 
-            strategy(Dict[str, Any]): DeploymentStrategy describes how to replace existing pods with new
+            strategy(Any): DeploymentStrategy describes how to replace existing pods with new
               ones.
 
-            template(Dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
+            template(Any): PodTemplateSpec describes the data a pod should have when created from
               a template
 
         """

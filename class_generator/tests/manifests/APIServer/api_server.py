@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -15,11 +15,11 @@ class APIServer(Resource):
     def __init__(
         self,
         additional_cors_allowed_origins: Optional[List[Any]] = None,
-        audit: Optional[Dict[str, Any]] = None,
-        client_ca: Optional[Dict[str, Any]] = None,
-        encryption: Optional[Dict[str, Any]] = None,
-        serving_certs: Optional[Dict[str, Any]] = None,
-        tls_security_profile: Optional[Dict[str, Any]] = None,
+        audit: Optional[Any] = None,
+        client_ca: Optional[Any] = None,
+        encryption: Optional[Any] = None,
+        serving_certs: Optional[Any] = None,
+        tls_security_profile: Optional[Any] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -31,10 +31,10 @@ class APIServer(Resource):
               The values are regular expressions that correspond to the Golang
               regular expression language.
 
-            audit(Dict[str, Any]): audit specifies the settings for audit configuration to be applied to
+            audit(Any): audit specifies the settings for audit configuration to be applied to
               all OpenShift-provided API servers in the cluster.
 
-            client_ca(Dict[str, Any]): clientCA references a ConfigMap containing a certificate bundle for
+            client_ca(Any): clientCA references a ConfigMap containing a certificate bundle for
               the signers that will be recognized for incoming client
               certificates in addition to the operator managed signers. If this
               is empty, then only operator managed signers are valid. You
@@ -43,14 +43,14 @@ class APIServer(Resource):
               openshift-config namespace and contain the following required
               fields: - ConfigMap.Data["ca-bundle.crt"] - CA bundle.
 
-            encryption(Dict[str, Any]): encryption allows the configuration of encryption of resources at the
+            encryption(Any): encryption allows the configuration of encryption of resources at the
               datastore layer.
 
-            serving_certs(Dict[str, Any]): servingCert is the TLS cert info for serving secure traffic. If not
+            serving_certs(Any): servingCert is the TLS cert info for serving secure traffic. If not
               specified, operator managed certificates will be used for serving
               secure traffic.
 
-            tls_security_profile(Dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
+            tls_security_profile(Any): tlsSecurityProfile specifies settings for TLS connections for
               externally exposed servers.   If unset, a default (which may
               change between releases) is chosen. Note that only Old,
               Intermediate and Custom profiles are currently supported, and the

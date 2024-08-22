@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -16,18 +16,18 @@ class DNS(Resource):
 
     def __init__(
         self,
-        cache: Optional[Dict[str, Any]] = None,
+        cache: Optional[Any] = None,
         log_level: Optional[str] = "",
         management_state: Optional[str] = "",
-        node_placement: Optional[Dict[str, Any]] = None,
+        node_placement: Optional[Any] = None,
         operator_log_level: Optional[str] = "",
         servers: Optional[List[Any]] = None,
-        upstream_resolvers: Optional[Dict[str, Any]] = None,
+        upstream_resolvers: Optional[Any] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            cache(Dict[str, Any]): cache describes the caching configuration that applies to all server
+            cache(Any): cache describes the caching configuration that applies to all server
               blocks listed in the Corefile. This field allows a cluster admin
               to optionally configure: * positiveTTL which is a duration for
               which positive responses should be cached. * negativeTTL which is
@@ -48,7 +48,7 @@ class DNS(Resource):
             management_state(str): managementState indicates whether the DNS operator should manage
               cluster DNS
 
-            node_placement(Dict[str, Any]): nodePlacement provides explicit control over the scheduling of DNS
+            node_placement(Any): nodePlacement provides explicit control over the scheduling of DNS
               pods.   Generally, it is useful to run a DNS pod on every node so
               that DNS queries are always handled by a local DNS pod instead of
               going over the network to a DNS pod on another node.  However,
@@ -75,7 +75,7 @@ class DNS(Resource):
               routed to the Server with Zone "a.foo.com".   If this field is
               nil, no servers are created.
 
-            upstream_resolvers(Dict[str, Any]): upstreamResolvers defines a schema for configuring CoreDNS to proxy
+            upstream_resolvers(Any): upstreamResolvers defines a schema for configuring CoreDNS to proxy
               DNS messages to upstream resolvers for the case of the default
               (".") server   If this field is not specified, the upstream used
               will default to /etc/resolv.conf, with policy "sequential"
