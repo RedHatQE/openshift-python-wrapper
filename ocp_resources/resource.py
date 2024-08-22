@@ -115,7 +115,7 @@ def get_client(
         proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
 
         if proxy:
-            LOGGER.info("Trying to get client using proxy %s", proxy)
+            LOGGER.info(f"Trying to get client using proxy {proxy}")
             client_configuration = client.Configuration()
             config.load_kube_config(
                 config_file=config_file, client_configuration=client_configuration, persist_config=True
