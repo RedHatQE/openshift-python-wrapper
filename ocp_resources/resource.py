@@ -557,13 +557,14 @@ class Resource:
         self.create(wait=wait)
         return self
 
-    def clean_up(self, wait: bool = True) -> bool:
+    def clean_up(self, wait: bool = True, timeout: Optional[int] = None) -> bool:
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
 
         Args:
             wait (bool, optional): Wait for resource deletion. Defaults to True.
+            timeout (int, optional): Timeout in seconds to wait for resource to be deleted. Defaults to 240.
 
         Returns:
             bool: True if resource was deleted else False.
@@ -594,7 +595,7 @@ class Resource:
             )
             return False
 
-        return self.delete(wait=wait, timeout=self.delete_timeout)
+        return self.delete(wait=wait, timeout=timeout or self.delete_timeout)
 
     @classmethod
     def _prepare_resources(
