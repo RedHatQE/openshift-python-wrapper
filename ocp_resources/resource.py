@@ -121,9 +121,10 @@ def get_client(
                 config_file=config_file, client_configuration=client_configuration, persist_config=True
             )
             client_configuration.proxy = proxy
-            api_client = client.ApiClient(configuration=client_configuration)
 
-            return kubernetes.dynamic.DynamicClient(client=api_client)
+            return kubernetes.dynamic.DynamicClient(
+                client=kubernetes.config.new_client_from_config(config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs)
+            )
 
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
         LOGGER.info("Trying to get client via new_client_from_config")
