@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -16,19 +16,19 @@ class Network(Resource):
         self,
         additional_networks: Optional[List[Any]] = None,
         cluster_network: Optional[List[Any]] = None,
-        default_network: Optional[Dict[str, Any]] = None,
+        default_network: Optional[Any] = None,
         deploy_kube_proxy: Optional[bool] = None,
         disable_multi_network: Optional[bool] = None,
         disable_network_diagnostics: Optional[bool] = None,
-        export_network_flows: Optional[Dict[str, Any]] = None,
-        kube_proxy_config: Optional[Dict[str, Any]] = None,
+        export_network_flows: Optional[Any] = None,
+        kube_proxy_config: Optional[Any] = None,
         log_level: Optional[str] = "",
         management_state: Optional[str] = "",
-        migration: Optional[Dict[str, Any]] = None,
-        observed_config: Optional[Dict[str, Any]] = None,
+        migration: Optional[Any] = None,
+        observed_config: Optional[Any] = None,
         operator_log_level: Optional[str] = "",
         service_network: Optional[List[Any]] = None,
-        unsupported_config_overrides: Optional[Dict[str, Any]] = None,
+        unsupported_config_overrides: Optional[Any] = None,
         use_multi_network_policy: Optional[bool] = None,
         **kwargs: Any,
     ) -> None:
@@ -41,7 +41,7 @@ class Network(Resource):
               providers, e.g. OpenShift SDN, support multiple ClusterNetworks.
               Others only support one. This is equivalent to the cluster-cidr.
 
-            default_network(Dict[str, Any]): defaultNetwork is the "default" network that all pods will receive
+            default_network(Any): defaultNetwork is the "default" network that all pods will receive
 
             deploy_kube_proxy(bool): deployKubeProxy specifies whether or not a standalone kube-proxy
               should be deployed by the operator. Some network providers include
@@ -60,12 +60,12 @@ class Network(Resource):
               Setting this to 'true' would reduce the additional load of the
               pods performing the checks.
 
-            export_network_flows(Dict[str, Any]): exportNetworkFlows enables and configures the export of network flow
+            export_network_flows(Any): exportNetworkFlows enables and configures the export of network flow
               metadata from the pod network by using protocols NetFlow, SFlow or
               IPFIX. Currently only supported on OVN-Kubernetes plugin. If
               unset, flows will not be exported to any collector.
 
-            kube_proxy_config(Dict[str, Any]): kubeProxyConfig lets us configure desired proxy configuration. If not
+            kube_proxy_config(Any): kubeProxyConfig lets us configure desired proxy configuration. If not
               specified, sensible defaults will be chosen by OpenShift directly.
               Not consumed by all network providers - currently only openshift-
               sdn.
@@ -79,10 +79,10 @@ class Network(Resource):
             management_state(str): managementState indicates whether and how the operator should manage
               the component
 
-            migration(Dict[str, Any]): migration enables and configures the cluster network migration. The
+            migration(Any): migration enables and configures the cluster network migration. The
               migration procedure allows to change the network type and the MTU.
 
-            observed_config(Dict[str, Any]): observedConfig holds a sparse config that controller has observed from
+            observed_config(Any): observedConfig holds a sparse config that controller has observed from
               the cluster state.  It exists in spec because it is an input to
               the level for the operator
 
@@ -96,7 +96,7 @@ class Network(Resource):
               Currently, all existing network providers only support a single
               value here, but this is an array to allow for growth.
 
-            unsupported_config_overrides(Dict[str, Any]): unsupportedConfigOverrides overrides the final configuration that was
+            unsupported_config_overrides(Any): unsupportedConfigOverrides overrides the final configuration that was
               computed by the operator. Red Hat does not support the use of this
               field. Misuse of this field could lead to unexpected behavior or
               conflict with other configuration options. Seek guidance from the

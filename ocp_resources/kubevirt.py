@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,14 +13,14 @@ class KubeVirt(NamespacedResource):
 
     def __init__(
         self,
-        certificate_rotate_strategy: Optional[Dict[str, Any]] = None,
-        configuration: Optional[Dict[str, Any]] = None,
-        customize_components: Optional[Dict[str, Any]] = None,
+        certificate_rotate_strategy: Optional[Any] = None,
+        configuration: Optional[Any] = None,
+        customize_components: Optional[Any] = None,
         image_pull_policy: Optional[str] = "",
         image_pull_secrets: Optional[List[Any]] = None,
         image_registry: Optional[str] = "",
         image_tag: Optional[str] = "",
-        infra: Optional[Dict[str, Any]] = None,
+        infra: Optional[Any] = None,
         monitor_account: Optional[str] = "",
         monitor_namespace: Optional[str] = "",
         product_component: Optional[str] = "",
@@ -28,17 +28,17 @@ class KubeVirt(NamespacedResource):
         product_version: Optional[str] = "",
         service_monitor_namespace: Optional[str] = "",
         uninstall_strategy: Optional[str] = "",
-        workload_update_strategy: Optional[Dict[str, Any]] = None,
-        workloads: Optional[Dict[str, Any]] = None,
+        workload_update_strategy: Optional[Any] = None,
+        workloads: Optional[Any] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            certificate_rotate_strategy(Dict[str, Any]): Missing description in API
+            certificate_rotate_strategy(Any): No field description from API; please add description
 
-            configuration(Dict[str, Any]): holds kubevirt configurations. same as the virt-configMap
+            configuration(Any): holds kubevirt configurations. same as the virt-configMap
 
-            customize_components(Dict[str, Any]): Missing description in API
+            customize_components(Any): No field description from API; please add description
 
             image_pull_policy(str): The ImagePullPolicy to use.
 
@@ -51,7 +51,7 @@ class KubeVirt(NamespacedResource):
             image_tag(str): The image tag to use for the continer images installed. Defaults to
               the same tag as the operator's container image.
 
-            infra(Dict[str, Any]): selectors and tolerations that should apply to KubeVirt infrastructure
+            infra(Any): selectors and tolerations that should apply to KubeVirt infrastructure
               components
 
             monitor_account(str): The name of the Prometheus service account that needs read-access to
@@ -80,10 +80,10 @@ class KubeVirt(NamespacedResource):
             uninstall_strategy(str): Specifies if kubevirt can be deleted if workloads are still present.
               This is mainly a precaution to avoid accidental data loss
 
-            workload_update_strategy(Dict[str, Any]): WorkloadUpdateStrategy defines at the cluster level how to handle
+            workload_update_strategy(Any): WorkloadUpdateStrategy defines at the cluster level how to handle
               automated workload updates
 
-            workloads(Dict[str, Any]): selectors and tolerations that should apply to KubeVirt workloads
+            workloads(Any): selectors and tolerations that should apply to KubeVirt workloads
 
         """
         super().__init__(**kwargs)

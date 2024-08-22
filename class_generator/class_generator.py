@@ -429,7 +429,7 @@ def prepare_property_dict(
             "property-name": key,
             "required": key in required,
             "description": format_description(
-                description=val_schema.get("description", "Field description missing " "from API")
+                description=val_schema.get("description", "No field description from API; please add description")
             ),
             "type-for-docstring": type_dict["type-for-doc"],
             "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
