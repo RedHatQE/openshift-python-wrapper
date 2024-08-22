@@ -366,21 +366,23 @@ def generate_resource_file_from_dict(
 
 
 def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
-    type_for_docstring: str = "Dict[str, Any]"
+    type_for_docstring: str = "Any"
     type_from_dict_for_init: str = ""
+    # A resource field may be defined with `x-kubernetes-preserve-unknown-fields`. In this case, `type` is not provided.
+    resource_type = key_dict.get("type")
 
     # All fields must be set with Optional since resource can have yaml_file to cover all args.
-    if key_dict["type"] == "array":
+    if resource_type == "array":
         type_for_docstring = "List[Any]"
 
-    elif key_dict["type"] == "string":
+    elif resource_type == "string":
         type_for_docstring = "str"
         type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
 
-    elif key_dict["type"] == "boolean":
+    elif resource_type == "boolean":
         type_for_docstring = "bool"
 
-    elif key_dict["type"] == "integer":
+    elif resource_type == "integer":
         type_for_docstring = "int"
 
     if not type_from_dict_for_init:
@@ -389,11 +391,11 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     return {"type-for-init": type_from_dict_for_init, "type-for-doc": type_for_docstring}
 
 
-def get_property_schema(property: Dict[str, Any]) -> Dict[str, Any]:
-    if _ref := property.get("$ref"):
+def get_property_schema(property_: Dict[str, Any]) -> Dict[str, Any]:
+    if _ref := property_.get("$ref"):
         with open(f"{SCHEMA_DIR}/{_ref.rsplit('.')[-1].lower()}.json") as fd:
             return json.load(fd)
-    return property
+    return property_
 
 
 def format_description(description: str) -> str:
@@ -419,14 +421,16 @@ def prepare_property_dict(
         if key in keys_to_ignore:
             continue
 
-        val_schema = get_property_schema(property=val)
+        val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
         python_name = convert_camel_case_to_snake_case(string_=key)
         resource_dict[dict_key].append({
             "name-for-class-arg": python_name,
             "property-name": key,
             "required": key in required,
-            "description": format_description(description=val_schema["description"]),
+            "description": format_description(
+                description=val_schema.get("description", "No field description from API; please add description")
+            ),
             "type-for-docstring": type_dict["type-for-doc"],
             "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
         })
@@ -455,7 +459,7 @@ def parse_explain(
         resource_dict.update(_kind_schema["x-kubernetes-group-version-kind"][0])
 
         if spec_schema := schema_properties.get("spec", {}):
-            spec_schema = get_property_schema(property=spec_schema)
+            spec_schema = get_property_schema(property_=spec_schema)
             spec_required = spec_schema.get("required", [])
             resource_dict = prepare_property_dict(
                 schema=spec_schema.get("properties", {}),
