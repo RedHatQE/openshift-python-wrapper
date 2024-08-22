@@ -57,9 +57,6 @@ class Project(Resource):
             if self.finalizers:
                 _spec["finalizers"] = self.finalizers
 
-    def clean_up(self, wait: bool = True) -> bool:
-        return Project(name=self.name).delete(wait=wait)
-
 
 class ProjectRequest(Resource):
     """
@@ -100,5 +97,5 @@ class ProjectRequest(Resource):
             if self.display_name:
                 self.res["displayName"] = self.display_name
 
-    def clean_up(self, wait: bool = True) -> bool:
-        return Project(name=self.name).delete(wait=wait)
+    def clean_up(self, wait: bool = True, timeout: Optional[int] = None) -> bool:
+        return Project(name=self.name).clean_up(wait=wait, timeout=timeout)
