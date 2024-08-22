@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -14,10 +14,10 @@ class Pod(NamespacedResource):
     def __init__(
         self,
         active_deadline_seconds: Optional[int] = None,
-        affinity: Optional[Any] = None,
+        affinity: Optional[Dict[str, Any]] = None,
         automount_service_account_token: Optional[bool] = None,
         containers: Optional[List[Any]] = None,
-        dns_config: Optional[Any] = None,
+        dns_config: Optional[Dict[str, Any]] = None,
         dns_policy: Optional[str] = "",
         enable_service_links: Optional[bool] = None,
         ephemeral_containers: Optional[List[Any]] = None,
@@ -30,9 +30,9 @@ class Pod(NamespacedResource):
         image_pull_secrets: Optional[List[Any]] = None,
         init_containers: Optional[List[Any]] = None,
         node_name: Optional[str] = "",
-        node_selector: Optional[Any] = None,
-        os: Optional[Any] = None,
-        overhead: Optional[Any] = None,
+        node_selector: Optional[Dict[str, Any]] = None,
+        os: Optional[Dict[str, Any]] = None,
+        overhead: Optional[Dict[str, Any]] = None,
         preemption_policy: Optional[str] = "",
         priority: Optional[int] = None,
         priority_class_name: Optional[str] = "",
@@ -42,7 +42,7 @@ class Pod(NamespacedResource):
         runtime_class_name: Optional[str] = "",
         scheduler_name: Optional[str] = "",
         scheduling_gates: Optional[List[Any]] = None,
-        security_context: Optional[Any] = None,
+        security_context: Optional[Dict[str, Any]] = None,
         service_account: Optional[str] = "",
         service_account_name: Optional[str] = "",
         set_hostname_as_fqdn: Optional[bool] = None,
@@ -61,7 +61,7 @@ class Pod(NamespacedResource):
               it failed and kill associated containers. Value must be a positive
               integer.
 
-            affinity(Any): Affinity is a group of affinity scheduling rules.
+            affinity(Dict[str, Any]): Affinity is a group of affinity scheduling rules.
 
             automount_service_account_token(bool): AutomountServiceAccountToken indicates whether a service account token
               should be automatically mounted.
@@ -70,7 +70,7 @@ class Pod(NamespacedResource):
               be added or removed. There must be at least one container in a
               Pod. Cannot be updated.
 
-            dns_config(Any): PodDNSConfig defines the DNS parameters of a pod in addition to those
+            dns_config(Dict[str, Any]): PodDNSConfig defines the DNS parameters of a pod in addition to those
               generated from DNSPolicy.
 
             dns_policy(str): Set DNS policy for the pod. Defaults to "ClusterFirst". Valid values
@@ -153,14 +153,14 @@ class Pod(NamespacedResource):
               is non-empty, the scheduler simply schedules this pod onto that
               node, assuming that it fits resource requirements.
 
-            node_selector(Any): NodeSelector is a selector which must be true for the pod to fit on a
+            node_selector(Dict[str, Any]): NodeSelector is a selector which must be true for the pod to fit on a
               node. Selector which must match a node's labels for the pod to be
               scheduled on that node. More info:
               https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 
-            os(Any): PodOS defines the OS parameters of a pod.
+            os(Dict[str, Any]): PodOS defines the OS parameters of a pod.
 
-            overhead(Any): Overhead represents the resource overhead associated with running a
+            overhead(Dict[str, Any]): Overhead represents the resource overhead associated with running a
               pod for a given RuntimeClass. This field will be autopopulated at
               admission time by the RuntimeClass admission controller. If the
               RuntimeClass admission controller is enabled, overhead must not be
@@ -228,7 +228,7 @@ class Pod(NamespacedResource):
               attempt to schedule the pod.  SchedulingGates can only be set at
               pod creation time, and be removed only afterwards.
 
-            security_context(Any): PodSecurityContext holds pod-level security attributes and common
+            security_context(Dict[str, Any]): PodSecurityContext holds pod-level security attributes and common
               container settings. Some fields are also present in
               container.securityContext.  Field values of
               container.securityContext take precedence over field values of
