@@ -368,19 +368,20 @@ def generate_resource_file_from_dict(
 def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     type_for_docstring: str = "Dict[str, Any]"
     type_from_dict_for_init: str = ""
+    resource_type = key_dict.get("type")
 
     # All fields must be set with Optional since resource can have yaml_file to cover all args.
-    if key_dict["type"] == "array":
+    if resource_type == "array":
         type_for_docstring = "List[Any]"
 
-    elif key_dict["type"] == "string":
+    elif resource_type == "string":
         type_for_docstring = "str"
         type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
 
-    elif key_dict["type"] == "boolean":
+    elif resource_type == "boolean":
         type_for_docstring = "bool"
 
-    elif key_dict["type"] == "integer":
+    elif resource_type == "integer":
         type_for_docstring = "int"
 
     if not type_from_dict_for_init:
@@ -426,7 +427,7 @@ def prepare_property_dict(
             "name-for-class-arg": python_name,
             "property-name": key,
             "required": key in required,
-            "description": format_description(description=val_schema["description"]),
+            "description": format_description(description=val_schema.get("description", "Missing description in API")),
             "type-for-docstring": type_dict["type-for-doc"],
             "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
         })

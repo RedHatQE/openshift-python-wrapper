@@ -34,273 +34,56 @@ class KubeVirt(NamespacedResource):
     ) -> None:
         """
         Args:
-            certificate_rotate_strategy(Dict[Any, Any]): <empty>
-              FIELDS:
-                selfSigned	<Object>
-                  <no description>
+            certificate_rotate_strategy(Dict[str, Any]): Missing description in API
 
-            configuration(Dict[Any, Any]): holds kubevirt configurations.
-              same as the virt-configMap
+            configuration(Dict[str, Any]): holds kubevirt configurations. same as the virt-configMap
 
-              FIELDS:
-                additionalGuestMemoryOverheadRatio	<string>
-                  AdditionalGuestMemoryOverheadRatio can be used to increase the
-                  virtualization infrastructure
-                  overhead. This is useful, since the calculation of this overhead is not
-                  accurate and cannot
-                  be entirely known in advance. The ratio that is being set determines by
-                  which factor to increase
-                  the overhead calculated by Kubevirt. A higher ratio means that the VMs would
-                  be less compromised
-                  by node pressures, but would mean that fewer VMs could be scheduled to a
-                  node.
-                  If not set, the default is 1.
-
-                apiConfiguration	<Object>
-                  ReloadableComponentConfiguration holds all generic k8s configuration options
-                  which can
-                  be reloaded by components without requiring a restart.
-
-                architectureConfiguration	<Object>
-                  <no description>
-
-                autoCPULimitNamespaceLabelSelector	<Object>
-                  When set, AutoCPULimitNamespaceLabelSelector will set a CPU limit on
-                  virt-launcher for VMIs running inside
-                  namespaces that match the label selector.
-                  The CPU limit will equal the number of requested vCPUs.
-                  This setting does not apply to VMIs with dedicated CPUs.
-
-                controllerConfiguration	<Object>
-                  ReloadableComponentConfiguration holds all generic k8s configuration options
-                  which can
-                  be reloaded by components without requiring a restart.
-
-                cpuModel	<string>
-                  <no description>
-
-                cpuRequest	<Object>
-                  <no description>
-
-                defaultRuntimeClass	<string>
-                  <no description>
-
-                developerConfiguration	<Object>
-                  DeveloperConfiguration holds developer options
-
-                emulatedMachines	<[]string>
-                  Deprecated. Use architectureConfiguration instead.
-
-                evictionStrategy	<string>
-                  EvictionStrategy defines at the cluster level if the VirtualMachineInstance
-                  should be
-                  migrated instead of shut-off in case of a node drain. If the
-                  VirtualMachineInstance specific
-                  field is set it overrides the cluster level one.
-
-                handlerConfiguration	<Object>
-                  ReloadableComponentConfiguration holds all generic k8s configuration options
-                  which can
-                  be reloaded by components without requiring a restart.
-
-                imagePullPolicy	<string>
-                  PullPolicy describes a policy for if/when to pull a container image
-
-                ksmConfiguration	<Object>
-                  KSMConfiguration holds the information regarding the enabling the KSM in the
-                  nodes (if available).
-
-                liveUpdateConfiguration	<Object>
-                  LiveUpdateConfiguration holds defaults for live update features
-
-                machineType	<string>
-                  Deprecated. Use architectureConfiguration instead.
-
-                mediatedDevicesConfiguration	<Object>
-                  MediatedDevicesConfiguration holds information about MDEV types to be
-                  defined, if available
-
-                memBalloonStatsPeriod	<integer>
-                  <no description>
-
-                migrations	<Object>
-                  MigrationConfiguration holds migration options.
-                  Can be overridden for specific groups of VMs though migration policies.
-                  Visit https://kubevirt.io/user-guide/operations/migration_policies/ for more
-                  information.
-
-                minCPUModel	<string>
-                  <no description>
-
-                network	<Object>
-                  NetworkConfiguration holds network options
-
-                obsoleteCPUModels	<map[string]boolean>
-                  <no description>
-
-                ovmfPath	<string>
-                  Deprecated. Use architectureConfiguration instead.
-
-                permittedHostDevices	<Object>
-                  PermittedHostDevices holds information about devices allowed for passthrough
-
-                seccompConfiguration	<Object>
-                  SeccompConfiguration holds Seccomp configuration for Kubevirt components
-
-                selinuxLauncherType	<string>
-                  <no description>
-
-                smbios	<Object>
-                  <no description>
-
-                supportContainerResources	<[]Object>
-                  SupportContainerResources specifies the resource requirements for various
-                  types of supporting containers such as container disks/virtiofs/sidecars and
-                  hotplug attachment pods. If omitted a sensible default will be supplied.
-
-                supportedGuestAgentVersions	<[]string>
-                  deprecated
-
-                tlsConfiguration	<Object>
-                  TLSConfiguration holds TLS options
-
-                virtualMachineInstancesPerNode	<integer>
-                  <no description>
-
-                virtualMachineOptions	<Object>
-                  VirtualMachineOptions holds the cluster level information regarding the
-                  virtual machine.
-
-                vmRolloutStrategy	<string>
-                  VMRolloutStrategy defines how changes to a VM object propagate to its VMI
-
-                vmStateStorageClass	<string>
-                  VMStateStorageClass is the name of the storage class to use for the PVCs
-                  created to preserve VM state, like TPM.
-                  The storage class must support RWX in filesystem mode.
-
-                webhookConfiguration	<Object>
-                  ReloadableComponentConfiguration holds all generic k8s configuration options
-                  which can
-                  be reloaded by components without requiring a restart.
-
-            customize_components(Dict[Any, Any]): <empty>
-              FIELDS:
-                flags	<Object>
-                  Configure the value used for deployment and daemonset resources
-
-                patches	<[]Object>
-                  <no description>
+            customize_components(Dict[str, Any]): Missing description in API
 
             image_pull_policy(str): The ImagePullPolicy to use.
 
-            image_pull_secrets(List[Any]): The imagePullSecrets to pull the container images from
-              Defaults to none
-              LocalObjectReference contains enough information to let you locate the
-              referenced object inside the same namespace.
+            image_pull_secrets(List[Any]): The imagePullSecrets to pull the container images from Defaults to
+              none
 
-              FIELDS:
-                name	<string>
-                  Name of the referent.
-                  More info:
-                  https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                  TODO: Add other useful fields. apiVersion, kind, uid?
+            image_registry(str): The image registry to pull the container images from Defaults to the
+              same registry the operator's container image is pulled from.
 
-            image_registry(str): The image registry to pull the container images from
-              Defaults to the same registry the operator's container image is pulled from.
+            image_tag(str): The image tag to use for the continer images installed. Defaults to
+              the same tag as the operator's container image.
 
-            image_tag(str): The image tag to use for the continer images installed.
-              Defaults to the same tag as the operator's container image.
-
-            infra(Dict[Any, Any]): selectors and tolerations that should apply to KubeVirt infrastructure
+            infra(Dict[str, Any]): selectors and tolerations that should apply to KubeVirt infrastructure
               components
 
-              FIELDS:
-                nodePlacement	<Object>
-                  nodePlacement describes scheduling configuration for specific
-                  KubeVirt components
-
-                replicas	<integer>
-                  replicas indicates how many replicas should be created for each KubeVirt
-                  infrastructure
-                  component (like virt-api or virt-controller). Defaults to 2.
-                  WARNING: this is an advanced feature that prevents auto-scaling for core
-                  kubevirt components. Please use with caution!
-
             monitor_account(str): The name of the Prometheus service account that needs read-access to
-              KubeVirt endpoints
-              Defaults to prometheus-k8s
+              KubeVirt endpoints Defaults to prometheus-k8s
 
-            monitor_namespace(str): The namespace Prometheus is deployed in
-              Defaults to openshift-monitor
+            monitor_namespace(str): The namespace Prometheus is deployed in Defaults to openshift-monitor
 
-            product_component(str): Designate the apps.kubevirt.io/component label for KubeVirt components.
-              Useful if KubeVirt is included as part of a product.
-              If ProductComponent is not specified, the component label default value is
-              kubevirt.
+            product_component(str): Designate the apps.kubevirt.io/component label for KubeVirt
+              components. Useful if KubeVirt is included as part of a product.
+              If ProductComponent is not specified, the component label default
+              value is kubevirt.
 
             product_name(str): Designate the apps.kubevirt.io/part-of label for KubeVirt components.
-              Useful if KubeVirt is included as part of a product.
-              If ProductName is not specified, the part-of label will be omitted.
+              Useful if KubeVirt is included as part of a product. If
+              ProductName is not specified, the part-of label will be omitted.
 
             product_version(str): Designate the apps.kubevirt.io/version label for KubeVirt components.
-              Useful if KubeVirt is included as part of a product.
-              If ProductVersion is not specified, KubeVirt's version will be used.
+              Useful if KubeVirt is included as part of a product. If
+              ProductVersion is not specified, KubeVirt's version will be used.
 
-            service_monitor_namespace(str): The namespace the service monitor will be deployed
-               When ServiceMonitorNamespace is set, then we'll install the service monitor
-              object in that namespace
-              otherwise we will use the monitoring namespace.
+            service_monitor_namespace(str): The namespace the service monitor will be deployed  When
+              ServiceMonitorNamespace is set, then we'll install the service
+              monitor object in that namespace otherwise we will use the
+              monitoring namespace.
 
             uninstall_strategy(str): Specifies if kubevirt can be deleted if workloads are still present.
               This is mainly a precaution to avoid accidental data loss
 
-            workload_update_strategy(Dict[Any, Any]): WorkloadUpdateStrategy defines at the cluster level how to handle
+            workload_update_strategy(Dict[str, Any]): WorkloadUpdateStrategy defines at the cluster level how to handle
               automated workload updates
 
-              FIELDS:
-                batchEvictionInterval	<string>
-                  BatchEvictionInterval Represents the interval to wait before issuing the
-                  next
-                  batch of shutdowns
-
-
-                  Defaults to 1 minute
-
-                batchEvictionSize	<integer>
-                  BatchEvictionSize Represents the number of VMIs that can be forced updated
-                  per
-                  the BatchShutdownInteral interval
-
-
-                  Defaults to 10
-
-                workloadUpdateMethods	<[]string>
-                  WorkloadUpdateMethods defines the methods that can be used to disrupt
-                  workloads
-                  during automated workload updates.
-                  When multiple methods are present, the least disruptive method takes
-                  precedence over more disruptive methods. For example if both LiveMigrate and
-                  Shutdown
-                  methods are listed, only VMs which are not live migratable will be
-                  restarted/shutdown
-
-
-                  An empty list defaults to no automated workload updating
-
-            workloads(Dict[Any, Any]): selectors and tolerations that should apply to KubeVirt workloads
-
-              FIELDS:
-                nodePlacement	<Object>
-                  nodePlacement describes scheduling configuration for specific
-                  KubeVirt components
-
-                replicas	<integer>
-                  replicas indicates how many replicas should be created for each KubeVirt
-                  infrastructure
-                  component (like virt-api or virt-controller). Defaults to 2.
-                  WARNING: this is an advanced feature that prevents auto-scaling for core
-                  kubevirt components. Please use with caution!
+            workloads(Dict[str, Any]): selectors and tolerations that should apply to KubeVirt workloads
 
         """
         super().__init__(**kwargs)

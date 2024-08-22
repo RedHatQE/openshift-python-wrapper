@@ -24,147 +24,36 @@ class NMState(Resource):
     ) -> None:
         """
         Args:
-            affinity(Dict[Any, Any]): Affinity is an optional affinity selector that will be added to handler
-              DaemonSet manifest.
+            affinity(Dict[str, Any]): Affinity is an optional affinity selector that will be added to
+              handler DaemonSet manifest.
 
-              FIELDS:
-                nodeAffinity	<Object>
-                  Describes node affinity scheduling rules for the pod.
+            infra_affinity(Dict[str, Any]): Affinity is an optional affinity selector that will be added to
+              webhook & certmanager Deployment manifests.
 
-                podAffinity	<Object>
-                  Describes pod affinity scheduling rules (e.g. co-locate this pod in the same
-                  node, zone, etc. as some other pod(s)).
+            infra_node_selector(Dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
+              webhook & certmanager Deployment manifests If InfraNodeSelector is
+              specified, the webhook and certmanager will run only on nodes that
+              have each of the indicated key-value pairs as labels applied to
+              the node.
 
-                podAntiAffinity	<Object>
-                  Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in
-                  the same node, zone, etc. as some other pod(s)).
+            infra_tolerations(List[Any]): InfraTolerations is an optional list of tolerations to be added to
+              webhook & certmanager Deployment manifests If InfraTolerations is
+              specified, the webhook and certmanager will be able to be
+              scheduled on nodes with corresponding taints
 
-            infra_affinity(Dict[Any, Any]): Affinity is an optional affinity selector that will be added to webhook &
-              certmanager Deployment manifests.
+            node_selector(Dict[str, Any]): NodeSelector is an optional selector that will be added to handler
+              DaemonSet manifest for both workers and control-plane
+              (https://github.com/nmstate/kubernetes-
+              nmstate/blob/main/deploy/handler/operator.yaml). If NodeSelector
+              is specified, the handler will run only on nodes that have each of
+              the indicated key-value pairs as labels applied to the node.
 
-              FIELDS:
-                nodeAffinity	<Object>
-                  Describes node affinity scheduling rules for the pod.
-
-                podAffinity	<Object>
-                  Describes pod affinity scheduling rules (e.g. co-locate this pod in the same
-                  node, zone, etc. as some other pod(s)).
-
-                podAntiAffinity	<Object>
-                  Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in
-                  the same node, zone, etc. as some other pod(s)).
-
-            infra_node_selector(Dict[Any, Any]): InfraNodeSelector is an optional selector that will be added to webhook &
-              certmanager Deployment manifests
-              If InfraNodeSelector is specified, the webhook and certmanager will run only
-              on nodes that have each of the indicated
-              key-value pairs as labels applied to the node.
-
-            infra_tolerations(List[Any]): InfraTolerations is an optional list of tolerations to be added to webhook &
-              certmanager Deployment manifests
-              If InfraTolerations is specified, the webhook and certmanager will be able
-              to be scheduled on nodes with corresponding taints
-              The pod this Toleration is attached to tolerates any taint that matches
-              the triple <key,value,effect> using the matching operator <operator>.
-
-              FIELDS:
-                effect	<string>
-                  Effect indicates the taint effect to match. Empty means match all taint
-                  effects.
-                  When specified, allowed values are NoSchedule, PreferNoSchedule and
-                  NoExecute.
-
-                key	<string>
-                  Key is the taint key that the toleration applies to. Empty means match all
-                  taint keys.
-                  If the key is empty, operator must be Exists; this combination means to
-                  match all values and all keys.
-
-                operator	<string>
-                  Operator represents a key's relationship to the value.
-                  Valid operators are Exists and Equal. Defaults to Equal.
-                  Exists is equivalent to wildcard for value, so that a pod can
-                  tolerate all taints of a particular category.
-
-                tolerationSeconds	<integer>
-                  TolerationSeconds represents the period of time the toleration (which must
-                  be
-                  of effect NoExecute, otherwise this field is ignored) tolerates the taint.
-                  By default,
-                  it is not set, which means tolerate the taint forever (do not evict). Zero
-                  and
-                  negative values will be treated as 0 (evict immediately) by the system.
-
-                value	<string>
-                  Value is the taint value the toleration matches to.
-                  If the operator is Exists, the value should be empty, otherwise just a
-                  regular string.
-
-            node_selector(Dict[Any, Any]): NodeSelector is an optional selector that will be added to handler DaemonSet
-              manifest
-              for both workers and control-plane
-              (https://github.com/nmstate/kubernetes-nmstate/blob/main/deploy/handler/operator.yaml).
-              If NodeSelector is specified, the handler will run only on nodes that have
-              each of the indicated key-value pairs
-              as labels applied to the node.
-
-            self_sign_configuration(Dict[Any, Any]): SelfSignConfiguration defines self signed certificate configuration
-
-              FIELDS:
-                caOverlapInterval	<string>
-                  CAOverlapInterval defines the duration where expired CA certificate
-                  can overlap with new one, in order to allow fluent CA rotation transitioning
-
-                caRotateInterval	<string>
-                  CARotateInterval defines duration for CA expiration
-
-                certOverlapInterval	<string>
-                  CertOverlapInterval defines the duration where expired service certificate
-                  can overlap with new one, in order to allow fluent service rotation
-                  transitioning
-
-                certRotateInterval	<string>
-                  CertRotateInterval defines duration for of service certificate expiration
+            self_sign_configuration(Dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
 
             tolerations(List[Any]): Tolerations is an optional list of tolerations to be added to handler
-              DaemonSet manifest
-              If Tolerations is specified, the handler daemonset will be also scheduled on
-              nodes with corresponding taints
-              The pod this Toleration is attached to tolerates any taint that matches
-              the triple <key,value,effect> using the matching operator <operator>.
-
-              FIELDS:
-                effect	<string>
-                  Effect indicates the taint effect to match. Empty means match all taint
-                  effects.
-                  When specified, allowed values are NoSchedule, PreferNoSchedule and
-                  NoExecute.
-
-                key	<string>
-                  Key is the taint key that the toleration applies to. Empty means match all
-                  taint keys.
-                  If the key is empty, operator must be Exists; this combination means to
-                  match all values and all keys.
-
-                operator	<string>
-                  Operator represents a key's relationship to the value.
-                  Valid operators are Exists and Equal. Defaults to Equal.
-                  Exists is equivalent to wildcard for value, so that a pod can
-                  tolerate all taints of a particular category.
-
-                tolerationSeconds	<integer>
-                  TolerationSeconds represents the period of time the toleration (which must
-                  be
-                  of effect NoExecute, otherwise this field is ignored) tolerates the taint.
-                  By default,
-                  it is not set, which means tolerate the taint forever (do not evict). Zero
-                  and
-                  negative values will be treated as 0 (evict immediately) by the system.
-
-                value	<string>
-                  Value is the taint value the toleration matches to.
-                  If the operator is Exists, the value should be empty, otherwise just a
-                  regular string.
+              DaemonSet manifest If Tolerations is specified, the handler
+              daemonset will be also scheduled on nodes with corresponding
+              taints
 
         """
         super().__init__(**kwargs)
