@@ -1,6 +1,3 @@
-# This test uses https://github.com/RedHatQE/openshift-resources-definitions to get resource definitions json file
-# File: resources_definitions.json
-
 from __future__ import annotations
 import ast
 import json
