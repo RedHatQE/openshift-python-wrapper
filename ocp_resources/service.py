@@ -9,12 +9,12 @@ class Service(NamespacedResource):
     Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
     """
 
+    api_version: str = NamespacedResource.ApiVersion.V1
+
     class Type:
         CLUSTER_IP = "ClusterIP"
         NODE_PORT = "NodePort"
         LOAD_BALANCER = "LoadBalancer"
-
-    api_version: str = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,
