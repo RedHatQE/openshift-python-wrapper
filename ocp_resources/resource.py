@@ -123,7 +123,12 @@ def get_client(
             client_configuration.proxy = proxy
 
             return kubernetes.dynamic.DynamicClient(
-                client=kubernetes.config.new_client_from_config(config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs)
+                client=kubernetes.config.new_client_from_config(
+                    config_file=config_file,
+                    client_configuration=client_configuration,
+                    context=context or None,
+                    **kwargs,
+                )
             )
 
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
