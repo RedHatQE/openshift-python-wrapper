@@ -1,104 +1,11 @@
-# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+from warnings import warn
 
-from typing import Any, Dict, Optional
-from ocp_resources.resource import Resource
+from ocp_resources.project_project_openshift_io import Project  # noqa: F401
 
-
-class Project(Resource):
-    """
-    Projects are the unit of isolation and collaboration in OpenShift. A project
-    has one or more members, a quota on the resources that the project may
-    consume, and the security controls on the resources in the project. Within a
-    project, members may have different roles - project administrators can set
-    membership, editors can create and manage the resources, and viewers can see
-    but not access running containers. In a normal cluster project
-    administrators are not able to alter their quotas - that is restricted to
-    cluster administrators.
-
-    Listing or watching projects will return only projects the user has the
-    reader role on.
-
-    An OpenShift project is an alternative representation of a Kubernetes
-    namespace. Projects are exposed as editable to end users while namespaces
-    are not. Direct creation of a project is typically restricted to
-    administrators, while end users should use the requestproject resource.
-
-    Compatibility level 1: Stable within a major release for a minimum of 12
-    months or 3 minor releases (whichever is longer).
-    """
-
-    api_group: str = Resource.ApiGroup.PROJECT_OPENSHIFT_IO
-
-    class Status(Resource.Status):
-        ACTIVE = "Active"
-
-    def __init__(
-        self,
-        finalizers: Optional[Dict[str, Any]] = None,
-        **kwargs: Any,
-    ) -> None:
-        """
-        Args:
-            finalizers(Dict[Any, Any]): Finalizers is an opaque list of values that must be empty to permanently
-              remove object from storage
-
-        """
-        super().__init__(**kwargs)
-
-        self.finalizers = finalizers
-
-    def to_dict(self) -> None:
-        super().to_dict()
-
-        if not self.yaml_file:
-            self.res["spec"] = {}
-            _spec = self.res["spec"]
-
-            if self.finalizers:
-                _spec["finalizers"] = self.finalizers
-
-    def clean_up(self, wait: bool = True) -> bool:
-        return Project(name=self.name).delete(wait=wait)
-
-
-class ProjectRequest(Resource):
-    """
-    ProjectRequest is the set of options necessary to fully qualify a project
-    request
-
-    Compatibility level 1: Stable within a major release for a minimum of 12
-    months or 3 minor releases (whichever is longer).
-    """
-
-    api_group: str = Resource.ApiGroup.PROJECT_OPENSHIFT_IO
-
-    def __init__(
-        self,
-        description: Optional[str] = "",
-        display_name: Optional[str] = "",
-        **kwargs: Any,
-    ) -> None:
-        """
-        Args:
-            description(str): Description is the description to apply to a project
-
-            display_name(str): DisplayName is the display name to apply to a project
-
-        """
-        super().__init__(**kwargs)
-
-        self.description = description
-        self.display_name = display_name
-
-    def to_dict(self) -> None:
-        super().to_dict()
-
-        if not self.yaml_file:
-            if self.description:
-                self.res["description"] = self.description
-
-            if self.display_name:
-                self.res["displayName"] = self.display_name
-
-    def clean_up(self, wait: bool = True) -> bool:
-        return Project(name=self.name).delete(wait=wait)
+warn(
+    f"The module {__name__} is deprecated and will be removed in version 4.17, "
+    "`Project` should be either imported from `ocp_resources.project_project_openshift_io` or "
+    "`ocp_resources.project_config_openshift_io` depending on the API group.",
+    DeprecationWarning,
+    stacklevel=2,
+)
