@@ -11,6 +11,11 @@ class Service(NamespacedResource):
 
     api_version: str = NamespacedResource.ApiVersion.V1
 
+    class Type:
+        CLUSTER_IP = "ClusterIP"
+        NODE_PORT = "NodePort"
+        LOAD_BALANCER = "LoadBalancer"
+
     def __init__(
         self,
         allocate_load_balancer_node_ports: Optional[bool] = None,
