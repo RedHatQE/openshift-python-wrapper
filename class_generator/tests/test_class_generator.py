@@ -21,6 +21,7 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
         "Pod",
         "Secret",
         "NMState",
+        "Image",
     ),
 )
 def test_parse_explain(tmpdir_factory, kind):
