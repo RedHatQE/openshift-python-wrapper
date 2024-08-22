@@ -13,6 +13,7 @@ from types import TracebackType
 from typing import Optional, Any, Dict, List
 
 import kubernetes
+from kubernetes import config, client
 from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
@@ -107,13 +108,26 @@ def get_client(
             )
         )
     try:
-        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
-        LOGGER.info("Trying to get client via new_client_from_config")
-
         # kubernetes.config.kube_config.load_kube_config sets KUBE_CONFIG_DEFAULT_LOCATION during module import.
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
+        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+
+        if proxy:
+            LOGGER.info("Trying to get client using proxy %s", proxy)
+            client_configuration = client.Configuration()
+            config.load_kube_config(
+                config_file=config_file, client_configuration=client_configuration, persist_config=True
+            )
+            client_configuration.proxy = proxy
+            api_client = client.ApiClient(configuration=client_configuration)
+
+            return kubernetes.dynamic.DynamicClient(client=api_client)
+
+        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
+        LOGGER.info("Trying to get client via new_client_from_config")
+
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
         )
