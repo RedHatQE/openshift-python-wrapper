@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -20,7 +20,7 @@ class Image(Resource):
         docker_image_manifest: Optional[str] = "",
         docker_image_manifest_media_type: Optional[str] = "",
         docker_image_manifests: Optional[List[Any]] = None,
-        docker_image_metadata: Optional[Any] = None,
+        docker_image_metadata: Optional[Dict[str, Any]] = None,
         docker_image_metadata_version: Optional[str] = "",
         docker_image_reference: Optional[str] = "",
         docker_image_signatures: Optional[List[Any]] = None,
@@ -46,7 +46,7 @@ class Image(Resource):
               image represents a manifest list. When this field is present, no
               DockerImageLayers should be specified.
 
-            docker_image_metadata(Any): RawExtension is used to hold extensions in external versions.  To use
+            docker_image_metadata(Dict[str, Any]): RawExtension is used to hold extensions in external versions.  To use
               this, make a field which has RawExtension as its type in your
               external, versioned struct, and Object in your internal struct.
               You also need to register your various plugin types.  // Internal

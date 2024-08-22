@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from ocp_resources.resource import Resource
 
 
@@ -14,15 +14,15 @@ class Image(Resource):
 
     def __init__(
         self,
-        additional_trusted_ca: Optional[Any] = None,
+        additional_trusted_ca: Optional[Dict[str, Any]] = None,
         allowed_registries_for_import: Optional[List[Any]] = None,
         external_registry_hostnames: Optional[List[Any]] = None,
-        registry_sources: Optional[Any] = None,
+        registry_sources: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            additional_trusted_ca(Any): additionalTrustedCA is a reference to a ConfigMap containing
+            additional_trusted_ca(Dict[str, Any]): additionalTrustedCA is a reference to a ConfigMap containing
               additional CAs that should be trusted during imagestream import,
               pod image pull, build image pull, and imageregistry pullthrough.
               The namespace for this config map is openshift-config.
@@ -41,7 +41,7 @@ class Image(Resource):
               used in 'publicDockerImageRepository' field in ImageStreams. The
               value must be in "hostname[:port]" format.
 
-            registry_sources(Any): registrySources contains configuration that determines how the
+            registry_sources(Dict[str, Any]): registrySources contains configuration that determines how the
               container runtime should treat individual registries when
               accessing images for builds+pods. (e.g. whether or not to allow
               insecure access).  It does not contain configuration for the
