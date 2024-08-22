@@ -368,6 +368,7 @@ def generate_resource_file_from_dict(
 def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
     type_for_docstring: str = "Dict[str, Any]"
     type_from_dict_for_init: str = ""
+    # A resource field may be defined with `x-kubernetes-preserve-unknown-fields`. In this case, `type` is not provided.
     resource_type = key_dict.get("type")
 
     # All fields must be set with Optional since resource can have yaml_file to cover all args.
