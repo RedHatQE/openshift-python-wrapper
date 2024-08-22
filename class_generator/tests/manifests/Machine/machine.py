@@ -1,6 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,19 +13,19 @@ class Machine(NamespacedResource):
 
     def __init__(
         self,
-        lifecycle_hooks: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        lifecycle_hooks: Optional[Any] = None,
+        metadata: Optional[Any] = None,
         provider_id: Optional[str] = "",
-        provider_spec: Optional[Dict[str, Any]] = None,
+        provider_spec: Optional[Any] = None,
         taints: Optional[List[Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            lifecycle_hooks(Dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
+            lifecycle_hooks(Any): LifecycleHooks allow users to pause operations on the machine at
               certain predefined points within the machine lifecycle.
 
-            metadata(Dict[str, Any]): ObjectMeta will autopopulate the Node created. Use this to indicate
+            metadata(Any): ObjectMeta will autopopulate the Node created. Use this to indicate
               what labels, annotations, name prefix, etc., should be used when
               creating the Node.
 
@@ -45,7 +45,7 @@ class Machine(NamespacedResource):
               autoscaler that will be interfacing with cluster-api as generic
               provider.
 
-            provider_spec(Dict[str, Any]): ProviderSpec details Provider-specific configuration to use during
+            provider_spec(Any): ProviderSpec details Provider-specific configuration to use during
               node creation.
 
             taints(List[Any]): The list of the taints to be applied to the corresponding Node in
