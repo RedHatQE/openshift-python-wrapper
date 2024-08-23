@@ -2,13 +2,13 @@ from __future__ import annotations
 import ast
 import json
 import os
-from typing import Any, Dict, Generator, List, Optional, Tuple
+from typing import Any, Dict, Generator, List, Tuple
 
 
 from ocp_resources.resource import Resource  # noqa
 
 
-def _get_api_value_by_type(api_value: str, api_type: str) -> Optional[str]:
+def _get_api_value_by_type(api_value: str, api_type: str) -> str:
     try:
         if api_value:
             if api_type == "api_version":
@@ -18,7 +18,9 @@ def _get_api_value_by_type(api_value: str, api_type: str) -> Optional[str]:
                 return eval(f"Resource.ApiGroup.{api_value}")
 
     except AttributeError:
-        return None
+        pass
+
+    return api_value
 
 
 def _get_api_group_and_version(bodies: List[Any]) -> Tuple[str, str]:
@@ -79,10 +81,8 @@ def validate_resource(
             matched_resource["namespaced"] = resource_dict["namespaced"]
             break
 
-    if _api_type_version and api_value_name and matched_resource.get("group"):
-        errors.append(
-            f"Resource {cls.name} have api_version {api_value} but should have api_group = " f"{api_value_name.upper()}"
-        )
+    if _api_type_version and matched_resource.get("group"):
+        errors.append(f"Resource {cls.name} have api_version {api_value} but should have api_group")
 
     elif _api_type_version and matched_resource["version"] != api_value_name:
         errors.append(
@@ -92,8 +92,7 @@ def validate_resource(
 
     if namespaced_based != matched_resource["namespaced"]:
         errors.append(
-            f"Resource {cls.name} should be "
-            f"{'namespaced' if namespaced_based else 'in cluster scope (not namespaced)'}"
+            f"Resource {cls.name} base class is `{base_class_from[0].id}` but should have base class `{namespaced_resource_str if matched_resource['namespaced'] else resource_str}`"
         )
 
     return errors
@@ -109,38 +108,36 @@ def resource_file() -> Generator[str, None, None]:
             yield os.path.join(root, _file)
 
 
-def parse_resource_file_for_errors(file_) -> List[str]:
+def parse_resource_file_for_errors(data) -> List[str]:
     errors: List[str] = []
     _resources_definitions = resources_definitions()
 
-    with open(file_) as fd:
-        data = fd.read()
-        if data.startswith(
-            "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md"
-        ):
-            return []
+    if data.startswith(
+        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md"
+    ):
+        return []
 
-        tree = ast.parse(source=data)
-        classes = [cls for cls in tree.body if isinstance(cls, ast.ClassDef)]
-        classes_to_skip = "Event"
-        for cls in classes:
-            if cls.name in classes_to_skip:
-                continue
+    tree = ast.parse(source=data)
+    classes = [cls for cls in tree.body if isinstance(cls, ast.ClassDef)]
+    classes_to_skip = "Event"
+    for cls in classes:
+        if cls.name in classes_to_skip:
+            continue
 
-            resource_list = _resources_definitions.get(cls.name.lower())
-            if not resource_list:
-                continue
+        resource_list = _resources_definitions.get(cls.name.lower())
+        if not resource_list:
+            continue
 
-            bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, (ast.Assign, ast.AnnAssign))]
-            api_type, api_value = _get_api_group_and_version(bodies=bodies)
-            errors.extend(
-                validate_resource(
-                    cls=cls,
-                    resource_list=resource_list,
-                    api_value=api_value,
-                    api_type=api_type,
-                )
+        bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, (ast.Assign, ast.AnnAssign))]
+        api_type, api_value = _get_api_group_and_version(bodies=bodies)
+        errors.extend(
+            validate_resource(
+                cls=cls,
+                resource_list=resource_list,
+                api_value=api_value,
+                api_type=api_type,
             )
+        )
 
     return errors
 

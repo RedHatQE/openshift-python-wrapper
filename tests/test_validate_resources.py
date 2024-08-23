@@ -8,7 +8,10 @@ from tests.scripts.validate_resources import parse_resource_file_for_errors, res
 def resources_definitions_errors() -> List[str]:
     errors = []
     for _file in resource_file():
-        errors.extend(parse_resource_file_for_errors(file_=_file))
+        with open(_file) as fd:
+            data = fd.read()
+
+        errors.extend(parse_resource_file_for_errors(data=data))
 
     return errors
 
