@@ -31,7 +31,8 @@ def _get_api_group_and_version(bodies: List[Any]) -> Tuple[str, str]:
         else:
             api_type = targets.targets[0].id
 
-        return api_type, getattr(targets.value, "attr", getattr(targets.value, "value", None))
+        if api_type in ("api_version", "api_group"):
+            return api_type, getattr(targets.value, "attr", getattr(targets.value, "value", None))
 
     return "", ""
 
@@ -61,7 +62,7 @@ def validate_resource(
         return [f"Resource {cls.name} must have only one of {resource_str} or {namespaced_resource_str} base class"]
 
     if not api_type:
-        return [f"Resource {cls.name} must have api_group or api_version"]
+        errors.append(f"Resource {cls.name} must have api_group or api_version")
 
     namespaced_based: bool = base_class_from[0].id == namespaced_resource_str
     api_value_name = _get_api_value_by_type(api_value=api_value, api_type=api_type)

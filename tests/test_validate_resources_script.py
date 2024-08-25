@@ -57,6 +57,17 @@ class NMState(Resource):
 
 API_GROUP_RESOURCE_WITH_API_VERSION_ERRORS = ["Resource NMState have api_version v1 but should have api_group"]
 
+WRONG_BASE_CLASS_WITOUT_API_TYPE = """
+class Secret(Resource):
+    pass
+"""
+
+WRONG_BASE_CLASS_WITOUT_API_TYPE_ERRORS = [
+    "Resource Secret must have api_group or api_version",
+    "Resource Secret base class is `Resource` but should have base class `NamespacedResource`",
+]
+
+
 ALL_WRONG = """
 class NMState(NamespacedResource):
     api_version = "v1"
@@ -84,6 +95,11 @@ ALL_WRONG_ERRORS = [
             API_GROUP_RESOURCE_WITH_API_VERSION,
             API_GROUP_RESOURCE_WITH_API_VERSION_ERRORS,
             id="api_group_resource_with_api_version",
+        ),
+        pytest.param(
+            WRONG_BASE_CLASS_WITOUT_API_TYPE,
+            WRONG_BASE_CLASS_WITOUT_API_TYPE_ERRORS,
+            id="wrong_base_class_and_api_version",
         ),
         pytest.param(ALL_WRONG, ALL_WRONG_ERRORS, id="wrong_base_class_and_api_version"),
     ],
