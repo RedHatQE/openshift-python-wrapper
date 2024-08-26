@@ -13,7 +13,7 @@ from types import TracebackType
 from typing import Optional, Any, Dict, List
 
 import kubernetes
-from kubernetes import config, client
+from kubernetes import client
 from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
@@ -79,7 +79,11 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str = "", config_dict: Dict[str, Any] | None = None, context: str = "", proxy: str = "", **kwargs: Any
+    config_file: str = "",
+    config_dict: Dict[str, Any] | None = None,
+    context: str = "",
+    proxy: Optional[str] = "",
+    **kwargs: Any,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -124,7 +128,9 @@ def get_client(
         LOGGER.info("Trying to get client via new_client_from_config")
 
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs)
+            client=kubernetes.config.new_client_from_config(
+                config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs
+            )
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
