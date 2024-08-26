@@ -114,26 +114,17 @@ def get_client(
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         proxy = proxy or os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+        client_configuration = client.Configuration()
 
         if proxy:
             LOGGER.info(f"Trying to get client using proxy {proxy}")
-            client_configuration = client.Configuration()
             client_configuration.proxy = proxy
-
-            return kubernetes.dynamic.DynamicClient(
-                client=kubernetes.config.new_client_from_config(
-                    config_file=config_file,
-                    client_configuration=client_configuration,
-                    context=context or None,
-                    **kwargs,
-                )
-            )
 
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
         LOGGER.info("Trying to get client via new_client_from_config")
 
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
+            client=kubernetes.config.new_client_from_config(config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs)
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
