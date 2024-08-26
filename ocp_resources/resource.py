@@ -112,7 +112,7 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
-        proxy = kwargs.pop("proxy", None) or os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+        proxy: Optional[str] = kwargs.pop("proxy", None) or os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
 
         if proxy:
             LOGGER.info(f"Trying to get client using proxy {proxy}")
