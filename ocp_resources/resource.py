@@ -81,8 +81,8 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 def get_client(
     config_file: str = "",
     config_dict: Dict[str, Any] | None = None,
+    client_configuration: client.Configuration | None = None,
     context: str = "",
-    proxy: Optional[str] = "",
     **kwargs: Any,
 ) -> DynamicClient:
     """
@@ -99,8 +99,8 @@ def get_client(
     Args:
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
+        client_configuration: The kubernetes.client.Configuration to set configs to.
         context (str): name of the context to use.
-        proxy (str): the URL to the proxy to be used for all requests made by this client.
 
     Returns:
         DynamicClient: a kubernetes client.
@@ -117,8 +117,8 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
-        proxy = proxy or os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
-        client_configuration = client.Configuration()
+        client_configuration = client_configuration or client.Configuration()
+        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
 
         if proxy:
             LOGGER.info(f"Trying to get client using proxy {proxy}")
