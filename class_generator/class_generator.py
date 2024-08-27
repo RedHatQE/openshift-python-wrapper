@@ -7,7 +7,6 @@ import os
 import sys
 import requests
 from pathlib import Path
-from packaging.version import Version
 
 import textwrap
 from typing import Any, Dict, List, Tuple
@@ -149,20 +148,9 @@ def get_client_binary() -> str:
         sys.exit(1)
 
 
-def check_minimum_cluster_version(client) -> None:
-    cluster_version = get_server_version(client=client)
-    minimum_server_version = "v1.30.0"
-    if Version(cluster_version) < Version(minimum_server_version):
-        LOGGER.error(
-            f"Server version {cluster_version} is not supported. Minimum supported version is {minimum_server_version}"
-        )
-        sys.exit(1)
-
-
 def update_kind_schema():
     openapi2jsonschema_str: str = "openapi2jsonschema"
     client = get_client_binary()
-    check_minimum_cluster_version(client=client)
 
     if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
         LOGGER.error(
