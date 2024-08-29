@@ -46,7 +46,7 @@ ipdb = "^0.13.13"
 
 [tool.poetry.group.tests.dependencies]
 requests = "^2.31.0"
-deepdiff = "^7.0.1"
+deepdiff = "^8.0.0"
 
 [tool.poetry-dynamic-versioning.substitution]
 files = ["VERSION"]
