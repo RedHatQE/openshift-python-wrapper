@@ -12,7 +12,7 @@ class Task(NamespacedResource):
 
     def __init__(
         self,
-        steps: List[Dict[str, Any]],
+        steps: Optional[List[Dict[str, Any]]] = None,
         description: Optional[str] = None,
         params: Optional[List[Dict[str, str]]] = None,
         workspaces: Optional[List[Dict[str, Any]]] = None,
