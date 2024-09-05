@@ -763,18 +763,6 @@
       "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.PackageManifestStatus"
     },
     {
-      "$ref": "_definitions.json#/definitions/com.nvidia.v1.ClusterPolicy"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/com.nvidia.v1.ClusterPolicyList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/com.nvidia.v1alpha1.NVIDIADriver"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/com.nvidia.v1alpha1.NVIDIADriverList"
-    },
-    {
       "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.CephConnection"
     },
     {
@@ -2776,18 +2764,6 @@
       "$ref": "_definitions.json#/definitions/io.k8s.networking.policy.v1alpha1.BaselineAdminNetworkPolicyList"
     },
     {
-      "$ref": "_definitions.json#/definitions/io.k8s.node.topology.v1alpha1.NodeResourceTopology"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.node.topology.v1alpha1.NodeResourceTopologyList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.node.topology.v1alpha2.NodeResourceTopology"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.node.topology.v1alpha2.NodeResourceTopologyList"
-    },
-    {
       "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshot"
     },
     {
@@ -3128,42 +3104,6 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediation"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationTemplate"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationTemplateList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.remediation.v1alpha1.NodeHealthCheck"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.remediation.v1alpha1.NodeHealthCheckList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediation"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationConfig"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationConfigList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationTemplate"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.medik8s.self-node-remediation.v1alpha1.SelfNodeRemediationTemplateList"
     },
     {
       "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.BMCEventSubscription"
@@ -3646,22 +3586,10 @@
       "$ref": "_definitions.json#/definitions/io.openshift.monitoring.v1.AlertingRuleList"
     },
     {
-      "$ref": "_definitions.json#/definitions/io.openshift.nfd.v1.NodeFeatureDiscovery"
+      "$ref": "_definitions.json#/definitions/io.openshift.network.cloud.v1.CloudPrivateIPConfig"
     },
     {
-      "$ref": "_definitions.json#/definitions/io.openshift.nfd.v1.NodeFeatureDiscoveryList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.openshift.nfd.v1alpha1.NodeFeature"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.openshift.nfd.v1alpha1.NodeFeatureList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.openshift.nfd.v1alpha1.NodeFeatureRule"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.openshift.nfd.v1alpha1.NodeFeatureRuleList"
+      "$ref": "_definitions.json#/definitions/io.openshift.network.cloud.v1.CloudPrivateIPConfigList"
     },
     {
       "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.OCSInitialization"
@@ -3830,6 +3758,12 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeControllerManagerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeDescheduler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeDeschedulerList"
     },
     {
       "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeScheduler"

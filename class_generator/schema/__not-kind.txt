@@ -433,3 +433,5 @@ io.openshift.performance.v2.PerformanceProfileList
 io.k8s.api.storage.v1.CSIStorageCapacityList
 org.ovn.k8s.v1.EgressIPList
 io.medik8s.fence-agents-remediation.v1alpha1.FenceAgentsRemediationList
+io.openshift.network.cloud.v1.CloudPrivateIPConfigList
+io.openshift.operator.v1.KubeDeschedulerList

@@ -58,6 +58,50 @@
                 "ROSA"
               ]
             },
+            "capabilities": {
+              "description": "capabilities defines an array of capabilities that can be interacted with in the console UI. Each capability defines a visual state that can be interacted with the console to render in the UI. Available capabilities are LightspeedButton. Each of the available capabilities may appear only once in the list.",
+              "type": "array",
+              "maxItems": 1,
+              "minItems": 1,
+              "items": {
+                "description": "Capabilities contains set of UI capabilities and their state in the console UI.",
+                "type": "object",
+                "required": [
+                  "name",
+                  "visibility"
+                ],
+                "properties": {
+                  "name": {
+                    "description": "name is the unique name of a capability. Available capabilities are LightspeedButton.",
+                    "type": "string",
+                    "enum": [
+                      "LightspeedButton"
+                    ]
+                  },
+                  "visibility": {
+                    "description": "visibility defines the visibility state of the capability.",
+                    "type": "object",
+                    "required": [
+                      "state"
+                    ],
+                    "properties": {
+                      "state": {
+                        "description": "state defines if the capability is enabled or disabled in the console UI. Enabling the capability in the console UI is represented by the \"Enabled\" value. Disabling the capability in the console UI is represented by the \"Disabled\" value.",
+                        "type": "string",
+                        "enum": [
+                          "Enabled",
+                          "Disabled"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "x-kubernetes-list-map-keys": [
+                "name"
+              ],
+              "x-kubernetes-list-type": "map"
+            },
             "customLogoFile": {
               "description": "customLogoFile replaces the default OpenShift logo in the masthead and about dialog. It is a reference to a ConfigMap in the openshift-config namespace. This can be created with a command like 'oc create configmap custom-logo --from-file=/path/to/file -n openshift-config'. Image size must be less than 1 MB due to constraints on the ConfigMap size. The ConfigMap key should include a file extension so that the console serves the file with the correct MIME type. Recommended logo specifications: Dimensions: Max height of 68px and max width of 200px SVG format preferred",
               "type": "object",
