@@ -819,7 +819,6 @@
               "type": "boolean"
             },
             "deployVmConsoleProxy": {
-              "description": "Deprecated: This field is ignored.",
               "type": "boolean"
             }
           }
@@ -1678,15 +1677,6 @@
                 "Modern",
                 "Custom"
               ]
-            }
-          }
-        },
-        "tokenGenerationService": {
-          "description": "TokenGenerationService configures the service for generating tokens to access VNC for a VM.",
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "type": "boolean"
             }
           }
         }
