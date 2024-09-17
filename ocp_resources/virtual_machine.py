@@ -24,6 +24,7 @@ class VirtualMachine(NamespacedResource):
         HALTED = "Halted"
         ALWAYS = "Always"
         RERUNONFAILURE = "RerunOnFailure"
+        ONCE = "Once"
 
     class Status(NamespacedResource.Status):
         MIGRATING = "Migrating"
