@@ -1,0 +1,242 @@
+{
+  "description": "Predictor is the Schema for the predictors API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "PredictorSpec defines the desired state of Predictor",
+      "type": "object",
+      "required": [
+        "modelType"
+      ],
+      "properties": {
+        "gpu": {
+          "description": "May be absent, \"preferred\" or \"required\"",
+          "type": "string",
+          "enum": [
+            "required",
+            "preferred"
+          ]
+        },
+        "modelType": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "path": {
+          "description": "(DEPRECATED) The path to the model files within the storage",
+          "type": "string"
+        },
+        "protocolVersion": {
+          "description": "Protocol version to be exposed by the predictor (i.e. v1 or v2 or grpc-v1 or grpc-v2)",
+          "type": "string"
+        },
+        "runtime": {
+          "description": "If omitted a compatible runtime is selected based on the model type (if available)",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "schemaPath": {
+          "description": "(DEPRECATED) The path to the schema file within the storage",
+          "type": "string"
+        },
+        "serviceAccountName": {
+          "description": "NOT YET SUPPORTED",
+          "type": "string"
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "description": "The Storage Key in the secret for this model.",
+              "type": "string"
+            },
+            "parameters": {
+              "description": "Parameters to override the default storage credentials and config.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "path": {
+              "description": "The path to the model object in the storage. It cannot co-exist with the storageURI.",
+              "type": "string"
+            },
+            "persistentVolumeClaim": {
+              "description": "(DEPRECATED) PersistentVolmueClaim was never supported this way and will be removed",
+              "type": "object",
+              "required": [
+                "claimName"
+              ],
+              "properties": {
+                "claimName": {
+                  "description": "ClaimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims",
+                  "type": "string"
+                },
+                "readOnly": {
+                  "description": "Will force the ReadOnly setting in VolumeMounts. Default false.",
+                  "type": "boolean"
+                }
+              }
+            },
+            "s3": {
+              "description": "(DEPRECATED) S3 has configuration to connect to an S3 instance. It is now deprecated, use fields from Spec.Storage instead.",
+              "type": "object",
+              "required": [
+                "secretKey"
+              ],
+              "properties": {
+                "bucket": {
+                  "type": "string"
+                },
+                "secretKey": {
+                  "type": "string"
+                }
+              }
+            },
+            "schemaPath": {
+              "description": "The path to the model schema file in the storage.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "PredictorStatus defines the observed state of Predictor",
+      "type": "object",
+      "required": [
+        "activeModelState",
+        "available",
+        "failedCopies",
+        "targetModelState",
+        "totalCopies",
+        "transitionStatus"
+      ],
+      "properties": {
+        "activeModelState": {
+          "description": "High level state string: Pending, Standby, Loading, Loaded, FailedToLoad",
+          "type": "string",
+          "enum": [
+            "",
+            "Pending",
+            "Standby",
+            "Loading",
+            "Loaded",
+            "FailedToLoad"
+          ]
+        },
+        "available": {
+          "description": "Whether the predictor endpoint is available",
+          "type": "boolean"
+        },
+        "failedCopies": {
+          "description": "How many copies of this predictor's models failed to load recently",
+          "type": "integer"
+        },
+        "grpcEndpoint": {
+          "type": "string"
+        },
+        "httpEndpoint": {
+          "description": "Addressable endpoint for the deployed trained model This will be \"static\" and will not change when the model is mutated",
+          "type": "string"
+        },
+        "lastFailureInfo": {
+          "description": "Details of last failure, when load of target model is failed or blocked",
+          "type": "object",
+          "properties": {
+            "location": {
+              "description": "Name of component to which the failure relates (usually Pod name)",
+              "type": "string"
+            },
+            "message": {
+              "description": "Detailed error message",
+              "type": "string"
+            },
+            "modelId": {
+              "description": "Internal ID of model, tied to specific Spec contents",
+              "type": "string"
+            },
+            "reason": {
+              "description": "High level class of failure",
+              "type": "string",
+              "enum": [
+                "ModelLoadFailed",
+                "RuntimeUnhealthy",
+                "NoSupportingRuntime",
+                "RuntimeNotRecognized",
+                "InvalidPredictorSpec"
+              ]
+            },
+            "time": {
+              "description": "Time failure occurred or was discovered",
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "targetModelState": {
+          "description": "ModelState enum",
+          "type": "string",
+          "enum": [
+            "",
+            "Pending",
+            "Standby",
+            "Loading",
+            "Loaded",
+            "FailedToLoad"
+          ]
+        },
+        "totalCopies": {
+          "description": "Total number of copies of this predictor's models",
+          "type": "integer"
+        },
+        "transitionStatus": {
+          "description": "Whether the available predictor endpoint reflects the current Spec or is in transition",
+          "type": "string",
+          "enum": [
+            "UpToDate",
+            "InProgress",
+            "BlockedByFailedLoad",
+            "InvalidSpec"
+          ]
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "serving.kserve.io",
+      "kind": "Predictor",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

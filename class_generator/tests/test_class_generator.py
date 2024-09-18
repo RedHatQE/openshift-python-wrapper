@@ -16,12 +16,13 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
         "ConfigMap",
         "DNS",
         "Deployment",
+        "Image",
         "ImageContentSourcePolicy",
         "Machine",
+        "NMState",
         "Pod",
         "Secret",
-        "NMState",
-        "Image",
+        "ServiceMeshMember",
     ),
 )
 def test_parse_explain(tmpdir_factory, kind):

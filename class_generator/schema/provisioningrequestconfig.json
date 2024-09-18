@@ -1,0 +1,61 @@
+{
+  "description": "ProvisioningRequestConfig is the Schema for the provisioningrequestconfig API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ProvisioningRequestConfigSpec defines the desired state of ProvisioningRequestConfig",
+      "type": "object",
+      "required": [
+        "provisioningClassName"
+      ],
+      "properties": {
+        "managedResources": {
+          "description": "managedResources contains the list of resources managed by the autoscaling.\n\n\nIf empty, all resources are considered managed.\n\n\nIf not empty, the ProvisioningRequest will contain only the podsets that are\nrequesting at least one of them.\n\n\nIf none of the workloads podsets is requesting at least a managed resource,\nthe workload is considered ready.",
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "description": "ResourceName is the name identifying various resources in a ResourceList.",
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "set"
+        },
+        "parameters": {
+          "description": "Parameters contains all other parameters classes may require.",
+          "type": "object",
+          "maxProperties": 100,
+          "additionalProperties": {
+            "description": "Parameter is limited to 255 characters.",
+            "type": "string",
+            "maxLength": 255
+          }
+        },
+        "provisioningClassName": {
+          "description": "ProvisioningClassName describes the different modes of provisioning the resources.\nCheck autoscaling.x-k8s.io ProvisioningRequestSpec.ProvisioningClassName for details.",
+          "type": "string",
+          "maxLength": 253,
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "kueue.x-k8s.io",
+      "kind": "ProvisioningRequestConfig",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

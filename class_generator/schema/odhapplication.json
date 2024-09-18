@@ -1,0 +1,209 @@
+{
+  "description": "OdhApplication is the Schema for the odhapplications API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "OdhApplicationSpec defines the desired state of OdhApplication",
+      "type": "object",
+      "required": [
+        "description",
+        "displayName",
+        "docsLink",
+        "getStartedLink",
+        "getStartedMarkDown",
+        "img",
+        "provider",
+        "support"
+      ],
+      "properties": {
+        "beta": {
+          "type": "boolean"
+        },
+        "betaText": {
+          "type": "string"
+        },
+        "betaTitle": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "comingSoon": {
+          "type": "boolean"
+        },
+        "consoleLink": {
+          "type": "string"
+        },
+        "csvName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "docsLink": {
+          "type": "string"
+        },
+        "enable": {
+          "type": "object",
+          "properties": {
+            "actionLabel": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "link": {
+              "type": "string"
+            },
+            "linkPreface": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "validationConfigMap": {
+              "type": "string"
+            },
+            "validationJob": {
+              "type": "string"
+            },
+            "validationSecret": {
+              "type": "string"
+            },
+            "variableDisplayText": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "variableHelpText": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "variables": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "enableCR": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "group": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            },
+            "plural": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "featureFlag": {
+          "type": "string"
+        },
+        "getStartedLink": {
+          "type": "string"
+        },
+        "getStartedMarkDown": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "img": {
+          "type": "string"
+        },
+        "internalRoute": {
+          "type": "string"
+        },
+        "isEnabled": {
+          "type": "boolean"
+        },
+        "kfdefApplications": {
+          "description": "(Deprecated) Apps do not rely on other deployments, they are deployed by those components.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "link": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "quickStart": {
+          "type": "string"
+        },
+        "route": {
+          "type": "string"
+        },
+        "routeNamespace": {
+          "type": "string"
+        },
+        "routeSuffix": {
+          "type": "string"
+        },
+        "serviceName": {
+          "type": "string"
+        },
+        "support": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "OdhApplicationStatus defines the observed state of OdhApplication",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "dashboard.opendatahub.io",
+      "kind": "OdhApplication",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

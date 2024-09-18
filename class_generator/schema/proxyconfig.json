@@ -1,0 +1,67 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Provides configuration for individual workloads. See more details at: https://istio.io/docs/reference/config/networking/proxy-config.html",
+      "type": "object",
+      "properties": {
+        "concurrency": {
+          "description": "The number of worker threads to run."
+        },
+        "environmentVariables": {
+          "description": "Additional environment variables for the proxy.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "image": {
+          "description": "Specifies the details of the proxy image.",
+          "type": "object",
+          "properties": {
+            "imageType": {
+              "description": "The image type of the image.",
+              "type": "string"
+            }
+          }
+        },
+        "selector": {
+          "description": "Optional.",
+          "type": "object",
+          "properties": {
+            "matchLabels": {
+              "description": "One or more labels that indicate a specific set of pods/VMs on which a policy should be applied.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "x-kubernetes-preserve-unknown-fields": true
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "networking.istio.io",
+      "kind": "ProxyConfig",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

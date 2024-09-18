@@ -3,7 +3,7 @@
 {% set all_required_args = [] %}
 {% for arg in fields + spec %}
   {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
-  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + "(" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe ) %}
+  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + " (" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe ) %}
   {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md

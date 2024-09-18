@@ -1,0 +1,88 @@
+{
+  "description": "Schema for the knativeservings API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Spec defines the desired state of KnativeServing",
+      "x-kubernetes-preserve-unknown-fields": true
+    },
+    "status": {
+      "description": "Status defines the observed state of KnativeServing",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "The latest available observations of a resource's current state.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "status"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time the condition transitioned from one status to another. We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic differences (all other things held constant).",
+                "type": "string"
+              },
+              "message": {
+                "description": "A human readable message indicating details about the transition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "The reason for the condition's last transition.",
+                "type": "string"
+              },
+              "severity": {
+                "description": "Severity with which to treat failures of this type of condition. When this is not specified, it defaults to Error.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of the condition, one of True, False, Unknown.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of condition.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "manifests": {
+          "description": "The list of serving manifests, which have been installed by the operator",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "observedGeneration": {
+          "description": "The generation last processed by the controller",
+          "type": "integer"
+        },
+        "version": {
+          "description": "The version of the installed release",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "operator.knative.dev",
+      "kind": "KnativeServing",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

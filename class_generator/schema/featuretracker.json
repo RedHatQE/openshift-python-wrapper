@@ -1,0 +1,91 @@
+{
+  "description": "FeatureTracker represents a cluster-scoped resource in the Data Science Cluster, specifically designed for monitoring and managing objects created via the internal Features API. This resource serves a crucial role in cross-namespace resource management, acting as an owner reference for various resources. The primary purpose of the FeatureTracker is to enable efficient garbage collection by Kubernetes. This is essential for ensuring that resources are automatically cleaned up and reclaimed when they are no longer required.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "FeatureTrackerSpec defines the desired state of FeatureTracker.",
+      "type": "object",
+      "properties": {
+        "appNamespace": {
+          "type": "string"
+        },
+        "source": {
+          "description": "Source describes the type of object that created the related Feature to this FeatureTracker.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "FeatureTrackerStatus defines the observed state of FeatureTracker.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition represents the state of the operator's reconciliation functionality.",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ConditionType is the state of the operator's reconciliation functionality.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "phase": {
+          "description": "Phase describes the Phase of FeatureTracker reconciliation state. This is used by OLM UI to provide status information to the user.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "features.opendatahub.io",
+      "kind": "FeatureTracker",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

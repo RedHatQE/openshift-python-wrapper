@@ -1,0 +1,723 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Authentication policy for Istio services. See more details at: https://istio.io/docs/reference/config/istio.authentication.v1alpha1.html",
+      "type": "object",
+      "properties": {
+        "originIsOptional": {
+          "type": "boolean"
+        },
+        "origins": {
+          "description": "List of authentication methods that can be used for origin authentication.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "jwt": {
+                "description": "Jwt params for the method.",
+                "type": "object",
+                "properties": {
+                  "audiences": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "issuer": {
+                    "description": "Identifies the issuer that issued the JWT.",
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwks": {
+                    "description": "JSON Web Key Set of public keys to validate signature of the JWT.",
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwksUri": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwks_uri": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwtHeaders": {
+                    "description": "JWT is sent in a request header.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "jwtParams": {
+                    "description": "JWT is sent in a query parameter.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "jwt_headers": {
+                    "description": "JWT is sent in a request header.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "triggerRules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "excludedPaths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "excluded_paths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "includedPaths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "included_paths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "trigger_rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "excludedPaths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "excluded_paths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "includedPaths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "included_paths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "peerIsOptional": {
+          "type": "boolean"
+        },
+        "peers": {
+          "description": "List of authentication methods that can be used for peer authentication.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "jwt": {
+                "type": "object",
+                "properties": {
+                  "audiences": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "issuer": {
+                    "description": "Identifies the issuer that issued the JWT.",
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwks": {
+                    "description": "JSON Web Key Set of public keys to validate signature of the JWT.",
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwksUri": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwks_uri": {
+                    "type": "string",
+                    "format": "string"
+                  },
+                  "jwtHeaders": {
+                    "description": "JWT is sent in a request header.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "jwtParams": {
+                    "description": "JWT is sent in a query parameter.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "jwt_headers": {
+                    "description": "JWT is sent in a request header.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "string"
+                    }
+                  },
+                  "triggerRules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "excludedPaths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "excluded_paths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "includedPaths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "included_paths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "trigger_rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "excludedPaths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "excluded_paths": {
+                          "description": "List of paths to be excluded from the request.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "includedPaths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        },
+                        "included_paths": {
+                          "description": "List of paths that the request must include.",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "exact": {
+                                "description": "exact string match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "prefix": {
+                                "description": "prefix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "regex": {
+                                "description": "ECMAscript style regex-based match as defined by [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript).",
+                                "type": "string",
+                                "format": "string"
+                              },
+                              "suffix": {
+                                "description": "suffix-based match.",
+                                "type": "string",
+                                "format": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "mtls": {
+                "description": "Set if mTLS is used.",
+                "type": "object",
+                "properties": {
+                  "allowTls": {
+                    "description": "WILL BE DEPRECATED, if set, will translates to `TLS_PERMISSIVE` mode.",
+                    "type": "boolean"
+                  },
+                  "mode": {
+                    "description": "Defines the mode of mTLS authentication.",
+                    "type": "string",
+                    "enum": [
+                      "STRICT",
+                      "PERMISSIVE"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "principalBinding": {
+          "description": "Define whether peer or origin identity should be use for principal.",
+          "type": "string",
+          "enum": [
+            "USE_PEER",
+            "USE_ORIGIN"
+          ]
+        },
+        "targets": {
+          "description": "List rules to select workloads that the policy should be applied on.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "format": "string"
+                }
+              },
+              "name": {
+                "description": "The name must be a short name from the service registry.",
+                "type": "string",
+                "format": "string"
+              },
+              "ports": {
+                "description": "Specifies the ports.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "format": "string"
+                    },
+                    "number": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "authentication.maistra.io",
+      "kind": "ServiceMeshPolicy",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,168 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Configuration affecting service registry. See more details at: https://istio.io/docs/reference/config/networking/service-entry.html",
+      "type": "object",
+      "required": [
+        "hosts"
+      ],
+      "properties": {
+        "addresses": {
+          "description": "The virtual IP addresses associated with the service.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endpoints": {
+          "description": "One or more endpoints associated with the service.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "description": "Address associated with the network endpoint without the port.",
+                "type": "string"
+              },
+              "labels": {
+                "description": "One or more labels associated with the endpoint.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "locality": {
+                "description": "The locality associated with the endpoint.",
+                "type": "string"
+              },
+              "network": {
+                "description": "Network enables Istio to group endpoints resident in the same L3 domain/network.",
+                "type": "string"
+              },
+              "ports": {
+                "description": "Set of ports associated with the endpoint.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer"
+                }
+              },
+              "serviceAccount": {
+                "description": "The service account associated with the workload if a sidecar is present in the workload.",
+                "type": "string"
+              },
+              "weight": {
+                "description": "The load balancing weight associated with the endpoint.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "exportTo": {
+          "description": "A list of namespaces to which this service is exported.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hosts": {
+          "description": "The hosts associated with the ServiceEntry.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "location": {
+          "description": "Specify whether the service should be considered external to the mesh or part of the mesh.",
+          "type": "string",
+          "enum": [
+            "MESH_EXTERNAL",
+            "MESH_INTERNAL"
+          ]
+        },
+        "ports": {
+          "description": "The ports associated with the external service.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "number",
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "description": "Label assigned to the port.",
+                "type": "string"
+              },
+              "number": {
+                "description": "A valid non-negative integer port number.",
+                "type": "integer"
+              },
+              "protocol": {
+                "description": "The protocol exposed on the port.",
+                "type": "string"
+              },
+              "targetPort": {
+                "description": "The port number on the endpoint where the traffic will be received.",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "resolution": {
+          "description": "Service resolution mode for the hosts.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "STATIC",
+            "DNS",
+            "DNS_ROUND_ROBIN"
+          ]
+        },
+        "subjectAltNames": {
+          "description": "If specified, the proxy will verify that the server certificate's subject alternate name matches one of the specified values.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "workloadSelector": {
+          "description": "Applicable only for MESH_INTERNAL services.",
+          "type": "object",
+          "properties": {
+            "labels": {
+              "description": "One or more labels that indicate a specific set of pods/VMs on which the configuration should be applied.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "x-kubernetes-preserve-unknown-fields": true
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "networking.istio.io",
+      "kind": "ServiceEntry",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,637 @@
+{
+  "type": "object",
+  "required": [
+    "metadata"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "archive": {
+                "type": "object",
+                "properties": {
+                  "none": {
+                    "type": "object"
+                  },
+                  "tar": {
+                    "type": "object",
+                    "properties": {
+                      "compressionLevel": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  },
+                  "zip": {
+                    "type": "object"
+                  }
+                }
+              },
+              "archiveLogs": {
+                "type": "boolean"
+              },
+              "artifactory": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "passwordSecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "usernameSecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "from": {
+                "type": "string"
+              },
+              "fromExpression": {
+                "type": "string"
+              },
+              "gcs": {
+                "type": "object",
+                "required": [
+                  "key"
+                ],
+                "properties": {
+                  "bucket": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "serviceAccountKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "git": {
+                "type": "object",
+                "required": [
+                  "repo"
+                ],
+                "properties": {
+                  "depth": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "disableSubmodules": {
+                    "type": "boolean"
+                  },
+                  "fetch": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "insecureIgnoreHostKey": {
+                    "type": "boolean"
+                  },
+                  "passwordSecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "repo": {
+                    "type": "string"
+                  },
+                  "revision": {
+                    "type": "string"
+                  },
+                  "sshPrivateKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "usernameSecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              },
+              "globalName": {
+                "type": "string"
+              },
+              "hdfs": {
+                "type": "object",
+                "required": [
+                  "path"
+                ],
+                "properties": {
+                  "addresses": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "force": {
+                    "type": "boolean"
+                  },
+                  "hdfsUser": {
+                    "type": "string"
+                  },
+                  "krbCCacheSecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "krbConfigConfigMap": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "krbKeytabSecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "krbRealm": {
+                    "type": "string"
+                  },
+                  "krbServicePrincipalName": {
+                    "type": "string"
+                  },
+                  "krbUsername": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                }
+              },
+              "http": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                }
+              },
+              "mode": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "name": {
+                "type": "string"
+              },
+              "optional": {
+                "type": "boolean"
+              },
+              "oss": {
+                "type": "object",
+                "required": [
+                  "key"
+                ],
+                "properties": {
+                  "accessKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "bucket": {
+                    "type": "string"
+                  },
+                  "createBucketIfNotPresent": {
+                    "type": "boolean"
+                  },
+                  "endpoint": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "lifecycleRule": {
+                    "type": "object",
+                    "properties": {
+                      "markDeletionAfterDays": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "markInfrequentAccessAfterDays": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  },
+                  "secretKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "securityToken": {
+                    "type": "string"
+                  }
+                }
+              },
+              "path": {
+                "type": "string"
+              },
+              "raw": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  }
+                }
+              },
+              "recurseMode": {
+                "type": "boolean"
+              },
+              "s3": {
+                "type": "object",
+                "properties": {
+                  "accessKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "bucket": {
+                    "type": "string"
+                  },
+                  "createBucketIfNotPresent": {
+                    "type": "object",
+                    "properties": {
+                      "objectLocking": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "encryptionOptions": {
+                    "type": "object",
+                    "properties": {
+                      "enableEncryption": {
+                        "type": "boolean"
+                      },
+                      "kmsEncryptionContext": {
+                        "type": "string"
+                      },
+                      "kmsKeyId": {
+                        "type": "string"
+                      },
+                      "serverSideCustomerKeySecret": {
+                        "type": "object",
+                        "required": [
+                          "key"
+                        ],
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "optional": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "endpoint": {
+                    "type": "string"
+                  },
+                  "insecure": {
+                    "type": "boolean"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "region": {
+                    "type": "string"
+                  },
+                  "roleARN": {
+                    "type": "string"
+                  },
+                  "secretKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "useSDKCreds": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "subPath": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "exitCode": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "default": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "enum": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "globalName": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "valueFrom": {
+                "type": "object",
+                "properties": {
+                  "configMapKeyRef": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "default": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "expression": {
+                    "type": "string"
+                  },
+                  "jqFilter": {
+                    "type": "string"
+                  },
+                  "jsonPath": {
+                    "type": "string"
+                  },
+                  "parameter": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "supplied": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "result": {
+          "type": "string"
+        }
+      }
+    },
+    "phase": {
+      "type": "string"
+    },
+    "progress": {
+      "type": "string"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "argoproj.io",
+      "kind": "WorkflowTaskResult",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
