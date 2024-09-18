@@ -19,7 +19,7 @@ class ServiceMeshMember(NamespacedResource):
     ) -> None:
         """
         Args:
-            control_plane_ref(Dict[str, Any]): No field description from API; please add description
+            control_plane_ref(Dict[str, Any]): Dict with `ServiceMeshControlPlane` information.
 
         """
         super().__init__(**kwargs)
