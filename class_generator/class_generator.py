@@ -33,7 +33,7 @@ TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
-MISSING_DESCRIPTION_STR = "No field description from API; please add description"
+MISSING_DESCRIPTION_STR: str = "No field description from API; please add description"
 
 
 def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Dict[str, Any]:
