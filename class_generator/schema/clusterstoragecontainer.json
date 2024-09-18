@@ -1,0 +1,920 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "disabled": {
+      "type": "boolean"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "container",
+        "supportedUriFormats"
+      ],
+      "properties": {
+        "container": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "command": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "env": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "valueFrom": {
+                    "type": "object",
+                    "properties": {
+                      "configMapKeyRef": {
+                        "type": "object",
+                        "required": [
+                          "key"
+                        ],
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "optional": {
+                            "type": "boolean"
+                          }
+                        },
+                        "x-kubernetes-map-type": "atomic"
+                      },
+                      "fieldRef": {
+                        "type": "object",
+                        "required": [
+                          "fieldPath"
+                        ],
+                        "properties": {
+                          "apiVersion": {
+                            "type": "string"
+                          },
+                          "fieldPath": {
+                            "type": "string"
+                          }
+                        },
+                        "x-kubernetes-map-type": "atomic"
+                      },
+                      "resourceFieldRef": {
+                        "type": "object",
+                        "required": [
+                          "resource"
+                        ],
+                        "properties": {
+                          "containerName": {
+                            "type": "string"
+                          },
+                          "divisor": {
+                            "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                            "x-kubernetes-int-or-string": true
+                          },
+                          "resource": {
+                            "type": "string"
+                          }
+                        },
+                        "x-kubernetes-map-type": "atomic"
+                      },
+                      "secretKeyRef": {
+                        "type": "object",
+                        "required": [
+                          "key"
+                        ],
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "optional": {
+                            "type": "boolean"
+                          }
+                        },
+                        "x-kubernetes-map-type": "atomic"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "envFrom": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "configMapRef": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    },
+                    "x-kubernetes-map-type": "atomic"
+                  },
+                  "prefix": {
+                    "type": "string"
+                  },
+                  "secretRef": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    },
+                    "x-kubernetes-map-type": "atomic"
+                  }
+                }
+              }
+            },
+            "image": {
+              "type": "string"
+            },
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "lifecycle": {
+              "type": "object",
+              "properties": {
+                "postStart": {
+                  "type": "object",
+                  "properties": {
+                    "exec": {
+                      "type": "object",
+                      "properties": {
+                        "command": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "httpGet": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "httpHeaders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "value"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "x-kubernetes-int-or-string": true
+                        },
+                        "scheme": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "tcpSocket": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "x-kubernetes-int-or-string": true
+                        }
+                      }
+                    }
+                  }
+                },
+                "preStop": {
+                  "type": "object",
+                  "properties": {
+                    "exec": {
+                      "type": "object",
+                      "properties": {
+                        "command": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "httpGet": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "httpHeaders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "value"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "x-kubernetes-int-or-string": true
+                        },
+                        "scheme": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "tcpSocket": {
+                      "type": "object",
+                      "required": [
+                        "port"
+                      ],
+                      "properties": {
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "x-kubernetes-int-or-string": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "livenessProbe": {
+              "type": "object",
+              "properties": {
+                "exec": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "failureThreshold": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "grpc": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "port": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "service": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "httpGet": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "host": {
+                      "type": "string"
+                    },
+                    "httpHeaders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "value"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "x-kubernetes-int-or-string": true
+                    },
+                    "scheme": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "tcpSocket": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "host": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "terminationGracePeriodSeconds": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "name": {
+              "type": "string"
+            },
+            "ports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "containerPort"
+                ],
+                "properties": {
+                  "containerPort": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "hostIP": {
+                    "type": "string"
+                  },
+                  "hostPort": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "protocol": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-list-map-keys": [
+                "containerPort",
+                "protocol"
+              ],
+              "x-kubernetes-list-type": "map"
+            },
+            "readinessProbe": {
+              "type": "object",
+              "properties": {
+                "exec": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "failureThreshold": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "grpc": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "port": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "service": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "httpGet": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "host": {
+                      "type": "string"
+                    },
+                    "httpHeaders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "value"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "x-kubernetes-int-or-string": true
+                    },
+                    "scheme": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "tcpSocket": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "host": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "terminationGracePeriodSeconds": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "resizePolicy": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "resourceName",
+                  "restartPolicy"
+                ],
+                "properties": {
+                  "resourceName": {
+                    "type": "string"
+                  },
+                  "restartPolicy": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "resources": {
+              "type": "object",
+              "properties": {
+                "claims": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-map-keys": [
+                    "name"
+                  ],
+                  "x-kubernetes-list-type": "map"
+                },
+                "limits": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                    "x-kubernetes-int-or-string": true
+                  }
+                },
+                "requests": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                    "x-kubernetes-int-or-string": true
+                  }
+                }
+              }
+            },
+            "restartPolicy": {
+              "type": "string"
+            },
+            "securityContext": {
+              "type": "object",
+              "properties": {
+                "allowPrivilegeEscalation": {
+                  "type": "boolean"
+                },
+                "capabilities": {
+                  "type": "object",
+                  "properties": {
+                    "add": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "drop": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "privileged": {
+                  "type": "boolean"
+                },
+                "procMount": {
+                  "type": "string"
+                },
+                "readOnlyRootFilesystem": {
+                  "type": "boolean"
+                },
+                "runAsGroup": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "runAsNonRoot": {
+                  "type": "boolean"
+                },
+                "runAsUser": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "seLinuxOptions": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "seccompProfile": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "localhostProfile": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "windowsOptions": {
+                  "type": "object",
+                  "properties": {
+                    "gmsaCredentialSpec": {
+                      "type": "string"
+                    },
+                    "gmsaCredentialSpecName": {
+                      "type": "string"
+                    },
+                    "hostProcess": {
+                      "type": "boolean"
+                    },
+                    "runAsUserName": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "startupProbe": {
+              "type": "object",
+              "properties": {
+                "exec": {
+                  "type": "object",
+                  "properties": {
+                    "command": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "failureThreshold": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "grpc": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "port": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "service": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "httpGet": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "host": {
+                      "type": "string"
+                    },
+                    "httpHeaders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "value"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "x-kubernetes-int-or-string": true
+                    },
+                    "scheme": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "initialDelaySeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "periodSeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "successThreshold": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "tcpSocket": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "host": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "terminationGracePeriodSeconds": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "timeoutSeconds": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "stdin": {
+              "type": "boolean"
+            },
+            "stdinOnce": {
+              "type": "boolean"
+            },
+            "terminationMessagePath": {
+              "type": "string"
+            },
+            "terminationMessagePolicy": {
+              "type": "string"
+            },
+            "tty": {
+              "type": "boolean"
+            },
+            "volumeDevices": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "devicePath",
+                  "name"
+                ],
+                "properties": {
+                  "devicePath": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "volumeMounts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "mountPath",
+                  "name"
+                ],
+                "properties": {
+                  "mountPath": {
+                    "type": "string"
+                  },
+                  "mountPropagation": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "readOnly": {
+                    "type": "boolean"
+                  },
+                  "subPath": {
+                    "type": "string"
+                  },
+                  "subPathExpr": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "workingDir": {
+              "type": "string"
+            }
+          }
+        },
+        "supportedUriFormats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prefix": {
+                "type": "string"
+              },
+              "regex": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "serving.kserve.io",
+      "kind": "ClusterStorageContainer",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
