@@ -20,14 +20,14 @@ class Image(NamespacedResource):
     ) -> None:
         """
         Args:
-            image(str): Image is the name of the container image url to cache across the
+            image (str): Image is the name of the container image url to cache across the
               cluster.
 
-            image_pull_secrets(List[Any]): ImagePullSecrets contains the names of the Kubernetes Secrets
+            image_pull_secrets (List[Any]): ImagePullSecrets contains the names of the Kubernetes Secrets
               containing login information used by the Pods which will run this
               container.
 
-            service_account_name(str): ServiceAccountName is the name of the Kubernetes ServiceAccount as
+            service_account_name (str): ServiceAccountName is the name of the Kubernetes ServiceAccount as
               which the Pods will run this container.  This is potentially used
               to authenticate the image pull if the service account has attached
               pull secrets.  For more information:

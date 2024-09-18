@@ -24,17 +24,17 @@ class APIServer(Resource):
     ) -> None:
         """
         Args:
-            additional_cors_allowed_origins(List[Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
+            additional_cors_allowed_origins (List[Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
               expressions describing hosts for which the API server allows
               access using the CORS headers. This may be needed to access the
               API and the integrated OAuth server from JavaScript applications.
               The values are regular expressions that correspond to the Golang
               regular expression language.
 
-            audit(Dict[str, Any]): audit specifies the settings for audit configuration to be applied to
+            audit (Dict[str, Any]): audit specifies the settings for audit configuration to be applied to
               all OpenShift-provided API servers in the cluster.
 
-            client_ca(Dict[str, Any]): clientCA references a ConfigMap containing a certificate bundle for
+            client_ca (Dict[str, Any]): clientCA references a ConfigMap containing a certificate bundle for
               the signers that will be recognized for incoming client
               certificates in addition to the operator managed signers. If this
               is empty, then only operator managed signers are valid. You
@@ -43,14 +43,14 @@ class APIServer(Resource):
               openshift-config namespace and contain the following required
               fields: - ConfigMap.Data["ca-bundle.crt"] - CA bundle.
 
-            encryption(Dict[str, Any]): encryption allows the configuration of encryption of resources at the
+            encryption (Dict[str, Any]): encryption allows the configuration of encryption of resources at the
               datastore layer.
 
-            serving_certs(Dict[str, Any]): servingCert is the TLS cert info for serving secure traffic. If not
+            serving_certs (Dict[str, Any]): servingCert is the TLS cert info for serving secure traffic. If not
               specified, operator managed certificates will be used for serving
               secure traffic.
 
-            tls_security_profile(Dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
+            tls_security_profile (Dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
               externally exposed servers.   If unset, a default (which may
               change between releases) is chosen. Note that only Old,
               Intermediate and Custom profiles are currently supported, and the
