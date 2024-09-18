@@ -1,0 +1,448 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Configuration affecting network reachability of a sidecar. See more details at: https://istio.io/docs/reference/config/networking/sidecar.html",
+      "type": "object",
+      "properties": {
+        "egress": {
+          "description": "Egress specifies the configuration of the sidecar for processing outbound traffic from the attached workload instance to other services in the mesh.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "hosts"
+            ],
+            "properties": {
+              "bind": {
+                "description": "The IP(IPv4 or IPv6) or the Unix domain socket to which the listener should be bound to.",
+                "type": "string"
+              },
+              "captureMode": {
+                "description": "When the bind address is an IP, the captureMode option dictates how traffic to the listener is expected to be captured (or not).",
+                "type": "string",
+                "enum": [
+                  "DEFAULT",
+                  "IPTABLES",
+                  "NONE"
+                ]
+              },
+              "hosts": {
+                "description": "One or more service hosts exposed by the listener in `namespace/dnsName` format.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "port": {
+                "description": "The port associated with the listener.",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "description": "Label assigned to the port.",
+                    "type": "string"
+                  },
+                  "number": {
+                    "description": "A valid non-negative integer port number.",
+                    "type": "integer"
+                  },
+                  "protocol": {
+                    "description": "The protocol exposed on the port.",
+                    "type": "string"
+                  },
+                  "targetPort": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "inboundConnectionPool": {
+          "description": "Settings controlling the volume of connections Envoy will accept from the network.",
+          "type": "object",
+          "properties": {
+            "http": {
+              "description": "HTTP connection pool settings.",
+              "type": "object",
+              "properties": {
+                "h2UpgradePolicy": {
+                  "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                  "type": "string",
+                  "enum": [
+                    "DEFAULT",
+                    "DO_NOT_UPGRADE",
+                    "UPGRADE"
+                  ]
+                },
+                "http1MaxPendingRequests": {
+                  "description": "Maximum number of requests that will be queued while waiting for a ready connection pool connection.",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "http2MaxRequests": {
+                  "description": "Maximum number of active requests to a destination.",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "idleTimeout": {
+                  "description": "The idle timeout for upstream connection pool connections.",
+                  "type": "string"
+                },
+                "maxRequestsPerConnection": {
+                  "description": "Maximum number of requests per connection to a backend.",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "maxRetries": {
+                  "description": "Maximum number of retries that can be outstanding to all hosts in a cluster at a given time.",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "useClientProtocol": {
+                  "description": "If set to true, client protocol will be preserved while initiating connection to backend.",
+                  "type": "boolean"
+                }
+              }
+            },
+            "tcp": {
+              "description": "Settings common to both HTTP and TCP upstream connections.",
+              "type": "object",
+              "properties": {
+                "connectTimeout": {
+                  "description": "TCP connection timeout.",
+                  "type": "string"
+                },
+                "maxConnectionDuration": {
+                  "description": "The maximum duration of a connection.",
+                  "type": "string"
+                },
+                "maxConnections": {
+                  "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "tcpKeepalive": {
+                  "description": "If set then set SO_KEEPALIVE on the socket to enable TCP Keepalives.",
+                  "type": "object",
+                  "properties": {
+                    "interval": {
+                      "description": "The time duration between keep-alive probes.",
+                      "type": "string"
+                    },
+                    "probes": {
+                      "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
+                      "type": "integer"
+                    },
+                    "time": {
+                      "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ingress": {
+          "description": "Ingress specifies the configuration of the sidecar for processing inbound traffic to the attached workload instance.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "port"
+            ],
+            "properties": {
+              "bind": {
+                "description": "The IP(IPv4 or IPv6) to which the listener should be bound.",
+                "type": "string"
+              },
+              "captureMode": {
+                "description": "The captureMode option dictates how traffic to the listener is expected to be captured (or not).",
+                "type": "string",
+                "enum": [
+                  "DEFAULT",
+                  "IPTABLES",
+                  "NONE"
+                ]
+              },
+              "connectionPool": {
+                "description": "Settings controlling the volume of connections Envoy will accept from the network.",
+                "type": "object",
+                "properties": {
+                  "http": {
+                    "description": "HTTP connection pool settings.",
+                    "type": "object",
+                    "properties": {
+                      "h2UpgradePolicy": {
+                        "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                        "type": "string",
+                        "enum": [
+                          "DEFAULT",
+                          "DO_NOT_UPGRADE",
+                          "UPGRADE"
+                        ]
+                      },
+                      "http1MaxPendingRequests": {
+                        "description": "Maximum number of requests that will be queued while waiting for a ready connection pool connection.",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "http2MaxRequests": {
+                        "description": "Maximum number of active requests to a destination.",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "idleTimeout": {
+                        "description": "The idle timeout for upstream connection pool connections.",
+                        "type": "string"
+                      },
+                      "maxRequestsPerConnection": {
+                        "description": "Maximum number of requests per connection to a backend.",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "maxRetries": {
+                        "description": "Maximum number of retries that can be outstanding to all hosts in a cluster at a given time.",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "useClientProtocol": {
+                        "description": "If set to true, client protocol will be preserved while initiating connection to backend.",
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "tcp": {
+                    "description": "Settings common to both HTTP and TCP upstream connections.",
+                    "type": "object",
+                    "properties": {
+                      "connectTimeout": {
+                        "description": "TCP connection timeout.",
+                        "type": "string"
+                      },
+                      "maxConnectionDuration": {
+                        "description": "The maximum duration of a connection.",
+                        "type": "string"
+                      },
+                      "maxConnections": {
+                        "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "tcpKeepalive": {
+                        "description": "If set then set SO_KEEPALIVE on the socket to enable TCP Keepalives.",
+                        "type": "object",
+                        "properties": {
+                          "interval": {
+                            "description": "The time duration between keep-alive probes.",
+                            "type": "string"
+                          },
+                          "probes": {
+                            "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
+                            "type": "integer"
+                          },
+                          "time": {
+                            "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "defaultEndpoint": {
+                "description": "The IP endpoint or Unix domain socket to which traffic should be forwarded to.",
+                "type": "string"
+              },
+              "port": {
+                "description": "The port associated with the listener.",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "description": "Label assigned to the port.",
+                    "type": "string"
+                  },
+                  "number": {
+                    "description": "A valid non-negative integer port number.",
+                    "type": "integer"
+                  },
+                  "protocol": {
+                    "description": "The protocol exposed on the port.",
+                    "type": "string"
+                  },
+                  "targetPort": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "tls": {
+                "description": "Set of TLS related options that will enable TLS termination on the sidecar for requests originating from outside the mesh.",
+                "type": "object",
+                "properties": {
+                  "caCertificates": {
+                    "description": "REQUIRED if mode is `MUTUAL` or `OPTIONAL_MUTUAL`.",
+                    "type": "string"
+                  },
+                  "cipherSuites": {
+                    "description": "Optional: If specified, only support the specified cipher list.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "credentialName": {
+                    "description": "For gateways running on Kubernetes, the name of the secret that holds the TLS certs including the CA certificates.",
+                    "type": "string"
+                  },
+                  "httpsRedirect": {
+                    "description": "If set to true, the load balancer will send a 301 redirect for all http connections, asking the clients to use HTTPS.",
+                    "type": "boolean"
+                  },
+                  "maxProtocolVersion": {
+                    "description": "Optional: Maximum TLS protocol version.",
+                    "type": "string",
+                    "enum": [
+                      "TLS_AUTO",
+                      "TLSV1_0",
+                      "TLSV1_1",
+                      "TLSV1_2",
+                      "TLSV1_3"
+                    ]
+                  },
+                  "minProtocolVersion": {
+                    "description": "Optional: Minimum TLS protocol version.",
+                    "type": "string",
+                    "enum": [
+                      "TLS_AUTO",
+                      "TLSV1_0",
+                      "TLSV1_1",
+                      "TLSV1_2",
+                      "TLSV1_3"
+                    ]
+                  },
+                  "mode": {
+                    "description": "Optional: Indicates whether connections to this port should be secured using TLS.",
+                    "type": "string",
+                    "enum": [
+                      "PASSTHROUGH",
+                      "SIMPLE",
+                      "MUTUAL",
+                      "AUTO_PASSTHROUGH",
+                      "ISTIO_MUTUAL",
+                      "OPTIONAL_MUTUAL"
+                    ]
+                  },
+                  "privateKey": {
+                    "description": "REQUIRED if mode is `SIMPLE` or `MUTUAL`.",
+                    "type": "string"
+                  },
+                  "serverCertificate": {
+                    "description": "REQUIRED if mode is `SIMPLE` or `MUTUAL`.",
+                    "type": "string"
+                  },
+                  "subjectAltNames": {
+                    "description": "A list of alternate names to verify the subject identity in the certificate presented by the client.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "verifyCertificateHash": {
+                    "description": "An optional list of hex-encoded SHA-256 hashes of the authorized client certificates.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "verifyCertificateSpki": {
+                    "description": "An optional list of base64-encoded SHA-256 hashes of the SPKIs of authorized client certificates.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "outboundTrafficPolicy": {
+          "description": "Configuration for the outbound traffic policy.",
+          "type": "object",
+          "properties": {
+            "egressProxy": {
+              "type": "object",
+              "required": [
+                "host"
+              ],
+              "properties": {
+                "host": {
+                  "description": "The name of a service from the service registry.",
+                  "type": "string"
+                },
+                "port": {
+                  "description": "Specifies the port on the host that is being addressed.",
+                  "type": "object",
+                  "properties": {
+                    "number": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "subset": {
+                  "description": "The name of a subset within the service.",
+                  "type": "string"
+                }
+              }
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "REGISTRY_ONLY",
+                "ALLOW_ANY"
+              ]
+            }
+          }
+        },
+        "workloadSelector": {
+          "description": "Criteria used to select the specific set of pods/VMs on which this `Sidecar` configuration should be applied.",
+          "type": "object",
+          "properties": {
+            "labels": {
+              "description": "One or more labels that indicate a specific set of pods/VMs on which the configuration should be applied.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "x-kubernetes-preserve-unknown-fields": true
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "networking.istio.io",
+      "kind": "Sidecar",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

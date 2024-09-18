@@ -24,6 +24,9 @@
           "items": {
             "description": "AdditionalNetworkDefinition configures an extra network that is available but not created by default. Instead, pods must request them by name. type must be specified, along with exactly one \"Config\" that matches the type.",
             "type": "object",
+            "required": [
+              "name"
+            ],
             "properties": {
               "name": {
                 "description": "name is the name of the network. This will be populated in the resulting CRD This must be unique.",
@@ -65,7 +68,8 @@
                                   "type": "string"
                                 }
                               }
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
                           },
                           "dns": {
                             "description": "DNS configures DNS for the interface",
@@ -80,14 +84,16 @@
                                 "type": "array",
                                 "items": {
                                   "type": "string"
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               },
                               "search": {
                                 "description": "Search configures priority ordered search domains for short hostname lookups",
                                 "type": "array",
                                 "items": {
                                   "type": "string"
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               }
                             }
                           },
@@ -107,7 +113,8 @@
                                   "type": "string"
                                 }
                               }
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
                           }
                         }
                       },
@@ -138,7 +145,11 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
         },
         "clusterNetwork": {
           "description": "clusterNetwork is the IP address pool to use for pod IPs. Some network providers, e.g. OpenShift SDN, support multiple ClusterNetworks. Others only support one. This is equivalent to the cluster-cidr.",
@@ -156,7 +167,8 @@
                 "minimum": 0
               }
             }
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "defaultNetwork": {
           "description": "defaultNetwork is the \"default\" network that all pods will receive",
@@ -294,7 +306,8 @@
                             "minimum": 0
                           }
                         }
-                      }
+                      },
+                      "x-kubernetes-list-type": "atomic"
                     },
                     "hybridOverlayVXLANPort": {
                       "description": "HybridOverlayVXLANPort defines the VXLAN port number to be used by the additional overlay network. Default is 4789",
@@ -486,7 +499,8 @@
                   "items": {
                     "type": "string",
                     "pattern": "^(([0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]):([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
-                  }
+                  },
+                  "x-kubernetes-list-type": "atomic"
                 }
               }
             },
@@ -502,7 +516,8 @@
                   "items": {
                     "type": "string",
                     "pattern": "^(([0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]):([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
-                  }
+                  },
+                  "x-kubernetes-list-type": "atomic"
                 }
               }
             },
@@ -518,7 +533,8 @@
                   "items": {
                     "type": "string",
                     "pattern": "^(([0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[0-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]):([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
-                  }
+                  },
+                  "x-kubernetes-list-type": "atomic"
                 }
               }
             }
@@ -544,7 +560,8 @@
                 "type": "array",
                 "items": {
                   "type": "string"
-                }
+                },
+                "x-kubernetes-list-type": "atomic"
               }
             }
           }
@@ -670,7 +687,8 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "unsupportedConfigOverrides": {
           "description": "unsupportedConfigOverrides overrides the final configuration that was computed by the operator. Red Hat does not support the use of this field. Misuse of this field could lead to unexpected behavior or conflict with other configuration options. Seek guidance from the Red Hat support before using this field. Use of this property blocks cluster upgrades, it must be removed before upgrading your cluster.",

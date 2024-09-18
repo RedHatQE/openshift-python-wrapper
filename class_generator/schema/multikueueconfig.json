@@ -1,0 +1,45 @@
+{
+  "description": "MultiKueueConfig is the Schema for the multikueue API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "MultiKueueConfigSpec defines the desired state of MultiKueueConfig",
+      "type": "object",
+      "required": [
+        "clusters"
+      ],
+      "properties": {
+        "clusters": {
+          "description": "List of MultiKueueClusters names where the workloads from the ClusterQueue should be distributed.",
+          "type": "array",
+          "maxItems": 10,
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "set"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "kueue.x-k8s.io",
+      "kind": "MultiKueueConfig",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

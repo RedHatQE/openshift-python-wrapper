@@ -29,24 +29,24 @@ class Image(Resource):
     ) -> None:
         """
         Args:
-            docker_image_config(str): DockerImageConfig is a JSON blob that the runtime uses to set up the
+            docker_image_config (str): DockerImageConfig is a JSON blob that the runtime uses to set up the
               container. This is a part of manifest schema v2. Will not be set
               when the image represents a manifest list.
 
-            docker_image_layers(List[Any]): DockerImageLayers represents the layers in the image. May not be set
+            docker_image_layers (List[Any]): DockerImageLayers represents the layers in the image. May not be set
               if the image does not define that data or if the image represents
               a manifest list.
 
-            docker_image_manifest(str): DockerImageManifest is the raw JSON of the manifest
+            docker_image_manifest (str): DockerImageManifest is the raw JSON of the manifest
 
-            docker_image_manifest_media_type(str): DockerImageManifestMediaType specifies the mediaType of manifest. This
+            docker_image_manifest_media_type (str): DockerImageManifestMediaType specifies the mediaType of manifest. This
               is a part of manifest schema v2.
 
-            docker_image_manifests(List[Any]): DockerImageManifests holds information about sub-manifests when the
+            docker_image_manifests (List[Any]): DockerImageManifests holds information about sub-manifests when the
               image represents a manifest list. When this field is present, no
               DockerImageLayers should be specified.
 
-            docker_image_metadata(Dict[str, Any]): RawExtension is used to hold extensions in external versions.  To use
+            docker_image_metadata (Dict[str, Any]): RawExtension is used to hold extensions in external versions.  To use
               this, make a field which has RawExtension as its type in your
               external, versioned struct, and Object in your internal struct.
               You also need to register your various plugin types.  // Internal
@@ -72,16 +72,16 @@ class Image(Resource):
               the case where the object is of an unknown type, a runtime.Unknown
               object will be created and stored.)
 
-            docker_image_metadata_version(str): DockerImageMetadataVersion conveys the version of the object, which if
+            docker_image_metadata_version (str): DockerImageMetadataVersion conveys the version of the object, which if
               empty defaults to "1.0"
 
-            docker_image_reference(str): DockerImageReference is the string that can be used to pull this
+            docker_image_reference (str): DockerImageReference is the string that can be used to pull this
               image.
 
-            docker_image_signatures(List[Any]): DockerImageSignatures provides the signatures as opaque blobs. This is
+            docker_image_signatures (List[Any]): DockerImageSignatures provides the signatures as opaque blobs. This is
               a part of manifest schema v1.
 
-            signatures(List[Any]): Signatures holds all signatures of the image.
+            signatures (List[Any]): Signatures holds all signatures of the image.
 
         """
         super().__init__(**kwargs)

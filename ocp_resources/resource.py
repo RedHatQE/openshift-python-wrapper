@@ -269,6 +269,7 @@ class Resource:
         APPS: str = "apps"
         BATCH: str = "batch"
         BITNAMI_COM: str = "bitnami.com"
+        CACHING_INTERNAL_KNATIVE_DEV: str = "caching.internal.knative.dev"
         CDI_KUBEVIRT_IO: str = "cdi.kubevirt.io"
         CLONE_KUBEVIRT_IO: str = "clone.kubevirt.io"
         CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO: str = "cluster.open-cluster-management.io"

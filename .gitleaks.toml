@@ -1,0 +1,11 @@
+title = "Gitleaks title"
+
+[[rules]]
+
+id = "skip rule"
+
+[rules.allowlist]
+description = "ignore class_generator/schema"
+paths = [
+  '''class_generator/schema/*''',
+]

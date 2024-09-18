@@ -1,0 +1,313 @@
+{
+  "description": "Authorino is the Schema for the authorinos API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "AuthorinoSpec defines the desired state of Authorino",
+      "type": "object",
+      "required": [
+        "listener",
+        "oidcServer"
+      ],
+      "properties": {
+        "authConfigLabelSelectors": {
+          "type": "string"
+        },
+        "clusterWide": {
+          "type": "boolean"
+        },
+        "evaluatorCacheSize": {
+          "type": "integer"
+        },
+        "healthz": {
+          "type": "object",
+          "properties": {
+            "port": {
+              "description": "Port number of the health/readiness probe endpoints.",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "image": {
+          "type": "string"
+        },
+        "imagePullPolicy": {
+          "description": "PullPolicy describes a policy for if/when to pull a container image",
+          "type": "string"
+        },
+        "listener": {
+          "type": "object",
+          "required": [
+            "tls"
+          ],
+          "properties": {
+            "maxHttpRequestBodySize": {
+              "description": "Maximum payload (request body) size for the auth service (HTTP interface), in bytes.",
+              "type": "integer"
+            },
+            "port": {
+              "description": "Port number of the GRPC interface. DEPRECATED: use 'ports.grpc' instead.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "ports": {
+              "description": "Port numbers of the GRPC and HTTP auth interfaces.",
+              "type": "object",
+              "properties": {
+                "grpc": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "http": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "timeout": {
+              "description": "Timeout of the auth service (GRPC and HTTP interfaces), in milliseconds.",
+              "type": "integer"
+            },
+            "tls": {
+              "description": "TLS configuration of the auth service (GRPC and HTTP interfaces).",
+              "type": "object",
+              "properties": {
+                "certSecretRef": {
+                  "description": "LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.",
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                      "type": "string"
+                    }
+                  }
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "logLevel": {
+          "type": "string"
+        },
+        "logMode": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "deep": {
+              "type": "boolean"
+            },
+            "port": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "oidcServer": {
+          "type": "object",
+          "required": [
+            "tls"
+          ],
+          "properties": {
+            "port": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "tls": {
+              "type": "object",
+              "properties": {
+                "certSecretRef": {
+                  "description": "LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.",
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                      "type": "string"
+                    }
+                  }
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "replicas": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "secretLabelSelectors": {
+          "type": "string"
+        },
+        "supersedingHostSubsets": {
+          "type": "boolean"
+        },
+        "tracing": {
+          "type": "object",
+          "required": [
+            "endpoint"
+          ],
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "insecure": {
+              "type": "boolean"
+            },
+            "tags": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "volumes": {
+          "type": "object",
+          "properties": {
+            "defaultMode": {
+              "description": "Permissions mode.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "mountPath"
+                ],
+                "properties": {
+                  "configMaps": {
+                    "description": "Allow multiple configmaps to mount to the same directory",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "items": {
+                    "description": "Mount details",
+                    "type": "array",
+                    "items": {
+                      "description": "Maps a string key to a path within a volume.",
+                      "type": "object",
+                      "required": [
+                        "key",
+                        "path"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "key is the key to project.",
+                          "type": "string"
+                        },
+                        "mode": {
+                          "description": "mode is Optional: mode bits used to set permissions on this file. Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511. YAML accepts both octal and decimal values, JSON requires decimal values for mode bits. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.",
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "path": {
+                          "description": "path is the relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "mountPath": {
+                    "description": "An absolute path where to mount it",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Volume name",
+                    "type": "string"
+                  },
+                  "secrets": {
+                    "description": "Secret mount",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "AuthorinoStatus defines the observed state of Authorino",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions is an array of the current Authorino's CR conditions Supported condition types: ConditionReady",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "Last time the condition transit from one status to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastUpdatedTime": {
+                "description": "Last time the condition was updated",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "Human readable message indicating details about last transition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "(brief) reason for the condition's last transition.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of the condition, one of True, False, Unknown.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of condition",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "operator.authorino.kuadrant.io",
+      "kind": "Authorino",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

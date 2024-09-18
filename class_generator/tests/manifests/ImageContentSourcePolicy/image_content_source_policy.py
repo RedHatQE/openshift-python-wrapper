@@ -19,7 +19,7 @@ class ImageContentSourcePolicy(Resource):
     ) -> None:
         """
         Args:
-            repository_digest_mirrors(List[Any]): repositoryDigestMirrors allows images referenced by image digests in
+            repository_digest_mirrors (List[Any]): repositoryDigestMirrors allows images referenced by image digests in
               pods to be pulled from alternative mirrored repository locations.
               The image pull specification provided to the pod will be compared
               to the source locations described in RepositoryDigestMirrors and

@@ -1,0 +1,92 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Configuration for Role Based Access Control. See more details at: https://istio.io/docs/reference/config/authorization/istio.rbac.v1alpha1.html",
+      "type": "object",
+      "properties": {
+        "enforcementMode": {
+          "type": "string",
+          "enum": [
+            "ENFORCED",
+            "PERMISSIVE"
+          ]
+        },
+        "exclusion": {
+          "description": "A list of services or namespaces that should not be enforced by Istio RBAC policies.",
+          "type": "object",
+          "properties": {
+            "namespaces": {
+              "description": "A list of namespaces.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "string"
+              }
+            },
+            "services": {
+              "description": "A list of services.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "string"
+              }
+            }
+          }
+        },
+        "inclusion": {
+          "description": "A list of services or namespaces that should be enforced by Istio RBAC policies.",
+          "type": "object",
+          "properties": {
+            "namespaces": {
+              "description": "A list of namespaces.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "string"
+              }
+            },
+            "services": {
+              "description": "A list of services.",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "string"
+              }
+            }
+          }
+        },
+        "mode": {
+          "description": "Istio RBAC mode.",
+          "type": "string",
+          "enum": [
+            "OFF",
+            "ON",
+            "ON_WITH_INCLUSION",
+            "ON_WITH_EXCLUSION"
+          ]
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "rbac.maistra.io",
+      "kind": "ServiceMeshRbacConfig",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

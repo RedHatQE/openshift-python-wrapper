@@ -22,12 +22,12 @@ class Image(Resource):
     ) -> None:
         """
         Args:
-            additional_trusted_ca(Dict[str, Any]): additionalTrustedCA is a reference to a ConfigMap containing
+            additional_trusted_ca (Dict[str, Any]): additionalTrustedCA is a reference to a ConfigMap containing
               additional CAs that should be trusted during imagestream import,
               pod image pull, build image pull, and imageregistry pullthrough.
               The namespace for this config map is openshift-config.
 
-            allowed_registries_for_import(List[Any]): allowedRegistriesForImport limits the container image registries that
+            allowed_registries_for_import (List[Any]): allowedRegistriesForImport limits the container image registries that
               normal users may import images from. Set this list to the
               registries that you trust to contain valid Docker images and that
               you want applications to be able to import from. Users with
@@ -35,13 +35,13 @@ class Image(Resource):
               not affected by this policy - typically only administrators or
               system integrations will have those permissions.
 
-            external_registry_hostnames(List[Any]): externalRegistryHostnames provides the hostnames for the default
+            external_registry_hostnames (List[Any]): externalRegistryHostnames provides the hostnames for the default
               external image registry. The external hostname should be set only
               when the image registry is exposed externally. The first value is
               used in 'publicDockerImageRepository' field in ImageStreams. The
               value must be in "hostname[:port]" format.
 
-            registry_sources(Dict[str, Any]): registrySources contains configuration that determines how the
+            registry_sources (Dict[str, Any]): registrySources contains configuration that determines how the
               container runtime should treat individual registries when
               accessing images for builds+pods. (e.g. whether or not to allow
               insecure access).  It does not contain configuration for the

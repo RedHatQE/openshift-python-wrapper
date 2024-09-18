@@ -22,14 +22,14 @@ class Machine(NamespacedResource):
     ) -> None:
         """
         Args:
-            lifecycle_hooks(Dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
+            lifecycle_hooks (Dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
               certain predefined points within the machine lifecycle.
 
-            metadata(Dict[str, Any]): ObjectMeta will autopopulate the Node created. Use this to indicate
+            metadata (Dict[str, Any]): ObjectMeta will autopopulate the Node created. Use this to indicate
               what labels, annotations, name prefix, etc., should be used when
               creating the Node.
 
-            provider_id(str): ProviderID is the identification ID of the machine provided by the
+            provider_id (str): ProviderID is the identification ID of the machine provided by the
               provider. This field must match the provider ID as seen on the
               node object corresponding to this machine. This field is required
               by higher level consumers of cluster-api. Example use case is
@@ -45,10 +45,10 @@ class Machine(NamespacedResource):
               autoscaler that will be interfacing with cluster-api as generic
               provider.
 
-            provider_spec(Dict[str, Any]): ProviderSpec details Provider-specific configuration to use during
+            provider_spec (Dict[str, Any]): ProviderSpec details Provider-specific configuration to use during
               node creation.
 
-            taints(List[Any]): The list of the taints to be applied to the corresponding Node in
+            taints (List[Any]): The list of the taints to be applied to the corresponding Node in
               additive manner. This list will not overwrite any other taints
               added to the Node on an ongoing basis by other entities. These
               taints should be actively reconciled e.g. if you ask the machine

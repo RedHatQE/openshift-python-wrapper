@@ -1,0 +1,145 @@
+{
+  "description": "TrustyAIService is the Schema for the trustyaiservices API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "TrustyAIServiceSpec defines the desired state of TrustyAIService",
+      "type": "object",
+      "required": [
+        "metrics",
+        "storage"
+      ],
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "filename": {
+              "type": "string"
+            },
+            "format": {
+              "type": "string"
+            }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "required": [
+            "schedule"
+          ],
+          "properties": {
+            "batchSize": {
+              "type": "integer"
+            },
+            "schedule": {
+              "type": "string"
+            }
+          }
+        },
+        "replicas": {
+          "description": "Number of replicas",
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "type": "object",
+          "required": [
+            "format"
+          ],
+          "properties": {
+            "databaseConfigurations": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "format": {
+              "description": "Format only supports \"PVC\" or \"DATABASE\" values",
+              "type": "string",
+              "enum": [
+                "PVC",
+                "DATABASE"
+              ]
+            },
+            "size": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "TrustyAIServiceStatus defines the observed state of TrustyAIService",
+      "type": "object",
+      "required": [
+        "conditions",
+        "phase",
+        "replicas"
+      ],
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition represents possible conditions of a TrustyAIServiceStatus",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "phase": {
+          "description": "Define your status fields here",
+          "type": "string"
+        },
+        "ready": {
+          "type": "string"
+        },
+        "replicas": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "trustyai.opendatahub.io",
+      "kind": "TrustyAIService",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
