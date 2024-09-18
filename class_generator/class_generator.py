@@ -33,6 +33,7 @@ TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
+MISSING_DESCRIPTION_STR = "No field description from API; please add description"
 
 
 def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Dict[str, Any]:
@@ -419,9 +420,7 @@ def prepare_property_dict(
             "name-for-class-arg": python_name,
             "property-name": key,
             "required": key in required,
-            "description": format_description(
-                description=val_schema.get("description", "No field description from API; please add description")
-            ),
+            "description": format_description(description=val_schema.get("description", MISSING_DESCRIPTION_STR)),
             "type-for-docstring": type_dict["type-for-doc"],
             "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
         })
@@ -440,7 +439,7 @@ def parse_explain(
         namespaced = _kind_schema["namespaced"]
         resource_dict: Dict[str, Any] = {
             "base_class": "NamespacedResource" if namespaced else "Resource",
-            "description": _kind_schema["description"],
+            "description": _kind_schema.get("description", MISSING_DESCRIPTION_STR),
             "fields": [],
             "spec": [],
         }
