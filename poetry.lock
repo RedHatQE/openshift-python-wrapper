@@ -201,6 +201,16 @@ files = [
 ]
 
 [[package]]
+name = "durationpy"
+version = "0.7"
+description = "Module for converting between datetime.timedelta and Go's Duration strings."
+optional = false
+python-versions = "*"
+files = [
+    {file = "durationpy-0.7.tar.gz", hash = "sha256:8447c43df4f1a0b434e70c15a38d77f5c9bd17284bfc1ff1d430f233d5083732"},
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -349,17 +359,18 @@ testing = ["Django", "attrs", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
 name = "kubernetes"
-version = "27.2.0"
+version = "31.0.0"
 description = "Kubernetes python client"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "kubernetes-27.2.0-py2.py3-none-any.whl", hash = "sha256:0f9376329c85cf07615ed6886bf9bf21eb1cbfc05e14ec7b0f74ed8153cd2815"},
-    {file = "kubernetes-27.2.0.tar.gz", hash = "sha256:d479931c6f37561dbfdf28fc5f46384b1cb8b28f9db344ed4a232ce91990825a"},
+    {file = "kubernetes-31.0.0-py2.py3-none-any.whl", hash = "sha256:bf141e2d380c8520eada8b351f4e319ffee9636328c137aa432bc486ca1200e1"},
+    {file = "kubernetes-31.0.0.tar.gz", hash = "sha256:28945de906c8c259c1ebe62703b56a03b714049372196f854105afe4e6d014c0"},
 ]
 
 [package.dependencies]
 certifi = ">=14.05.14"
+durationpy = ">=0.7"
 google-auth = ">=1.0.1"
 oauthlib = ">=3.2.2"
 python-dateutil = ">=2.5.3"
@@ -928,4 +939,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "581ebf2242bab274830caa93ac90124ca08b5386fabf7af420a1580b095b2466"
+content-hash = "cf49cc444a9460404563e5d5d663dac6aace834dc51097b5a4882fd1720638a4"
