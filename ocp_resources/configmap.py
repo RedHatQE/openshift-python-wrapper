@@ -1,31 +1,9 @@
-from __future__ import annotations
-from typing import Any, Dict
+from warnings import warn
+from ocp_resources.config_map import ConfigMap  # noqa: F401
 
-from ocp_resources.resource import NamespacedResource
-
-
-class ConfigMap(NamespacedResource):
-    """
-    https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/config-map-v1/
-    """
-
-    api_version = NamespacedResource.ApiVersion.V1
-
-    def __init__(
-        self,
-        data: Dict[str, Any] | None = None,
-        **kwargs: Any,
-    ):
-        """
-        Args:
-            data (dict, optional): key-value configuration pairs.
-        """
-        super().__init__(**kwargs)
-
-        self.data = data
-
-    def to_dict(self) -> None:
-        super().to_dict()
-
-        if not self.yaml_file and self.data:
-            self.res["data"] = self.data
+warn(
+    f"The module {__name__} is deprecated and will be removed in version 4.17, `ConfigMap` should be imported from "
+    f"`ocp_resources.config_map`",
+    DeprecationWarning,
+    stacklevel=2,
+)
