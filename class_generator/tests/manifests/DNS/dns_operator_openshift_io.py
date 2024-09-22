@@ -118,3 +118,5 @@ class DNS(Resource):
 
             if self.upstream_resolvers:
                 _spec["upstreamResolvers"] = self.upstream_resolvers
+
+    # End of generated code

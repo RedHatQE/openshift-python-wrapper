@@ -93,3 +93,5 @@ class NMState(Resource):
 
             if self.tolerations:
                 _spec["tolerations"] = self.tolerations
+
+    # End of generated code
