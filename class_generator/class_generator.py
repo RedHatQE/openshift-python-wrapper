@@ -587,7 +587,7 @@ def class_generator(
     return generated_files
 
 
-def write_and_format_rendered(filepath: str, data: str, user_code: str) -> None:
+def write_and_format_rendered(filepath: str, data: str, user_code: str = "") -> None:
     with open(filepath, "w") as fd:
         fd.write(data)
 
@@ -602,7 +602,7 @@ def write_and_format_rendered(filepath: str, data: str, user_code: str) -> None:
         )
 
 
-def generate_class_generator_tests(user_code: str) -> None:
+def generate_class_generator_tests() -> None:
     tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
     dirs_to_ignore: List[str] = ["__pycache__"]
 
@@ -629,7 +629,6 @@ def generate_class_generator_tests(user_code: str) -> None:
     write_and_format_rendered(
         filepath=os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py"),
         data=rendered,
-        user_code=user_code,
     )
 
 
@@ -720,7 +719,7 @@ def main(
             pass
 
     if add_tests:
-        generate_class_generator_tests(user_code="")
+        generate_class_generator_tests()
         pytest.main(["-k", "test_class_generator"])
 
 

@@ -452,3 +452,5 @@ class Pod(NamespacedResource):
 
             if self.volumes:
                 _spec["volumes"] = self.volumes
+
+    # End of generated code

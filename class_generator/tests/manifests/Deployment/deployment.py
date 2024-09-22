@@ -102,3 +102,5 @@ class Deployment(NamespacedResource):
 
             if self.strategy:
                 _spec["strategy"] = self.strategy
+
+    # End of generated code

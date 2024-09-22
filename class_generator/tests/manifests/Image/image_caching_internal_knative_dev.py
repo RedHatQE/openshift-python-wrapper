@@ -61,3 +61,5 @@ class Image(NamespacedResource):
 
             if self.service_account_name:
                 _spec["serviceAccountName"] = self.service_account_name
+
+    # End of generated code
