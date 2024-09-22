@@ -86,3 +86,5 @@ class Machine(NamespacedResource):
 
             if self.taints:
                 _spec["taints"] = self.taints
+
+    # End of generated code
