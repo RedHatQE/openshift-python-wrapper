@@ -303,9 +303,12 @@ def parse_user_code_from_file(file_path: str) -> str:
         data = fd.read()
 
     line = "    # End of generated code"
-    _end_of_generated_code_index = data.index(line)
-    _user_code = data[_end_of_generated_code_index + len(line) :]
-    return _user_code
+    if line in data:
+        _end_of_generated_code_index = data.index(line)
+        _user_code = data[_end_of_generated_code_index + len(line) :]
+        return _user_code
+
+    return ""
 
 
 def generate_resource_file_from_dict(
