@@ -58,6 +58,8 @@ class ConfigMap(NamespacedResource):
             if self.immutable is not None:
                 self.res["immutable"] = self.immutable
 
+    # End of generated code
+
     @property
     def keys_to_hash(self):
         return ["data", "binaryData"]
