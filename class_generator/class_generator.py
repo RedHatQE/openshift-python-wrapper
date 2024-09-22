@@ -298,6 +298,16 @@ def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, temp
     return rendered
 
 
+def parse_user_code_from_file(file_path: str) -> str:
+    with open(file_path) as fd:
+        data = fd.read()
+
+    line = "    # End of generated code"
+    _end_of_generated_code_index = data.index(line)
+    _user_code = data[_end_of_generated_code_index + len(line) :]
+    return _user_code
+
+
 def generate_resource_file_from_dict(
     resource_dict: Dict[str, Any],
     overwrite: bool = False,
@@ -318,7 +328,7 @@ def generate_resource_file_from_dict(
     )
 
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
-    _file_suffix = f"{'_' + output_file_suffix if output_file_suffix else ''}"
+    _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
     if add_tests:
         overwrite = True
@@ -334,8 +344,14 @@ def generate_resource_file_from_dict(
     else:
         _output_file = os.path.join(base_dir, f"{formatted_kind_str}{_file_suffix}.py")
 
+    _output_file_exists: bool = os.path.exists(_output_file)
+    _user_code: str = ""
+
+    if _output_file_exists:
+        _user_code = parse_user_code_from_file(file_path=_output_file)
+
     orig_filename = _output_file
-    if os.path.exists(_output_file):
+    if _output_file_exists:
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
 
@@ -345,11 +361,13 @@ def generate_resource_file_from_dict(
             _output_file = temp_output_file
 
     if dry_run:
+        if _user_code:
+            rendered += _user_code
         _code = Syntax(code=rendered, lexer="python", line_numbers=True)
         Console().print(_code)
 
     else:
-        write_and_format_rendered(filepath=_output_file, data=rendered)
+        write_and_format_rendered(filepath=_output_file, data=rendered, user_code=_user_code)
 
     return orig_filename, _output_file
 
@@ -566,9 +584,12 @@ def class_generator(
     return generated_files
 
 
-def write_and_format_rendered(filepath: str, data: str) -> None:
+def write_and_format_rendered(filepath: str, data: str, user_code: str) -> None:
     with open(filepath, "w") as fd:
         fd.write(data)
+
+        if user_code:
+            fd.write(user_code)
 
     for op in ("format", "check"):
         run_command(
@@ -578,7 +599,7 @@ def write_and_format_rendered(filepath: str, data: str) -> None:
         )
 
 
-def generate_class_generator_tests() -> None:
+def generate_class_generator_tests(user_code: str) -> None:
     tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
     dirs_to_ignore: List[str] = ["__pycache__"]
 
@@ -605,6 +626,7 @@ def generate_class_generator_tests() -> None:
     write_and_format_rendered(
         filepath=os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py"),
         data=rendered,
+        user_code=user_code,
     )
 
 
@@ -695,7 +717,7 @@ def main(
             pass
 
     if add_tests:
-        generate_class_generator_tests()
+        generate_class_generator_tests(user_code="")
         pytest.main(["-k", "test_class_generator"])
 
 
