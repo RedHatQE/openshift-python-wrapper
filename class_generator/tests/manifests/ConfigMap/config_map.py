@@ -57,3 +57,5 @@ class ConfigMap(NamespacedResource):
 
             if self.immutable is not None:
                 self.res["immutable"] = self.immutable
+
+    # End of generated code

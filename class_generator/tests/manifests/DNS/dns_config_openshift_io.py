@@ -69,3 +69,5 @@ class DNS(Resource):
 
             if self.public_zone:
                 _spec["publicZone"] = self.public_zone
+
+    # End of generated code
