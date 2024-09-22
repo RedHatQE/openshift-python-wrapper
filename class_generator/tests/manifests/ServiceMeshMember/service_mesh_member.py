@@ -38,3 +38,5 @@ class ServiceMeshMember(NamespacedResource):
             _spec = self.res["spec"]
 
             _spec["controlPlaneRef"] = self.control_plane_ref
+
+    # End of generated code

@@ -53,3 +53,5 @@ class ImageContentSourcePolicy(Resource):
 
             if self.repository_digest_mirrors:
                 _spec["repositoryDigestMirrors"] = self.repository_digest_mirrors
+
+    # End of generated code

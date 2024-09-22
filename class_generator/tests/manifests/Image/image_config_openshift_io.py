@@ -73,3 +73,5 @@ class Image(Resource):
 
             if self.registry_sources:
                 _spec["registrySources"] = self.registry_sources
+
+    # End of generated code

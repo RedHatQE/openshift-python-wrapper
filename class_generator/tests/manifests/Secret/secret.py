@@ -65,3 +65,5 @@ class Secret(NamespacedResource):
 
             if self.type:
                 self.res["type"] = self.type
+
+    # End of generated code
