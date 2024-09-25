@@ -275,7 +275,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         role: Optional[str] = None,
         mtu: Optional[int] = None,
         subnets: Optional[List] = None,
-        join_subnets: Optional[str] = None,
+        join_subnets: Optional[List] = None,
         ipam_lifecycle: Optional[str] = None,
         **kwargs,
     ):
@@ -289,7 +289,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List]): subnets are used for the pod network across the cluster.
-            join_subnets (Optional[str]): join_subnets are used inside the OVN network topology.
+            join_subnets (Optional[List]): join_subnets are used inside the OVN network topology.
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
@@ -363,7 +363,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         role: Optional[str] = None,
         mtu: Optional[int] = None,
         subnets: Optional[List[Layer3Subnets]] = None,
-        join_subnets: Optional[str] = None,
+        join_subnets: Optional[List] = None,
         **kwargs,
     ):
         """
@@ -376,7 +376,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List[Layer3Subnets]]): subnets are used for the pod network across the cluster.
-            join_subnets (Optional[str]): join_subnets are used inside the OVN network topology.
+            join_subnets (Optional[List]): join_subnets are used inside the OVN network topology.
         """
         super().__init__(
             name=name,
