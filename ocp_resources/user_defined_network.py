@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional, List
 from kubernetes.dynamic import DynamicClient
 from timeout_sampler import TimeoutSampler, TimeoutExpiredError
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class WaitForStatusConditionFailed(Exception):
@@ -12,63 +12,64 @@ class WaitForStatusConditionFailed(Exception):
 
 class UserDefinedNetwork(NamespacedResource):
     """
-    UserDefinedNetwork object.
-
-    API reference:
-    https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/
+    UserDefinedNetwork describe network request for a Namespace.
     """
 
-    api_group = NamespacedResource.ApiGroup.K8S_OVN_ORG
+    api_group: str = NamespacedResource.ApiGroup.K8S_OVN_ORG
 
     def __init__(
         self,
-        name: str,
-        namespace: str,
-        client: Optional[DynamicClient] = None,
-        topology: Optional[str] = None,
         layer2: Optional[Dict[str, Any]] = None,
         layer3: Optional[Dict[str, Any]] = None,
         local_net: Optional[Dict[str, Any]] = None,
-        **kwargs,
-    ):
+        topology: Optional[str] = "",
+        **kwargs: Any,
+    ) -> None:
         """
-        Create and manage UserDefinedNetwork
-
         Args:
-            name (str): The name of the UserDefinedNetwork.
-            namespace (str): The namespace of the UserDefinedNetwork.
-            client (Optional[DynamicClient]): DynamicClient to use.
-            topology (Optional[str]): Topology describes network configuration.
-            layer2 (Optional[Dict[str, Any]]): Layer2 is the Layer2 topology configuration.
-            layer3 (Optional[Dict[str, Any]]): Layer3 is the Layer3 topology configuration.
-            local_net (Optional[Dict[str, Any]]): LocalNet is the LocalNet topology configuration.
+            layer2 (Dict[str, Any]): Layer2 is the Layer2 topology configuration.
+
+            layer3 (Dict[str, Any]): Layer3 is the Layer3 topology configuration.
+
+            local_net (Dict[str, Any]): LocalNet is the LocalNet topology configuration.
+
+            topology (str): Topology describes network configuration.   Allowed values are
+              "Layer3", "Layer2", "LocalNet". Layer3 topology creates a layer 2
+              segment per node, each with a different subnet. Layer 3 routing is
+              used to interconnect node subnets. Layer2 topology creates one
+              logical switch shared by all nodes. LocalNet topology creates a
+              cluster-wide logical switch connected to a physical network.
+
         """
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            **kwargs,
-        )
-        self.topology = topology
+        super().__init__(**kwargs)
+
         self.layer2 = layer2
         self.layer3 = layer3
         self.local_net = local_net
+        self.topology = topology
 
     def to_dict(self) -> None:
         super().to_dict()
+
         if not self.yaml_file:
+            if not all([
+                self.topology,
+            ]):
+                raise MissingRequiredArgumentError(argument="topology")
+
             self.res["spec"] = {}
+            _spec = self.res["spec"]
 
-            attributes = {
-                "topology": self.topology,
-                "layer2": self.layer2,
-                "layer3": self.layer3,
-                "localNet": self.local_net,
-            }
+            _spec["topology"] = self.topology
 
-            for key, value in attributes.items():
-                if value is not None:
-                    self.res["spec"][key] = value
+            if self.layer2:
+                _spec["layer2"] = self.layer2
+
+            if self.layer3:
+                _spec["layer3"] = self.layer3
+
+            if self.local_net:
+                _spec["localNet"] = self.local_net
 
     class Status(NamespacedResource.Condition):
         """
