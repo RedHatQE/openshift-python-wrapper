@@ -39,7 +39,7 @@ pre-commit install
 
 ##### Using generator script
 
-- [class_generator README](scripts/resource/class_generator.py)
+- [class_generator](class_generator/README.md)
 
 ##### Manual
 
