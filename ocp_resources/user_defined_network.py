@@ -144,7 +144,9 @@ class UserDefinedNetwork(NamespacedResource):
         Returns:
             list: A list of status conditions associated with the UserDefinedNetwork instance.
         """
-        return self.instance.status.conditions or []
+        if self.instance.status and self.instance.status.conditions:
+            return self.instance.status.conditions
+        return []
 
     @property
     def ready(self) -> bool:
