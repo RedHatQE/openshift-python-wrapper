@@ -114,9 +114,9 @@ class UserDefinedNetwork(NamespacedResource):
             bool: True if the condition indicates the UserDefinedNetwork is ready, False otherwise.
         """
         return (
-            condition["reason"] == cls.Status.Reason.NETWORK_ATTACHMENT_DEFINITION_READY
-            and condition["status"] == cls.Condition.Status.TRUE
-            and condition["type"] == cls.Status.Type.NETWORK_READY
+            condition.get("reason") == cls.Status.Reason.NETWORK_ATTACHMENT_DEFINITION_READY
+            and condition.get("status") == cls.Condition.Status.TRUE
+            and condition.get("type") == cls.Status.Type.NETWORK_READY
         )
 
     @classmethod
@@ -131,9 +131,9 @@ class UserDefinedNetwork(NamespacedResource):
             bool: True if the condition indicates a synchronization error, False otherwise.
         """
         return (
-            condition["reason"] == cls.Status.Reason.SYNC_ERROR
-            and condition["status"] == cls.Condition.Status.FALSE
-            and condition["type"] == cls.Status.Type.NETWORK_READY
+            condition.get("reason") == cls.Status.Reason.SYNC_ERROR
+            and condition.get("status") == cls.Condition.Status.FALSE
+            and condition.get("type") == cls.Status.Type.NETWORK_READY
         )
 
     @property
