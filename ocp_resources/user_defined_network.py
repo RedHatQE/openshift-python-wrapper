@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from kubernetes.dynamic import DynamicClient
 from timeout_sampler import TimeoutSampler, TimeoutExpiredError
 from ocp_resources.resource import NamespacedResource
@@ -272,7 +272,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         client: Optional[DynamicClient] = None,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
-        subnets: Optional[list] = None,
+        subnets: Optional[List] = None,
         join_subnets: Optional[str] = None,
         ipam_lifecycle: Optional[str] = None,
         **kwargs,
@@ -286,7 +286,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             client (Optional[DynamicClient]): DynamicClient to use.
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[list]): subnets are used for the pod network across the cluster.
+            subnets (Optional[List]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[str]): join_subnets are used inside the OVN network topology.
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
@@ -360,7 +360,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         client: Optional[DynamicClient] = None,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
-        subnets: Optional[list[Layer3Subnets]] = None,
+        subnets: Optional[List[Layer3Subnets]] = None,
         join_subnets: Optional[str] = None,
         **kwargs,
     ):
@@ -373,7 +373,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
             client (Optional[DynamicClient]): DynamicClient to use.
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[list[Layer3Subnets]]): subnets are used for the pod network across the cluster.
+            subnets (Optional[List[Layer3Subnets]]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[str]): join_subnets are used inside the OVN network topology.
         """
         super().__init__(
@@ -430,8 +430,8 @@ class LocalNetUserDefinedNetwork(UserDefinedNetwork):
         client: Optional[DynamicClient] = None,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
-        subnets: Optional[list] = None,
-        exclude_subnets: Optional[list] = None,
+        subnets: Optional[List] = None,
+        exclude_subnets: Optional[List] = None,
         ipam_lifecycle: Optional[str] = None,
         **kwargs,
     ):
@@ -444,8 +444,8 @@ class LocalNetUserDefinedNetwork(UserDefinedNetwork):
             client (Optional[DynamicClient]): DynamicClient to use.
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[list]): subnets are used for the pod network across the cluster.
-            exclude_subnets (Optional[list]): exclude_subnets is a list of CIDRs that will be removed from the assignable
+            subnets (Optional[List]): subnets are used for the pod network across the cluster.
+            exclude_subnets (Optional[List]): exclude_subnets is a list of CIDRs that will be removed from the assignable
                 IP address pool specified by the "Subnets" field.
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
