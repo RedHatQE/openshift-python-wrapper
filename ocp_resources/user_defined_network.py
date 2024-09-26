@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional, List, Callable
 from kubernetes.dynamic import DynamicClient
 from timeout_sampler import TimeoutSampler, TimeoutExpiredError
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 
 class WaitForStatusConditionFailed(Exception):
@@ -50,11 +50,6 @@ class UserDefinedNetwork(NamespacedResource):
         super().to_dict()
 
         if not self.yaml_file:
-            if not all([
-                self.topology,
-            ]):
-                raise MissingRequiredArgumentError(argument="topology")
-
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
