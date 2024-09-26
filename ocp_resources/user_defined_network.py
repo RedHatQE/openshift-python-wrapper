@@ -202,7 +202,7 @@ class UserDefinedNetwork(NamespacedResource):
                         if any(not_wait_fn(condition) for not_wait_fn in not_wait_condition_fns):
                             raise WaitForStatusConditionFailed(
                                 f"Failed to wait for the intended status for UDN {self.name}. "
-                                f"Condition message: {condition['message']}"
+                                f"Condition message: {condition.get('message', 'No message provided')}"
                             )
 
         except (TimeoutExpiredError, WaitForStatusConditionFailed) as e:
