@@ -1,0 +1,43 @@
+{
+  "description": "NamedResourcesAttribute is a combination of an attribute name and its value.",
+  "type": "object",
+  "required": [
+    "name"
+  ],
+  "properties": {
+    "bool": {
+      "description": "BoolValue is a true/false value.",
+      "type": "boolean"
+    },
+    "int": {
+      "description": "IntValue is a 64-bit integer.",
+      "type": "integer",
+      "format": "int64"
+    },
+    "intSlice": {
+      "description": "IntSliceValue is an array of 64-bit integers.",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.resource.v1alpha2.NamedResourcesIntSlice"
+    },
+    "name": {
+      "description": "Name is unique identifier among all resource instances managed by the driver on the node. It must be a DNS subdomain.",
+      "type": "string"
+    },
+    "quantity": {
+      "description": "QuantityValue is a quantity.",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+    },
+    "string": {
+      "description": "StringValue is a string.",
+      "type": "string"
+    },
+    "stringSlice": {
+      "description": "StringSliceValue is an array of strings.",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.resource.v1alpha2.NamedResourcesStringSlice"
+    },
+    "version": {
+      "description": "VersionValue is a semantic version according to semver.org spec 2.0.0.",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

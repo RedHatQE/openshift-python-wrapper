@@ -2774,11 +2774,11 @@
                   "type": "object",
                   "properties": {
                     "logHostPath": {
-                      "description": "LogHostPath is the prefix directory path for the csi log files",
+                      "description": "LogHostPath is the prefix directory path for the csi log files\nDefault to /var/lib/cephcsi",
                       "type": "string"
                     },
                     "maxFiles": {
-                      "description": "MaxFiles is the number of logrtoate files",
+                      "description": "MaxFiles is the number of logrtoate files\nDefault to 7",
                       "type": "integer"
                     },
                     "maxLogSize": {
@@ -2796,7 +2796,13 @@
                         "monthly"
                       ]
                     }
-                  }
+                  },
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Either maxLogSize or periodicity must be set",
+                      "rule": "(has(self.maxLogSize)) || (has(self.periodicity))"
+                    }
+                  ]
                 },
                 "verbosity": {
                   "description": "Log verbosity level for driver pods,\nSupported values from 0 to 5. 0 for general useful logs (the default), 5 for trace level verbosity.\nDefault to 0",

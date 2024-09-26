@@ -1,0 +1,233 @@
+{
+  "description": "OpenStackFloatingIPPool is the Schema for the openstackfloatingippools API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "OpenStackFloatingIPPoolSpec defines the desired state of OpenStackFloatingIPPool.",
+      "type": "object",
+      "required": [
+        "identityRef",
+        "reclaimPolicy"
+      ],
+      "properties": {
+        "floatingIPNetwork": {
+          "description": "FloatingIPNetwork is the external network to use for floating ips, if there's only one external network it will be used by default",
+          "type": "object",
+          "maxProperties": 1,
+          "minProperties": 1,
+          "properties": {
+            "filter": {
+              "description": "Filter specifies a filter to select an OpenStack network. If provided, cannot be empty.",
+              "type": "object",
+              "minProperties": 1,
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "notTags": {
+                  "description": "NotTags is a list of tags to filter by. If specified, resources which\ncontain all of the given tags will be excluded from the result.",
+                  "type": "array",
+                  "items": {
+                    "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[^,]+$"
+                  },
+                  "x-kubernetes-list-type": "set"
+                },
+                "notTagsAny": {
+                  "description": "NotTagsAny is a list of tags to filter by. If specified, resources\nwhich contain any of the given tags will be excluded from the result.",
+                  "type": "array",
+                  "items": {
+                    "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[^,]+$"
+                  },
+                  "x-kubernetes-list-type": "set"
+                },
+                "projectID": {
+                  "type": "string"
+                },
+                "tags": {
+                  "description": "Tags is a list of tags to filter by. If specified, the resource must\nhave all of the tags specified to be included in the result.",
+                  "type": "array",
+                  "items": {
+                    "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[^,]+$"
+                  },
+                  "x-kubernetes-list-type": "set"
+                },
+                "tagsAny": {
+                  "description": "TagsAny is a list of tags to filter by. If specified, the resource\nmust have at least one of the tags specified to be included in the\nresult.",
+                  "type": "array",
+                  "items": {
+                    "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[^,]+$"
+                  },
+                  "x-kubernetes-list-type": "set"
+                }
+              }
+            },
+            "id": {
+              "description": "ID is the ID of the network to use. If ID is provided, the other filters cannot be provided. Must be in UUID format.",
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "identityRef": {
+          "description": "IdentityRef is a reference to a identity to be used when reconciling this pool.",
+          "type": "object",
+          "required": [
+            "cloudName",
+            "name"
+          ],
+          "properties": {
+            "cloudName": {
+              "description": "CloudName specifies the name of the entry in the clouds.yaml file to use.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of a secret in the same namespace as the resource being provisioned.\nThe secret must contain a key named `clouds.yaml` which contains an OpenStack clouds.yaml file.\nThe secret may optionally contain a key named `cacert` containing a PEM-encoded CA certificate.",
+              "type": "string"
+            }
+          }
+        },
+        "maxIPs": {
+          "description": "MaxIPs is the maximum number of floating ips that can be allocated from this pool, if nil there is no limit.\nIf set, the pool will stop allocating floating ips when it reaches this number of ClaimedIPs.",
+          "type": "integer"
+        },
+        "preAllocatedFloatingIPs": {
+          "description": "PreAllocatedFloatingIPs is a list of floating IPs precreated in OpenStack that should be used by this pool.\nThese are used before allocating new ones and are not deleted from OpenStack when the pool is deleted.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reclaimPolicy": {
+          "description": "The stratergy to use for reclaiming floating ips when they are released from a machine",
+          "type": "string",
+          "enum": [
+            "Retain",
+            "Delete"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "OpenStackFloatingIPPoolStatus defines the observed state of OpenStackFloatingIPPool.",
+      "type": "object",
+      "properties": {
+        "availableIPs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "claimedIPs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conditions": {
+          "description": "Conditions provide observations of the operational state of a Cluster API resource.",
+          "type": "array",
+          "items": {
+            "description": "Condition defines an observation of a Cluster API resource operational state.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "Last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed. If that is not known, then using the time when\nthe API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "A human readable message indicating details about the transition.\nThis field may be empty.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "The reason for the condition's last transition in CamelCase.\nThe specific API may choose whether or not this field is considered a guaranteed API.\nThis field may not be empty.",
+                "type": "string"
+              },
+              "severity": {
+                "description": "Severity provides an explicit classification of Reason code, so the users or machines can immediately\nunderstand the current situation and act accordingly.\nThe Severity field MUST be set only when Status=False.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of the condition, one of True, False, Unknown.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of condition in CamelCase or in foo.example.com/CamelCase.\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions\ncan be useful (see .node.status.conditions), the ability to deconflict is important.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "failedIPs": {
+          "description": "FailedIPs contains a list of floating ips that failed to be allocated",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "floatingIPNetwork": {
+          "description": "floatingIPNetwork contains information about the network used for floating ips",
+          "type": "object",
+          "required": [
+            "id",
+            "name"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "infrastructure.cluster.x-k8s.io",
+      "kind": "OpenStackFloatingIPPool",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

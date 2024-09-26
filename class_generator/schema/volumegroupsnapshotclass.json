@@ -1,0 +1,49 @@
+{
+  "description": "VolumeGroupSnapshotClass specifies parameters that a underlying storage system\nuses when creating a volume group snapshot. A specific VolumeGroupSnapshotClass\nis used by specifying its name in a VolumeGroupSnapshot object.\nVolumeGroupSnapshotClasses are non-namespaced.",
+  "type": "object",
+  "required": [
+    "deletionPolicy",
+    "driver"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "deletionPolicy": {
+      "description": "DeletionPolicy determines whether a VolumeGroupSnapshotContent created\nthrough the VolumeGroupSnapshotClass should be deleted when its bound\nVolumeGroupSnapshot is deleted.\nSupported values are \"Retain\" and \"Delete\".\n\"Retain\" means that the VolumeGroupSnapshotContent and its physical group\nsnapshot on underlying storage system are kept.\n\"Delete\" means that the VolumeGroupSnapshotContent and its physical group\nsnapshot on underlying storage system are deleted.\nRequired.",
+      "type": "string",
+      "enum": [
+        "Delete",
+        "Retain"
+      ]
+    },
+    "driver": {
+      "description": "Driver is the name of the storage driver expected to handle this VolumeGroupSnapshotClass.\nRequired.",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "parameters": {
+      "description": "Parameters is a key-value map with storage driver specific parameters for\ncreating group snapshots.\nThese values are opaque to Kubernetes and are passed directly to the driver.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "groupsnapshot.storage.k8s.io",
+      "kind": "VolumeGroupSnapshotClass",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

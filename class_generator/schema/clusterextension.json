@@ -1,0 +1,206 @@
+{
+  "description": "ClusterExtension is the Schema for the clusterextensions API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ClusterExtensionSpec defines the desired state of ClusterExtension",
+      "type": "object",
+      "required": [
+        "installNamespace",
+        "packageName",
+        "serviceAccount"
+      ],
+      "properties": {
+        "channel": {
+          "description": "Channel constraint definition",
+          "type": "string",
+          "maxLength": 48,
+          "pattern": "^[a-z0-9]+([\\.-][a-z0-9]+)*$"
+        },
+        "installNamespace": {
+          "description": "installNamespace is the namespace where the bundle should be installed. However, note that\nthe bundle may contain resources that are cluster-scoped or that are\ninstalled in a different namespace. This namespace is expected to exist.",
+          "type": "string",
+          "maxLength": 63,
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+          "x-kubernetes-validations": [
+            {
+              "message": "installNamespace is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "packageName": {
+          "type": "string",
+          "maxLength": 48,
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "preflight": {
+          "description": "Preflight defines the configuration of preflight checks.",
+          "type": "object",
+          "properties": {
+            "crdUpgradeSafety": {
+              "description": "CRDUpgradeSafety holds necessary configuration for the CRD Upgrade Safety preflight checks.",
+              "type": "object",
+              "properties": {
+                "disabled": {
+                  "description": "Disabled represents the state of the CRD upgrade safety preflight check being disabled/enabled.",
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "serviceAccount": {
+          "description": "ServiceAccount is used to install and manage resources.\nThe service account is expected to exist in the InstallNamespace.",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "name is the metadata.name of the referenced serviceAccount object.",
+              "type": "string",
+              "maxLength": 253,
+              "pattern": "^[a-z0-9]+([.|-][a-z0-9]+)*$",
+              "x-kubernetes-validations": [
+                {
+                  "message": "name is immutable",
+                  "rule": "self == oldSelf"
+                }
+              ]
+            }
+          }
+        },
+        "upgradeConstraintPolicy": {
+          "description": "Defines the policy for how to handle upgrade constraints",
+          "type": "string",
+          "enum": [
+            "Enforce",
+            "Ignore"
+          ]
+        },
+        "version": {
+          "description": "Version is an optional semver constraint on the package version. If not specified, the latest version available of the package will be installed.\nIf specified, the specific version of the package will be installed so long as it is available in any of the content sources available.\nExamples: 1.2.3, 1.0.0-alpha, 1.0.0-rc.1\n\n\nFor more information on semver, please see https://semver.org/",
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^(\\s*(=||!=|>|<|>=|=>|<=|=<|~|~>|\\^)\\s*(v?(0|[1-9]\\d*|[x|X|\\*])(\\.(0|[1-9]\\d*|x|X|\\*]))?(\\.(0|[1-9]\\d*|x|X|\\*))?(-([0-9A-Za-z\\-]+(\\.[0-9A-Za-z\\-]+)*))?(\\+([0-9A-Za-z\\-]+(\\.[0-9A-Za-z\\-]+)*))?)\\s*)((?:\\s+|,\\s*|\\s*\\|\\|\\s*)(=||!=|>|<|>=|=>|<=|=<|~|~>|\\^)\\s*(v?(0|[1-9]\\d*|x|X|\\*])(\\.(0|[1-9]\\d*|x|X|\\*))?(\\.(0|[1-9]\\d*|x|X|\\*]))?(-([0-9A-Za-z\\-]+(\\.[0-9A-Za-z\\-]+)*))?(\\+([0-9A-Za-z\\-]+(\\.[0-9A-Za-z\\-]+)*))?)\\s*)*$"
+        }
+      }
+    },
+    "status": {
+      "description": "ClusterExtensionStatus defines the observed state of ClusterExtension.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "installedBundle": {
+          "description": "InstalledBundle should only be modified when a new bundle is successfully installed. This ensures that if there\n is a previously successfully installed a bundle, and an upgrade fails, it is still communicated that there is\n still a bundle that is currently installed and owned by the ClusterExtension.",
+          "type": "object",
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "resolvedBundle": {
+          "type": "object",
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "olm.operatorframework.io",
+      "kind": "ClusterExtension",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

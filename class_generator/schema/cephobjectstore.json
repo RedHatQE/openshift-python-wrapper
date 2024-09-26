@@ -26,6 +26,18 @@
             "type": "string"
           }
         },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "keystone": {
+              "required": [
+                "acceptedRoles",
+                "serviceUserSecretName",
+                "url"
+              ]
+            }
+          }
+        },
         "dataPool": {},
         "gateway": {},
         "healthCheck": {},
@@ -33,6 +45,13 @@
         "metadataPool": {},
         "preservePoolsOnDelete": {
           "type": "boolean"
+        },
+        "protocols": {
+          "type": "object",
+          "properties": {
+            "s3": {},
+            "swift": {}
+          }
         },
         "security": {},
         "sharedPools": {

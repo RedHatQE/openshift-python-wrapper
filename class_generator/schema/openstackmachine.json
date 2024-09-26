@@ -1,0 +1,1036 @@
+{
+  "description": "OpenStackMachine is the Schema for the openstackmachines API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "OpenStackMachineSpec defines the desired state of OpenStackMachine.",
+      "type": "object",
+      "required": [
+        "flavor",
+        "image"
+      ],
+      "properties": {
+        "additionalBlockDevices": {
+          "description": "AdditionalBlockDevices is a list of specifications for additional block devices to attach to the server instance",
+          "type": "array",
+          "items": {
+            "description": "AdditionalBlockDevice is a block device to attach to the server.",
+            "type": "object",
+            "required": [
+              "name",
+              "sizeGiB",
+              "storage"
+            ],
+            "properties": {
+              "name": {
+                "description": "Name of the block device in the context of a machine.\nIf the block device is a volume, the Cinder volume will be named\nas a combination of the machine name and this name.\nAlso, this name will be used for tagging the block device.\nInformation about the block device tag can be obtained from the OpenStack\nmetadata API or the config drive.\nName cannot be 'root', which is reserved for the root volume.",
+                "type": "string"
+              },
+              "sizeGiB": {
+                "description": "SizeGiB is the size of the block device in gibibytes (GiB).",
+                "type": "integer",
+                "minimum": 1
+              },
+              "storage": {
+                "description": "Storage specifies the storage type of the block device and\nadditional storage options.",
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "description": "Type is the type of block device to create.\nThis can be either \"Volume\" or \"Local\".",
+                    "type": "string"
+                  },
+                  "volume": {
+                    "description": "Volume contains additional storage options for a volume block device.",
+                    "type": "object",
+                    "properties": {
+                      "availabilityZone": {
+                        "description": "AvailabilityZone is the volume availability zone to create the volume\nin. If not specified, the volume will be created without an explicit\navailability zone.",
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "description": "From specifies where we will obtain the availability zone for the\nvolume. The options are \"Name\" and \"Machine\". If \"Name\" is specified\nthen the Name field must also be specified. If \"Machine\" is specified\nthe volume will use the value of FailureDomain, if any, from the\nassociated Machine.",
+                            "type": "string",
+                            "enum": [
+                              "Name",
+                              "Machine"
+                            ]
+                          },
+                          "name": {
+                            "description": "Name is the name of a volume availability zone to use. It is required\nif From is \"Name\". The volume availability zone name may not contain\nspaces.",
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[^ ]+$"
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "name is required when from is 'Name' or default",
+                            "rule": "!has(self.from) || self.from == 'Name' ? has(self.name) : !has(self.name)"
+                          }
+                        ]
+                      },
+                      "type": {
+                        "description": "Type is the Cinder volume type of the volume.\nIf omitted, the default Cinder volume type that is configured in the OpenStack cloud\nwill be used.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "configDrive": {
+          "description": "Config Drive support",
+          "type": "boolean"
+        },
+        "flavor": {
+          "description": "The flavor reference for the flavor for your server instance.",
+          "type": "string"
+        },
+        "floatingIPPoolRef": {
+          "description": "floatingIPPoolRef is a reference to a IPPool that will be assigned\nto an IPAddressClaim. Once the IPAddressClaim is fulfilled, the FloatingIP\nwill be assigned to the OpenStackMachine.",
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "apiGroup": {
+              "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind is the type of resource being referenced",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of resource being referenced",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "identityRef": {
+          "description": "IdentityRef is a reference to a secret holding OpenStack credentials\nto be used when reconciling this machine. If not specified, the\ncredentials specified in the cluster will be used.",
+          "type": "object",
+          "required": [
+            "cloudName",
+            "name"
+          ],
+          "properties": {
+            "cloudName": {
+              "description": "CloudName specifies the name of the entry in the clouds.yaml file to use.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of a secret in the same namespace as the resource being provisioned.\nThe secret must contain a key named `clouds.yaml` which contains an OpenStack clouds.yaml file.\nThe secret may optionally contain a key named `cacert` containing a PEM-encoded CA certificate.",
+              "type": "string"
+            }
+          }
+        },
+        "image": {
+          "description": "The image to use for your server instance.\nIf the rootVolume is specified, this will be used when creating the root volume.",
+          "type": "object",
+          "maxProperties": 1,
+          "minProperties": 1,
+          "properties": {
+            "filter": {
+              "description": "Filter describes a query for an image. If specified, the combination\nof name and tags must return a single matching image or an error will\nbe raised.",
+              "type": "object",
+              "minProperties": 1,
+              "properties": {
+                "name": {
+                  "description": "The name of the desired image. If specified, the combination of name and tags must return a single matching image or an error will be raised.",
+                  "type": "string"
+                },
+                "tags": {
+                  "description": "The tags associated with the desired image. If specified, the combination of name and tags must return a single matching image or an error will be raised.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "set"
+                }
+              }
+            },
+            "id": {
+              "description": "ID is the uuid of the image. ID will not be validated before use.",
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "ports": {
+          "description": "Ports to be attached to the server instance. They are created if a port with the given name does not already exist.\nIf not specified a default port will be added for the default cluster network.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "adminStateUp": {
+                "description": "AdminStateUp specifies whether the port should be created in the up (true) or down (false) state. The default is up.",
+                "type": "boolean"
+              },
+              "allowedAddressPairs": {
+                "description": "AllowedAddressPairs is a list of address pairs which Neutron will\nallow the port to send traffic from in addition to the port's\naddresses. If not specified, the MAC Address will be the MAC Address\nof the port. Depending on the configuration of Neutron, it may be\nsupported to specify a CIDR instead of a specific IP address.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "ipAddress"
+                  ],
+                  "properties": {
+                    "ipAddress": {
+                      "description": "IPAddress is the IP address of the allowed address pair. Depending on\nthe configuration of Neutron, it may be supported to specify a CIDR\ninstead of a specific IP address.",
+                      "type": "string"
+                    },
+                    "macAddress": {
+                      "description": "MACAddress is the MAC address of the allowed address pair. If not\nspecified, the MAC address will be the MAC address of the port.",
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "description": {
+                "description": "Description is a human-readable description for the port.",
+                "type": "string"
+              },
+              "disablePortSecurity": {
+                "description": "DisablePortSecurity enables or disables the port security when set.\nWhen not set, it takes the value of the corresponding field at the network level.",
+                "type": "boolean"
+              },
+              "fixedIPs": {
+                "description": "FixedIPs is a list of pairs of subnet and/or IP address to assign to the port. If specified, these must be subnets of the port's network.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ipAddress": {
+                      "description": "IPAddress is a specific IP address to assign to the port. If Subnet\nis also specified, IPAddress must be a valid IP address in the\nsubnet. If Subnet is not specified, IPAddress must be a valid IP\naddress in any subnet of the port's network.",
+                      "type": "string"
+                    },
+                    "subnet": {
+                      "description": "Subnet is an openstack subnet query that will return the id of a subnet to create\nthe fixed IP of a port in. This query must not return more than one subnet.",
+                      "type": "object",
+                      "maxProperties": 1,
+                      "minProperties": 1,
+                      "properties": {
+                        "filter": {
+                          "description": "Filter specifies a filter to select the subnet. It must match exactly one subnet.",
+                          "type": "object",
+                          "minProperties": 1,
+                          "properties": {
+                            "cidr": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "gatewayIP": {
+                              "type": "string"
+                            },
+                            "ipVersion": {
+                              "type": "integer"
+                            },
+                            "ipv6AddressMode": {
+                              "type": "string"
+                            },
+                            "ipv6RAMode": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "notTags": {
+                              "description": "NotTags is a list of tags to filter by. If specified, resources which\ncontain all of the given tags will be excluded from the result.",
+                              "type": "array",
+                              "items": {
+                                "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^[^,]+$"
+                              },
+                              "x-kubernetes-list-type": "set"
+                            },
+                            "notTagsAny": {
+                              "description": "NotTagsAny is a list of tags to filter by. If specified, resources\nwhich contain any of the given tags will be excluded from the result.",
+                              "type": "array",
+                              "items": {
+                                "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^[^,]+$"
+                              },
+                              "x-kubernetes-list-type": "set"
+                            },
+                            "projectID": {
+                              "type": "string"
+                            },
+                            "tags": {
+                              "description": "Tags is a list of tags to filter by. If specified, the resource must\nhave all of the tags specified to be included in the result.",
+                              "type": "array",
+                              "items": {
+                                "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^[^,]+$"
+                              },
+                              "x-kubernetes-list-type": "set"
+                            },
+                            "tagsAny": {
+                              "description": "TagsAny is a list of tags to filter by. If specified, the resource\nmust have at least one of the tags specified to be included in the\nresult.",
+                              "type": "array",
+                              "items": {
+                                "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                                "type": "string",
+                                "minLength": 1,
+                                "pattern": "^[^,]+$"
+                              },
+                              "x-kubernetes-list-type": "set"
+                            }
+                          }
+                        },
+                        "id": {
+                          "description": "ID is the uuid of the subnet. It will not be validated.",
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  }
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "hostID": {
+                "description": "HostID specifies the ID of the host where the port resides.",
+                "type": "string"
+              },
+              "macAddress": {
+                "description": "MACAddress specifies the MAC address of the port. If not specified, the MAC address will be generated.",
+                "type": "string"
+              },
+              "nameSuffix": {
+                "description": "NameSuffix will be appended to the name of the port if specified. If unspecified, instead the 0-based index of the port in the list is used.",
+                "type": "string"
+              },
+              "network": {
+                "description": "Network is a query for an openstack network that the port will be created or discovered on.\nThis will fail if the query returns more than one network.",
+                "type": "object",
+                "maxProperties": 1,
+                "minProperties": 1,
+                "properties": {
+                  "filter": {
+                    "description": "Filter specifies a filter to select an OpenStack network. If provided, cannot be empty.",
+                    "type": "object",
+                    "minProperties": 1,
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "notTags": {
+                        "description": "NotTags is a list of tags to filter by. If specified, resources which\ncontain all of the given tags will be excluded from the result.",
+                        "type": "array",
+                        "items": {
+                          "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^[^,]+$"
+                        },
+                        "x-kubernetes-list-type": "set"
+                      },
+                      "notTagsAny": {
+                        "description": "NotTagsAny is a list of tags to filter by. If specified, resources\nwhich contain any of the given tags will be excluded from the result.",
+                        "type": "array",
+                        "items": {
+                          "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^[^,]+$"
+                        },
+                        "x-kubernetes-list-type": "set"
+                      },
+                      "projectID": {
+                        "type": "string"
+                      },
+                      "tags": {
+                        "description": "Tags is a list of tags to filter by. If specified, the resource must\nhave all of the tags specified to be included in the result.",
+                        "type": "array",
+                        "items": {
+                          "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^[^,]+$"
+                        },
+                        "x-kubernetes-list-type": "set"
+                      },
+                      "tagsAny": {
+                        "description": "TagsAny is a list of tags to filter by. If specified, the resource\nmust have at least one of the tags specified to be included in the\nresult.",
+                        "type": "array",
+                        "items": {
+                          "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "^[^,]+$"
+                        },
+                        "x-kubernetes-list-type": "set"
+                      }
+                    }
+                  },
+                  "id": {
+                    "description": "ID is the ID of the network to use. If ID is provided, the other filters cannot be provided. Must be in UUID format.",
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "profile": {
+                "description": "Profile is a set of key-value pairs that are used for binding\ndetails. We intentionally don't expose this as a map[string]string\nbecause we only want to enable the users to set the values of the\nkeys that are known to work in OpenStack Networking API.  See\nhttps://docs.openstack.org/api-ref/network/v2/index.html?expanded=create-port-detail#create-port\nTo set profiles, your tenant needs permissions rule:create_port, and\nrule:create_port:binding:profile",
+                "type": "object",
+                "properties": {
+                  "ovsHWOffload": {
+                    "description": "OVSHWOffload enables or disables the OVS hardware offload feature.",
+                    "type": "boolean"
+                  },
+                  "trustedVF": {
+                    "description": "TrustedVF enables or disables the \u201ctrusted mode\u201d for the VF.",
+                    "type": "boolean"
+                  }
+                }
+              },
+              "propagateUplinkStatus": {
+                "description": "PropageteUplinkStatus enables or disables the propagate uplink status on the port.",
+                "type": "boolean"
+              },
+              "securityGroups": {
+                "description": "SecurityGroups is a list of the names, uuids, filters or any combination these of the security groups to assign to the instance.",
+                "type": "array",
+                "items": {
+                  "description": "SecurityGroupParam specifies an OpenStack security group. It may be specified by ID or filter, but not both.",
+                  "type": "object",
+                  "maxProperties": 1,
+                  "minProperties": 1,
+                  "properties": {
+                    "filter": {
+                      "description": "Filter specifies a query to select an OpenStack security group. If provided, cannot be empty.",
+                      "type": "object",
+                      "minProperties": 1,
+                      "properties": {
+                        "description": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "notTags": {
+                          "description": "NotTags is a list of tags to filter by. If specified, resources which\ncontain all of the given tags will be excluded from the result.",
+                          "type": "array",
+                          "items": {
+                            "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[^,]+$"
+                          },
+                          "x-kubernetes-list-type": "set"
+                        },
+                        "notTagsAny": {
+                          "description": "NotTagsAny is a list of tags to filter by. If specified, resources\nwhich contain any of the given tags will be excluded from the result.",
+                          "type": "array",
+                          "items": {
+                            "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[^,]+$"
+                          },
+                          "x-kubernetes-list-type": "set"
+                        },
+                        "projectID": {
+                          "type": "string"
+                        },
+                        "tags": {
+                          "description": "Tags is a list of tags to filter by. If specified, the resource must\nhave all of the tags specified to be included in the result.",
+                          "type": "array",
+                          "items": {
+                            "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[^,]+$"
+                          },
+                          "x-kubernetes-list-type": "set"
+                        },
+                        "tagsAny": {
+                          "description": "TagsAny is a list of tags to filter by. If specified, the resource\nmust have at least one of the tags specified to be included in the\nresult.",
+                          "type": "array",
+                          "items": {
+                            "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[^,]+$"
+                          },
+                          "x-kubernetes-list-type": "set"
+                        }
+                      }
+                    },
+                    "id": {
+                      "description": "ID is the ID of the security group to use. If ID is provided, the other filters cannot be provided. Must be in UUID format.",
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "tags": {
+                "description": "Tags applied to the port (and corresponding trunk, if a trunk is configured.)\nThese tags are applied in addition to the instance's tags, which will also be applied to the port.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "set"
+              },
+              "trunk": {
+                "description": "Trunk specifies whether trunking is enabled at the port level. If not\nprovided the value is inherited from the machine, or false for a\nbastion host.",
+                "type": "boolean"
+              },
+              "valueSpecs": {
+                "description": "Value specs are extra parameters to include in the API request with OpenStack.\nThis is an extension point for the API, so what they do and if they are supported,\ndepends on the specific OpenStack implementation.",
+                "type": "array",
+                "items": {
+                  "description": "ValueSpec represents a single value_spec key-value pair.",
+                  "type": "object",
+                  "required": [
+                    "key",
+                    "name",
+                    "value"
+                  ],
+                  "properties": {
+                    "key": {
+                      "description": "Key is the key in the key-value pair.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name is the name of the key-value pair.\nThis is just for identifying the pair and will not be sent to the OpenStack API.",
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "Value is the value in the key-value pair.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "x-kubernetes-list-map-keys": [
+                  "name"
+                ],
+                "x-kubernetes-list-type": "map"
+              },
+              "vnicType": {
+                "description": "VNICType specifies the type of vNIC which this port should be\nattached to. This is used to determine which mechanism driver(s) to\nbe used to bind the port. The valid values are normal, macvtap,\ndirect, baremetal, direct-physical, virtio-forwarder, smart-nic and\nremote-managed, although these values will not be validated in this\nAPI to ensure compatibility with future neutron changes or custom\nimplementations. What type of vNIC is actually available depends on\ndeployments. If not specified, the Neutron default value is used.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "providerID": {
+          "description": "ProviderID is the unique identifier as specified by the cloud provider.",
+          "type": "string"
+        },
+        "rootVolume": {
+          "description": "The volume metadata to boot from",
+          "type": "object",
+          "required": [
+            "sizeGiB"
+          ],
+          "properties": {
+            "availabilityZone": {
+              "description": "AvailabilityZone is the volume availability zone to create the volume\nin. If not specified, the volume will be created without an explicit\navailability zone.",
+              "type": "object",
+              "properties": {
+                "from": {
+                  "description": "From specifies where we will obtain the availability zone for the\nvolume. The options are \"Name\" and \"Machine\". If \"Name\" is specified\nthen the Name field must also be specified. If \"Machine\" is specified\nthe volume will use the value of FailureDomain, if any, from the\nassociated Machine.",
+                  "type": "string",
+                  "enum": [
+                    "Name",
+                    "Machine"
+                  ]
+                },
+                "name": {
+                  "description": "Name is the name of a volume availability zone to use. It is required\nif From is \"Name\". The volume availability zone name may not contain\nspaces.",
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[^ ]+$"
+                }
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "name is required when from is 'Name' or default",
+                  "rule": "!has(self.from) || self.from == 'Name' ? has(self.name) : !has(self.name)"
+                }
+              ]
+            },
+            "sizeGiB": {
+              "description": "SizeGiB is the size of the block device in gibibytes (GiB).",
+              "type": "integer",
+              "minimum": 1
+            },
+            "type": {
+              "description": "Type is the Cinder volume type of the volume.\nIf omitted, the default Cinder volume type that is configured in the OpenStack cloud\nwill be used.",
+              "type": "string"
+            }
+          }
+        },
+        "securityGroups": {
+          "description": "The names of the security groups to assign to the instance",
+          "type": "array",
+          "items": {
+            "description": "SecurityGroupParam specifies an OpenStack security group. It may be specified by ID or filter, but not both.",
+            "type": "object",
+            "maxProperties": 1,
+            "minProperties": 1,
+            "properties": {
+              "filter": {
+                "description": "Filter specifies a query to select an OpenStack security group. If provided, cannot be empty.",
+                "type": "object",
+                "minProperties": 1,
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "notTags": {
+                    "description": "NotTags is a list of tags to filter by. If specified, resources which\ncontain all of the given tags will be excluded from the result.",
+                    "type": "array",
+                    "items": {
+                      "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[^,]+$"
+                    },
+                    "x-kubernetes-list-type": "set"
+                  },
+                  "notTagsAny": {
+                    "description": "NotTagsAny is a list of tags to filter by. If specified, resources\nwhich contain any of the given tags will be excluded from the result.",
+                    "type": "array",
+                    "items": {
+                      "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[^,]+$"
+                    },
+                    "x-kubernetes-list-type": "set"
+                  },
+                  "projectID": {
+                    "type": "string"
+                  },
+                  "tags": {
+                    "description": "Tags is a list of tags to filter by. If specified, the resource must\nhave all of the tags specified to be included in the result.",
+                    "type": "array",
+                    "items": {
+                      "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[^,]+$"
+                    },
+                    "x-kubernetes-list-type": "set"
+                  },
+                  "tagsAny": {
+                    "description": "TagsAny is a list of tags to filter by. If specified, the resource\nmust have at least one of the tags specified to be included in the\nresult.",
+                    "type": "array",
+                    "items": {
+                      "description": "NeutronTag represents a tag on a Neutron resource.\nIt may not be empty and may not contain commas.",
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[^,]+$"
+                    },
+                    "x-kubernetes-list-type": "set"
+                  }
+                }
+              },
+              "id": {
+                "description": "ID is the ID of the security group to use. If ID is provided, the other filters cannot be provided. Must be in UUID format.",
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "serverGroup": {
+          "description": "The server group to assign the machine to.",
+          "type": "object",
+          "maxProperties": 1,
+          "minProperties": 1,
+          "properties": {
+            "filter": {
+              "description": "Filter specifies a query to select an OpenStack server group. If provided, it cannot be empty.",
+              "type": "object",
+              "minProperties": 1,
+              "properties": {
+                "name": {
+                  "description": "Name is the name of a server group to look for.",
+                  "type": "string"
+                }
+              }
+            },
+            "id": {
+              "description": "ID is the ID of the server group to use.",
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "serverMetadata": {
+          "description": "Metadata mapping. Allows you to create a map of key value pairs to add to the server instance.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "value"
+            ],
+            "properties": {
+              "key": {
+                "description": "Key is the server metadata key",
+                "type": "string",
+                "maxLength": 255
+              },
+              "value": {
+                "description": "Value is the server metadata value",
+                "type": "string",
+                "maxLength": 255
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "key"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "sshKeyName": {
+          "description": "The ssh key to inject in the instance",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tags which will be added to the machine and all dependent resources\nwhich support them. These are in addition to Tags defined on the\ncluster.\nRequires Nova api 2.52 minimum!",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "set"
+        },
+        "trunk": {
+          "description": "Whether the server instance is created on a trunk port or not.",
+          "type": "boolean"
+        }
+      }
+    },
+    "status": {
+      "description": "OpenStackMachineStatus defines the observed state of OpenStackMachine.",
+      "type": "object",
+      "properties": {
+        "addresses": {
+          "description": "Addresses contains the OpenStack instance associated addresses.",
+          "type": "array",
+          "items": {
+            "description": "NodeAddress contains information for the node's address.",
+            "type": "object",
+            "required": [
+              "address",
+              "type"
+            ],
+            "properties": {
+              "address": {
+                "description": "The node address.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Node address type, one of Hostname, ExternalIP or InternalIP.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "conditions": {
+          "description": "Conditions provide observations of the operational state of a Cluster API resource.",
+          "type": "array",
+          "items": {
+            "description": "Condition defines an observation of a Cluster API resource operational state.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "Last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed. If that is not known, then using the time when\nthe API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "A human readable message indicating details about the transition.\nThis field may be empty.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "The reason for the condition's last transition in CamelCase.\nThe specific API may choose whether or not this field is considered a guaranteed API.\nThis field may not be empty.",
+                "type": "string"
+              },
+              "severity": {
+                "description": "Severity provides an explicit classification of Reason code, so the users or machines can immediately\nunderstand the current situation and act accordingly.\nThe Severity field MUST be set only when Status=False.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of the condition, one of True, False, Unknown.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of condition in CamelCase or in foo.example.com/CamelCase.\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions\ncan be useful (see .node.status.conditions), the ability to deconflict is important.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "failureMessage": {
+          "description": "FailureMessage will be set in the event that there is a terminal problem\nreconciling the Machine and will contain a more verbose string suitable\nfor logging and human consumption.\n\n\nThis field should not be set for transitive errors that a controller\nfaces that are expected to be fixed automatically over\ntime (like service outages), but instead indicate that something is\nfundamentally wrong with the Machine's spec or the configuration of\nthe controller, and that manual intervention is required. Examples\nof terminal errors would be invalid combinations of settings in the\nspec, values that are unsupported by the controller, or the\nresponsible controller itself being critically misconfigured.\n\n\nAny transient errors that occur during the reconciliation of Machines\ncan be added as events to the Machine object and/or logged in the\ncontroller's output.",
+          "type": "string"
+        },
+        "failureReason": {
+          "description": "MachineStatusError defines errors states for Machine objects.",
+          "type": "string"
+        },
+        "instanceID": {
+          "description": "InstanceID is the OpenStack instance ID for this machine.",
+          "type": "string"
+        },
+        "instanceState": {
+          "description": "InstanceState is the state of the OpenStack instance for this machine.",
+          "type": "string"
+        },
+        "ready": {
+          "description": "Ready is true when the provider resource is ready.",
+          "type": "boolean"
+        },
+        "resolved": {
+          "description": "Resolved contains parts of the machine spec with all external\nreferences fully resolved.",
+          "type": "object",
+          "properties": {
+            "imageID": {
+              "description": "ImageID is the ID of the image to use for the machine and is calculated based on ImageFilter.",
+              "type": "string"
+            },
+            "ports": {
+              "description": "Ports is the fully resolved list of ports to create for the machine.",
+              "type": "array",
+              "items": {
+                "description": "ResolvedPortSpec is a PortOpts with all contained references fully resolved.",
+                "type": "object",
+                "required": [
+                  "description",
+                  "name",
+                  "networkID"
+                ],
+                "properties": {
+                  "adminStateUp": {
+                    "description": "AdminStateUp specifies whether the port should be created in the up (true) or down (false) state. The default is up.",
+                    "type": "boolean"
+                  },
+                  "allowedAddressPairs": {
+                    "description": "AllowedAddressPairs is a list of address pairs which Neutron will\nallow the port to send traffic from in addition to the port's\naddresses. If not specified, the MAC Address will be the MAC Address\nof the port. Depending on the configuration of Neutron, it may be\nsupported to specify a CIDR instead of a specific IP address.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "ipAddress"
+                      ],
+                      "properties": {
+                        "ipAddress": {
+                          "description": "IPAddress is the IP address of the allowed address pair. Depending on\nthe configuration of Neutron, it may be supported to specify a CIDR\ninstead of a specific IP address.",
+                          "type": "string"
+                        },
+                        "macAddress": {
+                          "description": "MACAddress is the MAC address of the allowed address pair. If not\nspecified, the MAC address will be the MAC address of the port.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "description": {
+                    "description": "Description is a human-readable description for the port.",
+                    "type": "string"
+                  },
+                  "disablePortSecurity": {
+                    "description": "DisablePortSecurity enables or disables the port security when set.\nWhen not set, it takes the value of the corresponding field at the network level.",
+                    "type": "boolean"
+                  },
+                  "fixedIPs": {
+                    "description": "FixedIPs is a list of pairs of subnet and/or IP address to assign to the port. If specified, these must be subnets of the port's network.",
+                    "type": "array",
+                    "items": {
+                      "description": "ResolvedFixedIP is a FixedIP with the Subnet resolved to an ID.",
+                      "type": "object",
+                      "properties": {
+                        "ipAddress": {
+                          "description": "IPAddress is a specific IP address to assign to the port. If SubnetID\nis also specified, IPAddress must be a valid IP address in the\nsubnet. If Subnet is not specified, IPAddress must be a valid IP\naddress in any subnet of the port's network.",
+                          "type": "string"
+                        },
+                        "subnet": {
+                          "description": "SubnetID is the id of a subnet to create the fixed IP of a port in.",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  },
+                  "hostID": {
+                    "description": "HostID specifies the ID of the host where the port resides.",
+                    "type": "string"
+                  },
+                  "macAddress": {
+                    "description": "MACAddress specifies the MAC address of the port. If not specified, the MAC address will be generated.",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Name is the name of the port.",
+                    "type": "string"
+                  },
+                  "networkID": {
+                    "description": "NetworkID is the ID of the network the port will be created in.",
+                    "type": "string"
+                  },
+                  "profile": {
+                    "description": "Profile is a set of key-value pairs that are used for binding\ndetails. We intentionally don't expose this as a map[string]string\nbecause we only want to enable the users to set the values of the\nkeys that are known to work in OpenStack Networking API.  See\nhttps://docs.openstack.org/api-ref/network/v2/index.html?expanded=create-port-detail#create-port\nTo set profiles, your tenant needs permissions rule:create_port, and\nrule:create_port:binding:profile",
+                    "type": "object",
+                    "properties": {
+                      "ovsHWOffload": {
+                        "description": "OVSHWOffload enables or disables the OVS hardware offload feature.",
+                        "type": "boolean"
+                      },
+                      "trustedVF": {
+                        "description": "TrustedVF enables or disables the \u201ctrusted mode\u201d for the VF.",
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "propagateUplinkStatus": {
+                    "description": "PropageteUplinkStatus enables or disables the propagate uplink status on the port.",
+                    "type": "boolean"
+                  },
+                  "securityGroups": {
+                    "description": "SecurityGroups is a list of security group IDs to assign to the port.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  },
+                  "tags": {
+                    "description": "Tags applied to the port (and corresponding trunk, if a trunk is configured.)",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "x-kubernetes-list-type": "set"
+                  },
+                  "trunk": {
+                    "description": "Trunk specifies whether trunking is enabled at the port level.",
+                    "type": "boolean"
+                  },
+                  "valueSpecs": {
+                    "description": "Value specs are extra parameters to include in the API request with OpenStack.\nThis is an extension point for the API, so what they do and if they are supported,\ndepends on the specific OpenStack implementation.",
+                    "type": "array",
+                    "items": {
+                      "description": "ValueSpec represents a single value_spec key-value pair.",
+                      "type": "object",
+                      "required": [
+                        "key",
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "Key is the key in the key-value pair.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name is the name of the key-value pair.\nThis is just for identifying the pair and will not be sent to the OpenStack API.",
+                          "type": "string"
+                        },
+                        "value": {
+                          "description": "Value is the value in the key-value pair.",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "x-kubernetes-list-map-keys": [
+                      "name"
+                    ],
+                    "x-kubernetes-list-type": "map"
+                  },
+                  "vnicType": {
+                    "description": "VNICType specifies the type of vNIC which this port should be\nattached to. This is used to determine which mechanism driver(s) to\nbe used to bind the port. The valid values are normal, macvtap,\ndirect, baremetal, direct-physical, virtio-forwarder, smart-nic and\nremote-managed, although these values will not be validated in this\nAPI to ensure compatibility with future neutron changes or custom\nimplementations. What type of vNIC is actually available depends on\ndeployments. If not specified, the Neutron default value is used.",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "serverGroupID": {
+              "description": "ServerGroupID is the ID of the server group the machine should be added to and is calculated based on ServerGroupFilter.",
+              "type": "string"
+            }
+          }
+        },
+        "resources": {
+          "description": "Resources contains references to OpenStack resources created for the machine.",
+          "type": "object",
+          "properties": {
+            "ports": {
+              "description": "Ports is the status of the ports created for the machine.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "id": {
+                    "description": "ID is the unique identifier of the port.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "infrastructure.cluster.x-k8s.io",
+      "kind": "OpenStackMachine",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

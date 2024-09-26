@@ -296,6 +296,7 @@ class Resource:
         K8S_CNI_CNCF_IO: str = "k8s.cni.cncf.io"
         K8S_MARIADB_COM: str = "k8s.mariadb.com"
         K8S_V1_CNI_CNCF_IO: str = "k8s.v1.cni.cncf.io"
+        K8S_OVN_ORG: str = "k8s.ovn.org/v1"
         KUBERNETES_IO: str = "kubernetes.io"
         KUBEVIRT_IO: str = "kubevirt.io"
         KUBEVIRT_KUBEVIRT_IO: str = "kubevirt.kubevirt.io"

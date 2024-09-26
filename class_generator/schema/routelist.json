@@ -1,5 +1,5 @@
 {
-  "description": "RouteList is a list of Route",
+  "description": "RouteList is a collection of Routes.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "items"
@@ -10,10 +10,10 @@
       "type": "string"
     },
     "items": {
-      "description": "List of routes. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+      "description": "items is a list of routes",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/dev.knative.serving.v1.Route"
+        "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.Route"
       }
     },
     "kind": {
@@ -21,13 +21,18 @@
       "type": "string"
     },
     "metadata": {
-      "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "description": "metadata is the standard list's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
     }
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "serving.knative.dev",
+      "group": "",
+      "kind": "RouteList",
+      "version": "v1"
+    },
+    {
+      "group": "route.openshift.io",
       "kind": "RouteList",
       "version": "v1"
     }
