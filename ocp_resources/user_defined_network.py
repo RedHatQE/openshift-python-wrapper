@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Callable
 from kubernetes.dynamic import DynamicClient
 from timeout_sampler import TimeoutSampler, TimeoutExpiredError
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
@@ -138,7 +138,7 @@ class UserDefinedNetwork(NamespacedResource):
         )
 
     @property
-    def conditions(self) -> list:
+    def conditions(self) -> List:
         """
         Retrieve the current status conditions of the UserDefinedNetwork instance.
 
@@ -171,8 +171,8 @@ class UserDefinedNetwork(NamespacedResource):
 
     def wait_for_status_condition(
         self,
-        wait_condition_fns: list,
-        not_wait_condition_fns: Optional[list] = None,
+        wait_condition_fns: List[Callable],
+        not_wait_condition_fns: Optional[List[Callable]] = None,
         wait_timeout: int = 120,
         sleep_interval: int = 2,
     ) -> dict:
@@ -183,8 +183,8 @@ class UserDefinedNetwork(NamespacedResource):
         conditions to be satisfied while monitoring for any of the specified "not wait" conditions to trigger a failure.
 
         Args:
-            wait_condition_fns (list): A list of functions that determine if the desired status condition has been met.
-            not_wait_condition_fns (Optional[list]): A list of functions that determine if a failure condition has
+            wait_condition_fns (List[Callable]): A list of functions that determine if the desired status condition has been met.
+            not_wait_condition_fns (Optional[List[Callable]]): A list of functions that determine if a failure condition has
                 occurred. Default is None
             wait_timeout (int, optional): The maximum time to wait for the conditions to be satisfied (in seconds).
             sleep_interval (int, optional): The interval between checks (in seconds).
@@ -275,8 +275,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         client: Optional[DynamicClient] = None,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
-        subnets: Optional[List] = None,
-        join_subnets: Optional[List] = None,
+        subnets: Optional[List[str]] = None,
+        join_subnets: Optional[List[str]] = None,
         ipam_lifecycle: Optional[str] = None,
         **kwargs,
     ):
@@ -289,8 +289,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             client (Optional[DynamicClient]): DynamicClient to use.
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[List]): subnets are used for the pod network across the cluster.
-            join_subnets (Optional[List]): join_subnets are used inside the OVN network topology.
+            subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
+            join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
@@ -364,7 +364,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         role: Optional[str] = None,
         mtu: Optional[int] = None,
         subnets: Optional[List[Layer3Subnets]] = None,
-        join_subnets: Optional[List] = None,
+        join_subnets: Optional[List[str]] = None,
         **kwargs,
     ):
         """
@@ -377,7 +377,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List[Layer3Subnets]]): subnets are used for the pod network across the cluster.
-            join_subnets (Optional[List]): join_subnets are used inside the OVN network topology.
+            join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
         """
         super().__init__(
             name=name,
@@ -433,8 +433,8 @@ class LocalNetUserDefinedNetwork(UserDefinedNetwork):
         client: Optional[DynamicClient] = None,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
-        subnets: Optional[List] = None,
-        exclude_subnets: Optional[List] = None,
+        subnets: Optional[List[str]] = None,
+        exclude_subnets: Optional[List[str]] = None,
         ipam_lifecycle: Optional[str] = None,
         **kwargs,
     ):
@@ -447,8 +447,8 @@ class LocalNetUserDefinedNetwork(UserDefinedNetwork):
             client (Optional[DynamicClient]): DynamicClient to use.
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[List]): subnets are used for the pod network across the cluster.
-            exclude_subnets (Optional[List]): exclude_subnets is a list of CIDRs that will be removed from the assignable
+            subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
+            exclude_subnets (Optional[List[str]]): exclude_subnets is a list of CIDRs that will be removed from the assignable
                 IP address pool specified by the "Subnets" field.
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
