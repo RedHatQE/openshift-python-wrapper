@@ -10,7 +10,7 @@ class WaitForStatusConditionFailed(Exception):
 
 class UserDefinedNetwork(NamespacedResource):
     """
-    UserDefinedNetwork describe network request for a Namespace.
+    UserDefinedNetwork describes network request for a Namespace.
     """
 
     api_group: str = NamespacedResource.ApiGroup.K8S_OVN_ORG
