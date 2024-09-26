@@ -7,8 +7,6 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 class WaitForStatusConditionFailed(Exception):
     """Exception raised when waiting for a status condition fails."""
 
-    pass
-
 
 class UserDefinedNetwork(NamespacedResource):
     """
