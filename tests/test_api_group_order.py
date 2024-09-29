@@ -1,12 +1,17 @@
 import ast
+import os
 from typing import List, Set
 from deepdiff.diff import difflib
 import pytest
 
 
 def test_api_group_order():
-    with open("ocp_resources/resource.py") as fd:
-        content = fd.read()
+    file_path = os.path.join("ocp_resources", "resource.py")
+    try:
+        with open(file_path) as fd:
+            content = fd.read()
+    except IOError as exp:
+        pytest.fail(f"Failed to read {file_path}: {str(exp)}")
 
     tree = ast.parse(source=content)
     api_group_class: List[ast.ClassDef] = [
