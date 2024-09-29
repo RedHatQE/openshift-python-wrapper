@@ -1,37 +1,14 @@
 {
-  "description": "ResourceClaim describes which resources are needed by a resource consumer. Its status tracks whether the resource has been allocated and what the resulting attributes are.\n\nThis is an alpha type and requires enabling the DynamicResourceAllocation feature gate.",
+  "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
   "type": "object",
   "required": [
-    "spec"
+    "name"
   ],
   "properties": {
-    "apiVersion": {
-      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+    "name": {
+      "description": "Name must match the name of one entry in pod.spec.resourceClaims of the Pod where this field is used. It makes that resource available inside a container.",
       "type": "string"
-    },
-    "kind": {
-      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-      "type": "string"
-    },
-    "metadata": {
-      "description": "Standard object metadata",
-      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
-    },
-    "spec": {
-      "description": "Spec describes the desired attributes of a resource that then needs to be allocated. It can only be set once when creating the ResourceClaim.",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.resource.v1alpha2.ResourceClaimSpec"
-    },
-    "status": {
-      "description": "Status describes whether the resource is available and with which attributes.",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.resource.v1alpha2.ResourceClaimStatus"
     }
   },
-  "x-kubernetes-group-version-kind": [
-    {
-      "group": "resource.k8s.io",
-      "kind": "ResourceClaim",
-      "version": "v1alpha2"
-    }
-  ],
   "$schema": "http://json-schema.org/schema#"
 }

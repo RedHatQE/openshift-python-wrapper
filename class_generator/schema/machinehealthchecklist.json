@@ -13,7 +13,7 @@
       "description": "List of machinehealthchecks. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.v1beta1.MachineHealthCheck"
+        "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.MachineHealthCheck"
       }
     },
     "kind": {
@@ -27,7 +27,7 @@
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "cluster.x-k8s.io",
+      "group": "machine.openshift.io",
       "kind": "MachineHealthCheckList",
       "version": "v1beta1"
     }

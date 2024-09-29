@@ -20,19 +20,6 @@
     "spec": {
       "type": "object",
       "properties": {
-        "backendQuotaGiB": {
-          "description": "backendQuotaGiB sets the etcd backend storage size limit in gibibytes. The value should be an integer not less than 8 and not more than 32. When not specified, the default value is 8.",
-          "type": "integer",
-          "format": "int32",
-          "maximum": 32,
-          "minimum": 8,
-          "x-kubernetes-validations": [
-            {
-              "message": "etcd backendQuotaGiB may not be decreased",
-              "rule": "self>=oldSelf"
-            }
-          ]
-        },
         "controlPlaneHardwareSpeed": {
           "description": "HardwareSpeed allows user to change the etcd tuning profile which configures the latency parameters for heartbeat interval and leader election timeouts allowing the cluster to tolerate longer round-trip-times between etcd members. Valid values are \"\", \"Standard\" and \"Slower\". \"\" means no opinion and the platform is left to choose a reasonable default which is subject to change without notice.",
           "type": "string",

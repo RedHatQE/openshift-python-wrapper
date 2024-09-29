@@ -767,7 +767,7 @@
                 "vcenters": {
                   "description": "vcenters holds the connection details for services to communicate with vCenter. Currently, only a single vCenter is supported. ---",
                   "type": "array",
-                  "maxItems": 3,
+                  "maxItems": 1,
                   "minItems": 0,
                   "items": {
                     "description": "VSpherePlatformVCenterSpec stores the vCenter connection fields. This is used by the vSphere CCM.",
@@ -1223,15 +1223,6 @@
               "description": "GCP contains settings specific to the Google Cloud Platform infrastructure provider.",
               "type": "object",
               "properties": {
-                "cloudLoadBalancerConfig": {
-                  "description": "cloudLoadBalancerConfig is a union that contains the IP addresses of API, API-Int and Ingress Load Balancers created on the cloud platform. These values would not be populated on on-prem platforms. These Load Balancer IPs are used to configure the in-cluster DNS instances for API, API-Int and Ingress services. `dnsType` is expected to be set to `ClusterHosted` when these Load Balancer IP addresses are populated and used.",
-                  "x-kubernetes-validations": [
-                    {
-                      "message": "clusterHosted is permitted only when dnsType is ClusterHosted",
-                      "rule": "has(self.dnsType) && self.dnsType != 'ClusterHosted' ? !has(self.clusterHosted) : true"
-                    }
-                  ]
-                },
                 "projectID": {
                   "description": "resourceGroupName is the Project ID for new GCP resources created for the cluster.",
                   "type": "string"
