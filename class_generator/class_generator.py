@@ -495,7 +495,7 @@ def parse_explain(
                 api_group_real_name = version_splited[0]
 
         if api_group_real_name:
-            api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_")
+            api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_").replace("-", "_")
             resource_dict["group"] = api_group_for_resource_api_group
             missing_api_group_in_resource: bool = not hasattr(Resource.ApiGroup, api_group_for_resource_api_group)
 
