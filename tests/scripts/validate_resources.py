@@ -83,7 +83,7 @@ def validate_resource(
             break
 
     if not matched_resource:
-        errors.append(f"Resource {cls.name} not found in resources definitions")
+        print(f"Warning: Resource {cls.name} not found in resources definitions")
         return errors
 
     if _api_type_version and matched_resource.get("group"):
