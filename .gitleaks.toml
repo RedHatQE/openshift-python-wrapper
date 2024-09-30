@@ -1,11 +1,8 @@
 title = "Gitleaks title"
 
-[[rules]]
 
-id = "skip rule"
-
-[rules.allowlist]
+[allowlist]
+id = "skip class_generator/schema"
 description = "ignore class_generator/schema"
-paths = [
-  '''class_generator/schema/*''',
-]
+path = '''class_generator/schema/'''
+regex = '''^.*\.(yaml|yml)$'''
