@@ -1,7 +1,13 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from typing import Dict, Any, Optional, List, Callable
+from kubernetes.dynamic import DynamicClient
+from timeout_sampler import TimeoutSampler, TimeoutExpiredError
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+
+
+class WaitForStatusConditionFailed(Exception):
+    """Exception raised when waiting for a status condition fails."""
 
 
 class UserDefinedNetwork(NamespacedResource):
@@ -66,9 +72,6 @@ class UserDefinedNetwork(NamespacedResource):
                 _spec["localNet"] = self.local_net
 
     # End of generated code
-
-    class WaitForStatusConditionFailed(Exception):
-        """Exception raised when waiting for a status condition fails."""
 
     class Status(NamespacedResource.Condition):
         """
