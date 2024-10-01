@@ -82,6 +82,10 @@ def validate_resource(
             matched_resource["namespaced"] = resource_dict["namespaced"]
             break
 
+    if not matched_resource:
+        print(f"Warning: Resource {cls.name} not found in resources definitions")
+        return errors
+
     if _api_type_version and matched_resource.get("group"):
         errors.append(f"Resource {cls.name} have api_version {api_value} but should have api_group")
 
