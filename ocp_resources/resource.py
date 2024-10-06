@@ -253,6 +253,11 @@ class Resource:
         class Reason:
             ALL_REQUIREMENTS_MET: str = "AllRequirementsMet"
             INSTALL_SUCCEEDED: str = "InstallSucceeded"
+            NETWORK_ATTACHMENT_DEFINITION_READY: str = "NetworkAttachmentDefinitionReady"
+            SYNC_ERROR: str = "SyncError"
+
+        class Type:
+            NETWORK_READY: str = "NetworkReady"
 
     class Interface:
         class State:
