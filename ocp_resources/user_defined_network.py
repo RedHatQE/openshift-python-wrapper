@@ -66,3 +66,37 @@ class UserDefinedNetwork(NamespacedResource):
                 _spec["localNet"] = self.local_net
 
     # End of generated code
+
+    @classmethod
+    def is_ready_condition(cls, condition: dict) -> bool:
+        """
+        Check if the given condition indicates that the UserDefinedNetwork is ready.
+
+        Args:
+            condition (dict): A dictionary representing the condition of the UserDefinedNetwork.
+
+        Returns:
+            bool: True if the condition indicates the UserDefinedNetwork is ready, False otherwise.
+        """
+        return (
+            condition.get("reason") == cls.Condition.Reason.NETWORK_ATTACHMENT_DEFINITION_READY
+            and condition.get("status") == cls.Condition.Status.TRUE
+            and condition.get("type") == cls.Condition.Type.NETWORK_READY
+        )
+
+    @classmethod
+    def is_sync_error_condition(cls, condition: dict) -> bool:
+        """
+        Check if the given condition indicates a synchronization error for the UserDefinedNetwork.
+
+        Args:
+            condition (dict): A dictionary representing the condition of the UserDefinedNetwork.
+
+        Returns:
+            bool: True if the condition indicates a synchronization error, False otherwise.
+        """
+        return (
+            condition.get("reason") == cls.Condition.Reason.SYNC_ERROR
+            and condition.get("status") == cls.Condition.Status.FALSE
+            and condition.get("type") == cls.Condition.Type.NETWORK_READY
+        )
