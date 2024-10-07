@@ -386,7 +386,7 @@ class Resource:
         """
         Create an API resource
 
-        If `yaml_file` or `resource_dict` are passed, logic in `to_dict` is bypassed.
+        If `yaml_file` or `kind_dict` are passed, logic in `to_dict` is bypassed.
 
         Args:
             name (str): Resource name
@@ -486,7 +486,7 @@ class Resource:
             dict: Resource dict.
         """
         if self.res:
-            # If `resource_dict` is provided, no additional logic should be applied
+            # If `kind_dict` is provided, no additional logic should be applied
             return
         if self.yaml_file:
             if not self.yaml_file_contents:
