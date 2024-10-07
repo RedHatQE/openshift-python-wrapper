@@ -130,16 +130,20 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
-            self.res.setdefault("spec", {}).setdefault("layer2", {})
+            self.res["spec"]["layer2"] = {}
+            _layer2 = self.res["spec"]["layer2"]
 
-            attributes = {
-                "role": self.role,
-                "mtu": self.mtu,
-                "subnets": self.subnets,
-                "joinSubnets": self.join_subnets,
-                "ipamLifecycle": self.ipam_lifecycle,
-            }
+            if self.role:
+                _layer2["role"] = self.role
 
-            for key, value in attributes.items():
-                if value is not None:
-                    self.res["spec"]["layer2"][key] = value
+            if self.mtu:
+                _layer2["mtu"] = self.mtu
+
+            if self.subnets:
+                _layer2["subnets"] = self.subnets
+
+            if self.join_subnets:
+                _layer2["joinSubnets"] = self.join_subnets
+
+            if self.ipam_lifecycle:
+                _layer2["ipamLifecycle"] = self.ipam_lifecycle
