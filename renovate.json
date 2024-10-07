@@ -9,7 +9,7 @@
     },
     {
       "matchPackagePatterns": ["*"],
-      "groupName": "python-dependecies"
+      "groupName": "python-dependencies"
     }
   ]
 }
