@@ -48,14 +48,6 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-class MissingRequiredArgumentError(Exception):
-    def __init__(self, argument: str) -> None:
-        self.argument = argument
-
-    def __repr__(self) -> str:
-        return f"Missing required argument/s. Either provide yaml_file or pass {self.argument}"
-
-
 def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> Optional[ResourceField]:
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
@@ -139,6 +131,23 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
         return class_iterator.__name__
 
     return None
+
+
+# Exceptions classes
+class MissingRequiredArgumentError(Exception):
+    def __init__(self, argument: str) -> None:
+        self.argument = argument
+
+    def __repr__(self) -> str:
+        return f"Missing required argument/s. Either provide yaml_file, kind_dict or pass {self.argument}"
+
+
+class MissingResourceResError(Exception):
+    def __repr__(self) -> str:
+        return "Failed to generate resource self.res"
+
+
+# End Exceptions classes
 
 
 class KubeAPIVersion(Version):
@@ -485,32 +494,38 @@ class Resource:
         Returns:
             dict: Resource dict.
         """
-        if self.res:
+        if self.kind_dict:
             # If `kind_dict` is provided, no additional logic should be applied
-            self.name = self.res["metadata"]["name"]
-            return
+            self.name = self.kind_dict["metadata"]["name"]
 
-        if self.yaml_file:
+        elif self.yaml_file:
             if not self.yaml_file_contents:
                 if isinstance(self.yaml_file, StringIO):
                     self.yaml_file_contents = self.yaml_file.read()
+
                 else:
-                    with open(self.yaml_file, "r") as stream:
+                    with open(self.yaml_file) as stream:
                         self.yaml_file_contents = stream.read()
 
             self.res = yaml.safe_load(stream=self.yaml_file_contents)
             self.res.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.res["metadata"]["name"]
+
         else:
             self.res = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
+
             if self.label:
                 self.res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
+
             if self.annotations:
                 self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
+
+        if not self.res:
+            raise MissingResourceResError()
 
     def to_dict(self) -> None:
         """
@@ -784,8 +799,7 @@ class Resource:
         Returns:
             bool: True if create succeeded, False otherwise.
         """
-        if not self.res:
-            self.to_dict()
+        self.to_dict()
 
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
@@ -1300,22 +1314,17 @@ class NamespacedResource(Resource):
         return self.retry_cluster_exceptions(func=_instance)
 
     def _base_body(self) -> None:
-        if self.res:
-            self.res["metadata"]["namespace"] = self.namespace
-            return
-        else:
-            super(NamespacedResource, self)._base_body()
-
-        if self.yaml_file:
+        if self.yaml_file or self.kind_dict:
             self.namespace = self.res["metadata"].get("namespace", self.namespace)
+
+        else:
+            self.res["metadata"]["namespace"] = self.namespace
 
         if not self.namespace:
             raise MissingRequiredArgumentError(argument="namespace")
 
-        if not self.yaml_file:
-            self.res["metadata"]["namespace"] = self.namespace
-
     def to_dict(self) -> None:
+        super(NamespacedResource, self)._base_body()
         self._base_body()
 
 
