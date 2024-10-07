@@ -202,12 +202,6 @@ class ClassProperty:
         return self.func(owner)
 
 
-class ValueMismatch(Exception):
-    """
-    Raises when value doesn't match the class value
-    """
-
-
 class Resource:
     """
     Base class for API resources
@@ -773,9 +767,6 @@ class Resource:
 
         Returns:
             bool: True if create succeeded, False otherwise.
-
-        Raises:
-            ValueMismatch: When body value doesn't match class value
         """
         if not self.res:
             self.to_dict()
