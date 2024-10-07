@@ -1,3 +1,9 @@
+[tool.pytest.ini_options]
+markers = [
+  "incremental: Mark tests as incremental",
+  "kubevirt: Mark tests as kubevirt tests",
+]
+
 [tool.ruff]
 preview = true
 line-length = 120
@@ -71,13 +77,6 @@ packages = ["ocp_resources", "class_generator"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-
-[tool.pytest.ini_options]
-markers = [
-  "incremental: Mark tests as incremental",
-  "kubevirt: Mark tests as kubevirt tests",
-]
 
 [tool.uv]
 dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
