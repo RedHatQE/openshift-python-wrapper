@@ -440,7 +440,7 @@ class Resource:
         if not self.api_group and not self.api_version:
             raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
 
-        if not (self.name or self.yaml_file):
+        if not (self.name or self.yaml_file or self.resource_dict):
             raise MissingRequiredArgumentError(argument="name")
 
         self.namespace: str = ""
