@@ -381,7 +381,7 @@ class Resource:
         api_group: str = "",
         hash_log_data: bool = True,
         ensure_exists: bool = False,
-        resource_dict: Dict[Any, Any] | None = None,
+        kind_dict: Dict[Any, Any] | None = None,
     ):
         """
         Create an API resource
@@ -408,9 +408,9 @@ class Resource:
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
-            resource_dict (dict): dict which represents the resource object
+            kind_dict (dict): dict which represents the resource object
         """
-        if yaml_file and resource_dict:
+        if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         self.name = name
@@ -418,6 +418,7 @@ class Resource:
         self.timeout = timeout
         self.privileged_client = privileged_client
         self.yaml_file = yaml_file
+        self.kind_dict = kind_dict
         self.delete_timeout = delete_timeout
         self.dry_run = dry_run
         self.node_selector = node_selector
@@ -440,13 +441,12 @@ class Resource:
         if not self.api_group and not self.api_version:
             raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
 
-        if not (self.name or self.yaml_file or self.resource_dict):
+        if not (self.name or self.yaml_file or self.kind_dict):
             raise MissingRequiredArgumentError(argument="name")
 
         self.namespace: str = ""
-        self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
         self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res: Dict[Any, Any] = resource_dict or {}
+        self.res: Dict[Any, Any] = self.kind_dict or {}
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
@@ -1224,7 +1224,7 @@ class NamespacedResource(Resource):
             **kwargs,
         )
         self.namespace = namespace
-        if not (self.name and self.namespace) and not self.yaml_file:
+        if not (self.name and self.namespace) and not self.yaml_file and not self.kind_dict:
             raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
 
         if ensure_exists:

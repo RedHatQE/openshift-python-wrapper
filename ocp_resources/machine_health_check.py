@@ -47,7 +47,7 @@ class MachineHealthCheck(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.resource_dict and not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if self.reboot_strategy:
                 self.res["metadata"]["annotations"] = {f"{self.api_group}/remediation-strategy": "external-baremetal"}
             self.res.setdefault("spec", {})

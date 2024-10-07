@@ -30,7 +30,7 @@ class ApplicationAwareClusterResourceQuota(Resource):
 
     def to_dict(self):
         super().to_dict()
-        if not self.resource_dict and not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not (self.quota or self.selector):
                 raise MissingRequiredArgumentError(argument="'quota' or 'selector'")
 

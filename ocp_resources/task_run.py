@@ -38,7 +38,7 @@ class TaskRun(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.resource_dict and not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not (self.task_ref or self.task_spec):
                 raise MissingRequiredArgumentError(argument="'task_ref' or 'task_spec'")
 

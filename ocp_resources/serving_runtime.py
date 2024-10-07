@@ -60,7 +60,7 @@ class ServingRuntime(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.resource_dict and not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not self.containers:
                 raise MissingRequiredArgumentError(argument="'containers'")
 
