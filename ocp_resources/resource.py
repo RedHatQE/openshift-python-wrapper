@@ -381,12 +381,12 @@ class Resource:
         api_group: str = "",
         hash_log_data: bool = True,
         ensure_exists: bool = False,
-        resouce_dict: Dict[Any, Any] | None = None,
+        resource_dict: Dict[Any, Any] | None = None,
     ):
         """
         Create an API resource
 
-        If `yaml_file` or `resouce_dict` are passed, logic in `to_dict` is bypassed.
+        If `yaml_file` or `resource_dict` are passed, logic in `to_dict` is bypassed.
 
         Args:
             name (str): Resource name
@@ -408,10 +408,10 @@ class Resource:
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
-            resouce_dict (dict): dict which represents the resource object
+            resource_dict (dict): dict which represents the resource object
         """
-        if yaml_file and resouce_dict:
-            raise ValueError("yaml_file and resouce_dict are mutually exclusive")
+        if yaml_file and resource_dict:
+            raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         self.name = name
         self.teardown = teardown
@@ -446,7 +446,7 @@ class Resource:
         self.namespace: str = ""
         self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
         self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res: Dict[Any, Any] = resouce_dict or {}
+        self.res: Dict[Any, Any] = resource_dict or {}
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
@@ -486,7 +486,7 @@ class Resource:
             dict: Resource dict.
         """
         if self.res:
-            # If `resouce_dict` is provided, no additional logic should be applied
+            # If `resource_dict` is provided, no additional logic should be applied
             return
         if self.yaml_file:
             if not self.yaml_file_contents:
