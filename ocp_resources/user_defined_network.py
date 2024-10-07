@@ -3,7 +3,7 @@
 from typing import Any, Dict, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 from kubernetes.dynamic import DynamicClient
-from typing import Dict, Any, Optional, List, Callable
+from typing import List
 
 
 class UserDefinedNetwork(NamespacedResource):
@@ -69,6 +69,7 @@ class UserDefinedNetwork(NamespacedResource):
 
     # End of generated code
 
+
 class TopologyType:
     """
     This class contains constants for different network topology types used in the UserDefinedNetwork configuration.
@@ -78,6 +79,8 @@ class TopologyType:
     """
 
     LAYER2 = "Layer2"
+
+
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
     """
     UserDefinedNetwork layer2 object.
