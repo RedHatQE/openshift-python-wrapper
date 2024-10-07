@@ -487,7 +487,9 @@ class Resource:
         """
         if self.res:
             # If `kind_dict` is provided, no additional logic should be applied
+            self.name = self.res["metadata"]["name"]
             return
+
         if self.yaml_file:
             if not self.yaml_file_contents:
                 if isinstance(self.yaml_file, StringIO):
@@ -1299,6 +1301,7 @@ class NamespacedResource(Resource):
 
     def _base_body(self) -> None:
         if self.res:
+            self.res["metadata"]["namespace"] = self.namespace
             return
         else:
             super(NamespacedResource, self)._base_body()
