@@ -13,23 +13,16 @@ The output will be:
 
 ### Installation
 
-- Using [pipx](https://github.com/pypa/pipx) (recommended)
+Install [uv](https://github.com/astral-sh/uv)
 
 ```bash
- pipx install openshift-python-wrapper
+ uv tool install openshift-python-wrapper
 ```
 
 - Using `pip`
 
 ```bash
 python3 -m pip install openshift-python-wrapper
-```
-
-- Using [poetry](https://python-poetry.org/) (For development)
-
-```bash
-pipx install poetry
-poetry install
 ```
 
 For shell completion Add this to ~/.bashrc or ~/.zshrc:
@@ -73,11 +66,10 @@ class-generator --kind Pod --add-tests
   - Kubernetes/Openshift cluster
   - [oc](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/) or [kubectl](https://kubernetes.io/docs/tasks/tools/) (latest version)
   - [openapi2jsonschema](https://github.com/instrumenta/openapi2jsonschema)
-  - [poetry](https://python-poetry.org/)
+  - [uv](https://github.com/astral-sh/uv)
 
 ```bash
-pipx install poetry
-pipx install --python python3.9 openapi2jsonschema
+uv tool install --python python3.9 openapi2jsonschema
 ```
 
 - Clone this repository
@@ -85,12 +77,6 @@ pipx install --python python3.9 openapi2jsonschema
 ```bash
 git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
-```
-
-- Install dependencies
-
-```bash
-poetry install
 ```
 
 - Login to the cluster use admin user and password.
@@ -102,5 +88,5 @@ oc login <clster api URL> -u <username> -p <password>
 - Execute the command:
 
 ```bash
-poetry run python class_generator/class-generator --update-schema
+uv run python class_generator/class-generator --update-schema
 ```

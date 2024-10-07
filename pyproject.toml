@@ -17,67 +17,67 @@ no_implicit_optional = true
 show_error_codes = true
 warn_unused_ignores = true
 
-[tool.poetry]
+[project]
+requires-python = ">=3.8"
+authors = [
+  { "name" = "Meni Yakove", "email" = "myakove@gmail.com" },
+  { "name" = "Ruth Netser", "email" = "rnetser@gmail.com" },
+]
+maintainers = [
+  { "name" = "Meni Yakove", "email" = "myakove@gmail.com" },
+  { "name" = "Ruth Netser", "email" = "rnetser@gmail.com" },
+]
 name = "openshift-python-wrapper"
-version = "0.0.0"
+version = "10.0.89"
 description = "Wrapper around https://github.com/kubernetes-client/python"
-authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
-packages = [{ include = "ocp_resources" }, { include = "class_generator" }]
-homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
-documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 keywords = ["Openshift", "Kubevirt", "Openshift Virtualization"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
 ]
+dependencies = [
+  "click>=8.1.7",
+  "cloup>=3.0.5",
+  "colorlog>=6.8.2",
+  "deepdiff>=8.0.1",
+  "jinja2>=3.1.4",
+  "kubernetes>=31.0.0",
+  "packaging>=24.1",
+  "pyhelper-utils>=0.0.42",
+  "pytest>=8.3.3",
+  "python-benedict>=0.33.2",
+  "python-simple-logger>=1.0.40",
+  "requests>=2.32.3",
+  "rich>=13.9.2",
+  "ruff>=0.6.9",
+  "timeout-sampler>=0.0.46",
+  "xmltodict>=0.13.0",
+]
 
-[tool.poetry.scripts]
-class-generator = "class_generator.class_generator:main"
-
-[tool.poetry.urls]
+[project.urls]
+homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
+documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
 Download = "https://pypi.org/project/openshift-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
 
-[tool.poetry.group.dev.dependencies]
-ipdb = "^0.13.13"
+[project.scripts]
+class-generator = "class_generator.class_generator:main"
 
-
-[tool.poetry.group.tests.dependencies]
-requests = "^2.31.0"
-deepdiff = "^8.0.0"
-
-[tool.poetry-dynamic-versioning.substitution]
-files = ["VERSION"]
-
-[tool.poetry-dynamic-versioning]
-enable = true
-pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
+[tool.hatch.build.targets.wheel]
+packages = ["ocp_resources", "class_generator"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.dependencies]
-python = "^3.8"
-xmltodict = "^0.13.0"
-colorlog = "^6.7.0"
-kubernetes = "30.*.*"
-python-benedict = "^0.33.0"
-packaging = "^23.1"
-python-simple-logger = ">=1.0.6"
-jinja2 = "^3.1.2"
-timeout-sampler = ">=0.0.17"
-click = "^8.1.7"
-pyhelper-utils = "^0.0.42"
-ruff = "^0.6.0"
-rich = "^13.7.1"
-cloup = "^3.0.5"
-pytest = "^8.0.0"
 
 [tool.pytest.ini_options]
 markers = [
   "incremental: Mark tests as incremental",
   "kubevirt: Mark tests as kubevirt tests",
 ]
+
+[tool.uv]
+dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]

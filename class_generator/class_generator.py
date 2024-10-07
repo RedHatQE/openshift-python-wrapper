@@ -596,7 +596,7 @@ def write_and_format_rendered(filepath: str, data: str, user_code: str = "") -> 
 
     for op in ("format", "check"):
         run_command(
-            command=shlex.split(f"poetry run ruff {op} {filepath}"),
+            command=shlex.split(f"uv run ruff {op} {filepath}"),
             verify_stderr=False,
             check=False,
         )
