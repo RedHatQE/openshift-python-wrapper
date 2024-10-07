@@ -77,7 +77,7 @@ class TopologyType:
         LAYER2 (str): Represents a Layer2 topology.
     """
 
-    LAYER2 = "Layer2"
+    LAYER2: str = "Layer2"
 
 
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
