@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from kubernetes.dynamic import DynamicClient
+from typing import Dict, Any, Optional, List, Callable
 
 
 class UserDefinedNetwork(NamespacedResource):
@@ -66,3 +68,75 @@ class UserDefinedNetwork(NamespacedResource):
                 _spec["localNet"] = self.local_net
 
     # End of generated code
+
+class TopologyType:
+    """
+    This class contains constants for different network topology types used in the UserDefinedNetwork configuration.
+
+    Attributes:
+        LAYER2 (str): Represents a Layer2 topology.
+    """
+
+    LAYER2 = "Layer2"
+class Layer2UserDefinedNetwork(UserDefinedNetwork):
+    """
+    UserDefinedNetwork layer2 object.
+
+    API reference:
+    https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer2config
+    """
+
+    def __init__(
+        self,
+        name: str,
+        namespace: str,
+        client: Optional[DynamicClient] = None,
+        role: Optional[str] = None,
+        mtu: Optional[int] = None,
+        subnets: Optional[List[str]] = None,
+        join_subnets: Optional[List[str]] = None,
+        ipam_lifecycle: Optional[str] = None,
+        **kwargs,
+    ):
+        """
+        Create and manage UserDefinedNetwork with layer2 configuration
+
+        Args:
+            name (str): The name of the UserDefinedNetwork.
+            namespace (str): The namespace of the UserDefinedNetwork.
+            client (Optional[DynamicClient]): DynamicClient to use.
+            role (Optional[str]): role describes the network role in the pod.
+            mtu (Optional[int]): mtu is the maximum transmission unit for a network.
+            subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
+            join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
+            ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
+        """
+        super().__init__(
+            name=name,
+            namespace=namespace,
+            client=client,
+            topology=TopologyType.LAYER2,
+            **kwargs,
+        )
+        self.role = role
+        self.mtu = mtu
+        self.subnets = subnets
+        self.join_subnets = join_subnets
+        self.ipam_lifecycle = ipam_lifecycle
+
+    def to_dict(self) -> None:
+        super().to_dict()
+        if not self.yaml_file:
+            self.res.setdefault("spec", {}).setdefault("layer2", {})
+
+            attributes = {
+                "role": self.role,
+                "mtu": self.mtu,
+                "subnets": self.subnets,
+                "joinSubnets": self.join_subnets,
+                "ipamLifecycle": self.ipam_lifecycle,
+            }
+
+            for key, value in attributes.items():
+                if value is not None:
+                    self.res["spec"]["layer2"][key] = value
