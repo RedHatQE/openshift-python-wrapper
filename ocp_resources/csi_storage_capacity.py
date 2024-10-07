@@ -34,7 +34,7 @@ class CSIStorageCapacity(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             if not self.storage_class_name:
                 raise MissingRequiredArgumentError(argument="storage_class_name")
             self.res.update({

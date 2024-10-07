@@ -144,7 +144,7 @@ class VirtualMachineImport(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             spec = self.res.setdefault("spec", {})
 
             secret = spec.setdefault("providerCredentialsSecret", {})
@@ -263,7 +263,7 @@ class ResourceMapping(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             for provider, mapping in self.mapping.items():
                 res_provider_section = self.res.setdefault("spec", {}).setdefault(provider, {})
                 if mapping.network_mappings is not None:

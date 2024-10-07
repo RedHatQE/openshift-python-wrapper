@@ -49,7 +49,7 @@ class NetworkAttachmentDefinition(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             if self.resource_name is not None:
                 self.res["metadata"]["annotations"] = {
                     f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/resourceName": (self.resource_name)
@@ -231,7 +231,7 @@ class OVNOverlayNetworkAttachmentDefinition(NetworkAttachmentDefinition):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             if not self.network_name and not self.topology:
                 raise MissingRequiredArgumentError(argument="'network_name' and 'topology'")
 

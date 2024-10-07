@@ -40,7 +40,7 @@ class ReclaimSpaceCronJob(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             if not (self.job_template and self.schedule):
                 raise MissingRequiredArgumentError(argument="'job_template' and 'schedule'")
             self.res["spec"] = {"jobTemplate": self.job_template, "schedule": self.schedule}

@@ -38,11 +38,11 @@ class Restore(NamespacedResource):
     def to_dict(self) -> None:
         super().to_dict()
 
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             if not self.backup_name:
                 raise MissingRequiredArgumentError(argument="backup_name")
 
-            if not self.yaml_file:
+            if not self.resource_dict and not self.yaml_file:
                 self.res.update({
                     "spec": {
                         "backupName": self.backup_name,

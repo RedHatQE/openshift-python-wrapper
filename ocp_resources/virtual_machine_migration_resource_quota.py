@@ -33,7 +33,7 @@ class VirtualMachineMigrationResourceQuota(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             additional_resources = self.res.setdefault("spec", {}).setdefault("additionalMigrationResources", {})
 
             if self.requests_cpu:

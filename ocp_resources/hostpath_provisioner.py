@@ -37,7 +37,7 @@ class HostPathProvisioner(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.resource_dict and not self.yaml_file:
             spec = self.res.setdefault("spec", {})
             path_config = spec.setdefault("pathConfig", {})
             if self.path:
