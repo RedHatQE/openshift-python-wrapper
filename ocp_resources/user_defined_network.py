@@ -126,8 +126,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.yaml_file:
-            self.res["spec"]["layer2"] = {}
-            _layer2 = self.res["spec"]["layer2"]
+            _layer2 = self.res["spec"].setdefault(TopologyType.LAYER2.lower(), {})
 
             if self.role:
                 _layer2["role"] = self.role
