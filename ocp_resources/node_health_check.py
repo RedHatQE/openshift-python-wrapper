@@ -50,7 +50,7 @@ class NodeHealthCheck(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not (self.selector_match_expressions or self.selector_match_labels):
                 raise MissingRequiredArgumentError(argument="'selector_match_expressions' or 'selector_match_labels'")
 
