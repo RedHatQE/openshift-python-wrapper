@@ -48,7 +48,7 @@ class ConfigMap(NamespacedResource):
     def to_dict(self) -> None:
         super().to_dict()
 
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if self.binary_data:
                 self.res["binaryData"] = self.binary_data
 

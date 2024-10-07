@@ -39,7 +39,7 @@ class MultiClusterObservability(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not self.metric_object_storage:
                 raise MissingRequiredArgumentError(argument="metric_object_storage")
             spec_dict = {"observabilityAddonSpec": self.observability_addon_spec}

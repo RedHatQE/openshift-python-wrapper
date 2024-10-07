@@ -36,7 +36,7 @@ class CatalogSource(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not all([self.source_type, self.image, self.display_name, self.publisher]):
                 raise MissingRequiredArgumentError(argument="'source_type', 'image', 'display_name' and 'publisher'")
 
