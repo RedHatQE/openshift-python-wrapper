@@ -36,7 +36,7 @@ class Route(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if self.service:
                 self.res.update({"spec": {"to": {"kind": "Service", "name": self.service}}})
             if self.destination_ca_cert:

@@ -91,7 +91,7 @@ class StorageClass(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not self.provisioner:
                 raise MissingRequiredArgumentError(argument="provisioner")
             self.res.update({"provisioner": self.provisioner})

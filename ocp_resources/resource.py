@@ -48,14 +48,6 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-class MissingRequiredArgumentError(Exception):
-    def __init__(self, argument: str) -> None:
-        self.argument = argument
-
-    def __repr__(self) -> str:
-        return f"Missing required argument/s. Either provide yaml_file or pass {self.argument}"
-
-
 def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> Optional[ResourceField]:
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
@@ -139,6 +131,23 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
         return class_iterator.__name__
 
     return None
+
+
+# Exceptions classes
+class MissingRequiredArgumentError(Exception):
+    def __init__(self, argument: str) -> None:
+        self.argument = argument
+
+    def __repr__(self) -> str:
+        return f"Missing required argument/s. Either provide yaml_file, kind_dict or pass {self.argument}"
+
+
+class MissingResourceResError(Exception):
+    def __repr__(self) -> str:
+        return "Failed to generate resource self.res"
+
+
+# End Exceptions classes
 
 
 class KubeAPIVersion(Version):
@@ -381,9 +390,12 @@ class Resource:
         api_group: str = "",
         hash_log_data: bool = True,
         ensure_exists: bool = False,
+        kind_dict: Dict[Any, Any] | None = None,
     ):
         """
         Create an API resource
+
+        If `yaml_file` or `kind_dict` are passed, logic in `to_dict` is bypassed.
 
         Args:
             name (str): Resource name
@@ -405,13 +417,17 @@ class Resource:
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
+            kind_dict (dict): dict which represents the resource object
         """
+        if yaml_file and kind_dict:
+            raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         self.name = name
         self.teardown = teardown
         self.timeout = timeout
         self.privileged_client = privileged_client
         self.yaml_file = yaml_file
+        self.kind_dict = kind_dict
         self.delete_timeout = delete_timeout
         self.dry_run = dry_run
         self.node_selector = node_selector
@@ -434,13 +450,12 @@ class Resource:
         if not self.api_group and not self.api_version:
             raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
 
-        if not (self.name or self.yaml_file):
+        if not (self.name or self.yaml_file or self.kind_dict):
             raise MissingRequiredArgumentError(argument="name")
 
         self.namespace: str = ""
-        self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
         self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res: Dict[Any, Any] = {}
+        self.res: Dict[Any, Any] = self.kind_dict or {}
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
@@ -479,27 +494,38 @@ class Resource:
         Returns:
             dict: Resource dict.
         """
-        if self.yaml_file:
+        if self.kind_dict:
+            # If `kind_dict` is provided, no additional logic should be applied
+            self.name = self.kind_dict["metadata"]["name"]
+
+        elif self.yaml_file:
             if not self.yaml_file_contents:
                 if isinstance(self.yaml_file, StringIO):
                     self.yaml_file_contents = self.yaml_file.read()
+
                 else:
-                    with open(self.yaml_file, "r") as stream:
+                    with open(self.yaml_file) as stream:
                         self.yaml_file_contents = stream.read()
 
             self.res = yaml.safe_load(stream=self.yaml_file_contents)
             self.res.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.res["metadata"]["name"]
+
         else:
             self.res = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
+
             if self.label:
                 self.res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
+
             if self.annotations:
                 self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
+
+        if not self.res:
+            raise MissingResourceResError()
 
     def to_dict(self) -> None:
         """
@@ -773,8 +799,7 @@ class Resource:
         Returns:
             bool: True if create succeeded, False otherwise.
         """
-        if not self.res:
-            self.to_dict()
+        self.to_dict()
 
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
@@ -1215,7 +1240,7 @@ class NamespacedResource(Resource):
             **kwargs,
         )
         self.namespace = namespace
-        if not (self.name and self.namespace) and not self.yaml_file:
+        if not (self.name and self.namespace) and not self.yaml_file and not self.kind_dict:
             raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
 
         if ensure_exists:
@@ -1289,19 +1314,17 @@ class NamespacedResource(Resource):
         return self.retry_cluster_exceptions(func=_instance)
 
     def _base_body(self) -> None:
-        if not self.res:
-            super(NamespacedResource, self)._base_body()
-
-        if self.yaml_file:
+        if self.yaml_file or self.kind_dict:
             self.namespace = self.res["metadata"].get("namespace", self.namespace)
+
+        else:
+            self.res["metadata"]["namespace"] = self.namespace
 
         if not self.namespace:
             raise MissingRequiredArgumentError(argument="namespace")
 
-        if not self.yaml_file:
-            self.res["metadata"]["namespace"] = self.namespace
-
     def to_dict(self) -> None:
+        super(NamespacedResource, self)._base_body()
         self._base_body()
 
 
