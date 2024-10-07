@@ -9,9 +9,7 @@ The output will be:
 - dns_operator_openshift_io.py
 - dns_config_openshift_io.py
 
-## Usage
-
-### Installation
+## Installation
 
 Install [uv](https://github.com/astral-sh/uv)
 
@@ -31,7 +29,7 @@ For shell completion Add this to ~/.bashrc or ~/.zshrc:
 if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_source class-generator)"; fi
 ```
 
-#### Usage
+## Usage
 
 - All available options:
 
@@ -51,7 +49,7 @@ class-generator --kind <kind>
   - `OATH` -> `oath`
   - `CDIConfig` -> `cdi_config`
 
-#### Adding tests
+## Adding tests
 
 - Add a new test for the provided `kind` by passing `--add-tests` flag
 - Replace `Pod` with the kind you want to add to the tests
@@ -60,7 +58,7 @@ class-generator --kind <kind>
 class-generator --kind Pod --add-tests
 ```
 
-#### Update schema files
+## Update schema files
 
 - Dependencies
   - Kubernetes/Openshift cluster
@@ -88,5 +86,5 @@ oc login <clster api URL> -u <username> -p <password>
 - Execute the command:
 
 ```bash
-uv run python class_generator/class-generator --update-schema
+class-generator --update-schema
 ```
