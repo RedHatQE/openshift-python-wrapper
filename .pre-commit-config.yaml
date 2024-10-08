@@ -55,8 +55,3 @@ repos:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)
         additional_dependencies: ["types-PyYAML", "types-requests"]
-
-  - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.4.19
-    hooks:
-      - id: uv-lock
