@@ -60,4 +60,3 @@ repos:
     rev: 0.4.19
     hooks:
       - id: uv-lock
-        args: [--locked]
