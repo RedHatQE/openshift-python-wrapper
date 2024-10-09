@@ -426,7 +426,8 @@ def prepare_property_dict(
     resource_dict: Dict[str, Any],
     dict_key: str,
 ) -> Dict[str, Any]:
-    keys_to_ignore = ["kind", "apiVersion", "status", SPEC_STR.lower()]
+    keys_to_ignore: List[str] = ["kind", "apiVersion", "status", SPEC_STR.lower()]
+    keys_to_rename: set[str] = {"annotations", "labels"}
     if dict_key != SPEC_STR.lower():
         keys_to_ignore.append("metadata")
 
@@ -436,7 +437,7 @@ def prepare_property_dict(
 
         val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
-        python_name = convert_camel_case_to_snake_case(string_=key)
+        python_name = convert_camel_case_to_snake_case(string_=f"{dict_key}_{key}" if key in keys_to_rename else key)
         resource_dict[dict_key].append({
             "name-for-class-arg": python_name,
             "property-name": key,
