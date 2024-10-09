@@ -25,7 +25,7 @@ class ServingRuntime(NamespacedResource):
             replicas: Optional[int] = None,
             storage_helper: Optional[Dict[str, Any]] = None,
             built_in_adapter: Optional[Dict[str, Any]] = None,
-            spec_label: Optional[Dict[str, str]] = None,
+            spec_labels: Optional[Dict[str, str]] = None,
             spec_annotations: Optional[Dict[str, str]] = None,
             affinity: Optional[Dict[str, Any]] = None,
             node_selector: Optional[Dict[str, Any]] = None,
@@ -50,7 +50,7 @@ class ServingRuntime(NamespacedResource):
             storage_helper (Optional[Dict[str, Any]]): Configuration for this runtime's use of the storage helper.
             built_in_adapter (Optional[Dict[str, Any]]): Configuration for the built-in adapter.
             spec_annotations (Optional[Dict[str, str]]): Runtime Spec Resource annotations.
-            spec_label (Optional[Dict[str, str]]): Runtime Spec Resource label.
+            spec_labels (Optional[Dict[str, str]]): Runtime Spec Resource label.
             affinity (Optional[Dict[str, Any]]): Affinity is a group of affinity scheduling rules for model pod using SR.
             node_selector (Optional[Dict[str, Any]]): Node selectors on  SR and labels on nodes to control where the model pod is scheduled.
             tolerations (Optional[List[Any]]): allow the scheduler to schedule model pods with matching taints in SR
@@ -70,7 +70,7 @@ class ServingRuntime(NamespacedResource):
         self.replicas = replicas
         self.storage_helper = storage_helper
         self.built_in_adapter = built_in_adapter
-        self.spec_label = spec_label
+        self.spec_labels = spec_labels
         self.spec_annotations = spec_annotations
         self.affinity = affinity
         self.node_selector = node_selector
@@ -120,15 +120,21 @@ class ServingRuntime(NamespacedResource):
 
             if self.built_in_adapter:
                 _spec["builtInAdapter"] = self.built_in_adapter
-            if self.spec_label:
-                _spec["label"] = self.spec_label
+
+            if self.spec_labels:
+                _spec["labels"] = self.spec_labels
+
             if self.spec_annotations:
                 _spec["annotations"] = self.spec_annotations
+
             if self.affinity:
                 _spec["affinity"] = self.affinity
+
             if self.node_selector:
-                _spec["node_selector"] = self.node_selector
+                _spec["nodeSelector"] = self.node_selector
+
             if self.tolerations:
                 _spec["tolerations"] = self.tolerations
+
             if self.volumes:
                 _spec["volumes"] = self.volumes
