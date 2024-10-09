@@ -75,9 +75,11 @@ class TopologyType:
 
     Attributes:
         LAYER2 (str): Represents a Layer2 topology.
+        LAYER3 (str): Represents a Layer3 topology.
     """
 
     LAYER2: str = "Layer2"
+    LAYER3: str = "Layer3"
 
 
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
