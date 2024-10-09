@@ -125,7 +125,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             if not self.role:
                 raise MissingRequiredArgumentError(argument="role")
 
-            _layer2 = self.res["spec"].setdefault(TopologyType.LAYER2.lower(), {})
+            self.res["spec"][TopologyType.LAYER2.lower()] = {}
+            _layer2 = self.res["spec"][TopologyType.LAYER2.lower()]
 
             if self.role:
                 _layer2["role"] = self.role
