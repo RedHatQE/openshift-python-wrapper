@@ -92,8 +92,6 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
 
     def __init__(
         self,
-        name: str,
-        namespace: str,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
         subnets: Optional[List[str]] = None,
@@ -105,8 +103,6 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         Create and manage UserDefinedNetwork with layer2 configuration
 
         Args:
-            name (str): The name of the UserDefinedNetwork.
-            namespace (str): The namespace of the UserDefinedNetwork.
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
@@ -114,8 +110,6 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
-            name=name,
-            namespace=namespace,
             topology=TopologyType.LAYER2,
             **kwargs,
         )
