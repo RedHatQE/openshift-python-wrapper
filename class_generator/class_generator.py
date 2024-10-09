@@ -437,9 +437,7 @@ def prepare_property_dict(
 
         val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
-        python_name = convert_camel_case_to_snake_case(
-            string_=key if key not in keys_to_rename else f"{dict_key}_{key}"
-        )
+        python_name = convert_camel_case_to_snake_case(string_=f"{dict_key}_{key}" if key in keys_to_rename else key)
         resource_dict[dict_key].append({
             "name-for-class-arg": python_name,
             "property-name": key,
