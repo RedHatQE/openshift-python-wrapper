@@ -121,7 +121,7 @@ class ServingRuntime(NamespacedResource):
             if self.built_in_adapter:
                 _spec["builtInAdapter"] = self.built_in_adapter
             if self.spec_label:
-                _spec["label"] = self.self.spec_label
+                _spec["label"] = self.spec_label
             if self.spec_annotations:
                 _spec["annotations"] = self.spec_annotations
             if self.affinity:
