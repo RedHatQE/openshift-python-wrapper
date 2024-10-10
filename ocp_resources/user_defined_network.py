@@ -82,7 +82,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
 
     def __init__(
         self,
-        role: str,
+        role: Optional[str] = None,
         mtu: Optional[int] = None,
         subnets: Optional[List[str]] = None,
         join_subnets: Optional[List[str]] = None,
@@ -93,7 +93,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         Create and manage UserDefinedNetwork with layer2 configuration
 
         Args:
-            role (str): role describes the network role in the pod. Required.
+            role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
