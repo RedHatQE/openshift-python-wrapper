@@ -73,11 +73,11 @@ class Deployment(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.selector,
-                self.template,
-            ]):
-                raise MissingRequiredArgumentError(argument="selector, template")
+            if not self.selector:
+                raise MissingRequiredArgumentError(argument="self.selector")
+
+            if not self.template:
+                raise MissingRequiredArgumentError(argument="self.template")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]

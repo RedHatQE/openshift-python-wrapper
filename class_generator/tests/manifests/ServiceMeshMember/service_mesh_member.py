@@ -29,10 +29,8 @@ class ServiceMeshMember(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.control_plane_ref,
-            ]):
-                raise MissingRequiredArgumentError(argument="control_plane_ref")
+            if not self.control_plane_ref:
+                raise MissingRequiredArgumentError(argument="self.control_plane_ref")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
