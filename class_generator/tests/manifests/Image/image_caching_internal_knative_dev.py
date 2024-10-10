@@ -46,10 +46,8 @@ class Image(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.image,
-            ]):
-                raise MissingRequiredArgumentError(argument="image")
+            if not self.image:
+                raise MissingRequiredArgumentError(argument="self.image")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
