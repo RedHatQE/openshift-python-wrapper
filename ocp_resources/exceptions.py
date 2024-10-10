@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class MissingRequiredArgumentError(Exception):
     def __init__(self, argument: str) -> None:
         self.argument = argument
@@ -24,7 +27,7 @@ class MissingTemplateVariables(Exception):
 
 
 class ExecOnPodError(Exception):
-    def __init__(self, command: list[str], rc: int, out: str, err: str):
+    def __init__(self, command: list[str], rc: int, out: str, err: Any):
         self.cmd = command
         self.rc = rc
         self.out = out
