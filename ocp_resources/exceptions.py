@@ -18,7 +18,7 @@ class MissingResourceResError(Exception):
 
 
 class MissingTemplateVariables(Exception):
-    def __init__(self, var: str, template: str):
+    def __init__(self, var: str, template: str) -> None:
         self.var = var
         self.template = template
 
@@ -27,7 +27,7 @@ class MissingTemplateVariables(Exception):
 
 
 class ExecOnPodError(Exception):
-    def __init__(self, command: list[str], rc: int, out: str, err: Any):
+    def __init__(self, command: list[str], rc: int, out: str, err: Any) -> None:
         self.cmd = command
         self.rc = rc
         self.out = out
