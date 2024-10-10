@@ -59,18 +59,17 @@ class ServingRuntime(NamespacedResource):
 
             built_in_adapter Optional[Dict[str, Any]]: Configuration for the built-in adapter.
 
-            affinity (Dict[str, Any]): No field description from API; please add description
+            affinity (Optional[Dict[str, Any]]): Affinity is a group of affinity scheduling rules for model pod using SR.
 
-            spec_annotations (Dict[str, Any]): No field description from API; please add description
+            spec_annotations (Optional[Dict[str, str]]): Runtime Spec Resource annotations.
 
-            spec_labels (Dict[str, Any]): No field description from API; please add description
+            spec_labels (Optional[Dict[str, str]]): Runtime Spec Resource label.
 
-            node_selector (Dict[str, Any]): No field description from API; please add description
+            node_selector (Optional[Dict[str, Any]]): Node selectors on  SR and labels on nodes to control where the model pod is scheduled.
 
-            tolerations (List[Any]): No field description from API; please add description
+            tolerations (Optional[List[Any]]): allow the scheduler to schedule model pods with matching taints in SR
 
-            volumes (List[Any]): No field description from API; please add description
-
+            volumes(Optional[List[Any]]): List of volumes that can be mounted by containers belonging to the pod.
         """
         super().__init__(**kwargs)
 
