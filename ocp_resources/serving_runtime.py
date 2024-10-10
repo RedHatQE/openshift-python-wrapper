@@ -35,9 +35,9 @@ class ServingRuntime(NamespacedResource):
     ) -> None:
         """
         Args:
-            containers (Optional[List[Dict[str, Any]]], mandatory if yaml file is not provided): Containers of the serving runtime.
+            containers (Optional[List[Any]]): Containers of the serving runtime.
 
-            supported_model_formats (Optional[List[Dict[str, Any]]]): Model formats supported by the serving runtime.
+            supported_model_formats (Optional[List[Any]]): Model formats supported by the serving runtime.
 
             multi_model (Optional[bool]): Specifies if the model server can serve multiple models.
 
@@ -45,7 +45,7 @@ class ServingRuntime(NamespacedResource):
 
             protocol_versions (Optional[List[str]]): List of protocols versions used by the serving runtime.
 
-            image_pull_secrets (Optional[List[Dict[str, Any]]]): List of references to secrets used for pulling images used by this SR.
+            image_pull_secrets (Optional[List[Any]]): List of references to secrets used for pulling images used by this SR.
 
             grpc_endpoint (Optional[str]): Port of the gRPC endpoint.
 
