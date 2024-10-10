@@ -2,13 +2,16 @@ class MissingRequiredArgumentError(Exception):
     def __init__(self, argument: str) -> None:
         self.argument = argument
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f"Missing required argument/s. Either provide yaml_file, kind_dict or pass {self.argument}"
 
 
 class MissingResourceResError(Exception):
-    def __repr__(self) -> str:
-        return "Failed to generate resource self.res"
+    def __init__(self, name: str) -> None:
+        self.resource_name = name
+
+    def __str__(self) -> str:
+        return f"Failed to generate resource: {self.resource_name}"
 
 
 class MissingTemplateVariables(Exception):

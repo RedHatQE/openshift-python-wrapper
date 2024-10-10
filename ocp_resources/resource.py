@@ -514,7 +514,7 @@ class Resource:
                 self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
 
         if not self.res:
-            raise MissingResourceResError()
+            raise MissingResourceResError(name=self.name)
 
     def to_dict(self) -> None:
         """
