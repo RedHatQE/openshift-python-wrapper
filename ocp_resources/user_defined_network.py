@@ -69,17 +69,7 @@ class UserDefinedNetwork(NamespacedResource):
     # End of generated code
 
 
-class TopologyType:
-    """
-    This class contains constants for different network topology types used in the UserDefinedNetwork configuration.
-
-    Attributes:
-        LAYER2 (str): Represents a Layer2 topology.
-        LAYER3 (str): Represents a Layer3 topology.
-    """
-
-    LAYER2: str = "Layer2"
-    LAYER3: str = "Layer3"
+LAYER2: str = "Layer2"
 
 
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
@@ -110,7 +100,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
-            topology=TopologyType.LAYER2,
+            topology=LAYER2,
             **kwargs,
         )
         self.role = role
@@ -122,8 +112,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.kind_dict and not self.yaml_file:
-            self.res["spec"][TopologyType.LAYER2.lower()] = {}
-            _layer2 = self.res["spec"][TopologyType.LAYER2.lower()]
+            self.res["spec"][LAYER2.lower()] = {}
+            _layer2 = self.res["spec"][LAYER2.lower()]
 
             if self.role:
                 _layer2["role"] = self.role
