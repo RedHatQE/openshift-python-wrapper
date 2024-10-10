@@ -51,8 +51,11 @@ class {{ kind }}({{ base_class }}):
 
         if not self.kind_dict and not self.yaml_file:
           {% if all_required_args %}
-            if not all([{% for arg in all_required_args %}self.{{ arg }},{% endfor %}]):
-                raise MissingRequiredArgumentError(argument="{{ all_required_args|join(', ') }}")
+          {% for arg in all_required_args %}
+            if not self.{{ arg }}:
+                raise MissingRequiredArgumentError(argument="self.{{ arg }}")
+
+          {% endfor %}
           {% endif %}
 
           {% if spec %}
