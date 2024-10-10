@@ -3,14 +3,7 @@ import re
 import jinja2
 import yaml
 
-
-class MissingTemplateVariables(Exception):
-    def __init__(self, var, template):
-        self.var = var
-        self.template = template
-
-    def __str__(self):
-        return f"Missing variables {self.var} for template {self.template}"
+from ocp_resources.exceptions import MissingTemplateVariables
 
 
 def generate_yaml_from_template(**kwargs):

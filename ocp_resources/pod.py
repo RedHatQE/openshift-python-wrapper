@@ -6,19 +6,9 @@ from typing import Any, Dict, List, Optional
 import kubernetes
 from timeout_sampler import TimeoutWatch
 
+from ocp_resources.exceptions import ExecOnPodError
 from ocp_resources.node import Node
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
-
-
-class ExecOnPodError(Exception):
-    def __init__(self, command, rc, out, err):
-        self.cmd = command
-        self.rc = rc
-        self.out = out
-        self.err = err
-
-    def __str__(self):
-        return "Command execution failure: " f"{self.cmd}, " f"RC: {self.rc}, " f"OUT: {self.out}, " f"ERR: {self.err}"
 
 
 class Pod(NamespacedResource):
