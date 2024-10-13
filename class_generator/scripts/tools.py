@@ -39,7 +39,7 @@ def get_generated_files() -> Dict[str, Dict[str, str]]:
                             _kind = _cls.name
 
                     if not _kind:
-                        print(f"Can't find kind in file {file_path}")
+                        click.echo(f"Can't find kind in file {file_path}")
                         continue
 
                     if start_comment in content and end_comment in content:
