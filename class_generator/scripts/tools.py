@@ -22,8 +22,9 @@ def get_generated_files() -> Dict[str, Dict[str, str]]:
     resources_not_generated: Dict[str, str] = {}
     exclude_files: List[str] = ["resource.py", "__init__.py", "__pycache__"]
     for root, _, files in os.walk("ocp_resources"):
-        _kind: str = ""
         for _file in files:
+            _kind: str = ""
+
             if _file in exclude_files:
                 continue
 
@@ -32,16 +33,16 @@ def get_generated_files() -> Dict[str, Dict[str, str]]:
                 with open(file_path) as fd:
                     content = fd.read()
                     tree = ast.parse(content)
-                    for _cls in [_cls for _cls in tree.body if isinstance(_cls, ast.ClassDef)]:
+                    for _cls in (node for node in tree.body if isinstance(node, ast.ClassDef)):
                         bases = [_base.id for _base in _cls.bases if isinstance(_base, ast.Name)]
-                        if "Resource" or "NamespacedResource" in bases:
+                        if "Resource" in bases or "NamespacedResource" in bases:
                             _kind = _cls.name
 
                     if not _kind:
                         print(f"Can't find kind in file {file_path}")
                         continue
 
-                    if (start_comment and end_comment) in content:
+                    if start_comment in content and end_comment in content:
                         resources_with_end_comment[_kind] = file_path
 
                     elif start_comment in content:
