@@ -233,6 +233,7 @@ class Resource:
         TERMINATING: str = "Terminating"
         ERROR: str = "Error"
         COMPLETE: str = "Complete"
+        DEPLOYING: str = "Deploying"
 
     class Condition:
         UPGRADEABLE: str = "Upgradeable"

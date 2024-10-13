@@ -27,7 +27,7 @@ class DNS(Resource):
     ) -> None:
         """
         Args:
-            cache(Dict[str, Any]): cache describes the caching configuration that applies to all server
+            cache (Dict[str, Any]): cache describes the caching configuration that applies to all server
               blocks listed in the Corefile. This field allows a cluster admin
               to optionally configure: * positiveTTL which is a duration for
               which positive responses should be cached. * negativeTTL which is
@@ -38,17 +38,17 @@ class DNS(Resource):
               default negativeTTL is 30 seconds or as noted in the respective
               Corefile for your version of OpenShift.
 
-            log_level(str): logLevel describes the desired logging verbosity for CoreDNS. Any one
+            log_level (str): logLevel describes the desired logging verbosity for CoreDNS. Any one
               of the following values may be specified: * Normal logs errors
               from upstream resolvers. * Debug logs errors, NXDOMAIN responses,
               and NODATA responses. * Trace logs errors and all responses.
               Setting logLevel: Trace will produce extremely verbose logs. Valid
               values are: "Normal", "Debug", "Trace". Defaults to "Normal".
 
-            management_state(str): managementState indicates whether the DNS operator should manage
+            management_state (str): managementState indicates whether the DNS operator should manage
               cluster DNS
 
-            node_placement(Dict[str, Any]): nodePlacement provides explicit control over the scheduling of DNS
+            node_placement (Dict[str, Any]): nodePlacement provides explicit control over the scheduling of DNS
               pods.   Generally, it is useful to run a DNS pod on every node so
               that DNS queries are always handled by a local DNS pod instead of
               going over the network to a DNS pod on another node.  However,
@@ -61,12 +61,12 @@ class DNS(Resource):
               toleration can be specified for that taint.   If unset, defaults
               are used. See nodePlacement for more details.
 
-            operator_log_level(str): operatorLogLevel controls the logging level of the DNS Operator. Valid
+            operator_log_level (str): operatorLogLevel controls the logging level of the DNS Operator. Valid
               values are: "Normal", "Debug", "Trace". Defaults to "Normal".
               setting operatorLogLevel: Trace will produce extremely verbose
               logs.
 
-            servers(List[Any]): servers is a list of DNS resolvers that provide name query delegation
+            servers (List[Any]): servers is a list of DNS resolvers that provide name query delegation
               for one or more subdomains outside the scope of the cluster
               domain. If servers consists of more than one Server, longest
               suffix match will be used to determine the Server.   For example,
@@ -75,7 +75,7 @@ class DNS(Resource):
               routed to the Server with Zone "a.foo.com".   If this field is
               nil, no servers are created.
 
-            upstream_resolvers(Dict[str, Any]): upstreamResolvers defines a schema for configuring CoreDNS to proxy
+            upstream_resolvers (Dict[str, Any]): upstreamResolvers defines a schema for configuring CoreDNS to proxy
               DNS messages to upstream resolvers for the case of the default
               (".") server   If this field is not specified, the upstream used
               will default to /etc/resolv.conf, with policy "sequential"
@@ -118,3 +118,5 @@ class DNS(Resource):
 
             if self.upstream_resolvers:
                 _spec["upstreamResolvers"] = self.upstream_resolvers
+
+    # End of generated code
