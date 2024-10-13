@@ -13,7 +13,7 @@ class VirtualMachinePreference(NamespacedResource):
 
     def __init__(
         self,
-        annotations: Optional[Dict[str, Any]] = None,
+        spec_annotations: Optional[Dict[str, Any]] = None,
         clock: Optional[Dict[str, Any]] = None,
         cpu: Optional[Dict[str, Any]] = None,
         devices: Optional[Dict[str, Any]] = None,
@@ -29,45 +29,45 @@ class VirtualMachinePreference(NamespacedResource):
     ) -> None:
         """
         Args:
-            annotations(Dict[str, Any]): Optionally defines preferred Annotations to be applied to the
+            spec_annotations (Dict[str, Any]): Optionally defines preferred Annotations to be applied to the
               VirtualMachineInstance
 
-            clock(Dict[str, Any]): Clock optionally defines preferences associated with the Clock
+            clock (Dict[str, Any]): Clock optionally defines preferences associated with the Clock
               attribute of a VirtualMachineInstance DomainSpec
 
-            cpu(Dict[str, Any]): CPU optionally defines preferences associated with the CPU attribute
+            cpu (Dict[str, Any]): CPU optionally defines preferences associated with the CPU attribute
               of a VirtualMachineInstance DomainSpec
 
-            devices(Dict[str, Any]): Devices optionally defines preferences associated with the Devices
+            devices (Dict[str, Any]): Devices optionally defines preferences associated with the Devices
               attribute of a VirtualMachineInstance DomainSpec
 
-            features(Dict[str, Any]): Features optionally defines preferences associated with the Features
+            features (Dict[str, Any]): Features optionally defines preferences associated with the Features
               attribute of a VirtualMachineInstance DomainSpec
 
-            firmware(Dict[str, Any]): Firmware optionally defines preferences associated with the Firmware
+            firmware (Dict[str, Any]): Firmware optionally defines preferences associated with the Firmware
               attribute of a VirtualMachineInstance DomainSpec
 
-            machine(Dict[str, Any]): Machine optionally defines preferences associated with the Machine
+            machine (Dict[str, Any]): Machine optionally defines preferences associated with the Machine
               attribute of a VirtualMachineInstance DomainSpec
 
-            prefer_spread_socket_to_core_ratio(int): PreferSpreadSocketToCoreRatio defines the ratio to spread vCPUs
+            prefer_spread_socket_to_core_ratio (int): PreferSpreadSocketToCoreRatio defines the ratio to spread vCPUs
               between cores and sockets, it defaults to 2.
 
-            preferred_subdomain(str): Subdomain of the VirtualMachineInstance
+            preferred_subdomain (str): Subdomain of the VirtualMachineInstance
 
-            preferred_termination_grace_period_seconds(int): Grace period observed after signalling a VirtualMachineInstance to
+            preferred_termination_grace_period_seconds (int): Grace period observed after signalling a VirtualMachineInstance to
               stop after which the VirtualMachineInstance is force terminated.
 
-            requirements(Dict[str, Any]): Requirements defines the minium amount of instance type defined
+            requirements (Dict[str, Any]): Requirements defines the minium amount of instance type defined
               resources required by a set of preferences
 
-            volumes(Dict[str, Any]): Volumes optionally defines preferences associated with the Volumes
+            volumes (Dict[str, Any]): Volumes optionally defines preferences associated with the Volumes
               attribute of a VirtualMachineInstace DomainSpec
 
         """
         super().__init__(**kwargs)
 
-        self.annotations = annotations
+        self.spec_annotations = spec_annotations
         self.clock = clock
         self.cpu = cpu
         self.devices = devices
@@ -87,8 +87,8 @@ class VirtualMachinePreference(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.annotations:
-                _spec["annotations"] = self.annotations
+            if self.spec_annotations:
+                _spec["annotations"] = self.spec_annotations
 
             if self.clock:
                 _spec["clock"] = self.clock
@@ -122,3 +122,5 @@ class VirtualMachinePreference(NamespacedResource):
 
             if self.volumes:
                 _spec["volumes"] = self.volumes
+
+    # End of generated code

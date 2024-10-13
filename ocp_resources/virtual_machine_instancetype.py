@@ -14,7 +14,7 @@ class VirtualMachineInstancetype(NamespacedResource):
 
     def __init__(
         self,
-        annotations: Optional[Dict[str, Any]] = None,
+        spec_annotations: Optional[Dict[str, Any]] = None,
         cpu: Optional[Dict[str, Any]] = None,
         gpus: Optional[List[Any]] = None,
         host_devices: Optional[List[Any]] = None,
@@ -27,29 +27,29 @@ class VirtualMachineInstancetype(NamespacedResource):
     ) -> None:
         """
         Args:
-            annotations(Dict[str, Any]): Optionally defines the required Annotations to be used by the instance
+            spec_annotations (Dict[str, Any]): Optionally defines the required Annotations to be used by the instance
               type and applied to the VirtualMachineInstance
 
-            cpu(Dict[str, Any]): Required CPU related attributes of the instancetype.
+            cpu (Dict[str, Any]): Required CPU related attributes of the instancetype.
 
-            gpus(List[Any]): Optionally defines any GPU devices associated with the instancetype.
+            gpus (List[Any]): Optionally defines any GPU devices associated with the instancetype.
 
-            host_devices(List[Any]): Optionally defines any HostDevices associated with the instancetype.
+            host_devices (List[Any]): Optionally defines any HostDevices associated with the instancetype.
 
-            io_threads_policy(str): Optionally defines the IOThreadsPolicy to be used by the instancetype.
+            io_threads_policy (str): Optionally defines the IOThreadsPolicy to be used by the instancetype.
 
-            launch_security(Dict[str, Any]): Optionally defines the LaunchSecurity to be used by the instancetype.
+            launch_security (Dict[str, Any]): Optionally defines the LaunchSecurity to be used by the instancetype.
 
-            memory(Dict[str, Any]): Required Memory related attributes of the instancetype.
+            memory (Dict[str, Any]): Required Memory related attributes of the instancetype.
 
-            node_selector(Dict[str, Any]): NodeSelector is a selector which must be true for the vmi to fit on a
+            node_selector (Dict[str, Any]): NodeSelector is a selector which must be true for the vmi to fit on a
               node. Selector which must match a node's labels for the vmi to be
               scheduled on that node. More info:
               https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
               NodeSelector is the name of the custom node selector for the
               instancetype.
 
-            scheduler_name(str): If specified, the VMI will be dispatched by specified scheduler. If
+            scheduler_name (str): If specified, the VMI will be dispatched by specified scheduler. If
               not specified, the VMI will be dispatched by default scheduler.
               SchedulerName is the name of the custom K8s scheduler for the
               instancetype.
@@ -57,7 +57,7 @@ class VirtualMachineInstancetype(NamespacedResource):
         """
         super().__init__(**kwargs)
 
-        self.annotations = annotations
+        self.spec_annotations = spec_annotations
         self.cpu = cpu
         self.gpus = gpus
         self.host_devices = host_devices
@@ -71,11 +71,11 @@ class VirtualMachineInstancetype(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.cpu,
-                self.memory,
-            ]):
-                raise MissingRequiredArgumentError(argument="cpu, memory")
+            if not self.cpu:
+                raise MissingRequiredArgumentError(argument="self.cpu")
+
+            if not self.memory:
+                raise MissingRequiredArgumentError(argument="self.memory")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
@@ -83,8 +83,8 @@ class VirtualMachineInstancetype(NamespacedResource):
             _spec["cpu"] = self.cpu
             _spec["memory"] = self.memory
 
-            if self.annotations:
-                _spec["annotations"] = self.annotations
+            if self.spec_annotations:
+                _spec["annotations"] = self.spec_annotations
 
             if self.gpus:
                 _spec["gpus"] = self.gpus
@@ -103,3 +103,5 @@ class VirtualMachineInstancetype(NamespacedResource):
 
             if self.scheduler_name:
                 _spec["schedulerName"] = self.scheduler_name
+
+    # End of generated code

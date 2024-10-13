@@ -1,20 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class Service(NamespacedResource):
+class Service(Resource):
     """
     Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
     """
 
-    api_version: str = NamespacedResource.ApiVersion.V1
-
-    class Type:
-        CLUSTER_IP = "ClusterIP"
-        NODE_PORT = "NodePort"
-        LOAD_BALANCER = "LoadBalancer"
+    api_version: str = Resource.ApiVersion.V1
 
     def __init__(
         self,
@@ -42,7 +37,7 @@ class Service(NamespacedResource):
     ) -> None:
         """
         Args:
-            allocate_load_balancer_node_ports(bool): allocateLoadBalancerNodePorts defines if NodePorts will be
+            allocate_load_balancer_node_ports (bool): allocateLoadBalancerNodePorts defines if NodePorts will be
               automatically allocated for services with type LoadBalancer.
               Default is "true". It may be set to "false" if the cluster load-
               balancer does not rely on NodePorts.  If the caller requests
@@ -51,7 +46,7 @@ class Service(NamespacedResource):
               for services with type LoadBalancer and will be cleared if the
               type is changed to any other type.
 
-            cluster_ip(str): clusterIP is the IP address of the service and is usually assigned
+            cluster_ip (str): clusterIP is the IP address of the service and is usually assigned
               randomly. If an address is specified manually, is in-range (as per
               system configuration), and is not in use, it will be allocated to
               the service; otherwise creation of the service will fail. This
@@ -70,7 +65,7 @@ class Service(NamespacedResource):
               https://kubernetes.io/docs/concepts/services-
               networking/service/#virtual-ips-and-service-proxies
 
-            cluster_ips(List[Any]): ClusterIPs is a list of IP addresses assigned to this service, and are
+            cluster_ips (List[Any]): ClusterIPs is a list of IP addresses assigned to this service, and are
               usually assigned randomly.  If an address is specified manually,
               is in-range (as per system configuration), and is not in use, it
               will be allocated to the service; otherwise creation of the
@@ -95,20 +90,20 @@ class Service(NamespacedResource):
               info: https://kubernetes.io/docs/concepts/services-
               networking/service/#virtual-ips-and-service-proxies
 
-            external_ips(List[Any]): externalIPs is a list of IP addresses for which nodes in the cluster
+            external_ips (List[Any]): externalIPs is a list of IP addresses for which nodes in the cluster
               will also accept traffic for this service.  These IPs are not
               managed by Kubernetes.  The user is responsible for ensuring that
               traffic arrives at a node with this IP.  A common example is
               external load-balancers that are not part of the Kubernetes
               system.
 
-            external_name(str): externalName is the external reference that discovery mechanisms will
+            external_name (str): externalName is the external reference that discovery mechanisms will
               return as an alias for this service (e.g. a DNS CNAME record). No
               proxying will be involved.  Must be a lowercase RFC-1123 hostname
               (https://tools.ietf.org/html/rfc1123) and requires `type` to be
               "ExternalName".
 
-            external_traffic_policy(str): externalTrafficPolicy describes how nodes distribute service traffic
+            external_traffic_policy (str): externalTrafficPolicy describes how nodes distribute service traffic
               they receive on one of the Service's "externally-facing" addresses
               (NodePorts, ExternalIPs, and LoadBalancer IPs). If set to "Local",
               the proxy will configure the service in a way that assumes that
@@ -128,7 +123,7 @@ class Service(NamespacedResource):
               the traffic was received on (dropping the traffic if there are no
               local endpoints).
 
-            health_check_node_port(int): healthCheckNodePort specifies the healthcheck nodePort for the
+            health_check_node_port (int): healthCheckNodePort specifies the healthcheck nodePort for the
               service. This only applies when type is set to LoadBalancer and
               externalTrafficPolicy is set to Local. If a value is specified, is
               in-range, and is not in use, it will be used.  If not specified, a
@@ -140,7 +135,7 @@ class Service(NamespacedResource):
               longer need it (e.g. changing type). This field cannot be updated
               once set.
 
-            internal_traffic_policy(str): InternalTrafficPolicy describes how nodes distribute service traffic
+            internal_traffic_policy (str): InternalTrafficPolicy describes how nodes distribute service traffic
               they receive on the ClusterIP. If set to "Local", the proxy will
               assume that pods only want to talk to endpoints of the service on
               the same node as the pod, dropping the traffic if there are no
@@ -151,7 +146,7 @@ class Service(NamespacedResource):
               traffic only to endpoints on the same node as the client pod
               (dropping the traffic if there are no local endpoints).
 
-            ip_families(List[Any]): IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
+            ip_families (List[Any]): IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
               service. This field is usually assigned automatically based on
               cluster configuration and the ipFamilyPolicy field. If this field
               is specified manually, the requested family is available in the
@@ -168,7 +163,7 @@ class Service(NamespacedResource):
               the clusterIPs field, if specified. Both clusterIPs and ipFamilies
               are governed by the ipFamilyPolicy field.
 
-            ip_family_policy(str): IPFamilyPolicy represents the dual-stack-ness requested or required by
+            ip_family_policy (str): IPFamilyPolicy represents the dual-stack-ness requested or required by
               this Service. If there is no value provided, then this field will
               be set to SingleStack. Services can be "SingleStack" (a single IP
               family), "PreferDualStack" (two IP families on dual-stack
@@ -196,7 +191,7 @@ class Service(NamespacedResource):
               IPFamily used by the cluster or as identified by
               service.spec.ipFamilies field
 
-            load_balancer_class(str): loadBalancerClass is the class of the load balancer implementation
+            load_balancer_class (str): loadBalancerClass is the class of the load balancer implementation
               this Service belongs to. If specified, the value of this field
               must be a label-style identifier, with an optional prefix, e.g.
               "internal-vip" or "example.com/internal-vip". Unprefixed names are
@@ -212,7 +207,7 @@ class Service(NamespacedResource):
               set, it can not be changed. This field will be wiped when a
               service is updated to a non 'LoadBalancer' type.
 
-            load_balancer_ip(str): Only applies to Service Type: LoadBalancer. This feature depends on
+            load_balancer_ip (str): Only applies to Service Type: LoadBalancer. This feature depends on
               whether the underlying cloud-provider supports specifying the
               loadBalancerIP when a load balancer is created. This field will be
               ignored if the cloud-provider does not support the feature.
@@ -221,18 +216,18 @@ class Service(NamespacedResource):
               support dual-stack. Users are encouraged to use implementation-
               specific annotations when available.
 
-            load_balancer_source_ranges(List[Any]): If specified and supported by the platform, this will restrict traffic
+            load_balancer_source_ranges (List[Any]): If specified and supported by the platform, this will restrict traffic
               through the cloud-provider load-balancer will be restricted to the
               specified client IPs. This field will be ignored if the cloud-
               provider does not support the feature." More info:
               https://kubernetes.io/docs/tasks/access-application-
               cluster/create-external-load-balancer/
 
-            ports(List[Any]): The list of ports that are exposed by this service. More info:
+            ports (List[Any]): The list of ports that are exposed by this service. More info:
               https://kubernetes.io/docs/concepts/services-
               networking/service/#virtual-ips-and-service-proxies
 
-            publish_not_ready_addresses(bool): publishNotReadyAddresses indicates that any agent which deals with
+            publish_not_ready_addresses (bool): publishNotReadyAddresses indicates that any agent which deals with
               endpoints for this Service should disregard any indications of
               ready/not-ready. The primary use case for setting this field is
               for a StatefulSet's Headless Service to propagate SRV DNS records
@@ -244,14 +239,14 @@ class Service(NamespacedResource):
               Endpoints or EndpointSlice resources can safely assume this
               behavior.
 
-            selector(Dict[str, Any]): Route service traffic to pods with label keys and values matching this
+            selector (Dict[str, Any]): Route service traffic to pods with label keys and values matching this
               selector. If empty or not present, the service is assumed to have
               an external process managing its endpoints, which Kubernetes will
               not modify. Only applies to types ClusterIP, NodePort, and
               LoadBalancer. Ignored if type is ExternalName. More info:
               https://kubernetes.io/docs/concepts/services-networking/service/
 
-            session_affinity(str): Supports "ClientIP" and "None". Used to maintain session affinity.
+            session_affinity (str): Supports "ClientIP" and "None". Used to maintain session affinity.
               Enable client IP based session affinity. Must be ClientIP or None.
               Defaults to None. More info:
               https://kubernetes.io/docs/concepts/services-
@@ -259,10 +254,10 @@ class Service(NamespacedResource):
               values:  - `"ClientIP"` is the Client IP based.  - `"None"` - no
               session affinity.
 
-            session_affinity_config(Dict[str, Any]): SessionAffinityConfig represents the configurations of session
+            session_affinity_config (Dict[str, Any]): SessionAffinityConfig represents the configurations of session
               affinity.
 
-            traffic_distribution(str): TrafficDistribution offers a way to express preferences for how
+            traffic_distribution (str): TrafficDistribution offers a way to express preferences for how
               traffic is distributed to Service endpoints. Implementations can
               use this field as a hint, but are not required to guarantee strict
               adherence. If the field is not set, the implementation will apply
@@ -271,7 +266,7 @@ class Service(NamespacedResource):
               close (e.g., same zone). This is an alpha field and requires
               enabling ServiceTrafficDistribution feature.
 
-            type(str): type determines how the Service is exposed. Defaults to ClusterIP.
+            type (str): type determines how the Service is exposed. Defaults to ClusterIP.
               Valid options are ExternalName, ClusterIP, NodePort, and
               LoadBalancer. "ClusterIP" allocates a cluster-internal IP address
               for load-balancing to endpoints. Endpoints are determined by the
@@ -387,3 +382,5 @@ class Service(NamespacedResource):
 
             if self.type:
                 _spec["type"] = self.type
+
+    # End of generated code

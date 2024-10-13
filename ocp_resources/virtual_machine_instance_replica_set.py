@@ -21,15 +21,15 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
     ) -> None:
         """
         Args:
-            paused(bool): Indicates that the replica set is paused.
+            paused (bool): Indicates that the replica set is paused.
 
-            replicas(int): Number of desired pods. This is a pointer to distinguish between
+            replicas (int): Number of desired pods. This is a pointer to distinguish between
               explicit zero and not specified. Defaults to 1.
 
-            selector(Dict[str, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected
+            selector (Dict[str, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected
               by this will be the ones affected by this deployment.
 
-            template(Dict[str, Any]): Template describes the pods that will be created.
+            template (Dict[str, Any]): Template describes the pods that will be created.
 
         """
         super().__init__(**kwargs)
@@ -43,11 +43,11 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.selector,
-                self.template,
-            ]):
-                raise MissingRequiredArgumentError(argument="selector, template")
+            if not self.selector:
+                raise MissingRequiredArgumentError(argument="self.selector")
+
+            if not self.template:
+                raise MissingRequiredArgumentError(argument="self.template")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
@@ -60,3 +60,5 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
 
             if self.replicas:
                 _spec["replicas"] = self.replicas
+
+    # End of generated code

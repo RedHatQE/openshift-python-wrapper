@@ -42,39 +42,39 @@ class SecurityContextConstraints(Resource):
     ) -> None:
         """
         Args:
-            allow_host_dir_volume_plugin(bool): AllowHostDirVolumePlugin determines if the policy allow containers to
+            allow_host_dir_volume_plugin (bool): AllowHostDirVolumePlugin determines if the policy allow containers to
               use the HostDir volume plugin
 
-            allow_host_ipc(bool): AllowHostIPC determines if the policy allows host ipc in the
+            allow_host_ipc (bool): AllowHostIPC determines if the policy allows host ipc in the
               containers.
 
-            allow_host_network(bool): AllowHostNetwork determines if the policy allows the use of
+            allow_host_network (bool): AllowHostNetwork determines if the policy allows the use of
               HostNetwork in the pod spec.
 
-            allow_host_pid(bool): AllowHostPID determines if the policy allows host pid in the
+            allow_host_pid (bool): AllowHostPID determines if the policy allows host pid in the
               containers.
 
-            allow_host_ports(bool): AllowHostPorts determines if the policy allows host ports in the
+            allow_host_ports (bool): AllowHostPorts determines if the policy allows host ports in the
               containers.
 
-            allow_privilege_escalation(Any): AllowPrivilegeEscalation determines if a pod can request to allow
+            allow_privilege_escalation (Any): AllowPrivilegeEscalation determines if a pod can request to allow
               privilege escalation. If unspecified, defaults to true.
 
-            allow_privileged_container(bool): AllowPrivilegedContainer determines if a container can request to be
+            allow_privileged_container (bool): AllowPrivilegedContainer determines if a container can request to be
               run as privileged.
 
-            allowed_capabilities(Any): AllowedCapabilities is a list of capabilities that can be requested to
+            allowed_capabilities (Any): AllowedCapabilities is a list of capabilities that can be requested to
               add to the container. Capabilities in this field maybe added at
               the pod author's discretion. You must not list a capability in
               both AllowedCapabilities and RequiredDropCapabilities. To allow
               all capabilities you may use '*'.
 
-            allowed_flex_volumes(Any): AllowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or
+            allowed_flex_volumes (Any): AllowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or
               nil indicates that all Flexvolumes may be used.  This parameter is
               effective only when the usage of the Flexvolumes is allowed in the
               "Volumes" field.
 
-            allowed_unsafe_sysctls(Any): AllowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls,
+            allowed_unsafe_sysctls (Any): AllowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls,
               defaults to none. Each entry is either a plain sysctl name or ends
               in "*" in which case it is considered as a prefix of allowed
               sysctls. Single * means all unsafe sysctls are allowed. Kubelet
@@ -82,29 +82,29 @@ class SecurityContextConstraints(Resource):
               rejection.   Examples: e.g. "foo/*" allows "foo/bar", "foo/baz",
               etc. e.g. "foo.*" allows "foo.bar", "foo.baz", etc.
 
-            default_add_capabilities(Any): DefaultAddCapabilities is the default set of capabilities that will be
+            default_add_capabilities (Any): DefaultAddCapabilities is the default set of capabilities that will be
               added to the container unless the pod spec specifically drops the
               capability.  You may not list a capabiility in both
               DefaultAddCapabilities and RequiredDropCapabilities.
 
-            default_allow_privilege_escalation(Any): DefaultAllowPrivilegeEscalation controls the default setting for
+            default_allow_privilege_escalation (Any): DefaultAllowPrivilegeEscalation controls the default setting for
               whether a process can gain more privileges than its parent
               process.
 
-            forbidden_sysctls(Any): ForbiddenSysctls is a list of explicitly forbidden sysctls, defaults
+            forbidden_sysctls (Any): ForbiddenSysctls is a list of explicitly forbidden sysctls, defaults
               to none. Each entry is either a plain sysctl name or ends in "*"
               in which case it is considered as a prefix of forbidden sysctls.
               Single * means all sysctls are forbidden.   Examples: e.g. "foo/*"
               forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "foo.bar",
               "foo.baz", etc.
 
-            fs_group(Any): FSGroup is the strategy that will dictate what fs group is used by the
+            fs_group (Any): FSGroup is the strategy that will dictate what fs group is used by the
               SecurityContext.
 
-            groups(Any): The groups that have permission to use this security context
+            groups (Any): The groups that have permission to use this security context
               constraints
 
-            priority(Any): Priority influences the sort order of SCCs when evaluating which SCCs
+            priority (Any): Priority influences the sort order of SCCs when evaluating which SCCs
               to try first for a given pod request based on access in the Users
               and Groups fields.  The higher the int, the higher priority. An
               unset value is considered a 0 priority. If scores for multiple
@@ -112,37 +112,37 @@ class SecurityContextConstraints(Resource):
               restrictive. If both priorities and restrictions are equal the
               SCCs will be sorted by name.
 
-            read_only_root_filesystem(bool): ReadOnlyRootFilesystem when set to true will force containers to run
+            read_only_root_filesystem (bool): ReadOnlyRootFilesystem when set to true will force containers to run
               with a read only root file system.  If the container specifically
               requests to run with a non-read only root file system the SCC
               should deny the pod. If set to false the container may run with a
               read only root file system if it wishes but it will not be forced
               to.
 
-            required_drop_capabilities(Any): RequiredDropCapabilities are the capabilities that will be dropped
+            required_drop_capabilities (Any): RequiredDropCapabilities are the capabilities that will be dropped
               from the container.  These are required to be dropped and cannot
               be added.
 
-            run_as_user(Any): RunAsUser is the strategy that will dictate what RunAsUser is used in
+            run_as_user (Any): RunAsUser is the strategy that will dictate what RunAsUser is used in
               the SecurityContext.
 
-            se_linux_context(Any): SELinuxContext is the strategy that will dictate what labels will be
+            se_linux_context (Any): SELinuxContext is the strategy that will dictate what labels will be
               set in the SecurityContext.
 
-            seccomp_profiles(Any): SeccompProfiles lists the allowed profiles that may be set for the pod
+            seccomp_profiles (Any): SeccompProfiles lists the allowed profiles that may be set for the pod
               or container's seccomp annotations.  An unset (nil) or empty value
               means that no profiles may be specifid by the pod or container.
               The wildcard '*' may be used to allow all profiles.  When used to
               generate a value for a pod the first non-wildcard profile will be
               used as the default.
 
-            supplemental_groups(Any): SupplementalGroups is the strategy that will dictate what supplemental
+            supplemental_groups (Any): SupplementalGroups is the strategy that will dictate what supplemental
               groups are used by the SecurityContext.
 
-            users(Any): The users who have permissions to use this security context
+            users (Any): The users who have permissions to use this security context
               constraints
 
-            volumes(Any): Volumes is a white list of allowed volume plugins.  FSType corresponds
+            volumes (Any): Volumes is a white list of allowed volume plugins.  FSType corresponds
               directly with the field names of a VolumeSource (azureFile,
               configMap, emptyDir).  To allow all volumes you may use "*". To
               allow no volumes, set to ["none"].
@@ -179,18 +179,26 @@ class SecurityContextConstraints(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.allow_host_dir_volume_plugin,
-                self.allow_host_ipc,
-                self.allow_host_network,
-                self.allow_host_pid,
-                self.allow_host_ports,
-                self.allow_privileged_container,
-                self.read_only_root_filesystem,
-            ]):
-                raise MissingRequiredArgumentError(
-                    argument="allow_host_dir_volume_plugin, allow_host_ipc, allow_host_network, allow_host_pid, allow_host_ports, allow_privileged_container, read_only_root_filesystem"
-                )
+            if not self.allow_host_dir_volume_plugin:
+                raise MissingRequiredArgumentError(argument="self.allow_host_dir_volume_plugin")
+
+            if not self.allow_host_ipc:
+                raise MissingRequiredArgumentError(argument="self.allow_host_ipc")
+
+            if not self.allow_host_network:
+                raise MissingRequiredArgumentError(argument="self.allow_host_network")
+
+            if not self.allow_host_pid:
+                raise MissingRequiredArgumentError(argument="self.allow_host_pid")
+
+            if not self.allow_host_ports:
+                raise MissingRequiredArgumentError(argument="self.allow_host_ports")
+
+            if not self.allow_privileged_container:
+                raise MissingRequiredArgumentError(argument="self.allow_privileged_container")
+
+            if not self.read_only_root_filesystem:
+                raise MissingRequiredArgumentError(argument="self.read_only_root_filesystem")
 
             self.res["allowHostDirVolumePlugin"] = self.allow_host_dir_volume_plugin
             self.res["allowHostIPC"] = self.allow_host_ipc
@@ -250,3 +258,5 @@ class SecurityContextConstraints(Resource):
 
             if self.volumes:
                 self.res["volumes"] = self.volumes
+
+    # End of generated code

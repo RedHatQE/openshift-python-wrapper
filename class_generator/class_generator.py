@@ -211,6 +211,11 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
         - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
           (e.g., "myCamelCaseString").
     """
+    do_not_proccess_list = ["OAuth"]
+    # If the input string is in the do_not_proccess_list, return it as it is.
+    if string_ in [_str.lower() for _str in do_not_proccess_list]:
+        return string_.lower()
+
     formatted_str: str = ""
 
     if string_.islower():
