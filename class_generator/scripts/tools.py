@@ -63,7 +63,7 @@ def generate_resource(kinds: List[str], yes: bool) -> None:
 
         if _generate.lower() == "y":
             try:
-                class_generator(kind=_kind)
+                class_generator(kind=_kind, called_from_cli=False)
             except Exception:
                 continue
 
