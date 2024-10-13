@@ -62,7 +62,10 @@ def generate_resource(kinds: List[str], yes: bool) -> None:
         _generate = "y" if yes else click.prompt(f"Do you want to generate {_kind} resource? (y/n) ")
 
         if _generate.lower() == "y":
-            class_generator(kind=_kind)
+            try:
+                class_generator(kind=_kind)
+            except Exception:
+                continue
 
 
 @click.command("class-generator tools")

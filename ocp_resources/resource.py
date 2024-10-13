@@ -234,6 +234,7 @@ class Resource:
         ERROR: str = "Error"
         COMPLETE: str = "Complete"
         DEPLOYING: str = "Deploying"
+        SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
 
     class Condition:
         UPGRADEABLE: str = "Upgradeable"

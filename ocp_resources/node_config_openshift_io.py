@@ -20,9 +20,9 @@ class Node(Resource):
     ) -> None:
         """
         Args:
-            cgroup_mode(str): CgroupMode determines the cgroups version on the node
+            cgroup_mode (str): CgroupMode determines the cgroups version on the node
 
-            worker_latency_profile(str): WorkerLatencyProfile determins the how fast the kubelet is updating
+            worker_latency_profile (str): WorkerLatencyProfile determins the how fast the kubelet is updating
               the status and corresponding reaction of the cluster
 
         """
@@ -43,3 +43,5 @@ class Node(Resource):
 
             if self.worker_latency_profile:
                 _spec["workerLatencyProfile"] = self.worker_latency_profile
+
+    # End of generated code

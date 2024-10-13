@@ -130,3 +130,5 @@ class Image(Resource):
 
             if self.signatures:
                 self.res["signatures"] = self.signatures
+
+    # End of generated code

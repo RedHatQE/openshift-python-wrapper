@@ -34,69 +34,69 @@ class Network(Resource):
     ) -> None:
         """
         Args:
-            additional_networks(List[Any]): additionalNetworks is a list of extra networks to make available to
+            additional_networks (List[Any]): additionalNetworks is a list of extra networks to make available to
               pods when multiple networks are enabled.
 
-            cluster_network(List[Any]): clusterNetwork is the IP address pool to use for pod IPs. Some network
+            cluster_network (List[Any]): clusterNetwork is the IP address pool to use for pod IPs. Some network
               providers, e.g. OpenShift SDN, support multiple ClusterNetworks.
               Others only support one. This is equivalent to the cluster-cidr.
 
-            default_network(Dict[str, Any]): defaultNetwork is the "default" network that all pods will receive
+            default_network (Dict[str, Any]): defaultNetwork is the "default" network that all pods will receive
 
-            deploy_kube_proxy(bool): deployKubeProxy specifies whether or not a standalone kube-proxy
+            deploy_kube_proxy (bool): deployKubeProxy specifies whether or not a standalone kube-proxy
               should be deployed by the operator. Some network providers include
               kube-proxy or similar functionality. If unset, the plugin will
               attempt to select the correct value, which is false when OpenShift
               SDN and ovn-kubernetes are used and true otherwise.
 
-            disable_multi_network(bool): disableMultiNetwork specifies whether or not multiple pod network
+            disable_multi_network (bool): disableMultiNetwork specifies whether or not multiple pod network
               support should be disabled. If unset, this property defaults to
               'false' and multiple network support is enabled.
 
-            disable_network_diagnostics(bool): disableNetworkDiagnostics specifies whether or not
+            disable_network_diagnostics (bool): disableNetworkDiagnostics specifies whether or not
               PodNetworkConnectivityCheck CRs from a test pod to every node,
               apiserver and LB should be disabled or not. If unset, this
               property defaults to 'false' and network diagnostics is enabled.
               Setting this to 'true' would reduce the additional load of the
               pods performing the checks.
 
-            export_network_flows(Dict[str, Any]): exportNetworkFlows enables and configures the export of network flow
+            export_network_flows (Dict[str, Any]): exportNetworkFlows enables and configures the export of network flow
               metadata from the pod network by using protocols NetFlow, SFlow or
               IPFIX. Currently only supported on OVN-Kubernetes plugin. If
               unset, flows will not be exported to any collector.
 
-            kube_proxy_config(Dict[str, Any]): kubeProxyConfig lets us configure desired proxy configuration. If not
+            kube_proxy_config (Dict[str, Any]): kubeProxyConfig lets us configure desired proxy configuration. If not
               specified, sensible defaults will be chosen by OpenShift directly.
               Not consumed by all network providers - currently only openshift-
               sdn.
 
-            log_level(str): logLevel is an intent based logging for an overall component.  It does
+            log_level (str): logLevel is an intent based logging for an overall component.  It does
               not give fine grained control, but it is a simple way to manage
               coarse grained logging choices that operators have to interpret
               for their operands.   Valid values are: "Normal", "Debug",
               "Trace", "TraceAll". Defaults to "Normal".
 
-            management_state(str): managementState indicates whether and how the operator should manage
+            management_state (str): managementState indicates whether and how the operator should manage
               the component
 
-            migration(Dict[str, Any]): migration enables and configures the cluster network migration. The
+            migration (Dict[str, Any]): migration enables and configures the cluster network migration. The
               migration procedure allows to change the network type and the MTU.
 
-            observed_config(Any): observedConfig holds a sparse config that controller has observed from
+            observed_config (Any): observedConfig holds a sparse config that controller has observed from
               the cluster state.  It exists in spec because it is an input to
               the level for the operator
 
-            operator_log_level(str): operatorLogLevel is an intent based logging for the operator itself.
+            operator_log_level (str): operatorLogLevel is an intent based logging for the operator itself.
               It does not give fine grained control, but it is a simple way to
               manage coarse grained logging choices that operators have to
               interpret for themselves.   Valid values are: "Normal", "Debug",
               "Trace", "TraceAll". Defaults to "Normal".
 
-            service_network(List[Any]): serviceNetwork is the ip address pool to use for Service IPs
+            service_network (List[Any]): serviceNetwork is the ip address pool to use for Service IPs
               Currently, all existing network providers only support a single
               value here, but this is an array to allow for growth.
 
-            unsupported_config_overrides(Any): unsupportedConfigOverrides overrides the final configuration that was
+            unsupported_config_overrides (Any): unsupportedConfigOverrides overrides the final configuration that was
               computed by the operator. Red Hat does not support the use of this
               field. Misuse of this field could lead to unexpected behavior or
               conflict with other configuration options. Seek guidance from the
@@ -104,7 +104,7 @@ class Network(Resource):
               blocks cluster upgrades, it must be removed before upgrading your
               cluster.
 
-            use_multi_network_policy(bool): useMultiNetworkPolicy enables a controller which allows for
+            use_multi_network_policy (bool): useMultiNetworkPolicy enables a controller which allows for
               MultiNetworkPolicy objects to be used on additional networks as
               created by Multus CNI. MultiNetworkPolicy are similar to
               NetworkPolicy objects, but NetworkPolicy objects only apply to the
@@ -188,3 +188,5 @@ class Network(Resource):
 
             if self.use_multi_network_policy is not None:
                 _spec["useMultiNetworkPolicy"] = self.use_multi_network_policy
+
+    # End of generated code
