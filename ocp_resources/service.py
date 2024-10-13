@@ -1,15 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class Service(Resource):
+class Service(NamespacedResource):
     """
     Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
     """
 
-    api_version: str = Resource.ApiVersion.V1
+    api_version: str = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,
