@@ -175,7 +175,9 @@ def update_kind_schema():
         LOGGER.error("Failed to get openapi schema.")
         sys.exit(1)
 
-    ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
+    cluster_version = get_server_version(client=client)
+    cluster_version = cluster_version.split("+")[0]
+    ocp_openapi_json_file = f"class_generator/__k8s-openapi-{cluster_version}__.json"
     with open(ocp_openapi_json_file, "w") as fd:
         fd.write(data.text)
 

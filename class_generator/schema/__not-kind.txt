@@ -548,3 +548,13 @@ dev.codeflare.workload.v1beta2.AppWrapperList
 io.opendatahub.v1alpha.OdhDashboardConfigList
 io.opendatahub.features.v1.FeatureTrackerList
 io.opendatahub.trustyai.v1alpha1.TrustyAIServiceList
+com.mariadb.k8s.v1alpha1.UserList
+com.mariadb.k8s.v1alpha1.SqlJobList
+com.mariadb.k8s.v1alpha1.RestoreList
+com.mariadb.k8s.v1alpha1.MaxScaleList
+com.mariadb.k8s.v1alpha1.MariaDBList
+com.mariadb.k8s.v1alpha1.GrantList
+com.mariadb.k8s.v1alpha1.DatabaseList
+com.mariadb.k8s.v1alpha1.ConnectionList
+com.mariadb.k8s.v1alpha1.BackupList
+io.mmontes.mariadb.helm.v1alpha1.MariadbOperatorList

@@ -33,8 +33,7 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionVersion"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     }
   },
   "$schema": "http://json-schema.org/schema#"

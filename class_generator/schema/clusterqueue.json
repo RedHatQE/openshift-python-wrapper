@@ -381,6 +381,9 @@
         "fairSharing": {
           "description": "FairSharing contains the information about the current status of fair sharing.",
           "type": "object",
+          "required": [
+            "weightedShare"
+          ],
           "properties": {
             "weightedShare": {
               "description": "WeightedShare represent the maximum of the ratios of usage above nominal\nquota to the lendable resources in the cohort, among all the resources\nprovided by the ClusterQueue, and divided by the weight.\nIf zero, it means that the usage of the ClusterQueue is below the nominal quota.\nIf the ClusterQueue has a weight of zero, this will return 9223372036854775807,\nthe maximum possible share value.",

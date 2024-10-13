@@ -17,8 +17,7 @@
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     },
     "nonResourceAttributes": {
       "description": "NonResourceAttributes describes information for a non-resource access request",

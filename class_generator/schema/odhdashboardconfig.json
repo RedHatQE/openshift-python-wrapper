@@ -70,10 +70,10 @@
             "disableModelServing": {
               "type": "boolean"
             },
-            "disablePerformanceMetrics": {
+            "disableNIMModelServing": {
               "type": "boolean"
             },
-            "disablePipelineExperiments": {
+            "disablePerformanceMetrics": {
               "type": "boolean"
             },
             "disablePipelines": {
@@ -83,6 +83,9 @@
               "type": "boolean"
             },
             "disableProjects": {
+              "type": "boolean"
+            },
+            "disableStorageClasses": {
               "type": "boolean"
             },
             "disableSupport": {

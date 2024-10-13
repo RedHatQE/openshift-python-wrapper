@@ -66,12 +66,10 @@
                         "type": "array",
                         "items": {
                           "type": "string"
-                        },
-                        "x-kubernetes-list-type": "atomic"
+                        }
                       }
                     }
-                  },
-                  "x-kubernetes-list-type": "atomic"
+                  }
                 }
               },
               "x-kubernetes-map-type": "atomic"
@@ -82,8 +80,7 @@
               "items": {
                 "description": "A ResourceQuotaScope defines a filter that must match each object tracked by a quota",
                 "type": "string"
-              },
-              "x-kubernetes-list-type": "atomic"
+              }
             }
           }
         },
