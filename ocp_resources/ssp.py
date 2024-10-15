@@ -20,31 +20,27 @@ class SSP(NamespacedResource):
         tekton_tasks: Optional[Dict[str, Any]] = None,
         template_validator: Optional[Dict[str, Any]] = None,
         tls_security_profile: Optional[Dict[str, Any]] = None,
-        token_generation_service: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            common_instancetypes(Dict[str, Any]): CommonInstancetypes is the configuration of the common-instancetypes
+            common_instancetypes (Dict[str, Any]): CommonInstancetypes is the configuration of the common-instancetypes
               operand   Deprecated: This functionality will be removed in a
               future release.
 
-            common_templates(Dict[str, Any]): CommonTemplates is the configuration of the common templates operand
+            common_templates (Dict[str, Any]): CommonTemplates is the configuration of the common templates operand
 
-            feature_gates(Dict[str, Any]): FeatureGates for SSP
+            feature_gates (Dict[str, Any]): FeatureGates for SSP
 
-            tekton_pipelines(Dict[str, Any]): TektonPipelines is the configuration of the tekton-pipelines operand
+            tekton_pipelines (Dict[str, Any]): TektonPipelines is the configuration of the tekton-pipelines operand
               Deprecated: This field is ignored.
 
-            tekton_tasks(Dict[str, Any]): TektonTasks is the configuration of the tekton-tasks operand
+            tekton_tasks (Dict[str, Any]): TektonTasks is the configuration of the tekton-tasks operand
               Deprecated: This field is ignored.
 
-            template_validator(Dict[str, Any]): TemplateValidator is configuration of the template validator operand
+            template_validator (Dict[str, Any]): TemplateValidator is configuration of the template validator operand
 
-            tls_security_profile(Dict[str, Any]): TLSSecurityProfile is a configuration for the TLS.
-
-            token_generation_service(Dict[str, Any]): TokenGenerationService configures the service for generating tokens to
-              access VNC for a VM.
+            tls_security_profile (Dict[str, Any]): TLSSecurityProfile is a configuration for the TLS.
 
         """
         super().__init__(**kwargs)
@@ -56,16 +52,13 @@ class SSP(NamespacedResource):
         self.tekton_tasks = tekton_tasks
         self.template_validator = template_validator
         self.tls_security_profile = tls_security_profile
-        self.token_generation_service = token_generation_service
 
     def to_dict(self) -> None:
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.common_templates,
-            ]):
-                raise MissingRequiredArgumentError(argument="common_templates")
+            if not self.common_templates:
+                raise MissingRequiredArgumentError(argument="self.common_templates")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
@@ -90,5 +83,4 @@ class SSP(NamespacedResource):
             if self.tls_security_profile:
                 _spec["tlsSecurityProfile"] = self.tls_security_profile
 
-            if self.token_generation_service:
-                _spec["tokenGenerationService"] = self.token_generation_service
+    # End of generated code

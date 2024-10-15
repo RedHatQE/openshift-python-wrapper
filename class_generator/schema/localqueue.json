@@ -29,6 +29,15 @@
               "rule": "self == oldSelf"
             }
           ]
+        },
+        "stopPolicy": {
+          "description": "stopPolicy - if set to a value different from None, the LocalQueue is considered Inactive,\nno new reservation being made.\n\n\nDepending on its value, its associated workloads will:\n\n\n- None - Workloads are admitted\n- HoldAndDrain - Admitted workloads are evicted and Reserving workloads will cancel the reservation.\n- Hold - Admitted workloads will run to completion and Reserving workloads will cancel the reservation.",
+          "type": "string",
+          "enum": [
+            "None",
+            "Hold",
+            "HoldAndDrain"
+          ]
         }
       }
     },

@@ -30,7 +30,7 @@
     },
     "pullSecret": {
       "description": "pullSecret is the name of a Secret that would be used for setting up the authentication for pulling the container images from the private Docker registries",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference_v2"
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference"
     },
     "secrets": {
       "description": "secrets is a list of additional secrets that will be included in the build pod",

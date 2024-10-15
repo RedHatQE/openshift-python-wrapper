@@ -1,0 +1,59 @@
+skipsdist = true
+env_list = [
+  "validate-resources",
+  "validate-resources-script",
+  "class-generator",
+  "resource-tests",
+  "api-group-order",
+]
+
+[env.resource-tests]
+description = "Run resource tests on local cluster (k3d)"
+passenv = ["KUBECONFIG"]
+deps = ["uv"]
+commands_pre = [["scripts/k3d-runner.sh", "start"]]
+commands = [
+  [
+    "uv",
+    "run",
+    "pytest",
+    "tests/test_resources.py",
+    "-k",
+    "not kubevirt",
+  ],
+]
+commands_post = [["scripts/k3d-runner.sh", "stop"]]
+allowlist_externals = ["scripts/k3d-runner.sh"]
+
+[env.validate-resources]
+description = "Run validation resources tests"
+deps = ["uv"]
+commands = [["uv", "run", "pytest", "tests/test_validate_resources.py"]]
+
+[env.validate-resources-script]
+description = "Run validation resources script tests (test the script itself, not the resources)"
+deps = ["uv"]
+commands = [["uv", "run", "pytest", "tests/test_validate_resources_script.py"]]
+
+[env.class-generator]
+description = "Run class generator tests"
+deps = ["uv"]
+commands = [
+  [
+    "uv",
+    "run",
+    "pytest",
+    "class_generator/tests/test_camelcase_to_snake.py",
+  ],
+  [
+    "uv",
+    "run",
+    "pytest",
+    "class_generator/tests/test_class_generator.py",
+  ],
+]
+
+[env.api-group-order]
+description = "Run API group order tests"
+deps = ["uv"]
+commands = [["uv", "run", "pytest", "tests/test_api_group_order.py"]]

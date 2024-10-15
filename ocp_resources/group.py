@@ -20,7 +20,7 @@ class Group(Resource):
     ) -> None:
         """
         Args:
-            users(List[Any]): Users is the list of users in this group.
+            users (List[Any]): Users is the list of users in this group.
 
         """
         super().__init__(**kwargs)
@@ -31,9 +31,9 @@ class Group(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.users,
-            ]):
-                raise MissingRequiredArgumentError(argument="users")
+            if not self.users:
+                raise MissingRequiredArgumentError(argument="self.users")
 
             self.res["users"] = self.users
+
+    # End of generated code

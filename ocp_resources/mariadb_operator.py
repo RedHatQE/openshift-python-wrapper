@@ -16,3 +16,5 @@ class MariadbOperator(NamespacedResource):
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
+
+    # End of generated code

@@ -22,7 +22,7 @@ class Scheduler(Resource):
     ) -> None:
         """
         Args:
-            default_node_selector(str): defaultNodeSelector helps set the cluster-wide default node selector
+            default_node_selector (str): defaultNodeSelector helps set the cluster-wide default node selector
               to restrict pod placement to specific nodes. This is applied to
               the pods created in all namespaces and creates an intersection
               with any existing nodeSelectors already set on a pod, additionally
@@ -42,7 +42,7 @@ class Scheduler(Resource):
               "type=user-node,region=east" set in defaultNodeSelector would not
               be applied.
 
-            masters_schedulable(bool): MastersSchedulable allows masters nodes to be schedulable. When this
+            masters_schedulable (bool): MastersSchedulable allows masters nodes to be schedulable. When this
               flag is turned on, all the master nodes in the cluster will be
               made schedulable, so that workload pods can run on them. The
               default value for this field is false, meaning none of the master
@@ -51,14 +51,14 @@ class Scheduler(Resource):
               ensure that cluster-critical control plane components are not
               impacted. Please turn on this field after doing due diligence.
 
-            policy(Dict[str, Any]): DEPRECATED: the scheduler Policy API has been deprecated and will be
+            policy (Dict[str, Any]): DEPRECATED: the scheduler Policy API has been deprecated and will be
               removed in a future release. policy is a reference to a ConfigMap
               containing scheduler policy which has user specified predicates
               and priorities. If this ConfigMap is not available scheduler will
               default to use DefaultAlgorithmProvider. The namespace for this
               configmap is openshift-config.
 
-            profile(str): profile sets which scheduling profile should be set in order to
+            profile (str): profile sets which scheduling profile should be set in order to
               configure scheduling decisions for new pods.   Valid values are
               "LowNodeUtilization", "HighNodeUtilization", "NoScoring" Defaults
               to "LowNodeUtilization"
@@ -89,3 +89,5 @@ class Scheduler(Resource):
 
             if self.profile:
                 _spec["profile"] = self.profile
+
+    # End of generated code

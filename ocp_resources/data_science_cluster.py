@@ -7,8 +7,6 @@ from ocp_resources.resource import Resource
 class DataScienceCluster(Resource):
     """
     DataScienceCluster is the Schema for the datascienceclusters API.
-
-    API Link: https://github.com/opendatahub-io/opendatahub-operator/blob/incubation/apis/datasciencecluster/v1/datasciencecluster_types.go
     """
 
     api_group: str = Resource.ApiGroup.DATASCIENCECLUSTER_OPENDATAHUB_IO
@@ -20,43 +18,7 @@ class DataScienceCluster(Resource):
     ) -> None:
         """
         Args:
-            components(Dict[Any, Any]): Override and fine tune specific component configurations.
-
-              FIELDS:
-                codeflare	<Object>
-                  CodeFlare component configuration. If CodeFlare Operator has been installed
-                  in the cluster, it should be uninstalled first before enabled component.
-
-                dashboard	<Object>
-                  Dashboard component configuration.
-
-                datasciencepipelines	<Object>
-                  DataServicePipeline component configuration. Require OpenShift Pipelines
-                  Operator to be installed before enable component
-
-                kserve	<Object>
-                  Kserve component configuration. Require OpenShift Serverless and OpenShift
-                  Service Mesh Operators to be installed before enable component Does not
-                  support enabled ModelMeshServing at the same time
-
-                kueue	<Object>
-                  Kueue component configuration.
-
-                modelmeshserving	<Object>
-                  ModelMeshServing component configuration. Does not support enabled Kserve at
-                  the same time
-
-                ray	<Object>
-                  Ray component configuration.
-
-                trainingoperator	<Object>
-                  Training Operator component configuration.
-
-                trustyai	<Object>
-                  TrustyAI component configuration.
-
-                workbenches	<Object>
-                  Workbenches component configuration.
+            components (Dict[str, Any]): Override and fine tune specific component configurations.
 
         """
         super().__init__(**kwargs)
@@ -72,3 +34,5 @@ class DataScienceCluster(Resource):
 
             if self.components:
                 _spec["components"] = self.components
+
+    # End of generated code
