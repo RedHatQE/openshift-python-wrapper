@@ -380,6 +380,7 @@ class Resource:
         hash_log_data: bool = True,
         ensure_exists: bool = False,
         kind_dict: Dict[Any, Any] | None = None,
+        wait_for_resource: bool = False,
     ):
         """
         Create an API resource
@@ -407,6 +408,7 @@ class Resource:
                 (example: Secret resource)
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
             kind_dict (dict): dict which represents the resource object
+            wait_for_resource (bool): Waits for the resource to be created
         """
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
@@ -448,6 +450,7 @@ class Resource:
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
+        self.wait_for_resource = wait_for_resource
 
         if ensure_exists:
             self._ensure_exists()
@@ -524,7 +527,7 @@ class Resource:
 
     def __enter__(self) -> "Resource":
         signal(SIGINT, self._sigint_handler)
-        return self.deploy()
+        return self.deploy(wait=self.wait_for_resource)
 
     def __exit__(
         self,
