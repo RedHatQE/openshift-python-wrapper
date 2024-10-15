@@ -574,7 +574,7 @@ def class_generator(
 
         if not dry_run:
             run_command(
-                command=shlex.split(f"pre-commit run --files {generated_py_file}"),
+                command=shlex.split(f"uvx pre-commit run --files {generated_py_file}"),
                 verify_stderr=False,
                 check=False,
             )

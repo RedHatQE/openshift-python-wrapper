@@ -42,6 +42,7 @@ from timeout_sampler import (
     TimeoutSampler,
     TimeoutWatch,
 )
+from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError
 from ocp_resources.utils import skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
@@ -134,18 +135,6 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
 
 
 # Exceptions classes
-class MissingRequiredArgumentError(Exception):
-    def __init__(self, argument: str) -> None:
-        self.argument = argument
-
-    def __repr__(self) -> str:
-        return f"Missing required argument/s. Either provide yaml_file, kind_dict or pass {self.argument}"
-
-
-class MissingResourceResError(Exception):
-    def __repr__(self) -> str:
-        return "Failed to generate resource self.res"
-
 
 # End Exceptions classes
 
@@ -525,7 +514,7 @@ class Resource:
                 self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
 
         if not self.res:
-            raise MissingResourceResError()
+            raise MissingResourceResError(name=self.name)
 
     def to_dict(self) -> None:
         """
