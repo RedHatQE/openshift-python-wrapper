@@ -21,13 +21,13 @@ class OAuth(Resource):
     ) -> None:
         """
         Args:
-            identity_providers(List[Any]): identityProviders is an ordered list of ways for a user to identify
+            identity_providers (List[Any]): identityProviders is an ordered list of ways for a user to identify
               themselves. When this list is empty, no identities are provisioned
               for users.
 
-            templates(Dict[str, Any]): templates allow you to customize pages like the login page.
+            templates (Dict[str, Any]): templates allow you to customize pages like the login page.
 
-            token_config(Dict[str, Any]): tokenConfig contains options for authorization and access tokens
+            token_config (Dict[str, Any]): tokenConfig contains options for authorization and access tokens
 
         """
         super().__init__(**kwargs)
@@ -51,3 +51,5 @@ class OAuth(Resource):
 
             if self.token_config:
                 _spec["tokenConfig"] = self.token_config
+
+    # End of generated code

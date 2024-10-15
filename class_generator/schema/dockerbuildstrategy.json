@@ -38,7 +38,7 @@
     },
     "pullSecret": {
       "description": "pullSecret is the name of a Secret that would be used for setting up the authentication for pulling the container images from the private Docker registries",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference_v2"
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference"
     },
     "volumes": {
       "description": "volumes is a list of input volumes that can be mounted into the builds runtime environment. Only a subset of Kubernetes Volume sources are supported by builds. More info: https://kubernetes.io/docs/concepts/storage/volumes",

@@ -34,8 +34,7 @@
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     },
     "parameters": {
       "description": "parameters holds the parameters for the provisioner that should create volumes of this storage class.",

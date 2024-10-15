@@ -22,7 +22,7 @@
       ],
       "properties": {
         "controllerName": {
-          "description": "controllerName is name of the controller which will actually perform\nthe checks. This is the name with which controller identifies with,\nnot necessarily a K8S Pod or Deployment name. Cannot be empty.",
+          "description": "controllerName identifies the controller that processes the AdmissionCheck,\nnot necessarily a Kubernetes Pod or Deployment name. Cannot be empty.",
           "type": "string",
           "x-kubernetes-validations": [
             {
@@ -32,7 +32,7 @@
           ]
         },
         "parameters": {
-          "description": "Parameters identifies the resource providing additional check parameters.",
+          "description": "Parameters identifies a configuration with additional parameters for the\ncheck.",
           "type": "object",
           "required": [
             "apiGroup",
@@ -61,7 +61,7 @@
           }
         },
         "retryDelayMinutes": {
-          "description": "RetryDelayMinutes specifies how long to keep the workload suspended\nafter a failed check (after it transitioned to False).\nAfter that the check state goes to \"Unknown\".\nThe default is 15 min.",
+          "description": "RetryDelayMinutes **deprecated** specifies how long to keep the workload suspended after\na failed check (after it transitioned to False). When the delay period has passed, the check\nstate goes to \"Unknown\". The default is 15 min.\nThe default is 15 min.",
           "type": "integer",
           "format": "int64"
         }

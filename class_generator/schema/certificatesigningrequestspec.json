@@ -47,32 +47,7 @@
       "description": "usages specifies a set of key usages requested in the issued certificate.\n\nRequests for TLS client certificates typically request: \"digital signature\", \"key encipherment\", \"client auth\".\n\nRequests for TLS serving certificates typically request: \"key encipherment\", \"digital signature\", \"server auth\".\n\nValid values are:\n \"signing\", \"digital signature\", \"content commitment\",\n \"key encipherment\", \"key agreement\", \"data encipherment\",\n \"cert sign\", \"crl sign\", \"encipher only\", \"decipher only\", \"any\",\n \"server auth\", \"client auth\",\n \"code signing\", \"email protection\", \"s/mime\",\n \"ipsec end system\", \"ipsec tunnel\", \"ipsec user\",\n \"timestamping\", \"ocsp signing\", \"microsoft sgc\", \"netscape sgc\"",
       "type": "array",
       "items": {
-        "type": "string",
-        "enum": [
-          "any",
-          "cert sign",
-          "client auth",
-          "code signing",
-          "content commitment",
-          "crl sign",
-          "data encipherment",
-          "decipher only",
-          "digital signature",
-          "email protection",
-          "encipher only",
-          "ipsec end system",
-          "ipsec tunnel",
-          "ipsec user",
-          "key agreement",
-          "key encipherment",
-          "microsoft sgc",
-          "netscape sgc",
-          "ocsp signing",
-          "s/mime",
-          "server auth",
-          "signing",
-          "timestamping"
-        ]
+        "type": "string"
       },
       "x-kubernetes-list-type": "atomic"
     },

@@ -56,19 +56,6 @@
     "state": {
       "description": "State holds details about the container's current condition.",
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerState"
-    },
-    "volumeMounts": {
-      "description": "Status of volume mounts.",
-      "type": "array",
-      "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeMountStatus"
-      },
-      "x-kubernetes-list-map-keys": [
-        "mountPath"
-      ],
-      "x-kubernetes-list-type": "map",
-      "x-kubernetes-patch-merge-key": "mountPath",
-      "x-kubernetes-patch-strategy": "merge"
     }
   },
   "$schema": "http://json-schema.org/schema#"

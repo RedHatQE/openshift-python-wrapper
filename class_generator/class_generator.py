@@ -175,7 +175,9 @@ def update_kind_schema():
         LOGGER.error("Failed to get openapi schema.")
         sys.exit(1)
 
-    ocp_openapi_json_file = "class_generator/__ocp-openapi.json"
+    cluster_version = get_server_version(client=client)
+    cluster_version = cluster_version.split("+")[0]
+    ocp_openapi_json_file = f"class_generator/__k8s-openapi-{cluster_version}__.json"
     with open(ocp_openapi_json_file, "w") as fd:
         fd.write(data.text)
 
@@ -211,6 +213,11 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
         - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
           (e.g., "myCamelCaseString").
     """
+    do_not_proccess_list = ["OAuth", "KubeVirt"]
+    # If the input string is in the do_not_proccess_list, return it as it is.
+    if string_.lower() in [_str.lower() for _str in do_not_proccess_list]:
+        return string_.lower()
+
     formatted_str: str = ""
 
     if string_.islower():
@@ -543,6 +550,7 @@ def class_generator(
     output_file: str = "",
     output_dir: str = "",
     add_tests: bool = False,
+    called_from_cli: bool = True,
 ) -> List[str]:
     """
     Generates a class for a given Kind.
@@ -553,7 +561,10 @@ def class_generator(
 
     if not kind_and_namespaced_mappings:
         LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run with --update-schema")
-        sys.exit(1)
+        if called_from_cli:
+            sys.exit(1)
+        else:
+            return []
 
     resources = parse_explain(kind=kind)
 

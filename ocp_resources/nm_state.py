@@ -24,33 +24,33 @@ class NMState(Resource):
     ) -> None:
         """
         Args:
-            affinity(Dict[str, Any]): Affinity is an optional affinity selector that will be added to
+            affinity (Dict[str, Any]): Affinity is an optional affinity selector that will be added to
               handler DaemonSet manifest.
 
-            infra_affinity(Dict[str, Any]): Affinity is an optional affinity selector that will be added to
+            infra_affinity (Dict[str, Any]): Affinity is an optional affinity selector that will be added to
               webhook & certmanager Deployment manifests.
 
-            infra_node_selector(Dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
+            infra_node_selector (Dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
               webhook & certmanager Deployment manifests If InfraNodeSelector is
               specified, the webhook and certmanager will run only on nodes that
               have each of the indicated key-value pairs as labels applied to
               the node.
 
-            infra_tolerations(List[Any]): InfraTolerations is an optional list of tolerations to be added to
+            infra_tolerations (List[Any]): InfraTolerations is an optional list of tolerations to be added to
               webhook & certmanager Deployment manifests If InfraTolerations is
               specified, the webhook and certmanager will be able to be
               scheduled on nodes with corresponding taints
 
-            node_selector(Dict[str, Any]): NodeSelector is an optional selector that will be added to handler
+            node_selector (Dict[str, Any]): NodeSelector is an optional selector that will be added to handler
               DaemonSet manifest for both workers and control-plane
               (https://github.com/nmstate/kubernetes-
               nmstate/blob/main/deploy/handler/operator.yaml). If NodeSelector
               is specified, the handler will run only on nodes that have each of
               the indicated key-value pairs as labels applied to the node.
 
-            self_sign_configuration(Dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
+            self_sign_configuration (Dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
 
-            tolerations(List[Any]): Tolerations is an optional list of tolerations to be added to handler
+            tolerations (List[Any]): Tolerations is an optional list of tolerations to be added to handler
               DaemonSet manifest If Tolerations is specified, the handler
               daemonset will be also scheduled on nodes with corresponding
               taints
@@ -93,3 +93,5 @@ class NMState(Resource):
 
             if self.tolerations:
                 _spec["tolerations"] = self.tolerations
+
+    # End of generated code

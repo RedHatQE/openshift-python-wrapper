@@ -222,6 +222,12 @@ class Resource:
         TERMINATING: str = "Terminating"
         ERROR: str = "Error"
         COMPLETE: str = "Complete"
+        DEPLOYING: str = "Deploying"
+        SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
+        CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
+        IMAGE_PULL_BACK_OFF = "ImagePullBackOff"
+        ERR_IMAGE_PULL = "ErrImagePull"
+        ACTIVE = "Active"
 
     class Condition:
         UPGRADEABLE: str = "Upgradeable"
@@ -250,6 +256,11 @@ class Resource:
 
         class Type:
             NETWORK_READY: str = "NetworkReady"
+
+    class Type:
+        CLUSTER_IP = "ClusterIP"
+        NODE_PORT = "NodePort"
+        LOAD_BALANCER = "LoadBalancer"
 
     class Interface:
         class State:
@@ -332,6 +343,7 @@ class Resource:
         SECURITY_ISTIO_IO: str = "security.istio.io"
         SECURITY_OPENSHIFT_IO: str = "security.openshift.io"
         SELF_NODE_REMEDIATION_MEDIK8S_IO: str = "self-node-remediation.medik8s.io"
+        SERVING_KNATIVE_DEV: str = "serving.knative.dev"
         SERVING_KSERVE_IO: str = "serving.kserve.io"
         SNAPSHOT_KUBEVIRT_IO: str = "snapshot.kubevirt.io"
         SNAPSHOT_STORAGE_K8S_IO: str = "snapshot.storage.k8s.io"

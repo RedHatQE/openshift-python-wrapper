@@ -8,10 +8,6 @@
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeAddress"
       },
-      "x-kubernetes-list-map-keys": [
-        "type"
-      ],
-      "x-kubernetes-list-type": "map",
       "x-kubernetes-patch-merge-key": "type",
       "x-kubernetes-patch-strategy": "merge"
     },
@@ -35,10 +31,6 @@
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeCondition"
       },
-      "x-kubernetes-list-map-keys": [
-        "type"
-      ],
-      "x-kubernetes-list-type": "map",
       "x-kubernetes-patch-merge-key": "type",
       "x-kubernetes-patch-strategy": "merge"
     },
@@ -55,8 +47,7 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerImage"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     },
     "nodeInfo": {
       "description": "Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info",
@@ -71,29 +62,19 @@
         "Terminated"
       ]
     },
-    "runtimeHandlers": {
-      "description": "The available runtime handlers.",
-      "type": "array",
-      "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeRuntimeHandler"
-      },
-      "x-kubernetes-list-type": "atomic"
-    },
     "volumesAttached": {
       "description": "List of volumes that are attached to the node.",
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AttachedVolume"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     },
     "volumesInUse": {
       "description": "List of attachable volumes in use (mounted) by the node.",
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     }
   },
   "$schema": "http://json-schema.org/schema#"

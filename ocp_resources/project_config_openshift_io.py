@@ -20,10 +20,10 @@ class Project(Resource):
     ) -> None:
         """
         Args:
-            project_request_message(str): projectRequestMessage is the string presented to a user if they are
+            project_request_message (str): projectRequestMessage is the string presented to a user if they are
               unable to request a project via the projectrequest api endpoint
 
-            project_request_template(Dict[str, Any]): projectRequestTemplate is the template to use for creating projects in
+            project_request_template (Dict[str, Any]): projectRequestTemplate is the template to use for creating projects in
               response to projectrequest. This must point to a template in
               'openshift-config' namespace. It is optional. If it is not
               specified, a default template is used.
@@ -46,3 +46,5 @@ class Project(Resource):
 
             if self.project_request_template:
                 _spec["projectRequestTemplate"] = self.project_request_template
+
+    # End of generated code
