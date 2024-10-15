@@ -37,6 +37,31 @@ class MariadbOperator(NamespacedResource):
         webhook: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
+        """
+        Args:
+            affinity (Dict[str, Any]): Node affinity settings for the operator.
+            cert_controller (Dict[str, Any]): Configuration for the certificate controller.
+            cluster_name (str): Name of the Kubernetes cluster.
+            extr_args (List[str]): Additional arguments for the operator.
+            extra_volume_mounts (List[Dict[str, Any]]): Additional volume mounts for the operator.
+            extra_volumes (List[Dict[str, Any]]): Additional volumes for the operator.
+            fullname_override (str): Override for the full name of resources.
+            ha (Dict[str, Any]): High availability configuration.
+            image (Dict[str, Any]): Container image configuration.
+            image_pull_secrets (List[Dict[str, Any]]): Secrets for pulling container images.
+            log_level (str): Logging level for the operator.
+            metrics (Dict[str, Any]): Metrics collection configuration.
+            name_override (str): Override for the name of resources.
+            node_selector (Dict[str, str]): Node selection criteria.
+            pod_annotations (Dict[str, str]): Annotations for the operator pod.
+            pod_security_context (Dict[str, Any]): Security context for the operator pod.
+            rbac (Dict[str, Any]): RBAC configuration.
+            resources (Dict[str, Any]): Resource requirements for the operator.
+            security_context (Dict[str, Any]): Security context for the operator container.
+            service_account (Dict[str, Any]): Service account configuration.
+            tolerations (List[Dict[str, Any]]): Tolerations for node taints.
+            webhook (Dict[str, Any]): Webhook configuration.
+        """
         super().__init__(**kwargs)
 
         self.affinity = affinity
@@ -63,31 +88,6 @@ class MariadbOperator(NamespacedResource):
         self.webhook = webhook
 
     def to_dict(self) -> None:
-        """
-        Args:
-            affinity (Dict[str, Any]): Node affinity settings for the operator.
-            cert_controller (Dict[str, Any]): Configuration for the certificate controller.
-            cluster_name (str): Name of the Kubernetes cluster.
-            extr_args (List[str]): Additional arguments for the operator.
-            extra_volume_mounts (List[Dict[str, Any]]): Additional volume mounts for the operator.
-            extra_volumes (List[Dict[str, Any]]): Additional volumes for the operator.
-            fullname_override (str): Override for the full name of resources.
-            ha (Dict[str, Any]): High availability configuration.
-            image (Dict[str, Any]): Container image configuration.
-            image_pull_secrets (List[Dict[str, Any]]): Secrets for pulling container images.
-            log_level (str): Logging level for the operator.
-            metrics (Dict[str, Any]): Metrics collection configuration.
-            name_override (str): Override for the name of resources.
-            node_selector (Dict[str, str]): Node selection criteria.
-            pod_annotations (Dict[str, str]): Annotations for the operator pod.
-            pod_security_context (Dict[str, Any]): Security context for the operator pod.
-            rbac (Dict[str, Any]): RBAC configuration.
-            resources (Dict[str, Any]): Resource requirements for the operator.
-            security_context (Dict[str, Any]): Security context for the operator container.
-            service_account (Dict[str, Any]): Service account configuration.
-            tolerations (List[Dict[str, Any]]): Tolerations for node taints.
-            webhook (Dict[str, Any]): Webhook configuration.
-        """
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
