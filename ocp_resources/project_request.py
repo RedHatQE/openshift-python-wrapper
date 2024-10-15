@@ -2,6 +2,7 @@
 
 from typing import Any, Optional
 from ocp_resources.resource import Resource
+from ocp_resources.project_project_openshift_io import Project
 
 
 class ProjectRequest(Resource):
@@ -42,3 +43,6 @@ class ProjectRequest(Resource):
                 self.res["displayName"] = self.display_name
 
     # End of generated code
+
+    def clean_up(self, wait: bool = True, timeout: Optional[int] = None) -> bool:
+        return Project(name=self.name).clean_up(wait=wait, timeout=timeout)
