@@ -11,9 +11,6 @@ class Namespace(Resource):
 
     api_version: str = Resource.ApiVersion.V1
 
-    class Status(Resource.Status):
-        ACTIVE = "Active"
-
     def __init__(
         self,
         finalizers: Optional[List[Any]] = None,
@@ -21,7 +18,7 @@ class Namespace(Resource):
     ) -> None:
         """
         Args:
-            finalizers(List[Any]): Finalizers is an opaque list of values that must be empty to
+            finalizers (List[Any]): Finalizers is an opaque list of values that must be empty to
               permanently remove object from storage. More info:
               https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
 
@@ -39,3 +36,5 @@ class Namespace(Resource):
 
             if self.finalizers:
                 _spec["finalizers"] = self.finalizers
+
+    # End of generated code

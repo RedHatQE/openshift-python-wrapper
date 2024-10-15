@@ -138,3 +138,5 @@ class MariadbOperator(NamespacedResource):
                 _spec["tolerations"] = self.tolerations
             if self.webhook is not None:
                 _spec["webhook"] = self.webhook
+                
+    # End of generated code

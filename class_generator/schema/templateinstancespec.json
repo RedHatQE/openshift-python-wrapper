@@ -11,7 +11,7 @@
     },
     "secret": {
       "description": "secret is a reference to a Secret object containing the necessary template parameters.",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference_v2"
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference"
     },
     "template": {
       "description": "template is a full copy of the template for instantiation.",

@@ -21,22 +21,22 @@ class ReplicaSet(NamespacedResource):
     ) -> None:
         """
         Args:
-            min_ready_seconds(int): Minimum number of seconds for which a newly created pod should be
+            min_ready_seconds (int): Minimum number of seconds for which a newly created pod should be
               ready without any of its container crashing, for it to be
               considered available. Defaults to 0 (pod will be considered
               available as soon as it is ready)
 
-            replicas(int): Replicas is the number of desired replicas. This is a pointer to
+            replicas (int): Replicas is the number of desired replicas. This is a pointer to
               distinguish between explicit zero and unspecified. Defaults to 1.
               More info: https://kubernetes.io/docs/concepts/workloads/controlle
               rs/replicationcontroller/#what-is-a-replicationcontroller
 
-            selector(Dict[str, Any]): A label selector is a label query over a set of resources. The result
+            selector (Dict[str, Any]): A label selector is a label query over a set of resources. The result
               of matchLabels and matchExpressions are ANDed. An empty label
               selector matches all objects. A null label selector matches no
               objects.
 
-            template(Dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
+            template (Dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
               a template
 
         """
@@ -51,10 +51,8 @@ class ReplicaSet(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.selector,
-            ]):
-                raise MissingRequiredArgumentError(argument="selector")
+            if not self.selector:
+                raise MissingRequiredArgumentError(argument="self.selector")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
@@ -69,3 +67,5 @@ class ReplicaSet(NamespacedResource):
 
             if self.template:
                 _spec["template"] = self.template
+
+    # End of generated code

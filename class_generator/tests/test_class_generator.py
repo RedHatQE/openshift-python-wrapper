@@ -24,6 +24,7 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
         "Secret",
         "ServiceMeshMember",
         "ServingRuntime",
+        "OAuth",
     ),
 )
 def test_parse_explain(tmpdir_factory, kind):

@@ -26,37 +26,37 @@ class KubeDescheduler(NamespacedResource):
     ) -> None:
         """
         Args:
-            descheduling_interval_seconds(int): DeschedulingIntervalSeconds is the number of seconds between
+            descheduling_interval_seconds (int): DeschedulingIntervalSeconds is the number of seconds between
               descheduler runs
 
-            log_level(str): logLevel is an intent based logging for an overall component.  It does
+            log_level (str): logLevel is an intent based logging for an overall component.  It does
               not give fine grained control, but it is a simple way to manage
               coarse grained logging choices that operators have to interpret
               for their operands.   Valid values are: "Normal", "Debug",
               "Trace", "TraceAll". Defaults to "Normal".
 
-            management_state(str): managementState indicates whether and how the operator should manage
+            management_state (str): managementState indicates whether and how the operator should manage
               the component
 
-            mode(str): Mode configures the descheduler to either evict pods (Automatic) or to
+            mode (str): Mode configures the descheduler to either evict pods (Automatic) or to
               simulate the eviction (Predictive)
 
-            observed_config(Any): observedConfig holds a sparse config that controller has observed from
+            observed_config (Any): observedConfig holds a sparse config that controller has observed from
               the cluster state.  It exists in spec because it is an input to
               the level for the operator
 
-            operator_log_level(str): operatorLogLevel is an intent based logging for the operator itself.
+            operator_log_level (str): operatorLogLevel is an intent based logging for the operator itself.
               It does not give fine grained control, but it is a simple way to
               manage coarse grained logging choices that operators have to
               interpret for themselves.   Valid values are: "Normal", "Debug",
               "Trace", "TraceAll". Defaults to "Normal".
 
-            profile_customizations(Dict[str, Any]): ProfileCustomizations contains various parameters for modifying the
+            profile_customizations (Dict[str, Any]): ProfileCustomizations contains various parameters for modifying the
               default behavior of certain profiles
 
-            profiles(List[Any]): Profiles sets which descheduler strategy profiles are enabled
+            profiles (List[Any]): Profiles sets which descheduler strategy profiles are enabled
 
-            unsupported_config_overrides(Any): unsupportedConfigOverrides holds a sparse config that will override
+            unsupported_config_overrides (Any): unsupportedConfigOverrides holds a sparse config that will override
               any previously set options.  It only needs to be the fields to
               override it will end up overlaying in the following order: 1.
               hardcoded defaults 2. observedConfig 3. unsupportedConfigOverrides
@@ -107,3 +107,5 @@ class KubeDescheduler(NamespacedResource):
 
             if self.unsupported_config_overrides:
                 _spec["unsupportedConfigOverrides"] = self.unsupported_config_overrides
+
+    # End of generated code

@@ -24,30 +24,30 @@ class Network(Resource):
     ) -> None:
         """
         Args:
-            cluster_network(List[Any]): IP address pool to use for pod IPs. This field is immutable after
+            cluster_network (List[Any]): IP address pool to use for pod IPs. This field is immutable after
               installation.
 
-            external_ip(Dict[str, Any]): externalIP defines configuration for controllers that affect
+            external_ip (Dict[str, Any]): externalIP defines configuration for controllers that affect
               Service.ExternalIP. If nil, then ExternalIP is not allowed to be
               set.
 
-            network_diagnostics(Dict[str, Any]): networkDiagnostics defines network diagnostics configuration.   Takes
+            network_diagnostics (Dict[str, Any]): networkDiagnostics defines network diagnostics configuration.   Takes
               precedence over spec.disableNetworkDiagnostics in
               network.operator.openshift.io. If networkDiagnostics is not
               specified or is empty, and the spec.disableNetworkDiagnostics flag
               in network.operator.openshift.io is set to true, the network
               diagnostics feature will be disabled.
 
-            network_type(str): NetworkType is the plugin that is to be deployed (e.g. OpenShiftSDN).
+            network_type (str): NetworkType is the plugin that is to be deployed (e.g. OVNKubernetes).
               This should match a value that the cluster-network-operator
               understands, or else no networking will be installed. Currently
-              supported values are: - OpenShiftSDN This field is immutable after
-              installation.
+              supported values are: - OVNKubernetes This field is immutable
+              after installation.
 
-            service_network(List[Any]): IP address pool for services. Currently, we only support a single
+            service_network (List[Any]): IP address pool for services. Currently, we only support a single
               entry here. This field is immutable after installation.
 
-            service_node_port_range(str): The port range allowed for Services of type NodePort. If not
+            service_node_port_range (str): The port range allowed for Services of type NodePort. If not
               specified, the default of 30000-32767 will be used. Such Services
               without a NodePort specified will have one automatically allocated
               from this range. This parameter can be updated after the cluster
@@ -87,3 +87,5 @@ class Network(Resource):
 
             if self.service_node_port_range:
                 _spec["serviceNodePortRange"] = self.service_node_port_range
+
+    # End of generated code

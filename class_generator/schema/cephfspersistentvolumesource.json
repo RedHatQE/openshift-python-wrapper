@@ -10,8 +10,7 @@
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     },
     "path": {
       "description": "path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /",

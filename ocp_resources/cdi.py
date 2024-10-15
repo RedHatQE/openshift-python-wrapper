@@ -11,10 +11,6 @@ class CDI(Resource):
 
     api_group: str = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
-    class Status(Resource.Status):
-        DEPLOYING: str = "Deploying"
-        DEPLOYED: str = "Deployed"
-
     def __init__(
         self,
         cert_config: Optional[Dict[str, Any]] = None,
@@ -30,26 +26,26 @@ class CDI(Resource):
     ) -> None:
         """
         Args:
-            cert_config(Dict[str, Any]): certificate configuration
+            cert_config (Dict[str, Any]): certificate configuration
 
-            clone_strategy_override(str): Clone strategy override: should we use a host-assisted copy even if
+            clone_strategy_override (str): Clone strategy override: should we use a host-assisted copy even if
               snapshots are available?
 
-            config(Dict[str, Any]): CDIConfig at CDI level
+            config (Dict[str, Any]): CDIConfig at CDI level
 
-            customize_components(Dict[str, Any]): CustomizeComponents defines patches for components deployed by the CDI
+            customize_components (Dict[str, Any]): CustomizeComponents defines patches for components deployed by the CDI
               operator.
 
-            image_pull_policy(str): PullPolicy describes a policy for if/when to pull a container image
+            image_pull_policy (str): PullPolicy describes a policy for if/when to pull a container image
 
-            infra(Dict[str, Any]): Selectors and tolerations that should apply to cdi infrastructure
+            infra (Dict[str, Any]): Selectors and tolerations that should apply to cdi infrastructure
               components
 
-            priority_class(str): PriorityClass of the CDI control plane
+            priority_class (str): PriorityClass of the CDI control plane
 
-            uninstall_strategy(str): CDIUninstallStrategy defines the state to leave CDI on uninstall
+            uninstall_strategy (str): CDIUninstallStrategy defines the state to leave CDI on uninstall
 
-            workload(Dict[str, Any]): Restrict on which nodes CDI workload pods will be scheduled
+            workload (Dict[str, Any]): Restrict on which nodes CDI workload pods will be scheduled
 
         """
         super().__init__(**kwargs)
@@ -97,3 +93,5 @@ class CDI(Resource):
 
             if self.workload:
                 _spec["workload"] = self.workload
+
+    # End of generated code

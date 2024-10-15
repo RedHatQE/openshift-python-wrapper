@@ -24,21 +24,21 @@ class AAQ(Resource):
     ) -> None:
         """
         Args:
-            cert_config(Dict[str, Any]): certificate configuration
+            cert_config (Dict[str, Any]): certificate configuration
 
-            configuration(Dict[str, Any]): holds aaq configurations.
+            configuration (Dict[str, Any]): holds aaq configurations.
 
-            image_pull_policy(str): PullPolicy describes a policy for if/when to pull a container image
+            image_pull_policy (str): PullPolicy describes a policy for if/when to pull a container image
 
-            infra(Dict[str, Any]): Rules on which nodes AAQ infrastructure pods will be scheduled
+            infra (Dict[str, Any]): Rules on which nodes AAQ infrastructure pods will be scheduled
 
-            namespace_selector(Dict[str, Any]): namespaces where pods should be gated before scheduling Defaults to
+            namespace_selector (Dict[str, Any]): namespaces where pods should be gated before scheduling Defaults to
               targeting namespaces with an "application-aware-quota/enable-
               gating" label key.
 
-            priority_class(str): PriorityClass of the AAQ control plane
+            priority_class (str): PriorityClass of the AAQ control plane
 
-            workload(Dict[str, Any]): Restrict on which nodes AAQ workload pods will be scheduled
+            workload (Dict[str, Any]): Restrict on which nodes AAQ workload pods will be scheduled
 
         """
         super().__init__(**kwargs)
@@ -78,3 +78,5 @@ class AAQ(Resource):
 
             if self.workload:
                 _spec["workload"] = self.workload
+
+    # End of generated code

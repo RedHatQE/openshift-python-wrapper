@@ -55,6 +55,8 @@ fcn_exclude_functions =
     Path,
     writelines,
     submit,
+    click,
+    ast,
 
 enable-extensions =
     FCN,

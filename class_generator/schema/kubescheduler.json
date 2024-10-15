@@ -82,9 +82,6 @@
           "items": {
             "description": "OperatorCondition is just the standard condition fields.",
             "type": "object",
-            "required": [
-              "type"
-            ],
             "properties": {
               "lastTransitionTime": {
                 "type": "string",
@@ -103,11 +100,7 @@
                 "type": "string"
               }
             }
-          },
-          "x-kubernetes-list-map-keys": [
-            "type"
-          ],
-          "x-kubernetes-list-type": "map"
+          }
         },
         "generations": {
           "description": "generations are used to determine when an item needs to be reconciled or has changed in a way that needs a reaction.",
@@ -142,8 +135,7 @@
                 "type": "string"
               }
             }
-          },
-          "x-kubernetes-list-type": "atomic"
+          }
         },
         "latestAvailableRevision": {
           "description": "latestAvailableRevision is the deploymentID of the most recent deployment",
@@ -160,9 +152,6 @@
           "items": {
             "description": "NodeStatus provides information about the current state of a particular node managed by this operator.",
             "type": "object",
-            "required": [
-              "nodeName"
-            ],
             "properties": {
               "currentRevision": {
                 "description": "currentRevision is the generation of the most recently successful deployment",
@@ -187,8 +176,7 @@
                 "type": "array",
                 "items": {
                   "type": "string"
-                },
-                "x-kubernetes-list-type": "atomic"
+                }
               },
               "lastFailedTime": {
                 "description": "lastFailedTime is the time the last failed revision failed the last time.",
@@ -209,11 +197,7 @@
                 "format": "int32"
               }
             }
-          },
-          "x-kubernetes-list-map-keys": [
-            "nodeName"
-          ],
-          "x-kubernetes-list-type": "map"
+          }
         },
         "observedGeneration": {
           "description": "observedGeneration is the last generation change you've dealt with",

@@ -25,7 +25,7 @@ class CSIDriver(Resource):
     ) -> None:
         """
         Args:
-            attach_required(bool): attachRequired indicates this CSI volume driver requires an attach
+            attach_required (bool): attachRequired indicates this CSI volume driver requires an attach
               operation (because it implements the CSI ControllerPublishVolume()
               method), and that the Kubernetes attach detach controller should
               call the attach volume interface which checks the volumeattachment
@@ -37,7 +37,7 @@ class CSIDriver(Resource):
               will be skipped. Otherwise the attach operation will be called.
               This field is immutable.
 
-            fs_group_policy(str): fsGroupPolicy defines if the underlying volume supports changing
+            fs_group_policy (str): fsGroupPolicy defines if the underlying volume supports changing
               ownership and permission of the volume before being mounted. Refer
               to the specific FSGroupPolicy values for additional details.  This
               field was immutable in Kubernetes < 1.29 and now is mutable.
@@ -47,7 +47,7 @@ class CSIDriver(Resource):
               fsGroup will only be applied if a fstype is defined and the
               volume's access mode contains ReadWriteOnce.
 
-            pod_info_on_mount(bool): podInfoOnMount indicates this CSI volume driver requires additional
+            pod_info_on_mount (bool): podInfoOnMount indicates this CSI volume driver requires additional
               pod information (like podName, podUID, etc.) during mount
               operations, if set to true. If set to false, pod information will
               not be passed on mount. Default is false.  The CSI driver
@@ -73,14 +73,14 @@ class CSIDriver(Resource):
               command line parameter of the driver.  This field was immutable in
               Kubernetes < 1.29 and now is mutable.
 
-            requires_republish(bool): requiresRepublish indicates the CSI driver wants `NodePublishVolume`
+            requires_republish (bool): requiresRepublish indicates the CSI driver wants `NodePublishVolume`
               being periodically called to reflect any possible change in the
               mounted volume. This field defaults to false.  Note: After a
               successful initial NodePublishVolume call, subsequent calls to
               NodePublishVolume should only update the contents of the volume.
               New mount points will not be seen by a running container.
 
-            se_linux_mount(bool): seLinuxMount specifies if the CSI driver supports "-o context" mount
+            se_linux_mount (bool): seLinuxMount specifies if the CSI driver supports "-o context" mount
               option.  When "true", the CSI driver must ensure that all volumes
               provided by this CSI driver can be mounted separately with
               different `-o context` options. This is typical for storage
@@ -95,7 +95,7 @@ class CSIDriver(Resource):
               driver. This is typical for volumes that represent subdirectories
               of a bigger shared filesystem.  Default is "false".
 
-            storage_capacity(bool): storageCapacity indicates that the CSI volume driver wants pod
+            storage_capacity (bool): storageCapacity indicates that the CSI volume driver wants pod
               scheduling to consider the storage capacity that the driver
               deployment will report by creating CSIStorageCapacity objects with
               capacity information, if set to true.  The check can be enabled
@@ -107,7 +107,7 @@ class CSIDriver(Resource):
               information has been published.  This field was immutable in
               Kubernetes <= 1.22 and now is mutable.
 
-            token_requests(List[Any]): tokenRequests indicates the CSI driver needs pods' service account
+            token_requests (List[Any]): tokenRequests indicates the CSI driver needs pods' service account
               tokens it is mounting volume for to do necessary authentication.
               Kubelet will pass the tokens in VolumeContext in the CSI
               NodePublishVolume calls. The CSI driver should parse and validate
@@ -119,7 +119,7 @@ class CSIDriver(Resource):
               receive a new token after expiry, RequiresRepublish can be used to
               trigger NodePublishVolume periodically.
 
-            volume_lifecycle_modes(List[Any]): volumeLifecycleModes defines what kind of volumes this CSI volume
+            volume_lifecycle_modes (List[Any]): volumeLifecycleModes defines what kind of volumes this CSI volume
               driver supports. The default if the list is empty is "Persistent",
               which is the usage defined by the CSI specification and
               implemented in Kubernetes via the usual PV/PVC mechanism.  The
@@ -175,3 +175,5 @@ class CSIDriver(Resource):
 
             if self.volume_lifecycle_modes:
                 _spec["volumeLifecycleModes"] = self.volume_lifecycle_modes
+
+    # End of generated code
