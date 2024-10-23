@@ -15,7 +15,6 @@ from typing import Optional, Any, Dict, List
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
-from benedict import benedict
 from kubernetes.dynamic.exceptions import (
     ConflictError,
     MethodNotAllowedError,
@@ -134,9 +133,27 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
     return None
 
 
-# Exceptions classes
+def change_dict_value_to_hashed(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
+    """
+    Recursively search a nested dictionary for a given key and changes its value to "******" if found.
 
-# End Exceptions classes
+    Args:
+        resource_dict: The nested dictionary to search.
+        key_name: The key to find.
+
+    Returns:
+        The modified dictionary.
+    """
+    if isinstance(resource_dict, dict):
+        for key, value in resource_dict.items():
+            if key == key_name:
+                resource_dict[key] = "******"
+            elif isinstance(value, dict):
+                resource_dict[key] = change_dict_value_to_hashed(value, key_name)
+            elif isinstance(value, list):
+                for key_list, value_list in enumerate(value):
+                    value[key_list] = change_dict_value_to_hashed(value_list, key_name)
+    return resource_dict
 
 
 class KubeAPIVersion(Version):
@@ -1177,14 +1194,8 @@ class Resource:
     def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
-            resource_dict = benedict(resource_dict, keypath_separator="..")
-
             for key in self.keys_to_hash:
-                if key in resource_dict:
-                    resource_dict[key] = "***"
-
-            return resource_dict
-
+                resource_dict = change_dict_value_to_hashed(resource_dict=resource_dict, key_name=key)
         return resource_dict
 
     def get_condition_message(self, condition_type: str, condition_status: str = "") -> str:

@@ -175,3 +175,7 @@ class VirtualMachine(NamespacedResource):
         ):
             if sample is None:
                 return
+
+    @property
+    def keys_to_hash(self):
+        return ["userData"]
