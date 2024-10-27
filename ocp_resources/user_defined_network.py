@@ -117,8 +117,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             self.res["spec"][self.LAYER2.lower()] = {}
             _layer2 = self.res["spec"][self.LAYER2.lower()]
 
-            if self.role:
-                _layer2["role"] = self.role
+            _layer2["role"] = self.role
 
             if self.mtu:
                 _layer2["mtu"] = self.mtu
