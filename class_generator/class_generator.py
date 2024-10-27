@@ -71,7 +71,7 @@ def _is_kind_and_namespaced(
     return not_resource_dict
 
 
-def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file):
+def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file: str) -> None:
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     resources_mapping = read_resources_mapping_file()
