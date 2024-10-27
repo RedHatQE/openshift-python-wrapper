@@ -209,12 +209,8 @@ def update_kind_schema():
         # Copy only new files from tmp_schema_dir to schema dir
         for root, _, files in os.walk(tmp_schema_dir):
             for file_ in files:
-                try:
+                if not os.path.isfile(Path(SCHEMA_DIR) / file_):
                     shutil.copy(src=Path(root) / file_, dst=Path(SCHEMA_DIR) / file_)
-                except shutil.SameFileError:
-                    continue
-
-    __import__("ipdb").set_trace()
 
     map_kind_to_namespaced(client=client)
 
