@@ -192,14 +192,18 @@ def update_kind_schema():
         LOGGER.error("Failed to get openapi schema.")
         sys.exit(1)
 
+    cluster_version_file = Path("class_generator/__cluster_version__.txt")
+    try:
+        with open(cluster_version_file, "r") as fd:
+            last_cluster_version_generated = fd.read().strip()
+    except (FileNotFoundError, IOError) as exp:
+        LOGGER.error(f"Failed to read cluster version file: {exp}")
+        sys.exit(1)
+
     cluster_version = get_server_version(client=client)
     cluster_version = cluster_version.split("+")[0]
     ocp_openapi_json_file = Path(gettempdir()) / f"__k8s-openapi-{cluster_version}__.json"
     last_cluster_version_generated: str = ""
-    cluster_version_file = Path("class_generator/__cluster_version__.txt")
-
-    with open(cluster_version_file, "r") as fd:
-        last_cluster_version_generated = fd.read().strip()
 
     newer_version: bool = Version(cluster_version) > Version(last_cluster_version_generated)
 
