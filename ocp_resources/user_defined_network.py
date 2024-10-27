@@ -69,9 +69,6 @@ class UserDefinedNetwork(NamespacedResource):
     # End of generated code
 
 
-LAYER2: str = "Layer2"
-
-
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
     """
     UserDefinedNetwork layer2 object.
@@ -79,6 +76,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     API reference:
     https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer2config
     """
+
+    LAYER2: str = "Layer2"
 
     def __init__(
         self,
@@ -100,7 +99,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
-            topology=LAYER2,
+            topology=self.LAYER2,
             **kwargs,
         )
         self.role = role
@@ -112,8 +111,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.kind_dict and not self.yaml_file:
-            self.res["spec"][LAYER2.lower()] = {}
-            _layer2 = self.res["spec"][LAYER2.lower()]
+            self.res["spec"][self.LAYER2.lower()] = {}
+            _layer2 = self.res["spec"][self.LAYER2.lower()]
 
             if self.role:
                 _layer2["role"] = self.role
