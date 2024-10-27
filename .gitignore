@@ -124,7 +124,3 @@ local-cluster/_hco/
 node_modules/
 package.json
 package-lock.json
-
-# class generator script
-class_generator/schema-defintions/*
-schema-*
