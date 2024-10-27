@@ -197,15 +197,15 @@ def update_kind_schema():
     cluster_version = cluster_version.split("+")[0]
     ocp_openapi_json_file = f"/tmp/__k8s-openapi-{cluster_version}__.json"
     last_cluster_version_generated: str = ""
-    cluter_version_file = Path("class_generator/__cluster_version__.txt")
+    cluster_version_file = Path("class_generator/__cluster_version__.txt")
 
-    with open(cluter_version_file, "r") as fd:
+    with open(cluster_version_file, "r") as fd:
         last_cluster_version_generated = fd.read().strip()
 
     newer_version: bool = Version(cluster_version) > Version(last_cluster_version_generated)
 
     if newer_version:
-        with open(cluter_version_file, "w") as fd:
+        with open(cluster_version_file, "w") as fd:
             fd.write(cluster_version)
 
     with open(ocp_openapi_json_file, "w") as fd:
