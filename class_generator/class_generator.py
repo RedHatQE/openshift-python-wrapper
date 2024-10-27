@@ -9,6 +9,7 @@ import requests
 from pathlib import Path
 from packaging.version import Version
 import shutil
+from tempfile import gettempdir
 
 import textwrap
 from typing import Any, Dict, List, Tuple
@@ -193,7 +194,7 @@ def update_kind_schema():
 
     cluster_version = get_server_version(client=client)
     cluster_version = cluster_version.split("+")[0]
-    ocp_openapi_json_file = f"/tmp/__k8s-openapi-{cluster_version}__.json"
+    ocp_openapi_json_file = Path(gettempdir()) / f"__k8s-openapi-{cluster_version}__.json"
     last_cluster_version_generated: str = ""
     cluster_version_file = Path("class_generator/__cluster_version__.txt")
 
@@ -209,7 +210,7 @@ def update_kind_schema():
     with open(ocp_openapi_json_file, "w") as fd:
         fd.write(data.text)
 
-    tmp_schema_dir = f"/tmp/{SCHEMA_DIR}-{cluster_version}"
+    tmp_schema_dir = Path(gettempdir()) / f"{SCHEMA_DIR}-{cluster_version}"
 
     if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {tmp_schema_dir}"))[0]:
         LOGGER.error("Failed to generate schema.")
