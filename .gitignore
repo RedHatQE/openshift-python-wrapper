@@ -126,4 +126,5 @@ package.json
 package-lock.json
 
 # class generator script
-class_generator/__ocp-openapi.json
+class_generator/schema-defintions/*
+schema-*

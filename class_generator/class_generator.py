@@ -7,6 +7,8 @@ import os
 import sys
 import requests
 from pathlib import Path
+from packaging.version import Version
+import shutil
 
 import textwrap
 from typing import Any, Dict, List, Tuple
@@ -177,13 +179,42 @@ def update_kind_schema():
 
     cluster_version = get_server_version(client=client)
     cluster_version = cluster_version.split("+")[0]
-    ocp_openapi_json_file = f"class_generator/__k8s-openapi-{cluster_version}__.json"
+    ocp_openapi_json_file = f"/tmp/__k8s-openapi-{cluster_version}__.json"
+    last_cluster_version_generated: str = ""
+    cluter_version_file = Path("class_generator/__cluster_version__.txt")
+
+    with open(cluter_version_file, "r") as fd:
+        last_cluster_version_generated = fd.read().strip()
+
+    newer_version: bool = Version(cluster_version) > Version(last_cluster_version_generated)
+
+    if newer_version:
+        with open(cluter_version_file, "w") as fd:
+            fd.write(cluster_version)
+
     with open(ocp_openapi_json_file, "w") as fd:
         fd.write(data.text)
 
-    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
+    tmp_schema_dir = f"/tmp/{SCHEMA_DIR}-{cluster_version}"
+
+    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {tmp_schema_dir}"))[0]:
         LOGGER.error("Failed to generate schema.")
         sys.exit(1)
+
+    if newer_version:
+        # copy all files from tmp_schema_dir to schema dir
+        shutil.copytree(src=tmp_schema_dir, dst=SCHEMA_DIR, dirs_exist_ok=True)
+
+    else:
+        # Copy only new files from tmp_schema_dir to schema dir
+        for root, _, files in os.walk(tmp_schema_dir):
+            for file_ in files:
+                try:
+                    shutil.copy(src=Path(root) / file_, dst=Path(SCHEMA_DIR) / file_)
+                except shutil.SameFileError:
+                    continue
+
+    __import__("ipdb").set_trace()
 
     map_kind_to_namespaced(client=client)
 
