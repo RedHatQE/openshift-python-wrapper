@@ -38,24 +38,21 @@ RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.jso
 MISSING_DESCRIPTION_STR: str = "No field description from API; please add description"
 
 
-def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Dict[str, Any]:
-    x_kubernetes_group_version_kind = extract_group_kind_version(_kind_schema=_data)
-    _kind = x_kubernetes_group_version_kind["kind"]
-    _group = x_kubernetes_group_version_kind.get("group")
-    _version = x_kubernetes_group_version_kind.get("version")
-    _group_and_version = f"{_group}/{_version}" if _group else _version
-
+def _is_kind_and_namespaced(
+    client: str, _key: str, _data: Dict[str, Any], kind: str, group: str, version: str
+) -> Dict[str, Any]:
+    _group_and_version = f"{group}/{version}" if group else version
     not_resource_dict = {"is_kind": False, "kind": _key}
 
     # if explain command failed, this is not a resource
-    if not run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
+    if not run_command(command=shlex.split(f"{client} explain {kind}"), check=False, log_errors=False)[0]:
         return not_resource_dict
 
-    # check if this as a valid version for the resource.
     api_resources_base_cmd = f"bash -c '{client} api-resources"
 
+    # check if this as a valid version for the resource.
     if run_command(
-        command=shlex.split(f"{api_resources_base_cmd} | grep -w {_kind} | grep {_group_and_version}'"),
+        command=shlex.split(f"{api_resources_base_cmd} | grep -w {kind} | grep {_group_and_version}'"),
         check=False,
         log_errors=False,
     )[0]:
@@ -63,7 +60,7 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
         _data["namespaced"] = (
             run_command(
                 command=shlex.split(
-                    f"{api_resources_base_cmd} --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
+                    f"{api_resources_base_cmd} --namespaced | grep -w {kind} | grep {_group_and_version} | wc -l'"
                 ),
                 check=False,
                 log_errors=False,
@@ -99,7 +96,24 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
             if _key in not_kind_list:
                 continue
 
-            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _key=_key, _data=_data))
+            x_kubernetes_group_version_kind = extract_group_kind_version(_kind_schema=_data)
+            _kind = x_kubernetes_group_version_kind["kind"]
+            _group = x_kubernetes_group_version_kind.get("group", "")
+            _version = x_kubernetes_group_version_kind.get("version", "")
+
+            # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
+            if resources_mapping.get(_kind.lower()) and not newer_cluster_version:
+                _kind_data_futures.append(
+                    executor.submit(
+                        _is_kind_and_namespaced,
+                        client=client,
+                        _key=_key,
+                        _data=_data,
+                        kind=_kind,
+                        group=_group,
+                        version=_version,
+                    )
+                )
 
     _temp_resources_mappings: Dict[Any, Any] = {}
     for res in as_completed(_kind_data_futures):
@@ -108,9 +122,9 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
         kind_key = _res["kind"].rsplit(".", 1)[-1].lower()
 
         if _res["is_kind"]:
-            # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
-            if resources_mapping.get(kind_key) and not newer_cluster_version:
-                continue
+            # # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
+            # if resources_mapping.get(kind_key) and not newer_cluster_version:
+            #     continue
 
             _temp_resources_mappings.setdefault(kind_key, []).append(_res["data"])
         else:
