@@ -72,7 +72,7 @@ def _is_kind_and_namespaced(
     return not_resource_dict
 
 
-def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file: str) -> None:
+def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file: Path) -> None:
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     resources_mapping = read_resources_mapping_file()
@@ -228,8 +228,13 @@ def update_kind_schema():
         # Copy only new files from tmp_schema_dir to schema dir
         for root, _, files in os.walk(tmp_schema_dir):
             for file_ in files:
-                if not os.path.isfile(Path(SCHEMA_DIR) / file_):
-                    shutil.copy(src=Path(root) / file_, dst=Path(SCHEMA_DIR) / file_)
+                dst_file = Path(SCHEMA_DIR) / file_
+                try:
+                    if not os.path.isfile(dst_file):
+                        shutil.copy(src=Path(root) / file_, dst=dst_file)
+                except (OSError, IOError) as exp:
+                    LOGGER.error(f"Failed to copy file {file_}: {exp}")
+                    sys.exit(1)
 
     map_kind_to_namespaced(
         client=client, newer_cluster_version=newer_version, schema_definition_file=ocp_openapi_json_file
