@@ -473,7 +473,7 @@ def parse_explain(
             "spec": [],
         }
 
-        schema_properties: Dict[str, Any] = _kind_schema["properties"]
+        schema_properties: Dict[str, Any] = _kind_schema.get("properties", {})
         fields_required = _kind_schema.get("required", [])
 
         resource_dict.update(extract_group_kind_version(_kind_schema=_kind_schema))
