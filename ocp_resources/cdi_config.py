@@ -1,7 +1,6 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-
 from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 from timeout_sampler import TimeoutSampler
@@ -32,40 +31,40 @@ class CDIConfig(Resource):
     ) -> None:
         """
         Args:
-            data_volume_ttl_seconds(int): DataVolumeTTLSeconds is the time in seconds after DataVolume
+            data_volume_ttl_seconds (int): DataVolumeTTLSeconds is the time in seconds after DataVolume
               completion it can be garbage collected. Disabled by default.
 
-            feature_gates(List[Any]): FeatureGates are a list of specific enabled feature gates
+            feature_gates (List[Any]): FeatureGates are a list of specific enabled feature gates
 
-            filesystem_overhead(Dict[str, Any]): FilesystemOverhead describes the space reserved for overhead when
+            filesystem_overhead (Dict[str, Any]): FilesystemOverhead describes the space reserved for overhead when
               using Filesystem volumes. A value is between 0 and 1, if not
               defined it is 0.055 (5.5% overhead)
 
-            image_pull_secrets(List[Any]): The imagePullSecrets used to pull the container images
+            image_pull_secrets (List[Any]): The imagePullSecrets used to pull the container images
 
-            import_proxy(Dict[str, Any]): ImportProxy contains importer pod proxy configuration.
+            import_proxy (Dict[str, Any]): ImportProxy contains importer pod proxy configuration.
 
-            insecure_registries(List[Any]): InsecureRegistries is a list of TLS disabled registries
+            insecure_registries (List[Any]): InsecureRegistries is a list of TLS disabled registries
 
-            log_verbosity(int): LogVerbosity overrides the default verbosity level used to initialize
+            log_verbosity (int): LogVerbosity overrides the default verbosity level used to initialize
               loggers
 
-            pod_resource_requirements(Dict[str, Any]): ResourceRequirements describes the compute resource requirements.
+            pod_resource_requirements (Dict[str, Any]): ResourceRequirements describes the compute resource requirements.
 
-            preallocation(bool): Preallocation controls whether storage for DataVolumes should be
+            preallocation (bool): Preallocation controls whether storage for DataVolumes should be
               allocated in advance.
 
-            scratch_space_storage_class(str): Override the storage class to used for scratch space during transfer
+            scratch_space_storage_class (str): Override the storage class to used for scratch space during transfer
               operations. The scratch space storage class is determined in the
               following order: 1. value of scratchSpaceStorageClass, if that
               doesn't exist, use the default storage class, if there is no
               default storage class, use the storage class of the DataVolume, if
               no storage class specified, use no storage class for scratch space
 
-            tls_security_profile(Dict[str, Any]): TLSSecurityProfile is used by operators to apply cluster-wide TLS
+            tls_security_profile (Dict[str, Any]): TLSSecurityProfile is used by operators to apply cluster-wide TLS
               security settings to operands.
 
-            upload_proxy_url_override(str): Override the URL used when uploading to a DataVolume
+            upload_proxy_url_override (str): Override the URL used when uploading to a DataVolume
 
         """
         super().__init__(**kwargs)
@@ -125,6 +124,8 @@ class CDIConfig(Resource):
 
             if self.upload_proxy_url_override:
                 _spec["uploadProxyURLOverride"] = self.upload_proxy_url_override
+
+    # End of generated code
 
     @property
     def scratch_space_storage_class_from_spec(self) -> str:

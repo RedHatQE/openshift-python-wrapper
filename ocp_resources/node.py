@@ -11,9 +11,6 @@ class Node(Resource):
 
     api_version: str = Resource.ApiVersion.V1
 
-    class Status(Resource.Status):
-        SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
-
     def __init__(
         self,
         config_source: Optional[Dict[str, Any]] = None,
@@ -27,26 +24,26 @@ class Node(Resource):
     ) -> None:
         """
         Args:
-            config_source(Dict[str, Any]): NodeConfigSource specifies a source of node configuration. Exactly one
+            config_source (Dict[str, Any]): NodeConfigSource specifies a source of node configuration. Exactly one
               subfield (excluding metadata) must be non-nil. This API is
               deprecated since 1.22
 
-            external_id(str): Deprecated. Not all kubelets will set this field. Remove field after
+            external_id (str): Deprecated. Not all kubelets will set this field. Remove field after
               1.13. see: https://issues.k8s.io/61966
 
-            pod_cidr(str): PodCIDR represents the pod IP range assigned to the node.
+            pod_cidr (str): PodCIDR represents the pod IP range assigned to the node.
 
-            pod_cidrs(List[Any]): podCIDRs represents the IP ranges assigned to the node for usage by
+            pod_cidrs (List[Any]): podCIDRs represents the IP ranges assigned to the node for usage by
               Pods on that node. If this field is specified, the 0th entry must
               match the podCIDR field. It may contain at most 1 value for each
               of IPv4 and IPv6.
 
-            provider_id(str): ID of the node assigned by the cloud provider in the format:
+            provider_id (str): ID of the node assigned by the cloud provider in the format:
               <ProviderName>://<ProviderSpecificNodeID>
 
-            taints(List[Any]): If specified, the node's taints.
+            taints (List[Any]): If specified, the node's taints.
 
-            unschedulable(bool): Unschedulable controls node schedulability of new pods. By default,
+            unschedulable (bool): Unschedulable controls node schedulability of new pods. By default,
               node is schedulable. More info:
               https://kubernetes.io/docs/concepts/nodes/node/#manual-node-
               administration
@@ -59,7 +56,7 @@ class Node(Resource):
         self.pod_cidr = pod_cidr
         self.pod_cidrs = pod_cidrs
         self.provider_id = provider_id
-        self._taints = taints
+        self.taints = taints
         self.unschedulable = unschedulable
 
     def to_dict(self) -> None:
@@ -85,10 +82,12 @@ class Node(Resource):
                 _spec["providerID"] = self.provider_id
 
             if self.taints:
-                _spec["taints"] = self._taints
+                _spec["taints"] = self.taints
 
             if self.unschedulable is not None:
                 _spec["unschedulable"] = self.unschedulable
+
+    # End of generated code
 
     @property
     def kubelet_ready(self):
@@ -111,6 +110,5 @@ class Node(Resource):
     def hostname(self):
         return self.labels["kubernetes.io/hostname"]
 
-    @property
-    def taints(self):
+    def get_taints(self):
         return self.instance.get("spec", {}).get("taints")

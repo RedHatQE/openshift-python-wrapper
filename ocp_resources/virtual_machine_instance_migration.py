@@ -19,7 +19,7 @@ class VirtualMachineInstanceMigration(NamespacedResource):
     ) -> None:
         """
         Args:
-            vmi_name(str): The name of the VMI to perform the migration on. VMI must exist in the
+            vmi_name (str): The name of the VMI to perform the migration on. VMI must exist in the
               migration objects namespace
 
         """
@@ -36,3 +36,5 @@ class VirtualMachineInstanceMigration(NamespacedResource):
 
             if self.vmi_name:
                 _spec["vmiName"] = self.vmi_name
+
+    # End of generated code

@@ -23,10 +23,10 @@ class VirtualMachineInstancePreset(NamespacedResource):
     ) -> None:
         """
         Args:
-            domain(Dict[str, Any]): Domain is the same object type as contained in
+            domain (Dict[str, Any]): Domain is the same object type as contained in
               VirtualMachineInstanceSpec
 
-            selector(Dict[str, Any]): Selector is a label query over a set of VMIs. Required.
+            selector (Dict[str, Any]): Selector is a label query over a set of VMIs. Required.
 
         """
         super().__init__(**kwargs)
@@ -38,10 +38,8 @@ class VirtualMachineInstancePreset(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not all([
-                self.selector,
-            ]):
-                raise MissingRequiredArgumentError(argument="selector")
+            if not self.selector:
+                raise MissingRequiredArgumentError(argument="self.selector")
 
             self.res["spec"] = {}
             _spec = self.res["spec"]
@@ -50,3 +48,5 @@ class VirtualMachineInstancePreset(NamespacedResource):
 
             if self.domain:
                 _spec["domain"] = self.domain
+
+    # End of generated code

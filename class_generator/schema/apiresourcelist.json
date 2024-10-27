@@ -23,8 +23,7 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
-      },
-      "x-kubernetes-list-type": "atomic"
+      }
     }
   },
   "x-kubernetes-group-version-kind": [

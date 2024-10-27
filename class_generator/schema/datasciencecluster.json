@@ -331,6 +331,60 @@
                 }
               }
             },
+            "modelregistry": {
+              "description": "ModelRegistry component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values: \n - \"Managed\" : the operator is actively managing the component and trying to keep it active. It will only upgrade the component if it is safe to do so \n - \"Removed\" : the operator is actively managing the component and will not install it, or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                },
+                "registriesNamespace": {
+                  "description": "Namespace for model registries to be installed, configurable only once when model registry is enabled, defaults to \"rhoai-model-registries\"",
+                  "type": "string",
+                  "maxLength": 63,
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$"
+                }
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "RegistriesNamespace is immutable when model registry is Managed",
+                  "rule": "(self.managementState != 'Managed') || (oldSelf.registriesNamespace == '') || (oldSelf.managementState != 'Managed')|| (self.registriesNamespace == oldSelf.registriesNamespace)"
+                }
+              ]
+            },
             "ray": {
               "description": "Ray component configuration.",
               "type": "object",
@@ -507,6 +561,21 @@
       "description": "DataScienceClusterStatus defines the observed state of DataScienceCluster.",
       "type": "object",
       "properties": {
+        "components": {
+          "description": "Expose component's specific status",
+          "type": "object",
+          "properties": {
+            "modelregistry": {
+              "description": "ModelRegistry component status",
+              "type": "object",
+              "properties": {
+                "registriesNamespace": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
         "conditions": {
           "description": "Conditions describes the state of the DataScienceCluster resource.",
           "type": "array",

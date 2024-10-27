@@ -1,7 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    ":dependencyDashboard",
+    ":maintainLockFilesWeekly",
+    ":prHourlyLimitNone"
+  ],
+  "prConcurrentLimit": 0,
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "baseBranches": ["main", "v4.17", "v4.16", "v4.15"],
-  "ignoreDeps": ["kubernetes", "openshift"],
+  "ignoreDeps": ["kubernetes"],
   "packageRules": [
     {
       "baseBranchList": ["v4.17", "v4.16", "v4.15"],
