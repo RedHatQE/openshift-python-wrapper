@@ -103,17 +103,19 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
 
             # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
             if resources_mapping.get(_kind.lower()) and not newer_cluster_version:
-                _kind_data_futures.append(
-                    executor.submit(
-                        _is_kind_and_namespaced,
-                        client=client,
-                        _key=_key,
-                        _data=_data,
-                        kind=_kind,
-                        group=_group,
-                        version=_version,
-                    )
+                continue
+
+            _kind_data_futures.append(
+                executor.submit(
+                    _is_kind_and_namespaced,
+                    client=client,
+                    _key=_key,
+                    _data=_data,
+                    kind=_kind,
+                    group=_group,
+                    version=_version,
                 )
+            )
 
     _temp_resources_mappings: Dict[Any, Any] = {}
     for res in as_completed(_kind_data_futures):
@@ -122,10 +124,6 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
         kind_key = _res["kind"].rsplit(".", 1)[-1].lower()
 
         if _res["is_kind"]:
-            # # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
-            # if resources_mapping.get(kind_key) and not newer_cluster_version:
-            #     continue
-
             _temp_resources_mappings.setdefault(kind_key, []).append(_res["data"])
         else:
             not_kind_list.append(_res["kind"])
