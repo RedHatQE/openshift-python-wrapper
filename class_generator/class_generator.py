@@ -33,7 +33,6 @@ FIELDS_STR: str = "FIELDS"
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
-SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 MISSING_DESCRIPTION_STR: str = "No field description from API; please add description"
 
@@ -72,7 +71,7 @@ def _is_kind_and_namespaced(
     return not_resource_dict
 
 
-def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
+def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file):
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     resources_mapping = read_resources_mapping_file()
@@ -83,14 +82,13 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
     else:
         not_kind_list = []
 
-    with open(SCHEMA_DEFINITION_FILE) as fd:
+    with open(schema_definition_file) as fd:
         _definitions_json_data = json.load(fd)
 
     _kind_data_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
         for _key, _data in _definitions_json_data["definitions"].items():
-            _group_version_kind = _data.get("x-kubernetes-group-version-kind")
-            if not _group_version_kind:
+            if not _data.get("x-kubernetes-group-version-kind"):
                 continue
 
             if _key in not_kind_list:
@@ -228,7 +226,9 @@ def update_kind_schema():
                 if not os.path.isfile(Path(SCHEMA_DIR) / file_):
                     shutil.copy(src=Path(root) / file_, dst=Path(SCHEMA_DIR) / file_)
 
-    map_kind_to_namespaced(client=client, newer_cluster_version=newer_version)
+    map_kind_to_namespaced(
+        client=client, newer_cluster_version=newer_version, schema_definition_file=ocp_openapi_json_file
+    )
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
@@ -651,7 +651,7 @@ def write_and_format_rendered(filepath: str, data: str, user_code: str = "") -> 
 
     for op in ("format", "check"):
         run_command(
-            command=shlex.split(f"uv run ruff {op} {filepath}"),
+            command=shlex.split(f"uvx ruff {op} {filepath}"),
             verify_stderr=False,
             check=False,
         )
