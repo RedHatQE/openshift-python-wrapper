@@ -75,7 +75,7 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
     return not_resource_dict
 
 
-def map_kind_to_namespaced(client: str):
+def map_kind_to_namespaced(client: str, newer_cluster_version: bool):
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     resources_mapping = read_resources_mapping_file()
@@ -108,6 +108,10 @@ def map_kind_to_namespaced(client: str):
         kind_key = _res["kind"].rsplit(".", 1)[-1].lower()
 
         if _res["is_kind"]:
+            # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
+            if resources_mapping.get(kind_key) and not newer_cluster_version:
+                continue
+
             _temp_resources_mappings.setdefault(kind_key, []).append(_res["data"])
         else:
             not_kind_list.append(_res["kind"])
@@ -212,7 +216,7 @@ def update_kind_schema():
                 if not os.path.isfile(Path(SCHEMA_DIR) / file_):
                     shutil.copy(src=Path(root) / file_, dst=Path(SCHEMA_DIR) / file_)
 
-    map_kind_to_namespaced(client=client)
+    map_kind_to_namespaced(client=client, newer_cluster_version=newer_version)
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
