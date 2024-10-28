@@ -69,6 +69,19 @@ class UserDefinedNetwork(NamespacedResource):
     # End of generated code
 
 
+class TopologyType:
+    """
+    This class contains constants for different network topology types used in the UserDefinedNetwork configuration.
+
+    Attributes:
+        LAYER2 (str): Represents a Layer2 topology.
+        LAYER3 (str): Represents a Layer3 topology.
+    """
+
+    LAYER2 = "Layer2"
+    LAYER3 = "Layer3"
+
+
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
     """
     UserDefinedNetwork layer2 object.
@@ -76,8 +89,6 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     API reference:
     https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer2config
     """
-
-    LAYER2: str = "Layer2"
 
     def __init__(
         self,
@@ -99,7 +110,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
-            topology=self.LAYER2,
+            topology=TopologyType.LAYER2,
             **kwargs,
         )
         self.role = role
@@ -114,8 +125,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             if not self.role:
                 raise MissingRequiredArgumentError(argument="role")
 
-            self.res["spec"][self.LAYER2.lower()] = {"role": self.role}
-            _layer2 = self.res["spec"][self.LAYER2.lower()]
+            self.res["spec"][TopologyType.LAYER2.lower()] = {"role": self.role}
+            _layer2 = self.res["spec"][TopologyType.LAYER2.lower()]
 
             if self.mtu:
                 _layer2["mtu"] = self.mtu
@@ -128,3 +139,88 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
 
             if self.ipam_lifecycle:
                 _layer2["ipamLifecycle"] = self.ipam_lifecycle
+
+
+class Layer3Subnets:
+    """
+    UserDefinedNetwork layer3 subnets object.
+
+    API reference:
+    https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer3subnet
+    """
+
+    def __init__(
+        self,
+        cidr: Optional[str] = None,
+        host_subnet: Optional[int] = None,
+    ):
+        """
+        UserDefinedNetwork layer3 subnets object.
+
+        Args:
+            cidr (Optional[str]): CIDR specifies L3Subnet, which is split into smaller subnets for every node.
+            host_subnet (Optional[int]): host_subnet specifies the subnet size for every node.
+        """
+        self.cidr = cidr
+        self.host_subnet = host_subnet
+
+
+class Layer3UserDefinedNetwork(UserDefinedNetwork):
+    """
+    UserDefinedNetwork layer3 object.
+
+    API reference:
+    https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer3config
+    """
+
+    def __init__(
+        self,
+        role: str,
+        mtu: Optional[int] = None,
+        subnets: Optional[List[Layer3Subnets]] = None,
+        join_subnets: Optional[List[str]] = None,
+        **kwargs,
+    ):
+        """
+        Create and manage UserDefinedNetwork with layer3 configuration
+
+        Args:
+            role (Optional[str]): role describes the network role in the pod. Required.
+            mtu (Optional[int]): mtu is the maximum transmission unit for a network.
+            subnets (Optional[List[Layer3Subnets]]): subnets are used for the pod network across the cluster.
+            join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
+        """
+        super().__init__(
+            topology=TopologyType.LAYER3,
+            **kwargs,
+        )
+        self.role = role
+        self.mtu = mtu
+        self.subnets = subnets
+        self.join_subnets = join_subnets
+
+    def to_dict(self) -> None:
+        super().to_dict()
+        if not self.kind_dict and not self.yaml_file:
+            if not self.role:
+                raise MissingRequiredArgumentError(argument="role")
+
+            self.res["spec"][TopologyType.LAYER3.lower()] = {"role": self.role}
+            _layer3 = self.res["spec"][TopologyType.LAYER3.lower()]
+
+            if self.mtu:
+                _layer3["mtu"] = self.mtu
+
+            if self.join_subnets:
+                _layer3["joinSubnets"] = self.join_subnets
+
+            if self.subnets is not None:
+                _subnets = _layer3.setdefault("subnets", [])
+
+                for subnet in self.subnets:
+                    subnet_dict = {
+                        key: value
+                        for key, value in [("cidr", subnet.cidr), ("hostSubnet", subnet.host_subnet)]
+                        if value is not None
+                    }
+                    _subnets.append(subnet_dict)
