@@ -150,7 +150,7 @@ def change_dict_value_to_hashed(resource_dict: Dict[Any, Any], key_name: str) ->
                 resource_dict[key] = "******"
             elif isinstance(value, dict):
                 resource_dict[key] = change_dict_value_to_hashed(value, key_name)
-            elif isinstance(value, list):
+                    elif isinstance(value, list) and any(isinstance(item, dict) for item in value):
                 for key_list, value_list in enumerate(value):
                     value[key_list] = change_dict_value_to_hashed(value_list, key_name)
     return resource_dict
