@@ -9,8 +9,6 @@ class ClusterServiceVersion(NamespacedResource):
     class Status(NamespacedResource.Status):
         INSTALLING = "Installing"
 
-    import json
-
     def get_dicts_from_examples(self):
         """
         Parse the alm-examples annotation from the CSV instance and return a list of dictionaries.
