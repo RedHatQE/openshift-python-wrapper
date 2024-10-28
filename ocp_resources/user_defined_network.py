@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from typing import List
 
 
 class UserDefinedNetwork(NamespacedResource):
@@ -66,3 +67,64 @@ class UserDefinedNetwork(NamespacedResource):
                 _spec["localNet"] = self.local_net
 
     # End of generated code
+
+
+class Layer2UserDefinedNetwork(UserDefinedNetwork):
+    """
+    UserDefinedNetwork layer2 object.
+
+    API reference:
+    https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer2config
+    """
+
+    LAYER2: str = "Layer2"
+
+    def __init__(
+        self,
+        role: Optional[str] = None,
+        mtu: Optional[int] = None,
+        subnets: Optional[List[str]] = None,
+        join_subnets: Optional[List[str]] = None,
+        ipam_lifecycle: Optional[str] = None,
+        **kwargs,
+    ):
+        """
+        Create and manage UserDefinedNetwork with layer2 configuration
+
+        Args:
+            role (Optional[str]): role describes the network role in the pod.
+            mtu (Optional[int]): mtu is the maximum transmission unit for a network.
+            subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
+            join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
+            ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
+        """
+        super().__init__(
+            topology=self.LAYER2,
+            **kwargs,
+        )
+        self.role = role
+        self.mtu = mtu
+        self.subnets = subnets
+        self.join_subnets = join_subnets
+        self.ipam_lifecycle = ipam_lifecycle
+
+    def to_dict(self) -> None:
+        super().to_dict()
+        if not self.kind_dict and not self.yaml_file:
+            if not self.role:
+                raise MissingRequiredArgumentError(argument="role")
+
+            self.res["spec"][self.LAYER2.lower()] = {"role": self.role}
+            _layer2 = self.res["spec"][self.LAYER2.lower()]
+
+            if self.mtu:
+                _layer2["mtu"] = self.mtu
+
+            if self.subnets:
+                _layer2["subnets"] = self.subnets
+
+            if self.join_subnets:
+                _layer2["joinSubnets"] = self.join_subnets
+
+            if self.ipam_lifecycle:
+                _layer2["ipamLifecycle"] = self.ipam_lifecycle
