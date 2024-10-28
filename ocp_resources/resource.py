@@ -136,6 +136,11 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
 
 # Exceptions classes
 
+
+class WaitForStatusConditionFailed(Exception):
+    """Exception raised when waiting for a status condition fails."""
+
+
 # End Exceptions classes
 
 
@@ -1027,6 +1032,58 @@ class Resource:
                 for cond in sample.get("status", {}).get("conditions", []):
                     if cond["type"] == condition and cond["status"] == status:
                         return
+
+    def wait_for_status_condition(
+        self,
+        wait_condition_fns: List[Callable],
+        not_wait_condition_fns: Optional[List[Callable]] = None,
+        wait_timeout: int = 120,
+        sleep_interval: int = 2,
+    ) -> dict:
+        """
+        Wait for specific status conditions to be met.
+
+        This function continuously checks the current status conditions, waiting for any of the specified "wait"
+        conditions to be satisfied while monitoring for any of the specified "not wait" conditions to trigger a failure.
+
+        Args:
+            wait_condition_fns (List[Callable]): A list of functions that must all return True to indicate that the
+                condition has been met.
+            not_wait_condition_fns (Optional[List[Callable]]):A list of functions where at least one must return True to
+                indicate a failure condition and stop the wait. Default is None.
+            wait_timeout (int, optional): The maximum time to wait for the conditions to be satisfied (in seconds).
+            sleep_interval (int, optional): The interval between checks (in seconds).
+
+        Returns:
+            dict: The condition that indicates the desired status when met.
+
+        Raises:
+            WaitForStatusConditionFailed: If any of the unexpected conditions is met.
+            TimeoutExpiredError: If the timeout expires before the conditions are satisfied.
+        """
+        samples = TimeoutSampler(
+            wait_timeout=wait_timeout, sleep=sleep_interval, func=lambda: self.instance.status.conditions
+        )
+
+        try:
+            for sample in samples:
+                for condition in sample:
+                    if all(wait_fn(condition) for wait_fn in wait_condition_fns):
+                        return condition
+
+                if not_wait_condition_fns:
+                    for condition in sample:
+                        if any(not_wait_fn(condition) for not_wait_fn in not_wait_condition_fns):
+                            raise WaitForStatusConditionFailed(
+                                f"Failed to wait for the intended status for {self.kind}/{self.name}. "
+                                f"Condition message: {condition.get('message', 'No message provided')}"
+                            )
+
+        except (TimeoutExpiredError, WaitForStatusConditionFailed) as e:
+            self.logger.error(f"{str(e)}")
+            raise
+
+        return {}
 
     def api_request(self, method: str, action: str, url: str, **params: Any) -> Dict[str, Any]:
         """
