@@ -114,10 +114,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             if not self.role:
                 raise MissingRequiredArgumentError(argument="role")
 
-            self.res["spec"][self.LAYER2.lower()] = {}
+            self.res["spec"][self.LAYER2.lower()] = {"role": self.role}
             _layer2 = self.res["spec"][self.LAYER2.lower()]
-
-            _layer2["role"] = self.role
 
             if self.mtu:
                 _layer2["mtu"] = self.mtu
