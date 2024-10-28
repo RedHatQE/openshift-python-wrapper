@@ -194,7 +194,7 @@ class VirtualMachineInstance(NamespacedResource):
 
     def virsh_cmd(self, action):
         return shlex.split(
-            "virsh" f" {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
+            f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
         )
 
     def get_xml(self):
