@@ -205,7 +205,8 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
             if self.join_subnets:
                 _layer3["joinSubnets"] = self.join_subnets
 
-            if self.subnets is not None:
+            if self.subnets:
+                _layer3["subnets"] = []
                 _subnets = _layer3["subnets"]
 
                 for subnet in self.subnets:
