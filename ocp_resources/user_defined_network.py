@@ -193,7 +193,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.kind_dict and not self.yaml_file:
-            if not self.role:
+            if not all([self.role, self.subnets]):
                 raise MissingRequiredArgumentError(argument="role")
 
             self.res["spec"][self.LAYER3.lower()] = {"role": self.role}
