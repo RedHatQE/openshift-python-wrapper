@@ -10,7 +10,7 @@ class ClusterServiceVersion(NamespacedResource):
     class Status(NamespacedResource.Status):
         INSTALLING = "Installing"
 
-    def get_dicts_from_examples(self) -> Union[List[Dict[str, Any]], List]:
+    def get_alm_examples(self) -> Union[List[Dict[str, Any]], List]:
         """
         Parse the alm-examples annotation from the CSV instance and return a list of dictionaries.
 
