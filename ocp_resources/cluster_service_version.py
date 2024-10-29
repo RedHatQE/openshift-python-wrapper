@@ -1,9 +1,5 @@
 import json
-<<<<<<< Updated upstream
-from typing import List, Any
-=======
 from typing import List, Any, Dict, Union
->>>>>>> Stashed changes
 
 from ocp_resources.resource import NamespacedResource
 
