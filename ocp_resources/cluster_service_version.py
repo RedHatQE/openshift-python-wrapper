@@ -19,4 +19,11 @@ class ClusterServiceVersion(NamespacedResource):
             or an empty list if alm-examples doesn't exist.
         """
         examples = self.instance.metadata.annotations.get("alm-examples")
-        return json.loads(examples) if examples else []
+        if not examples:
+            self.logger.debug("No alm-examples annotation found in CSV")
+            return []
+        try:
+            return json.loads(examples)
+        except json.JSONDecodeError as e:
+            self.logger.warning(f"Failed to parse alm-examples annotation: {e}")
+        return []
