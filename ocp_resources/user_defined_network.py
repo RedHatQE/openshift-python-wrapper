@@ -152,7 +152,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         Create and manage UserDefinedNetwork with layer3 configuration
 
         Args:
-            role (Optional[str]): role describes the network role in the pod. Required.
+            role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List[Dict]]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
