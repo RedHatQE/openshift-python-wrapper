@@ -1,5 +1,5 @@
 import json
-from typing import List, Any, Dict
+from typing import List, Any
 
 from ocp_resources.resource import NamespacedResource
 
