@@ -39,23 +39,23 @@ repos:
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.0
+    rev: v0.7.1
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 38.128.6
+    rev: 38.133.1
     hooks:
       - id: renovate-config-validator
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.21.1
+    rev: v8.21.2
     hooks:
       - id: gitleaks
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.12.1
+    rev: v1.13.0
     hooks:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)
