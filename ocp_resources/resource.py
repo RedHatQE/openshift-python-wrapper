@@ -1007,7 +1007,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
-        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be" f" '{status}'")
+        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(
@@ -1414,7 +1414,7 @@ class ResourceEditor:
                         resource_to_patch.append(resource)
                         self._backups[resource] = backup
                     else:
-                        LOGGER.warning("ResourceEdit: no diff found in patch for " f"{resource.name} -- skipping")
+                        LOGGER.warning(f"ResourceEdit: no diff found in patch for {resource.name} -- skipping")
                 if not resource_to_patch:
                     return
         else:
@@ -1509,7 +1509,7 @@ class ResourceEditor:
         """
 
         for resource, patch in patches.items():
-            LOGGER.info(f"ResourceEdits: {action_text} data for " f"resource {resource.kind} {resource.name}")
+            LOGGER.info(f"ResourceEdits: {action_text} data for resource {resource.kind} {resource.name}")
 
             # add name to patch
             if "metadata" not in patch:
