@@ -130,30 +130,6 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
                 _layer2["ipamLifecycle"] = self.ipam_lifecycle
 
 
-class Layer3Subnets:
-    """
-    UserDefinedNetwork layer3 subnets object.
-
-    API reference:
-    https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer3subnet
-    """
-
-    def __init__(
-        self,
-        cidr: Optional[str] = None,
-        host_subnet: Optional[int] = None,
-    ):
-        """
-        UserDefinedNetwork layer3 subnets object.
-
-        Args:
-            cidr (Optional[str]): CIDR specifies L3Subnet, which is split into smaller subnets for every node.
-            host_subnet (Optional[int]): host_subnet specifies the subnet size for every node.
-        """
-        self.cidr = cidr
-        self.host_subnet = host_subnet
-
-
 class Layer3UserDefinedNetwork(UserDefinedNetwork):
     """
     UserDefinedNetwork layer3 object.
@@ -168,7 +144,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         self,
         role: str,
         mtu: Optional[int] = None,
-        subnets: Optional[List[Layer3Subnets]] = None,
+        subnets: Optional[List[Dict]] = None,
         join_subnets: Optional[List[str]] = None,
         **kwargs,
     ):
@@ -178,7 +154,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         Args:
             role (Optional[str]): role describes the network role in the pod. Required.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[List[Layer3Subnets]]): subnets are used for the pod network across the cluster.
+            subnets (Optional[List[Dict]]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
         """
         super().__init__(
@@ -206,13 +182,4 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
                 _layer3["joinSubnets"] = self.join_subnets
 
             if self.subnets:
-                _layer3["subnets"] = []
-                _subnets = _layer3["subnets"]
-
-                for subnet in self.subnets:
-                    subnet_dict = {
-                        key: value
-                        for key, value in [("cidr", subnet.cidr), ("hostSubnet", subnet.host_subnet)]
-                        if value is not None
-                    }
-                    _subnets.append(subnet_dict)
+                _layer3["subnets"] = self.subnets
