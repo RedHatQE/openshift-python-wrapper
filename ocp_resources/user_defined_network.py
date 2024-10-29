@@ -142,7 +142,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
 
     def __init__(
         self,
-        role: str,
+        role: Optional[str] = None,
         mtu: Optional[int] = None,
         subnets: Optional[List[Dict]] = None,
         join_subnets: Optional[List[str]] = None,
