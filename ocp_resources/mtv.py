@@ -112,7 +112,7 @@ class MTV:
                         return
 
         except TimeoutExpiredError:
-            self.logger.error(msg=(f"Last Status Condition of {self.kind} {self.name} was:" f" {last_condition}"))
+            self.logger.error(msg=(f"Last Status Condition of {self.kind} {self.name} was: {last_condition}"))
             raise
 
     def wait_for_condition_ready(self, wait_timeout=360):
