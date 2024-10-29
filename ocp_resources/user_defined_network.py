@@ -69,19 +69,6 @@ class UserDefinedNetwork(NamespacedResource):
     # End of generated code
 
 
-class TopologyType:
-    """
-    This class contains constants for different network topology types used in the UserDefinedNetwork configuration.
-
-    Attributes:
-        LAYER2 (str): Represents a Layer2 topology.
-        LAYER3 (str): Represents a Layer3 topology.
-    """
-
-    LAYER2 = "Layer2"
-    LAYER3 = "Layer3"
-
-
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
     """
     UserDefinedNetwork layer2 object.
@@ -89,6 +76,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
     API reference:
     https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer2config
     """
+
+    LAYER2: str = "Layer2"
 
     def __init__(
         self,
@@ -110,7 +99,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
-            topology=TopologyType.LAYER2,
+            topology=self.LAYER2,
             **kwargs,
         )
         self.role = role
@@ -125,8 +114,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             if not self.role:
                 raise MissingRequiredArgumentError(argument="role")
 
-            self.res["spec"][TopologyType.LAYER2.lower()] = {"role": self.role}
-            _layer2 = self.res["spec"][TopologyType.LAYER2.lower()]
+            self.res["spec"][self.LAYER2.lower()] = {"role": self.role}
+            _layer2 = self.res["spec"][self.LAYER2.lower()]
 
             if self.mtu:
                 _layer2["mtu"] = self.mtu
@@ -173,6 +162,8 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
     https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer3config
     """
 
+    LAYER3: str = "Layer3"
+
     def __init__(
         self,
         role: str,
@@ -191,7 +182,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
         """
         super().__init__(
-            topology=TopologyType.LAYER3,
+            topology=self.LAYER3,
             **kwargs,
         )
         self.role = role
@@ -205,8 +196,8 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
             if not self.role:
                 raise MissingRequiredArgumentError(argument="role")
 
-            self.res["spec"][TopologyType.LAYER3.lower()] = {"role": self.role}
-            _layer3 = self.res["spec"][TopologyType.LAYER3.lower()]
+            self.res["spec"][self.LAYER3.lower()] = {"role": self.role}
+            _layer3 = self.res["spec"][self.LAYER3.lower()]
 
             if self.mtu:
                 _layer3["mtu"] = self.mtu
