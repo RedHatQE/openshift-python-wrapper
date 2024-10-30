@@ -34,7 +34,7 @@ class ExecOnPodError(Exception):
         self.err = err
 
     def __str__(self):
-        return "Command execution failure: " f"{self.cmd}, " f"RC: {self.rc}, " f"OUT: {self.out}, " f"ERR: {self.err}"
+        return f"Command execution failure: {self.cmd}, RC: {self.rc}, OUT: {self.out}, ERR: {self.err}"
 
 
 class NNCPConfigurationFailed(Exception):
