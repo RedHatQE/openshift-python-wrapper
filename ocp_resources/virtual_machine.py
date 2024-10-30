@@ -178,4 +178,4 @@ class VirtualMachine(NamespacedResource):
 
     @property
     def keys_to_hash(self):
-        return ["userData"]
+        return ["spec->template->spec->volumes[list_index]->cloudInitNoCloud->userData"]

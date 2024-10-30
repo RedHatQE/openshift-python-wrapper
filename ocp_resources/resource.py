@@ -15,6 +15,7 @@ from typing import Optional, Any, Dict, List
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
+from benedict import benedict
 from kubernetes.dynamic.exceptions import (
     ConflictError,
     MethodNotAllowedError,
@@ -133,7 +134,7 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
     return None
 
 
-def change_dict_value_to_hashed(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
+def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
     """
     Recursively search a nested dictionary for a given key and changes its value to "******" if found.
 
@@ -144,15 +145,26 @@ def change_dict_value_to_hashed(resource_dict: Dict[Any, Any], key_name: str) ->
     Returns:
         The modified dictionary.
     """
-    if isinstance(resource_dict, dict):
-        for key, value in resource_dict.items():
-            if key == key_name:
-                resource_dict[key] = "******"
-            elif isinstance(value, dict):
-                resource_dict[key] = change_dict_value_to_hashed(value, key_name)
-                    elif isinstance(value, list) and any(isinstance(item, dict) for item in value):
-                for key_list, value_list in enumerate(value):
-                    value[key_list] = change_dict_value_to_hashed(value_list, key_name)
+    if "[list_index]" not in key_name:
+        resource_dict = benedict(resource_dict, keypath_separator="->")
+        if resource_dict.get(key_name):
+            resource_dict[key_name] = "*******"
+    else:
+        # If we reach here, we have a list. We need to only iterate through it, if the elements are dicts and
+        # expected key is present.
+        key_lists = key_name.split("[list_index]->", 1)
+        updated_resource_list = []
+        resource_dict = benedict(resource_dict, keypath_separator="->")
+        if resource_dict.get(key_lists[0]):
+            for resource_element in resource_dict[key_lists[0]]:
+                if isinstance(resource_element, dict):
+                    resource_element = benedict(resource_element, keypath_separator="->")
+                    updated_resource_list.append(
+                        replace_key_with_hashed_value(resource_dict=resource_element, key_name=key_lists[1])
+                    )
+                else:
+                    updated_resource_list.append(resource_element)
+            resource_dict[key_lists[0]][:] = updated_resource_list
     return resource_dict
 
 
@@ -1188,15 +1200,15 @@ class Resource:
 
          Example:
              given a dict: {"spec": {"data": <value_to_hash>}}
-             To hash spec['data'] key pass: ["spec..data"]
+             To hash spec['data'] key pass: ["spec->data"]
         """
         return []
 
     def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
-            for key in self.keys_to_hash:
-                resource_dict = change_dict_value_to_hashed(resource_dict=resource_dict, key_name=key)
+            for key_name in self.keys_to_hash:
+                resource_dict = replace_key_with_hashed_value(resource_dict=resource_dict, key_name=key_name)
         return resource_dict
 
     def get_condition_message(self, condition_type: str, condition_status: str = "") -> str:
