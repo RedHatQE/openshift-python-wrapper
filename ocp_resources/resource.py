@@ -145,20 +145,20 @@ def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) 
     Returns:
         The modified dictionary.
     """
-    if "[list_index]" not in key_name:
-        resource_dict = benedict(resource_dict, keypath_separator="->")
+    if "[]" not in key_name:
+        resource_dict = benedict(resource_dict, keypath_separator=">")
         if resource_dict.get(key_name):
             resource_dict[key_name] = "*******"
     else:
         # If we reach here, we have a list. We need to only iterate through it, if the elements are dicts and
         # expected key is present.
-        key_lists = key_name.split("[list_index]->", 1)
+        key_lists = key_name.split("[]>", 1)
         updated_resource_list = []
-        resource_dict = benedict(resource_dict, keypath_separator="->")
+        resource_dict = benedict(resource_dict, keypath_separator=">")
         if resource_dict.get(key_lists[0]):
             for resource_element in resource_dict[key_lists[0]]:
                 if isinstance(resource_element, dict):
-                    resource_element = benedict(resource_element, keypath_separator="->")
+                    resource_element = benedict(resource_element, keypath_separator=">")
                     updated_resource_list.append(
                         replace_key_with_hashed_value(resource_dict=resource_element, key_name=key_lists[1])
                     )
@@ -1200,11 +1200,14 @@ class Resource:
 
          Example:
              given a dict: {"spec": {"data": <value_to_hash>}}
-             To hash spec['data'] key pass: ["spec->data"]
+             To hash spec['data'] key pass: ["spec>data"]
         """
         return []
 
     def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+        if not isinstance(resource_dict, dict):
+            raise ValueError("Expected a dictionary as the first argument")
+
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
             for key_name in self.keys_to_hash:
