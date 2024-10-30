@@ -68,6 +68,74 @@ class UserDefinedNetwork(NamespacedResource):
 
     # End of generated code
 
+    @classmethod
+    def is_ready_condition(cls, condition: dict) -> bool:
+        """
+        Check if the given condition indicates that the UserDefinedNetwork is ready.
+
+        Args:
+            condition (dict): A dictionary representing the condition of the UserDefinedNetwork.
+
+        Returns:
+            bool: True if the condition indicates the UserDefinedNetwork is ready, False otherwise.
+        """
+        return (
+            condition.get("reason") == cls.Condition.Reason.NETWORK_ATTACHMENT_DEFINITION_READY
+            and condition.get("status") == cls.Condition.Status.TRUE
+            and condition.get("type") == cls.Condition.Type.NETWORK_READY
+        )
+
+    @classmethod
+    def is_sync_error_condition(cls, condition: dict) -> bool:
+        """
+        Check if the given condition indicates a synchronization error for the UserDefinedNetwork.
+
+        Args:
+            condition (dict): A dictionary representing the condition of the UserDefinedNetwork.
+
+        Returns:
+            bool: True if the condition indicates a synchronization error, False otherwise.
+        """
+        return (
+            condition.get("reason") == cls.Condition.Reason.SYNC_ERROR
+            and condition.get("status") == cls.Condition.Status.FALSE
+            and condition.get("type") == cls.Condition.Type.NETWORK_READY
+        )
+
+    @property
+    def conditions(self) -> List:
+        """
+        Retrieve the current status conditions of the UserDefinedNetwork instance.
+
+        Returns:
+            list: A list of status conditions associated with the UserDefinedNetwork instance.
+        """
+        # Cache instance to avoid repeated API requests
+        instance = self.instance
+        if instance.status and instance.status.conditions:
+            return instance.status.conditions
+        return []
+
+    @property
+    def ready(self) -> bool:
+        """
+        Check if the UserDefinedNetwork is ready.
+
+        Returns:
+            bool: True if the UserDefinedNetwork is ready; otherwise, False.
+        """
+        return any(self.is_ready_condition(condition=condition) for condition in self.conditions)
+
+    @property
+    def sync_error(self) -> bool:
+        """
+        Check for synchronization errors in the UserDefinedNetwork.
+
+        Returns:
+            bool: True if there is a synchronization error; otherwise, False.
+        """
+        return any(self.is_sync_error_condition(condition=condition) for condition in self.conditions)
+
 
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
     """
