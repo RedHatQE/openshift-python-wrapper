@@ -103,7 +103,7 @@ class UserDefinedNetwork(NamespacedResource):
         )
 
     @property
-    def conditions(self) -> List:
+    def conditions(self) -> List[Dict[str, Any]]:
         """
         Retrieve the current status conditions of the UserDefinedNetwork instance.
 
