@@ -169,13 +169,10 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
     def to_dict(self) -> None:
         super().to_dict()
         if not self.kind_dict and not self.yaml_file:
-            missing = []
             if not self.role:
-                missing.append("role")
+                raise MissingRequiredArgumentError(argument="role")
             if not self.subnets:
-                missing.append("subnets")
-            if missing:
-                raise MissingRequiredArgumentError(argument=", ".join(missing))
+                raise MissingRequiredArgumentError(argument="subnets")
 
             self.res["spec"][self.LAYER3.lower()] = {"role": self.role}
             _layer3 = self.res["spec"][self.LAYER3.lower()]
