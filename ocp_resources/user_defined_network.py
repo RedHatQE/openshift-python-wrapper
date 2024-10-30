@@ -144,7 +144,7 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         self,
         role: Optional[str] = None,
         mtu: Optional[int] = None,
-        subnets: Optional[List[Dict]] = None,
+        subnets: Optional[List[Dict[str, Any]]] = None,
         join_subnets: Optional[List[str]] = None,
         **kwargs,
     ):
