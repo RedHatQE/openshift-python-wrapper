@@ -32,7 +32,5 @@ class ClusterServiceVersion(NamespacedResource):
             return json.loads(examples)
         except json.JSONDecodeError as e:
             raise json.JSONDecodeError(
-                "Failed to parse alm-examples annotation: Invalid JSON format",
-                examples,
-                e.pos
+                "Failed to parse alm-examples annotation: Invalid JSON format", examples, e.pos
             ) from e
