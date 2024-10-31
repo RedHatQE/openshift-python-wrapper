@@ -21,11 +21,11 @@ class ClusterServiceVersion(NamespacedResource):
         alm_examples = self.instance.metadata.annotations.get("alm-examples")
 
         if not alm_examples:
-            self.logger.debug("No alm-examples annotation found in CSV")
+            self.logger.debug(f"No alm-examples annotation found in CSV {self.name}")
             return []
 
         try:
             return json.loads(alm_examples)
         except json.JSONDecodeError as e:
-            self.logger.error(f"Failed to parse alm-examples annotation: Invalid JSON format - {str(e)}")
+            self.logger.error(f"Failed to parse alm-examples annotation from CSV {self.name}: Invalid JSON format")
             return []
