@@ -154,7 +154,11 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
         Args:
             role (Optional[str]): role describes the network role in the pod.
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
-            subnets (Optional[List[Dict]]): subnets are used for the pod network across the cluster.
+            subnets (Optional[List[Dict]]): subnets are used for the pod network across the cluster, each expecting:
+                - `cidr` (str): IP range in CIDR notation.
+                - `hostSubnet` (Optional[int]): Host-specific subnet.
+                API reference:
+                https://ovn-kubernetes.io/api-reference/userdefinednetwork-api-spec/#layer3subnet
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
         """
         super().__init__(
