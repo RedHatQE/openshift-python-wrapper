@@ -137,35 +137,44 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
 def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
     """
     Recursively search a nested dictionary for a given key and changes its value to "******" if found.
-
+    The function supports two key formats:
+    1. Regular path: "path>to>key"
+    2. List path: "path>to[]>key"
     Args:
-        resource_dict: The nested dictionary to search.
-        key_name: The key to find.
-
+        resource_dict: The nested dictionary to search. Must be a dictionary.
+        key_name: The key path to find. Must be a string in the format "path>to>key" or "path>to[]>key".
     Returns:
-        The modified dictionary.
+        Dict[Any, Any]: A copy of the input dictionary with the specified key's value replaced with "*******".
+    Raises:
+        ValueError: If resource_dict is not a dictionary or key_name is not a string.
     """
+    # Create a deep copy to avoid modifying the input
+    result = copy.deepcopy(resource_dict)
+
+    # Convert to benedict only once
+    benedict_resource_dict = benedict(result, keypath_separator=">")
+
     if "[]" not in key_name:
-        resource_dict = benedict(resource_dict, keypath_separator=">")
-        if resource_dict.get(key_name):
-            resource_dict[key_name] = "*******"
-    else:
-        # If we reach here, we have a list. We need to only iterate through it, if the elements are dicts and
-        # expected key is present.
-        key_lists = key_name.split("[]>", 1)
-        updated_resource_list = []
-        resource_dict = benedict(resource_dict, keypath_separator=">")
-        if resource_dict.get(key_lists[0]):
-            for resource_element in resource_dict[key_lists[0]]:
-                if isinstance(resource_element, dict):
-                    resource_element = benedict(resource_element, keypath_separator=">")
-                    updated_resource_list.append(
-                        replace_key_with_hashed_value(resource_dict=resource_element, key_name=key_lists[1])
-                    )
-                else:
-                    updated_resource_list.append(resource_element)
-            resource_dict[key_lists[0]][:] = updated_resource_list
-    return resource_dict
+        if benedict_resource_dict.get(key_name):
+            benedict_resource_dict[key_name] = "*******"
+        return dict(benedict_resource_dict)
+
+    # Handle list case
+    key_prefix, remaining_key = key_name.split("[]>", 1)
+    if not benedict_resource_dict.get(key_prefix):
+        return dict(benedict_resource_dict)
+
+    # Process list elements
+    target_list = benedict_resource_dict[key_prefix]
+    if not isinstance(target_list, list):
+        return dict(benedict_resource_dict)
+
+    # Update list elements in-place to avoid unnecessary copies
+    for index, element in enumerate(target_list):
+        if isinstance(element, dict):
+            target_list[index] = replace_key_with_hashed_value(resource_dict=element, key_name=remaining_key)
+
+    return dict(benedict_resource_dict)
 
 
 class KubeAPIVersion(Version):
