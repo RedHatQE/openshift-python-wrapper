@@ -26,6 +26,6 @@ class ClusterServiceVersion(NamespacedResource):
 
         try:
             return json.loads(alm_examples)
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             self.logger.error(f"Failed to parse alm-examples annotation from CSV {self.name}: Invalid JSON format")
             return []
