@@ -7,6 +7,9 @@ import os
 import sys
 import requests
 from pathlib import Path
+from packaging.version import Version
+import shutil
+from tempfile import gettempdir
 
 import textwrap
 from typing import Any, Dict, List, Tuple
@@ -31,29 +34,25 @@ FIELDS_STR: str = "FIELDS"
 LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
-SCHEMA_DEFINITION_FILE: str = os.path.join(SCHEMA_DIR, "_definitions.json")
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 MISSING_DESCRIPTION_STR: str = "No field description from API; please add description"
 
 
-def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Dict[str, Any]:
-    x_kubernetes_group_version_kind = extract_group_kind_version(_kind_schema=_data)
-    _kind = x_kubernetes_group_version_kind["kind"]
-    _group = x_kubernetes_group_version_kind.get("group")
-    _version = x_kubernetes_group_version_kind.get("version")
-    _group_and_version = f"{_group}/{_version}" if _group else _version
-
+def _is_kind_and_namespaced(
+    client: str, _key: str, _data: Dict[str, Any], kind: str, group: str, version: str
+) -> Dict[str, Any]:
+    _group_and_version = f"{group}/{version}" if group else version
     not_resource_dict = {"is_kind": False, "kind": _key}
 
     # if explain command failed, this is not a resource
-    if not run_command(command=shlex.split(f"{client} explain {_kind}"), check=False, log_errors=False)[0]:
+    if not run_command(command=shlex.split(f"{client} explain {kind}"), check=False, log_errors=False)[0]:
         return not_resource_dict
 
-    # check if this as a valid version for the resource.
     api_resources_base_cmd = f"bash -c '{client} api-resources"
 
+    # check if this as a valid version for the resource.
     if run_command(
-        command=shlex.split(f"{api_resources_base_cmd} | grep -w {_kind} | grep {_group_and_version}'"),
+        command=shlex.split(f"{api_resources_base_cmd} | grep -w {kind} | grep {_group_and_version}'"),
         check=False,
         log_errors=False,
     )[0]:
@@ -61,7 +60,7 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
         _data["namespaced"] = (
             run_command(
                 command=shlex.split(
-                    f"{api_resources_base_cmd} --namespaced | grep -w {_kind} | grep {_group_and_version} | wc -l'"
+                    f"{api_resources_base_cmd} --namespaced | grep -w {kind} | grep {_group_and_version} | wc -l'"
                 ),
                 check=False,
                 log_errors=False,
@@ -73,7 +72,7 @@ def _is_kind_and_namespaced(client: str, _key: str, _data: Dict[str, Any]) -> Di
     return not_resource_dict
 
 
-def map_kind_to_namespaced(client: str):
+def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file: Path) -> None:
     not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
 
     resources_mapping = read_resources_mapping_file()
@@ -84,20 +83,38 @@ def map_kind_to_namespaced(client: str):
     else:
         not_kind_list = []
 
-    with open(SCHEMA_DEFINITION_FILE) as fd:
+    with open(schema_definition_file) as fd:
         _definitions_json_data = json.load(fd)
 
     _kind_data_futures: List[Future] = []
     with ThreadPoolExecutor() as executor:
         for _key, _data in _definitions_json_data["definitions"].items():
-            _group_version_kind = _data.get("x-kubernetes-group-version-kind")
-            if not _group_version_kind:
+            if not _data.get("x-kubernetes-group-version-kind"):
                 continue
 
             if _key in not_kind_list:
                 continue
 
-            _kind_data_futures.append(executor.submit(_is_kind_and_namespaced, client=client, _key=_key, _data=_data))
+            x_kubernetes_group_version_kind = extract_group_kind_version(_kind_schema=_data)
+            _kind = x_kubernetes_group_version_kind["kind"]
+            _group = x_kubernetes_group_version_kind.get("group", "")
+            _version = x_kubernetes_group_version_kind.get("version", "")
+
+            # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
+            if resources_mapping.get(_kind.lower()) and not newer_cluster_version:
+                continue
+
+            _kind_data_futures.append(
+                executor.submit(
+                    _is_kind_and_namespaced,
+                    client=client,
+                    _key=_key,
+                    _data=_data,
+                    kind=_kind,
+                    group=_group,
+                    version=_version,
+                )
+            )
 
     _temp_resources_mappings: Dict[Any, Any] = {}
     for res in as_completed(_kind_data_futures):
@@ -175,17 +192,53 @@ def update_kind_schema():
         LOGGER.error("Failed to get openapi schema.")
         sys.exit(1)
 
+    cluster_version_file = Path("class_generator/__cluster_version__.txt")
+    try:
+        with open(cluster_version_file, "r") as fd:
+            last_cluster_version_generated = fd.read().strip()
+    except (FileNotFoundError, IOError) as exp:
+        LOGGER.error(f"Failed to read cluster version file: {exp}")
+        sys.exit(1)
+
     cluster_version = get_server_version(client=client)
     cluster_version = cluster_version.split("+")[0]
-    ocp_openapi_json_file = f"class_generator/__k8s-openapi-{cluster_version}__.json"
+    ocp_openapi_json_file = Path(gettempdir()) / f"__k8s-openapi-{cluster_version}__.json"
+    last_cluster_version_generated: str = ""
+
+    newer_version: bool = Version(cluster_version) > Version(last_cluster_version_generated)
+
+    if newer_version:
+        with open(cluster_version_file, "w") as fd:
+            fd.write(cluster_version)
+
     with open(ocp_openapi_json_file, "w") as fd:
         fd.write(data.text)
 
-    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {SCHEMA_DIR}"))[0]:
+    tmp_schema_dir = Path(gettempdir()) / f"{SCHEMA_DIR}-{cluster_version}"
+
+    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {tmp_schema_dir}"))[0]:
         LOGGER.error("Failed to generate schema.")
         sys.exit(1)
 
-    map_kind_to_namespaced(client=client)
+    if newer_version:
+        # copy all files from tmp_schema_dir to schema dir
+        shutil.copytree(src=tmp_schema_dir, dst=SCHEMA_DIR, dirs_exist_ok=True)
+
+    else:
+        # Copy only new files from tmp_schema_dir to schema dir
+        for root, _, files in os.walk(tmp_schema_dir):
+            for file_ in files:
+                dst_file = Path(SCHEMA_DIR) / file_
+                try:
+                    if not os.path.isfile(dst_file):
+                        shutil.copy(src=Path(root) / file_, dst=dst_file)
+                except (OSError, IOError) as exp:
+                    LOGGER.error(f"Failed to copy file {file_}: {exp}")
+                    sys.exit(1)
+
+    map_kind_to_namespaced(
+        client=client, newer_cluster_version=newer_version, schema_definition_file=ocp_openapi_json_file
+    )
 
 
 def convert_camel_case_to_snake_case(string_: str) -> str:
@@ -473,7 +526,7 @@ def parse_explain(
             "spec": [],
         }
 
-        schema_properties: Dict[str, Any] = _kind_schema["properties"]
+        schema_properties: Dict[str, Any] = _kind_schema.get("properties", {})
         fields_required = _kind_schema.get("required", [])
 
         resource_dict.update(extract_group_kind_version(_kind_schema=_kind_schema))
@@ -608,7 +661,7 @@ def write_and_format_rendered(filepath: str, data: str, user_code: str = "") -> 
 
     for op in ("format", "check"):
         run_command(
-            command=shlex.split(f"uv run ruff {op} {filepath}"),
+            command=shlex.split(f"uvx ruff {op} {filepath}"),
             verify_stderr=False,
             check=False,
         )
