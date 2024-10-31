@@ -56,3 +56,26 @@ def test_replace_key_with_hashed_value_replace_key_in_list(nested_dict):
             },
         ],
     }
+
+
+def test_replace_key_with_hashed_value_edge_cases():
+    """Test edge cases for replace_key_with_hashed_value function."""
+    # Empty dictionary
+    assert replace_key_with_hashed_value(resource_dict={}, key_name="a>b") == {}
+
+    # Non-existent key
+    assert replace_key_with_hashed_value(resource_dict={"x": {"y": "z"}}, key_name="a>b") == {"x": {"y": "z"}}
+
+    # Multiple occurrences
+    data = {
+        "a": [{"b": "sensitive"}, {"b": "also_sensitive"}],
+    }
+    result = replace_key_with_hashed_value(resource_dict=data, key_name="a[]>b")
+    assert result["a"][0]["b"] == "*******"
+    assert result["a"][1]["b"] == "*******"
+
+
+def test_replace_key_with_hashed_value_invalid_inputs():
+    """Test that the function handles invalid inputs appropriately."""
+    with pytest.raises(TypeError):
+        replace_key_with_hashed_value(resource_dict=None, key_name="a>b")
