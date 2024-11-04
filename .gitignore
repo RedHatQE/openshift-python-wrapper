@@ -96,6 +96,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.envrc
 
 # Spyder project settings
 .spyderproject
@@ -123,6 +124,3 @@ local-cluster/_hco/
 node_modules/
 package.json
 package-lock.json
-
-# class generator script
-class_generator/__ocp-openapi.json

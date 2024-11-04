@@ -325,6 +325,7 @@ class Resource:
         NODEMAINTENANCE_KUBEVIRT_IO: str = "nodemaintenance.kubevirt.io"
         OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO: str = "observability.open-cluster-management.io"
         OCS_OPENSHIFT_IO: str = "ocs.openshift.io"
+        OPERATOR_AUTHORINO_KUADRANT_IO: str = "operator.authorino.kuadrant.io"
         OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO: str = "operator.open-cluster-management.io"
         OPERATOR_OPENSHIFT_IO: str = "operator.openshift.io"
         OPERATORS_COREOS_COM: str = "operators.coreos.com"
@@ -1006,7 +1007,7 @@ class Resource:
         Raises:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
-        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be" f" '{status}'")
+        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(
@@ -1413,7 +1414,7 @@ class ResourceEditor:
                         resource_to_patch.append(resource)
                         self._backups[resource] = backup
                     else:
-                        LOGGER.warning("ResourceEdit: no diff found in patch for " f"{resource.name} -- skipping")
+                        LOGGER.warning(f"ResourceEdit: no diff found in patch for {resource.name} -- skipping")
                 if not resource_to_patch:
                     return
         else:
@@ -1508,7 +1509,7 @@ class ResourceEditor:
         """
 
         for resource, patch in patches.items():
-            LOGGER.info(f"ResourceEdits: {action_text} data for " f"resource {resource.kind} {resource.name}")
+            LOGGER.info(f"ResourceEdits: {action_text} data for resource {resource.kind} {resource.name}")
 
             # add name to patch
             if "metadata" not in patch:

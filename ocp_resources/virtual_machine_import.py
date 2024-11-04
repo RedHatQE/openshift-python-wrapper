@@ -201,7 +201,7 @@ class VirtualMachineImport(NamespacedResource):
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
     ):
-        self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be" f" {cond_status}")
+        self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
