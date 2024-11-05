@@ -35,9 +35,7 @@ class Task(NamespacedResource):
             step_template (Optional[Dict[str, Any]]): Specifies a Container step definition to use as the basis for all Steps in the Task.
             sidecars (Optional[List[Dict[str, Any]]]): Specifies Sidecar containers to run alongside the Steps in the Task.
         """
-        super().__init__(
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.steps = steps
         self.description = description
         self.params = params
