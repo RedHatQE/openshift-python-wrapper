@@ -138,20 +138,25 @@ def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) 
     """
     Recursively search a nested dictionary for a given key and changes its value to "******" if found.
     The function supports two key formats:
-    1. Regular path: "path>to>key"
-    2. List path: "path>to[]>key"
+
+    1. Regular dictionary path:
+        A key to be hashed can be found directly in a dictionary, e.g. "a>b>c", would hash the value associated with
+        key "c", where dictionary format is {a:{b:{c:sensitive data}}}
+    2. List path:
+        A key to be hashed can be found in a dictionary that is in list somewhere in a dictionary, e.g. "a>b[]>c",
+        would hash the value associated with key "c", where dictionary format is {a:{b:[{d: not sensitive data},
+        {c:sensitive data}]}}
+
     Args:
-        resource_dict: The nested dictionary to search. Must be a dictionary.
-        key_name: The key path to find. Must be a string in the format "path>to>key" or "path>to[]>key".
+        resource_dict: The nested dictionary to search.
+        key_name: The key path to find.
+
     Returns:
         Dict[Any, Any]: A copy of the input dictionary with the specified key's value replaced with "*******".
-    Raises:
-        ValueError: If resource_dict is not a dictionary or key_name is not a string.
+
     """
-    # Create a deep copy to avoid modifying the input
     result = copy.deepcopy(resource_dict)
 
-    # Convert to benedict only once
     benedict_resource_dict = benedict(result, keypath_separator=">")
 
     if "[]" not in key_name:
@@ -159,20 +164,17 @@ def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) 
             benedict_resource_dict[key_name] = "*******"
         return dict(benedict_resource_dict)
 
-    # Handle list case
     key_prefix, remaining_key = key_name.split("[]>", 1)
     if not benedict_resource_dict.get(key_prefix):
         return dict(benedict_resource_dict)
 
-    # Process list elements
-    target_list = benedict_resource_dict[key_prefix]
-    if not isinstance(target_list, list):
+    resource_data = benedict_resource_dict[key_prefix]
+    if not isinstance(resource_data, list):
         return dict(benedict_resource_dict)
 
-    # Update list elements in-place to avoid unnecessary copies
-    for index, element in enumerate(target_list):
+    for index, element in enumerate(resource_data):
         if isinstance(element, dict):
-            target_list[index] = replace_key_with_hashed_value(resource_dict=element, key_name=remaining_key)
+            resource_data[index] = replace_key_with_hashed_value(resource_dict=element, key_name=remaining_key)
 
     return dict(benedict_resource_dict)
 
