@@ -137,8 +137,8 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
 def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
     """
     Recursively search a nested dictionary for a given key and changes its value to "******" if found.
-    The function supports two key formats:
 
+    The function supports two key formats:
     1. Regular dictionary path:
         A key to be hashed can be found directly in a dictionary, e.g. "a>b>c", would hash the value associated with
         key "c", where dictionary format is {a:{b:{c:sensitive data}}}
