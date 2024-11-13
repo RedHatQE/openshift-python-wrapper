@@ -11,6 +11,9 @@ class StorageProfile(Resource):
     https://github.com/kubevirt/containerized-data-importer/blob/main/doc/storageprofile.md
     """
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     api_group = Resource.ApiGroup.CDI_KUBEVIRT_IO
 
     @property
