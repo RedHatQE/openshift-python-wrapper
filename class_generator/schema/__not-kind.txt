@@ -696,3 +696,13 @@ dev.tekton.triggers.v1alpha1.ClusterTriggerBindingList
 dev.tekton.triggers.v1alpha1.TriggerTemplateList
 dev.tekton.v1beta1.StepActionList
 dev.tekton.triggers.v1alpha1.ClusterTriggerBinding
+io.konveyor.forklift.v1beta1.ForkliftControllerList
+io.konveyor.forklift.v1beta1.HookList
+io.konveyor.forklift.v1beta1.StorageMapList
+io.konveyor.forklift.v1beta1.ProviderList
+io.konveyor.forklift.v1beta1.PlanList
+io.konveyor.forklift.v1beta1.HostList
+io.konveyor.forklift.v1beta1.NetworkMapList
+io.konveyor.forklift.v1beta1.OpenstackVolumePopulatorList
+io.konveyor.forklift.v1beta1.OvirtVolumePopulatorList
+io.konveyor.forklift.v1beta1.MigrationList

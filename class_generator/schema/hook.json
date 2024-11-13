@@ -1,0 +1,115 @@
+{
+  "description": "Hook is the Schema for the hooks API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Hook specification.",
+      "type": "object",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "deadline": {
+          "description": "Hook deadline in seconds.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "image": {
+          "description": "Image to run.",
+          "type": "string"
+        },
+        "playbook": {
+          "description": "A base64 encoded Ansible playbook.",
+          "type": "string"
+        },
+        "serviceAccount": {
+          "description": "Service account.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "Hook status.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "List of conditions.",
+          "type": "array",
+          "items": {
+            "description": "Condition",
+            "type": "object",
+            "required": [
+              "category",
+              "lastTransitionTime",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "category": {
+                "description": "The condition category.",
+                "type": "string"
+              },
+              "durable": {
+                "description": "The condition is durable - never un-staged.",
+                "type": "boolean"
+              },
+              "items": {
+                "description": "A list of items referenced in the `Message`.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lastTransitionTime": {
+                "description": "When the last status transition occurred.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "The human readable description of the condition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "The reason for the condition or transition.",
+                "type": "string"
+              },
+              "status": {
+                "description": "The condition status [true,false].",
+                "type": "string"
+              },
+              "type": {
+                "description": "The condition type.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "observedGeneration": {
+          "description": "The most recent generation observed by the controller.",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "forklift.konveyor.io",
+      "kind": "Hook",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
