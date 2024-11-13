@@ -238,6 +238,7 @@ class Resource:
         RECONCILE_COMPLETE: str = "ReconcileComplete"
         READY: str = "Ready"
         FAILING: str = "Failing"
+        RUNNING: str = "Running"
 
         class Status:
             TRUE: str = "True"
