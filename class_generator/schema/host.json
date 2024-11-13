@@ -1,0 +1,189 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "HostSpec defines the desired state of Host",
+      "type": "object",
+      "required": [
+        "ipAddress",
+        "provider",
+        "secret"
+      ],
+      "properties": {
+        "id": {
+          "description": "The object ID.\nvsphere:\n  The managed object ID.",
+          "type": "string"
+        },
+        "ipAddress": {
+          "description": "IP address used for disk transfer.",
+          "type": "string"
+        },
+        "name": {
+          "description": "An object Name.\nvsphere:\n  A qualified name.",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "The VM Namespace\nOnly relevant for an openshift source.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "Provider",
+          "type": "object",
+          "properties": {
+            "apiVersion": {
+              "description": "API version of the referent.",
+              "type": "string"
+            },
+            "fieldPath": {
+              "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.\nTODO: this design is not final and this field is subject to change in the future.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+              "type": "string"
+            },
+            "resourceVersion": {
+              "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+              "type": "string"
+            },
+            "uid": {
+              "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "secret": {
+          "description": "Credentials.",
+          "type": "object",
+          "properties": {
+            "apiVersion": {
+              "description": "API version of the referent.",
+              "type": "string"
+            },
+            "fieldPath": {
+              "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.\nTODO: this design is not final and this field is subject to change in the future.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+              "type": "string"
+            },
+            "resourceVersion": {
+              "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+              "type": "string"
+            },
+            "uid": {
+              "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "type": {
+          "description": "Type used to qualify the name.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "HostStatus defines the observed state of Host",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "List of conditions.",
+          "type": "array",
+          "items": {
+            "description": "Condition",
+            "type": "object",
+            "required": [
+              "category",
+              "lastTransitionTime",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "category": {
+                "description": "The condition category.",
+                "type": "string"
+              },
+              "durable": {
+                "description": "The condition is durable - never un-staged.",
+                "type": "boolean"
+              },
+              "items": {
+                "description": "A list of items referenced in the `Message`.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "lastTransitionTime": {
+                "description": "When the last status transition occurred.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "The human readable description of the condition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "The reason for the condition or transition.",
+                "type": "string"
+              },
+              "status": {
+                "description": "The condition status [true,false].",
+                "type": "string"
+              },
+              "type": {
+                "description": "The condition type.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "observedGeneration": {
+          "description": "The most recent generation observed by the controller.",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "forklift.konveyor.io",
+      "kind": "Host",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
