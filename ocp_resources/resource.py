@@ -296,6 +296,8 @@ class Resource:
 
         class Type:
             NETWORK_READY: str = "NetworkReady"
+            SUCCESSFUL: str = "Successful"
+            RUNNING: str = "Running"
 
     class Type:
         CLUSTER_IP = "ClusterIP"
