@@ -141,11 +141,40 @@ def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) 
     The function supports two key formats:
     1. Regular dictionary path:
         A key to be hashed can be found directly in a dictionary, e.g. "a>b>c", would hash the value associated with
-        key "c", where dictionary format is {a:{b:{c:sensitive data}}}
+        key "c", where dictionary format is:
+        input = {
+            "a": {
+                "b": {
+                    "c": "sensitive data"
+                }
+            }
+        }
+        output = {
+            "a": {
+                "b": {
+                    "c": "*******"
+                }
+            }
+        }
     2. List path:
         A key to be hashed can be found in a dictionary that is in list somewhere in a dictionary, e.g. "a>b[]>c",
-        would hash the value associated with key "c", where dictionary format is {a:{b:[{d: not sensitive data},
-        {c:sensitive data}]}}
+        would hash the value associated with key "c", where dictionary format is:
+        input = {
+            "a": {
+                "b": [
+                    {"d": "not sensitive data"},
+                    {"c": "sensitive data"}
+                ]
+            }
+        }
+        output = {
+            "a": {
+                "b": [
+                    {"d": "not sensitive data"},
+                    {"c": "*******"}
+                ]
+            }
+        }
 
     Args:
         resource_dict: The nested dictionary to search.
