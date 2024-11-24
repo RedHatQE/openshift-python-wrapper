@@ -5,6 +5,7 @@ env_list = [
   "class-generator",
   "resource-tests",
   "api-group-order",
+  "validate-replace-key-hashed-value"
 ]
 
 [env.resource-tests]
@@ -57,3 +58,8 @@ commands = [
 description = "Run API group order tests"
 deps = ["uv"]
 commands = [["uv", "run", "pytest", "tests/test_api_group_order.py"]]
+
+[env.validate-replace-key-hashed-value]
+description = "Run tests to validate values associated with correct keys are getting replaced with hashed value"
+deps = ["uv"]
+commands = [["uv", "run", "pytest", "tests/test_replace_key_with_hashed_value.py"]]
