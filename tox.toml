@@ -59,7 +59,7 @@ description = "Run API group order tests"
 deps = ["uv"]
 commands = [["uv", "run", "pytest", "tests/test_api_group_order.py"]]
 
-[env.validate-unittests]
+[env.unittests]
 description = "Run unittests"
 deps = ["uv"]
-commands = [["uv", "run", "pytest", "tests/test_unittests.py"]]
+commands = [["uv", "run", "pytest", "tests/test_unittests.py", "-svv"]]
