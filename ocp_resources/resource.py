@@ -134,9 +134,78 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
     return None
 
 
-# Exceptions classes
+def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
+    """
+    Recursively search a nested dictionary for a given key and changes its value to "******" if found.
 
-# End Exceptions classes
+    The function supports two key formats:
+    1. Regular dictionary path:
+        A key to be hashed can be found directly in a dictionary, e.g. "a>b>c", would hash the value associated with
+        key "c", where dictionary format is:
+        input = {
+            "a": {
+                "b": {
+                    "c": "sensitive data"
+                }
+            }
+        }
+        output = {
+            "a": {
+                "b": {
+                    "c": "*******"
+                }
+            }
+        }
+    2. List path:
+        A key to be hashed can be found in a dictionary that is in list somewhere in a dictionary, e.g. "a>b[]>c",
+        would hash the value associated with key "c", where dictionary format is:
+        input = {
+            "a": {
+                "b": [
+                    {"d": "not sensitive data"},
+                    {"c": "sensitive data"}
+                ]
+            }
+        }
+        output = {
+            "a": {
+                "b": [
+                    {"d": "not sensitive data"},
+                    {"c": "*******"}
+                ]
+            }
+        }
+
+    Args:
+        resource_dict: The nested dictionary to search.
+        key_name: The key path to find.
+
+    Returns:
+        Dict[Any, Any]: A copy of the input dictionary with the specified key's value replaced with "*******".
+
+    """
+    result = copy.deepcopy(resource_dict)
+
+    benedict_resource_dict = benedict(result, keypath_separator=">")
+
+    if "[]" not in key_name:
+        if benedict_resource_dict.get(key_name):
+            benedict_resource_dict[key_name] = "*******"
+        return dict(benedict_resource_dict)
+
+    key_prefix, remaining_key = key_name.split("[]>", 1)
+    if not benedict_resource_dict.get(key_prefix):
+        return dict(benedict_resource_dict)
+
+    resource_data = benedict_resource_dict[key_prefix]
+    if not isinstance(resource_data, list):
+        return dict(benedict_resource_dict)
+
+    for index, element in enumerate(resource_data):
+        if isinstance(element, dict):
+            resource_data[index] = replace_key_with_hashed_value(resource_dict=element, key_name=remaining_key)
+
+    return dict(benedict_resource_dict)
 
 
 class KubeAPIVersion(Version):
@@ -1173,21 +1242,18 @@ class Resource:
 
          Example:
              given a dict: {"spec": {"data": <value_to_hash>}}
-             To hash spec['data'] key pass: ["spec..data"]
+             To hash spec['data'] key pass: ["spec>data"]
         """
         return []
 
     def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+        if not isinstance(resource_dict, dict):
+            raise ValueError("Expected a dictionary as the first argument")
+
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
-            resource_dict = benedict(resource_dict, keypath_separator="..")
-
-            for key in self.keys_to_hash:
-                if key in resource_dict:
-                    resource_dict[key] = "***"
-
-            return resource_dict
-
+            for key_name in self.keys_to_hash:
+                resource_dict = replace_key_with_hashed_value(resource_dict=resource_dict, key_name=key_name)
         return resource_dict
 
     def get_condition_message(self, condition_type: str, condition_status: str = "") -> str:

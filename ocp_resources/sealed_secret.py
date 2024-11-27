@@ -50,4 +50,4 @@ class SealedSecret(NamespacedResource):
 
     @property
     def keys_to_hash(self):
-        return ["spec..data", "spec..encryptedData"]
+        return ["spec>data", "spec>encryptedData"]
