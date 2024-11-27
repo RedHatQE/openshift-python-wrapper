@@ -70,7 +70,7 @@ class-generator --kind Pod --add-tests
 uv tool install --python python3.9 openapi2jsonschema
 ```
 
-If install fail ([Issue 1445](https://github.com/astral-sh/uv/issues/1455)) try to install manually:
+If install fail ([Issue 1455](https://github.com/astral-sh/uv/issues/1455)) try to install manually:
 
 ```bash
 git clone https://github.com/instrumenta/openapi2jsonschema
