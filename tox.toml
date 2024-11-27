@@ -5,6 +5,7 @@ env_list = [
   "class-generator",
   "resource-tests",
   "api-group-order",
+  "validate-unittests"
 ]
 
 [env.resource-tests]
@@ -57,3 +58,8 @@ commands = [
 description = "Run API group order tests"
 deps = ["uv"]
 commands = [["uv", "run", "pytest", "tests/test_api_group_order.py"]]
+
+[env.unittests]
+description = "Run unittests"
+deps = ["uv"]
+commands = [["uv", "run", "pytest", "tests/test_unittests.py", "-svv"]]
