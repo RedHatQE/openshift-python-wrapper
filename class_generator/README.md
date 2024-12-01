@@ -75,7 +75,7 @@ If install fail ([Issue 1455](https://github.com/astral-sh/uv/issues/1455)) try 
 ```bash
 git clone https://github.com/instrumenta/openapi2jsonschema
 cd openapi2jsonschema
-sed -i s/'pyyaml = "^5.1"'/'pyyaml = ">=6.0"'/g  pyproject.toml
+sed -i .bk s/'pyyaml = "^5.1"'/'pyyaml = ">=6.0"'/g  pyproject.toml
 uv tool install --python python3.9 .
 ```
 
