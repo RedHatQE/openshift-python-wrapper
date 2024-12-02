@@ -57,6 +57,7 @@ fcn_exclude_functions =
     submit,
     click,
     ast,
+    filecmp,
 
 enable-extensions =
     FCN,
