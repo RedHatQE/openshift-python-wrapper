@@ -1,5 +1,5 @@
 {
-  "description": "VolumeSnapshotClass specifies parameters that a underlying storage system uses when creating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its name in a VolumeSnapshot object. VolumeSnapshotClasses are non-namespaced",
+  "description": "VolumeSnapshotClass specifies parameters that a underlying storage system uses when\ncreating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its\nname in a VolumeSnapshot object.\nVolumeSnapshotClasses are non-namespaced",
   "type": "object",
   "required": [
     "deletionPolicy",
@@ -11,7 +11,7 @@
       "type": "string"
     },
     "deletionPolicy": {
-      "description": "deletionPolicy determines whether a VolumeSnapshotContent created through the VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted. Supported values are \"Retain\" and \"Delete\". \"Retain\" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are kept. \"Delete\" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are deleted. Required.",
+      "description": "deletionPolicy determines whether a VolumeSnapshotContent created through\nthe VolumeSnapshotClass should be deleted when its bound VolumeSnapshot is deleted.\nSupported values are \"Retain\" and \"Delete\".\n\"Retain\" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are kept.\n\"Delete\" means that the VolumeSnapshotContent and its physical snapshot on underlying storage system are deleted.\nRequired.",
       "type": "string",
       "enum": [
         "Delete",
@@ -19,7 +19,7 @@
       ]
     },
     "driver": {
-      "description": "driver is the name of the storage driver that handles this VolumeSnapshotClass. Required.",
+      "description": "driver is the name of the storage driver that handles this VolumeSnapshotClass.\nRequired.",
       "type": "string"
     },
     "kind": {
@@ -31,7 +31,7 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "parameters": {
-      "description": "parameters is a key-value map with storage driver specific parameters for creating snapshots. These values are opaque to Kubernetes.",
+      "description": "parameters is a key-value map with storage driver specific parameters for creating snapshots.\nThese values are opaque to Kubernetes.",
       "type": "object",
       "additionalProperties": {
         "type": "string"
@@ -45,5 +45,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

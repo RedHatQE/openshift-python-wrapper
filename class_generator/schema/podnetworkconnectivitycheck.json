@@ -1,5 +1,5 @@
 {
-  "description": "PodNetworkConnectivityCheck \n Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+  "description": "PodNetworkConnectivityCheck\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
   "type": "object",
   "required": [
     "spec"
@@ -31,12 +31,12 @@
           "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
         },
         "targetEndpoint": {
-          "description": "EndpointAddress to check. A TCP address of the form host:port. Note that if host is a DNS name, then the check would fail if the DNS name cannot be resolved. Specify an IP address for host to bypass DNS name lookup.",
+          "description": "EndpointAddress to check. A TCP address of the form host:port. Note that\nif host is a DNS name, then the check would fail if the DNS name cannot\nbe resolved. Specify an IP address for host to bypass DNS name lookup.",
           "type": "string",
           "pattern": "^\\S+:\\d*$"
         },
         "tlsClientCert": {
-          "description": "TLSClientCert, if specified, references a kubernetes.io/tls type secret with 'tls.crt' and 'tls.key' entries containing an optional TLS client certificate and key to be used when checking endpoints that require a client certificate in order to gracefully preform the scan without causing excessive logging in the endpoint process. The secret must exist in the same namespace as this resource.",
+          "description": "TLSClientCert, if specified, references a kubernetes.io/tls type secret with 'tls.crt' and\n'tls.key' entries containing an optional TLS client certificate and key to be used when\nchecking endpoints that require a client certificate in order to gracefully preform the\nscan without causing excessive logging in the endpoint process. The secret must exist in\nthe same namespace as this resource.",
           "type": "object",
           "required": [
             "name"
@@ -132,7 +132,7 @@
                 "format": "date-time"
               },
               "endLogs": {
-                "description": "EndLogs contains log entries related to the end of this outage. Should contain the success entry that resolved the outage and possibly a few of the failure log entries that preceded it.",
+                "description": "EndLogs contains log entries related to the end of this outage. Should contain the success\nentry that resolved the outage and possibly a few of the failure log entries that preceded it.",
                 "type": "array",
                 "items": {
                   "description": "LogEntry records events",
@@ -172,7 +172,7 @@
                 "format": "date-time"
               },
               "startLogs": {
-                "description": "StartLogs contains log entries related to the start of this outage. Should contain the original failure, any entries where the failure mode changed.",
+                "description": "StartLogs contains log entries related to the start of this outage. Should contain\nthe original failure, any entries where the failure mode changed.",
                 "type": "array",
                 "items": {
                   "description": "LogEntry records events",
@@ -248,5 +248,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

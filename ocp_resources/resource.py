@@ -386,6 +386,7 @@ class Resource:
         METALLB_IO: str = "metallb.io"
         METRICS_K8S_IO: str = "metrics.k8s.io"
         MIGRATIONS_KUBEVIRT_IO: str = "migrations.kubevirt.io"
+        MODELREGISTRY_OPENDATAHUB_IO = "modelregistry.opendatahub.io"
         MONITORING_COREOS_COM: str = "monitoring.coreos.com"
         MTQ_KUBEVIRT_IO: str = "mtq.kubevirt.io"
         NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO: str = "networkaddonsoperator.network.kubevirt.io"

@@ -66,6 +66,9 @@
           "items": {
             "description": "OperatorCondition is just the standard condition fields.",
             "type": "object",
+            "required": [
+              "type"
+            ],
             "properties": {
               "lastTransitionTime": {
                 "type": "string",
@@ -84,7 +87,11 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
         },
         "generations": {
           "description": "generations are used to determine when an item needs to be reconciled or has changed in a way that needs a reaction.",
@@ -119,7 +126,8 @@
                 "type": "string"
               }
             }
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "observedGeneration": {
           "description": "observedGeneration is the last generation change you've dealt with",
@@ -145,5 +153,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

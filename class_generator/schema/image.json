@@ -1,5 +1,5 @@
 {
-  "description": "Image governs policies related to imagestream imports and runtime configuration for external registries. It allows cluster admins to configure which registries OpenShift is allowed to import images from, extra CA trust bundles for external registries, and policies to block or allow registry hostnames. When exposing OpenShift's image registry to the public, this also lets cluster admins specify the external hostname. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "Image governs policies related to imagestream imports and runtime configuration\nfor external registries. It allows cluster admins to configure which registries\nOpenShift is allowed to import images from, extra CA trust bundles for external\nregistries, and policies to block or allow registry hostnames.\nWhen exposing OpenShift's image registry to the public, this also lets cluster\nadmins specify the external hostname.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "spec"
@@ -22,7 +22,7 @@
       "type": "object",
       "properties": {
         "additionalTrustedCA": {
-          "description": "additionalTrustedCA is a reference to a ConfigMap containing additional CAs that should be trusted during imagestream import, pod image pull, build image pull, and imageregistry pullthrough. The namespace for this config map is openshift-config.",
+          "description": "additionalTrustedCA is a reference to a ConfigMap containing additional CAs that\nshould be trusted during imagestream import, pod image pull, build image pull, and\nimageregistry pullthrough.\nThe namespace for this config map is openshift-config.",
           "type": "object",
           "required": [
             "name"
@@ -35,50 +35,54 @@
           }
         },
         "allowedRegistriesForImport": {
-          "description": "allowedRegistriesForImport limits the container image registries that normal users may import images from. Set this list to the registries that you trust to contain valid Docker images and that you want applications to be able to import from. Users with permission to create Images or ImageStreamMappings via the API are not affected by this policy - typically only administrators or system integrations will have those permissions.",
+          "description": "allowedRegistriesForImport limits the container image registries that normal users may import\nimages from. Set this list to the registries that you trust to contain valid Docker\nimages and that you want applications to be able to import from. Users with\npermission to create Images or ImageStreamMappings via the API are not affected by\nthis policy - typically only administrators or system integrations will have those\npermissions.",
           "type": "array",
           "items": {
-            "description": "RegistryLocation contains a location of the registry specified by the registry domain name. The domain name might include wildcards, like '*' or '??'.",
+            "description": "RegistryLocation contains a location of the registry specified by the registry domain\nname. The domain name might include wildcards, like '*' or '??'.",
             "type": "object",
             "properties": {
               "domainName": {
-                "description": "domainName specifies a domain name for the registry In case the registry use non-standard (80 or 443) port, the port should be included in the domain name as well.",
+                "description": "domainName specifies a domain name for the registry\nIn case the registry use non-standard (80 or 443) port, the port should be included\nin the domain name as well.",
                 "type": "string"
               },
               "insecure": {
-                "description": "insecure indicates whether the registry is secure (https) or insecure (http) By default (if not specified) the registry is assumed as secure.",
+                "description": "insecure indicates whether the registry is secure (https) or insecure (http)\nBy default (if not specified) the registry is assumed as secure.",
                 "type": "boolean"
               }
             }
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "externalRegistryHostnames": {
-          "description": "externalRegistryHostnames provides the hostnames for the default external image registry. The external hostname should be set only when the image registry is exposed externally. The first value is used in 'publicDockerImageRepository' field in ImageStreams. The value must be in \"hostname[:port]\" format.",
+          "description": "externalRegistryHostnames provides the hostnames for the default external image\nregistry. The external hostname should be set only when the image registry\nis exposed externally. The first value is used in 'publicDockerImageRepository'\nfield in ImageStreams. The value must be in \"hostname[:port]\" format.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "registrySources": {
-          "description": "registrySources contains configuration that determines how the container runtime should treat individual registries when accessing images for builds+pods. (e.g. whether or not to allow insecure access).  It does not contain configuration for the internal cluster registry.",
+          "description": "registrySources contains configuration that determines how the container runtime\nshould treat individual registries when accessing images for builds+pods. (e.g.\nwhether or not to allow insecure access).  It does not contain configuration for the\ninternal cluster registry.",
           "type": "object",
           "properties": {
             "allowedRegistries": {
-              "description": "allowedRegistries are the only registries permitted for image pull and push actions. All other registries are denied. \n Only one of BlockedRegistries or AllowedRegistries may be set.",
+              "description": "allowedRegistries are the only registries permitted for image pull and push actions. All other registries are denied.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "blockedRegistries": {
-              "description": "blockedRegistries cannot be used for image pull and push actions. All other registries are permitted. \n Only one of BlockedRegistries or AllowedRegistries may be set.",
+              "description": "blockedRegistries cannot be used for image pull and push actions. All other registries are permitted.\n\nOnly one of BlockedRegistries or AllowedRegistries may be set.",
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "containerRuntimeSearchRegistries": {
-              "description": "containerRuntimeSearchRegistries are registries that will be searched when pulling images that do not have fully qualified domains in their pull specs. Registries will be searched in the order provided in the list. Note: this search list only works with the container runtime, i.e CRI-O. Will NOT work with builds or imagestream imports.",
+              "description": "containerRuntimeSearchRegistries are registries that will be searched when pulling images that do not have fully qualified\ndomains in their pull specs. Registries will be searched in the order provided in the list.\nNote: this search list only works with the container runtime, i.e CRI-O. Will NOT work with builds or imagestream imports.",
               "type": "array",
               "format": "hostname",
               "minItems": 1,
@@ -92,7 +96,8 @@
               "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             }
           }
         }
@@ -103,14 +108,15 @@
       "type": "object",
       "properties": {
         "externalRegistryHostnames": {
-          "description": "externalRegistryHostnames provides the hostnames for the default external image registry. The external hostname should be set only when the image registry is exposed externally. The first value is used in 'publicDockerImageRepository' field in ImageStreams. The value must be in \"hostname[:port]\" format.",
+          "description": "externalRegistryHostnames provides the hostnames for the default external image\nregistry. The external hostname should be set only when the image registry\nis exposed externally. The first value is used in 'publicDockerImageRepository'\nfield in ImageStreams. The value must be in \"hostname[:port]\" format.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "internalRegistryHostname": {
-          "description": "internalRegistryHostname sets the hostname for the default internal image registry. The value must be in \"hostname[:port]\" format. This value is set by the image registry operator which controls the internal registry hostname.",
+          "description": "internalRegistryHostname sets the hostname for the default internal image\nregistry. The value must be in \"hostname[:port]\" format.\nThis value is set by the image registry operator which controls the internal registry\nhostname.",
           "type": "string"
         }
       }
@@ -123,5 +129,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
