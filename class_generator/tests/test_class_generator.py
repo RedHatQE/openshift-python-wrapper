@@ -37,7 +37,7 @@ def test_parse_explain(tmpdir_factory, kind):
     )
     for output_file in output_files:
         expected_file = f"{os.path.join(TESTS_MANIFESTS_DIR, kind, Path(output_file).parts[-1])}"
-        files_mismatch = filecmp.cmp(output_file, expected_file)
-        if not files_mismatch:
+        files_match = filecmp.cmp(output_file, expected_file)
+        if not files_match:
             os.system(f"diff {shlex.quote(str(output_file))} {shlex.quote(str(expected_file))}")
             pytest.fail(f"Generated file: {output_file} does not match expected file: {expected_file}")
