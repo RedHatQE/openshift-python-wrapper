@@ -29,6 +29,5 @@ def test_api_group_order():
             _err_diff = _diff.split(" ")[-1]
             errors.add(_err_diff)
 
-    assert not errors, (
-        f"ApiGroup class should be sorted alphabetically. Missed places ApiGroups: {'\n'.join(list(errors))}"
-    )
+    _errors_str = "\n".join(list(errors))
+    assert not errors, f"ApiGroup class should be sorted alphabetically. Missed places ApiGroups: {_errors_str}"

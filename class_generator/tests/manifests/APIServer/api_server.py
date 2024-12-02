@@ -6,7 +6,10 @@ from ocp_resources.resource import Resource
 
 class APIServer(Resource):
     """
-       APIServer holds configuration (like serving certificates, client CA and CORS domains) shared by all API servers in the system, among them especially kube-apiserver and openshift-apiserver. The canonical name of an instance is 'cluster'.
+        APIServer holds configuration (like serving certificates, client CA and CORS domains)
+    shared by all API servers in the system, among them especially kube-apiserver
+    and openshift-apiserver. The canonical name of an instance is 'cluster'.
+
     Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
     """
 
@@ -51,10 +54,10 @@ class APIServer(Resource):
               secure traffic.
 
             tls_security_profile (Dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
-              externally exposed servers.   If unset, a default (which may
-              change between releases) is chosen. Note that only Old,
-              Intermediate and Custom profiles are currently supported, and the
-              maximum available minTLSVersion is VersionTLS12.
+              externally exposed servers.  If unset, a default (which may change
+              between releases) is chosen. Note that only Old, Intermediate and
+              Custom profiles are currently supported, and the maximum available
+              minTLSVersion is VersionTLS12.
 
         """
         super().__init__(**kwargs)
