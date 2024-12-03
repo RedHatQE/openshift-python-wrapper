@@ -47,6 +47,10 @@
             "tunedProfile": {
               "description": "TuneD profile to apply",
               "type": "string"
+            },
+            "verbosity": {
+              "description": "klog logging verbosity",
+              "type": "integer"
             }
           }
         },
@@ -76,7 +80,7 @@
       }
     },
     "status": {
-      "description": "ProfileStatus is the status for a Profile resource; the status is for internal use only and its fields may be changed/removed in the future.",
+      "description": "ProfileStatus is the status for a Profile resource; the status is for internal use only\nand its fields may be changed/removed in the future.",
       "type": "object",
       "required": [
         "tunedProfile"
@@ -100,7 +104,7 @@
                 "format": "date-time"
               },
               "message": {
-                "description": "message provides additional information about the current condition. This is only to be consumed by humans.",
+                "description": "message provides additional information about the current condition.\nThis is only to be consumed by humans.",
                 "type": "string"
               },
               "reason": {
@@ -132,5 +136,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

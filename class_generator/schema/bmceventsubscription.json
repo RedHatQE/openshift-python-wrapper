@@ -30,7 +30,7 @@
           "type": "string"
         },
         "httpHeadersRef": {
-          "description": "A secret containing HTTP headers which should be passed along to the Destination when making a request",
+          "description": "A secret containing HTTP headers which should be passed along to the Destination\nwhen making a request",
           "type": "object",
           "properties": {
             "name": {
@@ -65,5 +65,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

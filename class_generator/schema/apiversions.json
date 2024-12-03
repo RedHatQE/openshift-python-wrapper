@@ -19,14 +19,16 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "versions": {
       "description": "versions are the api versions that are available.",
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "x-kubernetes-group-version-kind": [

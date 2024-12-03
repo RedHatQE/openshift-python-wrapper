@@ -6,7 +6,9 @@ from ocp_resources.resource import Resource
 
 class ImageContentSourcePolicy(Resource):
     """
-       ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules. When multiple policies are defined, the outcome of the behavior is defined on each field.
+        ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules.
+    When multiple policies are defined, the outcome of the behavior is defined on each field.
+
     Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.
     """
 
@@ -28,16 +30,16 @@ class ImageContentSourcePolicy(Resource):
               choose a potentially faster mirror. Only image pull specifications
               that have an image digest will have this behavior applied to them
               - tags will continue to be pulled from the specified repository in
-              the pull spec.   Each “source” repository is treated
-              independently; configurations for different “source” repositories
-              don’t interact.   When multiple policies are defined for the same
-              “source” repository, the sets of defined mirrors will be merged
-              together, preserving the relative order of the mirrors, if
-              possible. For example, if policy A has mirrors `a, b, c` and
-              policy B has mirrors `c, d, e`, the mirrors will be used in the
-              order `a, b, c, d, e`.  If the orders of mirror entries conflict
-              (e.g. `a, b` vs. `b, a`) the configuration is not rejected but the
-              resulting order is unspecified.
+              the pull spec.  Each “source” repository is treated independently;
+              configurations for different “source” repositories don’t interact.
+              When multiple policies are defined for the same “source”
+              repository, the sets of defined mirrors will be merged together,
+              preserving the relative order of the mirrors, if possible. For
+              example, if policy A has mirrors `a, b, c` and policy B has
+              mirrors `c, d, e`, the mirrors will be used in the order `a, b, c,
+              d, e`.  If the orders of mirror entries conflict (e.g. `a, b` vs.
+              `b, a`) the configuration is not rejected but the resulting order
+              is unspecified.
 
         """
         super().__init__(**kwargs)

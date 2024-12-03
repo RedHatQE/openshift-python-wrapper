@@ -1,5 +1,5 @@
 {
-  "description": "ClusterResourceQuota mirrors ResourceQuota at a cluster scope.  This object is easily convertible to synthetic ResourceQuota object to allow quota evaluation re-use. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "ClusterResourceQuota mirrors ResourceQuota at a cluster scope.  This object is easily convertible to\nsynthetic ResourceQuota object to allow quota evaluation re-use.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "metadata",
@@ -31,7 +31,7 @@
           "type": "object",
           "properties": {
             "hard": {
-              "description": "hard is the set of desired hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/",
+              "description": "hard is the set of desired hard limits for each named resource.\nMore info: https://kubernetes.io/docs/concepts/policy/resource-quotas/",
               "type": "object",
               "additionalProperties": {
                 "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
@@ -39,14 +39,14 @@
               }
             },
             "scopeSelector": {
-              "description": "scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota but expressed using ScopeSelectorOperator in combination with possible values. For a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched.",
+              "description": "scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota\nbut expressed using ScopeSelectorOperator in combination with possible values.\nFor a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched.",
               "type": "object",
               "properties": {
                 "matchExpressions": {
                   "description": "A list of scope selector requirements by scope of the resources.",
                   "type": "array",
                   "items": {
-                    "description": "A scoped-resource selector requirement is a selector that contains values, a scope name, and an operator that relates the scope name and values.",
+                    "description": "A scoped-resource selector requirement is a selector that contains values, a scope name, and an operator\nthat relates the scope name and values.",
                     "type": "object",
                     "required": [
                       "operator",
@@ -54,7 +54,7 @@
                     ],
                     "properties": {
                       "operator": {
-                        "description": "Represents a scope's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist.",
+                        "description": "Represents a scope's relationship to a set of values.\nValid operators are In, NotIn, Exists, DoesNotExist.",
                         "type": "string"
                       },
                       "scopeName": {
@@ -62,30 +62,33 @@
                         "type": "string"
                       },
                       "values": {
-                        "description": "An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                        "description": "An array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty.\nThis array is replaced during a strategic merge patch.",
                         "type": "array",
                         "items": {
                           "type": "string"
-                        }
+                        },
+                        "x-kubernetes-list-type": "atomic"
                       }
                     }
-                  }
+                  },
+                  "x-kubernetes-list-type": "atomic"
                 }
               },
               "x-kubernetes-map-type": "atomic"
             },
             "scopes": {
-              "description": "A collection of filters that must match each object tracked by a quota. If not specified, the quota matches all objects.",
+              "description": "A collection of filters that must match each object tracked by a quota.\nIf not specified, the quota matches all objects.",
               "type": "array",
               "items": {
                 "description": "A ResourceQuotaScope defines a filter that must match each object tracked by a quota",
                 "type": "string"
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             }
           }
         },
         "selector": {
-          "description": "Selector is the selector used to match projects. It should only select active projects on the scale of dozens (though it can select many more less active projects).  These projects will contend on object creation through this resource.",
+          "description": "Selector is the selector used to match projects.\nIt should only select active projects on the scale of dozens (though it can select\nmany more less active projects).  These projects will contend on object creation through\nthis resource.",
           "type": "object",
           "properties": {
             "annotations": {
@@ -110,14 +113,14 @@
       ],
       "properties": {
         "namespaces": {
-          "description": "Namespaces slices the usage by project.  This division allows for quick resolution of deletion reconciliation inside of a single project without requiring a recalculation across all projects.  This can be used to pull the deltas for a given project."
+          "description": "Namespaces slices the usage by project.  This division allows for quick resolution of\ndeletion reconciliation inside of a single project without requiring a recalculation\nacross all projects.  This can be used to pull the deltas for a given project."
         },
         "total": {
           "description": "Total defines the actual enforced quota and its current usage across all projects",
           "type": "object",
           "properties": {
             "hard": {
-              "description": "Hard is the set of enforced hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/",
+              "description": "Hard is the set of enforced hard limits for each named resource.\nMore info: https://kubernetes.io/docs/concepts/policy/resource-quotas/",
               "type": "object",
               "additionalProperties": {
                 "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
@@ -144,5 +147,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

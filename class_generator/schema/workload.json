@@ -6617,6 +6617,7 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": "podSetAssignments must have the same number of podSets as the spec",

@@ -82,5 +82,6 @@
       "version": "v1alpha"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

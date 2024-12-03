@@ -8,7 +8,7 @@
   "properties": {
     "quota": {
       "description": "Quota defines the desired quota",
-      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuotaSpec"
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuotaSpec_v2"
     },
     "selector": {
       "description": "Selector is the selector used to match projects. It should only select active projects on the scale of dozens (though it can select many more less active projects).  These projects will contend on object creation through this resource.",
