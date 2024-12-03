@@ -8,6 +8,10 @@
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeAddress"
       },
+      "x-kubernetes-list-map-keys": [
+        "type"
+      ],
+      "x-kubernetes-list-type": "map",
       "x-kubernetes-patch-merge-key": "type",
       "x-kubernetes-patch-strategy": "merge"
     },
@@ -19,7 +23,7 @@
       }
     },
     "capacity": {
-      "description": "Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity",
+      "description": "Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/reference/node/node-status/#capacity",
       "type": "object",
       "additionalProperties": {
         "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
@@ -31,6 +35,10 @@
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeCondition"
       },
+      "x-kubernetes-list-map-keys": [
+        "type"
+      ],
+      "x-kubernetes-list-type": "map",
       "x-kubernetes-patch-merge-key": "type",
       "x-kubernetes-patch-strategy": "merge"
     },
@@ -42,12 +50,17 @@
       "description": "Endpoints of daemons running on the Node.",
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeDaemonEndpoints"
     },
+    "features": {
+      "description": "Features describes the set of features implemented by the CRI implementation.",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeFeatures"
+    },
     "images": {
       "description": "List of container images on this node",
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerImage"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "nodeInfo": {
       "description": "Set of ids/uuids to uniquely identify the node. More info: https://kubernetes.io/docs/concepts/nodes/node/#info",
@@ -62,19 +75,29 @@
         "Terminated"
       ]
     },
+    "runtimeHandlers": {
+      "description": "The available runtime handlers.",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeRuntimeHandler"
+      },
+      "x-kubernetes-list-type": "atomic"
+    },
     "volumesAttached": {
       "description": "List of volumes that are attached to the node.",
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AttachedVolume"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "volumesInUse": {
       "description": "List of attachable volumes in use (mounted) by the node.",
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "$schema": "http://json-schema.org/schema#"

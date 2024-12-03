@@ -1,5 +1,5 @@
 {
-  "description": "Infrastructure holds cluster-wide information about Infrastructure.  The canonical name is `cluster` \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "Infrastructure holds cluster-wide information about Infrastructure.  The canonical name is `cluster`\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "spec"
@@ -22,7 +22,7 @@
       "type": "object",
       "properties": {
         "cloudConfig": {
-          "description": "cloudConfig is a reference to a ConfigMap containing the cloud provider configuration file. This configuration file is used to configure the Kubernetes cloud provider integration when using the built-in cloud provider integration or the external cloud controller manager. The namespace for this config map is openshift-config. \n cloudConfig should only be consumed by the kube_cloud_config controller. The controller is responsible for using the user configuration in the spec for various platforms and combining that with the user provided ConfigMap in this field to create a stitched kube cloud config. The controller generates a ConfigMap `kube-cloud-config` in `openshift-config-managed` namespace with the kube cloud config is stored in `cloud.conf` key. All the clients are expected to use the generated ConfigMap only.",
+          "description": "cloudConfig is a reference to a ConfigMap containing the cloud provider configuration file.\nThis configuration file is used to configure the Kubernetes cloud provider integration\nwhen using the built-in cloud provider integration or the external cloud controller manager.\nThe namespace for this config map is openshift-config.\n\ncloudConfig should only be consumed by the kube_cloud_config controller.\nThe controller is responsible for using the user configuration in the spec\nfor various platforms and combining that with the user provided ConfigMap in this field\nto create a stitched kube cloud config.\nThe controller generates a ConfigMap `kube-cloud-config` in `openshift-config-managed` namespace\nwith the kube cloud config is stored in `cloud.conf` key.\nAll the clients are expected to use the generated ConfigMap only.",
           "type": "object",
           "properties": {
             "key": {
@@ -35,7 +35,7 @@
           }
         },
         "platformSpec": {
-          "description": "platformSpec holds desired information specific to the underlying infrastructure provider.",
+          "description": "platformSpec holds desired information specific to the underlying\ninfrastructure provider.",
           "type": "object",
           "properties": {
             "alibabaCloud": {
@@ -47,19 +47,19 @@
               "type": "object",
               "properties": {
                 "serviceEndpoints": {
-                  "description": "serviceEndpoints list contains custom endpoints which will override default service endpoint of AWS Services. There must be only one ServiceEndpoint for a service.",
+                  "description": "serviceEndpoints list contains custom endpoints which will override default\nservice endpoint of AWS Services.\nThere must be only one ServiceEndpoint for a service.",
                   "type": "array",
                   "items": {
-                    "description": "AWSServiceEndpoint store the configuration of a custom url to override existing defaults of AWS Services.",
+                    "description": "AWSServiceEndpoint store the configuration of a custom url to\noverride existing defaults of AWS Services.",
                     "type": "object",
                     "properties": {
                       "name": {
-                        "description": "name is the name of the AWS service. The list of all the service names can be found at https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html This must be provided and cannot be empty.",
+                        "description": "name is the name of the AWS service.\nThe list of all the service names can be found at https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "pattern": "^[a-z0-9-]+$"
                       },
                       "url": {
-                        "description": "url is fully qualified URI with scheme https, that overrides the default generated endpoint for a client. This must be provided and cannot be empty.",
+                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "pattern": "^https://"
                       }
@@ -78,7 +78,7 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IP addresses, one from IPv4 family and one from IPv6. In single stack clusters a single IP address is expected. When omitted, values from the status.apiServerInternalIPs will be used. Once set, the list cannot be completely removed (but its second entry can).",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers.\nIn dual stack clusters this list contains two IP addresses, one from IPv4\nfamily and one from IPv6.\nIn single stack clusters a single IP address is expected.\nWhen omitted, values from the status.apiServerInternalIPs will be used.\nOnce set, the list cannot be completely removed (but its second entry can).",
                   "type": "array",
                   "maxItems": 2,
                   "items": {
@@ -102,7 +102,7 @@
                   ]
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IP addresses, one from IPv4 family and one from IPv6. In single stack clusters a single IP address is expected. When omitted, values from the status.ingressIPs will be used. Once set, the list cannot be completely removed (but its second entry can).",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names.\nIn dual stack clusters this list contains two IP addresses, one from IPv4\nfamily and one from IPv6.\nIn single stack clusters a single IP address is expected.\nWhen omitted, values from the status.ingressIPs will be used.\nOnce set, the list cannot be completely removed (but its second entry can).",
                   "type": "array",
                   "maxItems": 2,
                   "items": {
@@ -126,7 +126,7 @@
                   ]
                 },
                 "machineNetworks": {
-                  "description": "machineNetworks are IP networks used to connect all the OpenShift cluster nodes. Each network is provided in the CIDR format and should be IPv4 or IPv6, for example \"10.0.0.0/8\" or \"fd00::/8\".",
+                  "description": "machineNetworks are IP networks used to connect all the OpenShift cluster\nnodes. Each network is provided in the CIDR format and should be IPv4 or IPv6,\nfor example \"10.0.0.0/8\" or \"fd00::/8\".",
                   "type": "array",
                   "maxItems": 32,
                   "items": {
@@ -165,11 +165,11 @@
               "type": "object"
             },
             "external": {
-              "description": "ExternalPlatformType represents generic infrastructure provider. Platform-specific components should be supplemented separately.",
+              "description": "ExternalPlatformType represents generic infrastructure provider.\nPlatform-specific components should be supplemented separately.",
               "type": "object",
               "properties": {
                 "platformName": {
-                  "description": "PlatformName holds the arbitrary string representing the infrastructure provider name, expected to be set at the installation time. This field is solely for informational and reporting purposes and is not expected to be used for decision-making.",
+                  "description": "PlatformName holds the arbitrary string representing the infrastructure provider name, expected to be set at the installation time.\nThis field is solely for informational and reporting purposes and is not expected to be used for decision-making.",
                   "type": "string",
                   "x-kubernetes-validations": [
                     {
@@ -201,7 +201,7 @@
               ],
               "properties": {
                 "failureDomains": {
-                  "description": "failureDomains configures failure domains information for the Nutanix platform. When set, the failure domains defined here may be used to spread Machines across prism element clusters to improve fault tolerance of the cluster.",
+                  "description": "failureDomains configures failure domains information for the Nutanix platform.\nWhen set, the failure domains defined here may be used to spread Machines across\nprism element clusters to improve fault tolerance of the cluster.",
                   "type": "array",
                   "items": {
                     "description": "NutanixFailureDomain configures failure domain information for the Nutanix platform.",
@@ -213,7 +213,7 @@
                     ],
                     "properties": {
                       "cluster": {
-                        "description": "cluster is to identify the cluster (the Prism Element under management of the Prism Central), in which the Machine's VM will be created. The cluster identifier (uuid or name) can be obtained from the Prism Central console or using the prism_central API.",
+                        "description": "cluster is to identify the cluster (the Prism Element under management of the Prism Central),\nin which the Machine's VM will be created. The cluster identifier (uuid or name) can be obtained\nfrom the Prism Central console or using the prism_central API.",
                         "type": "object",
                         "required": [
                           "type"
@@ -248,14 +248,14 @@
                         ]
                       },
                       "name": {
-                        "description": "name defines the unique name of a failure domain. Name is required and must be at most 64 characters in length. It must consist of only lower case alphanumeric characters and hyphens (-). It must start and end with an alphanumeric character. This value is arbitrary and is used to identify the failure domain within the platform.",
+                        "description": "name defines the unique name of a failure domain.\nName is required and must be at most 64 characters in length.\nIt must consist of only lower case alphanumeric characters and hyphens (-).\nIt must start and end with an alphanumeric character.\nThis value is arbitrary and is used to identify the failure domain within the platform.",
                         "type": "string",
                         "maxLength": 64,
                         "minLength": 1,
                         "pattern": "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
                       },
                       "subnets": {
-                        "description": "subnets holds a list of identifiers (one or more) of the cluster's network subnets for the Machine's VM to connect to. The subnet identifiers (uuid or name) can be obtained from the Prism Central console or using the prism_central API.",
+                        "description": "subnets holds a list of identifiers (one or more) of the cluster's network subnets\nIf the feature gate NutanixMultiSubnets is enabled, up to 32 subnets may be configured.\nfor the Machine's VM to connect to. The subnet identifiers (uuid or name) can be\nobtained from the Prism Central console or using the prism_central API.",
                         "type": "array",
                         "maxItems": 1,
                         "minItems": 1,
@@ -294,10 +294,7 @@
                             }
                           ]
                         },
-                        "x-kubernetes-list-map-keys": [
-                          "type"
-                        ],
-                        "x-kubernetes-list-type": "map"
+                        "x-kubernetes-list-type": "atomic"
                       }
                     }
                   },
@@ -307,7 +304,7 @@
                   "x-kubernetes-list-type": "map"
                 },
                 "prismCentral": {
-                  "description": "prismCentral holds the endpoint address and port to access the Nutanix Prism Central. When a cluster-wide proxy is installed, by default, this endpoint will be accessed via the proxy. Should you wish for communication with this endpoint not to be proxied, please add the endpoint to the proxy spec.noProxy list.",
+                  "description": "prismCentral holds the endpoint address and port to access the Nutanix Prism Central.\nWhen a cluster-wide proxy is installed, by default, this endpoint will be accessed via the proxy.\nShould you wish for communication with this endpoint not to be proxied, please add the endpoint to the\nproxy spec.noProxy list.",
                   "type": "object",
                   "required": [
                     "address",
@@ -329,7 +326,7 @@
                   }
                 },
                 "prismElements": {
-                  "description": "prismElements holds one or more endpoint address and port data to access the Nutanix Prism Elements (clusters) of the Nutanix Prism Central. Currently we only support one Prism Element (cluster) for an OpenShift cluster, where all the Nutanix resources (VMs, subnets, volumes, etc.) used in the OpenShift cluster are located. In the future, we may support Nutanix resources (VMs, etc.) spread over multiple Prism Elements (clusters) of the Prism Central.",
+                  "description": "prismElements holds one or more endpoint address and port data to access the Nutanix\nPrism Elements (clusters) of the Nutanix Prism Central. Currently we only support one\nPrism Element (cluster) for an OpenShift cluster, where all the Nutanix resources (VMs, subnets, volumes, etc.)\nused in the OpenShift cluster are located. In the future, we may support Nutanix resources (VMs, etc.)\nspread over multiple Prism Elements (clusters) of the Prism Central.",
                   "type": "array",
                   "items": {
                     "description": "NutanixPrismElementEndpoint holds the name and endpoint data for a Prism Element (cluster)",
@@ -340,7 +337,7 @@
                     ],
                     "properties": {
                       "endpoint": {
-                        "description": "endpoint holds the endpoint address and port data of the Prism Element (cluster). When a cluster-wide proxy is installed, by default, this endpoint will be accessed via the proxy. Should you wish for communication with this endpoint not to be proxied, please add the endpoint to the proxy spec.noProxy list.",
+                        "description": "endpoint holds the endpoint address and port data of the Prism Element (cluster).\nWhen a cluster-wide proxy is installed, by default, this endpoint will be accessed via the proxy.\nShould you wish for communication with this endpoint not to be proxied, please add the endpoint to the\nproxy spec.noProxy list.",
                         "type": "object",
                         "required": [
                           "address",
@@ -362,7 +359,7 @@
                         }
                       },
                       "name": {
-                        "description": "name is the name of the Prism Element (cluster). This value will correspond with the cluster field configured on other resources (eg Machines, PVCs, etc).",
+                        "description": "name is the name of the Prism Element (cluster). This value will correspond with\nthe cluster field configured on other resources (eg Machines, PVCs, etc).",
                         "type": "string",
                         "maxLength": 256
                       }
@@ -380,7 +377,7 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IP addresses, one from IPv4 family and one from IPv6. In single stack clusters a single IP address is expected. When omitted, values from the status.apiServerInternalIPs will be used. Once set, the list cannot be completely removed (but its second entry can).",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers.\nIn dual stack clusters this list contains two IP addresses, one from IPv4\nfamily and one from IPv6.\nIn single stack clusters a single IP address is expected.\nWhen omitted, values from the status.apiServerInternalIPs will be used.\nOnce set, the list cannot be completely removed (but its second entry can).",
                   "type": "array",
                   "maxItems": 2,
                   "items": {
@@ -404,7 +401,7 @@
                   ]
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IP addresses, one from IPv4 family and one from IPv6. In single stack clusters a single IP address is expected. When omitted, values from the status.ingressIPs will be used. Once set, the list cannot be completely removed (but its second entry can).",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names.\nIn dual stack clusters this list contains two IP addresses, one from IPv4\nfamily and one from IPv6.\nIn single stack clusters a single IP address is expected.\nWhen omitted, values from the status.ingressIPs will be used.\nOnce set, the list cannot be completely removed (but its second entry can).",
                   "type": "array",
                   "maxItems": 2,
                   "items": {
@@ -428,7 +425,7 @@
                   ]
                 },
                 "machineNetworks": {
-                  "description": "machineNetworks are IP networks used to connect all the OpenShift cluster nodes. Each network is provided in the CIDR format and should be IPv4 or IPv6, for example \"10.0.0.0/8\" or \"fd00::/8\".",
+                  "description": "machineNetworks are IP networks used to connect all the OpenShift cluster\nnodes. Each network is provided in the CIDR format and should be IPv4 or IPv6,\nfor example \"10.0.0.0/8\" or \"fd00::/8\".",
                   "type": "array",
                   "maxItems": 32,
                   "items": {
@@ -471,10 +468,10 @@
               "type": "object",
               "properties": {
                 "serviceEndpoints": {
-                  "description": "serviceEndpoints is a list of custom endpoints which will override the default service endpoints of a Power VS service.",
+                  "description": "serviceEndpoints is a list of custom endpoints which will override the default\nservice endpoints of a Power VS service.",
                   "type": "array",
                   "items": {
-                    "description": "PowervsServiceEndpoint stores the configuration of a custom url to override existing defaults of PowerVS Services.",
+                    "description": "PowervsServiceEndpoint stores the configuration of a custom url to\noverride existing defaults of PowerVS Services.",
                     "type": "object",
                     "required": [
                       "name",
@@ -482,12 +479,27 @@
                     ],
                     "properties": {
                       "name": {
-                        "description": "name is the name of the Power VS service. Few of the services are IAM - https://cloud.ibm.com/apidocs/iam-identity-token-api ResourceController - https://cloud.ibm.com/apidocs/resource-controller/resource-controller Power Cloud - https://cloud.ibm.com/apidocs/power-cloud",
+                        "description": "name is the name of the Power VS service.\nFew of the services are\nIAM - https://cloud.ibm.com/apidocs/iam-identity-token-api\nResourceController - https://cloud.ibm.com/apidocs/resource-controller/resource-controller\nPower Cloud - https://cloud.ibm.com/apidocs/power-cloud",
                         "type": "string",
-                        "pattern": "^[a-z0-9-]+$"
+                        "enum": [
+                          "CIS",
+                          "COS",
+                          "COSConfig",
+                          "DNSServices",
+                          "GlobalCatalog",
+                          "GlobalSearch",
+                          "GlobalTagging",
+                          "HyperProtect",
+                          "IAM",
+                          "KeyProtect",
+                          "Power",
+                          "ResourceController",
+                          "ResourceManager",
+                          "VPC"
+                        ]
                       },
                       "url": {
-                        "description": "url is fully qualified URI with scheme https, that overrides the default generated endpoint for a client. This must be provided and cannot be empty.",
+                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "format": "uri",
                         "pattern": "^https://"
@@ -502,7 +514,7 @@
               }
             },
             "type": {
-              "description": "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", \"KubeVirt\", \"EquinixMetal\", \"PowerVS\", \"AlibabaCloud\", \"Nutanix\" and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform.",
+              "description": "type is the underlying infrastructure provider for the cluster. This\nvalue controls whether infrastructure automation such as service load\nbalancers, dynamic volume provisioning, machine creation and deletion, and\nother integrations are enabled. If None, no infrastructure automation is\nenabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\",\n\"OpenStack\", \"VSphere\", \"oVirt\", \"KubeVirt\", \"EquinixMetal\", \"PowerVS\",\n\"AlibabaCloud\", \"Nutanix\" and \"None\". Individual components may not support all platforms,\nand must handle unrecognized platforms as None if they do not support that platform.",
               "type": "string",
               "enum": [
                 "",
@@ -529,7 +541,7 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IP addresses, one from IPv4 family and one from IPv6. In single stack clusters a single IP address is expected. When omitted, values from the status.apiServerInternalIPs will be used. Once set, the list cannot be completely removed (but its second entry can).",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers.\nIn dual stack clusters this list contains two IP addresses, one from IPv4\nfamily and one from IPv6.\nIn single stack clusters a single IP address is expected.\nWhen omitted, values from the status.apiServerInternalIPs will be used.\nOnce set, the list cannot be completely removed (but its second entry can).",
                   "type": "array",
                   "maxItems": 2,
                   "items": {
@@ -553,10 +565,10 @@
                   ]
                 },
                 "failureDomains": {
-                  "description": "failureDomains contains the definition of region, zone and the vCenter topology. If this is omitted failure domains (regions and zones) will not be used.",
+                  "description": "failureDomains contains the definition of region, zone and the vCenter topology.\nIf this is omitted failure domains (regions and zones) will not be used.",
                   "type": "array",
                   "items": {
-                    "description": "VSpherePlatformFailureDomainSpec holds the region and zone failure domain and the vCenter topology of that failure domain.",
+                    "description": "VSpherePlatformFailureDomainSpec holds the region and zone failure domain and\nthe vCenter topology of that failure domain.",
                     "type": "object",
                     "required": [
                       "name",
@@ -567,19 +579,19 @@
                     ],
                     "properties": {
                       "name": {
-                        "description": "name defines the arbitrary but unique name of a failure domain.",
+                        "description": "name defines the arbitrary but unique name\nof a failure domain.",
                         "type": "string",
                         "maxLength": 256,
                         "minLength": 1
                       },
                       "region": {
-                        "description": "region defines the name of a region tag that will be attached to a vCenter datacenter. The tag category in vCenter must be named openshift-region.",
+                        "description": "region defines the name of a region tag that will\nbe attached to a vCenter datacenter. The tag\ncategory in vCenter must be named openshift-region.",
                         "type": "string",
                         "maxLength": 80,
                         "minLength": 1
                       },
                       "server": {
-                        "description": "server is the fully-qualified domain name or the IP address of the vCenter server. ---",
+                        "description": "server is the fully-qualified domain name or the IP address of the vCenter server.",
                         "type": "string",
                         "maxLength": 255,
                         "minLength": 1
@@ -595,30 +607,30 @@
                         ],
                         "properties": {
                           "computeCluster": {
-                            "description": "computeCluster the absolute path of the vCenter cluster in which virtual machine will be located. The absolute path is of the form /<datacenter>/host/<cluster>. The maximum length of the path is 2048 characters.",
+                            "description": "computeCluster the absolute path of the vCenter cluster\nin which virtual machine will be located.\nThe absolute path is of the form /<datacenter>/host/<cluster>.\nThe maximum length of the path is 2048 characters.",
                             "type": "string",
                             "maxLength": 2048,
                             "pattern": "^/.*?/host/.*?"
                           },
                           "datacenter": {
-                            "description": "datacenter is the name of vCenter datacenter in which virtual machines will be located. The maximum length of the datacenter name is 80 characters.",
+                            "description": "datacenter is the name of vCenter datacenter in which virtual machines will be located.\nThe maximum length of the datacenter name is 80 characters.",
                             "type": "string",
                             "maxLength": 80
                           },
                           "datastore": {
-                            "description": "datastore is the absolute path of the datastore in which the virtual machine is located. The absolute path is of the form /<datacenter>/datastore/<datastore> The maximum length of the path is 2048 characters.",
+                            "description": "datastore is the absolute path of the datastore in which the\nvirtual machine is located.\nThe absolute path is of the form /<datacenter>/datastore/<datastore>\nThe maximum length of the path is 2048 characters.",
                             "type": "string",
                             "maxLength": 2048,
                             "pattern": "^/.*?/datastore/.*?"
                           },
                           "folder": {
-                            "description": "folder is the absolute path of the folder where virtual machines are located. The absolute path is of the form /<datacenter>/vm/<folder>. The maximum length of the path is 2048 characters.",
+                            "description": "folder is the absolute path of the folder where\nvirtual machines are located. The absolute path\nis of the form /<datacenter>/vm/<folder>.\nThe maximum length of the path is 2048 characters.",
                             "type": "string",
                             "maxLength": 2048,
                             "pattern": "^/.*?/vm/.*?"
                           },
                           "networks": {
-                            "description": "networks is the list of port group network names within this failure domain. Currently, we only support a single interface per RHCOS virtual machine. The available networks (port groups) can be listed using `govc ls 'network/*'` The single interface should be the absolute path of the form /<datacenter>/network/<portgroup>.",
+                            "description": "networks is the list of port group network names within this failure domain.\nIf feature gate VSphereMultiNetworks is enabled, up to 10 network adapters may be defined.\n10 is the maximum number of virtual network devices which may be attached to a VM as defined by:\nhttps://configmax.esp.vmware.com/guest?vmwareproduct=vSphere&release=vSphere%208.0&categories=1-0\nThe available networks (port groups) can be listed using\n`govc ls 'network/*'`\nNetworks should be in the form of an absolute path:\n/<datacenter>/network/<portgroup>.",
                             "type": "array",
                             "maxItems": 1,
                             "minItems": 1,
@@ -628,13 +640,13 @@
                             "x-kubernetes-list-type": "atomic"
                           },
                           "resourcePool": {
-                            "description": "resourcePool is the absolute path of the resource pool where virtual machines will be created. The absolute path is of the form /<datacenter>/host/<cluster>/Resources/<resourcepool>. The maximum length of the path is 2048 characters.",
+                            "description": "resourcePool is the absolute path of the resource pool where virtual machines will be\ncreated. The absolute path is of the form /<datacenter>/host/<cluster>/Resources/<resourcepool>.\nThe maximum length of the path is 2048 characters.",
                             "type": "string",
                             "maxLength": 2048,
                             "pattern": "^/.*?/host/.*?/Resources.*"
                           },
                           "template": {
-                            "description": "template is the full inventory path of the virtual machine or template that will be cloned when creating new machines in this failure domain. The maximum length of the path is 2048 characters. \n When omitted, the template will be calculated by the control plane machineset operator based on the region and zone defined in VSpherePlatformFailureDomainSpec. For example, for zone=zonea, region=region1, and infrastructure name=test, the template path would be calculated as /<datacenter>/vm/test-rhcos-region1-zonea.",
+                            "description": "template is the full inventory path of the virtual machine or template\nthat will be cloned when creating new machines in this failure domain.\nThe maximum length of the path is 2048 characters.\n\nWhen omitted, the template will be calculated by the control plane\nmachineset operator based on the region and zone defined in\nVSpherePlatformFailureDomainSpec.\nFor example, for zone=zonea, region=region1, and infrastructure name=test,\nthe template path would be calculated as /<datacenter>/vm/test-rhcos-region1-zonea.",
                             "type": "string",
                             "maxLength": 2048,
                             "minLength": 1,
@@ -643,7 +655,7 @@
                         }
                       },
                       "zone": {
-                        "description": "zone defines the name of a zone tag that will be attached to a vCenter cluster. The tag category in vCenter must be named openshift-zone.",
+                        "description": "zone defines the name of a zone tag that will\nbe attached to a vCenter cluster. The tag\ncategory in vCenter must be named openshift-zone.",
                         "type": "string",
                         "maxLength": 80,
                         "minLength": 1
@@ -656,7 +668,7 @@
                   "x-kubernetes-list-type": "map"
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IP addresses, one from IPv4 family and one from IPv6. In single stack clusters a single IP address is expected. When omitted, values from the status.ingressIPs will be used. Once set, the list cannot be completely removed (but its second entry can).",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names.\nIn dual stack clusters this list contains two IP addresses, one from IPv4\nfamily and one from IPv6.\nIn single stack clusters a single IP address is expected.\nWhen omitted, values from the status.ingressIPs will be used.\nOnce set, the list cannot be completely removed (but its second entry can).",
                   "type": "array",
                   "maxItems": 2,
                   "items": {
@@ -680,7 +692,7 @@
                   ]
                 },
                 "machineNetworks": {
-                  "description": "machineNetworks are IP networks used to connect all the OpenShift cluster nodes. Each network is provided in the CIDR format and should be IPv4 or IPv6, for example \"10.0.0.0/8\" or \"fd00::/8\".",
+                  "description": "machineNetworks are IP networks used to connect all the OpenShift cluster\nnodes. Each network is provided in the CIDR format and should be IPv4 or IPv6,\nfor example \"10.0.0.0/8\" or \"fd00::/8\".",
                   "type": "array",
                   "maxItems": 32,
                   "items": {
@@ -703,7 +715,7 @@
                   ]
                 },
                 "nodeNetworking": {
-                  "description": "nodeNetworking contains the definition of internal and external network constraints for assigning the node's networking. If this field is omitted, networking defaults to the legacy address selection behavior which is to only support a single address and return the first one found.",
+                  "description": "nodeNetworking contains the definition of internal and external network constraints for\nassigning the node's networking.\nIf this field is omitted, networking defaults to the legacy\naddress selection behavior which is to only support a single address and\nreturn the first one found.",
                   "type": "object",
                   "properties": {
                     "external": {
@@ -711,7 +723,7 @@
                       "type": "object",
                       "properties": {
                         "excludeNetworkSubnetCidr": {
-                          "description": "excludeNetworkSubnetCidr IP addresses in subnet ranges will be excluded when selecting the IP address from the VirtualMachine's VM for use in the status.addresses fields. ---",
+                          "description": "excludeNetworkSubnetCidr IP addresses in subnet ranges will be excluded when selecting\nthe IP address from the VirtualMachine's VM for use in the status.addresses fields.",
                           "type": "array",
                           "items": {
                             "type": "string",
@@ -720,11 +732,11 @@
                           "x-kubernetes-list-type": "atomic"
                         },
                         "network": {
-                          "description": "network VirtualMachine's VM Network names that will be used to when searching for status.addresses fields. Note that if internal.networkSubnetCIDR and external.networkSubnetCIDR are not set, then the vNIC associated to this network must only have a single IP address assigned to it. The available networks (port groups) can be listed using `govc ls 'network/*'`",
+                          "description": "network VirtualMachine's VM Network names that will be used to when searching\nfor status.addresses fields. Note that if internal.networkSubnetCIDR and\nexternal.networkSubnetCIDR are not set, then the vNIC associated to this network must\nonly have a single IP address assigned to it.\nThe available networks (port groups) can be listed using\n`govc ls 'network/*'`",
                           "type": "string"
                         },
                         "networkSubnetCidr": {
-                          "description": "networkSubnetCidr IP address on VirtualMachine's network interfaces included in the fields' CIDRs that will be used in respective status.addresses fields. ---",
+                          "description": "networkSubnetCidr IP address on VirtualMachine's network interfaces included in the fields' CIDRs\nthat will be used in respective status.addresses fields.",
                           "type": "array",
                           "items": {
                             "type": "string",
@@ -739,7 +751,7 @@
                       "type": "object",
                       "properties": {
                         "excludeNetworkSubnetCidr": {
-                          "description": "excludeNetworkSubnetCidr IP addresses in subnet ranges will be excluded when selecting the IP address from the VirtualMachine's VM for use in the status.addresses fields. ---",
+                          "description": "excludeNetworkSubnetCidr IP addresses in subnet ranges will be excluded when selecting\nthe IP address from the VirtualMachine's VM for use in the status.addresses fields.",
                           "type": "array",
                           "items": {
                             "type": "string",
@@ -748,11 +760,11 @@
                           "x-kubernetes-list-type": "atomic"
                         },
                         "network": {
-                          "description": "network VirtualMachine's VM Network names that will be used to when searching for status.addresses fields. Note that if internal.networkSubnetCIDR and external.networkSubnetCIDR are not set, then the vNIC associated to this network must only have a single IP address assigned to it. The available networks (port groups) can be listed using `govc ls 'network/*'`",
+                          "description": "network VirtualMachine's VM Network names that will be used to when searching\nfor status.addresses fields. Note that if internal.networkSubnetCIDR and\nexternal.networkSubnetCIDR are not set, then the vNIC associated to this network must\nonly have a single IP address assigned to it.\nThe available networks (port groups) can be listed using\n`govc ls 'network/*'`",
                           "type": "string"
                         },
                         "networkSubnetCidr": {
-                          "description": "networkSubnetCidr IP address on VirtualMachine's network interfaces included in the fields' CIDRs that will be used in respective status.addresses fields. ---",
+                          "description": "networkSubnetCidr IP address on VirtualMachine's network interfaces included in the fields' CIDRs\nthat will be used in respective status.addresses fields.",
                           "type": "array",
                           "items": {
                             "type": "string",
@@ -765,12 +777,12 @@
                   }
                 },
                 "vcenters": {
-                  "description": "vcenters holds the connection details for services to communicate with vCenter. Currently, only a single vCenter is supported. ---",
+                  "description": "vcenters holds the connection details for services to communicate with vCenter.\nCurrently, only a single vCenter is supported, but in tech preview 3 vCenters are supported.\nOnce the cluster has been installed, you are unable to change the current number of defined\nvCenters except in the case where the cluster has been upgraded from a version of OpenShift\nwhere the vsphere platform spec was not present.  You may make modifications to the existing\nvCenters that are defined in the vcenters list in order to match with any added or modified\nfailure domains.",
                   "type": "array",
                   "maxItems": 1,
                   "minItems": 0,
                   "items": {
-                    "description": "VSpherePlatformVCenterSpec stores the vCenter connection fields. This is used by the vSphere CCM.",
+                    "description": "VSpherePlatformVCenterSpec stores the vCenter connection fields.\nThis is used by the vSphere CCM.",
                     "type": "object",
                     "required": [
                       "datacenters",
@@ -778,7 +790,7 @@
                     ],
                     "properties": {
                       "datacenters": {
-                        "description": "The vCenter Datacenters in which the RHCOS vm guests are located. This field will be used by the Cloud Controller Manager. Each datacenter listed here should be used within a topology.",
+                        "description": "The vCenter Datacenters in which the RHCOS\nvm guests are located. This field will\nbe used by the Cloud Controller Manager.\nEach datacenter listed here should be used within\na topology.",
                         "type": "array",
                         "minItems": 1,
                         "items": {
@@ -787,20 +799,26 @@
                         "x-kubernetes-list-type": "set"
                       },
                       "port": {
-                        "description": "port is the TCP port that will be used to communicate to the vCenter endpoint. When omitted, this means the user has no opinion and it is up to the platform to choose a sensible default, which is subject to change over time.",
+                        "description": "port is the TCP port that will be used to communicate to\nthe vCenter endpoint.\nWhen omitted, this means the user has no opinion and\nit is up to the platform to choose a sensible default,\nwhich is subject to change over time.",
                         "type": "integer",
                         "format": "int32",
                         "maximum": 32767,
                         "minimum": 1
                       },
                       "server": {
-                        "description": "server is the fully-qualified domain name or the IP address of the vCenter server. ---",
+                        "description": "server is the fully-qualified domain name or the IP address of the vCenter server.",
                         "type": "string",
                         "maxLength": 255
                       }
                     }
                   },
-                  "x-kubernetes-list-type": "atomic"
+                  "x-kubernetes-list-type": "atomic",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "vcenters cannot be added or removed once set",
+                      "rule": "size(self) != size(oldSelf) ? size(oldSelf) == 0 && size(self) < 2 : true"
+                    }
+                  ]
                 }
               },
               "x-kubernetes-validations": [
@@ -811,10 +829,20 @@
                 {
                   "message": "ingressIPs list is required once set",
                   "rule": "!has(oldSelf.ingressIPs) || has(self.ingressIPs)"
+                },
+                {
+                  "message": "vcenters can have at most 1 item when configured post-install",
+                  "rule": "!has(oldSelf.vcenters) && has(self.vcenters) ? size(self.vcenters) < 2 : true"
                 }
               ]
             }
-          }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "vcenters can have at most 1 item when configured post-install",
+              "rule": "!has(oldSelf.vsphere) && has(self.vsphere) ? size(self.vsphere.vcenters) < 2 : true"
+            }
+          ]
         }
       }
     },
@@ -823,15 +851,15 @@
       "type": "object",
       "properties": {
         "apiServerInternalURI": {
-          "description": "apiServerInternalURL is a valid URI with scheme 'https', address and optionally a port (defaulting to 443).  apiServerInternalURL can be used by components like kubelets, to contact the Kubernetes API server using the infrastructure provider rather than Kubernetes networking.",
+          "description": "apiServerInternalURL is a valid URI with scheme 'https',\naddress and optionally a port (defaulting to 443).  apiServerInternalURL can be used by components\nlike kubelets, to contact the Kubernetes API server using the\ninfrastructure provider rather than Kubernetes networking.",
           "type": "string"
         },
         "apiServerURL": {
-          "description": "apiServerURL is a valid URI with scheme 'https', address and optionally a port (defaulting to 443).  apiServerURL can be used by components like the web console to tell users where to find the Kubernetes API.",
+          "description": "apiServerURL is a valid URI with scheme 'https', address and\noptionally a port (defaulting to 443).  apiServerURL can be used by components like the web console\nto tell users where to find the Kubernetes API.",
           "type": "string"
         },
         "controlPlaneTopology": {
-          "description": "controlPlaneTopology expresses the expectations for operands that normally run on control nodes. The default is 'HighlyAvailable', which represents the behavior operators have in a \"normal\" cluster. The 'SingleReplica' mode will be used in single-node deployments and the operators should not configure the operand for highly-available operation The 'External' mode indicates that the control plane is hosted externally to the cluster and that its components are not visible within the cluster.",
+          "description": "controlPlaneTopology expresses the expectations for operands that normally run on control nodes.\nThe default is 'HighlyAvailable', which represents the behavior operators have in a \"normal\" cluster.\nThe 'SingleReplica' mode will be used in single-node deployments\nand the operators should not configure the operand for highly-available operation\nThe 'External' mode indicates that the control plane is hosted externally to the cluster and that\nits components are not visible within the cluster.",
           "type": "string",
           "enum": [
             "HighlyAvailable",
@@ -840,7 +868,7 @@
           ]
         },
         "cpuPartitioning": {
-          "description": "cpuPartitioning expresses if CPU partitioning is a currently enabled feature in the cluster. CPU Partitioning means that this cluster can support partitioning workloads to specific CPU Sets. Valid values are \"None\" and \"AllNodes\". When omitted, the default value is \"None\". The default value of \"None\" indicates that no nodes will be setup with CPU partitioning. The \"AllNodes\" value indicates that all nodes have been setup with CPU partitioning, and can then be further configured via the PerformanceProfile API.",
+          "description": "cpuPartitioning expresses if CPU partitioning is a currently enabled feature in the cluster.\nCPU Partitioning means that this cluster can support partitioning workloads to specific CPU Sets.\nValid values are \"None\" and \"AllNodes\". When omitted, the default value is \"None\".\nThe default value of \"None\" indicates that no nodes will be setup with CPU partitioning.\nThe \"AllNodes\" value indicates that all nodes have been setup with CPU partitioning,\nand can then be further configured via the PerformanceProfile API.",
           "type": "string",
           "enum": [
             "None",
@@ -848,15 +876,15 @@
           ]
         },
         "etcdDiscoveryDomain": {
-          "description": "etcdDiscoveryDomain is the domain used to fetch the SRV records for discovering etcd servers and clients. For more info: https://github.com/etcd-io/etcd/blob/329be66e8b3f9e2e6af83c123ff89297e49ebd15/Documentation/op-guide/clustering.md#dns-discovery deprecated: as of 4.7, this field is no longer set or honored.  It will be removed in a future release.",
+          "description": "etcdDiscoveryDomain is the domain used to fetch the SRV records for discovering\netcd servers and clients.\nFor more info: https://github.com/etcd-io/etcd/blob/329be66e8b3f9e2e6af83c123ff89297e49ebd15/Documentation/op-guide/clustering.md#dns-discovery\ndeprecated: as of 4.7, this field is no longer set or honored.  It will be removed in a future release.",
           "type": "string"
         },
         "infrastructureName": {
-          "description": "infrastructureName uniquely identifies a cluster with a human friendly name. Once set it should not be changed. Must be of max length 27 and must have only alphanumeric or hyphen characters.",
+          "description": "infrastructureName uniquely identifies a cluster with a human friendly name.\nOnce set it should not be changed. Must be of max length 27 and must have only\nalphanumeric or hyphen characters.",
           "type": "string"
         },
         "infrastructureTopology": {
-          "description": "infrastructureTopology expresses the expectations for infrastructure services that do not run on control plane nodes, usually indicated by a node selector for a `role` value other than `master`. The default is 'HighlyAvailable', which represents the behavior operators have in a \"normal\" cluster. The 'SingleReplica' mode will be used in single-node deployments and the operators should not configure the operand for highly-available operation NOTE: External topology mode is not applicable for this field.",
+          "description": "infrastructureTopology expresses the expectations for infrastructure services that do not run on control\nplane nodes, usually indicated by a node selector for a `role` value\nother than `master`.\nThe default is 'HighlyAvailable', which represents the behavior operators have in a \"normal\" cluster.\nThe 'SingleReplica' mode will be used in single-node deployments\nand the operators should not configure the operand for highly-available operation\nNOTE: External topology mode is not applicable for this field.",
           "type": "string",
           "enum": [
             "HighlyAvailable",
@@ -864,7 +892,7 @@
           ]
         },
         "platform": {
-          "description": "platform is the underlying infrastructure provider for the cluster. \n Deprecated: Use platformStatus.type instead.",
+          "description": "platform is the underlying infrastructure provider for the cluster.\n\nDeprecated: Use platformStatus.type instead.",
           "type": "string",
           "enum": [
             "",
@@ -887,7 +915,7 @@
           ]
         },
         "platformStatus": {
-          "description": "platformStatus holds status information specific to the underlying infrastructure provider.",
+          "description": "platformStatus holds status information specific to the underlying\ninfrastructure provider.",
           "type": "object",
           "properties": {
             "alibabaCloud": {
@@ -949,7 +977,7 @@
                   "type": "string"
                 },
                 "resourceTags": {
-                  "description": "resourceTags is a list of additional tags to apply to AWS resources created for the cluster. See https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html for information on tagging AWS resources. AWS supports a maximum of 50 tags per resource. OpenShift reserves 25 tags for its use, leaving 25 tags available for the user.",
+                  "description": "resourceTags is a list of additional tags to apply to AWS resources created for the cluster.\nSee https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html for information on tagging AWS resources.\nAWS supports a maximum of 50 tags per resource. OpenShift reserves 25 tags for its use, leaving 25 tags\navailable for the user.",
                   "type": "array",
                   "maxItems": 25,
                   "items": {
@@ -968,7 +996,7 @@
                         "pattern": "^[0-9A-Za-z_.:/=+-@]+$"
                       },
                       "value": {
-                        "description": "value is the value of the tag. Some AWS service do not support empty values. Since tags are added to resources in many services, the length of the tag value must meet the requirements of all services.",
+                        "description": "value is the value of the tag.\nSome AWS service do not support empty values. Since tags are added to resources in many services, the\nlength of the tag value must meet the requirements of all services.",
                         "type": "string",
                         "maxLength": 256,
                         "minLength": 1,
@@ -979,19 +1007,19 @@
                   "x-kubernetes-list-type": "atomic"
                 },
                 "serviceEndpoints": {
-                  "description": "ServiceEndpoints list contains custom endpoints which will override default service endpoint of AWS Services. There must be only one ServiceEndpoint for a service.",
+                  "description": "ServiceEndpoints list contains custom endpoints which will override default\nservice endpoint of AWS Services.\nThere must be only one ServiceEndpoint for a service.",
                   "type": "array",
                   "items": {
-                    "description": "AWSServiceEndpoint store the configuration of a custom url to override existing defaults of AWS Services.",
+                    "description": "AWSServiceEndpoint store the configuration of a custom url to\noverride existing defaults of AWS Services.",
                     "type": "object",
                     "properties": {
                       "name": {
-                        "description": "name is the name of the AWS service. The list of all the service names can be found at https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html This must be provided and cannot be empty.",
+                        "description": "name is the name of the AWS service.\nThe list of all the service names can be found at https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "pattern": "^[a-z0-9-]+$"
                       },
                       "url": {
-                        "description": "url is fully qualified URI with scheme https, that overrides the default generated endpoint for a client. This must be provided and cannot be empty.",
+                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "pattern": "^https://"
                       }
@@ -1010,7 +1038,7 @@
                   "type": "string"
                 },
                 "cloudName": {
-                  "description": "cloudName is the name of the Azure cloud environment which can be used to configure the Azure SDK with the appropriate Azure API endpoints. If empty, the value is equal to `AzurePublicCloud`.",
+                  "description": "cloudName is the name of the Azure cloud environment which can be used to configure the Azure SDK\nwith the appropriate Azure API endpoints.\nIf empty, the value is equal to `AzurePublicCloud`.",
                   "type": "string",
                   "enum": [
                     "",
@@ -1022,7 +1050,7 @@
                   ]
                 },
                 "networkResourceGroupName": {
-                  "description": "networkResourceGroupName is the Resource Group for network resources like the Virtual Network and Subnets used by the cluster. If empty, the value is same as ResourceGroupName.",
+                  "description": "networkResourceGroupName is the Resource Group for network resources like the Virtual Network and Subnets used by the cluster.\nIf empty, the value is same as ResourceGroupName.",
                   "type": "string"
                 },
                 "resourceGroupName": {
@@ -1030,7 +1058,7 @@
                   "type": "string"
                 },
                 "resourceTags": {
-                  "description": "resourceTags is a list of additional tags to apply to Azure resources created for the cluster. See https://docs.microsoft.com/en-us/rest/api/resources/tags for information on tagging Azure resources. Due to limitations on Automation, Content Delivery Network, DNS Azure resources, a maximum of 15 tags may be applied. OpenShift reserves 5 tags for internal use, allowing 10 tags for user configuration.",
+                  "description": "resourceTags is a list of additional tags to apply to Azure resources created for the cluster.\nSee https://docs.microsoft.com/en-us/rest/api/resources/tags for information on tagging Azure resources.\nDue to limitations on Automation, Content Delivery Network, DNS Azure resources, a maximum of 15 tags\nmay be applied. OpenShift reserves 5 tags for internal use, allowing 10 tags for user configuration.",
                   "type": "array",
                   "maxItems": 10,
                   "items": {
@@ -1042,14 +1070,14 @@
                     ],
                     "properties": {
                       "key": {
-                        "description": "key is the key part of the tag. A tag key can have a maximum of 128 characters and cannot be empty. Key must begin with a letter, end with a letter, number or underscore, and must contain only alphanumeric characters and the following special characters `_ . -`.",
+                        "description": "key is the key part of the tag. A tag key can have a maximum of 128 characters and cannot be empty. Key\nmust begin with a letter, end with a letter, number or underscore, and must contain only alphanumeric\ncharacters and the following special characters `_ . -`.",
                         "type": "string",
                         "maxLength": 128,
                         "minLength": 1,
                         "pattern": "^[a-zA-Z]([0-9A-Za-z_.-]*[0-9A-Za-z_])?$"
                       },
                       "value": {
-                        "description": "value is the value part of the tag. A tag value can have a maximum of 256 characters and cannot be empty. Value must contain only alphanumeric characters and the following special characters `_ + , - . / : ; < = > ? @`.",
+                        "description": "value is the value part of the tag. A tag value can have a maximum of 256 characters and cannot be empty. Value\nmust contain only alphanumeric characters and the following special characters `_ + , - . / : ; < = > ? @`.",
                         "type": "string",
                         "maxLength": 256,
                         "minLength": 1,
@@ -1078,11 +1106,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers. \n Deprecated: Use APIServerInternalIPs instead.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.\n\nDeprecated: Use APIServerInternalIPs instead.",
                   "type": "string"
                 },
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers. In dual\nstack clusters this list contains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1098,11 +1126,11 @@
                   ]
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names. \n Deprecated: Use IngressIPs instead.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.\n\nDeprecated: Use IngressIPs instead.",
                   "type": "string"
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names. In dual stack clusters this list\ncontains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1122,7 +1150,7 @@
                   "type": "object",
                   "properties": {
                     "type": {
-                      "description": "type defines the type of load balancer used by the cluster on BareMetal platform which can be a user-managed or openshift-managed load balancer that is to be used for the OpenShift API and Ingress endpoints. When set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing defined in the machine config operator will be deployed. When set to UserManaged these static pods will not be deployed and it is expected that the load balancer is configured out of band by the deployer. When omitted, this means no opinion and the platform is left to choose a reasonable default. The default value is OpenShiftManagedDefault.",
+                      "description": "type defines the type of load balancer used by the cluster on BareMetal platform\nwhich can be a user-managed or openshift-managed load balancer\nthat is to be used for the OpenShift API and Ingress endpoints.\nWhen set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing\ndefined in the machine config operator will be deployed.\nWhen set to UserManaged these static pods will not be deployed and it is expected that\nthe load balancer is configured out of band by the deployer.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default.\nThe default value is OpenShiftManagedDefault.",
                       "type": "string",
                       "enum": [
                         "OpenShiftManagedDefault",
@@ -1161,7 +1189,7 @@
                   ]
                 },
                 "nodeDNSIP": {
-                  "description": "nodeDNSIP is the IP address for the internal DNS used by the nodes. Unlike the one managed by the DNS operator, `NodeDNSIP` provides name resolution for the nodes themselves. There is no DNS-as-a-service for BareMetal deployments. In order to minimize necessary changes to the datacenter DNS, a DNS service is hosted as a static pod to serve those hostnames to the nodes in the cluster.",
+                  "description": "nodeDNSIP is the IP address for the internal DNS used by the\nnodes. Unlike the one managed by the DNS operator, `NodeDNSIP`\nprovides name resolution for the nodes themselves. There is no DNS-as-a-service for\nBareMetal deployments. In order to minimize necessary changes to the\ndatacenter DNS, a DNS service is hosted as a static pod to serve those hostnames\nto the nodes in the cluster.",
                   "type": "string"
                 }
               }
@@ -1171,11 +1199,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.",
                   "type": "string"
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.",
                   "type": "string"
                 }
               }
@@ -1185,11 +1213,11 @@
               "type": "object",
               "properties": {
                 "cloudControllerManager": {
-                  "description": "cloudControllerManager contains settings specific to the external Cloud Controller Manager (a.k.a. CCM or CPI). When omitted, new nodes will be not tainted and no extra initialization from the cloud controller manager is expected.",
+                  "description": "cloudControllerManager contains settings specific to the external Cloud Controller Manager (a.k.a. CCM or CPI).\nWhen omitted, new nodes will be not tainted\nand no extra initialization from the cloud controller manager is expected.",
                   "type": "object",
                   "properties": {
                     "state": {
-                      "description": "state determines whether or not an external Cloud Controller Manager is expected to be installed within the cluster. https://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/#running-cloud-controller-manager \n Valid values are \"External\", \"None\" and omitted. When set to \"External\", new nodes will be tainted as uninitialized when created, preventing them from running workloads until they are initialized by the cloud controller manager. When omitted or set to \"None\", new nodes will be not tainted and no extra initialization from the cloud controller manager is expected.",
+                      "description": "state determines whether or not an external Cloud Controller Manager is expected to\nbe installed within the cluster.\nhttps://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/#running-cloud-controller-manager\n\nValid values are \"External\", \"None\" and omitted.\nWhen set to \"External\", new nodes will be tainted as uninitialized when created,\npreventing them from running workloads until they are initialized by the cloud controller manager.\nWhen omitted or set to \"None\", new nodes will be not tainted\nand no extra initialization from the cloud controller manager is expected.",
                       "type": "string",
                       "enum": [
                         "",
@@ -1230,19 +1258,121 @@
                 "region": {
                   "description": "region holds the region for new GCP resources created for the cluster.",
                   "type": "string"
+                },
+                "resourceLabels": {
+                  "description": "resourceLabels is a list of additional labels to apply to GCP resources created for the cluster.\nSee https://cloud.google.com/compute/docs/labeling-resources for information on labeling GCP resources.\nGCP supports a maximum of 64 labels per resource. OpenShift reserves 32 labels for internal use,\nallowing 32 labels for user configuration.",
+                  "type": "array",
+                  "maxItems": 32,
+                  "items": {
+                    "description": "GCPResourceLabel is a label to apply to GCP resources created for the cluster.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "value"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "key is the key part of the label. A label key can have a maximum of 63 characters and cannot be empty.\nLabel key must begin with a lowercase letter, and must contain only lowercase letters, numeric characters,\nand the following special characters `_-`. Label key must not have the reserved prefixes `kubernetes-io`\nand `openshift-io`.",
+                        "type": "string",
+                        "maxLength": 63,
+                        "minLength": 1,
+                        "pattern": "^[a-z][0-9a-z_-]{0,62}$",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "label keys must not start with either `openshift-io` or `kubernetes-io`",
+                            "rule": "!self.startsWith('openshift-io') && !self.startsWith('kubernetes-io')"
+                          }
+                        ]
+                      },
+                      "value": {
+                        "description": "value is the value part of the label. A label value can have a maximum of 63 characters and cannot be empty.\nValue must contain only lowercase letters, numeric characters, and the following special characters `_-`.",
+                        "type": "string",
+                        "maxLength": 63,
+                        "minLength": 1,
+                        "pattern": "^[0-9a-z_-]{1,63}$"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-map-keys": [
+                    "key"
+                  ],
+                  "x-kubernetes-list-type": "map",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "resourceLabels are immutable and may only be configured during installation",
+                      "rule": "self.all(x, x in oldSelf) && oldSelf.all(x, x in self)"
+                    }
+                  ]
+                },
+                "resourceTags": {
+                  "description": "resourceTags is a list of additional tags to apply to GCP resources created for the cluster.\nSee https://cloud.google.com/resource-manager/docs/tags/tags-overview for information on\ntagging GCP resources. GCP supports a maximum of 50 tags per resource.",
+                  "type": "array",
+                  "maxItems": 50,
+                  "items": {
+                    "description": "GCPResourceTag is a tag to apply to GCP resources created for the cluster.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "parentID",
+                      "value"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "key is the key part of the tag. A tag key can have a maximum of 63 characters and cannot be empty.\nTag key must begin and end with an alphanumeric character, and must contain only uppercase, lowercase\nalphanumeric characters, and the following special characters `._-`.",
+                        "type": "string",
+                        "maxLength": 63,
+                        "minLength": 1,
+                        "pattern": "^[a-zA-Z0-9]([0-9A-Za-z_.-]{0,61}[a-zA-Z0-9])?$"
+                      },
+                      "parentID": {
+                        "description": "parentID is the ID of the hierarchical resource where the tags are defined,\ne.g. at the Organization or the Project level. To find the Organization or Project ID refer to the following pages:\nhttps://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id,\nhttps://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects.\nAn OrganizationID must consist of decimal numbers, and cannot have leading zeroes.\nA ProjectID must be 6 to 30 characters in length, can only contain lowercase letters, numbers,\nand hyphens, and must start with a letter, and cannot end with a hyphen.",
+                        "type": "string",
+                        "maxLength": 32,
+                        "minLength": 1,
+                        "pattern": "(^[1-9][0-9]{0,31}$)|(^[a-z][a-z0-9-]{4,28}[a-z0-9]$)"
+                      },
+                      "value": {
+                        "description": "value is the value part of the tag. A tag value can have a maximum of 63 characters and cannot be empty.\nTag value must begin and end with an alphanumeric character, and must contain only uppercase, lowercase\nalphanumeric characters, and the following special characters `_-.@%=+:,*#&(){}[]` and spaces.",
+                        "type": "string",
+                        "maxLength": 63,
+                        "minLength": 1,
+                        "pattern": "^[a-zA-Z0-9]([0-9A-Za-z_.@%=+:,*#&()\\[\\]{}\\-\\s]{0,61}[a-zA-Z0-9])?$"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-map-keys": [
+                    "key"
+                  ],
+                  "x-kubernetes-list-type": "map",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "resourceTags are immutable and may only be configured during installation",
+                      "rule": "self.all(x, x in oldSelf) && oldSelf.all(x, x in self)"
+                    }
+                  ]
                 }
-              }
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "resourceLabels may only be configured during installation",
+                  "rule": "!has(oldSelf.resourceLabels) && !has(self.resourceLabels) || has(oldSelf.resourceLabels) && has(self.resourceLabels)"
+                },
+                {
+                  "message": "resourceTags may only be configured during installation",
+                  "rule": "!has(oldSelf.resourceTags) && !has(self.resourceTags) || has(oldSelf.resourceTags) && has(self.resourceTags)"
+                }
+              ]
             },
             "ibmcloud": {
               "description": "IBMCloud contains settings specific to the IBMCloud infrastructure provider.",
               "type": "object",
               "properties": {
                 "cisInstanceCRN": {
-                  "description": "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing the DNS zone for the cluster's base domain",
+                  "description": "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing\nthe DNS zone for the cluster's base domain",
                   "type": "string"
                 },
                 "dnsInstanceCRN": {
-                  "description": "DNSInstanceCRN is the CRN of the DNS Services instance managing the DNS zone for the cluster's base domain",
+                  "description": "DNSInstanceCRN is the CRN of the DNS Services instance managing the DNS zone\nfor the cluster's base domain",
                   "type": "string"
                 },
                 "location": {
@@ -1258,10 +1388,10 @@
                   "type": "string"
                 },
                 "serviceEndpoints": {
-                  "description": "serviceEndpoints is a list of custom endpoints which will override the default service endpoints of an IBM Cloud service. These endpoints are consumed by components within the cluster to reach the respective IBM Cloud Services.",
+                  "description": "serviceEndpoints is a list of custom endpoints which will override the default\nservice endpoints of an IBM Cloud service. These endpoints are consumed by\ncomponents within the cluster to reach the respective IBM Cloud Services.",
                   "type": "array",
                   "items": {
-                    "description": "IBMCloudServiceEndpoint stores the configuration of a custom url to override existing defaults of IBM Cloud Services.",
+                    "description": "IBMCloudServiceEndpoint stores the configuration of a custom url to\noverride existing defaults of IBM Cloud Services.",
                     "type": "object",
                     "required": [
                       "name",
@@ -1269,12 +1399,14 @@
                     ],
                     "properties": {
                       "name": {
-                        "description": "name is the name of the IBM Cloud service. Possible values are: CIS, COS, DNSServices, GlobalSearch, GlobalTagging, HyperProtect, IAM, KeyProtect, ResourceController, ResourceManager, or VPC. For example, the IBM Cloud Private IAM service could be configured with the service `name` of `IAM` and `url` of `https://private.iam.cloud.ibm.com` Whereas the IBM Cloud Private VPC service for US South (Dallas) could be configured with the service `name` of `VPC` and `url` of `https://us.south.private.iaas.cloud.ibm.com`",
+                        "description": "name is the name of the IBM Cloud service.\nPossible values are: CIS, COS, COSConfig, DNSServices, GlobalCatalog, GlobalSearch, GlobalTagging, HyperProtect, IAM, KeyProtect, ResourceController, ResourceManager, or VPC.\nFor example, the IBM Cloud Private IAM service could be configured with the\nservice `name` of `IAM` and `url` of `https://private.iam.cloud.ibm.com`\nWhereas the IBM Cloud Private VPC service for US South (Dallas) could be configured\nwith the service `name` of `VPC` and `url` of `https://us.south.private.iaas.cloud.ibm.com`",
                         "type": "string",
                         "enum": [
                           "CIS",
                           "COS",
+                          "COSConfig",
                           "DNSServices",
+                          "GlobalCatalog",
                           "GlobalSearch",
                           "GlobalTagging",
                           "HyperProtect",
@@ -1286,7 +1418,7 @@
                         ]
                       },
                       "url": {
-                        "description": "url is fully qualified URI with scheme https, that overrides the default generated endpoint for a client. This must be provided and cannot be empty.",
+                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "x-kubernetes-validations": [
                           {
@@ -1309,11 +1441,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.",
                   "type": "string"
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.",
                   "type": "string"
                 }
               }
@@ -1323,11 +1455,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers. \n Deprecated: Use APIServerInternalIPs instead.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.\n\nDeprecated: Use APIServerInternalIPs instead.",
                   "type": "string"
                 },
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers. In dual\nstack clusters this list contains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1343,11 +1475,11 @@
                   ]
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names. \n Deprecated: Use IngressIPs instead.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.\n\nDeprecated: Use IngressIPs instead.",
                   "type": "string"
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names. In dual stack clusters this list\ncontains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1367,7 +1499,7 @@
                   "type": "object",
                   "properties": {
                     "type": {
-                      "description": "type defines the type of load balancer used by the cluster on Nutanix platform which can be a user-managed or openshift-managed load balancer that is to be used for the OpenShift API and Ingress endpoints. When set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing defined in the machine config operator will be deployed. When set to UserManaged these static pods will not be deployed and it is expected that the load balancer is configured out of band by the deployer. When omitted, this means no opinion and the platform is left to choose a reasonable default. The default value is OpenShiftManagedDefault.",
+                      "description": "type defines the type of load balancer used by the cluster on Nutanix platform\nwhich can be a user-managed or openshift-managed load balancer\nthat is to be used for the OpenShift API and Ingress endpoints.\nWhen set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing\ndefined in the machine config operator will be deployed.\nWhen set to UserManaged these static pods will not be deployed and it is expected that\nthe load balancer is configured out of band by the deployer.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default.\nThe default value is OpenShiftManagedDefault.",
                       "type": "string",
                       "enum": [
                         "OpenShiftManagedDefault",
@@ -1389,11 +1521,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers. \n Deprecated: Use APIServerInternalIPs instead.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.\n\nDeprecated: Use APIServerInternalIPs instead.",
                   "type": "string"
                 },
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers. In dual\nstack clusters this list contains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1409,15 +1541,15 @@
                   ]
                 },
                 "cloudName": {
-                  "description": "cloudName is the name of the desired OpenStack cloud in the client configuration file (`clouds.yaml`).",
+                  "description": "cloudName is the name of the desired OpenStack cloud in the\nclient configuration file (`clouds.yaml`).",
                   "type": "string"
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names. \n Deprecated: Use IngressIPs instead.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.\n\nDeprecated: Use IngressIPs instead.",
                   "type": "string"
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names. In dual stack clusters this list\ncontains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1437,7 +1569,7 @@
                   "type": "object",
                   "properties": {
                     "type": {
-                      "description": "type defines the type of load balancer used by the cluster on OpenStack platform which can be a user-managed or openshift-managed load balancer that is to be used for the OpenShift API and Ingress endpoints. When set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing defined in the machine config operator will be deployed. When set to UserManaged these static pods will not be deployed and it is expected that the load balancer is configured out of band by the deployer. When omitted, this means no opinion and the platform is left to choose a reasonable default. The default value is OpenShiftManagedDefault.",
+                      "description": "type defines the type of load balancer used by the cluster on OpenStack platform\nwhich can be a user-managed or openshift-managed load balancer\nthat is to be used for the OpenShift API and Ingress endpoints.\nWhen set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing\ndefined in the machine config operator will be deployed.\nWhen set to UserManaged these static pods will not be deployed and it is expected that\nthe load balancer is configured out of band by the deployer.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default.\nThe default value is OpenShiftManagedDefault.",
                       "type": "string",
                       "enum": [
                         "OpenShiftManagedDefault",
@@ -1476,7 +1608,7 @@
                   ]
                 },
                 "nodeDNSIP": {
-                  "description": "nodeDNSIP is the IP address for the internal DNS used by the nodes. Unlike the one managed by the DNS operator, `NodeDNSIP` provides name resolution for the nodes themselves. There is no DNS-as-a-service for OpenStack deployments. In order to minimize necessary changes to the datacenter DNS, a DNS service is hosted as a static pod to serve those hostnames to the nodes in the cluster.",
+                  "description": "nodeDNSIP is the IP address for the internal DNS used by the\nnodes. Unlike the one managed by the DNS operator, `NodeDNSIP`\nprovides name resolution for the nodes themselves. There is no DNS-as-a-service for\nOpenStack deployments. In order to minimize necessary changes to the\ndatacenter DNS, a DNS service is hosted as a static pod to serve those hostnames\nto the nodes in the cluster.",
                   "type": "string"
                 }
               }
@@ -1486,11 +1618,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers. \n Deprecated: Use APIServerInternalIPs instead.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.\n\nDeprecated: Use APIServerInternalIPs instead.",
                   "type": "string"
                 },
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers. In dual\nstack clusters this list contains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1506,11 +1638,11 @@
                   ]
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names. \n Deprecated: Use IngressIPs instead.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.\n\nDeprecated: Use IngressIPs instead.",
                   "type": "string"
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names. In dual stack clusters this list\ncontains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1530,7 +1662,7 @@
                   "type": "object",
                   "properties": {
                     "type": {
-                      "description": "type defines the type of load balancer used by the cluster on Ovirt platform which can be a user-managed or openshift-managed load balancer that is to be used for the OpenShift API and Ingress endpoints. When set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing defined in the machine config operator will be deployed. When set to UserManaged these static pods will not be deployed and it is expected that the load balancer is configured out of band by the deployer. When omitted, this means no opinion and the platform is left to choose a reasonable default. The default value is OpenShiftManagedDefault.",
+                      "description": "type defines the type of load balancer used by the cluster on Ovirt platform\nwhich can be a user-managed or openshift-managed load balancer\nthat is to be used for the OpenShift API and Ingress endpoints.\nWhen set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing\ndefined in the machine config operator will be deployed.\nWhen set to UserManaged these static pods will not be deployed and it is expected that\nthe load balancer is configured out of band by the deployer.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default.\nThe default value is OpenShiftManagedDefault.",
                       "type": "string",
                       "enum": [
                         "OpenShiftManagedDefault",
@@ -1556,11 +1688,11 @@
               "type": "object",
               "properties": {
                 "cisInstanceCRN": {
-                  "description": "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing the DNS zone for the cluster's base domain",
+                  "description": "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing\nthe DNS zone for the cluster's base domain",
                   "type": "string"
                 },
                 "dnsInstanceCRN": {
-                  "description": "DNSInstanceCRN is the CRN of the DNS Services instance managing the DNS zone for the cluster's base domain",
+                  "description": "DNSInstanceCRN is the CRN of the DNS Services instance managing the DNS zone\nfor the cluster's base domain",
                   "type": "string"
                 },
                 "region": {
@@ -1568,7 +1700,7 @@
                   "type": "string"
                 },
                 "resourceGroup": {
-                  "description": "resourceGroup is the resource group name for new IBMCloud resources created for a cluster. The resource group specified here will be used by cluster-image-registry-operator to set up a COS Instance in IBMCloud for the cluster registry. More about resource groups can be found here: https://cloud.ibm.com/docs/account?topic=account-rgs. When omitted, the image registry operator won't be able to configure storage, which results in the image registry cluster operator not being in an available state.",
+                  "description": "resourceGroup is the resource group name for new IBMCloud resources created for a cluster.\nThe resource group specified here will be used by cluster-image-registry-operator to set up a COS Instance in IBMCloud for the cluster registry.\nMore about resource groups can be found here: https://cloud.ibm.com/docs/account?topic=account-rgs.\nWhen omitted, the image registry operator won't be able to configure storage,\nwhich results in the image registry cluster operator not being in an available state.",
                   "type": "string",
                   "maxLength": 40,
                   "pattern": "^[a-zA-Z0-9-_ ]+$",
@@ -1580,10 +1712,10 @@
                   ]
                 },
                 "serviceEndpoints": {
-                  "description": "serviceEndpoints is a list of custom endpoints which will override the default service endpoints of a Power VS service.",
+                  "description": "serviceEndpoints is a list of custom endpoints which will override the default\nservice endpoints of a Power VS service.",
                   "type": "array",
                   "items": {
-                    "description": "PowervsServiceEndpoint stores the configuration of a custom url to override existing defaults of PowerVS Services.",
+                    "description": "PowervsServiceEndpoint stores the configuration of a custom url to\noverride existing defaults of PowerVS Services.",
                     "type": "object",
                     "required": [
                       "name",
@@ -1591,12 +1723,27 @@
                     ],
                     "properties": {
                       "name": {
-                        "description": "name is the name of the Power VS service. Few of the services are IAM - https://cloud.ibm.com/apidocs/iam-identity-token-api ResourceController - https://cloud.ibm.com/apidocs/resource-controller/resource-controller Power Cloud - https://cloud.ibm.com/apidocs/power-cloud",
+                        "description": "name is the name of the Power VS service.\nFew of the services are\nIAM - https://cloud.ibm.com/apidocs/iam-identity-token-api\nResourceController - https://cloud.ibm.com/apidocs/resource-controller/resource-controller\nPower Cloud - https://cloud.ibm.com/apidocs/power-cloud",
                         "type": "string",
-                        "pattern": "^[a-z0-9-]+$"
+                        "enum": [
+                          "CIS",
+                          "COS",
+                          "COSConfig",
+                          "DNSServices",
+                          "GlobalCatalog",
+                          "GlobalSearch",
+                          "GlobalTagging",
+                          "HyperProtect",
+                          "IAM",
+                          "KeyProtect",
+                          "Power",
+                          "ResourceController",
+                          "ResourceManager",
+                          "VPC"
+                        ]
                       },
                       "url": {
-                        "description": "url is fully qualified URI with scheme https, that overrides the default generated endpoint for a client. This must be provided and cannot be empty.",
+                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty.",
                         "type": "string",
                         "format": "uri",
                         "pattern": "^https://"
@@ -1609,7 +1756,7 @@
                   "x-kubernetes-list-type": "map"
                 },
                 "zone": {
-                  "description": "zone holds the default zone for the new Power VS resources created by the cluster. Note: Currently only single-zone OCP clusters are supported",
+                  "description": "zone holds the default zone for the new Power VS resources created by the cluster.\nNote: Currently only single-zone OCP clusters are supported",
                   "type": "string"
                 }
               },
@@ -1621,7 +1768,7 @@
               ]
             },
             "type": {
-              "description": "type is the underlying infrastructure provider for the cluster. This value controls whether infrastructure automation such as service load balancers, dynamic volume provisioning, machine creation and deletion, and other integrations are enabled. If None, no infrastructure automation is enabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\", \"OpenStack\", \"VSphere\", \"oVirt\", \"EquinixMetal\", \"PowerVS\", \"AlibabaCloud\", \"Nutanix\" and \"None\". Individual components may not support all platforms, and must handle unrecognized platforms as None if they do not support that platform. \n This value will be synced with to the `status.platform` and `status.platformStatus.type`. Currently this value cannot be changed once set.",
+              "description": "type is the underlying infrastructure provider for the cluster. This\nvalue controls whether infrastructure automation such as service load\nbalancers, dynamic volume provisioning, machine creation and deletion, and\nother integrations are enabled. If None, no infrastructure automation is\nenabled. Allowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"Libvirt\",\n\"OpenStack\", \"VSphere\", \"oVirt\", \"EquinixMetal\", \"PowerVS\", \"AlibabaCloud\", \"Nutanix\" and \"None\".\nIndividual components may not support all platforms, and must handle\nunrecognized platforms as None if they do not support that platform.\n\nThis value will be synced with to the `status.platform` and `status.platformStatus.type`.\nCurrently this value cannot be changed once set.",
               "type": "string",
               "enum": [
                 "",
@@ -1648,11 +1795,11 @@
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
-                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI points to. It is the IP for a self-hosted load balancer in front of the API servers. \n Deprecated: Use APIServerInternalIPs instead.",
+                  "description": "apiServerInternalIP is an IP address to contact the Kubernetes API server that can be used\nby components inside the cluster, like kubelets using the infrastructure rather\nthan Kubernetes networking. It is the IP that the Infrastructure.status.apiServerInternalURI\npoints to. It is the IP for a self-hosted load balancer in front of the API servers.\n\nDeprecated: Use APIServerInternalIPs instead.",
                   "type": "string"
                 },
                 "apiServerInternalIPs": {
-                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API server that can be used by components inside the cluster, like kubelets using the infrastructure rather than Kubernetes networking. These are the IPs for a self-hosted load balancer in front of the API servers. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "apiServerInternalIPs are the IP addresses to contact the Kubernetes API\nserver that can be used by components inside the cluster, like kubelets\nusing the infrastructure rather than Kubernetes networking. These are the\nIPs for a self-hosted load balancer in front of the API servers. In dual\nstack clusters this list contains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1668,11 +1815,11 @@
                   ]
                 },
                 "ingressIP": {
-                  "description": "ingressIP is an external IP which routes to the default ingress controller. The IP is a suitable target of a wildcard DNS record used to resolve default route host names. \n Deprecated: Use IngressIPs instead.",
+                  "description": "ingressIP is an external IP which routes to the default ingress controller.\nThe IP is a suitable target of a wildcard DNS record used to resolve default route host names.\n\nDeprecated: Use IngressIPs instead.",
                   "type": "string"
                 },
                 "ingressIPs": {
-                  "description": "ingressIPs are the external IPs which route to the default ingress controller. The IPs are suitable targets of a wildcard DNS record used to resolve default route host names. In dual stack clusters this list contains two IPs otherwise only one.",
+                  "description": "ingressIPs are the external IPs which route to the default ingress\ncontroller. The IPs are suitable targets of a wildcard DNS record used to\nresolve default route host names. In dual stack clusters this list\ncontains two IPs otherwise only one.",
                   "type": "array",
                   "format": "ip",
                   "maxItems": 2,
@@ -1692,7 +1839,7 @@
                   "type": "object",
                   "properties": {
                     "type": {
-                      "description": "type defines the type of load balancer used by the cluster on VSphere platform which can be a user-managed or openshift-managed load balancer that is to be used for the OpenShift API and Ingress endpoints. When set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing defined in the machine config operator will be deployed. When set to UserManaged these static pods will not be deployed and it is expected that the load balancer is configured out of band by the deployer. When omitted, this means no opinion and the platform is left to choose a reasonable default. The default value is OpenShiftManagedDefault.",
+                      "description": "type defines the type of load balancer used by the cluster on VSphere platform\nwhich can be a user-managed or openshift-managed load balancer\nthat is to be used for the OpenShift API and Ingress endpoints.\nWhen set to OpenShiftManagedDefault the static pods in charge of API and Ingress traffic load-balancing\ndefined in the machine config operator will be deployed.\nWhen set to UserManaged these static pods will not be deployed and it is expected that\nthe load balancer is configured out of band by the deployer.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default.\nThe default value is OpenShiftManagedDefault.",
                       "type": "string",
                       "enum": [
                         "OpenShiftManagedDefault",
@@ -1731,7 +1878,7 @@
                   ]
                 },
                 "nodeDNSIP": {
-                  "description": "nodeDNSIP is the IP address for the internal DNS used by the nodes. Unlike the one managed by the DNS operator, `NodeDNSIP` provides name resolution for the nodes themselves. There is no DNS-as-a-service for vSphere deployments. In order to minimize necessary changes to the datacenter DNS, a DNS service is hosted as a static pod to serve those hostnames to the nodes in the cluster.",
+                  "description": "nodeDNSIP is the IP address for the internal DNS used by the\nnodes. Unlike the one managed by the DNS operator, `NodeDNSIP`\nprovides name resolution for the nodes themselves. There is no DNS-as-a-service for\nvSphere deployments. In order to minimize necessary changes to the\ndatacenter DNS, a DNS service is hosted as a static pod to serve those hostnames\nto the nodes in the cluster.",
                   "type": "string"
                 }
               }
@@ -1748,5 +1895,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

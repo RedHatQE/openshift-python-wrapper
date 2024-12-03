@@ -7,14 +7,16 @@
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorRequirement"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "matchFields": {
       "description": "A list of node selector requirements by node's fields.",
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorRequirement"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     }
   },
   "x-kubernetes-map-type": "atomic",

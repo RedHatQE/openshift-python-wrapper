@@ -1,5 +1,5 @@
 {
-  "description": "ConsoleSample is an extension to customizing OpenShift web console by adding samples. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "ConsoleSample is an extension to customizing OpenShift web console by adding samples.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "metadata",
@@ -29,28 +29,28 @@
       ],
       "properties": {
         "abstract": {
-          "description": "abstract is a short introduction to the sample. \n It is required and must be no more than 100 characters in length. \n The abstract is shown on the sample card tile below the title and provider and is limited to three lines of content.",
+          "description": "abstract is a short introduction to the sample.\n\nIt is required and must be no more than 100 characters in length.\n\nThe abstract is shown on the sample card tile below the title and provider\nand is limited to three lines of content.",
           "type": "string",
           "maxLength": 100
         },
         "description": {
-          "description": "description is a long form explanation of the sample. \n It is required and can have a maximum length of **4096** characters. \n It is a README.md-like content for additional information, links, pre-conditions, and other instructions. It will be rendered as Markdown so that it can contain line breaks, links, and other simple formatting.",
+          "description": "description is a long form explanation of the sample.\n\nIt is required and can have a maximum length of **4096** characters.\n\nIt is a README.md-like content for additional information, links, pre-conditions, and other instructions.\nIt will be rendered as Markdown so that it can contain line breaks, links, and other simple formatting.",
           "type": "string",
           "maxLength": 4096
         },
         "icon": {
-          "description": "icon is an optional base64 encoded image and shown beside the sample title. \n The format must follow the data: URL format and can have a maximum size of **10 KB**. \n data:[<mediatype>][;base64],<base64 encoded image> \n For example: \n data:image;base64,             plus the base64 encoded image. \n Vector images can also be used. SVG icons must start with: \n data:image/svg+xml;base64,     plus the base64 encoded SVG image. \n All sample catalog icons will be shown on a white background (also when the dark theme is used). The web console ensures that different aspect ratios work correctly. Currently, the surface of the icon is at most 40x100px. \n For more information on the data URL format, please visit https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs.",
+          "description": "icon is an optional base64 encoded image and shown beside the sample title.\n\nThe format must follow the data: URL format and can have a maximum size of **10 KB**.\n\n  data:[<mediatype>][;base64],<base64 encoded image>\n\nFor example:\n\n  data:image;base64,             plus the base64 encoded image.\n\nVector images can also be used. SVG icons must start with:\n\n  data:image/svg+xml;base64,     plus the base64 encoded SVG image.\n\nAll sample catalog icons will be shown on a white background (also when the dark theme is used).\nThe web console ensures that different aspect ratios work correctly.\nCurrently, the surface of the icon is at most 40x100px.\n\nFor more information on the data URL format, please visit\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs.",
           "type": "string",
           "maxLength": 14000,
           "pattern": "^data:([a-z/\\.+0-9]*;(([-a-zA-Z0-9=])*;)?)?base64,"
         },
         "provider": {
-          "description": "provider is an optional label to honor who provides the sample. \n It is optional and must be no more than 50 characters in length. \n A provider can be a company like \"Red Hat\" or an organization like \"CNCF\" or \"Knative\". \n Currently, the provider is only shown on the sample card tile below the title with the prefix \"Provided by \"",
+          "description": "provider is an optional label to honor who provides the sample.\n\nIt is optional and must be no more than 50 characters in length.\n\nA provider can be a company like \"Red Hat\" or an organization like \"CNCF\" or \"Knative\".\n\nCurrently, the provider is only shown on the sample card tile below the title with the prefix \"Provided by \"",
           "type": "string",
           "maxLength": 50
         },
         "source": {
-          "description": "source defines where to deploy the sample service from. The sample may be sourced from an external git repository or container image.",
+          "description": "source defines where to deploy the sample service from.\nThe sample may be sourced from an external git repository or container image.",
           "type": "object",
           "required": [
             "type"
@@ -64,7 +64,7 @@
               ],
               "properties": {
                 "image": {
-                  "description": "reference to a container image that provides a HTTP service. The service must be exposed on the default port (8080) unless otherwise configured with the port field. \n Supported formats: - <repository-name>/<image-name> - docker.io/<repository-name>/<image-name> - quay.io/<repository-name>/<image-name> - quay.io/<repository-name>/<image-name>@sha256:<image hash> - quay.io/<repository-name>/<image-name>:<tag>",
+                  "description": "reference to a container image that provides a HTTP service.\nThe service must be exposed on the default port (8080) unless\notherwise configured with the port field.\n\nSupported formats:\n  - <repository-name>/<image-name>\n  - docker.io/<repository-name>/<image-name>\n  - quay.io/<repository-name>/<image-name>\n  - quay.io/<repository-name>/<image-name>@sha256:<image hash>\n  - quay.io/<repository-name>/<image-name>:<tag>",
                   "type": "string",
                   "maxLength": 256,
                   "minLength": 1
@@ -74,7 +74,7 @@
                   "type": "object",
                   "properties": {
                     "targetPort": {
-                      "description": "targetPort is the port that the service listens on for HTTP requests. This port will be used for Service and Route created for this sample. Port must be in the range 1 to 65535. Default port is 8080.",
+                      "description": "targetPort is the port that the service listens on for HTTP requests.\nThis port will be used for Service and Route created for this sample.\nPort must be in the range 1 to 65535.\nDefault port is 8080.",
                       "type": "integer",
                       "format": "int32",
                       "maximum": 65535,
@@ -99,18 +99,18 @@
                   ],
                   "properties": {
                     "contextDir": {
-                      "description": "contextDir is used to specify a directory within the repository to build the component. Must start with `/` and have a maximum length of 256 characters. When omitted, the default value is to build from the root of the repository.",
+                      "description": "contextDir is used to specify a directory within the repository to build the\ncomponent.\nMust start with `/` and have a maximum length of 256 characters.\nWhen omitted, the default value is to build from the root of the repository.",
                       "type": "string",
                       "maxLength": 256,
                       "pattern": "^/"
                     },
                     "revision": {
-                      "description": "revision is the git revision at which to clone the git repository Can be used to clone a specific branch, tag or commit SHA. Must be at most 256 characters in length. When omitted the repository's default branch is used.",
+                      "description": "revision is the git revision at which to clone the git repository\nCan be used to clone a specific branch, tag or commit SHA.\nMust be at most 256 characters in length.\nWhen omitted the repository's default branch is used.",
                       "type": "string",
                       "maxLength": 256
                     },
                     "url": {
-                      "description": "url of the Git repository that contains a HTTP service. The HTTP service must be exposed on the default port (8080) unless otherwise configured with the port field. \n Only public repositories on GitHub, GitLab and Bitbucket are currently supported: \n - https://github.com/<org>/<repository> - https://gitlab.com/<org>/<repository> - https://bitbucket.org/<org>/<repository> \n The url must have a maximum length of 256 characters.",
+                      "description": "url of the Git repository that contains a HTTP service.\nThe HTTP service must be exposed on the default port (8080) unless\notherwise configured with the port field.\n\nOnly public repositories on GitHub, GitLab and Bitbucket are currently supported:\n\n  - https://github.com/<org>/<repository>\n  - https://gitlab.com/<org>/<repository>\n  - https://bitbucket.org/<org>/<repository>\n\nThe url must have a maximum length of 256 characters.",
                       "type": "string",
                       "maxLength": 256,
                       "minLength": 1,
@@ -123,7 +123,7 @@
                   "type": "object",
                   "properties": {
                     "targetPort": {
-                      "description": "targetPort is the port that the service listens on for HTTP requests. This port will be used for Service created for this sample. Port must be in the range 1 to 65535. Default port is 8080.",
+                      "description": "targetPort is the port that the service listens on for HTTP requests.\nThis port will be used for Service created for this sample.\nPort must be in the range 1 to 65535.\nDefault port is 8080.",
                       "type": "integer",
                       "format": "int32",
                       "maximum": 65535,
@@ -150,7 +150,7 @@
           ]
         },
         "tags": {
-          "description": "tags are optional string values that can be used to find samples in the samples catalog. \n Examples of common tags may be \"Java\", \"Quarkus\", etc. \n They will be displayed on the samples details page.",
+          "description": "tags are optional string values that can be used to find samples in the samples catalog.\n\nExamples of common tags may be \"Java\", \"Quarkus\", etc.\n\nThey will be displayed on the samples details page.",
           "type": "array",
           "maxItems": 10,
           "items": {
@@ -159,13 +159,13 @@
           "x-kubernetes-list-type": "set"
         },
         "title": {
-          "description": "title is the display name of the sample. \n It is required and must be no more than 50 characters in length.",
+          "description": "title is the display name of the sample.\n\nIt is required and must be no more than 50 characters in length.",
           "type": "string",
           "maxLength": 50,
           "minLength": 1
         },
         "type": {
-          "description": "type is an optional label to group multiple samples. \n It is optional and must be no more than 20 characters in length. \n Recommendation is a singular term like \"Builder Image\", \"Devfile\" or \"Serverless Function\". \n Currently, the type is shown a badge on the sample card tile in the top right corner.",
+          "description": "type is an optional label to group multiple samples.\n\nIt is optional and must be no more than 20 characters in length.\n\nRecommendation is a singular term like \"Builder Image\", \"Devfile\" or \"Serverless Function\".\n\nCurrently, the type is shown a badge on the sample card tile in the top right corner.",
           "type": "string",
           "maxLength": 20
         }
@@ -179,5 +179,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

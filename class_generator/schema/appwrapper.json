@@ -130,6 +130,10 @@
             }
           }
         },
+        "managedBy": {
+          "description": "ManagedBy is used to indicate the controller or entity that manages the AppWrapper.",
+          "type": "string"
+        },
         "suspend": {
           "description": "Suspend suspends the AppWrapper when set to true",
           "type": "boolean"
@@ -327,5 +331,6 @@
       "version": "v1beta2"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

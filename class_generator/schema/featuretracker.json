@@ -1,5 +1,5 @@
 {
-  "description": "FeatureTracker represents a cluster-scoped resource in the Data Science Cluster, specifically designed for monitoring and managing objects created via the internal Features API. This resource serves a crucial role in cross-namespace resource management, acting as an owner reference for various resources. The primary purpose of the FeatureTracker is to enable efficient garbage collection by Kubernetes. This is essential for ensuring that resources are automatically cleaned up and reclaimed when they are no longer required.",
+  "description": "FeatureTracker represents a cluster-scoped resource in the Data Science Cluster,\nspecifically designed for monitoring and managing objects created via the internal Features API.\nThis resource serves a crucial role in cross-namespace resource management, acting as\nan owner reference for various resources. The primary purpose of the FeatureTracker\nis to enable efficient garbage collection by Kubernetes. This is essential for\nensuring that resources are automatically cleaned up and reclaimed when they are\nno longer required.",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -42,7 +42,7 @@
         "conditions": {
           "type": "array",
           "items": {
-            "description": "Condition represents the state of the operator's reconciliation functionality.",
+            "description": "Condition represents the state of the operator's\nreconciliation functionality.",
             "type": "object",
             "required": [
               "status",
@@ -74,7 +74,7 @@
           }
         },
         "phase": {
-          "description": "Phase describes the Phase of FeatureTracker reconciliation state. This is used by OLM UI to provide status information to the user.",
+          "description": "Phase describes the Phase of FeatureTracker reconciliation state.\nThis is used by OLM UI to provide status information to the user.",
           "type": "string"
         }
       }
@@ -87,5 +87,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

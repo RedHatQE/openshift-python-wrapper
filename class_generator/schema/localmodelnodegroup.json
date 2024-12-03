@@ -1,0 +1,976 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "persistentVolumeClaimSpec",
+        "persistentVolumeSpec",
+        "storageLimit"
+      ],
+      "properties": {
+        "persistentVolumeClaimSpec": {
+          "type": "object",
+          "properties": {
+            "accessModes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "dataSource": {
+              "type": "object",
+              "required": [
+                "kind",
+                "name"
+              ],
+              "properties": {
+                "apiGroup": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "dataSourceRef": {
+              "type": "object",
+              "required": [
+                "kind",
+                "name"
+              ],
+              "properties": {
+                "apiGroup": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                }
+              }
+            },
+            "resources": {
+              "type": "object",
+              "properties": {
+                "limits": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                    "x-kubernetes-int-or-string": true
+                  }
+                },
+                "requests": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                    "x-kubernetes-int-or-string": true
+                  }
+                }
+              }
+            },
+            "selector": {
+              "type": "object",
+              "properties": {
+                "matchExpressions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "operator": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "x-kubernetes-list-type": "atomic"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "matchLabels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "storageClassName": {
+              "type": "string"
+            },
+            "volumeAttributesClassName": {
+              "type": "string"
+            },
+            "volumeMode": {
+              "type": "string"
+            },
+            "volumeName": {
+              "type": "string"
+            }
+          }
+        },
+        "persistentVolumeSpec": {
+          "type": "object",
+          "properties": {
+            "accessModes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "awsElasticBlockStore": {
+              "type": "object",
+              "required": [
+                "volumeID"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "partition": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "volumeID": {
+                  "type": "string"
+                }
+              }
+            },
+            "azureDisk": {
+              "type": "object",
+              "required": [
+                "diskName",
+                "diskURI"
+              ],
+              "properties": {
+                "cachingMode": {
+                  "type": "string"
+                },
+                "diskName": {
+                  "type": "string"
+                },
+                "diskURI": {
+                  "type": "string"
+                },
+                "fsType": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "azureFile": {
+              "type": "object",
+              "required": [
+                "secretName",
+                "shareName"
+              ],
+              "properties": {
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretName": {
+                  "type": "string"
+                },
+                "secretNamespace": {
+                  "type": "string"
+                },
+                "shareName": {
+                  "type": "string"
+                }
+              }
+            },
+            "capacity": {
+              "type": "object",
+              "additionalProperties": {
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "x-kubernetes-int-or-string": true
+              }
+            },
+            "cephfs": {
+              "type": "object",
+              "required": [
+                "monitors"
+              ],
+              "properties": {
+                "monitors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretFile": {
+                  "type": "string"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "cinder": {
+              "type": "object",
+              "required": [
+                "volumeID"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "volumeID": {
+                  "type": "string"
+                }
+              }
+            },
+            "claimRef": {
+              "type": "object",
+              "properties": {
+                "apiVersion": {
+                  "type": "string"
+                },
+                "fieldPath": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                },
+                "resourceVersion": {
+                  "type": "string"
+                },
+                "uid": {
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "granular"
+            },
+            "csi": {
+              "type": "object",
+              "required": [
+                "driver",
+                "volumeHandle"
+              ],
+              "properties": {
+                "controllerExpandSecretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "controllerPublishSecretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "driver": {
+                  "type": "string"
+                },
+                "fsType": {
+                  "type": "string"
+                },
+                "nodeExpandSecretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "nodePublishSecretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "nodeStageSecretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "volumeAttributes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "volumeHandle": {
+                  "type": "string"
+                }
+              }
+            },
+            "fc": {
+              "type": "object",
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "lun": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "targetWWNs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "wwids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                }
+              }
+            },
+            "flexVolume": {
+              "type": "object",
+              "required": [
+                "driver"
+              ],
+              "properties": {
+                "driver": {
+                  "type": "string"
+                },
+                "fsType": {
+                  "type": "string"
+                },
+                "options": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                }
+              }
+            },
+            "flocker": {
+              "type": "object",
+              "properties": {
+                "datasetName": {
+                  "type": "string"
+                },
+                "datasetUUID": {
+                  "type": "string"
+                }
+              }
+            },
+            "gcePersistentDisk": {
+              "type": "object",
+              "required": [
+                "pdName"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "partition": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "pdName": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "glusterfs": {
+              "type": "object",
+              "required": [
+                "endpoints",
+                "path"
+              ],
+              "properties": {
+                "endpoints": {
+                  "type": "string"
+                },
+                "endpointsNamespace": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "hostPath": {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "iscsi": {
+              "type": "object",
+              "required": [
+                "iqn",
+                "lun",
+                "targetPortal"
+              ],
+              "properties": {
+                "chapAuthDiscovery": {
+                  "type": "boolean"
+                },
+                "chapAuthSession": {
+                  "type": "boolean"
+                },
+                "fsType": {
+                  "type": "string"
+                },
+                "initiatorName": {
+                  "type": "string"
+                },
+                "iqn": {
+                  "type": "string"
+                },
+                "iscsiInterface": {
+                  "type": "string"
+                },
+                "lun": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "portals": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "targetPortal": {
+                  "type": "string"
+                }
+              }
+            },
+            "local": {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              }
+            },
+            "mountOptions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "nfs": {
+              "type": "object",
+              "required": [
+                "path",
+                "server"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "server": {
+                  "type": "string"
+                }
+              }
+            },
+            "nodeAffinity": {
+              "type": "object",
+              "properties": {
+                "required": {
+                  "type": "object",
+                  "required": [
+                    "nodeSelectorTerms"
+                  ],
+                  "properties": {
+                    "nodeSelectorTerms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "matchFields": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          }
+                        },
+                        "x-kubernetes-map-type": "atomic"
+                      },
+                      "x-kubernetes-list-type": "atomic"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                }
+              }
+            },
+            "persistentVolumeReclaimPolicy": {
+              "type": "string"
+            },
+            "photonPersistentDisk": {
+              "type": "object",
+              "required": [
+                "pdID"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "pdID": {
+                  "type": "string"
+                }
+              }
+            },
+            "portworxVolume": {
+              "type": "object",
+              "required": [
+                "volumeID"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "volumeID": {
+                  "type": "string"
+                }
+              }
+            },
+            "quobyte": {
+              "type": "object",
+              "required": [
+                "registry",
+                "volume"
+              ],
+              "properties": {
+                "group": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "registry": {
+                  "type": "string"
+                },
+                "tenant": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                },
+                "volume": {
+                  "type": "string"
+                }
+              }
+            },
+            "rbd": {
+              "type": "object",
+              "required": [
+                "image",
+                "monitors"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "keyring": {
+                  "type": "string"
+                },
+                "monitors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "pool": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "scaleIO": {
+              "type": "object",
+              "required": [
+                "gateway",
+                "secretRef",
+                "system"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "gateway": {
+                  "type": "string"
+                },
+                "protectionDomain": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "sslEnabled": {
+                  "type": "boolean"
+                },
+                "storageMode": {
+                  "type": "string"
+                },
+                "storagePool": {
+                  "type": "string"
+                },
+                "system": {
+                  "type": "string"
+                },
+                "volumeName": {
+                  "type": "string"
+                }
+              }
+            },
+            "storageClassName": {
+              "type": "string"
+            },
+            "storageos": {
+              "type": "object",
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "secretRef": {
+                  "type": "object",
+                  "properties": {
+                    "apiVersion": {
+                      "type": "string"
+                    },
+                    "fieldPath": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    },
+                    "resourceVersion": {
+                      "type": "string"
+                    },
+                    "uid": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "volumeName": {
+                  "type": "string"
+                },
+                "volumeNamespace": {
+                  "type": "string"
+                }
+              }
+            },
+            "volumeAttributesClassName": {
+              "type": "string"
+            },
+            "volumeMode": {
+              "type": "string"
+            },
+            "vsphereVolume": {
+              "type": "object",
+              "required": [
+                "volumePath"
+              ],
+              "properties": {
+                "fsType": {
+                  "type": "string"
+                },
+                "storagePolicyID": {
+                  "type": "string"
+                },
+                "storagePolicyName": {
+                  "type": "string"
+                },
+                "volumePath": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "storageLimit": {
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "x-kubernetes-int-or-string": true
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "x-kubernetes-int-or-string": true
+        },
+        "used": {
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "x-kubernetes-int-or-string": true
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "serving.kserve.io",
+      "kind": "LocalModelNodeGroup",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

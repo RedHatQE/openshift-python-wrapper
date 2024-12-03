@@ -44,7 +44,7 @@
       "type": "object",
       "properties": {
         "annotations": {
-          "description": "Annotations is additional Status fields for the Resource to save some additional State as well as convey more information to the user. This is roughly akin to Annotations on any k8s resource, just the reconciler conveying richer information outwards.",
+          "description": "Annotations is additional Status fields for the Resource to save some\nadditional State as well as convey more information to the user. This is\nroughly akin to Annotations on any k8s resource, just the reconciler conveying\nricher information outwards.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -54,7 +54,7 @@
           "description": "Conditions the latest available observations of a resource's current state.",
           "type": "array",
           "items": {
-            "description": "Condition defines a readiness condition for a Knative resource. See: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties",
+            "description": "Condition defines a readiness condition for a Knative resource.\nSee: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties",
             "type": "object",
             "required": [
               "status",
@@ -62,7 +62,7 @@
             ],
             "properties": {
               "lastTransitionTime": {
-                "description": "LastTransitionTime is the last time the condition transitioned from one status to another. We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic differences (all other things held constant).",
+                "description": "LastTransitionTime is the last time the condition transitioned from one status to another.\nWe use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic\ndifferences (all other things held constant).",
                 "type": "string"
               },
               "message": {
@@ -74,7 +74,7 @@
                 "type": "string"
               },
               "severity": {
-                "description": "Severity with which to treat failures of this type of condition. When this is not specified, it defaults to Error.",
+                "description": "Severity with which to treat failures of this type of condition.\nWhen this is not specified, it defaults to Error.",
                 "type": "string"
               },
               "status": {
@@ -89,7 +89,7 @@
           }
         },
         "observedGeneration": {
-          "description": "ObservedGeneration is the 'Generation' of the Service that was last processed by the controller.",
+          "description": "ObservedGeneration is the 'Generation' of the Service that\nwas last processed by the controller.",
           "type": "integer",
           "format": "int64"
         }
@@ -103,5 +103,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

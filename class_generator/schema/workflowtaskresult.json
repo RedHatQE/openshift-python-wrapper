@@ -53,6 +53,40 @@
               "archiveLogs": {
                 "type": "boolean"
               },
+              "artifactGC": {
+                "type": "object",
+                "properties": {
+                  "podMetadata": {
+                    "type": "object",
+                    "properties": {
+                      "annotations": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      },
+                      "labels": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "serviceAccountName": {
+                    "type": "string"
+                  },
+                  "strategy": {
+                    "type": "string",
+                    "enum": [
+                      "",
+                      "OnWorkflowCompletion",
+                      "OnWorkflowDeletion",
+                      "Never"
+                    ]
+                  }
+                }
+              },
               "artifactory": {
                 "type": "object",
                 "required": [
@@ -98,6 +132,48 @@
                   }
                 }
               },
+              "azure": {
+                "type": "object",
+                "required": [
+                  "blob",
+                  "container",
+                  "endpoint"
+                ],
+                "properties": {
+                  "accountKeySecret": {
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "optional": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "blob": {
+                    "type": "string"
+                  },
+                  "container": {
+                    "type": "string"
+                  },
+                  "endpoint": {
+                    "type": "string"
+                  },
+                  "useSDKCreds": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "deleted": {
+                "type": "boolean"
+              },
               "from": {
                 "type": "string"
               },
@@ -141,6 +217,9 @@
                   "repo"
                 ],
                 "properties": {
+                  "branch": {
+                    "type": "string"
+                  },
                   "depth": {
                     "type": "integer",
                     "format": "int64"
@@ -179,6 +258,9 @@
                   },
                   "revision": {
                     "type": "string"
+                  },
+                  "singleBranch": {
+                    "type": "boolean"
                   },
                   "sshPrivateKeySecret": {
                     "type": "object",
@@ -308,6 +390,168 @@
                   "url"
                 ],
                 "properties": {
+                  "auth": {
+                    "type": "object",
+                    "properties": {
+                      "basicAuth": {
+                        "type": "object",
+                        "properties": {
+                          "passwordSecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "usernameSecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "clientCert": {
+                        "type": "object",
+                        "properties": {
+                          "clientCertSecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "clientKeySecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "oauth2": {
+                        "type": "object",
+                        "properties": {
+                          "clientIDSecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "clientSecretSecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "endpointParams": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "key"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "scopes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "tokenURLSecret": {
+                            "type": "object",
+                            "required": [
+                              "key"
+                            ],
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "optional": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
                   "headers": {
                     "type": "array",
                     "items": {
@@ -633,5 +877,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
