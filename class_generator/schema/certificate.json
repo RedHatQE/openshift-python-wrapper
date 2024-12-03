@@ -1,5 +1,5 @@
 {
-  "description": "Certificate is responsible for provisioning a SSL certificate for the given hosts. It is a Knative abstraction for various SSL certificate provisioning solutions (such as cert-manager or self-signed SSL certificate).",
+  "description": "Certificate is responsible for provisioning a SSL certificate for the\ngiven hosts. It is a Knative abstraction for various SSL certificate\nprovisioning solutions (such as cert-manager or self-signed SSL certificate).",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -15,7 +15,7 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "Spec is the desired state of the Certificate. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+      "description": "Spec is the desired state of the Certificate.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
       "type": "object",
       "required": [
         "dnsNames",
@@ -23,7 +23,7 @@
       ],
       "properties": {
         "dnsNames": {
-          "description": "DNSNames is a list of DNS names the Certificate could support. The wildcard format of DNSNames (e.g. *.default.example.com) is supported.",
+          "description": "DNSNames is a list of DNS names the Certificate could support.\nThe wildcard format of DNSNames (e.g. *.default.example.com) is supported.",
           "type": "array",
           "items": {
             "type": "string"
@@ -40,11 +40,11 @@
       }
     },
     "status": {
-      "description": "Status is the current state of the Certificate. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+      "description": "Status is the current state of the Certificate.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
       "type": "object",
       "properties": {
         "annotations": {
-          "description": "Annotations is additional Status fields for the Resource to save some additional State as well as convey more information to the user. This is roughly akin to Annotations on any k8s resource, just the reconciler conveying richer information outwards.",
+          "description": "Annotations is additional Status fields for the Resource to save some\nadditional State as well as convey more information to the user. This is\nroughly akin to Annotations on any k8s resource, just the reconciler conveying\nricher information outwards.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -54,7 +54,7 @@
           "description": "Conditions the latest available observations of a resource's current state.",
           "type": "array",
           "items": {
-            "description": "Condition defines a readiness condition for a Knative resource. See: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties",
+            "description": "Condition defines a readiness condition for a Knative resource.\nSee: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties",
             "type": "object",
             "required": [
               "status",
@@ -62,7 +62,7 @@
             ],
             "properties": {
               "lastTransitionTime": {
-                "description": "LastTransitionTime is the last time the condition transitioned from one status to another. We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic differences (all other things held constant).",
+                "description": "LastTransitionTime is the last time the condition transitioned from one status to another.\nWe use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic\ndifferences (all other things held constant).",
                 "type": "string"
               },
               "message": {
@@ -74,7 +74,7 @@
                 "type": "string"
               },
               "severity": {
-                "description": "Severity with which to treat failures of this type of condition. When this is not specified, it defaults to Error.",
+                "description": "Severity with which to treat failures of this type of condition.\nWhen this is not specified, it defaults to Error.",
                 "type": "string"
               },
               "status": {
@@ -89,10 +89,10 @@
           }
         },
         "http01Challenges": {
-          "description": "HTTP01Challenges is a list of HTTP01 challenges that need to be fulfilled in order to get the TLS certificate..",
+          "description": "HTTP01Challenges is a list of HTTP01 challenges that need to be fulfilled\nin order to get the TLS certificate..",
           "type": "array",
           "items": {
-            "description": "HTTP01Challenge defines the status of a HTTP01 challenge that a certificate needs to fulfill.",
+            "description": "HTTP01Challenge defines the status of a HTTP01 challenge that a certificate needs\nto fulfill.",
             "type": "object",
             "properties": {
               "serviceName": {
@@ -115,12 +115,12 @@
           }
         },
         "notAfter": {
-          "description": "The expiration time of the TLS certificate stored in the secret named by this resource in spec.secretName.",
+          "description": "The expiration time of the TLS certificate stored in the secret named\nby this resource in spec.secretName.",
           "type": "string",
           "format": "date-time"
         },
         "observedGeneration": {
-          "description": "ObservedGeneration is the 'Generation' of the Service that was last processed by the controller.",
+          "description": "ObservedGeneration is the 'Generation' of the Service that\nwas last processed by the controller.",
           "type": "integer",
           "format": "int64"
         }
@@ -134,5 +134,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

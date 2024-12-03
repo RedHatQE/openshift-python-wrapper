@@ -16,6 +16,19 @@
         "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
       }
     },
+    "allocatedResourcesStatus": {
+      "description": "AllocatedResourcesStatus represents the status of various resources allocated for this Pod.",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceStatus"
+      },
+      "x-kubernetes-list-map-keys": [
+        "name"
+      ],
+      "x-kubernetes-list-type": "map",
+      "x-kubernetes-patch-merge-key": "name",
+      "x-kubernetes-patch-strategy": "merge"
+    },
     "containerID": {
       "description": "ContainerID is the ID of the container in the format '<type>://<container_id>'. Where type is a container runtime identifier, returned from Version call of CRI API (for example \"containerd\").",
       "type": "string"
@@ -56,6 +69,23 @@
     "state": {
       "description": "State holds details about the container's current condition.",
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerState"
+    },
+    "user": {
+      "description": "User represents user identity information initially attached to the first process of the container",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerUser"
+    },
+    "volumeMounts": {
+      "description": "Status of volume mounts.",
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeMountStatus"
+      },
+      "x-kubernetes-list-map-keys": [
+        "mountPath"
+      ],
+      "x-kubernetes-list-type": "map",
+      "x-kubernetes-patch-merge-key": "mountPath",
+      "x-kubernetes-patch-strategy": "merge"
     }
   },
   "$schema": "http://json-schema.org/schema#"

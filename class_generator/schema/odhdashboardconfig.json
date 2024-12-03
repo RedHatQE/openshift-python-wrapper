@@ -28,13 +28,7 @@
             "disableBYONImageStream": {
               "type": "boolean"
             },
-            "disableBiasMetrics": {
-              "type": "boolean"
-            },
             "disableClusterManager": {
-              "type": "boolean"
-            },
-            "disableConnectionTypes": {
               "type": "boolean"
             },
             "disableCustomServingRuntimes": {
@@ -85,6 +79,9 @@
             "disableProjects": {
               "type": "boolean"
             },
+            "disableServingRuntimeParams": {
+              "type": "boolean"
+            },
             "disableStorageClasses": {
               "type": "boolean"
             },
@@ -92,6 +89,9 @@
               "type": "boolean"
             },
             "disableTracking": {
+              "type": "boolean"
+            },
+            "disableTrustyBiasMetrics": {
               "type": "boolean"
             },
             "disableUserManagement": {
@@ -254,5 +254,6 @@
       "version": "v1alpha"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

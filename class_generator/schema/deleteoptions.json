@@ -11,7 +11,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "x-kubernetes-list-type": "atomic"
     },
     "gracePeriodSeconds": {
       "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.",
@@ -87,11 +88,6 @@
       "version": "v1beta1"
     },
     {
-      "group": "apps.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
       "group": "apps",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -132,11 +128,6 @@
       "version": "v1beta1"
     },
     {
-      "group": "authorization.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
       "group": "autoscaling",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -167,11 +158,6 @@
       "version": "v1beta1"
     },
     {
-      "group": "build.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
       "group": "certificates.k8s.io",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -190,6 +176,11 @@
       "group": "coordination.k8s.io",
       "kind": "DeleteOptions",
       "version": "v1"
+    },
+    {
+      "group": "coordination.k8s.io",
+      "kind": "DeleteOptions",
+      "version": "v1alpha1"
     },
     {
       "group": "coordination.k8s.io",
@@ -240,11 +231,6 @@
       "group": "flowcontrol.apiserver.k8s.io",
       "kind": "DeleteOptions",
       "version": "v1beta3"
-    },
-    {
-      "group": "image.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
     },
     {
       "group": "imagepolicy.k8s.io",
@@ -302,16 +288,6 @@
       "version": "v1beta1"
     },
     {
-      "group": "project.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
-      "group": "quota.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
       "group": "rbac.authorization.k8s.io",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -329,12 +305,7 @@
     {
       "group": "resource.k8s.io",
       "kind": "DeleteOptions",
-      "version": "v1alpha2"
-    },
-    {
-      "group": "route.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
+      "version": "v1alpha3"
     },
     {
       "group": "scheduling.k8s.io",
@@ -352,11 +323,6 @@
       "version": "v1beta1"
     },
     {
-      "group": "security.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
       "group": "storage.k8s.io",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -372,9 +338,9 @@
       "version": "v1beta1"
     },
     {
-      "group": "template.openshift.io",
+      "group": "storagemigration.k8s.io",
       "kind": "DeleteOptions",
-      "version": "v1"
+      "version": "v1alpha1"
     },
     {
       "group": "user.openshift.io",

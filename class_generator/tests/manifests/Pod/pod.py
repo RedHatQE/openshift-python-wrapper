@@ -102,8 +102,7 @@ class Pod(NamespacedResource):
               ephemeralcontainers subresource.
 
             host_aliases (List[Any]): HostAliases is an optional list of hosts and IPs that will be injected
-              into the pod's hosts file if specified. This is only valid for
-              non-hostNetwork pods.
+              into the pod's hosts file if specified.
 
             host_ipc (bool): Use the host's ipc namespace. Optional: Default to false.
 
@@ -150,9 +149,14 @@ class Pod(NamespacedResource):
               https://kubernetes.io/docs/concepts/workloads/pods/init-
               containers/
 
-            node_name (str): NodeName is a request to schedule this pod onto a specific node. If it
-              is non-empty, the scheduler simply schedules this pod onto that
-              node, assuming that it fits resource requirements.
+            node_name (str): NodeName indicates in which node this pod is scheduled. If empty, this
+              pod is a candidate for scheduling by the scheduler defined in
+              schedulerName. Once this field is set, the kubelet for this node
+              becomes responsible for the lifecycle of this pod. This field
+              should not be used to express a desire for the pod to be scheduled
+              on a specific node.
+              https://kubernetes.io/docs/concepts/scheduling-eviction/assign-
+              pod-node/#nodename
 
             node_selector (Dict[str, Any]): NodeSelector is a selector which must be true for the pod to fit on a
               node. Selector which must match a node's labels for the pod to be
@@ -227,8 +231,7 @@ class Pod(NamespacedResource):
               block scheduling the pod. If schedulingGates is not empty, the pod
               will stay in the SchedulingGated state and the scheduler will not
               attempt to schedule the pod.  SchedulingGates can only be set at
-              pod creation time, and be removed only afterwards.  This is a beta
-              feature enabled by the PodSchedulingReadiness feature gate.
+              pod creation time, and be removed only afterwards.
 
             security_context (Dict[str, Any]): PodSecurityContext holds pod-level security attributes and common
               container settings. Some fields are also present in
@@ -236,8 +239,8 @@ class Pod(NamespacedResource):
               container.securityContext take precedence over field values of
               PodSecurityContext.
 
-            service_account (str): DeprecatedServiceAccount is a depreciated alias for
-              ServiceAccountName. Deprecated: Use serviceAccountName instead.
+            service_account (str): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
+              Deprecated: Use serviceAccountName instead.
 
             service_account_name (str): ServiceAccountName is the name of the ServiceAccount to use to run
               this pod. More info: https://kubernetes.io/docs/tasks/configure-

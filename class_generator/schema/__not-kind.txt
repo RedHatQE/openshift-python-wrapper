@@ -706,3 +706,12 @@ io.konveyor.forklift.v1beta1.NetworkMapList
 io.konveyor.forklift.v1beta1.OpenstackVolumePopulatorList
 io.konveyor.forklift.v1beta1.OvirtVolumePopulatorList
 io.konveyor.forklift.v1beta1.MigrationList
+io.opendatahub.trustyai.v1alpha1.LMEvalJobList
+io.cncf.cni.whereabouts.v1alpha1.NodeSlicePoolList
+io.kserve.serving.v1alpha1.LocalModelNodeGroupList
+io.opendatahub.nim.v1.AccountList
+io.kserve.serving.v1alpha1.ClusterLocalModelList
+io.argoproj.v1alpha1.WorkflowArtifactGCTaskList
+io.opendatahub.modelregistry.v1alpha1.ModelRegistryList
+io.opendatahub.datasciencepipelinesapplications.v1.DataSciencePipelinesApplicationList
+io.metal3.v1alpha1.HostUpdatePolicyList
