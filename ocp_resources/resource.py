@@ -35,6 +35,8 @@ from ocp_resources.constants import (
     TIMEOUT_1MINUTE,
     TIMEOUT_4MINUTES,
     TIMEOUT_10SEC,
+    TIMEOUT_30SEC,
+    TIMEOUT_5SEC,
 )
 from ocp_resources.event import Event
 from timeout_sampler import (
@@ -955,12 +957,16 @@ class Resource:
 
     @staticmethod
     def retry_cluster_exceptions(
-        func, exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs: Any
+        func,
+        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        timeout: int = TIMEOUT_10SEC,
+        sleep_time: int = 1,
+        **kwargs: Any,
     ) -> Any:
         try:
             sampler = TimeoutSampler(
-                wait_timeout=TIMEOUT_10SEC,
-                sleep=1,
+                wait_timeout=timeout,
+                sleep=sleep_time,
                 func=func,
                 print_log=False,
                 exceptions_dict=exceptions_dict,
@@ -1129,7 +1135,7 @@ class Resource:
     def wait_for_conditions(self) -> None:
         timeout_watcher = TimeoutWatch(timeout=30)
         for sample in TimeoutSampler(
-            wait_timeout=30,
+            wait_timeout=TIMEOUT_30SEC,
             sleep=1,
             func=lambda: self.exists,
         ):
@@ -1613,4 +1619,6 @@ class ResourceEditor:
             patches=patches,
             action_text=action_text,
             action=action,
+            timeout=TIMEOUT_30SEC,
+            sleep_time=TIMEOUT_5SEC,
         )
