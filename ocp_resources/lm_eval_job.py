@@ -13,6 +13,8 @@ class LMEvalJob(NamespacedResource):
 
     def __init__(
         self,
+        allow_code_execution: Optional[bool] = None,
+        allow_online: Optional[bool] = None,
         batch_size: Optional[str] = "",
         gen_args: Optional[List[Any]] = None,
         limit: Optional[str] = "",
@@ -29,6 +31,12 @@ class LMEvalJob(NamespacedResource):
     ) -> None:
         """
         Args:
+            allow_code_execution (bool): AllowCodeExecution specifies whether the LMEvalJob can execute remote
+              code. Default is false.
+
+            allow_online (bool): AllowOnly specifies whether the LMEvalJob can directly download remote
+              code, datasets and metrics. Default is false.
+
             batch_size (str): Batch size for the evaluation. This is used by the models that run and
               are loaded locally and not apply for the commercial APIs.
 
@@ -47,7 +55,7 @@ class LMEvalJob(NamespacedResource):
 
             num_few_shot (int): Sets the number of few-shot examples to place in context
 
-            offline (Dict[str, Any]): Offline specifies settings for running LMEvalJobs in a offline mode
+            offline (Dict[str, Any]): Offline specifies settings for running LMEvalJobs in an offline mode
 
             outputs (Dict[str, Any]): Outputs specifies storage for evaluation results
 
@@ -61,6 +69,8 @@ class LMEvalJob(NamespacedResource):
         """
         super().__init__(**kwargs)
 
+        self.allow_code_execution = allow_code_execution
+        self.allow_online = allow_online
         self.batch_size = batch_size
         self.gen_args = gen_args
         self.limit = limit
@@ -89,6 +99,12 @@ class LMEvalJob(NamespacedResource):
 
             _spec["model"] = self.model
             _spec["taskList"] = self.task_list
+
+            if self.allow_code_execution is not None:
+                _spec["allowCodeExecution"] = self.allow_code_execution
+
+            if self.allow_online is not None:
+                _spec["allowOnline"] = self.allow_online
 
             if self.batch_size:
                 _spec["batchSize"] = self.batch_size
