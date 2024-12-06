@@ -56,10 +56,10 @@ class ModelRegistry(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.grpc:
+            if not self.grpc and self.grpc != {}:
                 raise MissingRequiredArgumentError(argument="self.grpc")
 
-            if not self.rest:
+            if not self.rest and self.rest != {}:
                 raise MissingRequiredArgumentError(argument="self.rest")
 
             self.res["spec"] = {}
