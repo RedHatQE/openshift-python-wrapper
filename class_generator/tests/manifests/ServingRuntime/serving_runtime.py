@@ -97,7 +97,7 @@ class ServingRuntime(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.containers:
+            if self.containers is None:
                 raise MissingRequiredArgumentError(argument="self.containers")
 
             self.res["spec"] = {}

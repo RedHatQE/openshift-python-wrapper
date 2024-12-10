@@ -52,7 +52,7 @@ class {{ kind }}({{ base_class }}):
         if not self.kind_dict and not self.yaml_file:
           {% if all_required_args %}
           {% for arg in all_required_args %}
-            if not self.{{ arg }}:
+            if self.{{ arg }} is None:
                 raise MissingRequiredArgumentError(argument="self.{{ arg }}")
 
           {% endfor %}
