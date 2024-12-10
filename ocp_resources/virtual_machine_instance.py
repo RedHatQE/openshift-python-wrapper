@@ -75,6 +75,9 @@ class VirtualMachineInstance(NamespacedResource):
                 label_selector=f"kubevirt.io=virt-launcher,kubevirt.io/created-by={self.instance.metadata.uid}",
             )
         )
+        if not pods:
+            raise ResourceNotFoundError(f"VIRT launcher POD not found for {self.kind}:{self.name}")
+
         migration_state = self.instance.status.migrationState
         if migration_state:
             #  After VM migration there are two pods, one in Completed status and one in Running status.
@@ -84,8 +87,6 @@ class VirtualMachineInstance(NamespacedResource):
                     return pod
         else:
             return pods[0]
-
-        raise ResourceNotFoundError(f"VIRT launcher POD not found for {self.kind}:{self.name}")
 
     @property
     def virt_handler_pod(self):
