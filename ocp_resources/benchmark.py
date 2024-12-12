@@ -1,4 +1,4 @@
-from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
+from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT, TIMEOUT_30SEC
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
 
@@ -35,7 +35,7 @@ class Benchmark(NamespacedResource):
             str or None: Value of key if found, otherwise None
         """
         samples = TimeoutSampler(
-            wait_timeout=30,
+            wait_timeout=TIMEOUT_30SEC,
             sleep=1,
             func=lambda: getattr(self.instance, parent, None),
             exceptions_dict=NOT_FOUND_ERROR_EXCEPTION_DICT,
