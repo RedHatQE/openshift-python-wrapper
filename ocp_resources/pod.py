@@ -2,7 +2,7 @@ import json
 
 import kubernetes
 
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.constants import TIMEOUT_4MINUTES, TIMEOUT_5SEC
 from ocp_resources.node import Node
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutWatch
@@ -111,8 +111,8 @@ class Pod(NamespacedResource):
         if rcstring is None:
             raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error)
 
-        stdout = resp.read_stdout(timeout=5)
-        stderr = resp.read_stderr(timeout=5)
+        stdout = resp.read_stdout(timeout=TIMEOUT_5SEC)
+        stderr = resp.read_stderr(timeout=TIMEOUT_5SEC)
 
         if rcstring == "Success" or ignore_rc:
             return stdout
