@@ -12,16 +12,7 @@ env_list = [
 description = "Run resource tests on local cluster (k3d)"
 passenv = ["KUBECONFIG"]
 deps = ["uv"]
-commands = [
-  [
-    "uv",
-    "run",
-    "pytest",
-    "tests/test_resources.py",
-    "-k",
-    "not kubevirt",
-  ],
-]
+commands = [["uv", "run", "pytest", "tests/test_resources.py"]]
 
 [env.validate-resources]
 description = "Run validation resources tests"
