@@ -5,26 +5,14 @@ env_list = [
   "class-generator",
   "resource-tests",
   "api-group-order",
-  "validate-unittests"
+  "validate-unittests",
 ]
 
 [env.resource-tests]
 description = "Run resource tests on local cluster (k3d)"
 passenv = ["KUBECONFIG"]
 deps = ["uv"]
-commands_pre = [["scripts/k3d-runner.sh", "start"]]
-commands = [
-  [
-    "uv",
-    "run",
-    "pytest",
-    "tests/test_resources.py",
-    "-k",
-    "not kubevirt",
-  ],
-]
-commands_post = [["scripts/k3d-runner.sh", "stop"]]
-allowlist_externals = ["scripts/k3d-runner.sh"]
+commands = [["uv", "run", "pytest", "tests/test_resources.py"]]
 
 [env.validate-resources]
 description = "Run validation resources tests"

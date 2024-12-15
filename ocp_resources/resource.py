@@ -1176,7 +1176,6 @@ class Resource:
         example: reading all CSV Warning events in namespace "my-namespace", with reason of "AnEventReason"
             pod = Pod(client=client, name="pod", namespace="my-namespace")
             for event in pod.events(
-                default_client,
                 namespace="my-namespace",
                 field_selector="involvedObject.kind==ClusterServiceVersion,type==Warning,reason=AnEventReason",
                 timeout=10,
@@ -1198,12 +1197,18 @@ class Resource:
 
     @staticmethod
     def get_all_cluster_resources(
-        config_file: str = "", context: str = "", config_dict: Dict[str, Any] | None = None, *args: Any, **kwargs: Any
+        client: DynamicClient | None = None,
+        config_file: str = "",
+        context: str = "",
+        config_dict: Dict[str, Any] | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> Generator[ResourceField, None, None]:
         """
         Get all cluster resources
 
         Args:
+            client (DynamicClient): k8s client
             config_file (str): path to a kubeconfig file.
             config_dict (dict): dict with kubeconfig configuration.
             context (str): name of the context to use.
@@ -1217,8 +1222,9 @@ class Resource:
             for resource in get_all_cluster_resources(label_selector="my-label=value"):
                 print(f"Resource: {resource}")
         """
+        if not client:
+            client = get_client(config_file=config_file, config_dict=config_dict, context=context)
 
-        client = get_client(config_file=config_file, config_dict=config_dict, context=context)
         for _resource in client.resources.search():
             try:
                 _resources = client.get(_resource, *args, **kwargs)
