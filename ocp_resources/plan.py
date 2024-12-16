@@ -63,19 +63,9 @@ class Plan(NamespacedResource, MTV):
         self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
         self.hooks_array = []
 
-        def generate_hook_spec(hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
-            hook: dict[str, Any] = {
-                "hook": {
-                    "name": hook_name,
-                    "namespace": hook_namespace,
-                },
-                "step": hook_type,
-            }
-            return hook
-
         if self.pre_hook_name and self.pre_hook_namespace:
             self.hooks_array.append(
-                generate_hook_spec(
+                self.generate_hook_spec(
                     hook_name=self.pre_hook_name,
                     hook_namespace=self.pre_hook_namespace,
                     hook_type="PreHook",
@@ -84,7 +74,7 @@ class Plan(NamespacedResource, MTV):
 
         if self.after_hook_name and self.after_hook_namespace:
             self.hooks_array.append(
-                generate_hook_spec(
+                self.generate_hook_spec(
                     hook_name=self.after_hook_name,
                     hook_namespace=self.after_hook_namespace,
                     hook_type="AfterHook",
@@ -125,3 +115,13 @@ class Plan(NamespacedResource, MTV):
                     },
                 }
             })
+
+    def generate_hook_spec(self, hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
+        hook: dict[str, Any] = {
+            "hook": {
+                "name": hook_name,
+                "namespace": hook_namespace,
+            },
+            "step": hook_type,
+        }
+        return hook
