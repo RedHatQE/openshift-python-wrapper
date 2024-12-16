@@ -615,7 +615,6 @@ class Resource:
         self._base_body()
 
     def __enter__(self) -> Any:
-        __import__("ipdb").set_trace()
         signal(SIGINT, self._sigint_handler)
         return self.deploy(wait=self.wait_for_resource)
 
