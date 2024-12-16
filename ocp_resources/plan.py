@@ -1,4 +1,4 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from typing import Any
 from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
@@ -26,38 +26,24 @@ class Plan(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        source_provider_name=None,
-        source_provider_namespace=None,
-        destination_provider_name=None,
-        destination_provider_namespace=None,
-        storage_map_name=None,
-        storage_map_namespace=None,
-        network_map_name=None,
-        network_map_namespace=None,
-        virtual_machines_list=None,
-        target_namespace=None,
-        warm_migration=False,
-        pre_hook_name=None,
-        pre_hook_namespace=None,
-        after_hook_name=None,
-        after_hook_namespace=None,
-        client=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
+        source_provider_name: str | None = None,
+        source_provider_namespace: str | None = None,
+        destination_provider_name: str | None = None,
+        destination_provider_namespace: str | None = None,
+        storage_map_name: str | None = None,
+        storage_map_namespace: str | None = None,
+        network_map_name: str | None = None,
+        network_map_namespace: str | None = None,
+        virtual_machines_list: list[Any] | None = None,
+        target_namespace: str | None = None,
+        warm_migration: bool = False,
+        pre_hook_name: str | None = None,
+        pre_hook_namespace: str | None = None,
+        after_hook_name: str | None = None,
+        after_hook_namespace: str | None = None,
         **kwargs,
-    ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+    ) -> None:
+        super().__init__(**kwargs)
         self.source_provider_name = source_provider_name
         self.source_provider_namespace = source_provider_namespace
         self.destination_provider_name = destination_provider_name
@@ -75,9 +61,10 @@ class Plan(NamespacedResource, MTV):
         self.target_namespace = target_namespace or self.namespace
         self.condition_message_ready = self.ConditionMessage.PLAN_READY
         self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
+        self.hooks_array = []
 
-        def generate_hook_spec(hook_name, hook_namespace, hook_type):
-            hook = {
+        def generate_hook_spec(hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
+            hook: dict[str, Any] = {
                 "hook": {
                     "name": hook_name,
                     "namespace": hook_namespace,
@@ -86,9 +73,8 @@ class Plan(NamespacedResource, MTV):
             }
             return hook
 
-        hooks_array = []
         if self.pre_hook_name and self.pre_hook_namespace:
-            hooks_array.append(
+            self.hooks_array.append(
                 generate_hook_spec(
                     hook_name=self.pre_hook_name,
                     hook_namespace=self.pre_hook_namespace,
@@ -97,7 +83,7 @@ class Plan(NamespacedResource, MTV):
             )
 
         if self.after_hook_name and self.after_hook_namespace:
-            hooks_array.append(
+            self.hooks_array.append(
                 generate_hook_spec(
                     hook_name=self.after_hook_name,
                     hook_namespace=self.after_hook_namespace,
@@ -105,9 +91,9 @@ class Plan(NamespacedResource, MTV):
                 )
             )
 
-        if hooks_array:
+        if self.hooks_array and self.virtual_machines_list:
             for vm in self.virtual_machines_list:
-                vm["hooks"] = hooks_array
+                vm["hooks"] = self.hooks_array
 
     def to_dict(self) -> None:
         super().to_dict()
