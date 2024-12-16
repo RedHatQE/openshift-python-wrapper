@@ -1,7 +1,8 @@
 version = 1
 requires-python = ">=3.9"
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version == '3.10.*'",
+    "python_full_version < '3.10'",
     "python_full_version >= '3.11'",
 ]
 
@@ -473,7 +474,8 @@ version = "0.13.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "decorator" },
-    { name = "ipython" },
+    { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "ipython", version = "8.30.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3d/1b/7e07e7b752017f7693a0f4d41c13e5ca29ce8cbcfdcc1fd6c4ad8c0a27a0/ipdb-0.13.13.tar.gz", hash = "sha256:e3ac6018ef05126d442af680aad863006ec19d02290561ac88b8b1c0b0cfc726", size = 17042 }
@@ -485,22 +487,51 @@ wheels = [
 name = "ipython"
 version = "8.18.1"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.10'",
+]
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "decorator" },
-    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
-    { name = "jedi" },
-    { name = "matplotlib-inline" },
-    { name = "pexpect", marker = "sys_platform != 'win32'" },
-    { name = "prompt-toolkit" },
-    { name = "pygments" },
-    { name = "stack-data" },
-    { name = "traitlets" },
+    { name = "colorama", marker = "python_full_version < '3.10' and sys_platform == 'win32'" },
+    { name = "decorator", marker = "python_full_version < '3.10'" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.10'" },
+    { name = "jedi", marker = "python_full_version < '3.10'" },
+    { name = "matplotlib-inline", marker = "python_full_version < '3.10'" },
+    { name = "pexpect", marker = "python_full_version < '3.10' and sys_platform != 'win32'" },
+    { name = "prompt-toolkit", marker = "python_full_version < '3.10'" },
+    { name = "pygments", marker = "python_full_version < '3.10'" },
+    { name = "stack-data", marker = "python_full_version < '3.10'" },
+    { name = "traitlets", marker = "python_full_version < '3.10'" },
     { name = "typing-extensions", marker = "python_full_version < '3.10'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b1/b9/3ba6c45a6df813c09a48bac313c22ff83efa26cbb55011218d925a46e2ad/ipython-8.18.1.tar.gz", hash = "sha256:ca6f079bb33457c66e233e4580ebfc4128855b4cf6370dddd73842a9563e8a27", size = 5486330 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/47/6b/d9fdcdef2eb6a23f391251fde8781c38d42acd82abe84d054cb74f7863b0/ipython-8.18.1-py3-none-any.whl", hash = "sha256:e8267419d72d81955ec1177f8a29aaa90ac80ad647499201119e2f05e99aa397", size = 808161 },
+]
+
+[[package]]
+name = "ipython"
+version = "8.30.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.10.*'",
+    "python_full_version >= '3.11'",
+]
+dependencies = [
+    { name = "colorama", marker = "python_full_version >= '3.10' and sys_platform == 'win32'" },
+    { name = "decorator", marker = "python_full_version >= '3.10'" },
+    { name = "exceptiongroup", marker = "python_full_version == '3.10.*'" },
+    { name = "jedi", marker = "python_full_version >= '3.10'" },
+    { name = "matplotlib-inline", marker = "python_full_version >= '3.10'" },
+    { name = "pexpect", marker = "python_full_version >= '3.10' and sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "prompt-toolkit", marker = "python_full_version >= '3.10'" },
+    { name = "pygments", marker = "python_full_version >= '3.10'" },
+    { name = "stack-data", marker = "python_full_version >= '3.10'" },
+    { name = "traitlets", marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.10' and python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d8/8b/710af065ab8ed05649afa5bd1e07401637c9ec9fb7cfda9eac7e91e9fbd4/ipython-8.30.0.tar.gz", hash = "sha256:cb0a405a306d2995a5cbb9901894d240784a9f341394c6ba3f4fe8c6eb89ff6e", size = 5592205 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/f3/1332ba2f682b07b304ad34cad2f003adcfeb349486103f4b632335074a7c/ipython-8.30.0-py3-none-any.whl", hash = "sha256:85ec56a7e20f6c38fce7727dcca699ae4ffc85985aa7b23635a8008f918ae321", size = 820765 },
 ]
 
 [[package]]
@@ -696,7 +727,8 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "ipdb" },
-    { name = "ipython" },
+    { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "ipython", version = "8.30.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
 ]
 
 [package.metadata]
@@ -869,7 +901,7 @@ wheels = [
 
 [[package]]
 name = "pyhelper-utils"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ipdb" },
@@ -878,7 +910,7 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/05/4a/0079a0900e574322bfba750984e1746e2edd6c896046c9938ea819b79783/pyhelper_utils-1.0.2.tar.gz", hash = "sha256:e71d7cac062742af916fdff643bcb918886e81ce9b73ac7b61de46c8ba8264a9", size = 9753 }
+sdist = { url = "https://files.pythonhosted.org/packages/76/2b/84e9cdb750512766551278a45a0237f98d357f44845c04f8a4c947be1aca/pyhelper_utils-1.0.3.tar.gz", hash = "sha256:954230bae5a32098188e1cdd5f0cabefcac678c86fd087f26e81eb303f778f11", size = 9734 }
 
 [[package]]
 name = "pynacl"
@@ -988,12 +1020,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/45/60/571982c7af8f5453b
 
 [[package]]
 name = "python-simple-logger"
-version = "2.0.1"
+version = "2.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorlog" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/7c/98ba93362af00ac135762b47503b3cec9e08febc3841a0bcbdf1868a4ef4/python_simple_logger-2.0.1.tar.gz", hash = "sha256:3e567fbf70d0fce08305665ea069cdb14e74201ed545019ca5792d3830e31962", size = 8229 }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/40/ea9df26d88117f84acc77a0f301a032e6763559a3a2ee8dde0ffb49d8485/python_simple_logger-2.0.2.tar.gz", hash = "sha256:c40ba618245d3286d06e5e0780b36df5f83c7512018c7034a83e1eb010ab9793", size = 8232 }
 
 [[package]]
 name = "python-slugify"
@@ -1210,12 +1242,12 @@ wheels = [
 
 [[package]]
 name = "timeout-sampler"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-simple-logger" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/ac/25665074a5499517540f36da876038b9938073832fe74779890b02e09a88/timeout_sampler-1.0.2.tar.gz", hash = "sha256:975092ebf28fd30a874983c1b0c67a137405d22cd29e72003c8840321b8c76b5", size = 3669 }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/40/666561ffecb9b50adae217919875c39f2de73b36245a60f0e16a6e5526e6/timeout_sampler-1.0.3.tar.gz", hash = "sha256:e07826c346fc591422fc94664c776c139341198edefde69d25732893c4f09188", size = 3658 }
 
 [[package]]
 name = "tomli"
