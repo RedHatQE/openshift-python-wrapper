@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any
 from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
