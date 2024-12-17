@@ -117,11 +117,10 @@ class Plan(NamespacedResource, MTV):
             })
 
     def _generate_hook_spec(self, hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
-        hook: dict[str, Any] = {
+        return {
             "hook": {
                 "name": hook_name,
                 "namespace": hook_namespace,
             },
             "step": hook_type,
         }
-        return hook
