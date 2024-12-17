@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from collections.abc import Callable, Generator
 import contextlib
 
@@ -46,6 +47,7 @@ from timeout_sampler import (
 )
 from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError
 from ocp_resources.utils import skip_existing_resource_creation_teardown
+
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -612,7 +614,7 @@ class Resource:
         """
         self._base_body()
 
-    def __enter__(self) -> "Resource":
+    def __enter__(self) -> Any:
         signal(SIGINT, self._sigint_handler)
         return self.deploy(wait=self.wait_for_resource)
 
@@ -629,7 +631,7 @@ class Resource:
         self.__exit__()
         sys.exit(signal_received)
 
-    def deploy(self, wait: bool = False) -> "Resource":
+    def deploy(self, wait: bool = False) -> Any:
         """
         For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
         Spaces are important in the export dict
