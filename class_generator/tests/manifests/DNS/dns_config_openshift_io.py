@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -15,10 +17,10 @@ class DNS(Resource):
 
     def __init__(
         self,
-        base_domain: Optional[str] = "",
-        platform: Optional[Dict[str, Any]] = None,
-        private_zone: Optional[Dict[str, Any]] = None,
-        public_zone: Optional[Dict[str, Any]] = None,
+        base_domain: str | None = None,
+        platform: dict[str, Any] | None = None,
+        private_zone: dict[str, Any] | None = None,
+        public_zone: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -29,17 +31,17 @@ class DNS(Resource):
               created for `cluster-api.openshift.example.com`.  Once set, this
               field cannot be changed.
 
-            platform (Dict[str, Any]): platform holds configuration specific to the underlying infrastructure
+            platform (dict[str, Any]): platform holds configuration specific to the underlying infrastructure
               provider for DNS. When omitted, this means the user has no opinion
               and the platform is left to choose reasonable defaults. These
               defaults are subject to change over time.
 
-            private_zone (Dict[str, Any]): privateZone is the location where all the DNS records that are only
+            private_zone (dict[str, Any]): privateZone is the location where all the DNS records that are only
               available internally to the cluster exist.  If this field is nil,
               no private records should be created.  Once set, this field cannot
               be changed.
 
-            public_zone (Dict[str, Any]): publicZone is the location where all the DNS records that are publicly
+            public_zone (dict[str, Any]): publicZone is the location where all the DNS records that are publicly
               accessible to the internet exist.  If this field is nil, no public
               records should be created.  Once set, this field cannot be
               changed.

@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,21 +15,21 @@ class ConfigMap(NamespacedResource):
 
     def __init__(
         self,
-        binary_data: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any]] = None,
-        immutable: Optional[bool] = None,
+        binary_data: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        immutable: bool | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            binary_data (Dict[str, Any]): BinaryData contains the binary data. Each key must consist of
+            binary_data (dict[str, Any]): BinaryData contains the binary data. Each key must consist of
               alphanumeric characters, '-', '_' or '.'. BinaryData can contain
               byte sequences that are not in the UTF-8 range. The keys stored in
               BinaryData must not overlap with the ones in the Data field, this
               is enforced during validation process. Using this field will
               require 1.10+ apiserver and kubelet.
 
-            data (Dict[str, Any]): Data contains the configuration data. Each key must consist of
+            data (dict[str, Any]): Data contains the configuration data. Each key must consist of
               alphanumeric characters, '-', '_' or '.'. Values with non-UTF-8
               byte sequences must use the BinaryData field. The keys stored in
               Data must not overlap with the keys in the BinaryData field, this

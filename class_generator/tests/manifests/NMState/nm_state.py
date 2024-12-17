@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -13,44 +15,44 @@ class NMState(Resource):
 
     def __init__(
         self,
-        affinity: Optional[Dict[str, Any]] = None,
-        infra_affinity: Optional[Dict[str, Any]] = None,
-        infra_node_selector: Optional[Dict[str, Any]] = None,
-        infra_tolerations: Optional[List[Any]] = None,
-        node_selector: Optional[Dict[str, Any]] = None,
-        self_sign_configuration: Optional[Dict[str, Any]] = None,
-        tolerations: Optional[List[Any]] = None,
+        affinity: dict[str, Any] | None = None,
+        infra_affinity: dict[str, Any] | None = None,
+        infra_node_selector: dict[str, Any] | None = None,
+        infra_tolerations: list[Any] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        self_sign_configuration: dict[str, Any] | None = None,
+        tolerations: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            affinity (Dict[str, Any]): Affinity is an optional affinity selector that will be added to
+            affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
               handler DaemonSet manifest.
 
-            infra_affinity (Dict[str, Any]): Affinity is an optional affinity selector that will be added to
+            infra_affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
               webhook & certmanager Deployment manifests.
 
-            infra_node_selector (Dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
+            infra_node_selector (dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
               webhook & certmanager Deployment manifests If InfraNodeSelector is
               specified, the webhook and certmanager will run only on nodes that
               have each of the indicated key-value pairs as labels applied to
               the node.
 
-            infra_tolerations (List[Any]): InfraTolerations is an optional list of tolerations to be added to
+            infra_tolerations (list[Any]): InfraTolerations is an optional list of tolerations to be added to
               webhook & certmanager Deployment manifests If InfraTolerations is
               specified, the webhook and certmanager will be able to be
               scheduled on nodes with corresponding taints
 
-            node_selector (Dict[str, Any]): NodeSelector is an optional selector that will be added to handler
+            node_selector (dict[str, Any]): NodeSelector is an optional selector that will be added to handler
               DaemonSet manifest for both workers and control-plane
               (https://github.com/nmstate/kubernetes-
               nmstate/blob/main/deploy/handler/operator.yaml). If NodeSelector
               is specified, the handler will run only on nodes that have each of
               the indicated key-value pairs as labels applied to the node.
 
-            self_sign_configuration (Dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
+            self_sign_configuration (dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
 
-            tolerations (List[Any]): Tolerations is an optional list of tolerations to be added to handler
+            tolerations (list[Any]): Tolerations is an optional list of tolerations to be added to handler
               DaemonSet manifest If Tolerations is specified, the handler
               daemonset will be also scheduled on nodes with corresponding
               taints
