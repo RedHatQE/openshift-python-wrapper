@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -17,20 +19,20 @@ class OAuth(Resource):
 
     def __init__(
         self,
-        identity_providers: Optional[List[Any]] = None,
-        templates: Optional[Dict[str, Any]] = None,
-        token_config: Optional[Dict[str, Any]] = None,
+        identity_providers: list[Any] | None = None,
+        templates: dict[str, Any] | None = None,
+        token_config: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            identity_providers (List[Any]): identityProviders is an ordered list of ways for a user to identify
+            identity_providers (list[Any]): identityProviders is an ordered list of ways for a user to identify
               themselves. When this list is empty, no identities are provisioned
               for users.
 
-            templates (Dict[str, Any]): templates allow you to customize pages like the login page.
+            templates (dict[str, Any]): templates allow you to customize pages like the login page.
 
-            token_config (Dict[str, Any]): tokenConfig contains options for authorization and access tokens
+            token_config (dict[str, Any]): tokenConfig contains options for authorization and access tokens
 
         """
         super().__init__(**kwargs)

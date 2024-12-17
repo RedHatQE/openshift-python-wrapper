@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -16,12 +18,12 @@ class ImageContentSourcePolicy(Resource):
 
     def __init__(
         self,
-        repository_digest_mirrors: Optional[List[Any]] = None,
+        repository_digest_mirrors: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            repository_digest_mirrors (List[Any]): repositoryDigestMirrors allows images referenced by image digests in
+            repository_digest_mirrors (list[Any]): repositoryDigestMirrors allows images referenced by image digests in
               pods to be pulled from alternative mirrored repository locations.
               The image pull specification provided to the pod will be compared
               to the source locations described in RepositoryDigestMirrors and
