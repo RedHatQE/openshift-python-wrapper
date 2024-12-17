@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -13,35 +15,35 @@ class ServingRuntime(NamespacedResource):
 
     def __init__(
         self,
-        affinity: Optional[Dict[str, Any]] = None,
-        spec_annotations: Optional[Dict[str, Any]] = None,
-        built_in_adapter: Optional[Dict[str, Any]] = None,
-        containers: Optional[List[Any]] = None,
-        disabled: Optional[bool] = None,
-        grpc_data_endpoint: Optional[str] = "",
-        grpc_endpoint: Optional[str] = "",
-        http_data_endpoint: Optional[str] = "",
-        image_pull_secrets: Optional[List[Any]] = None,
-        spec_labels: Optional[Dict[str, Any]] = None,
-        multi_model: Optional[bool] = None,
-        node_selector: Optional[Dict[str, Any]] = None,
-        protocol_versions: Optional[List[Any]] = None,
-        replicas: Optional[int] = None,
-        storage_helper: Optional[Dict[str, Any]] = None,
-        supported_model_formats: Optional[List[Any]] = None,
-        tolerations: Optional[List[Any]] = None,
-        volumes: Optional[List[Any]] = None,
+        affinity: dict[str, Any] | None = None,
+        spec_annotations: dict[str, Any] | None = None,
+        built_in_adapter: dict[str, Any] | None = None,
+        containers: list[Any] | None = None,
+        disabled: bool | None = None,
+        grpc_data_endpoint: str | None = None,
+        grpc_endpoint: str | None = None,
+        http_data_endpoint: str | None = None,
+        image_pull_secrets: list[Any] | None = None,
+        spec_labels: dict[str, Any] | None = None,
+        multi_model: bool | None = None,
+        node_selector: dict[str, Any] | None = None,
+        protocol_versions: list[Any] | None = None,
+        replicas: int | None = None,
+        storage_helper: dict[str, Any] | None = None,
+        supported_model_formats: list[Any] | None = None,
+        tolerations: list[Any] | None = None,
+        volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            affinity (Dict[str, Any]): No field description from API; please add description
+            affinity (dict[str, Any]): No field description from API; please add description
 
-            spec_annotations (Dict[str, Any]): No field description from API; please add description
+            spec_annotations (dict[str, Any]): No field description from API; please add description
 
-            built_in_adapter (Dict[str, Any]): No field description from API; please add description
+            built_in_adapter (dict[str, Any]): No field description from API; please add description
 
-            containers (List[Any]): No field description from API; please add description
+            containers (list[Any]): No field description from API; please add description
 
             disabled (bool): No field description from API; please add description
 
@@ -51,25 +53,25 @@ class ServingRuntime(NamespacedResource):
 
             http_data_endpoint (str): No field description from API; please add description
 
-            image_pull_secrets (List[Any]): No field description from API; please add description
+            image_pull_secrets (list[Any]): No field description from API; please add description
 
-            spec_labels (Dict[str, Any]): No field description from API; please add description
+            spec_labels (dict[str, Any]): No field description from API; please add description
 
             multi_model (bool): No field description from API; please add description
 
-            node_selector (Dict[str, Any]): No field description from API; please add description
+            node_selector (dict[str, Any]): No field description from API; please add description
 
-            protocol_versions (List[Any]): No field description from API; please add description
+            protocol_versions (list[Any]): No field description from API; please add description
 
             replicas (int): No field description from API; please add description
 
-            storage_helper (Dict[str, Any]): No field description from API; please add description
+            storage_helper (dict[str, Any]): No field description from API; please add description
 
-            supported_model_formats (List[Any]): No field description from API; please add description
+            supported_model_formats (list[Any]): No field description from API; please add description
 
-            tolerations (List[Any]): No field description from API; please add description
+            tolerations (list[Any]): No field description from API; please add description
 
-            volumes (List[Any]): No field description from API; please add description
+            volumes (list[Any]): No field description from API; please add description
 
         """
         super().__init__(**kwargs)

@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -13,14 +15,14 @@ class Deployment(NamespacedResource):
 
     def __init__(
         self,
-        min_ready_seconds: Optional[int] = None,
-        paused: Optional[bool] = None,
-        progress_deadline_seconds: Optional[int] = None,
-        replicas: Optional[int] = None,
-        revision_history_limit: Optional[int] = None,
-        selector: Optional[Dict[str, Any]] = None,
-        strategy: Optional[Dict[str, Any]] = None,
-        template: Optional[Dict[str, Any]] = None,
+        min_ready_seconds: int | None = None,
+        paused: bool | None = None,
+        progress_deadline_seconds: int | None = None,
+        replicas: int | None = None,
+        revision_history_limit: int | None = None,
+        selector: dict[str, Any] | None = None,
+        strategy: dict[str, Any] | None = None,
+        template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -46,15 +48,15 @@ class Deployment(NamespacedResource):
               pointer to distinguish between explicit zero and not specified.
               Defaults to 10.
 
-            selector (Dict[str, Any]): A label selector is a label query over a set of resources. The result
+            selector (dict[str, Any]): A label selector is a label query over a set of resources. The result
               of matchLabels and matchExpressions are ANDed. An empty label
               selector matches all objects. A null label selector matches no
               objects.
 
-            strategy (Dict[str, Any]): DeploymentStrategy describes how to replace existing pods with new
+            strategy (dict[str, Any]): DeploymentStrategy describes how to replace existing pods with new
               ones.
 
-            template (Dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
+            template (dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
               a template
 
         """

@@ -12,7 +12,7 @@ import shutil
 from tempfile import gettempdir
 
 import textwrap
-from typing import Any, Dict, List, Tuple
+from typing import Any
 import click
 import re
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
@@ -39,8 +39,8 @@ MISSING_DESCRIPTION_STR: str = "No field description from API; please add descri
 
 
 def _is_kind_and_namespaced(
-    client: str, _key: str, _data: Dict[str, Any], kind: str, group: str, version: str
-) -> Dict[str, Any]:
+    client: str, _key: str, _data: dict[str, Any], kind: str, group: str, version: str
+) -> dict[str, Any]:
     _group_and_version = f"{group}/{version}" if group else version
     not_resource_dict = {"is_kind": False, "kind": _key}
 
@@ -86,7 +86,7 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_defi
     with open(schema_definition_file) as fd:
         _definitions_json_data = json.load(fd)
 
-    _kind_data_futures: List[Future] = []
+    _kind_data_futures: list[Future] = []
     with ThreadPoolExecutor() as executor:
         for _key, _data in _definitions_json_data["definitions"].items():
             if not _data.get("x-kubernetes-group-version-kind"):
@@ -116,7 +116,7 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_defi
                 )
             )
 
-    _temp_resources_mappings: Dict[Any, Any] = {}
+    _temp_resources_mappings: dict[Any, Any] = {}
     for res in as_completed(_kind_data_futures):
         _res = res.result()
         # _res["kind"] is group.version.kind, set only kind as key in the final dict
@@ -137,7 +137,7 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_defi
         fd.writelines("\n".join(not_kind_list))
 
 
-def read_resources_mapping_file() -> Dict[Any, Any]:
+def read_resources_mapping_file() -> dict[Any, Any]:
     try:
         with open(RESOURCES_MAPPING_FILE) as fd:
             return json.load(fd)
@@ -339,7 +339,7 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
     return formatted_str
 
 
-def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, template_name: str) -> str:
+def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, template_name: str) -> str:
     env = Environment(
         loader=FileSystemLoader(template_dir),
         trim_blocks=True,
@@ -358,28 +358,34 @@ def render_jinja_template(template_dict: Dict[Any, Any], template_dir: str, temp
     return rendered
 
 
-def parse_user_code_from_file(file_path: str) -> str:
+def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
     with open(file_path) as fd:
         data = fd.read()
 
-    line = "    # End of generated code"
-    if line in data:
-        _end_of_generated_code_index = data.index(line)
-        _user_code = data[_end_of_generated_code_index + len(line) :]
-        return _user_code
+    end_of_generated_code_line = "    # End of generated code"
+    user_code: str = ""
+    user_imports: str = ""
 
-    return ""
+    if end_of_generated_code_line in data:
+        _end_of_generated_code_index = data.index(end_of_generated_code_line)
+        user_code = data[_end_of_generated_code_index + len(end_of_generated_code_line) :]
+
+    for _line in data.splitlines():
+        if _line.startswith("import") or _line.startswith("from"):
+            user_imports += f"{_line}\n"
+
+    return user_code, user_imports
 
 
 def generate_resource_file_from_dict(
-    resource_dict: Dict[str, Any],
+    resource_dict: dict[str, Any],
     overwrite: bool = False,
     dry_run: bool = False,
     output_file: str = "",
     add_tests: bool = False,
     output_file_suffix: str = "",
     output_dir: str = "",
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     base_dir = output_dir or "ocp_resources"
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
@@ -390,6 +396,7 @@ def generate_resource_file_from_dict(
         template_name="class_generator_template.j2",
     )
 
+    output = "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md\n\nfrom __future__ import annotations\n"
     formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
     _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
@@ -409,9 +416,10 @@ def generate_resource_file_from_dict(
 
     _output_file_exists: bool = os.path.exists(_output_file)
     _user_code: str = ""
+    _user_imports: str = ""
 
-    if _output_file_exists:
-        _user_code = parse_user_code_from_file(file_path=_output_file)
+    if _output_file_exists and not add_tests:
+        _user_code, _user_imports = parse_user_code_from_file(file_path=_output_file)
 
     orig_filename = _output_file
     if _output_file_exists:
@@ -423,19 +431,22 @@ def generate_resource_file_from_dict(
             LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
             _output_file = temp_output_file
 
+    if _user_code or _user_imports:
+        output += f"{_user_imports}{rendered}{_user_code}"
+    else:
+        output += rendered
+
     if dry_run:
-        if _user_code:
-            rendered += _user_code
-        _code = Syntax(code=rendered, lexer="python", line_numbers=True)
+        _code = Syntax(code=output, lexer="python", line_numbers=True)
         Console().print(_code)
 
     else:
-        write_and_format_rendered(filepath=_output_file, data=rendered, user_code=_user_code)
+        write_and_format_rendered(filepath=_output_file, output=output)
 
     return orig_filename, _output_file
 
 
-def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
+def types_generator(key_dict: dict[str, Any]) -> dict[str, str]:
     type_for_docstring: str = "Any"
     type_from_dict_for_init: str = ""
     # A resource field may be defined with `x-kubernetes-preserve-unknown-fields`. In this case, `type` is not provided.
@@ -443,11 +454,11 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
 
     # All fields must be set with Optional since resource can have yaml_file to cover all args.
     if resource_type == "array":
-        type_for_docstring = "List[Any]"
+        type_for_docstring = "list[Any]"
 
     elif resource_type == "string":
         type_for_docstring = "str"
-        type_from_dict_for_init = f'Optional[{type_for_docstring}] = ""'
+        type_from_dict_for_init = f"{type_for_docstring} | None = None"
 
     elif resource_type == "boolean":
         type_for_docstring = "bool"
@@ -456,15 +467,15 @@ def types_generator(key_dict: Dict[str, Any]) -> Dict[str, str]:
         type_for_docstring = "int"
 
     elif resource_type == "object":
-        type_for_docstring = "Dict[str, Any]"
+        type_for_docstring = "dict[str, Any]"
 
     if not type_from_dict_for_init:
-        type_from_dict_for_init = f"Optional[{type_for_docstring}] = None"
+        type_from_dict_for_init = f"{type_for_docstring} | None = None"
 
     return {"type-for-init": type_from_dict_for_init, "type-for-doc": type_for_docstring}
 
 
-def get_property_schema(property_: Dict[str, Any]) -> Dict[str, Any]:
+def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
     if _ref := property_.get("$ref"):
         with open(f"{SCHEMA_DIR}/{_ref.rsplit('.')[-1].lower()}.json") as fd:
             return json.load(fd)
@@ -481,12 +492,12 @@ def format_description(description: str) -> str:
 
 
 def prepare_property_dict(
-    schema: Dict[str, Any],
-    required: List[str],
-    resource_dict: Dict[str, Any],
+    schema: dict[str, Any],
+    required: list[str],
+    resource_dict: dict[str, Any],
     dict_key: str,
-) -> Dict[str, Any]:
-    keys_to_ignore: List[str] = ["kind", "apiVersion", "status", SPEC_STR.lower()]
+) -> dict[str, Any]:
+    keys_to_ignore: list[str] = ["kind", "apiVersion", "status", SPEC_STR.lower()]
     keys_to_rename: set[str] = {"annotations", "labels"}
     if dict_key != SPEC_STR.lower():
         keys_to_ignore.append("metadata")
@@ -512,21 +523,21 @@ def prepare_property_dict(
 
 def parse_explain(
     kind: str,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     _schema_definition = read_resources_mapping_file()
-    _resources: List[Dict[str, Any]] = []
+    _resources: list[dict[str, Any]] = []
 
     _kinds_schema = _schema_definition[kind.lower()]
     for _kind_schema in _kinds_schema:
         namespaced = _kind_schema["namespaced"]
-        resource_dict: Dict[str, Any] = {
+        resource_dict: dict[str, Any] = {
             "base_class": "NamespacedResource" if namespaced else "Resource",
             "description": _kind_schema.get("description", MISSING_DESCRIPTION_STR),
             "fields": [],
             "spec": [],
         }
 
-        schema_properties: Dict[str, Any] = _kind_schema.get("properties", {})
+        schema_properties: dict[str, Any] = _kind_schema.get("properties", {})
         fields_required = _kind_schema.get("required", [])
 
         resource_dict.update(extract_group_kind_version(_kind_schema=_kind_schema))
@@ -585,8 +596,8 @@ def parse_explain(
     return _resources
 
 
-def extract_group_kind_version(_kind_schema: Dict[str, Any]) -> Dict[str, str]:
-    group_kind_versions: List[Dict[str, str]] = _kind_schema["x-kubernetes-group-version-kind"]
+def extract_group_kind_version(_kind_schema: dict[str, Any]) -> dict[str, str]:
+    group_kind_versions: list[dict[str, str]] = _kind_schema["x-kubernetes-group-version-kind"]
     group_kind_version = group_kind_versions[0]
 
     for group_kind_version in group_kind_versions:
@@ -604,7 +615,7 @@ def class_generator(
     output_dir: str = "",
     add_tests: bool = False,
     called_from_cli: bool = True,
-) -> List[str]:
+) -> list[str]:
     """
     Generates a class for a given Kind.
     """
@@ -622,7 +633,7 @@ def class_generator(
     resources = parse_explain(kind=kind)
 
     use_output_file_suffix: bool = len(resources) > 1
-    generated_files: List[str] = []
+    generated_files: list[str] = []
     for resource_dict in resources:
         output_file_suffix = resource_dict["group"].lower() if use_output_file_suffix else ""
 
@@ -652,12 +663,9 @@ def class_generator(
     return generated_files
 
 
-def write_and_format_rendered(filepath: str, data: str, user_code: str = "") -> None:
+def write_and_format_rendered(filepath: str, output: str) -> None:
     with open(filepath, "w") as fd:
-        fd.write(data)
-
-        if user_code:
-            fd.write(user_code)
+        fd.write(output)
 
     for op in ("format", "check"):
         run_command(
@@ -668,8 +676,8 @@ def write_and_format_rendered(filepath: str, data: str, user_code: str = "") -> 
 
 
 def generate_class_generator_tests() -> None:
-    tests_info: Dict[str, List[Dict[str, str]]] = {"template": []}
-    dirs_to_ignore: List[str] = ["__pycache__"]
+    tests_info: dict[str, list[dict[str, str]]] = {"template": []}
+    dirs_to_ignore: list[str] = ["__pycache__"]
 
     for _dir in os.listdir(TESTS_MANIFESTS_DIR):
         if _dir in dirs_to_ignore:
@@ -693,7 +701,7 @@ def generate_class_generator_tests() -> None:
 
     write_and_format_rendered(
         filepath=os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py"),
-        data=rendered,
+        output=rendered,
     )
 
 
@@ -756,15 +764,15 @@ def main(
     if update_schema:
         return update_kind_schema()
 
-    _kwargs: Dict[str, Any] = {
+    _kwargs: dict[str, Any] = {
         "overwrite": overwrite,
         "dry_run": dry_run,
         "output_file": output_file,
         "add_tests": add_tests,
     }
 
-    kinds: List[str] = kind.split(",")
-    futures: List[Future] = []
+    kinds: list[str] = kind.split(",")
+    futures: list[Future] = []
 
     with ThreadPoolExecutor() as executor:
         for _kind in kinds:

@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -13,12 +15,12 @@ class ServiceMeshMember(NamespacedResource):
 
     def __init__(
         self,
-        control_plane_ref: Optional[Dict[str, Any]] = None,
+        control_plane_ref: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            control_plane_ref (Dict[str, Any]): No field description from API; please add description
+            control_plane_ref (dict[str, Any]): No field description from API; please add description
 
         """
         super().__init__(**kwargs)

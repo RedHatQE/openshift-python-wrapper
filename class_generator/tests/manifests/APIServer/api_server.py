@@ -1,6 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -17,27 +19,27 @@ class APIServer(Resource):
 
     def __init__(
         self,
-        additional_cors_allowed_origins: Optional[List[Any]] = None,
-        audit: Optional[Dict[str, Any]] = None,
-        client_ca: Optional[Dict[str, Any]] = None,
-        encryption: Optional[Dict[str, Any]] = None,
-        serving_certs: Optional[Dict[str, Any]] = None,
-        tls_security_profile: Optional[Dict[str, Any]] = None,
+        additional_cors_allowed_origins: list[Any] | None = None,
+        audit: dict[str, Any] | None = None,
+        client_ca: dict[str, Any] | None = None,
+        encryption: dict[str, Any] | None = None,
+        serving_certs: dict[str, Any] | None = None,
+        tls_security_profile: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
         Args:
-            additional_cors_allowed_origins (List[Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
+            additional_cors_allowed_origins (list[Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
               expressions describing hosts for which the API server allows
               access using the CORS headers. This may be needed to access the
               API and the integrated OAuth server from JavaScript applications.
               The values are regular expressions that correspond to the Golang
               regular expression language.
 
-            audit (Dict[str, Any]): audit specifies the settings for audit configuration to be applied to
+            audit (dict[str, Any]): audit specifies the settings for audit configuration to be applied to
               all OpenShift-provided API servers in the cluster.
 
-            client_ca (Dict[str, Any]): clientCA references a ConfigMap containing a certificate bundle for
+            client_ca (dict[str, Any]): clientCA references a ConfigMap containing a certificate bundle for
               the signers that will be recognized for incoming client
               certificates in addition to the operator managed signers. If this
               is empty, then only operator managed signers are valid. You
@@ -46,14 +48,14 @@ class APIServer(Resource):
               openshift-config namespace and contain the following required
               fields: - ConfigMap.Data["ca-bundle.crt"] - CA bundle.
 
-            encryption (Dict[str, Any]): encryption allows the configuration of encryption of resources at the
+            encryption (dict[str, Any]): encryption allows the configuration of encryption of resources at the
               datastore layer.
 
-            serving_certs (Dict[str, Any]): servingCert is the TLS cert info for serving secure traffic. If not
+            serving_certs (dict[str, Any]): servingCert is the TLS cert info for serving secure traffic. If not
               specified, operator managed certificates will be used for serving
               secure traffic.
 
-            tls_security_profile (Dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
+            tls_security_profile (dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
               externally exposed servers.  If unset, a default (which may change
               between releases) is chosen. Note that only Old, Intermediate and
               Custom profiles are currently supported, and the maximum available
