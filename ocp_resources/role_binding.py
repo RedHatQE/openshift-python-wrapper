@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ocp_resources.constants import TIMEOUT_1MINUTE
+from ocp_resources.utils.constants import TIMEOUT_1MINUTE
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 from ocp_resources.virtual_machine import VirtualMachine
