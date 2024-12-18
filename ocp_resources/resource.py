@@ -5,7 +5,8 @@ import contextlib
 
 import copy
 import json
-from logging import warning
+from warnings import warn
+
 import os
 import re
 import sys
@@ -501,9 +502,10 @@ class Resource:
             wait_for_resource (bool): Waits for the resource to be created
         """
         if privileged_client:
-            warning(
+            warn(
                 "privileged_client is deprecated and will be removed in the future. Use client instead.",
                 DeprecationWarning,
+                stacklevel=2,
             )
 
         if yaml_file and kind_dict:
