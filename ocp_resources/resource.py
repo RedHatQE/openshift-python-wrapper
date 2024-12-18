@@ -236,6 +236,7 @@ class KubeAPIVersion(Version):
 
         if len(components) not in (2, 4) or components[0] != "v" or not isinstance(components[1], int):
             raise ValueError(errmsg)
+
         if len(components) == 4 and (components[2] not in ("alpha", "beta") or not isinstance(components[3], int)):
             raise ValueError(errmsg)
 
@@ -506,7 +507,7 @@ class Resource(ResourceConstants):
         return self.node_selector or self.node_selector_labels or {}
 
     @ClassProperty
-    def kind(cls) -> str | None:  # noqa: N805
+    def kind(cls) -> str | None:
         return sub_resource_level(cls, NamespacedResource, Resource)
 
     def _base_body(self) -> None:
