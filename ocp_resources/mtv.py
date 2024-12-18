@@ -65,6 +65,7 @@ class MTV:
         VSPHERE = "vsphere"
         OPENSHIFT = "openshift"
         RHV = "ovirt"
+        OVA = "ova"
 
     def wait_for_resource_status(
         self,
