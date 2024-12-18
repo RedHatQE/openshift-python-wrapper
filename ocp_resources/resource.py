@@ -1122,13 +1122,15 @@ class Resource:
 
         """
         client: DynamicClient = self.privileged_client or self.client
-        response = client.client.request(
+        response = self.retry_cluster_exceptions(
+            func=client.client.request,
             method=method,
             url=f"{url}/{action}",
             headers=client.client.configuration.api_key,
+            timeout=TIMEOUT_30SEC,
+            sleep_time=TIMEOUT_5SEC,
             **params,
         )
-
         try:
             return json.loads(response.data)
         except json.decoder.JSONDecodeError:
