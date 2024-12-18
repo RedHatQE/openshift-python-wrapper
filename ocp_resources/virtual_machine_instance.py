@@ -3,7 +3,7 @@ import shlex
 import xmltodict
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES, RETRY_FLAG
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
@@ -47,8 +47,10 @@ class VirtualMachineInstance(NamespacedResource):
             f"namespaces/{self.namespace}/virtualmachineinstances/{self.name}"
         )
 
-    def api_request(self, method, action, **params):
-        return super().api_request(method=method, action=action, url=self._subresource_api_url, **params)
+    def api_request(self, method, action, retry_params=RETRY_FLAG, **params):
+        return super().api_request(
+            method=method, action=action, url=self._subresource_api_url, retry_params=retry_params, **params
+        )
 
     def pause(self, timeout=TIMEOUT_4MINUTES, wait=False):
         self.api_request(method="PUT", action="pause")

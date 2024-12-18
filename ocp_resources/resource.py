@@ -40,6 +40,7 @@ from ocp_resources.utils.constants import (
     TIMEOUT_10SEC,
     TIMEOUT_30SEC,
     TIMEOUT_5SEC,
+    TIMEOUT_1SEC,
 )
 from ocp_resources.event import Event
 from timeout_sampler import (
@@ -1059,7 +1060,9 @@ class Resource(ResourceConstants):
                     if cond["type"] == condition and cond["status"] == status:
                         return
 
-    def api_request(self, method: str, action: str, url: str, **params: Any) -> dict[str, Any]:
+    def api_request(
+        self, method: str, action: str, url: str, retry_params: Dict[str, int] | None = None, **params: Any
+    ) -> dict[str, Any]:
         """
         Handle API requests to resource.
 
@@ -1067,19 +1070,22 @@ class Resource(ResourceConstants):
             method (str): Request method (GET/PUT etc.).
             action (str): Action to perform (stop/start/guestosinfo etc.).
             url (str): URL of resource.
+            retry_params (dict): dict of timeout and sleep_time values for retrying the api request call
 
         Returns:
            data(dict): response data
 
         """
         client: DynamicClient = self.client
+        timeout = retry_params.get("timeout", TIMEOUT_10SEC) if retry_params else TIMEOUT_10SEC
+        sleep_time = retry_params.get("sleep_time", TIMEOUT_1SEC) if retry_params else TIMEOUT_1SEC
         response = self.retry_cluster_exceptions(
             func=client.client.request,
             method=method,
             url=f"{url}/{action}",
             headers=client.client.configuration.api_key,
-            timeout=TIMEOUT_30SEC,
-            sleep_time=TIMEOUT_5SEC,
+            timeout=timeout,
+            sleep_time=sleep_time,
             **params,
         )
         try:
