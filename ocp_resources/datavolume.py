@@ -88,7 +88,6 @@ class DataVolume(NamespacedResource):
         bind_immediate_annotation=None,
         preallocation=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         api_name="pvc",
@@ -119,7 +118,6 @@ class DataVolume(NamespacedResource):
             should be bound immediately.
             preallocation (bool, default: None): preallocate disk space.
             teardown (bool, default: True): Indicates if this resource would need to be deleted.
-            privileged_client (DynamicClient, default: None): Instance of Dynamic client
             yaml_file (yaml, default: None): yaml file for the resource.
             delete_timeout (int, default: 4 minutes): timeout associated with delete action.
             api_name (str, default: "pvc"): api used for DV, pvc/storage
@@ -130,7 +128,6 @@ class DataVolume(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -230,7 +227,7 @@ class DataVolume(NamespacedResource):
     @property
     def pvc(self):
         return PersistentVolumeClaim(
-            client=self.privileged_client or self.client,
+            client=self.client,
             name=self.name,
             namespace=self.namespace,
         )

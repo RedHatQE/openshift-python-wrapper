@@ -5,6 +5,8 @@ import contextlib
 
 import copy
 import json
+from warnings import warn
+
 import os
 import re
 import sys
@@ -499,13 +501,20 @@ class Resource:
             kind_dict (dict): dict which represents the resource object
             wait_for_resource (bool): Waits for the resource to be created
         """
+        if privileged_client:
+            warn(
+                "privileged_client is deprecated and will be removed in the future. Use client instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         self.name = name
         self.teardown = teardown
         self.timeout = timeout
-        self.privileged_client = privileged_client
+        self.privileged_client = client
         self.yaml_file = yaml_file
         self.kind_dict = kind_dict
         self.delete_timeout = delete_timeout
@@ -513,7 +522,7 @@ class Resource:
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
         self.config_file = config_file
-        if not isinstance(config_file, str):
+        if not isinstance(self.config_file, str):
             # If we pass config_file which isn't a string, get_client will fail and it will be very hard to know why.
             # Better fail here and let the user know.
             raise ValueError("config_file must be a string")
@@ -1121,7 +1130,7 @@ class Resource:
            data(dict): response data
 
         """
-        client: DynamicClient = self.privileged_client or self.client
+        client: DynamicClient = self.client
         response = client.client.request(
             method=method,
             url=f"{url}/{action}",
@@ -1313,7 +1322,6 @@ class NamespacedResource(Resource):
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
-        privileged_client: DynamicClient | None = None,
         ensure_exists: bool = False,
         **kwargs: Any,
     ):
@@ -1322,7 +1330,6 @@ class NamespacedResource(Resource):
             client=client,
             teardown=teardown,
             timeout=timeout,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
