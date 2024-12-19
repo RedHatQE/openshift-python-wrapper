@@ -1,9 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class NetworkMap(NamespacedResource, MTV):
+class NetworkMap(NamespacedResource):
     """
     Migration Toolkit For Virtualization (MTV) NetworkMap object.
 
@@ -56,7 +55,24 @@ class NetworkMap(NamespacedResource, MTV):
         self.source_provider_namespace = source_provider_namespace
         self.destination_provider_name = destination_provider_name
         self.destination_provider_namespace = destination_provider_namespace
-        self.condition_message_ready = self.ConditionMessage.NETWORK_MAP_READY
+
+    @property
+    def map_to_dict(self):
+        return {
+            "spec": {
+                "map": self.mapping,
+                "provider": {
+                    "source": {
+                        "name": self.source_provider_name,
+                        "namespace": self.source_provider_namespace,
+                    },
+                    "destination": {
+                        "name": self.destination_provider_name,
+                        "namespace": self.destination_provider_namespace,
+                    },
+                },
+            }
+        }
 
     def to_dict(self) -> None:
         super().to_dict()
