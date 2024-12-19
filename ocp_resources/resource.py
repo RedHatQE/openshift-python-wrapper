@@ -827,7 +827,7 @@ class Resource:
 
     @property
     def _kube_v1_api(self) -> kubernetes.client.CoreV1Api:
-        return kubernetes.client.CoreV1Api(api_client=self.client)
+        return kubernetes.client.CoreV1Api(api_client=self.client.client)
 
     def wait_for_status(
         self, status: str, timeout: int = TIMEOUT_4MINUTES, stop_status: str | None = None, sleep: int = 1
