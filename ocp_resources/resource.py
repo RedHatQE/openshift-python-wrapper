@@ -564,6 +564,8 @@ class Resource:
     def _set_logger(self) -> logging.Logger:
         log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
         log_file = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "")
+        if log_level == "DEBUG":
+            self.logger.warning(f"{log_level} selected. Unhashed resource data would be printed on log.")
         return get_logger(
             name=f"{__name__.rsplit('.')[0]} {self.kind}",
             level=log_level,
@@ -894,7 +896,7 @@ class Resource:
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
-        self.logger.debug(f"\n{yaml.dump(hashed_res)}")
+        self.logger.debug(f"\n{yaml.dump(self.res)}")
         resource_kwargs = {"body": self.res, "namespace": self.namespace}
         if self.dry_run:
             resource_kwargs["dry_run"] = "All"
@@ -914,7 +916,7 @@ class Resource:
             try:
                 hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
                 self.logger.info(f"Deleting {hashed_data}")
-                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+                self.logger.debug(f"\n{yaml.dump(self.instance.to_dict())}")
                 self.api.delete(name=self.name, namespace=self.namespace, body=body)
 
                 if wait:
@@ -949,7 +951,7 @@ class Resource:
         """
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -963,7 +965,7 @@ class Resource:
         """
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
+        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
