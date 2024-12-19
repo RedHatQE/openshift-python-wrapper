@@ -47,7 +47,6 @@ class VirtualMachine(NamespacedResource):
         client=None,
         body=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -57,7 +56,6 @@ class VirtualMachine(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -142,7 +140,6 @@ class VirtualMachine(NamespacedResource):
             client=self.client,
             name=self.name,
             namespace=self.namespace,
-            privileged_client=self.privileged_client or self.client,
         )
 
     @property

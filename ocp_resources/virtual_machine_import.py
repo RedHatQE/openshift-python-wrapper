@@ -103,7 +103,6 @@ class VirtualMachineImport(NamespacedResource):
         resource_mapping_namespace=None,
         warm=False,
         finalize_date=None,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -113,7 +112,6 @@ class VirtualMachineImport(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -139,7 +137,6 @@ class VirtualMachineImport(NamespacedResource):
             name=self.target_vm_name,
             namespace=self.namespace,
             client=self.client,
-            privileged_client=self.privileged_client or self.client,
         )
 
     def to_dict(self) -> None:
