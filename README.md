@@ -69,8 +69,7 @@ To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:
 ```bash
 export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
 ```
-IMPORTANT: DEBUG log level should be used with caution. DEBUG loglevel prints unhashed raw data for resources on the
-log.
+Important: DEBUG log level should be used with caution. It prints unhashed raw data for resources in the logs, which may expose sensitive information. Use only in secure environments.log.
 
 ## Code check
 We use pre-commit for code check.
