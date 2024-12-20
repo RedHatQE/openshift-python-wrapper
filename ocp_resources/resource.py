@@ -564,14 +564,11 @@ class Resource:
     def _set_logger(self) -> logging.Logger:
         log_level = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL", "INFO")
         log_file = os.environ.get("OPENSHIFT_PYTHON_WRAPPER_LOG_FILE", "")
-        logger = get_logger(
+        return get_logger(
             name=f"{__name__.rsplit('.')[0]} {self.kind}",
             level=log_level,
             filename=log_file,
         )
-        if log_level == "DEBUG":
-            logger.warning(f"{log_level} selected. Unhashed resource data would be printed on log.")
-        return logger
 
     def _prepare_node_selector_spec(self) -> Dict[str, str]:
         return self.node_selector or self.node_selector_labels or {}
