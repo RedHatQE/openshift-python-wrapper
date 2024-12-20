@@ -14,13 +14,14 @@ from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Optional, Any, Dict, List
+import urllib3
+import http
 
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
 from kubernetes.dynamic.exceptions import (
-    ConflictError,
     MethodNotAllowedError,
     NotFoundError,
     ForbiddenError,
@@ -37,9 +38,7 @@ from ocp_resources.constants import (
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_1MINUTE,
     TIMEOUT_4MINUTES,
-    TIMEOUT_10SEC,
     TIMEOUT_30SEC,
-    TIMEOUT_5SEC,
 )
 from ocp_resources.event import Event
 from timeout_sampler import (
@@ -50,6 +49,14 @@ from timeout_sampler import (
 from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError
 from ocp_resources.utils import skip_existing_resource_creation_teardown
 
+DEFAULT_HTTP_STATUS_CODE_TO_RETRY = urllib3.util.Retry.RETRY_AFTER_STATUS_CODES | {
+    http.HTTPStatus.INTERNAL_SERVER_ERROR.value,
+    http.HTTPStatus.GATEWAY_TIMEOUT.value,
+    http.HTTPStatus.FORBIDDEN.value,
+    http.HTTPStatus.CONFLICT.value,
+    http.HTTPStatus.NOT_FOUND.value,
+    104,
+}
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -74,6 +81,29 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
     LOGGER.info(f"kind: {kind} api version: {res.group_version}")
     return res.group_version
+
+
+@contextlib.contextmanager
+def get_retry_cluster_exceptions_client(
+    client: DynamicClient,
+    backoff_factor: float = 0.5,
+    retry_count: int = 5,
+    status_codes=None,
+) -> Any:
+    original_retries = client.configuration.retries
+    if not status_codes:
+        status_codes = set()
+    client.configuration.retries = urllib3.util.Retry(
+        total=retry_count,
+        backoff_factor=backoff_factor,
+        allowed_methods=(urllib3.util.Retry.DEFAULT_ALLOWED_METHODS | {http.HTTPMethod.PATCH, http.HTTPMethod.POST}),
+        status_forcelist=(DEFAULT_HTTP_STATUS_CODE_TO_RETRY | status_codes),
+        raise_on_redirect=False,
+        raise_on_status=False,
+    )
+
+    yield client
+    client.configuration.retries = original_retries
 
 
 def get_client(
@@ -964,33 +994,8 @@ class Resource:
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
-        self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
-
-    @staticmethod
-    def retry_cluster_exceptions(
-        func,
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-        timeout: int = TIMEOUT_10SEC,
-        sleep_time: int = 1,
-        **kwargs: Any,
-    ) -> Any:
-        try:
-            sampler = TimeoutSampler(
-                wait_timeout=timeout,
-                sleep=sleep_time,
-                func=func,
-                print_log=False,
-                exceptions_dict=exceptions_dict,
-                **kwargs,
-            )
-            for sample in sampler:
-                return sample
-
-        except TimeoutExpiredError as exp:
-            if exp.last_exp:
-                raise exp.last_exp
-
-            raise
+        with get_retry_cluster_exceptions_client(client=self.client, retry_count=5, backoff_factor=1) as self.client:
+            self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @classmethod
     def get(
@@ -998,7 +1003,6 @@ class Resource:
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
@@ -1013,15 +1017,13 @@ class Resource:
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
-            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind.
         """
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
-
-        def _get() -> Generator["Resource|ResourceInstance", None, None]:
+        with get_retry_cluster_exceptions_client(client=dyn_client) as dyn_client:
             _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
@@ -1036,8 +1038,6 @@ class Resource:
                 else:
                     yield cls(client=dyn_client, name=_resources.metadata.name)
 
-        return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
-
     @property
     def instance(self) -> ResourceInstance:
         """
@@ -1046,11 +1046,11 @@ class Resource:
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
+        _instance_out = None
 
-        def _instance() -> Optional[ResourceInstance]:
-            return self.api.get(name=self.name)
-
-        return self.retry_cluster_exceptions(func=_instance)
+        with get_retry_cluster_exceptions_client(client=self.client) as self.client:
+            _instance_out = self.api.get(name=self.name)
+        return _instance_out
 
     @property
     def labels(self) -> ResourceField:
@@ -1131,17 +1131,18 @@ class Resource:
 
         """
         client: DynamicClient = self.client
-        response = client.client.request(
-            method=method,
-            url=f"{url}/{action}",
-            headers=client.client.configuration.api_key,
-            **params,
-        )
+        with get_retry_cluster_exceptions_client(client=client, backoff_factor=1, retry_count=5) as updated_client:
+            response = updated_client.client.request(
+                method=method,
+                url=f"{url}/{action}",
+                headers=updated_client.client.configuration.api_key,
+                **params,
+            )
 
-        try:
-            return json.loads(response.data)
-        except json.decoder.JSONDecodeError:
-            return response.data
+            try:
+                return json.loads(response.data)
+            except json.decoder.JSONDecodeError:
+                return response.data
 
     def wait_for_conditions(self) -> None:
         timeout_watcher = TimeoutWatch(timeout=30)
@@ -1347,7 +1348,6 @@ class NamespacedResource(Resource):
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
@@ -1362,7 +1362,6 @@ class NamespacedResource(Resource):
             context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
-            exceptions_dict (dict): Exceptions dict for TimeoutSampler
 
         Returns:
             generator: Generator of Resources of cls.kind
@@ -1370,7 +1369,7 @@ class NamespacedResource(Resource):
         if not dyn_client:
             dyn_client = get_client(config_file=config_file, context=context)
 
-        def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
+        with get_retry_cluster_exceptions_client(client=dyn_client) as dyn_client:
             _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
@@ -1392,8 +1391,6 @@ class NamespacedResource(Resource):
                         namespace=_resources.metadata.namespace,
                     )
 
-        return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
-
     @property
     def instance(self) -> ResourceInstance:
         """
@@ -1402,11 +1399,11 @@ class NamespacedResource(Resource):
         Returns:
             openshift.dynamic.client.ResourceInstance
         """
+        _instance_out = None
 
-        def _instance() -> ResourceInstance:
-            return self.api.get(name=self.name, namespace=self.namespace)
-
-        return self.retry_cluster_exceptions(func=_instance)
+        with get_retry_cluster_exceptions_client(client=self.client) as self.client:
+            _instance_out = self.api.get(name=self.name, namespace=self.namespace)
+        return _instance_out
 
     def _base_body(self) -> None:
         if self.yaml_file or self.kind_dict:
@@ -1511,12 +1508,11 @@ class ResourceEditor:
             resource_to_patch = self._patches
 
         patches_to_apply = {resource: self._patches[resource] for resource in resource_to_patch}
-
         # apply changes
-        self._apply_patches_sampler(patches=patches_to_apply, action_text="Updating", action=self.action)
+        self._apply_patches(patches=patches_to_apply, action_text="Updating", action=self.action)
 
     def restore(self) -> None:
-        self._apply_patches_sampler(patches=self._backups, action_text="Restoring", action=self.action)
+        self._apply_patches(patches=self._backups, action_text="Restoring", action=self.action)
 
     def __enter__(self) -> "ResourceEditor":
         self.update(backup_resources=True)
@@ -1624,16 +1620,3 @@ class ResourceEditor:
                 patch["apiVersion"] = resource.api_version
 
                 resource.update_replace(resource_dict=patch)  # replace the resource metadata
-
-    def _apply_patches_sampler(self, patches: Dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
-        exceptions_dict: Dict[type[Exception], List[str]] = {ConflictError: []}
-        exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
-        return Resource.retry_cluster_exceptions(
-            func=self._apply_patches,
-            exceptions_dict=exceptions_dict,
-            patches=patches,
-            action_text=action_text,
-            action=action,
-            timeout=TIMEOUT_30SEC,
-            sleep_time=TIMEOUT_5SEC,
-        )
