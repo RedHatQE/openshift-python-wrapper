@@ -912,8 +912,7 @@ class Resource:
 
         if self.exists:
             try:
-                instance_dict = self.instance.to_dict()
-                hashed_data = self.hash_resource_dict(resource_dict=instance_dict)
+                hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
                 self.logger.info(f"Deleting {hashed_data}")
                 self.logger.debug(f"\n{yaml.dump(hashed_data)}")
                 self.api.delete(name=self.name, namespace=self.namespace, body=body)
