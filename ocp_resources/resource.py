@@ -894,7 +894,7 @@ class Resource:
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
-        self.logger.debug(f"\n{yaml.dump(self.res)}")
+        self.logger.debug(f"\n{yaml.dump(hashed_res)}")
         resource_kwargs = {"body": self.res, "namespace": self.namespace}
         if self.dry_run:
             resource_kwargs["dry_run"] = "All"
@@ -915,7 +915,7 @@ class Resource:
                 instance_dict = self.instance.to_dict()
                 hashed_data = self.hash_resource_dict(resource_dict=instance_dict)
                 self.logger.info(f"Deleting {hashed_data}")
-                self.logger.debug(f"\n{yaml.dump(instance_dict)}")
+                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
                 self.api.delete(name=self.name, namespace=self.namespace, body=body)
 
                 if wait:
@@ -950,7 +950,7 @@ class Resource:
         """
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -964,7 +964,7 @@ class Resource:
         """
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
-        self.logger.debug(f"\n{yaml.dump(resource_dict)}")
+        self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
@@ -1275,10 +1275,14 @@ class Resource:
         if not isinstance(resource_dict, dict):
             raise ValueError("Expected a dictionary as the first argument")
 
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA", "true") == "false":
+            return resource_dict
+
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
             for key_name in self.keys_to_hash:
                 resource_dict = replace_key_with_hashed_value(resource_dict=resource_dict, key_name=key_name)
+
         return resource_dict
 
     def get_condition_message(self, condition_type: str, condition_status: str = "") -> str:

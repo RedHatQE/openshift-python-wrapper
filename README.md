@@ -1,4 +1,5 @@
 # openshift-python-wrapper (`wrapper`)
+
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
 A python wrapper for [kubernetes-python-client](https://github.com/kubernetes-client/python) with support for [RedHat Container Virtualization](https://www.openshift.com/learn/topics/virtualization)  
 Docs: [openshift-python-wrapper docs](https://openshift-python-wrapper.readthedocs.io/en/latest/)
@@ -14,7 +15,7 @@ The wrapper handles it all and provides simple and intuitive functionality.
 
 ![Alt Text](examples/pod_example.gif)
 
-Both developers or testers can use the wrapper.  The code is modular and easy to maintain.  
+Both developers or testers can use the wrapper. The code is modular and easy to maintain.  
 Instead of writing custom code for every API, you can use the wrapper that provides a consistent interface for interacting with APIs.  
 It saves time, avoids code duplications, and reduces the chance of errors.
 
@@ -25,31 +26,43 @@ Resources can even be saved for debugging.
 Resource manifests and logs can be easily collected.
 
 ## Installation
+
 From source:
+
 ```bash
 git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
 python setup.py install --user
 ```
+
 From pypi:
+
 ```bash
 pip install openshift-python-wrapper --user
 ```
 
 ## Release new version
-### requirements:
-* Export GitHub token
+
+### requirements
+
+- Export GitHub token
+
 ```bash
 export GITHUB_TOKEN=<your_github_token>
 ```
-* [release-it](https://github.com/release-it/release-it)
+
+- [release-it](https://github.com/release-it/release-it)
+
 ```bash
 sudo npm install --global release-it
 npm install --save-dev @release-it/bumper
 ```
-### usage:
-* Create a release, run from the relevant branch.  
-To create a 4.11 release, run:
+
+### usage
+
+- Create a release, run from the relevant branch.  
+  To create a 4.11 release, run:
+
 ```bash
 git checkout v4.11
 git pull
@@ -57,22 +70,33 @@ release-it # Follow the instructions
 ```
 
 ## docs
+
 Hosted on readthedocs.io [openshift-python-wrapper](https://openshift-python-wrapper.readthedocs.io/en/latest/)
 
 ## PR dependency
+
 For PR dependency we use [dpulls](https://www.dpulls.com/)  
 To make PR depends on other PR add `depends on #<PR NUMBER>` in the PR description.
 
 ## Logging configuration
-To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:  
+
+To change log level export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL:
 
 ```bash
 export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
 ```
-Important: DEBUG log level should be used with caution. It prints unhashed raw data for resources in the logs, which may expose sensitive information. Use only in secure environments.
+
+- By default some sensitive information is hashed in the logs, and if running with DEBUG the log output can be corrupted.  
+  In secure environments user can set `OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA="false"` environment variable to disable the log hashing.
+
+  ```bash
+  export OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA="false"
+  ```
 
 ## Code check
+
 We use pre-commit for code check.
+
 ```bash
 pre-commit install
 ```
@@ -80,4 +104,5 @@ pre-commit install
 Some code examples locate at [examples](examples) directory
 
 ## Contribute to the project
+
 To contribute new additions or changes to the project, please refer to the [contribution guide](CONTRIBUTING.md) first.
