@@ -26,7 +26,6 @@ class VirtualMachineInstance(NamespacedResource):
         name=None,
         namespace=None,
         client=None,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -35,7 +34,6 @@ class VirtualMachineInstance(NamespacedResource):
             name=name,
             namespace=namespace,
             client=client,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -70,7 +68,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_launcher_pod(self):
         pods = list(
             Pod.get(
-                dyn_client=self.privileged_client or self.client,
+                dyn_client=self.client,
                 namespace=self.namespace,
                 label_selector=f"kubevirt.io=virt-launcher,kubevirt.io/created-by={self.instance.metadata.uid}",
             )
@@ -92,7 +90,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_handler_pod(self):
         pods = list(
             Pod.get(
-                dyn_client=self.privileged_client or self.client,
+                dyn_client=self.client,
                 label_selector="kubevirt.io=virt-handler",
             )
         )
@@ -189,7 +187,7 @@ class VirtualMachineInstance(NamespacedResource):
             Node: Node
         """
         return Node(
-            client=self.privileged_client or self.client,
+            client=self.client,
             name=self.instance.status.nodeName,
         )
 

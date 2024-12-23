@@ -546,7 +546,7 @@ class Pod(NamespacedResource):
         node_name = self.instance.spec.nodeName
         assert node_name, f"Node not found for pod {self.name}"
         return Node(
-            client=self.privileged_client or self.client,
+            client=self.client,
             name=node_name,
         )
 

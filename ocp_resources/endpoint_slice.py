@@ -19,7 +19,6 @@ class EndpointSlice(NamespacedResource):
         endpoints=None,
         ports=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -33,7 +32,6 @@ class EndpointSlice(NamespacedResource):
             endpoints (list): List of unique endpoints in this slice
             ports (list, optional): List of port numbers available on the related ip addresses
             teardown (bool): Indicates if the resource should be torn down at the end
-            privileged_client (DynamicClient): Privileged client for api calls
             yaml_file (str): yaml file for the resource.
             delete_timeout (int): timeout associated with delete action
         """
@@ -42,7 +40,6 @@ class EndpointSlice(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
