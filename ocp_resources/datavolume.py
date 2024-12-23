@@ -8,6 +8,7 @@ from ocp_resources.constants import (
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
+from warnings import warn
 
 
 class DataVolume(NamespacedResource):
@@ -311,6 +312,7 @@ class DataVolume(NamespacedResource):
                 if sample and sample.get("status", {}).get("phase") == self.Status.SUCCEEDED:
                     break
                 elif sample is None and dv_garbage_collection_enabled:
+                    warn("garbage collector is going to be deprecated", DeprecationWarning)
                     break
                 elif stop_status_func and stop_status_func(*stop_status_func_args, **stop_status_func_kwargs):
                     raise TimeoutExpiredError(
@@ -343,4 +345,5 @@ class DataVolume(NamespacedResource):
         if self.exists:
             return super().delete(wait=wait, timeout=timeout, body=body)
         else:
+            warn("garbage collector is going to be deprecated", DeprecationWarning)
             return self.pvc.delete(wait=wait, timeout=timeout, body=body)
