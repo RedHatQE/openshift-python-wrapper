@@ -13,7 +13,7 @@ import sys
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Optional, Any, Dict, List
+from typing import Any
 
 import kubernetes
 from kubernetes.dynamic import DynamicClient, ResourceInstance
@@ -31,7 +31,7 @@ from packaging.version import Version
 from simple_logger.logger import get_logger, logging
 from urllib3.exceptions import MaxRetryError
 
-from ocp_resources.constants import (
+from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
@@ -48,14 +48,15 @@ from timeout_sampler import (
     TimeoutWatch,
 )
 from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError
-from ocp_resources.utils import skip_existing_resource_creation_teardown
+from ocp_resources.utils.resource_constants import ResourceConstants
+from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> Optional[ResourceField]:
+def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> ResourceField | None:
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
     for result in sorted_results:
@@ -77,7 +78,7 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str = "", config_dict: Dict[str, Any] | None = None, context: str = "", **kwargs: Any
+    config_file: str = "", config_dict: dict[str, Any] | None = None, context: str = "", **kwargs: Any
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -127,7 +128,7 @@ def get_client(
         )
 
 
-def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> Optional[str]:
+def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> str | None:
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
     for class_iterator in reversed([
@@ -140,7 +141,7 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
     return None
 
 
-def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) -> Dict[Any, Any]:
+def replace_key_with_hashed_value(resource_dict: dict[Any, Any], key_name: str) -> dict[Any, Any]:
     """
     Recursively search a nested dictionary for a given key and changes its value to "******" if found.
 
@@ -162,7 +163,7 @@ def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) 
                 }
             }
         }
-    2. List path:
+    2. list path:
         A key to be hashed can be found in a dictionary that is in list somewhere in a dictionary, e.g. "a>b[]>c",
         would hash the value associated with key "c", where dictionary format is:
         input = {
@@ -187,7 +188,7 @@ def replace_key_with_hashed_value(resource_dict: Dict[Any, Any], key_name: str) 
         key_name: The key path to find.
 
     Returns:
-        Dict[Any, Any]: A copy of the input dictionary with the specified key's value replaced with "*******".
+        dict[Any, Any]: A copy of the input dictionary with the specified key's value replaced with "*******".
 
     """
     result = copy.deepcopy(resource_dict)
@@ -224,7 +225,7 @@ class KubeAPIVersion(Version):
 
     def __init__(self, vstring: str):
         self.vstring = vstring
-        self.version: List[str | Any] = []
+        self.version: list[str | Any] = []
         super().__init__(version=vstring)
 
     def parse(self, vstring: str):
@@ -237,6 +238,7 @@ class KubeAPIVersion(Version):
 
         if len(components) not in (2, 4) or components[0] != "v" or not isinstance(components[1], int):
             raise ValueError(errmsg)
+
         if len(components) == 4 and (components[2] not in ("alpha", "beta") or not isinstance(components[3], int)):
             raise ValueError(errmsg)
 
@@ -275,7 +277,7 @@ class ClassProperty:
         return self.func(owner)
 
 
-class Resource:
+class Resource(ResourceConstants):
     """
     Base class for API resources
     """
@@ -284,66 +286,6 @@ class Resource:
     api_version: str = ""
     singular_name: str = ""
     timeout_seconds: int = TIMEOUT_1MINUTE
-
-    class Status:
-        SUCCEEDED: str = "Succeeded"
-        FAILED: str = "Failed"
-        DELETING: str = "Deleting"
-        DEPLOYED: str = "Deployed"
-        PENDING: str = "Pending"
-        COMPLETED: str = "Completed"
-        RUNNING: str = "Running"
-        READY: str = "Ready"
-        TERMINATING: str = "Terminating"
-        ERROR: str = "Error"
-        COMPLETE: str = "Complete"
-        DEPLOYING: str = "Deploying"
-        SCHEDULING_DISABLED = "Ready,SchedulingDisabled"
-        CRASH_LOOPBACK_OFF = "CrashLoopBackOff"
-        IMAGE_PULL_BACK_OFF = "ImagePullBackOff"
-        ERR_IMAGE_PULL = "ErrImagePull"
-        ACTIVE = "Active"
-
-    class Condition:
-        UPGRADEABLE: str = "Upgradeable"
-        AVAILABLE: str = "Available"
-        DEGRADED: str = "Degraded"
-        PROGRESSING: str = "Progressing"
-        CREATED: str = "Created"
-        RECONCILE_COMPLETE: str = "ReconcileComplete"
-        READY: str = "Ready"
-        FAILING: str = "Failing"
-
-        class Status:
-            TRUE: str = "True"
-            FALSE: str = "False"
-            UNKNOWN: str = "Unknown"
-
-        class Phase:
-            INSTALL_READY: str = "InstallReady"
-            SUCCEEDED: str = "Succeeded"
-
-        class Reason:
-            ALL_REQUIREMENTS_MET: str = "AllRequirementsMet"
-            INSTALL_SUCCEEDED: str = "InstallSucceeded"
-            NETWORK_ATTACHMENT_DEFINITION_READY: str = "NetworkAttachmentDefinitionReady"
-            SYNC_ERROR: str = "SyncError"
-
-        class Type:
-            NETWORK_READY: str = "NetworkReady"
-            SUCCESSFUL: str = "Successful"
-            RUNNING: str = "Running"
-
-    class Type:
-        CLUSTER_IP = "ClusterIP"
-        NODE_PORT = "NodePort"
-        LOAD_BALANCER = "LoadBalancer"
-
-    class Interface:
-        class State:
-            UP: str = "up"
-            DOWN: str = "down"
-            ABSENT: str = "absent"
 
     class ApiGroup:
         AAQ_KUBEVIRT_IO: str = "aaq.kubevirt.io"
@@ -459,18 +401,18 @@ class Resource:
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         dry_run: bool = False,
-        node_selector: Dict[str, Any] | None = None,
-        node_selector_labels: Dict[str, str] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        node_selector_labels: dict[str, str] | None = None,
         config_file: str = "",
-        config_dict: Dict[str, Any] | None = None,
+        config_dict: dict[str, Any] | None = None,
         context: str = "",
-        label: Dict[str, str] | None = None,
-        annotations: Dict[str, str] | None = None,
+        label: dict[str, str] | None = None,
+        annotations: dict[str, str] | None = None,
         timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
         hash_log_data: bool = True,
         ensure_exists: bool = False,
-        kind_dict: Dict[Any, Any] | None = None,
+        kind_dict: dict[Any, Any] | None = None,
         wait_for_resource: bool = False,
     ):
         """
@@ -493,7 +435,7 @@ class Resource:
             context (str): Context name for connecting to remote cluster.
             timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
-            annotations (Dict[str, str] | None): Resource annotations
+            annotations (dict[str, str] | None): Resource annotations
             api_group (str): Resource API group; will overwrite API group definition in resource class
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
@@ -544,7 +486,7 @@ class Resource:
 
         self.namespace: str = ""
         self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res: Dict[Any, Any] = self.kind_dict or {}
+        self.res: dict[Any, Any] = self.kind_dict or {}
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
@@ -570,11 +512,11 @@ class Resource:
             filename=log_file,
         )
 
-    def _prepare_node_selector_spec(self) -> Dict[str, str]:
+    def _prepare_node_selector_spec(self) -> dict[str, str]:
         return self.node_selector or self.node_selector_labels or {}
 
     @ClassProperty
-    def kind(cls) -> Optional[str]:  # noqa: N805
+    def kind(cls) -> str | None:
         return sub_resource_level(cls, NamespacedResource, Resource)
 
     def _base_body(self) -> None:
@@ -674,7 +616,7 @@ class Resource:
         self.create(wait=wait)
         return self
 
-    def clean_up(self, wait: bool = True, timeout: Optional[int] = None) -> bool:
+    def clean_up(self, wait: bool = True, timeout: int | None = None) -> bool:
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
@@ -728,7 +670,7 @@ class Resource:
             **get_kwargs,
         ).get(*args, **kwargs, timeout_seconds=cls.timeout_seconds)
 
-    def _prepare_singular_name_kwargs(self, **kwargs: Any) -> Dict[str, Any]:
+    def _prepare_singular_name_kwargs(self, **kwargs: Any) -> dict[str, Any]:
         kwargs = kwargs if kwargs else {}
         if self.singular_name:
             kwargs["singular_name"] = self.singular_name
@@ -816,7 +758,7 @@ class Resource:
         return False
 
     @property
-    def exists(self) -> Optional[ResourceInstance]:
+    def exists(self) -> ResourceInstance | None:
         """
         Whether self exists on the server
         """
@@ -879,7 +821,7 @@ class Resource:
                 self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
-    def create(self, wait: bool = False) -> Optional[ResourceInstance]:
+    def create(self, wait: bool = False) -> ResourceInstance | None:
         """
         Create resource.
 
@@ -907,7 +849,7 @@ class Resource:
             self.wait()
         return resource_
 
-    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: Dict[str, Any] | None = None) -> bool:
+    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: dict[str, Any] | None = None) -> bool:
         self.logger.info(f"Delete {self.kind} {self.name}")
 
         if self.exists:
@@ -946,7 +888,7 @@ class Resource:
         self.logger.info(f"Get {self.kind} {self.name} status")
         return self.instance.status.phase
 
-    def update(self, resource_dict: Dict[str, Any]) -> None:
+    def update(self, resource_dict: dict[str, Any]) -> None:
         """
         Update resource with resource dict
 
@@ -962,7 +904,7 @@ class Resource:
             content_type="application/merge-patch+json",
         )
 
-    def update_replace(self, resource_dict: Dict[str, Any]) -> None:
+    def update_replace(self, resource_dict: dict[str, Any]) -> None:
         """
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
@@ -975,7 +917,7 @@ class Resource:
     @staticmethod
     def retry_cluster_exceptions(
         func,
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         timeout: int = TIMEOUT_10SEC,
         sleep_time: int = 1,
         **kwargs: Any,
@@ -1004,7 +946,7 @@ class Resource:
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
@@ -1053,7 +995,7 @@ class Resource:
             openshift.dynamic.client.ResourceInstance
         """
 
-        def _instance() -> Optional[ResourceInstance]:
+        def _instance() -> ResourceInstance | None:
             return self.api.get(name=self.name)
 
         return self.retry_cluster_exceptions(func=_instance)
@@ -1068,7 +1010,7 @@ class Resource:
         """
         return self.instance.get("metadata", {})["labels"]
 
-    def watcher(self, timeout: int, resource_version: str = "") -> Generator[Dict[str, Any], None, None]:
+    def watcher(self, timeout: int, resource_version: str = "") -> Generator[dict[str, Any], None, None]:
         """
         Get resource for a given timeout.
 
@@ -1123,7 +1065,7 @@ class Resource:
                     if cond["type"] == condition and cond["status"] == status:
                         return
 
-    def api_request(self, method: str, action: str, url: str, **params: Any) -> Dict[str, Any]:
+    def api_request(self, method: str, action: str, url: str, **params: Any) -> dict[str, Any]:
         """
         Handle API requests to resource.
 
@@ -1217,7 +1159,7 @@ class Resource:
         client: DynamicClient | None = None,
         config_file: str = "",
         context: str = "",
-        config_dict: Dict[str, Any] | None = None,
+        config_dict: dict[str, Any] | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> Generator[ResourceField, None, None]:
@@ -1264,7 +1206,7 @@ class Resource:
         return resource_yaml
 
     @property
-    def keys_to_hash(self) -> List[str]:
+    def keys_to_hash(self) -> list[str]:
         """
         Resource attributes list to hash in the logs.
 
@@ -1276,7 +1218,7 @@ class Resource:
         """
         return []
 
-    def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+    def hash_resource_dict(self, resource_dict: dict[Any, Any]) -> dict[Any, Any]:
         if not isinstance(resource_dict, dict):
             raise ValueError("Expected a dictionary as the first argument")
 
@@ -1357,7 +1299,7 @@ class NamespacedResource(Resource):
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
@@ -1435,7 +1377,7 @@ class NamespacedResource(Resource):
 
 class ResourceEditor:
     def __init__(
-        self, patches: Dict[Any, Any], action: str = "update", user_backups: Dict[Any, Any] | None = None
+        self, patches: dict[Any, Any], action: str = "update", user_backups: dict[Any, Any] | None = None
     ) -> None:
         """
         Args:
@@ -1463,16 +1405,16 @@ class ResourceEditor:
         self._patches = self._dictify_resourcefield(res=patches)
         self.action = action
         self.user_backups = user_backups
-        self._backups: Dict[Any, Any] = {}
+        self._backups: dict[Any, Any] = {}
 
     @property
-    def backups(self) -> Dict[Any, Any]:
+    def backups(self) -> dict[Any, Any]:
         """Returns a dict {<Resource object>: <backup_as_dict>}
         The backup dict kept for each resource edited"""
         return self._backups
 
     @property
-    def patches(self) -> Dict[Any, Any]:
+    def patches(self) -> dict[Any, Any]:
         """Returns the patches dict provided in the constructor"""
         return self._patches
 
@@ -1556,7 +1498,7 @@ class ResourceEditor:
         return res
 
     @staticmethod
-    def _create_backup(original: Dict[Any, Any], patch: Dict[Any, Any]) -> Dict[Any, Any]:
+    def _create_backup(original: dict[Any, Any], patch: dict[Any, Any]) -> dict[Any, Any]:
         """
         Args:
             original (dict*): source of values to back up if necessary
@@ -1575,7 +1517,7 @@ class ResourceEditor:
 
         # when both are dicts, get the diff (recursively if need be)
         if isinstance(original, dict) and isinstance(patch, dict):
-            diff_dict: Dict[Any, Any] = {}
+            diff_dict: dict[Any, Any] = {}
             for key, value in patch.items():
                 if key not in original:
                     diff_dict[key] = None
@@ -1597,7 +1539,7 @@ class ResourceEditor:
             return None
 
     @staticmethod
-    def _apply_patches(patches: Dict[Any, Any], action_text: str, action: str) -> None:
+    def _apply_patches(patches: dict[Any, Any], action_text: str, action: str) -> None:
         """
         Updates provided Resource objects with provided yaml patches
 
@@ -1635,8 +1577,8 @@ class ResourceEditor:
 
                 resource.update_replace(resource_dict=patch)  # replace the resource metadata
 
-    def _apply_patches_sampler(self, patches: Dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
-        exceptions_dict: Dict[type[Exception], List[str]] = {ConflictError: []}
+    def _apply_patches_sampler(self, patches: dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
+        exceptions_dict: dict[type[Exception], list[str]] = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
         return Resource.retry_cluster_exceptions(
             func=self._apply_patches,

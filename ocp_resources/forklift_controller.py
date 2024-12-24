@@ -1,8 +1,7 @@
-from ocp_resources.mtv import MTV
 from ocp_resources.resource import NamespacedResource
 
 
-class ForkliftController(NamespacedResource, MTV):
+class ForkliftController(NamespacedResource):
     """
     Migration Toolkit For Virtualization (MTV) ForkliftController Resource
     """

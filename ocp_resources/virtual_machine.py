@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ocp_resources.constants import (
+from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,

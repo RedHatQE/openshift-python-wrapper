@@ -1,7 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, List, Optional
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 from timeout_sampler import TimeoutSampler
 
