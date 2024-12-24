@@ -854,9 +854,15 @@ class Resource(ResourceConstants):
 
         if self.exists:
             try:
-                hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
-                self.logger.info(f"Deleting {hashed_data}")
-                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+                _instance_dict = self.instance.to_dict()
+                if isinstance(_instance_dict, dict):
+                    hashed_data = self.hash_resource_dict(resource_dict=_instance_dict)
+                    self.logger.info(f"Deleting {hashed_data}")
+                    self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+
+                else:
+                    self.logger.warning(f"{self.kind}: {self.name} instance.to_dict() return was not a dict")
+
                 self.api.delete(name=self.name, namespace=self.namespace, body=body)
 
                 if wait:
@@ -1216,10 +1222,14 @@ class Resource(ResourceConstants):
         if not isinstance(resource_dict, dict):
             raise ValueError("Expected a dictionary as the first argument")
 
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA", "true") == "false":
+            return resource_dict
+
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
             for key_name in self.keys_to_hash:
                 resource_dict = replace_key_with_hashed_value(resource_dict=resource_dict, key_name=key_name)
+
         return resource_dict
 
     def get_condition_message(self, condition_type: str, condition_status: str = "") -> str:
