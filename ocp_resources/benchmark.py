@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT, TIMEOUT_30SEC
+from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT, TIMEOUT_30SEC
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
 
