@@ -1,9 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class Hook(NamespacedResource, MTV):
+class Hook(NamespacedResource):
     """
     Migration Tool for Virtualization (MTV) Plan's Hook Resource.
     """
