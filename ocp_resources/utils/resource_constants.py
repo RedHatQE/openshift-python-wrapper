@@ -47,6 +47,7 @@ class ResourceConstants:
             NETWORK_READY: str = "NetworkReady"
             SUCCESSFUL: str = "Successful"
             RUNNING: str = "Running"
+            AGENT_CONNECTED: str = "AgentConnected"
 
     class Type:
         CLUSTER_IP = "ClusterIP"
