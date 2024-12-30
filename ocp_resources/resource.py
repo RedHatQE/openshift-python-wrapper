@@ -396,7 +396,6 @@ class Resource(ResourceConstants):
         name: str = "",
         client: DynamicClient | None = None,
         teardown: bool = True,
-        timeout: int = TIMEOUT_4MINUTES,
         privileged_client: DynamicClient | None = None,
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
@@ -408,7 +407,6 @@ class Resource(ResourceConstants):
         context: str = "",
         label: dict[str, str] | None = None,
         annotations: dict[str, str] | None = None,
-        timeout_seconds: int = TIMEOUT_1MINUTE,
         api_group: str = "",
         hash_log_data: bool = True,
         ensure_exists: bool = False,
@@ -424,7 +422,6 @@ class Resource(ResourceConstants):
             name (str): Resource name
             client (DynamicClient): Dynamic client for connecting to a remote cluster
             teardown (bool): Indicates if this resource would need to be deleted
-            timeout (int): timeout for a get api call
             privileged_client (DynamicClient): Instance of Dynamic client
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
@@ -433,7 +430,6 @@ class Resource(ResourceConstants):
             node_selector_labels (str): node selector labels
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
-            timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
             annotations (dict[str, str] | None): Resource annotations
             api_group (str): Resource API group; will overwrite API group definition in resource class
@@ -455,7 +451,6 @@ class Resource(ResourceConstants):
 
         self.name = name
         self.teardown = teardown
-        self.timeout = timeout
         self.privileged_client = client
         self.yaml_file = yaml_file
         self.kind_dict = kind_dict
@@ -473,7 +468,6 @@ class Resource(ResourceConstants):
         self.context = context
         self.label = label
         self.annotations = annotations
-        self.timeout_seconds = timeout_seconds
         self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
@@ -1270,7 +1264,6 @@ class NamespacedResource(Resource):
         name: str = "",
         namespace: str = "",
         teardown: bool = True,
-        timeout: int = TIMEOUT_4MINUTES,
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
@@ -1281,7 +1274,6 @@ class NamespacedResource(Resource):
             name=name,
             client=client,
             teardown=teardown,
-            timeout=timeout,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
