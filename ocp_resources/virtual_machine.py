@@ -1,15 +1,19 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+from typing import Any
 
 
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,
-    RETRY_FLAG,
+    TIMEOUT_30SEC,
+    TIMEOUT_5SEC,
 )
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
+
+VM_API_REQUEST_RETRY_PARAMS = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
 
 
 class VirtualMachine(NamespacedResource):
@@ -71,9 +75,15 @@ class VirtualMachine(NamespacedResource):
             f"namespaces/{self.namespace}/virtualmachines/{self.name}"
         )
 
-    def api_request(self, method, action, retry_params=RETRY_FLAG, **params):
+    def api_request(
+        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
+    ) -> dict[str, Any]:
         return super().api_request(
-            method=method, action=action, url=self._subresource_api_url, retry_params=retry_params, **params
+            method=method,
+            action=action,
+            url=url or self._subresource_api_url,
+            retry_params=retry_params or VM_API_REQUEST_RETRY_PARAMS,
+            **params,
         )
 
     def to_dict(self) -> None:

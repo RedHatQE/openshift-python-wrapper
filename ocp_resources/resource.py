@@ -1061,7 +1061,7 @@ class Resource(ResourceConstants):
                         return
 
     def api_request(
-        self, method: str, action: str, url: str, retry_params: Dict[str, int] | None = None, **params: Any
+        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
     ) -> dict[str, Any]:
         """
         Handle API requests to resource.
@@ -1077,17 +1077,23 @@ class Resource(ResourceConstants):
 
         """
         client: DynamicClient = self.client
-        timeout = retry_params.get("timeout", TIMEOUT_10SEC) if retry_params else TIMEOUT_10SEC
-        sleep_time = retry_params.get("sleep_time", TIMEOUT_1SEC) if retry_params else TIMEOUT_1SEC
-        response = self.retry_cluster_exceptions(
-            func=client.client.request,
-            method=method,
-            url=f"{url}/{action}",
-            headers=client.client.configuration.api_key,
-            timeout=timeout,
-            sleep_time=sleep_time,
-            **params,
-        )
+        if retry_params:
+            response = self.retry_cluster_exceptions(
+                func=client.client.request,
+                method=method,
+                url=f"{url}/{action}",
+                headers=client.client.configuration.api_key,
+                timeout=retry_params.get("timeout", TIMEOUT_10SEC),
+                sleep_time=retry_params.get("sleep_time", TIMEOUT_1SEC),
+                **params,
+            )
+        else:
+            response = client.client.request(
+                method=method,
+                url=f"{url}/{action}",
+                headers=client.client.configuration.api_key,
+                **params,
+            )
         try:
             return json.loads(response.data)
         except json.decoder.JSONDecodeError:
