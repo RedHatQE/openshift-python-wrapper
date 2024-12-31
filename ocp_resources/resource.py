@@ -1077,21 +1077,22 @@ class Resource(ResourceConstants):
 
         """
         client: DynamicClient = self.client
+        api_request_params = {
+            "url": f"{url}/{action}",
+            "method": method,
+            "headers": client.client.configuration.api_key,
+        }
         if retry_params:
             response = self.retry_cluster_exceptions(
                 func=client.client.request,
-                method=method,
-                url=f"{url}/{action}",
-                headers=client.client.configuration.api_key,
                 timeout=retry_params.get("timeout", TIMEOUT_10SEC),
                 sleep_time=retry_params.get("sleep_time", TIMEOUT_1SEC),
+                **api_request_params,
                 **params,
             )
         else:
             response = client.client.request(
-                method=method,
-                url=f"{url}/{action}",
-                headers=client.client.configuration.api_key,
+                **api_request_params,
                 **params,
             )
         try:
