@@ -52,7 +52,7 @@ class VirtualMachineInstance(NamespacedResource):
         )
 
     def api_request(
-        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
+        self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
     ) -> dict[str, Any]:
         return super().api_request(
             method=method,
