@@ -40,6 +40,7 @@ from ocp_resources.utils.constants import (
     TIMEOUT_10SEC,
     TIMEOUT_30SEC,
     TIMEOUT_5SEC,
+    TIMEOUT_1SEC,
 )
 from ocp_resources.event import Event
 from timeout_sampler import (
@@ -1059,7 +1060,9 @@ class Resource(ResourceConstants):
                     if cond["type"] == condition and cond["status"] == status:
                         return
 
-    def api_request(self, method: str, action: str, url: str, **params: Any) -> dict[str, Any]:
+    def api_request(
+        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
+    ) -> dict[str, Any]:
         """
         Handle API requests to resource.
 
@@ -1067,19 +1070,31 @@ class Resource(ResourceConstants):
             method (str): Request method (GET/PUT etc.).
             action (str): Action to perform (stop/start/guestosinfo etc.).
             url (str): URL of resource.
+            retry_params (dict): dict of timeout and sleep_time values for retrying the api request call
 
         Returns:
            data(dict): response data
 
         """
         client: DynamicClient = self.client
-        response = client.client.request(
-            method=method,
-            url=f"{url}/{action}",
-            headers=client.client.configuration.api_key,
-            **params,
-        )
-
+        api_request_params = {
+            "url": f"{url}/{action}",
+            "method": method,
+            "headers": client.client.configuration.api_key,
+        }
+        if retry_params:
+            response = self.retry_cluster_exceptions(
+                func=client.client.request,
+                timeout=retry_params.get("timeout", TIMEOUT_10SEC),
+                sleep_time=retry_params.get("sleep_time", TIMEOUT_1SEC),
+                **api_request_params,
+                **params,
+            )
+        else:
+            response = client.client.request(
+                **api_request_params,
+                **params,
+            )
         try:
             return json.loads(response.data)
         except json.decoder.JSONDecodeError:
