@@ -13,8 +13,6 @@ from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
 
-VM_API_REQUEST_RETRY_PARAMS = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
-
 
 class VirtualMachine(NamespacedResource):
     """
@@ -78,11 +76,12 @@ class VirtualMachine(NamespacedResource):
     def api_request(
         self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
     ) -> dict[str, Any]:
+        default_vm_api_request_retry_params = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
         return super().api_request(
             method=method,
             action=action,
             url=url or self._subresource_api_url,
-            retry_params=retry_params or VM_API_REQUEST_RETRY_PARAMS,
+            retry_params=retry_params or default_vm_api_request_retry_params,
             **params,
         )
 
