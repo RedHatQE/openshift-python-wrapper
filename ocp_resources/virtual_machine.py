@@ -76,7 +76,7 @@ class VirtualMachine(NamespacedResource):
     def api_request(
         self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
     ) -> dict[str, Any]:
-        default_vm_api_request_retry_params = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
+        default_vm_api_request_retry_params: dict[str, int] = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
         return super().api_request(
             method=method,
             action=action,
