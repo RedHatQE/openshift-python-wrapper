@@ -25,6 +25,7 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS: Dict[type[Exception], List[str]] = {
 PROTOCOL_ERROR_EXCEPTION_DICT: Dict[type[Exception], List[str]] = {ProtocolError: []}
 NOT_FOUND_ERROR_EXCEPTION_DICT: Dict[type[Exception], List[str]] = {NotFoundError: []}
 
+TIMEOUT_1SEC: int = 1
 TIMEOUT_5SEC: int = 5
 TIMEOUT_10SEC: int = 10
 TIMEOUT_30SEC: int = 30
