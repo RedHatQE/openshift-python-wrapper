@@ -12,7 +12,7 @@ class VirtualMachineExport(NamespacedResource):
     VirtualMachineExport object.
     """
 
-    api_group = NamespacedResource.ApiGroup.EXPORT_KUBEVIRT_IO
+    api_group: str = NamespacedResource.ApiGroup.EXPORT_KUBEVIRT_IO
 
     class SourceKind:
         VM = VirtualMachine.kind
@@ -21,46 +21,57 @@ class VirtualMachineExport(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
-        token_secret_ref=None,
-        source_api_group=None,
-        source_kind=None,
-        source_name=None,
-        timeout=TIMEOUT_1MINUTE,
-        delete_timeout=TIMEOUT_1MINUTE,
-        yaml_file=None,
+        source_api_group: str | None = None,
+        source_kind: str | None = None,
+        source_name: str | None = None,
+        token_secret_ref: str | None = None,
+        ttl_duration: str | None = None,
+        delete_timeout: int = TIMEOUT_1MINUTE,
         **kwargs,
-    ):
+    ) -> None:
+        """
+        Args:
+            source_api_group (str): Api group of the exported resource
+            source_kind (str): Kind of the exported resource
+            source_name (str): Name of the exported resource inside the same namespace
+
+            token_secret_ref (str): TokenSecretRef is the name of the custom-defined secret that contains
+              the token used by the export server pod
+
+            ttl_duration (str): ttlDuration limits the lifetime of an export If this field is set,
+              after this duration has passed from counting from
+              CreationTimestamp, the export is eligible to be automatically
+              deleted. If this field is omitted, a reasonable default is
+              applied.
+        """
         super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            timeout=timeout,
             delete_timeout=delete_timeout,
             **kwargs,
         )
-        self.token_secret_ref = token_secret_ref
         self.source_api_group = source_api_group
         self.source_kind = source_kind
         self.source_name = source_name
+        self.token_secret_ref = token_secret_ref
+        self.ttl_duration = ttl_duration
 
     def to_dict(self) -> None:
         super().to_dict()
+
         if not self.kind_dict and not self.yaml_file:
             if not (self.source_kind and self.source_name):
                 raise MissingRequiredArgumentError(argument="'source_kind' and 'source_name'")
-            self.res.update({
-                "spec": {
-                    "tokenSecretRef": self.token_secret_ref,
-                    "source": {
-                        "apiGroup": self.source_api_group,
-                        "kind": self.source_kind,
-                        "name": self.source_name,
-                    },
-                }
-            })
+
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            _spec["source"] = {
+                "apiGroup": self.source_api_group,
+                "kind": self.source_kind,
+                "name": self.source_name,
+            }
+
+            if self.token_secret_ref:
+                _spec["tokenSecretRef"] = self.token_secret_ref
+
+            if self.ttl_duration:
+                _spec["ttlDuration"] = self.ttl_duration
