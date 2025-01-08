@@ -68,6 +68,13 @@ class UserDefinedNetwork(NamespacedResource):
 
     # End of generated code
 
+    def wait_for_network_ready(self, timeout=30):
+        self.wait_for_condition(
+            condition=self.Condition.NETWORK_READY,
+            status=self.Condition.Status.TRUE,
+            timeout=timeout,
+        )
+
 
 class Layer2UserDefinedNetwork(UserDefinedNetwork):
     """
