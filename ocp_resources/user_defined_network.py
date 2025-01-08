@@ -68,7 +68,16 @@ class UserDefinedNetwork(NamespacedResource):
 
     # End of generated code
 
-    def wait_for_network_ready(self, timeout=30):
+    def wait_for_network_ready(self, timeout: int = 30) -> None:
+        """
+        Wait for the network to be ready.
+
+        Args:
+            timeout (int, optional): Maximum time to wait in seconds. Defaults to 30.
+
+        Raises:
+            TimeoutExpiredError: If the network is not ready within the specified timeout.
+        """
         self.wait_for_condition(
             condition=self.Condition.NETWORK_READY,
             status=self.Condition.Status.TRUE,
