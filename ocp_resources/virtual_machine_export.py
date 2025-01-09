@@ -1,10 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
-from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
-from ocp_resources.virtual_machine import VirtualMachine
-from ocp_resources.virtual_machine_snapshot import VirtualMachineSnapshot
 
 from typing import Any
 
@@ -63,8 +60,3 @@ class VirtualMachineExport(NamespacedResource):
                 _spec["ttlDuration"] = self.ttl_duration
 
     # End of generated code
-
-    class SourceKind:
-        VM = VirtualMachine.kind
-        VM_SNAPSHOT = VirtualMachineSnapshot.kind
-        PVC = PersistentVolumeClaim.kind
