@@ -304,7 +304,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             return self
         except Exception as exp:
             self.logger.error(exp)
-            super().__exit__(exception_type=None, exception_value=None, traceback=None)
+            super().__exit__()
             raise
 
     def clean_up(self):
