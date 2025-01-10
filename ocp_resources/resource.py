@@ -1045,7 +1045,7 @@ class Resource:
 
         """
         client: DynamicClient = self.privileged_client or self.client
- 
+
         api_request_params = {
             "url": f"{url}/{action}",
             "method": method,
