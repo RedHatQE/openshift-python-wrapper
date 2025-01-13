@@ -27,6 +27,7 @@ class ResourceConstants:
         RECONCILE_COMPLETE: str = "ReconcileComplete"
         READY: str = "Ready"
         FAILING: str = "Failing"
+        NETWORK_READY = "NetworkReady"
 
         class Status:
             TRUE: str = "True"
