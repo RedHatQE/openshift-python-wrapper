@@ -1,4 +1,5 @@
 from typing import Any
+from warnings import warn
 
 
 class MissingRequiredArgumentError(Exception):
@@ -9,12 +10,25 @@ class MissingRequiredArgumentError(Exception):
         return f"Missing required argument/s. Either provide yaml_file, kind_dict or pass {self.argument}"
 
 
-class MissingResourceResError(Exception):
+class MissingResourceError(Exception):
     def __init__(self, name: str) -> None:
         self.resource_name = name
 
     def __str__(self) -> str:
         return f"Failed to generate resource: {self.resource_name}"
+
+
+class MissingResourceResError(MissingResourceError):
+    def __init__(self, name: str) -> None:
+        warn(
+            "MissingResourceResError is deprecated and will be removed in the future. Use MissingResourceError instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(name=name)
+
+    def __str__(self) -> str:
+        return super().__str__()
 
 
 class MissingTemplateVariables(Exception):
