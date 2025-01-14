@@ -18,17 +18,17 @@ class MissingResourceError(Exception):
         return f"Failed to generate resource: {self.resource_name}"
 
 
-class MissingResourceResError(MissingResourceError):
+class MissingResourceResError(Exception):
     def __init__(self, name: str) -> None:
         warn(
             "MissingResourceResError is deprecated and will be removed in the future. Use MissingResourceError instead.",
             DeprecationWarning,
             stacklevel=2,
         )
-        super().__init__(name=name)
+        self.resource_name = name
 
     def __str__(self) -> str:
-        return super().__str__()
+        return f"Failed to generate resource: {self.resource_name}"
 
 
 class MissingTemplateVariables(Exception):
