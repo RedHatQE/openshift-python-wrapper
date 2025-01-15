@@ -59,8 +59,8 @@ class DataImportCron(NamespacedResource):
             if self.image_stream and self.url:
                 raise ValueError("imageStream and url cannot coexist")
 
-            if not self.pull_method:
-                raise MissingRequiredArgumentError(argument="pull_method")
+            if not (self.schedule and self.managed_data_source):
+                raise MissingRequiredArgumentError(argument="'schedule' and 'managedDataSource'")
 
             self.res.update({
                 "spec": {
