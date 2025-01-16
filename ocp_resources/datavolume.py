@@ -11,7 +11,6 @@ from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 from warnings import warn
 
 
-
 class DataVolume(NamespacedResource):
     """
     DataVolume object.
