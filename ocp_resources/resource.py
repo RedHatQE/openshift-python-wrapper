@@ -1027,7 +1027,7 @@ class Resource(ResourceConstants):
             resource_version=resource_version or self.initial_resource_version,
         )
 
-    def wait_for_condition(self, condition: str, status: str, timeout: int = 300) -> None:
+    def wait_for_condition(self, condition: str, status: str, timeout: int = 300, sleep_time: int = 1) -> None:
         """
         Wait for Resource condition to be in desire status.
 
@@ -1035,6 +1035,7 @@ class Resource(ResourceConstants):
             condition (str): Condition to query.
             status (str): Expected condition status.
             timeout (int): Time to wait for the resource.
+            sleep_time(int): Interval between each retry when checking the resource's condition.
 
         Raises:
             TimeoutExpiredError: If Resource condition in not in desire status.
@@ -1044,7 +1045,7 @@ class Resource(ResourceConstants):
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(
             wait_timeout=timeout,
-            sleep=1,
+            sleep=sleep_time,
             func=lambda: self.exists,
         ):
             if sample:
@@ -1052,7 +1053,7 @@ class Resource(ResourceConstants):
 
         for sample in TimeoutSampler(
             wait_timeout=timeout_watcher.remaining_time(),
-            sleep=1,
+            sleep=sleep_time,
             func=lambda: self.instance,
         ):
             if sample:
