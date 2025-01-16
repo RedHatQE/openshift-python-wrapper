@@ -87,22 +87,22 @@ class Deployment(NamespacedResource):
             _spec["selector"] = self.selector
             _spec["template"] = self.template
 
-            if self.min_ready_seconds:
+            if self.min_ready_seconds is not None:
                 _spec["minReadySeconds"] = self.min_ready_seconds
 
             if self.paused is not None:
                 _spec["paused"] = self.paused
 
-            if self.progress_deadline_seconds:
+            if self.progress_deadline_seconds is not None:
                 _spec["progressDeadlineSeconds"] = self.progress_deadline_seconds
 
-            if self.replicas:
+            if self.replicas is not None:
                 _spec["replicas"] = self.replicas
 
-            if self.revision_history_limit:
+            if self.revision_history_limit is not None:
                 _spec["revisionHistoryLimit"] = self.revision_history_limit
 
-            if self.strategy:
+            if self.strategy is not None:
                 _spec["strategy"] = self.strategy
 
     # End of generated code

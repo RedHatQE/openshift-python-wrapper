@@ -55,7 +55,7 @@ class ImageContentSourcePolicy(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.repository_digest_mirrors:
+            if self.repository_digest_mirrors is not None:
                 _spec["repositoryDigestMirrors"] = self.repository_digest_mirrors
 
     # End of generated code

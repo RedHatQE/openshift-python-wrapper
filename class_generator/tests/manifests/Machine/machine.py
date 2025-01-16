@@ -74,19 +74,19 @@ class Machine(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.lifecycle_hooks:
+            if self.lifecycle_hooks is not None:
                 _spec["lifecycleHooks"] = self.lifecycle_hooks
 
-            if self.metadata:
+            if self.metadata is not None:
                 _spec["metadata"] = self.metadata
 
-            if self.provider_id:
+            if self.provider_id is not None:
                 _spec["providerID"] = self.provider_id
 
-            if self.provider_spec:
+            if self.provider_spec is not None:
                 _spec["providerSpec"] = self.provider_spec
 
-            if self.taints:
+            if self.taints is not None:
                 _spec["taints"] = self.taints
 
     # End of generated code
