@@ -1,6 +1,7 @@
+import ast
 import os
 from typing import Dict, List
-import ast
+
 import click
 
 from class_generator.class_generator import class_generator
@@ -81,8 +82,13 @@ def generate_resource(kinds: List[str], yes: bool) -> None:
     is_flag=True,
     help="Generate missing end comment for all resources under `ocp_resources` directory",
 )
-def main(list_generated_file: bool, generated_missing_end_comment: bool, yes: bool) -> None:
+@click.option("--regenerate-generated-files", is_flag=True, help="Regenerate all generated files")
+def main(list_generated_file: bool, generated_missing_end_comment: bool, yes: bool, regenerate_generated_files) -> None:
     res = get_generated_files()
+    if regenerate_generated_files:
+        for kind in res["with_end_comment"].keys():
+            os.system(f"uv run class_generator/class_generator.py -k {kind} --overwrite --dry-run")
+
     if generated_missing_end_comment:
         generate_resource(kinds=list(res["without_end_comment"].keys()), yes=yes)
 
