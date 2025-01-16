@@ -87,7 +87,7 @@ def main(list_generated_file: bool, generated_missing_end_comment: bool, yes: bo
     res = get_generated_files()
     if regenerate_generated_files:
         for kind in res["with_end_comment"].keys():
-            os.system(f"uv run class_generator/class_generator.py -k {kind} --overwrite --dry-run")
+            os.system(f"uv run class_generator/class_generator.py -k {kind} --overwrite")
 
     if generated_missing_end_comment:
         generate_resource(kinds=list(res["without_end_comment"].keys()), yes=yes)
