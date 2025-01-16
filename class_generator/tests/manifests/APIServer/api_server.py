@@ -78,22 +78,22 @@ class APIServer(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.additional_cors_allowed_origins:
+            if self.additional_cors_allowed_origins is not None:
                 _spec["additionalCORSAllowedOrigins"] = self.additional_cors_allowed_origins
 
-            if self.audit:
+            if self.audit is not None:
                 _spec["audit"] = self.audit
 
-            if self.client_ca:
+            if self.client_ca is not None:
                 _spec["clientCA"] = self.client_ca
 
-            if self.encryption:
+            if self.encryption is not None:
                 _spec["encryption"] = self.encryption
 
-            if self.serving_certs:
+            if self.serving_certs is not None:
                 _spec["servingCerts"] = self.serving_certs
 
-            if self.tls_security_profile:
+            if self.tls_security_profile is not None:
                 _spec["tlsSecurityProfile"] = self.tls_security_profile
 
     # End of generated code

@@ -61,16 +61,16 @@ class DNS(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.base_domain:
+            if self.base_domain is not None:
                 _spec["baseDomain"] = self.base_domain
 
-            if self.platform:
+            if self.platform is not None:
                 _spec["platform"] = self.platform
 
-            if self.private_zone:
+            if self.private_zone is not None:
                 _spec["privateZone"] = self.private_zone
 
-            if self.public_zone:
+            if self.public_zone is not None:
                 _spec["publicZone"] = self.public_zone
 
     # End of generated code

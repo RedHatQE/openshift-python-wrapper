@@ -70,16 +70,16 @@ class Image(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.additional_trusted_ca:
+            if self.additional_trusted_ca is not None:
                 _spec["additionalTrustedCA"] = self.additional_trusted_ca
 
-            if self.allowed_registries_for_import:
+            if self.allowed_registries_for_import is not None:
                 _spec["allowedRegistriesForImport"] = self.allowed_registries_for_import
 
-            if self.external_registry_hostnames:
+            if self.external_registry_hostnames is not None:
                 _spec["externalRegistryHostnames"] = self.external_registry_hostnames
 
-            if self.registry_sources:
+            if self.registry_sources is not None:
                 _spec["registrySources"] = self.registry_sources
 
     # End of generated code
