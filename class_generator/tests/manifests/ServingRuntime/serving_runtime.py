@@ -107,55 +107,55 @@ class ServingRuntime(NamespacedResource):
 
             _spec["containers"] = self.containers
 
-            if self.affinity:
+            if self.affinity is not None:
                 _spec["affinity"] = self.affinity
 
-            if self.spec_annotations:
+            if self.spec_annotations is not None:
                 _spec["annotations"] = self.spec_annotations
 
-            if self.built_in_adapter:
+            if self.built_in_adapter is not None:
                 _spec["builtInAdapter"] = self.built_in_adapter
 
             if self.disabled is not None:
                 _spec["disabled"] = self.disabled
 
-            if self.grpc_data_endpoint:
+            if self.grpc_data_endpoint is not None:
                 _spec["grpcDataEndpoint"] = self.grpc_data_endpoint
 
-            if self.grpc_endpoint:
+            if self.grpc_endpoint is not None:
                 _spec["grpcEndpoint"] = self.grpc_endpoint
 
-            if self.http_data_endpoint:
+            if self.http_data_endpoint is not None:
                 _spec["httpDataEndpoint"] = self.http_data_endpoint
 
-            if self.image_pull_secrets:
+            if self.image_pull_secrets is not None:
                 _spec["imagePullSecrets"] = self.image_pull_secrets
 
-            if self.spec_labels:
+            if self.spec_labels is not None:
                 _spec["labels"] = self.spec_labels
 
             if self.multi_model is not None:
                 _spec["multiModel"] = self.multi_model
 
-            if self.node_selector:
+            if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
 
-            if self.protocol_versions:
+            if self.protocol_versions is not None:
                 _spec["protocolVersions"] = self.protocol_versions
 
-            if self.replicas:
+            if self.replicas is not None:
                 _spec["replicas"] = self.replicas
 
-            if self.storage_helper:
+            if self.storage_helper is not None:
                 _spec["storageHelper"] = self.storage_helper
 
-            if self.supported_model_formats:
+            if self.supported_model_formats is not None:
                 _spec["supportedModelFormats"] = self.supported_model_formats
 
-            if self.tolerations:
+            if self.tolerations is not None:
                 _spec["tolerations"] = self.tolerations
 
-            if self.volumes:
+            if self.volumes is not None:
                 _spec["volumes"] = self.volumes
 
     # End of generated code

@@ -48,13 +48,13 @@ class OAuth(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.identity_providers:
+            if self.identity_providers is not None:
                 _spec["identityProviders"] = self.identity_providers
 
-            if self.templates:
+            if self.templates is not None:
                 _spec["templates"] = self.templates
 
-            if self.token_config:
+            if self.token_config is not None:
                 _spec["tokenConfig"] = self.token_config
 
     # End of generated code
