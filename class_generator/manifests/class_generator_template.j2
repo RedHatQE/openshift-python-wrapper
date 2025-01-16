@@ -79,7 +79,7 @@ class {{ kind }}({{ base_class }}):
           {# Add optional args under `self.res` #}
           {% for arg in fields %}
           {% if arg["required"] == False %}
-            if self.{{ arg["name-for-class-arg"] }}{% if arg["type-for-docstring"] == "bool" %} is not None{% endif %}:
+            if self.{{ arg["name-for-class-arg"] }} is not None:
                 self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
 
           {% endif %}
@@ -88,7 +88,7 @@ class {{ kind }}({{ base_class }}):
           {# Add optional args under `_spec` #}
           {% for arg in spec %}
           {% if arg["required"] == False %}
-            if self.{{ arg["name-for-class-arg"] }}{% if arg["type-for-docstring"] == "bool" %} is not None{% endif %}:
+            if self.{{ arg["name-for-class-arg"] }} is not None:
                 _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
 
           {% endif %}

@@ -75,25 +75,25 @@ class NMState(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.affinity:
+            if self.affinity is not None:
                 _spec["affinity"] = self.affinity
 
-            if self.infra_affinity:
+            if self.infra_affinity is not None:
                 _spec["infraAffinity"] = self.infra_affinity
 
-            if self.infra_node_selector:
+            if self.infra_node_selector is not None:
                 _spec["infraNodeSelector"] = self.infra_node_selector
 
-            if self.infra_tolerations:
+            if self.infra_tolerations is not None:
                 _spec["infraTolerations"] = self.infra_tolerations
 
-            if self.node_selector:
+            if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
 
-            if self.self_sign_configuration:
+            if self.self_sign_configuration is not None:
                 _spec["selfSignConfiguration"] = self.self_sign_configuration
 
-            if self.tolerations:
+            if self.tolerations is not None:
                 _spec["tolerations"] = self.tolerations
 
     # End of generated code
