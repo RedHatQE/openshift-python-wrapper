@@ -103,8 +103,6 @@ def main(
             click.echo(f"Failed to regenerate: {', '.join(failed_kinds)}", err=True)
         else:
             click.echo("All files regenerated successfully!")
-        # for kind in res["with_end_comment"].keys():
-        #     os.system(f"uv run class_generator/class_generator.py -k {kind} --overwrite")
 
     if generated_missing_end_comment:
         generate_resource(kinds=list(res["without_end_comment"].keys()), yes=yes)
