@@ -83,11 +83,28 @@ def generate_resource(kinds: List[str], yes: bool) -> None:
     help="Generate missing end comment for all resources under `ocp_resources` directory",
 )
 @click.option("--regenerate-generated-files", is_flag=True, help="Regenerate all generated files")
-def main(list_generated_file: bool, generated_missing_end_comment: bool, yes: bool, regenerate_generated_files) -> None:
+def main(
+    list_generated_file: bool, generated_missing_end_comment: bool, yes: bool, regenerate_generated_files: bool
+) -> None:
     res = get_generated_files()
     if regenerate_generated_files:
+        click.echo("Regenerating files...")
+        failed_kinds = []
         for kind in res["with_end_comment"].keys():
-            os.system(f"uv run class_generator/class_generator.py -k {kind} --overwrite")
+            try:
+                click.echo(f"Regenerating {kind}...")
+                if not class_generator(kind=kind, called_from_cli=False, overwrite=True):
+                    failed_kinds.append(kind)
+
+            except Exception as exc:
+                click.echo(f"Failed to regenerate {kind}: {exc}", err=True)
+                failed_kinds.append(kind)
+        if failed_kinds:
+            click.echo(f"Failed to regenerate: {', '.join(failed_kinds)}", err=True)
+        else:
+            click.echo("All files regenerated successfully!")
+        # for kind in res["with_end_comment"].keys():
+        #     os.system(f"uv run class_generator/class_generator.py -k {kind} --overwrite")
 
     if generated_missing_end_comment:
         generate_resource(kinds=list(res["without_end_comment"].keys()), yes=yes)
