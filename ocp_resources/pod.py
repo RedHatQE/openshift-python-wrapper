@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 import kubernetes
 from timeout_sampler import TimeoutWatch
 
-from ocp_resources.constants import TIMEOUT_5SEC
+from ocp_resources.utils.constants import TIMEOUT_5SEC
 from ocp_resources.exceptions import ExecOnPodError
 from ocp_resources.node import Node
 

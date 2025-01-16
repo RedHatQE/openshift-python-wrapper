@@ -56,16 +56,16 @@ class Secret(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.data:
+            if self.data is not None:
                 self.res["data"] = self.data
 
             if self.immutable is not None:
                 self.res["immutable"] = self.immutable
 
-            if self.string_data:
+            if self.string_data is not None:
                 self.res["stringData"] = self.string_data
 
-            if self.type:
+            if self.type is not None:
                 self.res["type"] = self.type
 
     # End of generated code

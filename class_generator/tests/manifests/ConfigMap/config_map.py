@@ -51,10 +51,10 @@ class ConfigMap(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.binary_data:
+            if self.binary_data is not None:
                 self.res["binaryData"] = self.binary_data
 
-            if self.data:
+            if self.data is not None:
                 self.res["data"] = self.data
 
             if self.immutable is not None:

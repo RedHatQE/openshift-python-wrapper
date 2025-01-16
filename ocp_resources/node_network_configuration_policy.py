@@ -2,7 +2,7 @@ import re
 
 from kubernetes.dynamic.exceptions import ConflictError
 
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.exceptions import NNCPConfigurationFailed
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
@@ -301,7 +301,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             return self
         except Exception as exp:
             self.logger.error(exp)
-            super().__exit__(exception_type=None, exception_value=None, traceback=None)
+            super().__exit__()
             raise
 
     def clean_up(self):
