@@ -27,20 +27,7 @@ commands = [["uv", "run", "pytest", "tests/test_validate_resources_script.py"]]
 [env.class-generator]
 description = "Run class generator tests"
 deps = ["uv"]
-commands = [
-  [
-    "uv",
-    "run",
-    "pytest",
-    "class_generator/tests/test_camelcase_to_snake.py",
-  ],
-  [
-    "uv",
-    "run",
-    "pytest",
-    "class_generator/tests/test_class_generator.py",
-  ],
-]
+commands = [["uv", "run", "pytest", "class_generator/"]]
 
 [env.api-group-order]
 description = "Run API group order tests"

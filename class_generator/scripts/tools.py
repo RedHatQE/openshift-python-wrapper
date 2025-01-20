@@ -1,13 +1,12 @@
 import ast
 import os
-from typing import Dict, List
 
 import click
 
 from class_generator.class_generator import class_generator
 
 
-def get_generated_files() -> Dict[str, Dict[str, str]]:
+def get_generated_files() -> dict[str, dict[str, str]]:
     """
     This function returns a dictionary containing three keys:
         - `with_end_comment`: A dictionary containing the kind of resources that have the end comment in their file.
@@ -18,10 +17,10 @@ def get_generated_files() -> Dict[str, Dict[str, str]]:
         "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md"
     )
     end_comment: str = "# End of generated code"
-    resources_with_end_comment: Dict[str, str] = {}
-    resources_without_end_comment: Dict[str, str] = {}
-    resources_not_generated: Dict[str, str] = {}
-    exclude_files: List[str] = ["resource.py", "__init__.py", "__pycache__"]
+    resources_with_end_comment: dict[str, str] = {}
+    resources_without_end_comment: dict[str, str] = {}
+    resources_not_generated: dict[str, str] = {}
+    exclude_files: list[str] = ["resource.py", "__init__.py", "__pycache__"]
     for root, _, files in os.walk("ocp_resources"):
         for _file in files:
             _kind: str = ""
@@ -59,7 +58,7 @@ def get_generated_files() -> Dict[str, Dict[str, str]]:
     }
 
 
-def generate_resource(kinds: List[str], yes: bool) -> None:
+def generate_resource(kinds: list[str], yes: bool) -> None:
     for _kind in kinds:
         _generate = "y" if yes else click.prompt(f"Do you want to generate {_kind} resource? (y/n) ")
 
@@ -74,7 +73,7 @@ def generate_resource(kinds: List[str], yes: bool) -> None:
 @click.option(
     "--list-generated_file",
     is_flag=True,
-    help="List all generated files by `class_generator` under `ocp_resources` directory",
+    help="list all generated files by `class_generator` under `ocp_resources` directory",
 )
 @click.option("--yes", is_flag=True, help="Answer yes to all prompts")
 @click.option(
@@ -87,6 +86,7 @@ def main(
     list_generated_file: bool, generated_missing_end_comment: bool, yes: bool, regenerate_generated_files: bool
 ) -> None:
     res = get_generated_files()
+
     if regenerate_generated_files:
         click.echo("Regenerating files...")
         failed_kinds = []
@@ -99,6 +99,7 @@ def main(
             except Exception as exc:
                 click.echo(f"Failed to regenerate {kind}: {exc}", err=True)
                 failed_kinds.append(kind)
+
         if failed_kinds:
             click.echo(f"Failed to regenerate: {', '.join(failed_kinds)}", err=True)
         else:
