@@ -370,11 +370,6 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         raise NNCPConfigurationFailed(f"Reason: {failed_condition_reason}\n{last_err_msg}")
 
-    def get_available_condition(self):
-        for condition in self.instance.get("status", {}).get("conditions", []):
-            if condition["type"] == self.Conditions.Type.AVAILABLE:
-                return condition
-
     @retry(wait_timeout=120, sleep=5)
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
@@ -385,16 +380,16 @@ class NodeNetworkConfigurationPolicy(Resource):
             for condition in self.instance.get("status", {}).get("conditions", [])
             if condition and condition["type"] == self.Conditions.Type.AVAILABLE
         ]
-        if available_condition and available_condition[0]["status"] == self.Condition.Status.TRUE:
-            self.logger.info(f"NNCP {self.name} configured Successfully")
-            return available_condition
+        if available_condition:
+            if available_condition[0]["status"] == self.Condition.Status.TRUE:
+                self.logger.info(f"NNCP {self.name} configured Successfully")
+                return available_condition
 
-        elif available_condition[0]["reason"] == no_match_node_condition_reason:
-            raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
+            elif available_condition[0]["reason"] == no_match_node_condition_reason:
+                raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
 
-        elif available_condition[0]["reason"] == failed_condition_reason:
-            self.logger.error(f"Available condition: {available_condition}")
-            self._process_failed_status(failed_condition_reason=failed_condition_reason)
+            elif available_condition[0]["reason"] == failed_condition_reason:
+                self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
     @property
     def nnces(self):
