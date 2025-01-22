@@ -10,7 +10,7 @@ from ocp_resources.node_network_configuration_enactment import (
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -329,10 +329,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     @property
     def status(self):
         for condition in self.instance.status.conditions:
-            if (
-                condition["type"] == self.Conditions.Type.AVAILABLE
-                and condition["status"] == self.Condition.Status.TRUE
-            ):
+            if condition["type"] == self.Conditions.Type.AVAILABLE:
                 return condition["reason"]
 
     def wait_for_configuration_conditions_unknown_or_progressing(self, wait_timeout=30):
@@ -373,32 +370,31 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         raise NNCPConfigurationFailed(f"Reason: {failed_condition_reason}\n{last_err_msg}")
 
+    def get_available_condition(self):
+        for condition in self.instance.get("status", {}).get("conditions", []):
+            if condition["type"] == self.Conditions.Type.AVAILABLE:
+                return condition
+
+    @retry(wait_timeout=120, sleep=5)
     def wait_for_status_success(self):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
-        # if we get here too fast there are no conditions, we need to wait.
-        self.wait_for_configuration_conditions_unknown_or_progressing()
+        available_condition = [
+            condition
+            for condition in self.instance.get("status", {}).get("conditions", [])
+            if condition and condition["type"] == self.Conditions.Type.AVAILABLE
+        ]
+        if available_condition and available_condition[0]["status"] == self.Condition.Status.TRUE:
+            self.logger.info(f"NNCP {self.name} configured Successfully")
+            return available_condition
 
-        samples = TimeoutSampler(wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status)
-        try:
-            for sample in samples:
-                if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
-                    self.logger.info(f"NNCP {self.name} configured Successfully")
-                    return sample
+        elif available_condition[0]["reason"] == no_match_node_condition_reason:
+            raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
 
-                elif sample == no_match_node_condition_reason:
-                    raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
-
-                elif sample == failed_condition_reason:
-                    self._process_failed_status(failed_condition_reason=failed_condition_reason)
-
-        except (TimeoutExpiredError, NNCPConfigurationFailed):
-            self.logger.error(
-                f"Unable to configure NNCP {self.name} "
-                f"{f'nodes: {[node.name for node in self.nodes]}' if self.nodes else ''}"
-            )
-            raise
+        elif available_condition[0]["reason"] == failed_condition_reason:
+            self.logger.error(f"Available condition: {available_condition}")
+            self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
     @property
     def nnces(self):
