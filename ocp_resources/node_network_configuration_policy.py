@@ -329,7 +329,10 @@ class NodeNetworkConfigurationPolicy(Resource):
     @property
     def status(self):
         for condition in self.instance.status.conditions:
-            if condition["type"] == self.Conditions.Type.AVAILABLE:
+            if (
+                condition["type"] == self.Conditions.Type.AVAILABLE
+                and condition["status"] == self.Condition.Status.TRUE
+            ):
                 return condition["reason"]
 
     def wait_for_configuration_conditions_unknown_or_progressing(self, wait_timeout=30):
