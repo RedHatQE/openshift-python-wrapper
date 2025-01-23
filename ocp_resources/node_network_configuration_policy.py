@@ -374,17 +374,18 @@ class NodeNetworkConfigurationPolicy(Resource):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
-        def _get_available_status_condition() -> dict[str, str]:
-            conditions = [
-                condition
-                for condition in self.instance.get("status", {}).get("conditions", [])
-                if condition and condition["type"] == self.Conditions.Type.AVAILABLE
-            ]
-            return conditions[0] if conditions else {}
-
         try:
             for sample in TimeoutSampler(
-                wait_timeout=self.success_timeout, sleep=5, func=_get_available_status_condition
+                wait_timeout=self.success_timeout,
+                sleep=5,
+                func=lambda: next(
+                    (
+                        condition
+                        for condition in self.instance.get("status", {}).get("conditions", [])
+                        if condition and condition["type"] == self.Conditions.Type.AVAILABLE
+                    ),
+                    {},
+                ),
             ):
                 if sample.get("status") == self.Condition.Status.TRUE:
                     self.logger.info(f"NNCP {self.name} configured Successfully")
