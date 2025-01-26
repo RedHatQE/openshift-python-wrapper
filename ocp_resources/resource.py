@@ -120,7 +120,7 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
-        client_configuration = kubernetes.client.Configuration()
+        client_configuration = None
 
         if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY") or use_proxy:
             use_proxy = True
@@ -130,11 +130,15 @@ def get_client(
             if not proxy:
                 raise ValueError("Proxy not found. Please set the HTTPS_PROXY or HTTP_PROXY environment variable.")
             LOGGER.info(f"Setting proxy in client configuration: {proxy}")
+            client_configuration = kubernetes.client.Configuration()
             client_configuration.proxy = proxy
 
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(
-                config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs
+                config_file=config_file,
+                client_configuration=client_configuration if client_configuration else None,
+                context=context or None,
+                **kwargs,
             )
         )
     except MaxRetryError:
