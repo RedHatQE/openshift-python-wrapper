@@ -124,7 +124,7 @@ def get_client(
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         client_configuration = client_configuration or kubernetes.client.Configuration()
 
-        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY") or use_proxy:
             use_proxy = True
 
         if use_proxy:
