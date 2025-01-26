@@ -202,7 +202,7 @@ class DataVolume(NamespacedResource):
                     f"{self.api_group}/storage.deleteAfterCompletion": (self.delete_after_completion)
                 })
 
-    def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
+    def wait_deleted(self, timeout=TIMEOUT_1MINUTE):
         """
         Wait until DataVolume and the PVC created by it are deleted
 
