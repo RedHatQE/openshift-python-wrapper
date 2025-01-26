@@ -93,6 +93,16 @@ export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO",
   export OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA="false"
   ```
 
+## Dynamic Proxy Enablement
+
+To dynamically enable proxy configuration:
+
+Set the environment variable OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY=1.
+This will automatically enable the proxy without needing to set the use_proxy argument when creating the client.
+
+Make sure to define the HTTPS_PROXY or HTTP_PROXY environment variable for the proxy URL.
+If neither is set, a ValueError will be raised.
+
 ## Code check
 
 We use pre-commit for code check.

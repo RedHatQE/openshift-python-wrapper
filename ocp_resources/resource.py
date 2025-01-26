@@ -79,7 +79,12 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str = "", config_dict: dict[str, Any] | None = None, context: str = "", **kwargs: Any
+    config_file: str = "",
+    config_dict: dict[str, Any] | None = None,
+    client_configuration: kubernetes.client.Configuration | None = None,
+    use_proxy: bool = False,
+    context: str = "",
+    **kwargs: Any,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -95,6 +100,10 @@ def get_client(
     Args:
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
+        client_configuration (kubernetes.client.Configuration): The kubernetes.client.Configuration to set configs to.
+        use_proxy (bool): If True, automatically retrieves and sets the proxy from the environment
+              variables (`HTTPS_PROXY` or `HTTP_PROXY`). If proxy is not found, raises an error.
+              Default is False, meaning no proxy is used.
         context (str): name of the context to use.
 
     Returns:
@@ -115,8 +124,22 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
+        client_configuration = client_configuration or kubernetes.client.Configuration()
+
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY") == "1":
+            use_proxy = True
+
+        if use_proxy:
+            proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+            if not proxy:
+                raise ValueError("Proxy not found. Please set the HTTPS_PROXY or HTTP_PROXY environment variable.")
+            LOGGER.info(f"Setting proxy in client configuration: {proxy}")
+            client_configuration.proxy = proxy
+
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
+            client=kubernetes.config.new_client_from_config(
+                config_file=config_file, client_configuration=client_configuration, context=context or None, **kwargs
+            )
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
