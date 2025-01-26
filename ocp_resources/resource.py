@@ -81,7 +81,6 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 def get_client(
     config_file: str = "",
     config_dict: dict[str, Any] | None = None,
-    client_configuration: kubernetes.client.Configuration | None = None,
     use_proxy: bool = False,
     context: str = "",
     **kwargs: Any,
@@ -100,7 +99,6 @@ def get_client(
     Args:
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
-        client_configuration (kubernetes.client.Configuration): The kubernetes.client.Configuration to set configs to.
         use_proxy (bool): If True, retrieves HTTPS_PROXY or HTTP_PROXY from OS environment and use it.
         context (str): name of the context to use.
 
@@ -122,7 +120,7 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
-        client_configuration = client_configuration or kubernetes.client.Configuration()
+        client_configuration = kubernetes.client.Configuration()
 
         if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY") or use_proxy:
             use_proxy = True
