@@ -136,7 +136,7 @@ def get_client(
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(
                 config_file=config_file,
-                client_configuration=client_configuration if client_configuration else None,
+                client_configuration=client_configuration,
                 context=context or None,
                 **kwargs,
             )
