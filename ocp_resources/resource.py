@@ -101,8 +101,7 @@ def get_client(
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
         client_configuration (kubernetes.client.Configuration): The kubernetes.client.Configuration to set configs to.
-        use_proxy (bool): If True, automatically retrieves and sets the proxy from the environment
-              variables (`HTTPS_PROXY` or `HTTP_PROXY`). If proxy is not found, raises an error.
+        use_proxy (bool): If True, retrieves HTTPS_PROXY or HTTP_PROXY from OS environment and use it.
         context (str): name of the context to use.
 
     Returns:
