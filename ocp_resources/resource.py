@@ -103,7 +103,6 @@ def get_client(
         client_configuration (kubernetes.client.Configuration): The kubernetes.client.Configuration to set configs to.
         use_proxy (bool): If True, automatically retrieves and sets the proxy from the environment
               variables (`HTTPS_PROXY` or `HTTP_PROXY`). If proxy is not found, raises an error.
-              Default is False, meaning no proxy is used.
         context (str): name of the context to use.
 
     Returns:
