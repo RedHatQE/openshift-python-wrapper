@@ -126,7 +126,9 @@ def get_client(
         if use_proxy or os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
             if not proxy:
-                raise ValueError("Proxy not found. Please set the HTTPS_PROXY or HTTP_PROXY environment variable.")
+                raise ValueError(
+                    "Proxy configuration requested but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set"
+                )
             LOGGER.info(f"Setting proxy in client configuration: {proxy}")
             client_configuration = kubernetes.client.Configuration()
             client_configuration.proxy = proxy
