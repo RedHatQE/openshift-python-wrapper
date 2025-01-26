@@ -391,10 +391,10 @@ class NodeNetworkConfigurationPolicy(Resource):
                     if sample["status"] == self.Condition.Status.TRUE:
                         self.logger.info(f"NNCP {self.name} configured Successfully")
                         return sample
-                    elif sample["reason"] == no_match_node_condition_reason:
+                    elif sample.get("reason") == no_match_node_condition_reason:
                         raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
 
-                    elif sample["reason"] == failed_condition_reason:
+                    elif sample.get("reason") == failed_condition_reason:
                         self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
