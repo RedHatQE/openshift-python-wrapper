@@ -1,10 +1,20 @@
 import pytest
+import yaml
+from testcontainers.k3s import K3SContainer
 
+from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
 from ocp_resources.resource import Resource, get_client
-import yaml
-from testcontainers.k3s import K3SContainer
+from ocp_resources.secret import Secret
+
+
+class TestSecretExit(Secret):
+    def deploy(self, wait: bool = False):
+        return self
+
+    def clean_up(self, wait: bool = True, timeout: int | None = None) -> bool:
+        return False
 
 
 @pytest.fixture(scope="session")
@@ -82,3 +92,14 @@ class TestResource:
 
     def test_cleanup(self, namespace):
         namespace.clean_up(wait=False)
+
+    def test_resource_context_manager(self, client):
+        with Secret(name="test-context-manager", namespace="default", client=client) as sec:
+            pass
+
+        assert not sec.exists
+
+    def test_resource_context_manager_exit(self, client):
+        with pytest.raises(ResourceTeardownError):
+            with TestSecretExit(name="test-context-manager-exit", namespace="default", client=client):
+                pass

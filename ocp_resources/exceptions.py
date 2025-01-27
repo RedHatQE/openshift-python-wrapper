@@ -53,3 +53,11 @@ class ExecOnPodError(Exception):
 
 class NNCPConfigurationFailed(Exception):
     pass
+
+
+class ResourceTeardownError(Exception):
+    def __init__(self, resource: Any):
+        self.resource = resource
+
+    def __str__(self):
+        return f"Failed to excute teardown for resource {self.resource}"
