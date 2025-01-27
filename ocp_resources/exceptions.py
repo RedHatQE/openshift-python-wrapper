@@ -59,5 +59,5 @@ class ResourceTeardownError(Exception):
     def __init__(self, resource: Any):
         self.resource = resource
 
-    def _str__(self):
+    def __str__(self):
         return f"Failed to excute teardown for resource {self.resource}"
