@@ -97,11 +97,16 @@ export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO",
 
 To enable proxy configuration for the client:
 
-Set the environment variable OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY=<any value>
-This enables the proxy without requiring the use_proxy argument when creating the client.
+1. Set the `use_proxy` argument when creating the client or set the environment variable `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY=<any value>`
+This enables the proxy without requiring the `use_proxy` argument when creating the client.
 
-Define the HTTPS_PROXY or HTTP_PROXY environment variable for the proxy URL.
-If neither is set, a ValueError will be raised.
+2. Define either `HTTPS_PROXY` or `HTTP_PROXY` environment variable with your proxy URL:
+```bash
+export HTTPS_PROXY="http://proxy.example.com:8080"
+# or
+export HTTP_PROXY="http://proxy.example.com:8080"
+```
+If neither variable is set when proxy is enabled, a `ValueError` will be raised.
 
 ## Code check
 
