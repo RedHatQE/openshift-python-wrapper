@@ -1,57 +1,54 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Generator
 import contextlib
-
 import copy
 import json
-from warnings import warn
-
 import os
 import re
 import sys
+from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Any
+from warnings import warn
 
 import kubernetes
-from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
+from kubernetes.dynamic import DynamicClient, ResourceInstance
 from kubernetes.dynamic.exceptions import (
     ConflictError,
+    ForbiddenError,
     MethodNotAllowedError,
     NotFoundError,
-    ForbiddenError,
     ResourceNotFoundError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger, logging
-from urllib3.exceptions import MaxRetryError
-
-from ocp_resources.utils.constants import (
-    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-    NOT_FOUND_ERROR_EXCEPTION_DICT,
-    PROTOCOL_ERROR_EXCEPTION_DICT,
-    TIMEOUT_1MINUTE,
-    TIMEOUT_4MINUTES,
-    TIMEOUT_10SEC,
-    TIMEOUT_30SEC,
-    TIMEOUT_5SEC,
-    TIMEOUT_1SEC,
-)
-from ocp_resources.event import Event
 from timeout_sampler import (
     TimeoutExpiredError,
     TimeoutSampler,
     TimeoutWatch,
 )
-from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError
+from urllib3.exceptions import MaxRetryError
+
+from ocp_resources.event import Event
+from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError, ResourceTeardownError
+from ocp_resources.utils.constants import (
+    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+    NOT_FOUND_ERROR_EXCEPTION_DICT,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_1MINUTE,
+    TIMEOUT_1SEC,
+    TIMEOUT_4MINUTES,
+    TIMEOUT_5SEC,
+    TIMEOUT_10SEC,
+    TIMEOUT_30SEC,
+)
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
-
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -571,7 +568,8 @@ class Resource(ResourceConstants):
         exc_tb: TracebackType | None = None,
     ) -> None:
         if self.teardown:
-            self.clean_up()
+            if not self.clean_up():
+                raise ResourceTeardownError(resource=self)
 
     def _sigint_handler(self, signal_received: int, frame: Any) -> None:
         self.__exit__()

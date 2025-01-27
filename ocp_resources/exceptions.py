@@ -1,6 +1,8 @@
 from typing import Any
 from warnings import warn
 
+from ocp_resources.resource import NamespacedResource, Resource
+
 
 class MissingRequiredArgumentError(Exception):
     def __init__(self, argument: str) -> None:
@@ -53,3 +55,11 @@ class ExecOnPodError(Exception):
 
 class NNCPConfigurationFailed(Exception):
     pass
+
+
+class ResourceTeardownError(Exception):
+    def __init__(self, resource: Resource | NamespacedResource):
+        self.resource = resource
+
+    def _str__(self):
+        return f"Failed to excute teardown for resource {self.resource}"
