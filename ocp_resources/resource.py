@@ -121,7 +121,7 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
-        client_configuration = kwargs.get('client_configuration', None)
+        client_configuration = kwargs.get("client_configuration", None)
 
         if use_proxy or os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
