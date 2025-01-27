@@ -743,10 +743,13 @@ class Resource(ResourceConstants):
             TimeoutExpiredError: If resource still exists.
         """
         self.logger.info(f"Wait until {self.kind} {self.name} is deleted")
-        samples = TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists)
-        for sample in samples:
-            if not sample:
-                return True
+        try:
+            for sample in TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists):
+                if not sample:
+                    return True
+        except TimeoutExpiredError:
+            self.logger.warning(f"Timeour expired while waiting for {self.kind} {self.name} to be deleted")
+            return False
 
         return False
 

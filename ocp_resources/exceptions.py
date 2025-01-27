@@ -1,8 +1,6 @@
 from typing import Any
 from warnings import warn
 
-from ocp_resources.resource import NamespacedResource, Resource
-
 
 class MissingRequiredArgumentError(Exception):
     def __init__(self, argument: str) -> None:
@@ -58,7 +56,7 @@ class NNCPConfigurationFailed(Exception):
 
 
 class ResourceTeardownError(Exception):
-    def __init__(self, resource: Resource | NamespacedResource):
+    def __init__(self, resource: Any):
         self.resource = resource
 
     def _str__(self):
