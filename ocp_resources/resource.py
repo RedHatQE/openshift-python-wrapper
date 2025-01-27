@@ -748,7 +748,7 @@ class Resource(ResourceConstants):
                 if not sample:
                     return True
         except TimeoutExpiredError:
-            self.logger.warning(f"Timeour expired while waiting for {self.kind} {self.name} to be deleted")
+            self.logger.warning(f"Timeout expired while waiting for {self.kind} {self.name} to be deleted")
             return False
 
         return False
