@@ -100,7 +100,8 @@ def get_client(
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
         use_proxy (bool): If True, retrieves HTTPS_PROXY or HTTP_PROXY from OS environment and use it.
-             If the environment variable `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY` is set and not empty, it will override the value of `use_proxy`.
+            If `use_proxy` is not set, the `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY` environment variable will be used
+            if it is set and not empty.
         context (str): name of the context to use.
 
     Returns:
@@ -123,7 +124,7 @@ def get_client(
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         client_configuration = kwargs.get("client_configuration", None)
 
-        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY") or use_proxy:
+        if use_proxy or os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
             if not proxy:
                 raise ValueError(
