@@ -129,7 +129,6 @@ def get_client(
                 raise ValueError(
                     "Proxy configuration requested but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set"
                 )
-            LOGGER.info(f"Setting proxy in client configuration: {proxy}")
             client_configuration = kubernetes.client.Configuration()
             client_configuration.proxy = proxy
 
