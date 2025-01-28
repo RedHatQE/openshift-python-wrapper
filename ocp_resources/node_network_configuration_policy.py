@@ -312,7 +312,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             except Exception as exp:
                 self.logger.error(exp)
 
-        super().clean_up()
+        return super().clean_up()
 
     def _absent_interface(self):
         for _iface in self.desired_state["interfaces"]:
