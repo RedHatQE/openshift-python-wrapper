@@ -95,6 +95,9 @@ export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=<LOG_LEVEL> # can be: "DEBUG", "INFO",
 
 ## Proxy Enablement
 
+This configuration allows the client to route traffic through a specified proxy server.
+It can be enabled via the `use_proxy` argument or environment variable `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY`.
+
 To enable proxy configuration for the client:
 
 1. Set the `use_proxy` argument to `True` when creating the client or set the environment variable `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY=<any value>`
