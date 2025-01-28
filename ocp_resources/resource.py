@@ -100,8 +100,8 @@ def get_client(
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
         use_proxy (bool): If True, retrieves HTTPS_PROXY or HTTP_PROXY from OS environment and use it.
-            If `use_proxy` is not set, the `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY` environment variable will be used
-            if it is set and not empty.
+            The `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY` environment variable, if set and not empty, will be used
+            in addition to the `use_proxy` parameter.
         context (str): name of the context to use.
 
     Returns:
@@ -114,7 +114,7 @@ def get_client(
                 config_dict=config_dict, context=context or None, **kwargs
             )
         )
-    client_configuration = kwargs.get("client_configuration")
+    client_configuration = kwargs.get("client_configuration", kubernetes.client.Configuration())
     try:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
         LOGGER.info("Trying to get client via new_client_from_config")
@@ -128,10 +128,9 @@ def get_client(
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
             if not proxy:
                 raise ValueError(
-                    "Proxy configuration requested but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set"
+                    "Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set."
                 )
-            if not client_configuration:
-                client_configuration = kubernetes.client.Configuration()
+            if not kwargs.get("client_configuration"):
                 client_configuration.proxy = proxy
 
         return kubernetes.dynamic.DynamicClient(
