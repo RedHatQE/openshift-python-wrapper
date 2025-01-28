@@ -60,4 +60,4 @@ class ResourceTeardownError(Exception):
         self.resource = resource
 
     def __str__(self):
-        return f"Failed to excute teardown for resource {self.resource}"
+        return f"Failed to execute teardown for resource {self.resource}"

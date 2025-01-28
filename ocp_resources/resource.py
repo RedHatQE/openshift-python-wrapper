@@ -645,7 +645,7 @@ class Resource(ResourceConstants):
             self.logger.warning(
                 f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
-            return False
+            return True
 
         return self.delete(wait=wait, timeout=timeout or self.delete_timeout)
 
@@ -849,24 +849,21 @@ class Resource(ResourceConstants):
         self.logger.info(f"Delete {self.kind} {self.name}")
 
         if self.exists:
-            try:
-                _instance_dict = self.instance.to_dict()
-                if isinstance(_instance_dict, dict):
-                    hashed_data = self.hash_resource_dict(resource_dict=_instance_dict)
-                    self.logger.info(f"Deleting {hashed_data}")
-                    self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+            _instance_dict = self.instance.to_dict()
+            if isinstance(_instance_dict, dict):
+                hashed_data = self.hash_resource_dict(resource_dict=_instance_dict)
+                self.logger.info(f"Deleting {hashed_data}")
+                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
 
-                else:
-                    self.logger.warning(f"{self.kind}: {self.name} instance.to_dict() return was not a dict")
+            else:
+                self.logger.warning(f"{self.kind}: {self.name} instance.to_dict() return was not a dict")
 
-                self.api.delete(name=self.name, namespace=self.namespace, body=body)
+            self.api.delete(name=self.name, namespace=self.namespace, body=body)
 
-                if wait:
-                    return self.wait_deleted(timeout=timeout)
+            if wait:
+                return self.wait_deleted(timeout=timeout)
 
-                return True
-            except (NotFoundError, TimeoutExpiredError):
-                return False
+            return True
 
         self.logger.warning(f"Resource {self.kind} {self.name} was not found, and wasn't deleted")
         return True
