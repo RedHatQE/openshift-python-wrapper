@@ -114,6 +114,7 @@ def get_client(
                 config_dict=config_dict, context=context or None, **kwargs
             )
         )
+    client_configuration = kwargs.get("client_configuration")
     try:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
         LOGGER.info("Trying to get client via new_client_from_config")
@@ -122,7 +123,6 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
-        client_configuration = kwargs.get("client_configuration", None)
 
         if use_proxy or os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
@@ -130,8 +130,9 @@ def get_client(
                 raise ValueError(
                     "Proxy configuration requested but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set"
                 )
-            client_configuration = client_configuration or kubernetes.client.Configuration()
-            client_configuration.proxy = proxy
+            if not client_configuration:
+                client_configuration = kubernetes.client.Configuration()
+                client_configuration.proxy = proxy
 
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(
@@ -146,7 +147,7 @@ def get_client(
         LOGGER.info("Trying to get client via incluster_config")
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.incluster_config.load_incluster_config(
-                client_configuration=kwargs.get("client_configuration"),
+                client_configuration=client_configuration,
                 try_refresh_token=kwargs.get("try_refresh_token", True),
             )
         )
