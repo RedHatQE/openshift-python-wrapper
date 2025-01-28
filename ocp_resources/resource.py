@@ -947,7 +947,7 @@ class Resource(ResourceConstants):
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator["Resource|ResourceInstance", None, None]:
+    ) -> Generator[Any, None, None]:
         """
         Get resources
 
@@ -1313,7 +1313,7 @@ class NamespacedResource(Resource):
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator["NamespacedResource|ResourceInstance", None, None]:
+    ) -> Generator[Any, None, None]:
         """
         Get resources
 
