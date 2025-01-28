@@ -123,7 +123,7 @@ def get_client(
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
         client_configuration = kwargs.get("client_configuration", None)
 
-        if use_proxy or os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY") or use_proxy:
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
             if not proxy:
                 raise ValueError(
