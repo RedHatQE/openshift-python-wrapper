@@ -1,57 +1,54 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Generator
 import contextlib
-
 import copy
 import json
-from warnings import warn
-
 import os
 import re
 import sys
+from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Any
+from warnings import warn
 
 import kubernetes
-from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
+from kubernetes.dynamic import DynamicClient, ResourceInstance
 from kubernetes.dynamic.exceptions import (
     ConflictError,
+    ForbiddenError,
     MethodNotAllowedError,
     NotFoundError,
-    ForbiddenError,
     ResourceNotFoundError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger, logging
-from urllib3.exceptions import MaxRetryError
-
-from ocp_resources.utils.constants import (
-    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-    NOT_FOUND_ERROR_EXCEPTION_DICT,
-    PROTOCOL_ERROR_EXCEPTION_DICT,
-    TIMEOUT_1MINUTE,
-    TIMEOUT_4MINUTES,
-    TIMEOUT_10SEC,
-    TIMEOUT_30SEC,
-    TIMEOUT_5SEC,
-    TIMEOUT_1SEC,
-)
-from ocp_resources.event import Event
 from timeout_sampler import (
     TimeoutExpiredError,
     TimeoutSampler,
     TimeoutWatch,
 )
-from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError
+from urllib3.exceptions import MaxRetryError
+
+from ocp_resources.event import Event
+from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError, ResourceTeardownError
+from ocp_resources.utils.constants import (
+    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+    NOT_FOUND_ERROR_EXCEPTION_DICT,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_1MINUTE,
+    TIMEOUT_1SEC,
+    TIMEOUT_4MINUTES,
+    TIMEOUT_5SEC,
+    TIMEOUT_10SEC,
+    TIMEOUT_30SEC,
+)
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
-
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -596,7 +593,8 @@ class Resource(ResourceConstants):
         exc_tb: TracebackType | None = None,
     ) -> None:
         if self.teardown:
-            self.clean_up()
+            if not self.clean_up():
+                raise ResourceTeardownError(resource=self)
 
     def _sigint_handler(self, signal_received: int, frame: Any) -> None:
         self.__exit__()
@@ -672,7 +670,7 @@ class Resource(ResourceConstants):
             self.logger.warning(
                 f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
-            return False
+            return True
 
         return self.delete(wait=wait, timeout=timeout or self.delete_timeout)
 
@@ -770,10 +768,13 @@ class Resource(ResourceConstants):
             TimeoutExpiredError: If resource still exists.
         """
         self.logger.info(f"Wait until {self.kind} {self.name} is deleted")
-        samples = TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists)
-        for sample in samples:
-            if not sample:
-                return True
+        try:
+            for sample in TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists):
+                if not sample:
+                    return True
+        except TimeoutExpiredError:
+            self.logger.warning(f"Timeout expired while waiting for {self.kind} {self.name} to be deleted")
+            return False
 
         return False
 
@@ -873,24 +874,21 @@ class Resource(ResourceConstants):
         self.logger.info(f"Delete {self.kind} {self.name}")
 
         if self.exists:
-            try:
-                _instance_dict = self.instance.to_dict()
-                if isinstance(_instance_dict, dict):
-                    hashed_data = self.hash_resource_dict(resource_dict=_instance_dict)
-                    self.logger.info(f"Deleting {hashed_data}")
-                    self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+            _instance_dict = self.instance.to_dict()
+            if isinstance(_instance_dict, dict):
+                hashed_data = self.hash_resource_dict(resource_dict=_instance_dict)
+                self.logger.info(f"Deleting {hashed_data}")
+                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
 
-                else:
-                    self.logger.warning(f"{self.kind}: {self.name} instance.to_dict() return was not a dict")
+            else:
+                self.logger.warning(f"{self.kind}: {self.name} instance.to_dict() return was not a dict")
 
-                self.api.delete(name=self.name, namespace=self.namespace, body=body)
+            self.api.delete(name=self.name, namespace=self.namespace, body=body)
 
-                if wait:
-                    return self.wait_deleted(timeout=timeout)
+            if wait:
+                return self.wait_deleted(timeout=timeout)
 
-                return True
-            except (NotFoundError, TimeoutExpiredError):
-                return False
+            return True
 
         self.logger.warning(f"Resource {self.kind} {self.name} was not found, and wasn't deleted")
         return True
@@ -971,7 +969,7 @@ class Resource(ResourceConstants):
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator["Resource|ResourceInstance", None, None]:
+    ) -> Generator[Any, None, None]:
         """
         Get resources
 
@@ -1337,7 +1335,7 @@ class NamespacedResource(Resource):
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator["NamespacedResource|ResourceInstance", None, None]:
+    ) -> Generator[Any, None, None]:
         """
         Get resources
 
