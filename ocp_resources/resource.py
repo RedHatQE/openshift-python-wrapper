@@ -81,7 +81,7 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 def get_client(
     config_file: str = "",
     config_dict: dict[str, Any] | None = None,
-    use_proxy: bool = False,
+    use_proxy: bool | None = None,
     context: str = "",
     **kwargs: Any,
 ) -> DynamicClient:
@@ -99,9 +99,11 @@ def get_client(
     Args:
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
-        use_proxy (bool): If True, retrieves HTTPS_PROXY or HTTP_PROXY from OS environment and use it.
-            The `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY` environment variable, if set and not empty, will be used
-            in addition to the `use_proxy` parameter.
+        use_proxy (bool, default=None):
+            - `True`: retrieves HTTPS_PROXY or HTTP_PROXY from OS environment and use it.
+            - `False`: Disables proxy.
+            - `None`: (default): Proxy is determined by the `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY` environment
+                  variable. non-empty value enables proxy.
         context (str): name of the context to use.
 
     Returns:
@@ -124,7 +126,7 @@ def get_client(
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
 
-        if use_proxy or os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
+        if use_proxy or (use_proxy is None and os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY")):
             proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
             if not proxy:
                 raise ValueError(
