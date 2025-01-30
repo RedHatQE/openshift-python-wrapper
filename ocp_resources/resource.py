@@ -126,7 +126,7 @@ def get_client(
             if client_configuration.proxy and client_configuration.proxy != proxy:
                 raise ValueError(
                     f"Conflicting proxy settings: client_configuration.proxy={client_configuration.proxy}, "
-                    f"but the environment variable 'OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY' defines proxy as {proxy}."
+                    f"but the environment variable 'HTTPS_PROXY/HTTP_PROXY' defines proxy as {proxy}."
                 )
             client_configuration.proxy = proxy
 
