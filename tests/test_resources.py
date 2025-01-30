@@ -1,5 +1,6 @@
 import pytest
 import yaml
+import kubernetes
 from testcontainers.k3s import K3SContainer
 
 from ocp_resources.exceptions import ResourceTeardownError
@@ -103,3 +104,26 @@ class TestResource:
         with pytest.raises(ResourceTeardownError):
             with TestSecretExit(name="test-context-manager-exit", namespace="default", client=client):
                 pass
+
+    def test_proxy_enabled_but_no_proxy_set(self, monkeypatch):
+        monkeypatch.setenv(name="OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY", value="1")
+
+        with pytest.raises(
+            ValueError,
+            match="Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set.",
+        ):
+            get_client()
+
+    def test_proxy_conflict_raises_value_error(self, monkeypatch):
+        monkeypatch.setenv(name="OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY", value="1")
+        monkeypatch.setenv(name="HTTPS_PROXY", value="http://env-proxy.com")
+
+        client_configuration = kubernetes.client.Configuration()
+        client_configuration.proxy = "http://not-env-proxy.com"
+
+        with pytest.raises(
+            ValueError,
+            match="Conflicting proxy settings: client_configuration.proxy=http://not-env-proxy.com, "
+            "but the environment variable 'OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY' defines proxy as http://env-proxy.com.",
+        ):
+            get_client(client_configuration=client_configuration)
