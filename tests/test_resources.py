@@ -1,5 +1,6 @@
 import pytest
 import yaml
+from docker.errors import DockerException
 from testcontainers.k3s import K3SContainer
 
 from ocp_resources.exceptions import ResourceTeardownError
@@ -19,8 +20,11 @@ class TestSecretExit(Secret):
 
 @pytest.fixture(scope="session")
 def client():
-    with K3SContainer() as k3s:
-        yield get_client(config_dict=yaml.safe_load(k3s.config_yaml()))
+    try:
+        with K3SContainer() as k3s:
+            yield get_client(config_dict=yaml.safe_load(k3s.config_yaml()))
+    except DockerException:
+        pytest.skip("K3S container not available")
 
 
 @pytest.fixture(scope="class")
