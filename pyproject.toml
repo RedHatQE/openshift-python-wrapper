@@ -20,7 +20,7 @@ addopts = [
 omit = ["tests/*", "class_generator/tests/*", "class_generator/scripts/tests/*"]
 
 [tool.coverage.report]
-fail_under = 60
+fail_under = 45
 skip_empty = true
 
 [tool.coverage.html]

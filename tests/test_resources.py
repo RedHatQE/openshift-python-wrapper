@@ -10,7 +10,7 @@ from ocp_resources.resource import Resource, get_client
 from ocp_resources.secret import Secret
 
 
-class TestSecretExit(Secret):
+class SecretTestExit(Secret):
     def deploy(self, wait: bool = False):
         return self
 
@@ -105,5 +105,5 @@ class TestResource:
 
     def test_resource_context_manager_exit(self, client):
         with pytest.raises(ResourceTeardownError):
-            with TestSecretExit(name="test-context-manager-exit", namespace="default", client=client):
+            with SecretTestExit(name="test-context-manager-exit", namespace="default", client=client):
                 pass
