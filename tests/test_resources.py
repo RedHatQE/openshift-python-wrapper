@@ -105,6 +105,15 @@ class TestResource:
             with TestSecretExit(name="test-context-manager-exit", namespace="default", client=client):
                 pass
 
+    def test_proxy_enabled_but_no_proxy_set(self, monkeypatch):
+        monkeypatch.setenv(name="OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY", value="1")
+
+        with pytest.raises(
+            ValueError,
+            match="Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set.",
+        ):
+            get_client()
+
     def test_proxy_conflict_raises_value_error(self, monkeypatch):
         monkeypatch.setenv(name="OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY", value="1")
         monkeypatch.setenv(name="HTTPS_PROXY", value="http://env-proxy.com")
