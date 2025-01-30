@@ -112,9 +112,9 @@ class TestResource:
         client_configuration = kubernetes.client.Configuration()
         client_configuration.proxy = "http://not-env-proxy.com"
 
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(
+            ValueError,
+            match="Conflicting proxy settings: client_configuration.proxy=http://not-env-proxy.com, "
+            "but the environment variable 'OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY' defines proxy as http://env-proxy.com.",
+        ):
             get_client(client_configuration=client_configuration)
-
-        assert "Conflicting proxy settings" in str(exc_info.value)
-        assert "http://not-env-proxy.com" in str(exc_info.value)
-        assert "http://env-proxy.com" in str(exc_info.value)
