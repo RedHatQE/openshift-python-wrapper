@@ -123,8 +123,7 @@ def get_client(
                 raise ValueError(
                     "Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set."
                 )
-            if not kwargs.get("client_configuration"):
-                client_configuration.proxy = proxy
+            client_configuration.proxy = proxy
 
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(
