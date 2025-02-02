@@ -49,6 +49,7 @@ class ResourceConstants:
             SUCCESSFUL: str = "Successful"
             RUNNING: str = "Running"
             AGENT_CONNECTED: str = "AgentConnected"
+            SUCCEEDED: str = "Succeeded"
 
     class Type:
         CLUSTER_IP = "ClusterIP"
