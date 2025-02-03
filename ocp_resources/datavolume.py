@@ -308,7 +308,7 @@ class DataVolume(NamespacedResource):
                 wait_timeout=timeout,
                 func=lambda: self.exists,
             ):
-                if dv_garbage_collection_enabled is not None:
+                if dv_garbage_collection_enabled:
                     warn("garbage collector is deprecated and removed in version v4.19", DeprecationWarning)
                 # DV reach success if the status is Succeeded, or if DV garbage collection enabled and the DV does not exist
                 if sample and sample.get("status", {}).get("phase") == self.Status.SUCCEEDED:
