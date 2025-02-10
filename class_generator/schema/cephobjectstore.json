@@ -26,6 +26,18 @@
             "type": "string"
           }
         },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "keystone": {
+              "required": [
+                "acceptedRoles",
+                "serviceUserSecretName",
+                "url"
+              ]
+            }
+          }
+        },
         "dataPool": {},
         "gateway": {},
         "healthCheck": {},
@@ -34,13 +46,15 @@
         "preservePoolsOnDelete": {
           "type": "boolean"
         },
-        "security": {},
-        "sharedPools": {
-          "required": [
-            "dataPoolName",
-            "metadataPoolName"
-          ]
+        "protocols": {
+          "type": "object",
+          "properties": {
+            "s3": {},
+            "swift": {}
+          }
         },
+        "security": {},
+        "sharedPools": {},
         "zone": {
           "required": [
             "name"
@@ -59,5 +73,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

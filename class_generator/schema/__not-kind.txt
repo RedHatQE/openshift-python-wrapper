@@ -715,3 +715,9 @@ io.argoproj.v1alpha1.WorkflowArtifactGCTaskList
 io.opendatahub.modelregistry.v1alpha1.ModelRegistryList
 io.opendatahub.datasciencepipelinesapplications.v1.DataSciencePipelinesApplicationList
 io.metal3.v1alpha1.HostUpdatePolicyList
+io.openshift.csiaddons.v1alpha1.NetworkFenceClassList
+io.kubevirt.ssp.v1beta3.SSPList
+io.kubevirt.ssp.v1beta2.SSP
+io.operatorframework.olm.v1.ClusterExtensionList
+io.operatorframework.olm.v1.ClusterCatalogList
+io.openshift.operator.v1.OLMList

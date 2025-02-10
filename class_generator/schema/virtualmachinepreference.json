@@ -163,7 +163,7 @@
                   "type": "string"
                 },
                 "ratio": {
-                  "description": "Ratio optionally defines the ratio to spread vCPUs across the guest visible topology:\n\n\nCoresThreads        - 1:2   - Controls the ratio of cores to threads. Only a ratio of 2 is currently accepted.\nSocketsCores        - 1:N   - Controls the ratio of socket to cores.\nSocketsCoresThreads - 1:N:2 - Controls the ratio of socket to cores. Each core providing 2 threads.\n\n\nDefault: 2",
+                  "description": "Ratio optionally defines the ratio to spread vCPUs across the guest visible topology:\n\nCoresThreads        - 1:2   - Controls the ratio of cores to threads. Only a ratio of 2 is currently accepted.\nSocketsCores        - 1:N   - Controls the ratio of socket to cores.\nSocketsCoresThreads - 1:N:2 - Controls the ratio of socket to cores. Each core providing 2 threads.\n\nDefault: 2",
                   "type": "integer",
                   "format": "int32"
                 }
@@ -556,12 +556,26 @@
           "description": "Firmware optionally defines preferences associated with the Firmware attribute of a VirtualMachineInstance DomainSpec",
           "type": "object",
           "properties": {
+            "preferredEfi": {
+              "description": "PreferredEfi optionally enables EFI",
+              "type": "object",
+              "properties": {
+                "persistent": {
+                  "description": "If set to true, Persistent will persist the EFI NVRAM across reboots.\nDefaults to false",
+                  "type": "boolean"
+                },
+                "secureBoot": {
+                  "description": "If set, SecureBoot will be enabled and the OVMF roms will be swapped for\nSecureBoot-enabled ones.\nRequires SMM to be enabled.\nDefaults to true",
+                  "type": "boolean"
+                }
+              }
+            },
             "preferredUseBios": {
               "description": "PreferredUseBios optionally enables BIOS",
               "type": "boolean"
             },
             "preferredUseBiosSerial": {
-              "description": "PreferredUseBiosSerial optionally transmitts BIOS output over the serial.\n\n\nRequires PreferredUseBios to be enabled.",
+              "description": "PreferredUseBiosSerial optionally transmitts BIOS output over the serial.\n\nRequires PreferredUseBios to be enabled.",
               "type": "boolean"
             },
             "preferredUseEfi": {
@@ -569,7 +583,7 @@
               "type": "boolean"
             },
             "preferredUseSecureBoot": {
-              "description": "PreferredUseSecureBoot optionally enables SecureBoot and the OVMF roms will be swapped for SecureBoot-enabled ones.\n\n\nRequires PreferredUseEfi and PreferredSmm to be enabled.",
+              "description": "PreferredUseSecureBoot optionally enables SecureBoot and the OVMF roms will be swapped for SecureBoot-enabled ones.\n\nRequires PreferredUseEfi and PreferredSmm to be enabled.",
               "type": "boolean"
             }
           }
@@ -652,5 +666,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

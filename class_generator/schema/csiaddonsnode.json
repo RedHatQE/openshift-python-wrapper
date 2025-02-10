@@ -65,9 +65,57 @@
       "description": "CSIAddonsNodeStatus defines the observed state of CSIAddonsNode",
       "type": "object",
       "properties": {
+        "capabilities": {
+          "description": "A list of capabilities advertised by the sidecar",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "message": {
           "description": "Message is a human-readable message indicating details about why the CSIAddonsNode\nis in this state.",
           "type": "string"
+        },
+        "networkFenceClientStatus": {
+          "description": "NetworkFenceClientStatus contains the status of the clients required for fencing.",
+          "type": "array",
+          "items": {
+            "description": "NetworkFenceClientStatus contains the status of the clients required for fencing.",
+            "type": "object",
+            "required": [
+              "ClientDetails",
+              "networkFenceClassName"
+            ],
+            "properties": {
+              "ClientDetails": {
+                "type": "array",
+                "items": {
+                  "description": "ClientDetail contains the details of the client required for fencing.",
+                  "type": "object",
+                  "required": [
+                    "cidrs",
+                    "id"
+                  ],
+                  "properties": {
+                    "cidrs": {
+                      "description": "Cidrs is the list of CIDR blocks that are fenced.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "id": {
+                      "description": "Id is the unique identifier of the client where it belongs to.",
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "networkFenceClassName": {
+                "type": "string"
+              }
+            }
+          }
         },
         "reason": {
           "description": "Reason is a brief CamelCase string that describes any failure and is meant\nfor machine parsing and tidy display in the CLI.",
@@ -87,5 +135,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

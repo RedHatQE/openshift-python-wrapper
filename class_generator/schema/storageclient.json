@@ -40,6 +40,9 @@
           "description": "ConsumerID will hold the identity of this cluster inside the attached provider cluster",
           "type": "string"
         },
+        "inMaintenanceMode": {
+          "type": "boolean"
+        },
         "phase": {
           "type": "string"
         }
@@ -53,5 +56,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

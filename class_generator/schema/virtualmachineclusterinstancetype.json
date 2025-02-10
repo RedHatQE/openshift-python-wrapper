@@ -44,7 +44,7 @@
               "type": "boolean"
             },
             "guest": {
-              "description": "Required number of vCPUs to expose to the guest.\n\n\nThe resulting CPU topology being derived from the optional PreferredCPUTopology attribute of CPUPreferences that itself defaults to PreferSockets.",
+              "description": "Required number of vCPUs to expose to the guest.\n\nThe resulting CPU topology being derived from the optional PreferredCPUTopology attribute of CPUPreferences that itself defaults to PreferSockets.",
               "type": "integer",
               "format": "int32"
             },
@@ -231,14 +231,14 @@
           }
         },
         "nodeSelector": {
-          "description": "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/\n\n\nNodeSelector is the name of the custom node selector for the instancetype.",
+          "description": "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/\n\nNodeSelector is the name of the custom node selector for the instancetype.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "schedulerName": {
-          "description": "If specified, the VMI will be dispatched by specified scheduler.\nIf not specified, the VMI will be dispatched by default scheduler.\n\n\nSchedulerName is the name of the custom K8s scheduler for the instancetype.",
+          "description": "If specified, the VMI will be dispatched by specified scheduler.\nIf not specified, the VMI will be dispatched by default scheduler.\n\nSchedulerName is the name of the custom K8s scheduler for the instancetype.",
           "type": "string"
         }
       }
@@ -251,5 +251,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

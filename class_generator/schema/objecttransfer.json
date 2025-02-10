@@ -1,5 +1,5 @@
 {
-  "description": "ObjectTransfer is the cluster scoped object transfer resource",
+  "description": "Deprecated for removal in v1.\n\n\nObjectTransfer is the cluster scoped object transfer resource",
   "type": "object",
   "required": [
     "spec"
@@ -130,5 +130,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
