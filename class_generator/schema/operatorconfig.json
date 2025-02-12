@@ -804,6 +804,30 @@
                     "type": "string"
                   }
                 },
+                "deploymentStrategy": {
+                  "description": "DeploymentStrategy describes how to replace existing pods with new ones\nDefault value is RollingUpdate with MaxUnavailable and MaxSurege as 25% (kubernetes default)",
+                  "type": "object",
+                  "properties": {
+                    "rollingUpdate": {
+                      "description": "Rolling update config params. Present only if DeploymentStrategyType =\nRollingUpdate.\n---\nTODO: Update this to follow our convention for oneOf, whatever we decide it\nto be.",
+                      "type": "object",
+                      "properties": {
+                        "maxSurge": {
+                          "description": "The maximum number of pods that can be scheduled above the desired number of\npods.\nValue can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).\nThis can not be 0 if MaxUnavailable is 0.\nAbsolute number is calculated from percentage by rounding up.\nDefaults to 25%.\nExample: when this is set to 30%, the new ReplicaSet can be scaled up immediately when\nthe rolling update starts, such that the total number of old and new pods do not exceed\n130% of desired pods. Once old pods have been killed,\nnew ReplicaSet can be scaled up further, ensuring that total number of pods running\nat any time during the update is at most 130% of desired pods.",
+                          "x-kubernetes-int-or-string": true
+                        },
+                        "maxUnavailable": {
+                          "description": "The maximum number of pods that can be unavailable during the update.\nValue can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).\nAbsolute number is calculated from percentage by rounding down.\nThis can not be 0 if MaxSurge is 0.\nDefaults to 25%.\nExample: when this is set to 30%, the old ReplicaSet can be scaled down to 70% of desired pods\nimmediately when the rolling update starts. Once new pods are ready, old ReplicaSet\ncan be scaled down further, followed by scaling up the new ReplicaSet, ensuring\nthat the total number of pods available at all times during the update is at\nleast 70% of desired pods.",
+                          "x-kubernetes-int-or-string": true
+                        }
+                      }
+                    },
+                    "type": {
+                      "description": "Type of deployment. Can be \"Recreate\" or \"RollingUpdate\". Default is RollingUpdate.",
+                      "type": "string"
+                    }
+                  }
+                },
                 "imagePullPolicy": {
                   "description": "To indicate the image pull policy to be applied to all the containers in the csi driver pods.",
                   "type": "string"
@@ -2700,7 +2724,7 @@
               }
             },
             "generateOMapInfo": {
-              "description": "OMAP generator will generate the omap mapping between the PV name and the RBD image.\nNeed to be enabled when we are using rbd mirroring feature.\nBy default OMAP generator sidecar is deployed with Csi controller plugin pod, to disable\nit set it to false.",
+              "description": "OMAP generator will generate the omap mapping between the PV name and the RBD image.\nNeed to be enabled when we are using rbd mirroring feature.\nBy default OMAP generator sidecar is not deployed with Csi controller plugin pod, to enable\nit set it to true.",
               "type": "boolean"
             },
             "grpcTimeout": {
@@ -2774,11 +2798,11 @@
                   "type": "object",
                   "properties": {
                     "logHostPath": {
-                      "description": "LogHostPath is the prefix directory path for the csi log files",
+                      "description": "LogHostPath is the prefix directory path for the csi log files\nDefault to /var/lib/cephcsi",
                       "type": "string"
                     },
                     "maxFiles": {
-                      "description": "MaxFiles is the number of logrtoate files",
+                      "description": "MaxFiles is the number of logrtoate files\nDefault to 7",
                       "type": "integer"
                     },
                     "maxLogSize": {
@@ -2796,7 +2820,13 @@
                         "monthly"
                       ]
                     }
-                  }
+                  },
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Either maxLogSize or periodicity must be set",
+                      "rule": "(has(self.maxLogSize)) || (has(self.periodicity))"
+                    }
+                  ]
                 },
                 "verbosity": {
                   "description": "Log verbosity level for driver pods,\nSupported values from 0 to 5. 0 for general useful logs (the default), 5 for trace level verbosity.\nDefault to 0",
@@ -5325,5 +5355,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

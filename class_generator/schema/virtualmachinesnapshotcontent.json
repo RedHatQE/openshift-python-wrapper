@@ -107,7 +107,7 @@
                       "type": "string"
                     },
                     "running": {
-                      "description": "Running controls whether the associatied VirtualMachineInstance is created or not\nMutually exclusive with RunStrategy",
+                      "description": "Running controls whether the associatied VirtualMachineInstance is created or not\nMutually exclusive with RunStrategy\nDeprecated: VirtualMachineInstance field \"Running\" is now deprecated, please use RunStrategy instead.",
                       "type": "boolean"
                     },
                     "template": {
@@ -486,7 +486,7 @@
                                                 "x-kubernetes-map-type": "atomic"
                                               },
                                               "matchLabelKeys": {
-                                                "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                                "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
@@ -494,7 +494,7 @@
                                                 "x-kubernetes-list-type": "atomic"
                                               },
                                               "mismatchLabelKeys": {
-                                                "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                                "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
@@ -625,7 +625,7 @@
                                             "x-kubernetes-map-type": "atomic"
                                           },
                                           "matchLabelKeys": {
-                                            "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                            "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                             "type": "array",
                                             "items": {
                                               "type": "string"
@@ -633,7 +633,7 @@
                                             "x-kubernetes-list-type": "atomic"
                                           },
                                           "mismatchLabelKeys": {
-                                            "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                            "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                             "type": "array",
                                             "items": {
                                               "type": "string"
@@ -771,7 +771,7 @@
                                                 "x-kubernetes-map-type": "atomic"
                                               },
                                               "matchLabelKeys": {
-                                                "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                                "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
@@ -779,7 +779,7 @@
                                                 "x-kubernetes-list-type": "atomic"
                                               },
                                               "mismatchLabelKeys": {
-                                                "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                                "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
@@ -910,7 +910,7 @@
                                             "x-kubernetes-map-type": "atomic"
                                           },
                                           "matchLabelKeys": {
-                                            "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                            "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key in (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both matchLabelKeys and labelSelector.\nAlso, matchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                             "type": "array",
                                             "items": {
                                               "type": "string"
@@ -918,7 +918,7 @@
                                             "x-kubernetes-list-type": "atomic"
                                           },
                                           "mismatchLabelKeys": {
-                                            "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.",
+                                            "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with 'labelSelector' as 'key notin (value)'\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming\npod labels will be ignored. The default value is empty.\nThe same key is forbidden to exist in both mismatchLabelKeys and labelSelector.\nAlso, mismatchLabelKeys cannot be set when labelSelector isn't set.\nThis is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
                                             "type": "array",
                                             "items": {
                                               "type": "string"
@@ -1540,7 +1540,7 @@
                                             "type": "object"
                                           },
                                           "model": {
-                                            "description": "Interface model.\nOne of: e1000, e1000e, ne2k_pci, pcnet, rtl8139, virtio.\nDefaults to virtio.\nTODO:(ihar) switch to enums once opengen-api supports them. See: https://github.com/kubernetes/kube-openapi/issues/51",
+                                            "description": "Interface model.\nOne of: e1000, e1000e, igb, ne2k_pci, pcnet, rtl8139, virtio.\nDefaults to virtio.",
                                             "type": "string"
                                           },
                                           "name": {
@@ -2195,7 +2195,7 @@
                                   "format": "int32"
                                 },
                                 "tcpSocket": {
-                                  "description": "TCPSocket specifies an action involving a TCP port.\nTCP hooks not yet supported\nTODO: implement a realistic TCP lifecycle hook",
+                                  "description": "TCPSocket specifies an action involving a TCP port.\nTCP hooks not yet supported",
                                   "type": "object",
                                   "required": [
                                     "port"
@@ -2369,7 +2369,7 @@
                                   "format": "int32"
                                 },
                                 "tcpSocket": {
-                                  "description": "TCPSocket specifies an action involving a TCP port.\nTCP hooks not yet supported\nTODO: implement a realistic TCP lifecycle hook",
+                                  "description": "TCPSocket specifies an action involving a TCP port.\nTCP hooks not yet supported",
                                   "type": "object",
                                   "required": [
                                     "port"
@@ -2498,7 +2498,7 @@
                                     "x-kubernetes-map-type": "atomic"
                                   },
                                   "matchLabelKeys": {
-                                    "description": "MatchLabelKeys is a set of pod label keys to select the pods over which\nspreading will be calculated. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are ANDed with labelSelector\nto select the group of existing pods over which spreading will be calculated\nfor the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.\nMatchLabelKeys cannot be set when LabelSelector isn't set.\nKeys that don't exist in the incoming pod labels will\nbe ignored. A null or empty list means only match against labelSelector.\n\n\nThis is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).",
+                                    "description": "MatchLabelKeys is a set of pod label keys to select the pods over which\nspreading will be calculated. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are ANDed with labelSelector\nto select the group of existing pods over which spreading will be calculated\nfor the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.\nMatchLabelKeys cannot be set when LabelSelector isn't set.\nKeys that don't exist in the incoming pod labels will\nbe ignored. A null or empty list means only match against labelSelector.\n\nThis is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).",
                                     "type": "array",
                                     "items": {
                                       "type": "string"
@@ -2511,16 +2511,16 @@
                                     "format": "int32"
                                   },
                                   "minDomains": {
-                                    "description": "MinDomains indicates a minimum number of eligible domains.\nWhen the number of eligible domains with matching topology keys is less than minDomains,\nPod Topology Spread treats \"global minimum\" as 0, and then the calculation of Skew is performed.\nAnd when the number of eligible domains with matching topology keys equals or greater than minDomains,\nthis value has no effect on scheduling.\nAs a result, when the number of eligible domains is less than minDomains,\nscheduler won't schedule more than maxSkew Pods to those domains.\nIf value is nil, the constraint behaves as if MinDomains is equal to 1.\nValid values are integers greater than 0.\nWhen value is not nil, WhenUnsatisfiable must be DoNotSchedule.\n\n\nFor example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same\nlabelSelector spread as 2/2/2:\n| zone1 | zone2 | zone3 |\n|  P P  |  P P  |  P P  |\nThe number of domains is less than 5(MinDomains), so \"global minimum\" is treated as 0.\nIn this situation, new pod with the same labelSelector cannot be scheduled,\nbecause computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,\nit will violate MaxSkew.",
+                                    "description": "MinDomains indicates a minimum number of eligible domains.\nWhen the number of eligible domains with matching topology keys is less than minDomains,\nPod Topology Spread treats \"global minimum\" as 0, and then the calculation of Skew is performed.\nAnd when the number of eligible domains with matching topology keys equals or greater than minDomains,\nthis value has no effect on scheduling.\nAs a result, when the number of eligible domains is less than minDomains,\nscheduler won't schedule more than maxSkew Pods to those domains.\nIf value is nil, the constraint behaves as if MinDomains is equal to 1.\nValid values are integers greater than 0.\nWhen value is not nil, WhenUnsatisfiable must be DoNotSchedule.\n\nFor example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same\nlabelSelector spread as 2/2/2:\n| zone1 | zone2 | zone3 |\n|  P P  |  P P  |  P P  |\nThe number of domains is less than 5(MinDomains), so \"global minimum\" is treated as 0.\nIn this situation, new pod with the same labelSelector cannot be scheduled,\nbecause computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,\nit will violate MaxSkew.",
                                     "type": "integer",
                                     "format": "int32"
                                   },
                                   "nodeAffinityPolicy": {
-                                    "description": "NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector\nwhen calculating pod topology spread skew. Options are:\n- Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.\n- Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.\n\n\nIf this value is nil, the behavior is equivalent to the Honor policy.\nThis is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.",
+                                    "description": "NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector\nwhen calculating pod topology spread skew. Options are:\n- Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.\n- Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.\n\nIf this value is nil, the behavior is equivalent to the Honor policy.\nThis is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.",
                                     "type": "string"
                                   },
                                   "nodeTaintsPolicy": {
-                                    "description": "NodeTaintsPolicy indicates how we will treat node taints when calculating\npod topology spread skew. Options are:\n- Honor: nodes without taints, along with tainted nodes for which the incoming pod\nhas a toleration, are included.\n- Ignore: node taints are ignored. All nodes are included.\n\n\nIf this value is nil, the behavior is equivalent to the Ignore policy.\nThis is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.",
+                                    "description": "NodeTaintsPolicy indicates how we will treat node taints when calculating\npod topology spread skew. Options are:\n- Honor: nodes without taints, along with tainted nodes for which the incoming pod\nhas a toleration, are included.\n- Ignore: node taints are ignored. All nodes are included.\n\nIf this value is nil, the behavior is equivalent to the Ignore policy.\nThis is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.",
                                     "type": "string"
                                   },
                                   "topologyKey": {
@@ -2567,7 +2567,7 @@
                                         "type": "object",
                                         "properties": {
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           }
                                         },
@@ -2578,7 +2578,7 @@
                                         "type": "object",
                                         "properties": {
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           }
                                         },
@@ -2611,7 +2611,7 @@
                                         "type": "object",
                                         "properties": {
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           }
                                         },
@@ -2622,7 +2622,7 @@
                                         "type": "object",
                                         "properties": {
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           }
                                         },
@@ -2643,7 +2643,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -2923,7 +2923,7 @@
                                         "type": "object",
                                         "properties": {
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           }
                                         },
@@ -2934,7 +2934,7 @@
                                         "type": "object",
                                         "properties": {
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           }
                                         },
@@ -3315,6 +3315,130 @@
                           }
                         }
                       }
+                    },
+                    "volumeUpdateState": {
+                      "description": "VolumeUpdateState contains the information about the volumes set\nupdates related to the volumeUpdateStrategy",
+                      "type": "object",
+                      "properties": {
+                        "volumeMigrationState": {
+                          "description": "VolumeMigrationState tracks the information related to the volume migration",
+                          "type": "object",
+                          "properties": {
+                            "migratedVolumes": {
+                              "description": "MigratedVolumes lists the source and destination volumes during the volume migration",
+                              "type": "array",
+                              "items": {
+                                "description": "StorageMigratedVolumeInfo tracks the information about the source and destination volumes during the volume migration",
+                                "type": "object",
+                                "required": [
+                                  "volumeName"
+                                ],
+                                "properties": {
+                                  "destinationPVCInfo": {
+                                    "description": "DestinationPVCInfo contains the information about the destination PVC",
+                                    "type": "object",
+                                    "properties": {
+                                      "accessModes": {
+                                        "description": "AccessModes contains the desired access modes the volume should have.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1",
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        },
+                                        "x-kubernetes-list-type": "atomic"
+                                      },
+                                      "capacity": {
+                                        "description": "Capacity represents the capacity set on the corresponding PVC status",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                          "x-kubernetes-int-or-string": true
+                                        }
+                                      },
+                                      "claimName": {
+                                        "description": "ClaimName is the name of the PVC",
+                                        "type": "string"
+                                      },
+                                      "filesystemOverhead": {
+                                        "description": "Percentage of filesystem's size to be reserved when resizing the PVC",
+                                        "type": "string",
+                                        "pattern": "^(0(?:\\.\\d{1,3})?|1)$"
+                                      },
+                                      "preallocated": {
+                                        "description": "Preallocated indicates if the PVC's storage is preallocated or not",
+                                        "type": "boolean"
+                                      },
+                                      "requests": {
+                                        "description": "Requests represents the resources requested by the corresponding PVC spec",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                          "x-kubernetes-int-or-string": true
+                                        }
+                                      },
+                                      "volumeMode": {
+                                        "description": "VolumeMode defines what type of volume is required by the claim.\nValue of Filesystem is implied when not included in claim spec.",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "sourcePVCInfo": {
+                                    "description": "SourcePVCInfo contains the information about the source PVC",
+                                    "type": "object",
+                                    "properties": {
+                                      "accessModes": {
+                                        "description": "AccessModes contains the desired access modes the volume should have.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1",
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        },
+                                        "x-kubernetes-list-type": "atomic"
+                                      },
+                                      "capacity": {
+                                        "description": "Capacity represents the capacity set on the corresponding PVC status",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                          "x-kubernetes-int-or-string": true
+                                        }
+                                      },
+                                      "claimName": {
+                                        "description": "ClaimName is the name of the PVC",
+                                        "type": "string"
+                                      },
+                                      "filesystemOverhead": {
+                                        "description": "Percentage of filesystem's size to be reserved when resizing the PVC",
+                                        "type": "string",
+                                        "pattern": "^(0(?:\\.\\d{1,3})?|1)$"
+                                      },
+                                      "preallocated": {
+                                        "description": "Preallocated indicates if the PVC's storage is preallocated or not",
+                                        "type": "boolean"
+                                      },
+                                      "requests": {
+                                        "description": "Requests represents the resources requested by the corresponding PVC spec",
+                                        "type": "object",
+                                        "additionalProperties": {
+                                          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                          "x-kubernetes-int-or-string": true
+                                        }
+                                      },
+                                      "volumeMode": {
+                                        "description": "VolumeMode defines what type of volume is required by the claim.\nValue of Filesystem is implied when not included in claim spec.",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "volumeName": {
+                                    "description": "VolumeName is the name of the volume that is being migrated",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "x-kubernetes-list-type": "atomic"
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -3475,7 +3599,7 @@
                         "type": "string"
                       },
                       "volumeAttributesClassName": {
-                        "description": "volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.\nIf specified, the CSI driver will create or update the volume with the attributes defined\nin the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,\nit can be changed after the claim is created. An empty string value means that no VolumeAttributesClass\nwill be applied to the claim but it's not allowed to reset this field to empty string once it is set.\nIf unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass\nwill be set by the persistentvolume controller if it exists.\nIf the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be\nset to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource\nexists.\nMore info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/\n(Alpha) Using this field requires the VolumeAttributesClass feature gate to be enabled.",
+                        "description": "volumeAttributesClassName may be used to set the VolumeAttributesClass used by this claim.\nIf specified, the CSI driver will create or update the volume with the attributes defined\nin the corresponding VolumeAttributesClass. This has a different purpose than storageClassName,\nit can be changed after the claim is created. An empty string value means that no VolumeAttributesClass\nwill be applied to the claim but it's not allowed to reset this field to empty string once it is set.\nIf unspecified and the PersistentVolumeClaim is unbound, the default VolumeAttributesClass\nwill be set by the persistentvolume controller if it exists.\nIf the resource referred to by volumeAttributesClass does not exist, this PersistentVolumeClaim will be\nset to a Pending state, as reflected by the modifyVolumeStatus field, until such as a resource\nexists.\nMore info: https://kubernetes.io/docs/concepts/storage/volume-attributes-classes/\n(Beta) Using this field requires the VolumeAttributesClass feature gate to be enabled (off by default).",
                         "type": "string"
                       },
                       "volumeMode": {
@@ -3570,5 +3694,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

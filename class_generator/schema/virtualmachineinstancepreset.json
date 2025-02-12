@@ -1,5 +1,5 @@
 {
-  "description": "Deprecated for removal in v2, please use VirtualMachineInstanceType and VirtualMachinePreference instead.\n\n\nVirtualMachineInstancePreset defines a VMI spec.domain to be applied to all VMIs that match the provided label selector\nMore info: https://kubevirt.io/user-guide/virtual_machines/presets/#overrides",
+  "description": "Deprecated for removal in v2, please use VirtualMachineInstanceType and VirtualMachinePreference instead.\n\nVirtualMachineInstancePreset defines a VMI spec.domain to be applied to all VMIs that match the provided label selector\nMore info: https://kubevirt.io/user-guide/virtual_machines/presets/#overrides",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -523,7 +523,7 @@
                         "type": "object"
                       },
                       "model": {
-                        "description": "Interface model.\nOne of: e1000, e1000e, ne2k_pci, pcnet, rtl8139, virtio.\nDefaults to virtio.\nTODO:(ihar) switch to enums once opengen-api supports them. See: https://github.com/kubernetes/kube-openapi/issues/51",
+                        "description": "Interface model.\nOne of: e1000, e1000e, igb, ne2k_pci, pcnet, rtl8139, virtio.\nDefaults to virtio.",
                         "type": "string"
                       },
                       "name": {
@@ -1134,5 +1134,6 @@
       "version": "v1alpha3"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

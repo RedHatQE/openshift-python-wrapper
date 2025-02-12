@@ -106,7 +106,7 @@
                   "x-kubernetes-int-or-string": true
                 },
                 "completionTimeoutPerGiB": {
-                  "description": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take.\nIf a live-migration takes longer to migrate than this value multiplied by the size of the VMI,\nthe migration will be cancelled, unless AllowPostCopy is true. Defaults to 800",
+                  "description": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take.\nIf a live-migration takes longer to migrate than this value multiplied by the size of the VMI,\nthe migration will be cancelled, unless AllowPostCopy is true. Defaults to 150",
                   "type": "integer",
                   "format": "int64"
                 },
@@ -163,6 +163,10 @@
               "description": "The source node that the VMI originated on",
               "type": "string"
             },
+            "sourcePersistentStatePVCName": {
+              "description": "If the VMI being migrated uses persistent features (backend-storage), its source PVC name is saved here",
+              "type": "string"
+            },
             "sourcePod": {
               "type": "string"
             },
@@ -210,6 +214,10 @@
               "description": "If the VMI requires dedicated CPUs, this field will\nhold the numa topology on the target node",
               "type": "string"
             },
+            "targetPersistentStatePVCName": {
+              "description": "If the VMI being migrated uses persistent features (backend-storage), its target PVC name is saved here",
+              "type": "string"
+            },
             "targetPod": {
               "description": "The target pod that the VMI is moving to",
               "type": "string"
@@ -250,5 +258,6 @@
       "version": "v1alpha3"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

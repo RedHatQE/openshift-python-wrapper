@@ -32,6 +32,42 @@
             }
           ]
         },
+        "mirroring": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "",
+                "pool",
+                "image"
+              ]
+            },
+            "remoteNamespace": {
+              "type": "string"
+            },
+            "snapshotSchedules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "interval": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "startTime": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "name": {
           "type": "string",
           "x-kubernetes-validations": [
@@ -54,5 +90,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

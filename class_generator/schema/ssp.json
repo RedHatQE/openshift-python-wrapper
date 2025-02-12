@@ -21,16 +21,6 @@
         "commonTemplates"
       ],
       "properties": {
-        "commonInstancetypes": {
-          "description": "CommonInstancetypes is the configuration of the common-instancetypes operand\n\n\nDeprecated: This functionality will be removed in a future release.",
-          "type": "object",
-          "properties": {
-            "url": {
-              "description": "URL of a remote Kustomize target from which to generate and deploy resources.\n\n\nThe following caveats apply to the provided URL:\n\n\n* Only 'https://' and 'git://' URLs are supported.\n\n\n* The URL must include '?ref=$ref' or '?version=$ref' pinning it to a specific\n  reference. It is recommended that the reference be a specific commit or tag\n  to ensure the generated contents does not change over time. As such it is\n  recommended not to use branches as the ref for the time being.\n\n\n* Only VirtualMachineClusterPreference and VirtualMachineClusterInstancetype\n  resources generated from the URL are deployed by the operand.\n\n\nSee the following Kustomize documentation for more details:\n\n\nremote targets\nhttps://github.com/kubernetes-sigs/kustomize/blob/master/examples/remoteBuild.md",
-              "type": "string"
-            }
-          }
-        },
         "commonTemplates": {
           "description": "CommonTemplates is the configuration of the common templates operand",
           "type": "object",
@@ -39,7 +29,7 @@
           ],
           "properties": {
             "dataImportCronTemplates": {
-              "description": "DataImportCronTemplates defines a list of DataImportCrons managed by the SSP\nOperator. This is intended for images used by CommonTemplates.",
+              "description": "DataImportCronTemplates defines a list of DataImportCrons managed by the SSP Operator.",
               "type": "array",
               "items": {
                 "description": "DataImportCronTemplate defines the template type for DataImportCrons.\nIt requires metadata.name to be specified while leaving namespace as optional.",
@@ -803,41 +793,6 @@
               "type": "string",
               "maxLength": 63,
               "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
-            }
-          }
-        },
-        "featureGates": {
-          "description": "FeatureGates for SSP",
-          "type": "object",
-          "properties": {
-            "deployCommonInstancetypes": {
-              "description": "Enables deployment of the common-instancetypes bundles, defaults to true.",
-              "type": "boolean"
-            },
-            "deployTektonTaskResources": {
-              "description": "Deprecated: This field is ignored.",
-              "type": "boolean"
-            },
-            "deployVmConsoleProxy": {
-              "type": "boolean"
-            }
-          }
-        },
-        "tektonPipelines": {
-          "description": "TektonPipelines is the configuration of the tekton-pipelines operand\nDeprecated: This field is ignored.",
-          "type": "object",
-          "properties": {
-            "namespace": {
-              "type": "string"
-            }
-          }
-        },
-        "tektonTasks": {
-          "description": "TektonTasks is the configuration of the tekton-tasks operand\nDeprecated: This field is ignored.",
-          "type": "object",
-          "properties": {
-            "namespace": {
-              "type": "string"
             }
           }
         },
@@ -1679,6 +1634,15 @@
               ]
             }
           }
+        },
+        "tokenGenerationService": {
+          "description": "TokenGenerationService configures the service for generating tokens to access VNC for a VM.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
         }
       }
     },
@@ -1753,8 +1717,9 @@
     {
       "group": "ssp.kubevirt.io",
       "kind": "SSP",
-      "version": "v1beta2"
+      "version": "v1beta3"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

@@ -13,7 +13,7 @@
       "description": "List of ssps. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.kubevirt.ssp.v1beta2.SSP"
+        "$ref": "_definitions.json#/definitions/io.kubevirt.ssp.v1beta3.SSP"
       }
     },
     "kind": {
@@ -29,8 +29,9 @@
     {
       "group": "ssp.kubevirt.io",
       "kind": "SSPList",
-      "version": "v1beta2"
+      "version": "v1beta3"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

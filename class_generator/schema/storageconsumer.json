@@ -65,6 +65,10 @@
           "description": "Information of storage client received from consumer",
           "type": "object",
           "properties": {
+            "clientId": {
+              "description": "ID is the k8s UID of connected storageclient",
+              "type": "string"
+            },
             "clusterId": {
               "description": "ClusterID is the id of the openshift cluster",
               "type": "string"
@@ -84,6 +88,10 @@
             "platformVersion": {
               "description": "StorageClient Platform Version",
               "type": "string"
+            },
+            "storageQuotaUtilizationRatio": {
+              "description": "StorageQuotaUtilizationRatio is the ratio of utilized quota of connected client",
+              "type": "number"
             }
           }
         },
@@ -106,5 +114,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

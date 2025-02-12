@@ -18,37 +18,28 @@
       "description": "ClientProfileMappingSpec defines the desired state of ClientProfileMapping",
       "type": "object",
       "properties": {
-        "blockPoolMapping": {
+        "mappings": {
           "type": "array",
           "items": {
-            "description": "BlockPoolMappingSpec define a mapiing between a local and remote block pools",
+            "description": "MappingsSpec define a mapping between a local and remote profiles",
             "type": "object",
             "properties": {
-              "local": {
-                "description": "BlockPoolRefSpec identify a blockpool - client profile pair",
-                "type": "object",
-                "properties": {
-                  "clientProfileName": {
+              "blockPoolIdMapping": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "items": {
                     "type": "string"
-                  },
-                  "poolId": {
-                    "type": "integer",
-                    "minimum": 0
                   }
                 }
               },
-              "remote": {
-                "description": "BlockPoolRefSpec identify a blockpool - client profile pair",
-                "type": "object",
-                "properties": {
-                  "clientProfileName": {
-                    "type": "string"
-                  },
-                  "poolId": {
-                    "type": "integer",
-                    "minimum": 0
-                  }
-                }
+              "localClientProfile": {
+                "type": "string"
+              },
+              "remoteClientProfile": {
+                "type": "string"
               }
             }
           }
@@ -67,5 +58,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
