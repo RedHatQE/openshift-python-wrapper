@@ -12,7 +12,8 @@
     },
     "groupVersion": {
       "description": "groupVersion is the group and version this APIResourceList is for.",
-      "type": "string"
+      "type": "string",
+      "default": ""
     },
     "kind": {
       "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
@@ -22,17 +23,11 @@
       "description": "resources contains the name of the resources and if they are namespaced.",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
+        "default": {},
+        "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.APIResource"
       },
       "x-kubernetes-list-type": "atomic"
     }
   },
-  "x-kubernetes-group-version-kind": [
-    {
-      "group": "",
-      "kind": "APIResourceList",
-      "version": "v1"
-    }
-  ],
   "$schema": "http://json-schema.org/schema#"
 }

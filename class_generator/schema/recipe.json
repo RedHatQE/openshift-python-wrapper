@@ -25,34 +25,6 @@
           "description": "Type of application the recipe is designed for. (AppType is not used yet. For now, we will\nmatch the name of the app CR)",
           "type": "string"
         },
-        "captureWorkflow": {
-          "description": "The sequence of actions to capture data to protect from disaster",
-          "type": "object",
-          "required": [
-            "sequence"
-          ],
-          "properties": {
-            "failOn": {
-              "description": "Implies behaviour in case of failure: any-error (default), essential-error, full-error",
-              "type": "string",
-              "enum": [
-                "any-error",
-                "essential-error",
-                "full-error"
-              ]
-            },
-            "sequence": {
-              "description": "List of the names of groups or hooks, in the order in which they should be executed\nFormat: <group|hook>: <group or hook name>[/<hook op>]",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "groups": {
           "description": "List of one or multiple groups",
           "type": "array",
@@ -72,6 +44,13 @@
                 "description": "Defaults to true, if set to false, a failure is not necessarily handled as fatal",
                 "type": "boolean"
               },
+              "excludedNamespaces": {
+                "description": "List of namespace to exclude",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
               "excludedResourceTypes": {
                 "description": "List of resource types to exclude",
                 "type": "array",
@@ -89,6 +68,51 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "includedNamespacesByLabel": {
+                "description": "Selects namespaces by label",
+                "type": "object",
+                "properties": {
+                  "matchExpressions": {
+                    "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                    "type": "array",
+                    "items": {
+                      "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                      "type": "object",
+                      "required": [
+                        "key",
+                        "operator"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "key is the label key that the selector applies to.",
+                          "type": "string"
+                        },
+                        "operator": {
+                          "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                          "type": "string"
+                        },
+                        "values": {
+                          "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "x-kubernetes-list-type": "atomic"
+                        }
+                      }
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  },
+                  "matchLabels": {
+                    "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "x-kubernetes-map-type": "atomic"
               },
               "includedResourceTypes": {
                 "description": "List of resource types to include. If unspecified, all resource types are included.",
@@ -125,10 +149,12 @@
                           "type": "array",
                           "items": {
                             "type": "string"
-                          }
+                          },
+                          "x-kubernetes-list-type": "atomic"
                         }
                       }
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   },
                   "matchLabels": {
                     "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -151,6 +177,30 @@
               "parent": {
                 "description": "Name of the parent group defined in the associated Application CR. Optional - If unspecified,\nparent group is represented by the implicit default group of Application CR (implies the\nApplication CR does not specify groups explicitly).",
                 "type": "string"
+              },
+              "restoreOverwriteResources": {
+                "description": "Whether to overwrite resources during restore. Default to false.",
+                "type": "boolean"
+              },
+              "restoreStatus": {
+                "description": "RestoreStatus restores status if set to all the includedResources specified. Specify '*' to restore all statuses for all the CRs",
+                "type": "object",
+                "properties": {
+                  "excludedResources": {
+                    "description": "List of resource types to exclude.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "includedResources": {
+                    "description": "List of resource types to include. If unspecified, all resource types are included.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
               },
               "selectResource": {
                 "description": "Determines the resource type which the fields labelSelector and nameSelector apply to for selecting PVCs. Default selection is pvc. Valid for volume groups only.",
@@ -185,6 +235,7 @@
             "type": "object",
             "required": [
               "name",
+              "namespace",
               "type"
             ],
             "properties": {
@@ -211,9 +262,8 @@
                       "type": "string"
                     },
                     "timeout": {
-                      "description": "How long to wait for the check to execute",
-                      "type": "string",
-                      "format": "duration"
+                      "description": "How long to wait for the check to execute, in seconds",
+                      "type": "integer"
                     }
                   }
                 },
@@ -254,10 +304,12 @@
                           "type": "array",
                           "items": {
                             "type": "string"
-                          }
+                          },
+                          "x-kubernetes-list-type": "atomic"
                         }
                       }
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   },
                   "matchLabels": {
                     "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -302,11 +354,8 @@
                   "properties": {
                     "command": {
                       "description": "The command to execute",
-                      "type": "array",
-                      "minItems": 1,
-                      "items": {
-                        "type": "string"
-                      }
+                      "type": "string",
+                      "minLength": 1
                     },
                     "container": {
                       "description": "The container where the command should be executed",
@@ -325,9 +374,8 @@
                       "type": "string"
                     },
                     "timeout": {
-                      "description": "How long to wait for the command to execute",
-                      "type": "string",
-                      "format": "duration"
+                      "description": "How long to wait for the command to execute, in seconds",
+                      "type": "integer"
                     }
                   }
                 },
@@ -338,21 +386,15 @@
               },
               "selectResource": {
                 "description": "Resource type to that a hook applies to",
-                "type": "string",
-                "enum": [
-                  "pod",
-                  "deployment",
-                  "statefulset"
-                ]
+                "type": "string"
               },
               "singlePodOnly": {
                 "description": "Boolean flag that indicates whether to execute command on a single pod or on all pods that\nmatch the selector",
                 "type": "boolean"
               },
               "timeout": {
-                "description": "Default timeout applied to custom and built-in operations. If not specified, equals to 30s.",
-                "type": "string",
-                "format": "duration"
+                "description": "Default timeout in seconds applied to custom and built-in operations. If not specified, equals to 30s.",
+                "type": "integer"
               },
               "type": {
                 "description": "Hook type",
@@ -370,34 +412,6 @@
           ],
           "x-kubernetes-list-type": "map"
         },
-        "recoverWorkflow": {
-          "description": "The sequence of actions to recover data protected from disaster",
-          "type": "object",
-          "required": [
-            "sequence"
-          ],
-          "properties": {
-            "failOn": {
-              "description": "Implies behaviour in case of failure: any-error (default), essential-error, full-error",
-              "type": "string",
-              "enum": [
-                "any-error",
-                "essential-error",
-                "full-error"
-              ]
-            },
-            "sequence": {
-              "description": "List of the names of groups or hooks, in the order in which they should be executed\nFormat: <group|hook>: <group or hook name>[/<hook op>]",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
         "volumes": {
           "description": "Volumes to protect from disaster",
           "type": "object",
@@ -413,6 +427,13 @@
             "essential": {
               "description": "Defaults to true, if set to false, a failure is not necessarily handled as fatal",
               "type": "boolean"
+            },
+            "excludedNamespaces": {
+              "description": "List of namespace to exclude",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "excludedResourceTypes": {
               "description": "List of resource types to exclude",
@@ -431,6 +452,51 @@
               "items": {
                 "type": "string"
               }
+            },
+            "includedNamespacesByLabel": {
+              "description": "Selects namespaces by label",
+              "type": "object",
+              "properties": {
+                "matchExpressions": {
+                  "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                  "type": "array",
+                  "items": {
+                    "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "key is the label key that the selector applies to.",
+                        "type": "string"
+                      },
+                      "operator": {
+                        "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                        "type": "string"
+                      },
+                      "values": {
+                        "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "x-kubernetes-list-type": "atomic"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "matchLabels": {
+                  "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
             },
             "includedResourceTypes": {
               "description": "List of resource types to include. If unspecified, all resource types are included.",
@@ -467,10 +533,12 @@
                         "type": "array",
                         "items": {
                           "type": "string"
-                        }
+                        },
+                        "x-kubernetes-list-type": "atomic"
                       }
                     }
-                  }
+                  },
+                  "x-kubernetes-list-type": "atomic"
                 },
                 "matchLabels": {
                   "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -494,6 +562,30 @@
               "description": "Name of the parent group defined in the associated Application CR. Optional - If unspecified,\nparent group is represented by the implicit default group of Application CR (implies the\nApplication CR does not specify groups explicitly).",
               "type": "string"
             },
+            "restoreOverwriteResources": {
+              "description": "Whether to overwrite resources during restore. Default to false.",
+              "type": "boolean"
+            },
+            "restoreStatus": {
+              "description": "RestoreStatus restores status if set to all the includedResources specified. Specify '*' to restore all statuses for all the CRs",
+              "type": "object",
+              "properties": {
+                "excludedResources": {
+                  "description": "List of resource types to exclude.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "includedResources": {
+                  "description": "List of resource types to include. If unspecified, all resource types are included.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
             "selectResource": {
               "description": "Determines the resource type which the fields labelSelector and nameSelector apply to for selecting PVCs. Default selection is pvc. Valid for volume groups only.",
               "type": "string",
@@ -513,6 +605,47 @@
               ]
             }
           }
+        },
+        "workflows": {
+          "description": "Workflow is the sequence of actions to take",
+          "type": "array",
+          "items": {
+            "description": "Workflow is the sequence of actions to take",
+            "type": "object",
+            "required": [
+              "name",
+              "sequence"
+            ],
+            "properties": {
+              "failOn": {
+                "description": "Implies behaviour in case of failure: any-error (default), essential-error, full-error",
+                "type": "string",
+                "enum": [
+                  "any-error",
+                  "essential-error",
+                  "full-error"
+                ]
+              },
+              "name": {
+                "description": "Name of recipe. Names \"backup\" and \"restore\" are reserved and implicitly used by default for\nbackup or restore respectively",
+                "type": "string"
+              },
+              "sequence": {
+                "description": "List of the names of groups or hooks, in the order in which they should be executed\nFormat: <group|hook>: <group or hook name>[/<hook op>]",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
         }
       }
     },
@@ -528,5 +661,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
