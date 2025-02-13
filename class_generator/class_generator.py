@@ -1,33 +1,32 @@
 from __future__ import annotations
 
+import ast
 import filecmp
 import json
-import shlex
 import os
-import sys
-import requests
-from pathlib import Path
-from packaging.version import Version
-import shutil
-from tempfile import gettempdir
-
-import textwrap
-from typing import Any
-import click
 import re
+import shlex
+import shutil
+import sys
+import textwrap
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from pathlib import Path
+from tempfile import gettempdir
+from typing import Any
+
+import click
 import cloup
-from cloup.constraints import If, IsSet, accept_none, require_one
-from pyhelper_utils.shell import run_command
 import pytest
+import requests
+from cloup.constraints import If, IsSet, accept_none, require_one
+from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
+from packaging.version import Version
+from pyhelper_utils.shell import run_command
 from rich.console import Console
 from rich.syntax import Syntax
-
-from ocp_resources.resource import Resource
-
-from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
 
+from ocp_resources.resource import Resource
 
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
@@ -370,9 +369,18 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
         _end_of_generated_code_index = data.index(end_of_generated_code_line)
         user_code = data[_end_of_generated_code_index + len(end_of_generated_code_line) :]
 
-    for _line in data.splitlines():
-        if _line.startswith("import") or _line.startswith("from"):
-            user_imports += f"{_line}\n"
+        tree = ast.parse(data)
+        imports = [imp for imp in tree.body if isinstance(imp, ast.Import) or isinstance(imp, ast.ImportFrom)]
+        splited_data = data.splitlines()
+
+        for _import in imports:
+            end_import_no = _import.end_lineno
+
+            if end_import_no and _import.lineno != end_import_no:
+                for num in range(_import.lineno - 1, end_import_no):
+                    user_imports += f"{splited_data[num]}\n"
+            else:
+                user_imports += f"{splited_data[_import.lineno - 1]}\n"
 
     return user_code, user_imports
 
