@@ -59,7 +59,7 @@ repos:
         additional_dependencies: ["types-PyYAML", "types-requests"]
 
   - repo: https://github.com/espressif/conventional-precommit-linter
-    rev: v1.7.0 # The version tag you wish to use
+    rev: v1.10.0 # The version tag you wish to use
     hooks:
       - id: conventional-precommit-linter
         stages: [commit-msg]
