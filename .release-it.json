@@ -37,19 +37,11 @@
   },
   "plugins": {
     "@release-it/conventional-changelog": {
+      "writerOpts": {
+        "groupBy": "scope"
+      },
       "preset": {
-        "name": "conventionalcommits",
-        "types": [
-          {
-            "type": "feat",
-            "section": "Features"
-          },
-          {
-            "type": "fix",
-            "section": "Bug Fixes"
-          },
-          {}
-        ]
+        "name": "conventionalcommits"
       },
       "infile": "CHANGELOG.md"
     },
