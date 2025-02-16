@@ -67,10 +67,10 @@ sudo npm install -g conventional-changelog-cli
 ### usage
 
 - Create a release, run from the relevant branch.  
-  To create a 4.11 release, run:
+  To create a 4.17 release, run:
 
 ```bash
-git checkout v4.11
+git checkout v4.17
 git pull
 release-it # Follow the instructions
 ```
