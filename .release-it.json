@@ -39,7 +39,7 @@
     "@release-it/conventional-changelog": {
       "ignoreRecommendedBump": true,
       "preset": {
-        "name": "angular"
+        "name": "atom"
       }
     },
     "@release-it/bumper": {
