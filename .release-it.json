@@ -9,7 +9,7 @@
     "requireCommits": false,
     "addUntrackedFiles": false,
     "commit": true,
-    "commitMessage": "Release ${version}",
+    "commitMessage": "release: Release ${version}",
     "commitArgs": [],
     "tag": true,
     "tagName": null,
