@@ -39,7 +39,7 @@
     "@release-it/conventional-changelog": {
       "ignoreRecommendedBump": true,
       "preset": {
-        "name": "codemirror"
+        "name": "ember"
       }
     },
     "@release-it/bumper": {
