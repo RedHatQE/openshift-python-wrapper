@@ -39,7 +39,7 @@
     "@release-it/conventional-changelog": {
       "ignoreRecommendedBump": true,
       "preset": {
-        "name": "ember"
+        "name": "express"
       }
     },
     "@release-it/bumper": {
