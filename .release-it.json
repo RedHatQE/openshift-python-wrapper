@@ -39,7 +39,7 @@
     "@release-it/conventional-changelog": {
       "ignoreRecommendedBump": true,
       "preset": {
-        "name": "atom"
+        "name": "codemirror"
       }
     },
     "@release-it/bumper": {
