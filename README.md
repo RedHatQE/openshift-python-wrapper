@@ -58,13 +58,19 @@ sudo npm install --global release-it
 npm install --save-dev @release-it/bumper
 ```
 
+- [git-cliff](https://github.com/orhun/git-cliff)
+
+```bash
+sudo npm install -g conventional-changelog-cli
+```
+
 ### usage
 
 - Create a release, run from the relevant branch.  
-  To create a 4.11 release, run:
+  To create a 4.17 release, run:
 
 ```bash
-git checkout v4.11
+git checkout v4.17
 git pull
 release-it # Follow the instructions
 ```
@@ -103,11 +109,13 @@ To enable proxy configuration for the client:
 1. Set the environment variable `OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY=<any value>`
 
 2. Define either `HTTPS_PROXY` or `HTTP_PROXY` environment variable with your proxy URL:
+
 ```bash
 export HTTPS_PROXY="http://proxy.example.com:8080"
 # or
 export HTTP_PROXY="http://proxy.example.com:8080"
 ```
+
 If neither variable is set when proxy is enabled, a `ValueError` will be raised.
 
 ## Code check
