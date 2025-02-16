@@ -39,7 +39,7 @@
     "@release-it/conventional-changelog": {
       "ignoreRecommendedBump": true,
       "preset": {
-        "name": "express"
+        "name": "conventionalcommits"
       }
     },
     "@release-it/bumper": {
