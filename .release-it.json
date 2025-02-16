@@ -39,7 +39,7 @@
     "@release-it/conventional-changelog": {
       "ignoreRecommendedBump": true,
       "parserOpts": {
-        "mergePattern": "^Merge pull request #(\\d+) from (.*)$"
+        "mergePattern": "#(\\d+) from (.*)$"
       },
       "preset": {
         "name": "conventionalcommits"
