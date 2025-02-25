@@ -7,9 +7,7 @@ from ocp_resources.resource import NamespacedResource
 
 
 class Notebook(NamespacedResource):
-    """
-    No field description from API; please add description
-    """
+    """Notebook is the CR for Kubeflow Notebooks 1.x (and OpenShift AI Workbenches)."""
 
     api_group: str = NamespacedResource.ApiGroup.KUBEFLOW_ORG
 
@@ -20,8 +18,7 @@ class Notebook(NamespacedResource):
     ) -> None:
         """
         Args:
-            template (dict[str, Any]): No field description from API; please add description
-
+            template (dict[str, Any]): Pod template for the notebook pod.
         """
         super().__init__(**kwargs)
 
