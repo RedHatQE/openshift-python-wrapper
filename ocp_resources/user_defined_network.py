@@ -102,6 +102,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         subnets: Optional[List[str]] = None,
         join_subnets: Optional[List[str]] = None,
         ipam_lifecycle: Optional[str] = None,
+        ipam: Optional[dict[str, Any]] = None,
         **kwargs,
     ):
         """
@@ -113,6 +114,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
             ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
+            ipam (Optional[dict[str, Any]]): ipam section contains IPAM-related configuration for the network.
         """
         super().__init__(
             topology=self.LAYER2,
@@ -123,6 +125,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         self.subnets = subnets
         self.join_subnets = join_subnets
         self.ipam_lifecycle = ipam_lifecycle
+        self.ipam = ipam
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -143,7 +146,11 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
                 _layer2["joinSubnets"] = self.join_subnets
 
             if self.ipam_lifecycle:
-                _layer2["ipamLifecycle"] = self.ipam_lifecycle
+                self.logger.warn("ipam_lifecycle is deprecated and will be removed in the future. Use ipam instead.")
+                _layer2["ipam"] = self.ipam_lifecycle
+
+            if self.ipam:
+                _layer2["ipam"] = self.ipam
 
 
 class Layer3UserDefinedNetwork(UserDefinedNetwork):
