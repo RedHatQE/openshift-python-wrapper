@@ -1,4 +1,4 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -41,7 +41,7 @@ class SriovNetwork(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res["spec"] = {
                 "ipam": self.ipam or "{}\n",
                 "networkNamespace": self.network_namespace,

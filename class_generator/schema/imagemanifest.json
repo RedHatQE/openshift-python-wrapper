@@ -1,0 +1,39 @@
+{
+  "description": "ImageManifest represents sub-manifests of a manifest list. The Digest field points to a regular Image object.",
+  "type": "object",
+  "required": [
+    "digest",
+    "mediaType",
+    "manifestSize",
+    "architecture",
+    "os"
+  ],
+  "properties": {
+    "architecture": {
+      "description": "Architecture specifies the supported CPU architecture, for example `amd64` or `ppc64le`.",
+      "type": "string"
+    },
+    "digest": {
+      "description": "Digest is the unique identifier for the manifest. It refers to an Image object.",
+      "type": "string"
+    },
+    "manifestSize": {
+      "description": "ManifestSize represents the size of the raw object contents, in bytes.",
+      "type": "integer",
+      "format": "int64"
+    },
+    "mediaType": {
+      "description": "MediaType defines the type of the manifest, possible values are application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json or application/vnd.docker.distribution.manifest.v1+json.",
+      "type": "string"
+    },
+    "os": {
+      "description": "OS specifies the operating system, for example `linux`.",
+      "type": "string"
+    },
+    "variant": {
+      "description": "Variant is an optional field repreenting a variant of the CPU, for example v6 to specify a particular CPU variant of the ARM CPU.",
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

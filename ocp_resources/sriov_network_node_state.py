@@ -9,6 +9,9 @@ class SriovNetworkNodeState(NamespacedResource):
 
     api_group = NamespacedResource.ApiGroup.SRIOVNETWORK_OPENSHIFT_IO
 
+    class SyncStatus:
+        IN_PROGRESS: str = "InProgress"
+
     @property
     def interfaces(self):
         return self.instance.status.interfaces
@@ -45,5 +48,5 @@ class SriovNetworkNodeState(NamespacedResource):
                 if sample == wanted_status:
                     return
         except TimeoutExpiredError:
-            self.logger.error(f"after {timeout} seconds, {self.name} status is" f" {self.instance.status.syncStatus}")
+            self.logger.error(f"after {timeout} seconds, {self.name} status is {self.instance.status.syncStatus}")
             raise

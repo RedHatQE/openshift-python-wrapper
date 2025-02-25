@@ -18,7 +18,6 @@ class Restore(NamespacedResource):
         backup_name=None,
         client=None,
         teardown=False,
-        privileged_client=None,
         yaml_file=None,
         **kwargs,
     ):
@@ -27,7 +26,6 @@ class Restore(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             **kwargs,
         )
@@ -38,11 +36,11 @@ class Restore(NamespacedResource):
     def to_dict(self) -> None:
         super().to_dict()
 
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not self.backup_name:
                 raise MissingRequiredArgumentError(argument="backup_name")
 
-            if not self.yaml_file:
+            if not self.kind_dict and not self.yaml_file:
                 self.res.update({
                     "spec": {
                         "backupName": self.backup_name,

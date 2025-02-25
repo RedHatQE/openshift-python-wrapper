@@ -1,97 +1,85 @@
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
+from __future__ import annotations
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+
+from typing import Any
 
 
 class DataImportCron(NamespacedResource):
     """
-    https://kubevirt.io/cdi-api-reference/main/definitions.html#_v1beta1_dataimportcron
+    DataImportCron defines a cron job for recurring polling/importing disk images as PVCs into a golden image namespace
     """
 
-    api_group = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
+    api_group: str = NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO
 
     def __init__(
         self,
-        image_stream=None,
-        url=None,
-        cert_configmap=None,
-        pull_method=None,
-        storage_class=None,
-        size=None,
-        schedule=None,
-        garbage_collect=None,
-        managed_data_source=None,
-        imports_to_keep=None,
-        bind_immediate_annotation=None,
-        **kwargs,
-    ):
+        garbage_collect: str | None = None,
+        imports_to_keep: int | None = None,
+        managed_data_source: str | None = None,
+        retention_policy: str | None = None,
+        schedule: str | None = None,
+        template: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
-            garbage_collect (str, optional): whether old PVCs should be cleaned up after a new PVC is imported.
-                Options are "Outdated"/"Never".
-            imports_to_keep (int, optional): number of import PVCs to keep when garbage collecting.
-            managed_data_source(str, optional): specifies the name of the corresponding DataSource to manage.
-                DataSource has to be in the same namespace.
-            schedule (str, optional): specifies in cron format when and how often to look for new imports.
-            storage_class (str, optional): Name of the StorageClass required by the claim.
-            size (str): Size of the resources claim quantity. Format is size+size unit, for example: "5Gi".
-            url (str, optional): URL is the url of the registry source (starting with the scheme: docker, oci-archive).
-            cert_configmap (str, optional): CertConfigMap provides a reference to the Registry certs
-            image_stream (str, optional): ImageStream is the name of image stream for import
-            bind_immediate_annotation (bool, optional): when WaitForFirstConsumer is set in StorageClass and the
-                DataSource should be bound immediately.
-            pull_method (str): can be either "pod" or "node" (node docker cache based import)
+            garbage_collect (str): GarbageCollect specifies whether old PVCs should be cleaned up after a
+              new PVC is imported. Options are currently "Outdated" and "Never",
+              defaults to "Outdated".
+
+            imports_to_keep (int): Number of import PVCs to keep when garbage collecting. Default is 3.
+
+            managed_data_source (str): ManagedDataSource specifies the name of the corresponding DataSource
+              this cron will manage. DataSource has to be in the same namespace.
+
+            retention_policy (str): RetentionPolicy specifies whether the created DataVolumes and
+              DataSources are retained when their DataImportCron is deleted.
+              Default is RatainAll.
+
+            schedule (str): Schedule specifies in cron format when and how often to look for new
+              imports
+
+            template (dict[str, Any]): Template specifies template for the DVs to be created
+
         """
         super().__init__(**kwargs)
-        self.image_stream = image_stream
-        self.url = url
-        self.cert_configmap = cert_configmap
-        self.pull_method = pull_method
-        self.storage_class = storage_class
-        self.size = size
-        self.schedule = schedule
+
         self.garbage_collect = garbage_collect
-        self.managed_data_source = managed_data_source
         self.imports_to_keep = imports_to_keep
-        self.bind_immediate_annotation = bind_immediate_annotation
+        self.managed_data_source = managed_data_source
+        self.retention_policy = retention_policy
+        self.schedule = schedule
+        self.template = template
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
-            if self.image_stream and self.url:
-                raise ValueError("imageStream and url cannot coexist")
 
-            if not self.pull_method:
-                raise MissingRequiredArgumentError(argument="pull_method")
+        if not self.kind_dict and not self.yaml_file:
+            if self.managed_data_source is None:
+                raise MissingRequiredArgumentError(argument="self.managed_data_source")
 
-            self.res.update({
-                "spec": {
-                    "template": {"spec": {"source": {"registry": {"pullMethod": self.pull_method}}}},
-                }
-            })
-            spec = self.res["spec"]["template"]["spec"]
+            if self.schedule is None:
+                raise MissingRequiredArgumentError(argument="self.schedule")
 
-            if self.bind_immediate_annotation:
-                self.res["metadata"].setdefault("annotations", {}).update({
-                    f"{NamespacedResource.ApiGroup.CDI_KUBEVIRT_IO}/storage.bind.immediate.requested": ("true")
-                })
-            if self.image_stream:
-                spec["source"]["registry"]["imageStream"] = self.image_stream
-            if self.url:
-                spec["source"]["registry"]["url"] = self.url
-            if self.cert_configmap:
-                spec["source"]["registry"]["certConfigMap"] = self.cert_configmap
-            if self.schedule:
-                self.res["spec"]["schedule"] = self.schedule
-            if self.garbage_collect:
-                self.res["spec"]["garbageCollect"] = self.garbage_collect
-            if self.managed_data_source:
-                self.res["spec"]["managedDataSource"] = self.managed_data_source
-            if self.imports_to_keep:
-                self.res["spec"]["importsToKeep"] = self.imports_to_keep
+            if self.template is None:
+                raise MissingRequiredArgumentError(argument="self.template")
 
-            storage = {}
-            if self.size:
-                storage["resources"] = {"requests": {"storage": self.size}}
-            if self.storage_class:
-                storage["storageClassName"] = self.storage_class
-            if storage:
-                spec["storage"] = storage
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            _spec["managedDataSource"] = self.managed_data_source
+            _spec["schedule"] = self.schedule
+            _spec["template"] = self.template
+
+            if self.garbage_collect is not None:
+                _spec["garbageCollect"] = self.garbage_collect
+
+            if self.imports_to_keep is not None:
+                _spec["importsToKeep"] = self.imports_to_keep
+
+            if self.retention_policy is not None:
+                _spec["retentionPolicy"] = self.retention_policy
+
+    # End of generated code

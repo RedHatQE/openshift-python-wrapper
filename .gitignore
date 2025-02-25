@@ -96,6 +96,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.envrc
 
 # Spyder project settings
 .spyderproject
@@ -123,3 +124,6 @@ local-cluster/_hco/
 node_modules/
 package.json
 package-lock.json
+
+# Dev
+.local_dev/

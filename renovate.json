@@ -1,27 +1,24 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranches": ["main", "v4.15", "v4.14"],
+  "extends": [
+    ":dependencyDashboard",
+    ":maintainLockFilesWeekly",
+    ":prHourlyLimitNone"
+  ],
+  "prConcurrentLimit": 0,
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "baseBranches": ["main", "v4.17", "v4.16", "v4.15"],
+  "ignoreDeps": ["kubernetes"],
   "packageRules": [
     {
-      "baseBranchList": ["v4.14"],
-      "excludeDepNames": ["kubernetes", "openshift"],
+      "baseBranchList": ["v4.17", "v4.16", "v4.15"],
       "enabled": false
     },
     {
-      "matchPackagePatterns": [
-        "xmltodict",
-        "colorlog",
-        "kubernetes",
-        "python-benedict",
-        "packaging",
-        "python-simple-logger",
-        "jinja2",
-        "timeout-sampler",
-        "ipdb",
-        "pytest",
-        "requests"
-      ],
-      "groupName": "poetry-deps"
+      "matchPackagePatterns": ["*"],
+      "groupName": "python-dependencies"
     }
   ]
 }

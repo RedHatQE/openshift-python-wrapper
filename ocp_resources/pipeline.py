@@ -8,21 +8,14 @@ class Pipeline(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
         tasks=None,
         params=None,
         final_parallel_tasks=None,
-        client=None,
-        yaml_file=None,
         **kwargs,
     ):
         """
         Args:
-            name (str): Name of the pipeline
-            namespace (str): Namespace of the pipeline
             tasks (str, optional): actions to perform in pipeline
-            client: (DynamicClient): DynamicClient to use.
             params (dict, optional):  params to support pipelines.
             params can be set/changed based on tasks.
             example: 'spec': {'params': [{'name': 'sourceTemplateName','type': 'string','default':'openshift'},
@@ -31,12 +24,7 @@ class Pipeline(NamespacedResource):
             tasks have completed in parallel.
             spec section can't be empty. It requires at least one optional field.
         """
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         # TODO: Add a check for tasks when bug https://issues.redhat.com/browse/SRVKP-3019 is resolved.
         self.tasks = tasks
         self.params = params
@@ -44,7 +32,7 @@ class Pipeline(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not (self.tasks or self.params or self.final_parallel_tasks):
                 raise MissingRequiredArgumentError(argument="'tasks' or 'params' or 'final_parallel_tasks'")
 

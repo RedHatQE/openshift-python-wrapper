@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+from typing import Any
 
 
-from ocp_resources.constants import (
+from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,
+    TIMEOUT_30SEC,
+    TIMEOUT_5SEC,
 )
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
@@ -47,7 +50,6 @@ class VirtualMachine(NamespacedResource):
         client=None,
         body=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -57,7 +59,6 @@ class VirtualMachine(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -72,12 +73,21 @@ class VirtualMachine(NamespacedResource):
             f"namespaces/{self.namespace}/virtualmachines/{self.name}"
         )
 
-    def api_request(self, method, action, **params):
-        return super().api_request(method=method, action=action, url=self._subresource_api_url, **params)
+    def api_request(
+        self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
+    ) -> dict[str, Any]:
+        default_vm_api_request_retry_params: dict[str, int] = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
+        return super().api_request(
+            method=method,
+            action=action,
+            url=url or self._subresource_api_url,
+            retry_params=retry_params or default_vm_api_request_retry_params,
+            **params,
+        )
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             body_spec = self.body.get("spec") if self.body else None
             self.res["spec"] = body_spec or {"template": {"spec": {}}}
 
@@ -142,7 +152,6 @@ class VirtualMachine(NamespacedResource):
             client=self.client,
             name=self.name,
             namespace=self.namespace,
-            privileged_client=self.privileged_client or self.client,
         )
 
     @property
@@ -175,3 +184,7 @@ class VirtualMachine(NamespacedResource):
         ):
             if sample is None:
                 return
+
+    @property
+    def keys_to_hash(self):
+        return ["spec>template>spec>volumes[]>cloudInitNoCloud>userData"]

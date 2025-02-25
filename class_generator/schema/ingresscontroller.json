@@ -1,0 +1,1781 @@
+{
+  "description": "IngressController describes a managed ingress controller for the cluster. The\ncontroller can service OpenShift Route and Kubernetes Ingress resources.\n\nWhen an IngressController is created, a new ingress controller deployment is\ncreated to allow external traffic to reach the services that expose Ingress\nor Route resources. Updating this resource may lead to disruption for public\nfacing network connections as a new ingress controller revision may be rolled\nout.\n\nhttps://kubernetes.io/docs/concepts/services-networking/ingress-controllers\n\nWhenever possible, sensible defaults for the platform are used. See each\nfield for more details.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "spec is the specification of the desired behavior of the IngressController.",
+      "type": "object",
+      "properties": {
+        "clientTLS": {
+          "description": "clientTLS specifies settings for requesting and verifying client\ncertificates, which can be used to enable mutual TLS for\nedge-terminated and reencrypt routes.",
+          "type": "object",
+          "required": [
+            "clientCA",
+            "clientCertificatePolicy"
+          ],
+          "properties": {
+            "allowedSubjectPatterns": {
+              "description": "allowedSubjectPatterns specifies a list of regular expressions that\nshould be matched against the distinguished name on a valid client\ncertificate to filter requests.  The regular expressions must use\nPCRE syntax.  If this list is empty, no filtering is performed.  If\nthe list is nonempty, then at least one pattern must match a client\ncertificate's distinguished name or else the ingress controller\nrejects the certificate and denies the connection.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "clientCA": {
+              "description": "clientCA specifies a configmap containing the PEM-encoded CA\ncertificate bundle that should be used to verify a client's\ncertificate.  The administrator must create this configmap in the\nopenshift-config namespace.",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "description": "name is the metadata.name of the referenced config map",
+                  "type": "string"
+                }
+              }
+            },
+            "clientCertificatePolicy": {
+              "description": "clientCertificatePolicy specifies whether the ingress controller\nrequires clients to provide certificates.  This field accepts the\nvalues \"Required\" or \"Optional\".\n\nNote that the ingress controller only checks client certificates for\nedge-terminated and reencrypt TLS routes; it cannot check\ncertificates for cleartext HTTP or passthrough TLS routes.",
+              "type": "string",
+              "enum": [
+                "",
+                "Required",
+                "Optional"
+              ]
+            }
+          }
+        },
+        "defaultCertificate": {
+          "description": "defaultCertificate is a reference to a secret containing the default\ncertificate served by the ingress controller. When Routes don't specify\ntheir own certificate, defaultCertificate is used.\n\nThe secret must contain the following keys and data:\n\n  tls.crt: certificate file contents\n  tls.key: key file contents\n\nIf unset, a wildcard certificate is automatically generated and used. The\ncertificate is valid for the ingress controller domain (and subdomains) and\nthe generated certificate's CA will be automatically integrated with the\ncluster's trust store.\n\nIf a wildcard certificate is used and shared by multiple\nHTTP/2 enabled routes (which implies ALPN) then clients\n(i.e., notably browsers) are at liberty to reuse open\nconnections. This means a client can reuse a connection to\nanother route and that is likely to fail. This behaviour is\ngenerally known as connection coalescing.\n\nThe in-use certificate (whether generated or user-specified) will be\nautomatically integrated with OpenShift's built-in OAuth server.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "domain": {
+          "description": "domain is a DNS name serviced by the ingress controller and is used to\nconfigure multiple features:\n\n* For the LoadBalancerService endpoint publishing strategy, domain is\n  used to configure DNS records. See endpointPublishingStrategy.\n\n* When using a generated default certificate, the certificate will be valid\n  for domain and its subdomains. See defaultCertificate.\n\n* The value is published to individual Route statuses so that end-users\n  know where to target external DNS records.\n\ndomain must be unique among all IngressControllers, and cannot be\nupdated.\n\nIf empty, defaults to ingress.config.openshift.io/cluster .spec.domain.",
+          "type": "string"
+        },
+        "endpointPublishingStrategy": {
+          "description": "endpointPublishingStrategy is used to publish the ingress controller\nendpoints to other networks, enable load balancer integrations, etc.\n\nIf unset, the default is based on\ninfrastructure.config.openshift.io/cluster .status.platform:\n\n  AWS:          LoadBalancerService (with External scope)\n  Azure:        LoadBalancerService (with External scope)\n  GCP:          LoadBalancerService (with External scope)\n  IBMCloud:     LoadBalancerService (with External scope)\n  AlibabaCloud: LoadBalancerService (with External scope)\n  Libvirt:      HostNetwork\n\nAny other platform types (including None) default to HostNetwork.\n\nendpointPublishingStrategy cannot be updated.",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "hostNetwork": {
+              "description": "hostNetwork holds parameters for the HostNetwork endpoint publishing\nstrategy. Present only if type is HostNetwork.",
+              "type": "object",
+              "properties": {
+                "httpPort": {
+                  "description": "httpPort is the port on the host which should be used to listen for\nHTTP requests. This field should be set when port 80 is already in use.\nThe value should not coincide with the NodePort range of the cluster.\nWhen the value is 0 or is not specified it defaults to 80.",
+                  "type": "integer",
+                  "format": "int32",
+                  "maximum": 65535,
+                  "minimum": 0
+                },
+                "httpsPort": {
+                  "description": "httpsPort is the port on the host which should be used to listen for\nHTTPS requests. This field should be set when port 443 is already in use.\nThe value should not coincide with the NodePort range of the cluster.\nWhen the value is 0 or is not specified it defaults to 443.",
+                  "type": "integer",
+                  "format": "int32",
+                  "maximum": 65535,
+                  "minimum": 0
+                },
+                "protocol": {
+                  "description": "protocol specifies whether the IngressController expects incoming\nconnections to use plain TCP or whether the IngressController expects\nPROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string.\n* \"TCP\".\n* \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY\nprotocol.  Note that the default is subject to change.",
+                  "type": "string",
+                  "enum": [
+                    "",
+                    "TCP",
+                    "PROXY"
+                  ]
+                },
+                "statsPort": {
+                  "description": "statsPort is the port on the host where the stats from the router are\npublished. The value should not coincide with the NodePort range of the\ncluster. If an external load balancer is configured to forward connections\nto this IngressController, the load balancer should use this port for\nhealth checks. The load balancer can send HTTP probes on this port on a\ngiven node, with the path /healthz/ready to determine if the ingress\ncontroller is ready to receive traffic on the node. For proper operation\nthe load balancer must not forward traffic to a node until the health\ncheck reports ready. The load balancer should also stop forwarding requests\nwithin a maximum of 45 seconds after /healthz/ready starts reporting\nnot-ready. Probing every 5 to 10 seconds, with a 5-second timeout and with\na threshold of two successful or failed requests to become healthy or\nunhealthy respectively, are well-tested values. When the value is 0 or\nis not specified it defaults to 1936.",
+                  "type": "integer",
+                  "format": "int32",
+                  "maximum": 65535,
+                  "minimum": 0
+                }
+              }
+            },
+            "loadBalancer": {
+              "description": "loadBalancer holds parameters for the load balancer. Present only if\ntype is LoadBalancerService.",
+              "type": "object",
+              "required": [
+                "dnsManagementPolicy",
+                "scope"
+              ],
+              "properties": {
+                "allowedSourceRanges": {
+                  "description": "allowedSourceRanges specifies an allowlist of IP address ranges to which\naccess to the load balancer should be restricted.  Each range must be\nspecified using CIDR notation (e.g. \"10.0.0.0/8\" or \"fd00::/8\"). If no range is\nspecified, \"0.0.0.0/0\" for IPv4 and \"::/0\" for IPv6 are used by default,\nwhich allows all source addresses.\n\nTo facilitate migration from earlier versions of OpenShift that did\nnot have the allowedSourceRanges field, you may set the\nservice.beta.kubernetes.io/load-balancer-source-ranges annotation on\nthe \"router-<ingresscontroller name>\" service in the\n\"openshift-ingress\" namespace, and this annotation will take\neffect if allowedSourceRanges is empty on OpenShift 4.12.",
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "dnsManagementPolicy": {
+                  "description": "dnsManagementPolicy indicates if the lifecycle of the wildcard DNS record\nassociated with the load balancer service will be managed by\nthe ingress operator. It defaults to Managed.\nValid values are: Managed and Unmanaged.",
+                  "type": "string",
+                  "enum": [
+                    "Managed",
+                    "Unmanaged"
+                  ]
+                },
+                "providerParameters": {
+                  "description": "providerParameters holds desired load balancer information specific to\nthe underlying infrastructure provider.\n\nIf empty, defaults will be applied. See specific providerParameters\nfields for details about their defaults.",
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "aws": {
+                      "description": "aws provides configuration settings that are specific to AWS\nload balancers.\n\nIf empty, defaults will be applied. See specific aws fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "classicLoadBalancer": {
+                          "description": "classicLoadBalancerParameters holds configuration parameters for an AWS\nclassic load balancer. Present only if type is Classic.",
+                          "type": "object",
+                          "properties": {
+                            "connectionIdleTimeout": {
+                              "description": "connectionIdleTimeout specifies the maximum time period that a\nconnection may be idle before the load balancer closes the\nconnection.  The value must be parseable as a time duration value;\nsee <https://pkg.go.dev/time#ParseDuration>.  A nil or zero value\nmeans no opinion, in which case a default value is used.  The default\nvalue for this field is 60s.  This default is subject to change.",
+                              "type": "string",
+                              "format": "duration"
+                            },
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will\nattach. The subnets may be specified by either their\nID or name. The total number of subnets is limited to 10.\n\nIn order for the load balancer to be provisioned with subnets,\neach subnet must exist, each subnet must be from a different\navailability zone, and the load balancer service must be\nrecreated to pick up new values.\n\nWhen omitted from the spec, the subnets will be auto-discovered\nfor each availability zone. Auto-discovered subnets are not reported\nin the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID.\nSubnet IDs must start with \"subnet-\", consist only\nof alphanumeric characters, must be exactly 24\ncharacters long, must be unique, and the total\nnumber of subnets specified by ids and names\nmust not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name.\nSubnet names must not start with \"subnet-\", must not\ninclude commas, must be under 256 characters in length,\nmust be unique, and the total number of subnets\nspecified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "networkLoadBalancer": {
+                          "description": "networkLoadBalancerParameters holds configuration parameters for an AWS\nnetwork load balancer. Present only if type is NLB.",
+                          "type": "object",
+                          "properties": {
+                            "eipAllocations": {
+                              "description": "eipAllocations is a list of IDs for Elastic IP (EIP) addresses that\nare assigned to the Network Load Balancer.\nThe following restrictions apply:\n\neipAllocations can only be used with external scope, not internal.\nAn EIP can be allocated to only a single IngressController.\nThe number of EIP allocations must match the number of subnets that are used for the load balancer.\nEach EIP allocation must be unique.\nA maximum of 10 EIP allocations are permitted.\n\nSee https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html for general\ninformation about configuration, characteristics, and limitations of Elastic IP addresses.",
+                              "type": "array",
+                              "maxItems": 10,
+                              "items": {
+                                "description": "EIPAllocation is an ID for an Elastic IP (EIP) address that can be allocated to an ELB in the AWS environment.\nValues must begin with `eipalloc-` followed by exactly 17 hexadecimal (`[0-9a-fA-F]`) characters.",
+                                "type": "string",
+                                "maxLength": 26,
+                                "minLength": 26,
+                                "x-kubernetes-validations": [
+                                  {
+                                    "message": "eipAllocations should start with 'eipalloc-'",
+                                    "rule": "self.startsWith('eipalloc-')"
+                                  },
+                                  {
+                                    "message": "eipAllocations must be 'eipalloc-' followed by exactly 17 hexadecimal characters (0-9, a-f, A-F)",
+                                    "rule": "self.split(\"-\", 2)[1].matches('[0-9a-fA-F]{17}$')"
+                                  }
+                                ]
+                              },
+                              "x-kubernetes-list-type": "atomic",
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "eipAllocations cannot contain duplicates",
+                                  "rule": "self.all(x, self.exists_one(y, x == y))"
+                                }
+                              ]
+                            },
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will\nattach. The subnets may be specified by either their\nID or name. The total number of subnets is limited to 10.\n\nIn order for the load balancer to be provisioned with subnets,\neach subnet must exist, each subnet must be from a different\navailability zone, and the load balancer service must be\nrecreated to pick up new values.\n\nWhen omitted from the spec, the subnets will be auto-discovered\nfor each availability zone. Auto-discovered subnets are not reported\nin the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID.\nSubnet IDs must start with \"subnet-\", consist only\nof alphanumeric characters, must be exactly 24\ncharacters long, must be unique, and the total\nnumber of subnets specified by ids and names\nmust not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name.\nSubnet names must not start with \"subnet-\", must not\ninclude commas, must be under 256 characters in length,\nmust be unique, and the total number of subnets\nspecified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
+                            }
+                          },
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "number of subnets must be equal to number of eipAllocations",
+                              "rule": "has(self.subnets) && has(self.subnets.ids) && has(self.subnets.names) && has(self.eipAllocations) ? size(self.subnets.ids + self.subnets.names) == size(self.eipAllocations) : true"
+                            },
+                            {
+                              "message": "number of subnets must be equal to number of eipAllocations",
+                              "rule": "has(self.subnets) && has(self.subnets.ids) && !has(self.subnets.names) && has(self.eipAllocations) ? size(self.subnets.ids) == size(self.eipAllocations) : true"
+                            },
+                            {
+                              "message": "number of subnets must be equal to number of eipAllocations",
+                              "rule": "has(self.subnets) && has(self.subnets.names) && !has(self.subnets.ids) && has(self.eipAllocations) ? size(self.subnets.names) == size(self.eipAllocations) : true"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "description": "type is the type of AWS load balancer to instantiate for an ingresscontroller.\n\nValid values are:\n\n* \"Classic\": A Classic Load Balancer that makes routing decisions at either\n  the transport layer (TCP/SSL) or the application layer (HTTP/HTTPS). See\n  the following for additional details:\n\n    https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#clb\n\n* \"NLB\": A Network Load Balancer that makes routing decisions at the\n  transport layer (TCP/SSL). See the following for additional details:\n\n    https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#nlb",
+                          "type": "string",
+                          "enum": [
+                            "Classic",
+                            "NLB"
+                          ]
+                        }
+                      }
+                    },
+                    "gcp": {
+                      "description": "gcp provides configuration settings that are specific to GCP\nload balancers.\n\nIf empty, defaults will be applied. See specific gcp fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "properties": {
+                        "clientAccess": {
+                          "description": "clientAccess describes how client access is restricted for internal\nload balancers.\n\nValid values are:\n* \"Global\": Specifying an internal load balancer with Global client access\n  allows clients from any region within the VPC to communicate with the load\n  balancer.\n\n    https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#global_access\n\n* \"Local\": Specifying an internal load balancer with Local client access\n  means only clients within the same region (and VPC) as the GCP load balancer\n  can communicate with the load balancer. Note that this is the default behavior.\n\n    https://cloud.google.com/load-balancing/docs/internal#client_access",
+                          "type": "string",
+                          "enum": [
+                            "Global",
+                            "Local"
+                          ]
+                        }
+                      }
+                    },
+                    "ibm": {
+                      "description": "ibm provides configuration settings that are specific to IBM Cloud\nload balancers.\n\nIf empty, defaults will be applied. See specific ibm fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "properties": {
+                        "protocol": {
+                          "description": "protocol specifies whether the load balancer uses PROXY protocol to forward connections to\nthe IngressController. See \"service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features:\n\"proxy-protocol\"\" at https://cloud.ibm.com/docs/containers?topic=containers-vpc-lbaas\"\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nValid values for protocol are TCP, PROXY and omitted.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.\nThe current default is TCP, without the proxy protocol enabled.",
+                          "type": "string",
+                          "enum": [
+                            "",
+                            "TCP",
+                            "PROXY"
+                          ]
+                        }
+                      }
+                    },
+                    "openstack": {
+                      "description": "openstack provides configuration settings that are specific to OpenStack\nload balancers.\n\nIf empty, defaults will be applied. See specific openstack fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "properties": {
+                        "floatingIP": {
+                          "description": "floatingIP specifies the IP address that the load balancer will use.\nWhen not specified, an IP address will be assigned randomly by the OpenStack cloud provider.\nWhen specified, the floating IP has to be pre-created.  If the\nspecified value is not a floating IP or is already claimed, the\nOpenStack cloud provider won't be able to provision the load\nbalancer.\nThis field may only be used if the IngressController has External scope.\nThis value must be a valid IPv4 or IPv6 address.",
+                          "type": "string",
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "floatingIP must be a valid IPv4 or IPv6 address",
+                              "rule": "isIP(self)"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": {
+                      "description": "type is the underlying infrastructure provider for the load balancer.\nAllowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"IBM\", \"Nutanix\",\n\"OpenStack\", and \"VSphere\".",
+                      "type": "string",
+                      "enum": [
+                        "AWS",
+                        "Azure",
+                        "BareMetal",
+                        "GCP",
+                        "Nutanix",
+                        "OpenStack",
+                        "VSphere",
+                        "IBM"
+                      ]
+                    }
+                  },
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "openstack is not permitted when type is not OpenStack",
+                      "rule": "has(self.type) && self.type == 'OpenStack' ? true : !has(self.openstack)"
+                    }
+                  ]
+                },
+                "scope": {
+                  "description": "scope indicates the scope at which the load balancer is exposed.\nPossible values are \"External\" and \"Internal\".",
+                  "type": "string",
+                  "enum": [
+                    "Internal",
+                    "External"
+                  ]
+                }
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "eipAllocations are forbidden when the scope is Internal.",
+                  "rule": "!has(self.scope) || self.scope != 'Internal' || !has(self.providerParameters) || !has(self.providerParameters.aws) || !has(self.providerParameters.aws.networkLoadBalancer) || !has(self.providerParameters.aws.networkLoadBalancer.eipAllocations)"
+                },
+                {
+                  "message": "cannot specify a floating ip when scope is internal",
+                  "rule": "!has(self.scope) || self.scope != 'Internal' || !has(self.providerParameters) || !has(self.providerParameters.openstack) || !has(self.providerParameters.openstack.floatingIP) || self.providerParameters.openstack.floatingIP == \"\""
+                }
+              ]
+            },
+            "nodePort": {
+              "description": "nodePort holds parameters for the NodePortService endpoint publishing strategy.\nPresent only if type is NodePortService.",
+              "type": "object",
+              "properties": {
+                "protocol": {
+                  "description": "protocol specifies whether the IngressController expects incoming\nconnections to use plain TCP or whether the IngressController expects\nPROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string.\n* \"TCP\".\n* \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY\nprotocol.  Note that the default is subject to change.",
+                  "type": "string",
+                  "enum": [
+                    "",
+                    "TCP",
+                    "PROXY"
+                  ]
+                }
+              }
+            },
+            "private": {
+              "description": "private holds parameters for the Private endpoint publishing\nstrategy. Present only if type is Private.",
+              "type": "object",
+              "properties": {
+                "protocol": {
+                  "description": "protocol specifies whether the IngressController expects incoming\nconnections to use plain TCP or whether the IngressController expects\nPROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string.\n* \"TCP\".\n* \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY\nprotocol.  Note that the default is subject to change.",
+                  "type": "string",
+                  "enum": [
+                    "",
+                    "TCP",
+                    "PROXY"
+                  ]
+                }
+              }
+            },
+            "type": {
+              "description": "type is the publishing strategy to use. Valid values are:\n\n* LoadBalancerService\n\nPublishes the ingress controller using a Kubernetes LoadBalancer Service.\n\nIn this configuration, the ingress controller deployment uses container\nnetworking. A LoadBalancer Service is created to publish the deployment.\n\nSee: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer\n\nIf domain is set, a wildcard DNS record will be managed to point at the\nLoadBalancer Service's external name. DNS records are managed only in DNS\nzones defined by dns.config.openshift.io/cluster .spec.publicZone and\n.spec.privateZone.\n\nWildcard DNS management is currently supported only on the AWS, Azure,\nand GCP platforms.\n\n* HostNetwork\n\nPublishes the ingress controller on node ports where the ingress controller\nis deployed.\n\nIn this configuration, the ingress controller deployment uses host\nnetworking, bound to node ports 80 and 443. The user is responsible for\nconfiguring an external load balancer to publish the ingress controller via\nthe node ports.\n\n* Private\n\nDoes not publish the ingress controller.\n\nIn this configuration, the ingress controller deployment uses container\nnetworking, and is not explicitly published. The user must manually publish\nthe ingress controller.\n\n* NodePortService\n\nPublishes the ingress controller using a Kubernetes NodePort Service.\n\nIn this configuration, the ingress controller deployment uses container\nnetworking. A NodePort Service is created to publish the deployment. The\nspecific node ports are dynamically allocated by OpenShift; however, to\nsupport static port allocations, user changes to the node port\nfield of the managed NodePort Service will preserved.",
+              "type": "string",
+              "enum": [
+                "LoadBalancerService",
+                "HostNetwork",
+                "Private",
+                "NodePortService"
+              ]
+            }
+          }
+        },
+        "httpCompression": {
+          "description": "httpCompression defines a policy for HTTP traffic compression.\nBy default, there is no HTTP compression.",
+          "type": "object",
+          "properties": {
+            "mimeTypes": {
+              "description": "mimeTypes is a list of MIME types that should have compression applied.\nThis list can be empty, in which case the ingress controller does not apply compression.\n\nNote: Not all MIME types benefit from compression, but HAProxy will still use resources\nto try to compress if instructed to.  Generally speaking, text (html, css, js, etc.)\nformats benefit from compression, but formats that are already compressed (image,\naudio, video, etc.) benefit little in exchange for the time and cpu spent on compressing\nagain. See https://joehonton.medium.com/the-gzip-penalty-d31bd697f1a2",
+              "type": "array",
+              "items": {
+                "description": "CompressionMIMEType defines the format of a single MIME type.\nE.g. \"text/css; charset=utf-8\", \"text/html\", \"text/*\", \"image/svg+xml\",\n\"application/octet-stream\", \"X-custom/customsub\", etc.\n\nThe format should follow the Content-Type definition in RFC 1341:\nContent-Type := type \"/\" subtype *[\";\" parameter]\n  - The type in Content-Type can be one of:\n    application, audio, image, message, multipart, text, video, or a custom\n    type preceded by \"X-\" and followed by a token as defined below.\n  - The token is a string of at least one character, and not containing white\n    space, control characters, or any of the characters in the tspecials set.\n  - The tspecials set contains the characters ()<>@,;:\\\"/[]?.=\n  - The subtype in Content-Type is also a token.\n  - The optional parameter/s following the subtype are defined as:\n    token \"=\" (token / quoted-string)\n  - The quoted-string, as defined in RFC 822, is surrounded by double quotes\n    and can contain white space plus any character EXCEPT \\, \", and CR.\n    It can also contain any single ASCII character as long as it is escaped by \\.",
+                "type": "string",
+                "pattern": "^(?i)(x-[^][ ()\\\\<>@,;:\"/?.=\\x00-\\x1F\\x7F]+|application|audio|image|message|multipart|text|video)/[^][ ()\\\\<>@,;:\"/?.=\\x00-\\x1F\\x7F]+(; *[^][ ()\\\\<>@,;:\"/?.=\\x00-\\x1F\\x7F]+=([^][ ()\\\\<>@,;:\"/?.=\\x00-\\x1F\\x7F]+|\"(\\\\[\\x00-\\x7F]|[^\\x0D\"\\\\])*\"))*$"
+              },
+              "x-kubernetes-list-type": "set"
+            }
+          }
+        },
+        "httpEmptyRequestsPolicy": {
+          "description": "httpEmptyRequestsPolicy describes how HTTP connections should be\nhandled if the connection times out before a request is received.\nAllowed values for this field are \"Respond\" and \"Ignore\".  If the\nfield is set to \"Respond\", the ingress controller sends an HTTP 400\nor 408 response, logs the connection (if access logging is enabled),\nand counts the connection in the appropriate metrics.  If the field\nis set to \"Ignore\", the ingress controller closes the connection\nwithout sending a response, logging the connection, or incrementing\nmetrics.  The default value is \"Respond\".\n\nTypically, these connections come from load balancers' health probes\nor Web browsers' speculative connections (\"preconnect\") and can be\nsafely ignored.  However, these requests may also be caused by\nnetwork errors, and so setting this field to \"Ignore\" may impede\ndetection and diagnosis of problems.  In addition, these requests may\nbe caused by port scans, in which case logging empty requests may aid\nin detecting intrusion attempts.",
+          "type": "string",
+          "enum": [
+            "Respond",
+            "Ignore"
+          ]
+        },
+        "httpErrorCodePages": {
+          "description": "httpErrorCodePages specifies a configmap with custom error pages.\nThe administrator must create this configmap in the openshift-config namespace.\nThis configmap should have keys in the format \"error-page-<error code>.http\",\nwhere <error code> is an HTTP error code.\nFor example, \"error-page-503.http\" defines an error page for HTTP 503 responses.\nCurrently only error pages for 503 and 404 responses can be customized.\nEach value in the configmap should be the full response, including HTTP headers.\nEg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http\nIf this field is empty, the ingress controller uses the default error pages.",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "name is the metadata.name of the referenced config map",
+              "type": "string"
+            }
+          }
+        },
+        "httpHeaders": {
+          "description": "httpHeaders defines policy for HTTP headers.\n\nIf this field is empty, the default values are used.",
+          "type": "object",
+          "properties": {
+            "actions": {
+              "description": "actions specifies options for modifying headers and their values.\nNote that this option only applies to cleartext HTTP connections\nand to secure HTTP connections for which the ingress controller\nterminates encryption (that is, edge-terminated or reencrypt\nconnections).  Headers cannot be modified for TLS passthrough\nconnections.\nSetting the HSTS (`Strict-Transport-Security`) header is not supported via actions. `Strict-Transport-Security`\nmay only be configured using the \"haproxy.router.openshift.io/hsts_header\" route annotation, and only in\naccordance with the policy specified in Ingress.Spec.RequiredHSTSPolicies.\nAny actions defined here are applied after any actions related to the following other fields:\ncache-control, spec.clientTLS,\nspec.httpHeaders.forwardedHeaderPolicy, spec.httpHeaders.uniqueId,\nand spec.httpHeaders.headerNameCaseAdjustments.\nIn case of HTTP request headers, the actions specified in spec.httpHeaders.actions on the Route will be executed after\nthe actions specified in the IngressController's spec.httpHeaders.actions field.\nIn case of HTTP response headers, the actions specified in spec.httpHeaders.actions on the IngressController will be\nexecuted after the actions specified in the Route's spec.httpHeaders.actions field.\nHeaders set using this API cannot be captured for use in access logs.\nThe following header names are reserved and may not be modified via this API:\nStrict-Transport-Security, Proxy, Host, Cookie, Set-Cookie.\nNote that the total size of all net added headers *after* interpolating dynamic values\nmust not exceed the value of spec.tuningOptions.headerBufferMaxRewriteBytes on the\nIngressController. Please refer to the documentation\nfor that API field for more details.",
+              "type": "object",
+              "properties": {
+                "request": {
+                  "description": "request is a list of HTTP request headers to modify.\nActions defined here will modify the request headers of all requests passing through an ingress controller.\nThese actions are applied to all Routes i.e. for all connections handled by the ingress controller defined within a cluster.\nIngressController actions for request headers will be executed before Route actions.\nCurrently, actions may define to either `Set` or `Delete` headers values.\nActions are applied in sequence as defined in this list.\nA maximum of 20 request header actions may be configured.\nSample fetchers allowed are \"req.hdr\" and \"ssl_c_der\".\nConverters allowed are \"lower\" and \"base64\".\nExample header values: \"%[req.hdr(X-target),lower]\", \"%{+Q}[ssl_c_der,base64]\".",
+                  "type": "array",
+                  "maxItems": 20,
+                  "items": {
+                    "description": "IngressControllerHTTPHeader specifies configuration for setting or deleting an HTTP header.",
+                    "type": "object",
+                    "required": [
+                      "action",
+                      "name"
+                    ],
+                    "properties": {
+                      "action": {
+                        "description": "action specifies actions to perform on headers, such as setting or deleting headers.",
+                        "type": "object",
+                        "required": [
+                          "type"
+                        ],
+                        "properties": {
+                          "set": {
+                            "description": "set specifies how the HTTP header should be set.\nThis field is required when type is Set and forbidden otherwise.",
+                            "type": "object",
+                            "required": [
+                              "value"
+                            ],
+                            "properties": {
+                              "value": {
+                                "description": "value specifies a header value.\nDynamic values can be added. The value will be interpreted as an HAProxy format string as defined in\nhttp://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6  and may use HAProxy's %[] syntax and\notherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.\nThe value of this field must be no more than 16384 characters in length.\nNote that the total size of all net added headers *after* interpolating dynamic values\nmust not exceed the value of spec.tuningOptions.headerBufferMaxRewriteBytes on the\nIngressController.",
+                                "type": "string",
+                                "maxLength": 16384,
+                                "minLength": 1
+                              }
+                            }
+                          },
+                          "type": {
+                            "description": "type defines the type of the action to be applied on the header.\nPossible values are Set or Delete.\nSet allows you to set HTTP request and response headers.\nDelete allows you to delete HTTP request and response headers.",
+                            "type": "string",
+                            "enum": [
+                              "Set",
+                              "Delete"
+                            ]
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "set is required when type is Set, and forbidden otherwise",
+                            "rule": "has(self.type) && self.type == 'Set' ?  has(self.set) : !has(self.set)"
+                          }
+                        ]
+                      },
+                      "name": {
+                        "description": "name specifies the name of a header on which to perform an action. Its value must be a valid HTTP header\nname as defined in RFC 2616 section 4.2.\nThe name must consist only of alphanumeric and the following special characters, \"-!#$%&'*+.^_`\".\nThe following header names are reserved and may not be modified via this API:\nStrict-Transport-Security, Proxy, Host, Cookie, Set-Cookie.\nIt must be no more than 255 characters in length.\nHeader name must be unique.",
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "pattern": "^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "strict-transport-security header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'strict-transport-security'"
+                          },
+                          {
+                            "message": "proxy header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'proxy'"
+                          },
+                          {
+                            "message": "host header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'host'"
+                          },
+                          {
+                            "message": "cookie header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'cookie'"
+                          },
+                          {
+                            "message": "set-cookie header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'set-cookie'"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-map-keys": [
+                    "name"
+                  ],
+                  "x-kubernetes-list-type": "map",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64.",
+                      "rule": "self.all(key, key.action.type == \"Delete\" || (has(key.action.set) && key.action.set.value.matches('^(?:%(?:%|(?:\\\\{[-+]?[QXE](?:,[-+]?[QXE])*\\\\})?\\\\[(?:req\\\\.hdr\\\\([0-9A-Za-z-]+\\\\)|ssl_c_der)(?:,(?:lower|base64))*\\\\])|[^%[:cntrl:]])+$')))"
+                    }
+                  ]
+                },
+                "response": {
+                  "description": "response is a list of HTTP response headers to modify.\nActions defined here will modify the response headers of all requests passing through an ingress controller.\nThese actions are applied to all Routes i.e. for all connections handled by the ingress controller defined within a cluster.\nIngressController actions for response headers will be executed after Route actions.\nCurrently, actions may define to either `Set` or `Delete` headers values.\nActions are applied in sequence as defined in this list.\nA maximum of 20 response header actions may be configured.\nSample fetchers allowed are \"res.hdr\" and \"ssl_c_der\".\nConverters allowed are \"lower\" and \"base64\".\nExample header values: \"%[res.hdr(X-target),lower]\", \"%{+Q}[ssl_c_der,base64]\".",
+                  "type": "array",
+                  "maxItems": 20,
+                  "items": {
+                    "description": "IngressControllerHTTPHeader specifies configuration for setting or deleting an HTTP header.",
+                    "type": "object",
+                    "required": [
+                      "action",
+                      "name"
+                    ],
+                    "properties": {
+                      "action": {
+                        "description": "action specifies actions to perform on headers, such as setting or deleting headers.",
+                        "type": "object",
+                        "required": [
+                          "type"
+                        ],
+                        "properties": {
+                          "set": {
+                            "description": "set specifies how the HTTP header should be set.\nThis field is required when type is Set and forbidden otherwise.",
+                            "type": "object",
+                            "required": [
+                              "value"
+                            ],
+                            "properties": {
+                              "value": {
+                                "description": "value specifies a header value.\nDynamic values can be added. The value will be interpreted as an HAProxy format string as defined in\nhttp://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6  and may use HAProxy's %[] syntax and\notherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.\nThe value of this field must be no more than 16384 characters in length.\nNote that the total size of all net added headers *after* interpolating dynamic values\nmust not exceed the value of spec.tuningOptions.headerBufferMaxRewriteBytes on the\nIngressController.",
+                                "type": "string",
+                                "maxLength": 16384,
+                                "minLength": 1
+                              }
+                            }
+                          },
+                          "type": {
+                            "description": "type defines the type of the action to be applied on the header.\nPossible values are Set or Delete.\nSet allows you to set HTTP request and response headers.\nDelete allows you to delete HTTP request and response headers.",
+                            "type": "string",
+                            "enum": [
+                              "Set",
+                              "Delete"
+                            ]
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "set is required when type is Set, and forbidden otherwise",
+                            "rule": "has(self.type) && self.type == 'Set' ?  has(self.set) : !has(self.set)"
+                          }
+                        ]
+                      },
+                      "name": {
+                        "description": "name specifies the name of a header on which to perform an action. Its value must be a valid HTTP header\nname as defined in RFC 2616 section 4.2.\nThe name must consist only of alphanumeric and the following special characters, \"-!#$%&'*+.^_`\".\nThe following header names are reserved and may not be modified via this API:\nStrict-Transport-Security, Proxy, Host, Cookie, Set-Cookie.\nIt must be no more than 255 characters in length.\nHeader name must be unique.",
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "pattern": "^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "strict-transport-security header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'strict-transport-security'"
+                          },
+                          {
+                            "message": "proxy header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'proxy'"
+                          },
+                          {
+                            "message": "host header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'host'"
+                          },
+                          {
+                            "message": "cookie header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'cookie'"
+                          },
+                          {
+                            "message": "set-cookie header may not be modified via header actions",
+                            "rule": "self.lowerAscii() != 'set-cookie'"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-map-keys": [
+                    "name"
+                  ],
+                  "x-kubernetes-list-type": "map",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64.",
+                      "rule": "self.all(key, key.action.type == \"Delete\" || (has(key.action.set) && key.action.set.value.matches('^(?:%(?:%|(?:\\\\{[-+]?[QXE](?:,[-+]?[QXE])*\\\\})?\\\\[(?:res\\\\.hdr\\\\([0-9A-Za-z-]+\\\\)|ssl_c_der)(?:,(?:lower|base64))*\\\\])|[^%[:cntrl:]])+$')))"
+                    }
+                  ]
+                }
+              }
+            },
+            "forwardedHeaderPolicy": {
+              "description": "forwardedHeaderPolicy specifies when and how the IngressController\nsets the Forwarded, X-Forwarded-For, X-Forwarded-Host,\nX-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version\nHTTP headers.  The value may be one of the following:\n\n* \"Append\", which specifies that the IngressController appends the\n  headers, preserving existing headers.\n\n* \"Replace\", which specifies that the IngressController sets the\n  headers, replacing any existing Forwarded or X-Forwarded-* headers.\n\n* \"IfNone\", which specifies that the IngressController sets the\n  headers if they are not already set.\n\n* \"Never\", which specifies that the IngressController never sets the\n  headers, preserving any existing headers.\n\nBy default, the policy is \"Append\".",
+              "type": "string",
+              "enum": [
+                "Append",
+                "Replace",
+                "IfNone",
+                "Never"
+              ]
+            },
+            "headerNameCaseAdjustments": {
+              "description": "headerNameCaseAdjustments specifies case adjustments that can be\napplied to HTTP header names.  Each adjustment is specified as an\nHTTP header name with the desired capitalization.  For example,\nspecifying \"X-Forwarded-For\" indicates that the \"x-forwarded-for\"\nHTTP header should be adjusted to have the specified capitalization.\n\nThese adjustments are only applied to cleartext, edge-terminated, and\nre-encrypt routes, and only when using HTTP/1.\n\nFor request headers, these adjustments are applied only for routes\nthat have the haproxy.router.openshift.io/h1-adjust-case=true\nannotation.  For response headers, these adjustments are applied to\nall HTTP responses.\n\nIf this field is empty, no request headers are adjusted.",
+              "x-kubernetes-list-type": "atomic"
+            },
+            "uniqueId": {
+              "description": "uniqueId describes configuration for a custom HTTP header that the\ningress controller should inject into incoming HTTP requests.\nTypically, this header is configured to have a value that is unique\nto the HTTP request.  The header can be used by applications or\nincluded in access logs to facilitate tracing individual HTTP\nrequests.\n\nIf this field is empty, no such header is injected into requests.",
+              "type": "object",
+              "properties": {
+                "format": {
+                  "description": "format specifies the format for the injected HTTP header's value.\nThis field has no effect unless name is specified.  For the\nHAProxy-based ingress controller implementation, this format uses the\nsame syntax as the HTTP log format.  If the field is empty, the\ndefault value is \"%{+X}o\\\\ %ci:%cp_%fi:%fp_%Ts_%rt:%pid\"; see the\ncorresponding HAProxy documentation:\nhttp://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3",
+                  "type": "string",
+                  "maxLength": 1024,
+                  "minLength": 0,
+                  "pattern": "^(%(%|(\\{[-+]?[QXE](,[-+]?[QXE])*\\})?([A-Za-z]+|\\[[.0-9A-Z_a-z]+(\\([^)]+\\))?(,[.0-9A-Z_a-z]+(\\([^)]+\\))?)*\\]))|[^%[:cntrl:]])*$"
+                },
+                "name": {
+                  "description": "name specifies the name of the HTTP header (for example, \"unique-id\")\nthat the ingress controller should inject into HTTP requests.  The\nfield's value must be a valid HTTP header name as defined in RFC 2616\nsection 4.2.  If the field is empty, no header is injected.",
+                  "type": "string",
+                  "maxLength": 1024,
+                  "minLength": 0,
+                  "pattern": "^$|^[-!#$%&'*+.0-9A-Z^_`a-z|~]+$"
+                }
+              }
+            }
+          }
+        },
+        "logging": {
+          "description": "logging defines parameters for what should be logged where.  If this\nfield is empty, operational logs are enabled but access logs are\ndisabled.",
+          "type": "object",
+          "properties": {
+            "access": {
+              "description": "access describes how the client requests should be logged.\n\nIf this field is empty, access logging is disabled.",
+              "type": "object",
+              "required": [
+                "destination"
+              ],
+              "properties": {
+                "destination": {
+                  "description": "destination is where access logs go.",
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "container": {
+                      "description": "container holds parameters for the Container logging destination.\nPresent only if type is Container.",
+                      "type": "object",
+                      "properties": {
+                        "maxLength": {
+                          "description": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 8192, inclusive.\n\nWhen omitted, the default value is 1024.",
+                          "type": "integer",
+                          "format": "int32",
+                          "maximum": 8192,
+                          "minimum": 480
+                        }
+                      }
+                    },
+                    "syslog": {
+                      "description": "syslog holds parameters for a syslog endpoint.  Present only if\ntype is Syslog.",
+                      "type": "object",
+                      "required": [
+                        "address",
+                        "port"
+                      ],
+                      "properties": {
+                        "address": {
+                          "description": "address is the IP address of the syslog endpoint that receives log\nmessages.",
+                          "type": "string"
+                        },
+                        "facility": {
+                          "description": "facility specifies the syslog facility of log messages.\n\nIf this field is empty, the facility is \"local1\".",
+                          "type": "string",
+                          "enum": [
+                            "kern",
+                            "user",
+                            "mail",
+                            "daemon",
+                            "auth",
+                            "syslog",
+                            "lpr",
+                            "news",
+                            "uucp",
+                            "cron",
+                            "auth2",
+                            "ftp",
+                            "ntp",
+                            "audit",
+                            "alert",
+                            "cron2",
+                            "local0",
+                            "local1",
+                            "local2",
+                            "local3",
+                            "local4",
+                            "local5",
+                            "local6",
+                            "local7"
+                          ]
+                        },
+                        "maxLength": {
+                          "description": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 4096, inclusive.\n\nWhen omitted, the default value is 1024.",
+                          "type": "integer",
+                          "format": "int32",
+                          "maximum": 4096,
+                          "minimum": 480
+                        },
+                        "port": {
+                          "description": "port is the UDP port number of the syslog endpoint that receives log\nmessages.",
+                          "type": "integer",
+                          "format": "int32",
+                          "maximum": 65535,
+                          "minimum": 1
+                        }
+                      }
+                    },
+                    "type": {
+                      "description": "type is the type of destination for logs.  It must be one of the\nfollowing:\n\n* Container\n\nThe ingress operator configures the sidecar container named \"logs\" on\nthe ingress controller pod and configures the ingress controller to\nwrite logs to the sidecar.  The logs are then available as container\nlogs.  The expectation is that the administrator configures a custom\nlogging solution that reads logs from this sidecar.  Note that using\ncontainer logs means that logs may be dropped if the rate of logs\nexceeds the container runtime's or the custom logging solution's\ncapacity.\n\n* Syslog\n\nLogs are sent to a syslog endpoint.  The administrator must specify\nan endpoint that can receive syslog messages.  The expectation is\nthat the administrator has configured a custom syslog instance.",
+                      "type": "string",
+                      "enum": [
+                        "Container",
+                        "Syslog"
+                      ]
+                    }
+                  }
+                },
+                "httpCaptureCookies": {
+                  "description": "httpCaptureCookies specifies HTTP cookies that should be captured in\naccess logs.  If this field is empty, no cookies are captured.",
+                  "maxItems": 1,
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "httpCaptureHeaders": {
+                  "description": "httpCaptureHeaders defines HTTP headers that should be captured in\naccess logs.  If this field is empty, no headers are captured.\n\nNote that this option only applies to cleartext HTTP connections\nand to secure HTTP connections for which the ingress controller\nterminates encryption (that is, edge-terminated or reencrypt\nconnections).  Headers cannot be captured for TLS passthrough\nconnections.",
+                  "type": "object",
+                  "properties": {
+                    "request": {
+                      "description": "request specifies which HTTP request headers to capture.\n\nIf this field is empty, no request headers are captured.",
+                      "x-kubernetes-list-type": "atomic"
+                    },
+                    "response": {
+                      "description": "response specifies which HTTP response headers to capture.\n\nIf this field is empty, no response headers are captured.",
+                      "x-kubernetes-list-type": "atomic"
+                    }
+                  }
+                },
+                "httpLogFormat": {
+                  "description": "httpLogFormat specifies the format of the log message for an HTTP\nrequest.\n\nIf this field is empty, log messages use the implementation's default\nHTTP log format.  For HAProxy's default HTTP log format, see the\nHAProxy documentation:\nhttp://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3\n\nNote that this format only applies to cleartext HTTP connections\nand to secure HTTP connections for which the ingress controller\nterminates encryption (that is, edge-terminated or reencrypt\nconnections).  It does not affect the log format for TLS passthrough\nconnections.",
+                  "type": "string"
+                },
+                "logEmptyRequests": {
+                  "description": "logEmptyRequests specifies how connections on which no request is\nreceived should be logged.  Typically, these empty requests come from\nload balancers' health probes or Web browsers' speculative\nconnections (\"preconnect\"), in which case logging these requests may\nbe undesirable.  However, these requests may also be caused by\nnetwork errors, in which case logging empty requests may be useful\nfor diagnosing the errors.  In addition, these requests may be caused\nby port scans, in which case logging empty requests may aid in\ndetecting intrusion attempts.  Allowed values for this field are\n\"Log\" and \"Ignore\".  The default value is \"Log\".",
+                  "type": "string",
+                  "enum": [
+                    "Log",
+                    "Ignore"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "namespaceSelector": {
+          "description": "namespaceSelector is used to filter the set of namespaces serviced by the\ningress controller. This is useful for implementing shards.\n\nIf unset, the default is no filtering.",
+          "type": "object",
+          "properties": {
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "type": "object",
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "type": "string"
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  }
+                }
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "nodePlacement": {
+          "description": "nodePlacement enables explicit control over the scheduling of the ingress\ncontroller.\n\nIf unset, defaults are used. See NodePlacement for more details.",
+          "type": "object",
+          "properties": {
+            "nodeSelector": {
+              "description": "nodeSelector is the node selector applied to ingress controller\ndeployments.\n\nIf set, the specified selector is used and replaces the default.\n\nIf unset, the default depends on the value of the defaultPlacement\nfield in the cluster config.openshift.io/v1/ingresses status.\n\nWhen defaultPlacement is Workers, the default is:\n\n  kubernetes.io/os: linux\n  node-role.kubernetes.io/worker: ''\n\nWhen defaultPlacement is ControlPlane, the default is:\n\n  kubernetes.io/os: linux\n  node-role.kubernetes.io/master: ''\n\nThese defaults are subject to change.\n\nNote that using nodeSelector.matchExpressions is not supported.  Only\nnodeSelector.matchLabels may be used.  This is a limitation of the\nKubernetes API: the pod spec does not allow complex expressions for\nnode selectors.",
+              "type": "object",
+              "properties": {
+                "matchExpressions": {
+                  "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                  "type": "array",
+                  "items": {
+                    "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "key is the label key that the selector applies to.",
+                        "type": "string"
+                      },
+                      "operator": {
+                        "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                        "type": "string"
+                      },
+                      "values": {
+                        "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "x-kubernetes-list-type": "atomic"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "matchLabels": {
+                  "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "tolerations": {
+              "description": "tolerations is a list of tolerations applied to ingress controller\ndeployments.\n\nThe default is an empty list.\n\nSee https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/",
+              "type": "array",
+              "items": {
+                "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
+                "type": "object",
+                "properties": {
+                  "effect": {
+                    "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+                    "type": "string"
+                  },
+                  "key": {
+                    "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.",
+                    "type": "string"
+                  },
+                  "tolerationSeconds": {
+                    "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "value": {
+                    "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-list-type": "atomic"
+            }
+          }
+        },
+        "replicas": {
+          "description": "replicas is the desired number of ingress controller replicas. If unset,\nthe default depends on the value of the defaultPlacement field in the\ncluster config.openshift.io/v1/ingresses status.\n\nThe value of replicas is set based on the value of a chosen field in the\nInfrastructure CR. If defaultPlacement is set to ControlPlane, the\nchosen field will be controlPlaneTopology. If it is set to Workers the\nchosen field will be infrastructureTopology. Replicas will then be set to 1\nor 2 based whether the chosen field's value is SingleReplica or\nHighlyAvailable, respectively.\n\nThese defaults are subject to change.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "routeAdmission": {
+          "description": "routeAdmission defines a policy for handling new route claims (for example,\nto allow or deny claims across namespaces).\n\nIf empty, defaults will be applied. See specific routeAdmission fields\nfor details about their defaults.",
+          "type": "object",
+          "properties": {
+            "namespaceOwnership": {
+              "description": "namespaceOwnership describes how host name claims across namespaces should\nbe handled.\n\nValue must be one of:\n\n- Strict: Do not allow routes in different namespaces to claim the same host.\n\n- InterNamespaceAllowed: Allow routes to claim different paths of the same\n  host name across namespaces.\n\nIf empty, the default is Strict.",
+              "type": "string",
+              "enum": [
+                "InterNamespaceAllowed",
+                "Strict"
+              ]
+            },
+            "wildcardPolicy": {
+              "description": "wildcardPolicy describes how routes with wildcard policies should\nbe handled for the ingress controller. WildcardPolicy controls use\nof routes [1] exposed by the ingress controller based on the route's\nwildcard policy.\n\n[1] https://github.com/openshift/api/blob/master/route/v1/types.go\n\nNote: Updating WildcardPolicy from WildcardsAllowed to WildcardsDisallowed\nwill cause admitted routes with a wildcard policy of Subdomain to stop\nworking. These routes must be updated to a wildcard policy of None to be\nreadmitted by the ingress controller.\n\nWildcardPolicy supports WildcardsAllowed and WildcardsDisallowed values.\n\nIf empty, defaults to \"WildcardsDisallowed\".",
+              "type": "string",
+              "enum": [
+                "WildcardsAllowed",
+                "WildcardsDisallowed"
+              ]
+            }
+          }
+        },
+        "routeSelector": {
+          "description": "routeSelector is used to filter the set of Routes serviced by the ingress\ncontroller. This is useful for implementing shards.\n\nIf unset, the default is no filtering.",
+          "type": "object",
+          "properties": {
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "type": "object",
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "type": "string"
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  }
+                }
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "tlsSecurityProfile": {
+          "description": "tlsSecurityProfile specifies settings for TLS connections for ingresscontrollers.\n\nIf unset, the default is based on the apiservers.config.openshift.io/cluster resource.\n\nNote that when using the Old, Intermediate, and Modern profile types, the effective\nprofile configuration is subject to change between releases. For example, given\na specification to use the Intermediate profile deployed on release X.Y.Z, an upgrade\nto release X.Y.Z+1 may cause a new profile configuration to be applied to the ingress\ncontroller, resulting in a rollout.",
+          "type": "object",
+          "properties": {
+            "custom": {
+              "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n  ciphers:\n\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-AES128-GCM-SHA256\n\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n\n  minTLSVersion: VersionTLS11"
+            },
+            "intermediate": {
+              "description": "intermediate is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29\n\nand looks like this (yaml):\n\n  ciphers:\n\n    - TLS_AES_128_GCM_SHA256\n\n    - TLS_AES_256_GCM_SHA384\n\n    - TLS_CHACHA20_POLY1305_SHA256\n\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n\n    - ECDHE-RSA-AES128-GCM-SHA256\n\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n\n    - ECDHE-RSA-AES256-GCM-SHA384\n\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-CHACHA20-POLY1305\n\n    - DHE-RSA-AES128-GCM-SHA256\n\n    - DHE-RSA-AES256-GCM-SHA384\n\n  minTLSVersion: VersionTLS12"
+            },
+            "modern": {
+              "description": "modern is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n\n    - TLS_AES_128_GCM_SHA256\n\n    - TLS_AES_256_GCM_SHA384\n\n    - TLS_CHACHA20_POLY1305_SHA256\n\n  minTLSVersion: VersionTLS13"
+            },
+            "old": {
+              "description": "old is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n\n    - TLS_AES_128_GCM_SHA256\n\n    - TLS_AES_256_GCM_SHA384\n\n    - TLS_CHACHA20_POLY1305_SHA256\n\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n\n    - ECDHE-RSA-AES128-GCM-SHA256\n\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n\n    - ECDHE-RSA-AES256-GCM-SHA384\n\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-CHACHA20-POLY1305\n\n    - DHE-RSA-AES128-GCM-SHA256\n\n    - DHE-RSA-AES256-GCM-SHA384\n\n    - DHE-RSA-CHACHA20-POLY1305\n\n    - ECDHE-ECDSA-AES128-SHA256\n\n    - ECDHE-RSA-AES128-SHA256\n\n    - ECDHE-ECDSA-AES128-SHA\n\n    - ECDHE-RSA-AES128-SHA\n\n    - ECDHE-ECDSA-AES256-SHA384\n\n    - ECDHE-RSA-AES256-SHA384\n\n    - ECDHE-ECDSA-AES256-SHA\n\n    - ECDHE-RSA-AES256-SHA\n\n    - DHE-RSA-AES128-SHA256\n\n    - DHE-RSA-AES256-SHA256\n\n    - AES128-GCM-SHA256\n\n    - AES256-GCM-SHA384\n\n    - AES128-SHA256\n\n    - AES256-SHA256\n\n    - AES128-SHA\n\n    - AES256-SHA\n\n    - DES-CBC3-SHA\n\n  minTLSVersion: VersionTLS10"
+            },
+            "type": {
+              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides\nthe ability to specify individual TLS security profile parameters.\nOld, Intermediate and Modern are TLS security profiles based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations\n\nThe profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers\nare found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be\nreduced.\n\nNote that the Modern profile is currently not supported because it is not\nyet well adopted by common software libraries.",
+              "type": "string",
+              "enum": [
+                "Old",
+                "Intermediate",
+                "Modern",
+                "Custom"
+              ]
+            }
+          }
+        },
+        "tuningOptions": {
+          "description": "tuningOptions defines parameters for adjusting the performance of\ningress controller pods. All fields are optional and will use their\nrespective defaults if not set. See specific tuningOptions fields for\nmore details.\n\nSetting fields within tuningOptions is generally not recommended. The\ndefault values are suitable for most configurations.",
+          "type": "object",
+          "properties": {
+            "clientFinTimeout": {
+              "description": "clientFinTimeout defines how long a connection will be held open while\nwaiting for the client response to the server/backend closing the\nconnection.\n\nIf unset, the default timeout is 1s",
+              "type": "string",
+              "format": "duration"
+            },
+            "clientTimeout": {
+              "description": "clientTimeout defines how long a connection will be held open while\nwaiting for a client response.\n\nIf unset, the default timeout is 30s",
+              "type": "string",
+              "format": "duration"
+            },
+            "connectTimeout": {
+              "description": "ConnectTimeout defines the maximum time to wait for\na connection attempt to a server/backend to succeed.\n\nThis field expects an unsigned duration string of decimal numbers, each with optional\nfraction and a unit suffix, e.g. \"300ms\", \"1.5h\" or \"2h45m\".\nValid time units are \"ns\", \"us\" (or \"\u00b5s\" U+00B5 or \"\u03bcs\" U+03BC), \"ms\", \"s\", \"m\", \"h\".\n\nWhen omitted, this means the user has no opinion and the platform is left\nto choose a reasonable default. This default is subject to change over time.\nThe current default is 5s.",
+              "type": "string",
+              "pattern": "^(0|([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|\u03bcs|ms|s|m|h))+)$"
+            },
+            "headerBufferBytes": {
+              "description": "headerBufferBytes describes how much memory should be reserved\n(in bytes) for IngressController connection sessions.\nNote that this value must be at least 16384 if HTTP/2 is\nenabled for the IngressController (https://tools.ietf.org/html/rfc7540).\nIf this field is empty, the IngressController will use a default value\nof 32768 bytes.\n\nSetting this field is generally not recommended as headerBufferBytes\nvalues that are too small may break the IngressController and\nheaderBufferBytes values that are too large could cause the\nIngressController to use significantly more memory than necessary.",
+              "type": "integer",
+              "format": "int32",
+              "minimum": 16384
+            },
+            "headerBufferMaxRewriteBytes": {
+              "description": "headerBufferMaxRewriteBytes describes how much memory should be reserved\n(in bytes) from headerBufferBytes for HTTP header rewriting\nand appending for IngressController connection sessions.\nNote that incoming HTTP requests will be limited to\n(headerBufferBytes - headerBufferMaxRewriteBytes) bytes, meaning\nheaderBufferBytes must be greater than headerBufferMaxRewriteBytes.\nIf this field is empty, the IngressController will use a default value\nof 8192 bytes.\n\nSetting this field is generally not recommended as\nheaderBufferMaxRewriteBytes values that are too small may break the\nIngressController and headerBufferMaxRewriteBytes values that are too\nlarge could cause the IngressController to use significantly more memory\nthan necessary.",
+              "type": "integer",
+              "format": "int32",
+              "minimum": 4096
+            },
+            "healthCheckInterval": {
+              "description": "healthCheckInterval defines how long the router waits between two consecutive\nhealth checks on its configured backends.  This value is applied globally as\na default for all routes, but may be overridden per-route by the route annotation\n\"router.openshift.io/haproxy.health.check.interval\".\n\nExpects an unsigned duration string of decimal numbers, each with optional\nfraction and a unit suffix, eg \"300ms\", \"1.5h\" or \"2h45m\".\nValid time units are \"ns\", \"us\" (or \"\u00b5s\" U+00B5 or \"\u03bcs\" U+03BC), \"ms\", \"s\", \"m\", \"h\".\n\nSetting this to less than 5s can cause excess traffic due to too frequent\nTCP health checks and accompanying SYN packet storms.  Alternatively, setting\nthis too high can result in increased latency, due to backend servers that are no\nlonger available, but haven't yet been detected as such.\n\nAn empty or zero healthCheckInterval means no opinion and IngressController chooses\na default, which is subject to change over time.\nCurrently the default healthCheckInterval value is 5s.\n\nCurrently the minimum allowed value is 1s and the maximum allowed value is\n2147483647ms (24.85 days).  Both are subject to change over time.",
+              "type": "string",
+              "pattern": "^(0|([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|\u03bcs|ms|s|m|h))+)$"
+            },
+            "maxConnections": {
+              "description": "maxConnections defines the maximum number of simultaneous\nconnections that can be established per HAProxy process.\nIncreasing this value allows each ingress controller pod to\nhandle more connections but at the cost of additional\nsystem resources being consumed.\n\nPermitted values are: empty, 0, -1, and the range\n2000-2000000.\n\nIf this field is empty or 0, the IngressController will use\nthe default value of 50000, but the default is subject to\nchange in future releases.\n\nIf the value is -1 then HAProxy will dynamically compute a\nmaximum value based on the available ulimits in the running\ncontainer. Selecting -1 (i.e., auto) will result in a large\nvalue being computed (~520000 on OpenShift >=4.10 clusters)\nand therefore each HAProxy process will incur significant\nmemory usage compared to the current default of 50000.\n\nSetting a value that is greater than the current operating\nsystem limit will prevent the HAProxy process from\nstarting.\n\nIf you choose a discrete value (e.g., 750000) and the\nrouter pod is migrated to a new node, there's no guarantee\nthat that new node has identical ulimits configured. In\nsuch a scenario the pod would fail to start. If you have\nnodes with different ulimits configured (e.g., different\ntuned profiles) and you choose a discrete value then the\nguidance is to use -1 and let the value be computed\ndynamically at runtime.\n\nYou can monitor memory usage for router containers with the\nfollowing metric:\n'container_memory_working_set_bytes{container=\"router\",namespace=\"openshift-ingress\"}'.\n\nYou can monitor memory usage of individual HAProxy\nprocesses in router containers with the following metric:\n'container_memory_working_set_bytes{container=\"router\",namespace=\"openshift-ingress\"}/container_processes{container=\"router\",namespace=\"openshift-ingress\"}'.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "reloadInterval": {
+              "description": "reloadInterval defines the minimum interval at which the router is allowed to reload\nto accept new changes. Increasing this value can prevent the accumulation of\nHAProxy processes, depending on the scenario. Increasing this interval can\nalso lessen load imbalance on a backend's servers when using the roundrobin\nbalancing algorithm. Alternatively, decreasing this value may decrease latency\nsince updates to HAProxy's configuration can take effect more quickly.\n\nThe value must be a time duration value; see <https://pkg.go.dev/time#ParseDuration>.\nCurrently, the minimum value allowed is 1s, and the maximum allowed value is\n120s. Minimum and maximum allowed values may change in future versions of OpenShift.\nNote that if a duration outside of these bounds is provided, the value of reloadInterval\nwill be capped/floored and not rejected (e.g. a duration of over 120s will be capped to\n120s; the IngressController will not reject and replace this disallowed value with\nthe default).\n\nA zero value for reloadInterval tells the IngressController to choose the default,\nwhich is currently 5s and subject to change without notice.\n\nThis field expects an unsigned duration string of decimal numbers, each with optional\nfraction and a unit suffix, e.g. \"300ms\", \"1.5h\" or \"2h45m\".\nValid time units are \"ns\", \"us\" (or \"\u00b5s\" U+00B5 or \"\u03bcs\" U+03BC), \"ms\", \"s\", \"m\", \"h\".\n\nNote: Setting a value significantly larger than the default of 5s can cause latency\nin observing updates to routes and their endpoints. HAProxy's configuration will\nbe reloaded less frequently, and newly created routes will not be served until the\nsubsequent reload.",
+              "type": "string",
+              "pattern": "^(0|([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|\u03bcs|ms|s|m|h))+)$"
+            },
+            "serverFinTimeout": {
+              "description": "serverFinTimeout defines how long a connection will be held open while\nwaiting for the server/backend response to the client closing the\nconnection.\n\nIf unset, the default timeout is 1s",
+              "type": "string",
+              "format": "duration"
+            },
+            "serverTimeout": {
+              "description": "serverTimeout defines how long a connection will be held open while\nwaiting for a server/backend response.\n\nIf unset, the default timeout is 30s",
+              "type": "string",
+              "format": "duration"
+            },
+            "threadCount": {
+              "description": "threadCount defines the number of threads created per HAProxy process.\nCreating more threads allows each ingress controller pod to handle more\nconnections, at the cost of more system resources being used. HAProxy\ncurrently supports up to 64 threads. If this field is empty, the\nIngressController will use the default value.  The current default is 4\nthreads, but this may change in future releases.\n\nSetting this field is generally not recommended. Increasing the number\nof HAProxy threads allows ingress controller pods to utilize more CPU\ntime under load, potentially starving other pods if set too high.\nReducing the number of threads may cause the ingress controller to\nperform poorly.",
+              "type": "integer",
+              "format": "int32",
+              "maximum": 64,
+              "minimum": 1
+            },
+            "tlsInspectDelay": {
+              "description": "tlsInspectDelay defines how long the router can hold data to find a\nmatching route.\n\nSetting this too short can cause the router to fall back to the default\ncertificate for edge-terminated or reencrypt routes even when a better\nmatching certificate could be used.\n\nIf unset, the default inspect delay is 5s",
+              "type": "string",
+              "format": "duration"
+            },
+            "tunnelTimeout": {
+              "description": "tunnelTimeout defines how long a tunnel connection (including\nwebsockets) will be held open while the tunnel is idle.\n\nIf unset, the default timeout is 1h",
+              "type": "string",
+              "format": "duration"
+            }
+          }
+        },
+        "unsupportedConfigOverrides": {
+          "description": "unsupportedConfigOverrides allows specifying unsupported\nconfiguration options.  Its use is unsupported.",
+          "x-kubernetes-preserve-unknown-fields": true
+        }
+      }
+    },
+    "status": {
+      "description": "status is the most recently observed status of the IngressController.",
+      "type": "object",
+      "properties": {
+        "availableReplicas": {
+          "description": "availableReplicas is number of observed available replicas according to the\ningress controller deployment.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "conditions": {
+          "description": "conditions is a list of conditions and their status.\n\nAvailable means the ingress controller deployment is available and\nservicing route and ingress resources (i.e, .status.availableReplicas\nequals .spec.replicas)\n\nThere are additional conditions which indicate the status of other\ningress controller features and capabilities.\n\n  * LoadBalancerManaged\n  - True if the following conditions are met:\n    * The endpoint publishing strategy requires a service load balancer.\n  - False if any of those conditions are unsatisfied.\n\n  * LoadBalancerReady\n  - True if the following conditions are met:\n    * A load balancer is managed.\n    * The load balancer is ready.\n  - False if any of those conditions are unsatisfied.\n\n  * DNSManaged\n  - True if the following conditions are met:\n    * The endpoint publishing strategy and platform support DNS.\n    * The ingress controller domain is set.\n    * dns.config.openshift.io/cluster configures DNS zones.\n  - False if any of those conditions are unsatisfied.\n\n  * DNSReady\n  - True if the following conditions are met:\n    * DNS is managed.\n    * DNS records have been successfully created.\n  - False if any of those conditions are unsatisfied.",
+          "type": "array",
+          "items": {
+            "description": "OperatorCondition is just the standard condition fields.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "domain": {
+          "description": "domain is the actual domain in use.",
+          "type": "string"
+        },
+        "endpointPublishingStrategy": {
+          "description": "endpointPublishingStrategy is the actual strategy in use.",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "hostNetwork": {
+              "description": "hostNetwork holds parameters for the HostNetwork endpoint publishing\nstrategy. Present only if type is HostNetwork.",
+              "type": "object",
+              "properties": {
+                "httpPort": {
+                  "description": "httpPort is the port on the host which should be used to listen for\nHTTP requests. This field should be set when port 80 is already in use.\nThe value should not coincide with the NodePort range of the cluster.\nWhen the value is 0 or is not specified it defaults to 80.",
+                  "type": "integer",
+                  "format": "int32",
+                  "maximum": 65535,
+                  "minimum": 0
+                },
+                "httpsPort": {
+                  "description": "httpsPort is the port on the host which should be used to listen for\nHTTPS requests. This field should be set when port 443 is already in use.\nThe value should not coincide with the NodePort range of the cluster.\nWhen the value is 0 or is not specified it defaults to 443.",
+                  "type": "integer",
+                  "format": "int32",
+                  "maximum": 65535,
+                  "minimum": 0
+                },
+                "protocol": {
+                  "description": "protocol specifies whether the IngressController expects incoming\nconnections to use plain TCP or whether the IngressController expects\nPROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string.\n* \"TCP\".\n* \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY\nprotocol.  Note that the default is subject to change.",
+                  "type": "string",
+                  "enum": [
+                    "",
+                    "TCP",
+                    "PROXY"
+                  ]
+                },
+                "statsPort": {
+                  "description": "statsPort is the port on the host where the stats from the router are\npublished. The value should not coincide with the NodePort range of the\ncluster. If an external load balancer is configured to forward connections\nto this IngressController, the load balancer should use this port for\nhealth checks. The load balancer can send HTTP probes on this port on a\ngiven node, with the path /healthz/ready to determine if the ingress\ncontroller is ready to receive traffic on the node. For proper operation\nthe load balancer must not forward traffic to a node until the health\ncheck reports ready. The load balancer should also stop forwarding requests\nwithin a maximum of 45 seconds after /healthz/ready starts reporting\nnot-ready. Probing every 5 to 10 seconds, with a 5-second timeout and with\na threshold of two successful or failed requests to become healthy or\nunhealthy respectively, are well-tested values. When the value is 0 or\nis not specified it defaults to 1936.",
+                  "type": "integer",
+                  "format": "int32",
+                  "maximum": 65535,
+                  "minimum": 0
+                }
+              }
+            },
+            "loadBalancer": {
+              "description": "loadBalancer holds parameters for the load balancer. Present only if\ntype is LoadBalancerService.",
+              "type": "object",
+              "required": [
+                "dnsManagementPolicy",
+                "scope"
+              ],
+              "properties": {
+                "allowedSourceRanges": {
+                  "description": "allowedSourceRanges specifies an allowlist of IP address ranges to which\naccess to the load balancer should be restricted.  Each range must be\nspecified using CIDR notation (e.g. \"10.0.0.0/8\" or \"fd00::/8\"). If no range is\nspecified, \"0.0.0.0/0\" for IPv4 and \"::/0\" for IPv6 are used by default,\nwhich allows all source addresses.\n\nTo facilitate migration from earlier versions of OpenShift that did\nnot have the allowedSourceRanges field, you may set the\nservice.beta.kubernetes.io/load-balancer-source-ranges annotation on\nthe \"router-<ingresscontroller name>\" service in the\n\"openshift-ingress\" namespace, and this annotation will take\neffect if allowedSourceRanges is empty on OpenShift 4.12.",
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "dnsManagementPolicy": {
+                  "description": "dnsManagementPolicy indicates if the lifecycle of the wildcard DNS record\nassociated with the load balancer service will be managed by\nthe ingress operator. It defaults to Managed.\nValid values are: Managed and Unmanaged.",
+                  "type": "string",
+                  "enum": [
+                    "Managed",
+                    "Unmanaged"
+                  ]
+                },
+                "providerParameters": {
+                  "description": "providerParameters holds desired load balancer information specific to\nthe underlying infrastructure provider.\n\nIf empty, defaults will be applied. See specific providerParameters\nfields for details about their defaults.",
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "aws": {
+                      "description": "aws provides configuration settings that are specific to AWS\nload balancers.\n\nIf empty, defaults will be applied. See specific aws fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "classicLoadBalancer": {
+                          "description": "classicLoadBalancerParameters holds configuration parameters for an AWS\nclassic load balancer. Present only if type is Classic.",
+                          "type": "object",
+                          "properties": {
+                            "connectionIdleTimeout": {
+                              "description": "connectionIdleTimeout specifies the maximum time period that a\nconnection may be idle before the load balancer closes the\nconnection.  The value must be parseable as a time duration value;\nsee <https://pkg.go.dev/time#ParseDuration>.  A nil or zero value\nmeans no opinion, in which case a default value is used.  The default\nvalue for this field is 60s.  This default is subject to change.",
+                              "type": "string",
+                              "format": "duration"
+                            },
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will\nattach. The subnets may be specified by either their\nID or name. The total number of subnets is limited to 10.\n\nIn order for the load balancer to be provisioned with subnets,\neach subnet must exist, each subnet must be from a different\navailability zone, and the load balancer service must be\nrecreated to pick up new values.\n\nWhen omitted from the spec, the subnets will be auto-discovered\nfor each availability zone. Auto-discovered subnets are not reported\nin the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID.\nSubnet IDs must start with \"subnet-\", consist only\nof alphanumeric characters, must be exactly 24\ncharacters long, must be unique, and the total\nnumber of subnets specified by ids and names\nmust not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name.\nSubnet names must not start with \"subnet-\", must not\ninclude commas, must be under 256 characters in length,\nmust be unique, and the total number of subnets\nspecified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "networkLoadBalancer": {
+                          "description": "networkLoadBalancerParameters holds configuration parameters for an AWS\nnetwork load balancer. Present only if type is NLB.",
+                          "type": "object",
+                          "properties": {
+                            "eipAllocations": {
+                              "description": "eipAllocations is a list of IDs for Elastic IP (EIP) addresses that\nare assigned to the Network Load Balancer.\nThe following restrictions apply:\n\neipAllocations can only be used with external scope, not internal.\nAn EIP can be allocated to only a single IngressController.\nThe number of EIP allocations must match the number of subnets that are used for the load balancer.\nEach EIP allocation must be unique.\nA maximum of 10 EIP allocations are permitted.\n\nSee https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html for general\ninformation about configuration, characteristics, and limitations of Elastic IP addresses.",
+                              "type": "array",
+                              "maxItems": 10,
+                              "items": {
+                                "description": "EIPAllocation is an ID for an Elastic IP (EIP) address that can be allocated to an ELB in the AWS environment.\nValues must begin with `eipalloc-` followed by exactly 17 hexadecimal (`[0-9a-fA-F]`) characters.",
+                                "type": "string",
+                                "maxLength": 26,
+                                "minLength": 26,
+                                "x-kubernetes-validations": [
+                                  {
+                                    "message": "eipAllocations should start with 'eipalloc-'",
+                                    "rule": "self.startsWith('eipalloc-')"
+                                  },
+                                  {
+                                    "message": "eipAllocations must be 'eipalloc-' followed by exactly 17 hexadecimal characters (0-9, a-f, A-F)",
+                                    "rule": "self.split(\"-\", 2)[1].matches('[0-9a-fA-F]{17}$')"
+                                  }
+                                ]
+                              },
+                              "x-kubernetes-list-type": "atomic",
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "eipAllocations cannot contain duplicates",
+                                  "rule": "self.all(x, self.exists_one(y, x == y))"
+                                }
+                              ]
+                            },
+                            "subnets": {
+                              "description": "subnets specifies the subnets to which the load balancer will\nattach. The subnets may be specified by either their\nID or name. The total number of subnets is limited to 10.\n\nIn order for the load balancer to be provisioned with subnets,\neach subnet must exist, each subnet must be from a different\navailability zone, and the load balancer service must be\nrecreated to pick up new values.\n\nWhen omitted from the spec, the subnets will be auto-discovered\nfor each availability zone. Auto-discovered subnets are not reported\nin the status of the IngressController object.",
+                              "type": "object",
+                              "properties": {
+                                "ids": {
+                                  "description": "ids specifies a list of AWS subnets by subnet ID.\nSubnet IDs must start with \"subnet-\", consist only\nof alphanumeric characters, must be exactly 24\ncharacters long, must be unique, and the total\nnumber of subnets specified by ids and names\nmust not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetID is a reference to an AWS subnet ID.",
+                                    "type": "string",
+                                    "maxLength": 24,
+                                    "minLength": 24,
+                                    "pattern": "^subnet-[0-9A-Za-z]+$"
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet ids cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                },
+                                "names": {
+                                  "description": "names specifies a list of AWS subnets by subnet name.\nSubnet names must not start with \"subnet-\", must not\ninclude commas, must be under 256 characters in length,\nmust be unique, and the total number of subnets\nspecified by ids and names must not exceed 10.",
+                                  "type": "array",
+                                  "maxItems": 10,
+                                  "items": {
+                                    "description": "AWSSubnetName is a reference to an AWS subnet name.",
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "minLength": 1,
+                                    "x-kubernetes-validations": [
+                                      {
+                                        "message": "subnet name cannot contain a comma",
+                                        "rule": "!self.contains(',')"
+                                      },
+                                      {
+                                        "message": "subnet name cannot start with 'subnet-'",
+                                        "rule": "!self.startsWith('subnet-')"
+                                      }
+                                    ]
+                                  },
+                                  "x-kubernetes-list-type": "atomic",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "subnet names cannot contain duplicates",
+                                      "rule": "self.all(x, self.exists_one(y, x == y))"
+                                    }
+                                  ]
+                                }
+                              },
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "the total number of subnets cannot exceed 10",
+                                  "rule": "has(self.ids) && has(self.names) ? size(self.ids + self.names) <= 10 : true"
+                                },
+                                {
+                                  "message": "must specify at least 1 subnet name or id",
+                                  "rule": "has(self.ids) && self.ids.size() > 0 || has(self.names) && self.names.size() > 0"
+                                }
+                              ]
+                            }
+                          },
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "number of subnets must be equal to number of eipAllocations",
+                              "rule": "has(self.subnets) && has(self.subnets.ids) && has(self.subnets.names) && has(self.eipAllocations) ? size(self.subnets.ids + self.subnets.names) == size(self.eipAllocations) : true"
+                            },
+                            {
+                              "message": "number of subnets must be equal to number of eipAllocations",
+                              "rule": "has(self.subnets) && has(self.subnets.ids) && !has(self.subnets.names) && has(self.eipAllocations) ? size(self.subnets.ids) == size(self.eipAllocations) : true"
+                            },
+                            {
+                              "message": "number of subnets must be equal to number of eipAllocations",
+                              "rule": "has(self.subnets) && has(self.subnets.names) && !has(self.subnets.ids) && has(self.eipAllocations) ? size(self.subnets.names) == size(self.eipAllocations) : true"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "description": "type is the type of AWS load balancer to instantiate for an ingresscontroller.\n\nValid values are:\n\n* \"Classic\": A Classic Load Balancer that makes routing decisions at either\n  the transport layer (TCP/SSL) or the application layer (HTTP/HTTPS). See\n  the following for additional details:\n\n    https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#clb\n\n* \"NLB\": A Network Load Balancer that makes routing decisions at the\n  transport layer (TCP/SSL). See the following for additional details:\n\n    https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#nlb",
+                          "type": "string",
+                          "enum": [
+                            "Classic",
+                            "NLB"
+                          ]
+                        }
+                      }
+                    },
+                    "gcp": {
+                      "description": "gcp provides configuration settings that are specific to GCP\nload balancers.\n\nIf empty, defaults will be applied. See specific gcp fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "properties": {
+                        "clientAccess": {
+                          "description": "clientAccess describes how client access is restricted for internal\nload balancers.\n\nValid values are:\n* \"Global\": Specifying an internal load balancer with Global client access\n  allows clients from any region within the VPC to communicate with the load\n  balancer.\n\n    https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#global_access\n\n* \"Local\": Specifying an internal load balancer with Local client access\n  means only clients within the same region (and VPC) as the GCP load balancer\n  can communicate with the load balancer. Note that this is the default behavior.\n\n    https://cloud.google.com/load-balancing/docs/internal#client_access",
+                          "type": "string",
+                          "enum": [
+                            "Global",
+                            "Local"
+                          ]
+                        }
+                      }
+                    },
+                    "ibm": {
+                      "description": "ibm provides configuration settings that are specific to IBM Cloud\nload balancers.\n\nIf empty, defaults will be applied. See specific ibm fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "properties": {
+                        "protocol": {
+                          "description": "protocol specifies whether the load balancer uses PROXY protocol to forward connections to\nthe IngressController. See \"service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features:\n\"proxy-protocol\"\" at https://cloud.ibm.com/docs/containers?topic=containers-vpc-lbaas\"\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nValid values for protocol are TCP, PROXY and omitted.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.\nThe current default is TCP, without the proxy protocol enabled.",
+                          "type": "string",
+                          "enum": [
+                            "",
+                            "TCP",
+                            "PROXY"
+                          ]
+                        }
+                      }
+                    },
+                    "openstack": {
+                      "description": "openstack provides configuration settings that are specific to OpenStack\nload balancers.\n\nIf empty, defaults will be applied. See specific openstack fields for\ndetails about their defaults.",
+                      "type": "object",
+                      "properties": {
+                        "floatingIP": {
+                          "description": "floatingIP specifies the IP address that the load balancer will use.\nWhen not specified, an IP address will be assigned randomly by the OpenStack cloud provider.\nWhen specified, the floating IP has to be pre-created.  If the\nspecified value is not a floating IP or is already claimed, the\nOpenStack cloud provider won't be able to provision the load\nbalancer.\nThis field may only be used if the IngressController has External scope.\nThis value must be a valid IPv4 or IPv6 address.",
+                          "type": "string",
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "floatingIP must be a valid IPv4 or IPv6 address",
+                              "rule": "isIP(self)"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": {
+                      "description": "type is the underlying infrastructure provider for the load balancer.\nAllowed values are \"AWS\", \"Azure\", \"BareMetal\", \"GCP\", \"IBM\", \"Nutanix\",\n\"OpenStack\", and \"VSphere\".",
+                      "type": "string",
+                      "enum": [
+                        "AWS",
+                        "Azure",
+                        "BareMetal",
+                        "GCP",
+                        "Nutanix",
+                        "OpenStack",
+                        "VSphere",
+                        "IBM"
+                      ]
+                    }
+                  },
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "openstack is not permitted when type is not OpenStack",
+                      "rule": "has(self.type) && self.type == 'OpenStack' ? true : !has(self.openstack)"
+                    }
+                  ]
+                },
+                "scope": {
+                  "description": "scope indicates the scope at which the load balancer is exposed.\nPossible values are \"External\" and \"Internal\".",
+                  "type": "string",
+                  "enum": [
+                    "Internal",
+                    "External"
+                  ]
+                }
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "eipAllocations are forbidden when the scope is Internal.",
+                  "rule": "!has(self.scope) || self.scope != 'Internal' || !has(self.providerParameters) || !has(self.providerParameters.aws) || !has(self.providerParameters.aws.networkLoadBalancer) || !has(self.providerParameters.aws.networkLoadBalancer.eipAllocations)"
+                },
+                {
+                  "message": "cannot specify a floating ip when scope is internal",
+                  "rule": "!has(self.scope) || self.scope != 'Internal' || !has(self.providerParameters) || !has(self.providerParameters.openstack) || !has(self.providerParameters.openstack.floatingIP) || self.providerParameters.openstack.floatingIP == \"\""
+                }
+              ]
+            },
+            "nodePort": {
+              "description": "nodePort holds parameters for the NodePortService endpoint publishing strategy.\nPresent only if type is NodePortService.",
+              "type": "object",
+              "properties": {
+                "protocol": {
+                  "description": "protocol specifies whether the IngressController expects incoming\nconnections to use plain TCP or whether the IngressController expects\nPROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string.\n* \"TCP\".\n* \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY\nprotocol.  Note that the default is subject to change.",
+                  "type": "string",
+                  "enum": [
+                    "",
+                    "TCP",
+                    "PROXY"
+                  ]
+                }
+              }
+            },
+            "private": {
+              "description": "private holds parameters for the Private endpoint publishing\nstrategy. Present only if type is Private.",
+              "type": "object",
+              "properties": {
+                "protocol": {
+                  "description": "protocol specifies whether the IngressController expects incoming\nconnections to use plain TCP or whether the IngressController expects\nPROXY protocol.\n\nPROXY protocol can be used with load balancers that support it to\ncommunicate the source addresses of client connections when\nforwarding those connections to the IngressController.  Using PROXY\nprotocol enables the IngressController to report those source\naddresses instead of reporting the load balancer's address in HTTP\nheaders and logs.  Note that enabling PROXY protocol on the\nIngressController will cause connections to fail if you are not using\na load balancer that uses PROXY protocol to forward connections to\nthe IngressController.  See\nhttp://www.haproxy.org/download/2.2/doc/proxy-protocol.txt for\ninformation about PROXY protocol.\n\nThe following values are valid for this field:\n\n* The empty string.\n* \"TCP\".\n* \"PROXY\".\n\nThe empty string specifies the default, which is TCP without PROXY\nprotocol.  Note that the default is subject to change.",
+                  "type": "string",
+                  "enum": [
+                    "",
+                    "TCP",
+                    "PROXY"
+                  ]
+                }
+              }
+            },
+            "type": {
+              "description": "type is the publishing strategy to use. Valid values are:\n\n* LoadBalancerService\n\nPublishes the ingress controller using a Kubernetes LoadBalancer Service.\n\nIn this configuration, the ingress controller deployment uses container\nnetworking. A LoadBalancer Service is created to publish the deployment.\n\nSee: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer\n\nIf domain is set, a wildcard DNS record will be managed to point at the\nLoadBalancer Service's external name. DNS records are managed only in DNS\nzones defined by dns.config.openshift.io/cluster .spec.publicZone and\n.spec.privateZone.\n\nWildcard DNS management is currently supported only on the AWS, Azure,\nand GCP platforms.\n\n* HostNetwork\n\nPublishes the ingress controller on node ports where the ingress controller\nis deployed.\n\nIn this configuration, the ingress controller deployment uses host\nnetworking, bound to node ports 80 and 443. The user is responsible for\nconfiguring an external load balancer to publish the ingress controller via\nthe node ports.\n\n* Private\n\nDoes not publish the ingress controller.\n\nIn this configuration, the ingress controller deployment uses container\nnetworking, and is not explicitly published. The user must manually publish\nthe ingress controller.\n\n* NodePortService\n\nPublishes the ingress controller using a Kubernetes NodePort Service.\n\nIn this configuration, the ingress controller deployment uses container\nnetworking. A NodePort Service is created to publish the deployment. The\nspecific node ports are dynamically allocated by OpenShift; however, to\nsupport static port allocations, user changes to the node port\nfield of the managed NodePort Service will preserved.",
+              "type": "string",
+              "enum": [
+                "LoadBalancerService",
+                "HostNetwork",
+                "Private",
+                "NodePortService"
+              ]
+            }
+          }
+        },
+        "namespaceSelector": {
+          "description": "namespaceSelector is the actual namespaceSelector in use.",
+          "type": "object",
+          "properties": {
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "type": "object",
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "type": "string"
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  }
+                }
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "observedGeneration": {
+          "description": "observedGeneration is the most recent generation observed.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "routeSelector": {
+          "description": "routeSelector is the actual routeSelector in use.",
+          "type": "object",
+          "properties": {
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "type": "object",
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "type": "string"
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "x-kubernetes-list-type": "atomic"
+                  }
+                }
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "selector": {
+          "description": "selector is a label selector, in string format, for ingress controller pods\ncorresponding to the IngressController. The number of matching pods should\nequal the value of availableReplicas.",
+          "type": "string"
+        },
+        "tlsProfile": {
+          "description": "tlsProfile is the TLS connection configuration that is in effect.",
+          "type": "object",
+          "properties": {
+            "ciphers": {
+              "description": "ciphers is used to specify the cipher algorithms that are negotiated\nduring the TLS handshake.  Operators may remove entries their operands\ndo not support.  For example, to use DES-CBC3-SHA  (yaml):\n\n  ciphers:\n    - DES-CBC3-SHA",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "x-kubernetes-list-type": "atomic"
+            },
+            "minTLSVersion": {
+              "description": "minTLSVersion is used to specify the minimal version of the TLS protocol\nthat is negotiated during the TLS handshake. For example, to use TLS\nversions 1.1, 1.2 and 1.3 (yaml):\n\n  minTLSVersion: VersionTLS11\n\nNOTE: currently the highest minTLSVersion allowed is VersionTLS12",
+              "type": "string",
+              "enum": [
+                "VersionTLS10",
+                "VersionTLS11",
+                "VersionTLS12",
+                "VersionTLS13"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "operator.openshift.io",
+      "kind": "IngressController",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,9 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class Migration(NamespacedResource, MTV):
+class Migration(NamespacedResource):
     """
     Migration Toolkit For Virtualization (MTV) Migration object.
 
@@ -41,11 +40,10 @@ class Migration(NamespacedResource, MTV):
         self.plan_name = plan_name
         self.plan_namespace = plan_namespace
         self.cut_over = cut_over
-        self.condition_message_succeeded = self.ConditionMessage.MIGRATION_SUCCEEDED
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res.update({
                 "spec": {
                     "plan": {

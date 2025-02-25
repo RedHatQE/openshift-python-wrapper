@@ -1,0 +1,51 @@
+{
+  "description": "CRDDescription provides details to OLM about the CRDs",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "kind"
+  ],
+  "properties": {
+    "actionDescriptors": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.ActionDescriptor"
+      }
+    },
+    "description": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.APIResourceReference"
+      }
+    },
+    "specDescriptors": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.SpecDescriptor"
+      }
+    },
+    "statusDescriptors": {
+      "type": "array",
+      "items": {
+        "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.StatusDescriptor"
+      }
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 from ocp_resources.virtual_machine import VirtualMachine
@@ -103,7 +103,6 @@ class VirtualMachineImport(NamespacedResource):
         resource_mapping_namespace=None,
         warm=False,
         finalize_date=None,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -113,7 +112,6 @@ class VirtualMachineImport(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -139,12 +137,11 @@ class VirtualMachineImport(NamespacedResource):
             name=self.target_vm_name,
             namespace=self.namespace,
             client=self.client,
-            privileged_client=self.privileged_client or self.client,
         )
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             spec = self.res.setdefault("spec", {})
 
             secret = spec.setdefault("providerCredentialsSecret", {})
@@ -201,7 +198,7 @@ class VirtualMachineImport(NamespacedResource):
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
     ):
-        self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be" f" {cond_status}")
+        self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=1,
@@ -263,7 +260,7 @@ class ResourceMapping(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             for provider, mapping in self.mapping.items():
                 res_provider_section = self.res.setdefault("spec", {}).setdefault(provider, {})
                 if mapping.network_mappings is not None:

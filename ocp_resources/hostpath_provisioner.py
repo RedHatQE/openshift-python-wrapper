@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
 
 
@@ -37,7 +37,7 @@ class HostPathProvisioner(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             spec = self.res.setdefault("spec", {})
             path_config = spec.setdefault("pathConfig", {})
             if self.path:

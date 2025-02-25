@@ -1,4 +1,4 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -18,7 +18,6 @@ class ImageStream(NamespacedResource):
         lookup_policy=False,
         tags=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -28,7 +27,6 @@ class ImageStream(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -38,7 +36,7 @@ class ImageStream(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res.update({
                 "spec": {
                     "lookupPolicy": {"local": self.lookup_policy},

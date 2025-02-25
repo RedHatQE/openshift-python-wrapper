@@ -2,7 +2,7 @@
 
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler, TimeoutWatch
 from ocp_resources.virtual_machine import VirtualMachine
@@ -39,7 +39,7 @@ class VirtualMachineSnapshot(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             spec = self.res.setdefault("spec", {})
             spec.setdefault("source", {})["apiGroup"] = NamespacedResource.ApiGroup.KUBEVIRT_IO
             spec["source"]["kind"] = VirtualMachine.kind
@@ -56,7 +56,7 @@ class VirtualMachineSnapshot(NamespacedResource):
         Raises:
             TimeoutExpiredError: If timeout reached.
         """
-        self.logger.info(f"Wait for {self.kind} {self.name} status to be" f" {'' if status else 'not '}ready to use")
+        self.logger.info(f"Wait for {self.kind} {self.name} status to be {'' if status else 'not '}ready to use")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(

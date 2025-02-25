@@ -1,0 +1,155 @@
+{
+  "description": "NodeResourceTopology describes node resources and their topology.",
+  "type": "object",
+  "required": [
+    "zones"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "attributes": {
+      "description": "AttributeList contains an array of AttributeInfo objects.",
+      "type": "array",
+      "items": {
+        "description": "AttributeInfo contains one attribute of a Zone.",
+        "type": "object",
+        "required": [
+          "name",
+          "value"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "topologyPolicies": {
+      "description": "DEPRECATED (to be removed in v1beta1): use top level attributes if needed",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "zones": {
+      "description": "ZoneList contains an array of Zone objects.",
+      "type": "array",
+      "items": {
+        "description": "Zone represents a resource topology zone, e.g. socket, node, die or core.",
+        "type": "object",
+        "required": [
+          "name",
+          "type"
+        ],
+        "properties": {
+          "attributes": {
+            "description": "AttributeList contains an array of AttributeInfo objects.",
+            "type": "array",
+            "items": {
+              "description": "AttributeInfo contains one attribute of a Zone.",
+              "type": "object",
+              "required": [
+                "name",
+                "value"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "costs": {
+            "description": "CostList contains an array of CostInfo objects.",
+            "type": "array",
+            "items": {
+              "description": "CostInfo describes the cost (or distance) between two Zones.",
+              "type": "object",
+              "required": [
+                "name",
+                "value"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "resources": {
+            "description": "ResourceInfoList contains an array of ResourceInfo objects.",
+            "type": "array",
+            "items": {
+              "description": "ResourceInfo contains information about one resource type.",
+              "type": "object",
+              "required": [
+                "allocatable",
+                "available",
+                "capacity",
+                "name"
+              ],
+              "properties": {
+                "allocatable": {
+                  "description": "Allocatable quantity of the resource, corresponding to allocatable in node status, i.e. total amount of this resource available to be used by pods.",
+                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                  "x-kubernetes-int-or-string": true
+                },
+                "available": {
+                  "description": "Available is the amount of this resource currently available for new (to be scheduled) pods, i.e. Allocatable minus the resources reserved by currently running pods.",
+                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                  "x-kubernetes-int-or-string": true
+                },
+                "capacity": {
+                  "description": "Capacity of the resource, corresponding to capacity in node status, i.e. total amount of this resource that the node has.",
+                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                  "x-kubernetes-int-or-string": true
+                },
+                "name": {
+                  "description": "Name of the resource.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "topology.node.k8s.io",
+      "kind": "NodeResourceTopology",
+      "version": "v1alpha2"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

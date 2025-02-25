@@ -1,0 +1,97 @@
+{% set all_types_for_class_args = [] %}
+{% set all_names_types_for_docstring = [] %}
+{% set all_required_args = [] %}
+{% for arg in fields + spec %}
+  {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
+  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + " (" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe ) %}
+  {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
+{% endfor %}
+
+from typing import Any
+from ocp_resources.resource import {{ base_class }}, MissingRequiredArgumentError
+
+
+class {{ kind }}({{ base_class }}):
+    """
+    {{ description }}
+    """
+
+    {% if group %}
+    api_group: str = {{ base_class }}.ApiGroup.{{ group.upper() }}
+    {% else %}
+    api_version: str = {{ base_class }}.ApiVersion.{{ version.upper() }}
+    {% endif %}
+
+    def __init__(
+        self,
+        {% if all_types_for_class_args %}
+        {{ all_types_for_class_args|join(",\n        ") }},
+        {% endif %}
+        **kwargs: Any,
+    ) -> None:
+        {% if all_types_for_class_args %}
+        """
+        Args:
+            {% for value in all_names_types_for_docstring %}
+            {{ value }}
+            {% endfor %}
+        """
+        {% endif %}
+        super().__init__(**kwargs)
+
+        {% for arg in fields + spec %}
+        self.{{ arg["name-for-class-arg"] }} = {{ arg["name-for-class-arg"] }}
+        {% endfor %}
+
+    {% if fields or spec %}
+    def to_dict(self) -> None:
+
+        super().to_dict()
+
+        if not self.kind_dict and not self.yaml_file:
+          {% if all_required_args %}
+          {% for arg in all_required_args %}
+            if self.{{ arg }} is None:
+                raise MissingRequiredArgumentError(argument="self.{{ arg }}")
+
+          {% endfor %}
+          {% endif %}
+
+          {% if spec %}
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+          {% endif %}
+
+          {# Add required args under `self.res` #}
+          {% for arg in fields %}
+          {% if arg["required"] == True %}
+            self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
+          {% endif %}
+          {% endfor %}
+
+          {# Add required args under `_spec` #}
+          {% for arg in spec %}
+          {% if arg["required"] == True %}
+            _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
+          {% endif %}
+          {% endfor %}
+
+          {# Add optional args under `self.res` #}
+          {% for arg in fields %}
+          {% if arg["required"] == False %}
+            if self.{{ arg["name-for-class-arg"] }} is not None:
+                self.res["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
+
+          {% endif %}
+          {% endfor %}
+
+          {# Add optional args under `_spec` #}
+          {% for arg in spec %}
+          {% if arg["required"] == False %}
+            if self.{{ arg["name-for-class-arg"] }} is not None:
+                _spec["{{ arg["property-name"] }}"] = self.{{ arg["name-for-class-arg"] }}
+
+          {% endif %}
+          {% endfor %}
+    {% endif %}
+    # End of generated code

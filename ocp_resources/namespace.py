@@ -1,31 +1,40 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
+from typing import Any, List, Optional
 from ocp_resources.resource import Resource
 
 
 class Namespace(Resource):
     """
-    Namespace object, inherited from Resource.
+    Namespace provides a scope for Names. Use of multiple namespaces is optional.
     """
 
-    api_version = Resource.ApiVersion.V1
-
-    class Status(Resource.Status):
-        ACTIVE = "Active"
+    api_version: str = Resource.ApiVersion.V1
 
     def __init__(
         self,
-        name=None,
-        client=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
-    ):
-        super().__init__(
-            name=name,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        finalizers: Optional[List[Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Args:
+            finalizers (List[Any]): Finalizers is an opaque list of values that must be empty to
+              permanently remove object from storage. More info:
+              https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
+
+        """
+        super().__init__(**kwargs)
+
+        self.finalizers = finalizers
+
+    def to_dict(self) -> None:
+        super().to_dict()
+
+        if not self.kind_dict and not self.yaml_file:
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            if self.finalizers:
+                _spec["finalizers"] = self.finalizers
+
+    # End of generated code

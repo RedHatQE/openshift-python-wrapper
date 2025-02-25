@@ -1,61 +1,60 @@
 from __future__ import annotations
-from collections.abc import Callable, Generator
+
 import contextlib
 import copy
 import json
 import os
 import re
 import sys
+from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Optional, Any, Dict, List
+from typing import Any
+from warnings import warn
 
 import kubernetes
-from kubernetes.dynamic import DynamicClient, ResourceInstance
 import yaml
 from benedict import benedict
+from kubernetes.dynamic import DynamicClient, ResourceInstance
 from kubernetes.dynamic.exceptions import (
     ConflictError,
+    ForbiddenError,
     MethodNotAllowedError,
     NotFoundError,
-    ForbiddenError,
     ResourceNotFoundError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger, logging
-from urllib3.exceptions import MaxRetryError
-
-from ocp_resources.constants import (
-    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-    NOT_FOUND_ERROR_EXCEPTION_DICT,
-    PROTOCOL_ERROR_EXCEPTION_DICT,
-    TIMEOUT_1MINUTE,
-    TIMEOUT_4MINUTES,
-    TIMEOUT_10SEC,
-)
-from ocp_resources.event import Event
 from timeout_sampler import (
     TimeoutExpiredError,
     TimeoutSampler,
     TimeoutWatch,
 )
-from ocp_resources.utils import skip_existing_resource_creation_teardown
+from urllib3.exceptions import MaxRetryError
+
+from ocp_resources.event import Event
+from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError, ResourceTeardownError
+from ocp_resources.utils.constants import (
+    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+    NOT_FOUND_ERROR_EXCEPTION_DICT,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_1MINUTE,
+    TIMEOUT_1SEC,
+    TIMEOUT_4MINUTES,
+    TIMEOUT_5SEC,
+    TIMEOUT_10SEC,
+    TIMEOUT_30SEC,
+)
+from ocp_resources.utils.resource_constants import ResourceConstants
+from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-class MissingRequiredArgumentError(Exception):
-    def __init__(self, argument: str) -> None:
-        self.argument = argument
-
-    def __repr__(self) -> str:
-        return f"Missing required argument/s. Either provide yaml_file or pass {self.argument}"
-
-
-def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> Optional[ResourceField]:
+def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> ResourceField | None:
     results = dyn_client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
     for result in sorted_results:
@@ -77,7 +76,10 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str = "", config_dict: Dict[str, Any] | None = None, context: str = "", **kwargs: Any
+    config_file: str = "",
+    config_dict: dict[str, Any] | None = None,
+    context: str = "",
+    **kwargs: Any,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -105,6 +107,7 @@ def get_client(
                 config_dict=config_dict, context=context or None, **kwargs
             )
         )
+    client_configuration = kwargs.get("client_configuration", kubernetes.client.Configuration())
     try:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
         LOGGER.info("Trying to get client via new_client_from_config")
@@ -113,21 +116,40 @@ def get_client(
         # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
+
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
+            proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+            if not proxy:
+                raise ValueError(
+                    "Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set."
+                )
+            if client_configuration.proxy and client_configuration.proxy != proxy:
+                raise ValueError(
+                    f"Conflicting proxy settings: client_configuration.proxy={client_configuration.proxy}, "
+                    f"but the environment variable 'HTTPS_PROXY/HTTP_PROXY' defines proxy as {proxy}."
+                )
+            client_configuration.proxy = proxy
+
         return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(config_file=config_file, context=context or None, **kwargs)
+            client=kubernetes.config.new_client_from_config(
+                config_file=config_file,
+                client_configuration=client_configuration,
+                context=context or None,
+                **kwargs,
+            )
         )
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
         LOGGER.info("Trying to get client via incluster_config")
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.incluster_config.load_incluster_config(
-                client_configuration=kwargs.get("client_configuration"),
+                client_configuration=client_configuration,
                 try_refresh_token=kwargs.get("try_refresh_token", True),
             )
         )
 
 
-def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> Optional[str]:
+def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> str | None:
     # return the name of the last class in MRO list that is not one of base
     # classes; otherwise return None
     for class_iterator in reversed([
@@ -140,6 +162,80 @@ def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) 
     return None
 
 
+def replace_key_with_hashed_value(resource_dict: dict[Any, Any], key_name: str) -> dict[Any, Any]:
+    """
+    Recursively search a nested dictionary for a given key and changes its value to "******" if found.
+
+    The function supports two key formats:
+    1. Regular dictionary path:
+        A key to be hashed can be found directly in a dictionary, e.g. "a>b>c", would hash the value associated with
+        key "c", where dictionary format is:
+        input = {
+            "a": {
+                "b": {
+                    "c": "sensitive data"
+                }
+            }
+        }
+        output = {
+            "a": {
+                "b": {
+                    "c": "*******"
+                }
+            }
+        }
+    2. list path:
+        A key to be hashed can be found in a dictionary that is in list somewhere in a dictionary, e.g. "a>b[]>c",
+        would hash the value associated with key "c", where dictionary format is:
+        input = {
+            "a": {
+                "b": [
+                    {"d": "not sensitive data"},
+                    {"c": "sensitive data"}
+                ]
+            }
+        }
+        output = {
+            "a": {
+                "b": [
+                    {"d": "not sensitive data"},
+                    {"c": "*******"}
+                ]
+            }
+        }
+
+    Args:
+        resource_dict: The nested dictionary to search.
+        key_name: The key path to find.
+
+    Returns:
+        dict[Any, Any]: A copy of the input dictionary with the specified key's value replaced with "*******".
+
+    """
+    result = copy.deepcopy(resource_dict)
+
+    benedict_resource_dict = benedict(result, keypath_separator=">")
+
+    if "[]" not in key_name:
+        if benedict_resource_dict.get(key_name):
+            benedict_resource_dict[key_name] = "*******"
+        return dict(benedict_resource_dict)
+
+    key_prefix, remaining_key = key_name.split("[]>", 1)
+    if not benedict_resource_dict.get(key_prefix):
+        return dict(benedict_resource_dict)
+
+    resource_data = benedict_resource_dict[key_prefix]
+    if not isinstance(resource_data, list):
+        return dict(benedict_resource_dict)
+
+    for index, element in enumerate(resource_data):
+        if isinstance(element, dict):
+            resource_data[index] = replace_key_with_hashed_value(resource_dict=element, key_name=remaining_key)
+
+    return dict(benedict_resource_dict)
+
+
 class KubeAPIVersion(Version):
     """
     Implement the Kubernetes API versioning scheme from
@@ -150,7 +246,7 @@ class KubeAPIVersion(Version):
 
     def __init__(self, vstring: str):
         self.vstring = vstring
-        self.version: List[str | Any] = []
+        self.version: list[str | Any] = []
         super().__init__(version=vstring)
 
     def parse(self, vstring: str):
@@ -163,6 +259,7 @@ class KubeAPIVersion(Version):
 
         if len(components) not in (2, 4) or components[0] != "v" or not isinstance(components[1], int):
             raise ValueError(errmsg)
+
         if len(components) == 4 and (components[2] not in ("alpha", "beta") or not isinstance(components[3], int)):
             raise ValueError(errmsg)
 
@@ -201,13 +298,7 @@ class ClassProperty:
         return self.func(owner)
 
 
-class ValueMismatch(Exception):
-    """
-    Raises when value doesn't match the class value
-    """
-
-
-class Resource:
+class Resource(ResourceConstants):
     """
     Base class for API resources
     """
@@ -217,201 +308,180 @@ class Resource:
     singular_name: str = ""
     timeout_seconds: int = TIMEOUT_1MINUTE
 
-    class Status:
-        SUCCEEDED = "Succeeded"
-        FAILED = "Failed"
-        DELETING = "Deleting"
-        DEPLOYED = "Deployed"
-        PENDING = "Pending"
-        COMPLETED = "Completed"
-        RUNNING = "Running"
-        READY = "Ready"
-        TERMINATING = "Terminating"
-        ERROR = "Error"
-        COMPLETE = "Complete"
-
-    class Condition:
-        UPGRADEABLE = "Upgradeable"
-        AVAILABLE = "Available"
-        DEGRADED = "Degraded"
-        PROGRESSING = "Progressing"
-        CREATED = "Created"
-        RECONCILE_COMPLETE = "ReconcileComplete"
-        READY = "Ready"
-        FAILING = "Failing"
-
-        class Status:
-            TRUE = "True"
-            FALSE = "False"
-            UNKNOWN = "Unknown"
-
-        class Phase:
-            INSTALL_READY = "InstallReady"
-            SUCCEEDED = "Succeeded"
-
-        class Reason:
-            ALL_REQUIREMENTS_MET = "AllRequirementsMet"
-            INSTALL_SUCCEEDED = "InstallSucceeded"
-
-    class Interface:
-        class State:
-            UP = "up"
-            DOWN = "down"
-            ABSENT = "absent"
-
     class ApiGroup:
-        AAQ_KUBEVIRT_IO = "aaq.kubevirt.io"
-        ADMISSIONREGISTRATION_K8S_IO = "admissionregistration.k8s.io"
-        APIEXTENSIONS_K8S_IO = "apiextensions.k8s.io"
-        APIREGISTRATION_K8S_IO = "apiregistration.k8s.io"
-        APP_KUBERNETES_IO = "app.kubernetes.io"
-        APPS = "apps"
-        BATCH = "batch"
-        BITNAMI_COM = "bitnami.com"
-        CDI_KUBEVIRT_IO = "cdi.kubevirt.io"
-        CLONE_KUBEVIRT_IO = "clone.kubevirt.io"
-        CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO = "cluster.open-cluster-management.io"
-        CONFIG_OPENSHIFT_IO = "config.openshift.io"
-        CONSOLE_OPENSHIFT_IO = "console.openshift.io"
-        COORDINATION_K8S_IO = "coordination.k8s.io"
-        CSIADDONS_OPENSHIFT_IO = "csiaddons.openshift.io"
-        DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO = "dataimportcrontemplate.kubevirt.io"
-        DISCOVERY_K8S_IO = "discovery.k8s.io"
-        EVENTS_K8S_IO = "events.k8s.io"
-        EXPORT_KUBEVIRT_IO = "export.kubevirt.io"
-        FENCE_AGENTS_REMEDIATION_MEDIK8S_IO = "fence-agents-remediation.medik8s.io"
-        FORKLIFT_KONVEYOR_IO = "forklift.konveyor.io"
-        INSTANCETYPE_KUBEVIRT_IO = "instancetype.kubevirt.io"
-        HCO_KUBEVIRT_IO = "hco.kubevirt.io"
-        HIVE_OPENSHIFT_IO = "hive.openshift.io"
-        HOSTPATHPROVISIONER_KUBEVIRT_IO = "hostpathprovisioner.kubevirt.io"
-        IMAGE_OPENSHIFT_IO = "image.openshift.io"
-        IMAGE_REGISTRY = "registry.redhat.io"
-        INTEGREATLY_ORG = "integreatly.org"
-        K8S_CNI_CNCF_IO = "k8s.cni.cncf.io"
-        K8S_V1_CNI_CNCF_IO = "k8s.v1.cni.cncf.io"
-        KUBERNETES_IO = "kubernetes.io"
-        KUBEVIRT_IO = "kubevirt.io"
-        KUBEVIRT_KUBEVIRT_IO = "kubevirt.kubevirt.io"
-        LITMUS_IO = "litmuschaos.io"
-        MACHINE_OPENSHIFT_IO = "machine.openshift.io"
-        MACHINECONFIGURATION_OPENSHIFT_IO = "machineconfiguration.openshift.io"
-        MAISTRA_IO = "maistra.io"
-        METALLB_IO = "metallb.io"
-        METRICS_K8S_IO = "metrics.k8s.io"
-        MIGRATIONS_KUBEVIRT_IO = "migrations.kubevirt.io"
-        MONITORING_COREOS_COM = "monitoring.coreos.com"
-        MTQ_KUBEVIRT_IO = "mtq.kubevirt.io"
-        NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO = "networkaddonsoperator.network.kubevirt.io"
-        NETWORKING_ISTIO_IO = "networking.istio.io"
-        NETWORKING_K8S_IO = "networking.k8s.io"
-        NODE_LABELLER_KUBEVIRT_IO = "node-labeller.kubevirt.io"
-        NMSTATE_IO = "nmstate.io"
-        NODEMAINTENANCE_KUBEVIRT_IO = "nodemaintenance.kubevirt.io"
-        OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO = "observability.open-cluster-management.io"
-        OCS_OPENSHIFT_IO = "ocs.openshift.io"
-        OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO = "operator.open-cluster-management.io"
-        OPERATOR_OPENSHIFT_IO = "operator.openshift.io"
-        OPERATORS_COREOS_COM = "operators.coreos.com"
-        OPERATORS_OPENSHIFT_IO = "operators.openshift.io"
-        OS_TEMPLATE_KUBEVIRT_IO = "os.template.kubevirt.io"
-        PACKAGES_OPERATORS_COREOS_COM = "packages.operators.coreos.com"
-        PERFORMANCE_OPENSHIFT_IO = "performance.openshift.io"
-        POLICY = "policy"
-        POOL_KUBEVIRT_IO = "pool.kubevirt.io"
-        PROJECT_OPENSHIFT_IO = "project.openshift.io"
-        RBAC_AUTHORIZATION_K8S_IO = "rbac.authorization.k8s.io"
-        REMEDIATION_MEDIK8S_IO = "remediation.medik8s.io"
-        RIPSAW_CLOUDBULLDOZER_IO = "ripsaw.cloudbulldozer.io"
-        ROUTE_OPENSHIFT_IO = "route.openshift.io"
-        SCHEDULING_K8S_IO = "scheduling.k8s.io"
-        SECURITY_ISTIO_IO = "security.istio.io"
-        SECURITY_OPENSHIFT_IO = "security.openshift.io"
-        SELF_NODE_REMEDIATION_MEDIK8S_IO = "self-node-remediation.medik8s.io"
-        SERVING_KSERVE_IO = "serving.kserve.io"
-        SNAPSHOT_STORAGE_K8S_IO = "snapshot.storage.k8s.io"
-        SNAPSHOT_KUBEVIRT_IO = "snapshot.kubevirt.io"
-        SRIOVNETWORK_OPENSHIFT_IO = "sriovnetwork.openshift.io"
-        SSP_KUBEVIRT_IO = "ssp.kubevirt.io"
-        STORAGE_K8S_IO = "storage.k8s.io"
-        STORAGECLASS_KUBERNETES_IO = "storageclass.kubernetes.io"
-        STORAGECLASS_KUBEVIRT_IO = "storageclass.kubevirt.io"
-        SUBRESOURCES_KUBEVIRT_IO = "subresources.kubevirt.io"
-        TEKTONTASKS_KUBEVIRT_IO = "tektontasks.kubevirt.io"
-        TEKTON_DEV = "tekton.dev"
-        TEMPLATE_KUBEVIRT_IO = "template.kubevirt.io"
-        TEMPLATE_OPENSHIFT_IO = "template.openshift.io"
-        TRUSTYAI_OPENDATAHUB_IO = "trustyai.opendatahub.io"
-        UPLOAD_CDI_KUBEVIRT_IO = "upload.cdi.kubevirt.io"
-        USER_OPENSHIFT_IO = "user.openshift.io"
-        V2V_KUBEVIRT_IO = "v2v.kubevirt.io"
-        VELERO_IO = "velero.io"
-        VM_KUBEVIRT_IO = "vm.kubevirt.io"
+        AAQ_KUBEVIRT_IO: str = "aaq.kubevirt.io"
+        ADMISSIONREGISTRATION_K8S_IO: str = "admissionregistration.k8s.io"
+        APIEXTENSIONS_K8S_IO: str = "apiextensions.k8s.io"
+        APIREGISTRATION_K8S_IO: str = "apiregistration.k8s.io"
+        APP_KUBERNETES_IO: str = "app.kubernetes.io"
+        APPS: str = "apps"
+        BATCH: str = "batch"
+        BITNAMI_COM: str = "bitnami.com"
+        CACHING_INTERNAL_KNATIVE_DEV: str = "caching.internal.knative.dev"
+        CDI_KUBEVIRT_IO: str = "cdi.kubevirt.io"
+        CLONE_KUBEVIRT_IO: str = "clone.kubevirt.io"
+        CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO: str = "cluster.open-cluster-management.io"
+        CONFIG_OPENSHIFT_IO: str = "config.openshift.io"
+        CONSOLE_OPENSHIFT_IO: str = "console.openshift.io"
+        COORDINATION_K8S_IO: str = "coordination.k8s.io"
+        CSIADDONS_OPENSHIFT_IO: str = "csiaddons.openshift.io"
+        DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO: str = "dataimportcrontemplate.kubevirt.io"
+        DATASCIENCECLUSTER_OPENDATAHUB_IO: str = "datasciencecluster.opendatahub.io"
+        DISCOVERY_K8S_IO: str = "discovery.k8s.io"
+        DSCINITIALIZATION_OPENDATAHUB_IO: str = "dscinitialization.opendatahub.io"
+        EVENTS_K8S_IO: str = "events.k8s.io"
+        EXPORT_KUBEVIRT_IO: str = "export.kubevirt.io"
+        FENCE_AGENTS_REMEDIATION_MEDIK8S_IO: str = "fence-agents-remediation.medik8s.io"
+        FORKLIFT_KONVEYOR_IO: str = "forklift.konveyor.io"
+        HCO_KUBEVIRT_IO: str = "hco.kubevirt.io"
+        HELM_MARIADB_MMONTES_IO: str = "helm.mariadb.mmontes.io"
+        HIVE_OPENSHIFT_IO: str = "hive.openshift.io"
+        HOSTPATHPROVISIONER_KUBEVIRT_IO: str = "hostpathprovisioner.kubevirt.io"
+        IMAGE_OPENSHIFT_IO: str = "image.openshift.io"
+        IMAGE_REGISTRY: str = "registry.redhat.io"
+        INSTANCETYPE_KUBEVIRT_IO: str = "instancetype.kubevirt.io"
+        INTEGREATLY_ORG: str = "integreatly.org"
+        K8S_CNI_CNCF_IO: str = "k8s.cni.cncf.io"
+        K8S_MARIADB_COM: str = "k8s.mariadb.com"
+        K8S_OVN_ORG: str = "k8s.ovn.org"
+        K8S_V1_CNI_CNCF_IO: str = "k8s.v1.cni.cncf.io"
+        KUBEFLOW_ORG: str = "kubeflow.org"
+        KUBERNETES_IO: str = "kubernetes.io"
+        KUBEVIRT_IO: str = "kubevirt.io"
+        KUBEVIRT_KUBEVIRT_IO: str = "kubevirt.kubevirt.io"
+        LITMUS_IO: str = "litmuschaos.io"
+        MACHINE_OPENSHIFT_IO: str = "machine.openshift.io"
+        MACHINECONFIGURATION_OPENSHIFT_IO: str = "machineconfiguration.openshift.io"
+        MAISTRA_IO: str = "maistra.io"
+        METALLB_IO: str = "metallb.io"
+        METRICS_K8S_IO: str = "metrics.k8s.io"
+        MIGRATIONS_KUBEVIRT_IO: str = "migrations.kubevirt.io"
+        MODELREGISTRY_OPENDATAHUB_IO: str = "modelregistry.opendatahub.io"
+        MONITORING_COREOS_COM: str = "monitoring.coreos.com"
+        MTQ_KUBEVIRT_IO: str = "mtq.kubevirt.io"
+        NETWORKADDONSOPERATOR_NETWORK_KUBEVIRT_IO: str = "networkaddonsoperator.network.kubevirt.io"
+        NETWORKING_ISTIO_IO: str = "networking.istio.io"
+        NETWORKING_K8S_IO: str = "networking.k8s.io"
+        NMSTATE_IO: str = "nmstate.io"
+        NODE_LABELLER_KUBEVIRT_IO: str = "node-labeller.kubevirt.io"
+        NODEMAINTENANCE_KUBEVIRT_IO: str = "nodemaintenance.kubevirt.io"
+        OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO: str = "observability.open-cluster-management.io"
+        OCS_OPENSHIFT_IO: str = "ocs.openshift.io"
+        OPERATOR_AUTHORINO_KUADRANT_IO: str = "operator.authorino.kuadrant.io"
+        OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO: str = "operator.open-cluster-management.io"
+        OPERATOR_OPENSHIFT_IO: str = "operator.openshift.io"
+        OPERATORS_COREOS_COM: str = "operators.coreos.com"
+        OPERATORS_OPENSHIFT_IO: str = "operators.openshift.io"
+        OS_TEMPLATE_KUBEVIRT_IO: str = "os.template.kubevirt.io"
+        PACKAGES_OPERATORS_COREOS_COM: str = "packages.operators.coreos.com"
+        PERFORMANCE_OPENSHIFT_IO: str = "performance.openshift.io"
+        POLICY: str = "policy"
+        POOL_KUBEVIRT_IO: str = "pool.kubevirt.io"
+        PROJECT_OPENSHIFT_IO: str = "project.openshift.io"
+        RBAC_AUTHORIZATION_K8S_IO: str = "rbac.authorization.k8s.io"
+        REMEDIATION_MEDIK8S_IO: str = "remediation.medik8s.io"
+        RIPSAW_CLOUDBULLDOZER_IO: str = "ripsaw.cloudbulldozer.io"
+        ROUTE_OPENSHIFT_IO: str = "route.openshift.io"
+        SCHEDULING_K8S_IO: str = "scheduling.k8s.io"
+        SECURITY_ISTIO_IO: str = "security.istio.io"
+        SECURITY_OPENSHIFT_IO: str = "security.openshift.io"
+        SELF_NODE_REMEDIATION_MEDIK8S_IO: str = "self-node-remediation.medik8s.io"
+        SERVING_KNATIVE_DEV: str = "serving.knative.dev"
+        SERVING_KSERVE_IO: str = "serving.kserve.io"
+        SNAPSHOT_KUBEVIRT_IO: str = "snapshot.kubevirt.io"
+        SNAPSHOT_STORAGE_K8S_IO: str = "snapshot.storage.k8s.io"
+        SRIOVNETWORK_OPENSHIFT_IO: str = "sriovnetwork.openshift.io"
+        SSP_KUBEVIRT_IO: str = "ssp.kubevirt.io"
+        STORAGE_K8S_IO: str = "storage.k8s.io"
+        STORAGECLASS_KUBERNETES_IO: str = "storageclass.kubernetes.io"
+        STORAGECLASS_KUBEVIRT_IO: str = "storageclass.kubevirt.io"
+        SUBRESOURCES_KUBEVIRT_IO: str = "subresources.kubevirt.io"
+        TEKTON_DEV: str = "tekton.dev"
+        TEKTONTASKS_KUBEVIRT_IO: str = "tektontasks.kubevirt.io"
+        TEMPLATE_KUBEVIRT_IO: str = "template.kubevirt.io"
+        TEMPLATE_OPENSHIFT_IO: str = "template.openshift.io"
+        TRUSTYAI_OPENDATAHUB_IO: str = "trustyai.opendatahub.io"
+        UPLOAD_CDI_KUBEVIRT_IO: str = "upload.cdi.kubevirt.io"
+        USER_OPENSHIFT_IO: str = "user.openshift.io"
+        V2V_KUBEVIRT_IO: str = "v2v.kubevirt.io"
+        VELERO_IO: str = "velero.io"
+        VM_KUBEVIRT_IO: str = "vm.kubevirt.io"
 
     class ApiVersion:
-        V1 = "v1"
-        V1BETA1 = "v1beta1"
-        V1ALPHA1 = "v1alpha1"
-        V1ALPHA3 = "v1alpha3"
+        V1: str = "v1"
+        V1BETA1: str = "v1beta1"
+        V1ALPHA1: str = "v1alpha1"
+        V1ALPHA3: str = "v1alpha3"
 
     def __init__(
         self,
         name: str = "",
         client: DynamicClient | None = None,
         teardown: bool = True,
-        timeout: int = TIMEOUT_4MINUTES,
         privileged_client: DynamicClient | None = None,
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         dry_run: bool = False,
-        node_selector: str = "",
-        node_selector_labels: Dict[str, str] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        node_selector_labels: dict[str, str] | None = None,
         config_file: str = "",
-        config_dict: Dict[str, Any] | None = None,
+        config_dict: dict[str, Any] | None = None,
         context: str = "",
-        label: Dict[str, str] | None = None,
-        annotations: Dict[str, str] | None = None,
-        timeout_seconds: int = TIMEOUT_1MINUTE,
+        label: dict[str, str] | None = None,
+        annotations: dict[str, str] | None = None,
         api_group: str = "",
         hash_log_data: bool = True,
         ensure_exists: bool = False,
+        kind_dict: dict[Any, Any] | None = None,
+        wait_for_resource: bool = False,
     ):
         """
         Create an API resource
+
+        If `yaml_file` or `kind_dict` are passed, logic in `to_dict` is bypassed.
 
         Args:
             name (str): Resource name
             client (DynamicClient): Dynamic client for connecting to a remote cluster
             teardown (bool): Indicates if this resource would need to be deleted
-            timeout (int): timeout for a get api call
             privileged_client (DynamicClient): Instance of Dynamic client
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
             dry_run (bool): dry run
-            node_selector (str): node selector
+            node_selector (dict): node selector
             node_selector_labels (str): node selector labels
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
-            timeout_seconds (int): timeout for a get api call, call out be terminated after this many seconds
             label (dict): Resource labels
-            annotations (Dict[str, str] | None): Resource annotations
+            annotations (dict[str, str] | None): Resource annotations
             api_group (str): Resource API group; will overwrite API group definition in resource class
             hash_log_data (bool): Hash resource content based on resource keys_to_hash property
                 (example: Secret resource)
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
+            kind_dict (dict): dict which represents the resource object
+            wait_for_resource (bool): Waits for the resource to be created
         """
+        if privileged_client:
+            warn(
+                "privileged_client is deprecated and will be removed in the future. Use client instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+        if yaml_file and kind_dict:
+            raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         self.name = name
         self.teardown = teardown
-        self.timeout = timeout
-        self.privileged_client = privileged_client
+        self.privileged_client = client
         self.yaml_file = yaml_file
+        self.kind_dict = kind_dict
         self.delete_timeout = delete_timeout
         self.dry_run = dry_run
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
         self.config_file = config_file
-        if not isinstance(config_file, str):
+        if not isinstance(self.config_file, str):
             # If we pass config_file which isn't a string, get_client will fail and it will be very hard to know why.
             # Better fail here and let the user know.
             raise ValueError("config_file must be a string")
@@ -420,7 +490,6 @@ class Resource:
         self.context = context
         self.label = label
         self.annotations = annotations
-        self.timeout_seconds = timeout_seconds
         self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
@@ -428,16 +497,16 @@ class Resource:
         if not self.api_group and not self.api_version:
             raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
 
-        if not (self.name or self.yaml_file):
+        if not (self.name or self.yaml_file or self.kind_dict):
             raise MissingRequiredArgumentError(argument="name")
 
         self.namespace: str = ""
-        self.resource_dict: Dict[str, Any] = {}  # Filled in case yaml_file is not None
         self.node_selector_spec = self._prepare_node_selector_spec()
-        self.res: Dict[str, Any] = {}
+        self.res: dict[Any, Any] = self.kind_dict or {}
         self.yaml_file_contents: str = ""
         self.initial_resource_version: str = ""
         self.logger = self._set_logger()
+        self.wait_for_resource = wait_for_resource
 
         if ensure_exists:
             self._ensure_exists()
@@ -459,16 +528,11 @@ class Resource:
             filename=log_file,
         )
 
-    def _prepare_node_selector_spec(self) -> Dict[str, str]:
-        if self.node_selector:
-            return {f"{self.ApiGroup.KUBERNETES_IO}/hostname": self.node_selector}
-        elif self.node_selector_labels:
-            return self.node_selector_labels
-        else:
-            return {}
+    def _prepare_node_selector_spec(self) -> dict[str, str]:
+        return self.node_selector or self.node_selector_labels or {}
 
     @ClassProperty
-    def kind(cls) -> Optional[str]:  # noqa: N805
+    def kind(cls) -> str | None:
         return sub_resource_level(cls, NamespacedResource, Resource)
 
     def _base_body(self) -> None:
@@ -478,27 +542,38 @@ class Resource:
         Returns:
             dict: Resource dict.
         """
-        if self.yaml_file:
+        if self.kind_dict:
+            # If `kind_dict` is provided, no additional logic should be applied
+            self.name = self.kind_dict["metadata"]["name"]
+
+        elif self.yaml_file:
             if not self.yaml_file_contents:
                 if isinstance(self.yaml_file, StringIO):
                     self.yaml_file_contents = self.yaml_file.read()
+
                 else:
-                    with open(self.yaml_file, "r") as stream:
+                    with open(self.yaml_file) as stream:
                         self.yaml_file_contents = stream.read()
 
             self.res = yaml.safe_load(stream=self.yaml_file_contents)
             self.res.get("metadata", {}).pop("resourceVersion", None)
             self.name = self.res["metadata"]["name"]
+
         else:
             self.res = {
                 "apiVersion": self.api_version,
                 "kind": self.kind,
                 "metadata": {"name": self.name},
             }
+
             if self.label:
                 self.res.setdefault("metadata", {}).setdefault("labels", {}).update(self.label)
+
             if self.annotations:
                 self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
+
+        if not self.res:
+            raise MissingResourceResError(name=self.name)
 
     def to_dict(self) -> None:
         """
@@ -506,9 +581,9 @@ class Resource:
         """
         self._base_body()
 
-    def __enter__(self) -> "Resource":
+    def __enter__(self) -> Any:
         signal(SIGINT, self._sigint_handler)
-        return self.deploy()
+        return self.deploy(wait=self.wait_for_resource)
 
     def __exit__(
         self,
@@ -517,13 +592,14 @@ class Resource:
         exc_tb: TracebackType | None = None,
     ) -> None:
         if self.teardown:
-            self.clean_up()
+            if not self.clean_up():
+                raise ResourceTeardownError(resource=self)
 
     def _sigint_handler(self, signal_received: int, frame: Any) -> None:
         self.__exit__()
         sys.exit(signal_received)
 
-    def deploy(self, wait: bool = False) -> "Resource":
+    def deploy(self, wait: bool = False) -> Any:
         """
         For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
         Spaces are important in the export dict
@@ -557,13 +633,14 @@ class Resource:
         self.create(wait=wait)
         return self
 
-    def clean_up(self, wait: bool = True) -> bool:
+    def clean_up(self, wait: bool = True, timeout: int | None = None) -> bool:
         """
         For debug, export SKIP_RESOURCE_TEARDOWN to skip resource teardown.
         Spaces are important in the export dict
 
         Args:
             wait (bool, optional): Wait for resource deletion. Defaults to True.
+            timeout (int, optional): Timeout in seconds to wait for resource to be deleted. Defaults to 240.
 
         Returns:
             bool: True if resource was deleted else False.
@@ -592,9 +669,9 @@ class Resource:
             self.logger.warning(
                 f"Skip resource {self.kind} {self.name} teardown. Got {_export_str}={skip_resource_teardown}"
             )
-            return False
+            return True
 
-        return self.delete(wait=wait, timeout=self.delete_timeout)
+        return self.delete(wait=wait, timeout=timeout or self.delete_timeout)
 
     @classmethod
     def _prepare_resources(
@@ -610,7 +687,7 @@ class Resource:
             **get_kwargs,
         ).get(*args, **kwargs, timeout_seconds=cls.timeout_seconds)
 
-    def _prepare_singular_name_kwargs(self, **kwargs: Any) -> Dict[str, Any]:
+    def _prepare_singular_name_kwargs(self, **kwargs: Any) -> dict[str, Any]:
         kwargs = kwargs if kwargs else {}
         if self.singular_name:
             kwargs["singular_name"] = self.singular_name
@@ -679,7 +756,7 @@ class Resource:
             if sample:
                 return
 
-    def wait_deleted(self, timeout: int = TIMEOUT_4MINUTES) -> None:
+    def wait_deleted(self, timeout: int = TIMEOUT_4MINUTES) -> bool:
         """
         Wait until resource is deleted
 
@@ -690,10 +767,18 @@ class Resource:
             TimeoutExpiredError: If resource still exists.
         """
         self.logger.info(f"Wait until {self.kind} {self.name} is deleted")
-        return self.client_wait_deleted(timeout=timeout)
+        try:
+            for sample in TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists):
+                if not sample:
+                    return True
+        except TimeoutExpiredError:
+            self.logger.warning(f"Timeout expired while waiting for {self.kind} {self.name} to be deleted")
+            return False
+
+        return False
 
     @property
-    def exists(self) -> Optional[ResourceInstance]:
+    def exists(self) -> ResourceInstance | None:
         """
         Whether self exists on the server
         """
@@ -705,21 +790,6 @@ class Resource:
     @property
     def _kube_v1_api(self) -> kubernetes.client.CoreV1Api:
         return kubernetes.client.CoreV1Api(api_client=self.client.client)
-
-    def client_wait_deleted(self, timeout: int) -> None:
-        """
-        client-side Wait until resource is deleted
-
-        Args:
-            timeout (int): Time to wait for the resource.
-
-        Raises:
-            TimeoutExpiredError: If resource still exists.
-        """
-        samples = TimeoutSampler(wait_timeout=timeout, sleep=1, func=lambda: self.exists)
-        for sample in samples:
-            if not sample:
-                return
 
     def wait_for_status(
         self, status: str, timeout: int = TIMEOUT_4MINUTES, stop_status: str | None = None, sleep: int = 1
@@ -771,7 +841,7 @@ class Resource:
                 self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
-    def create(self, wait: bool = False) -> Optional[ResourceInstance]:
+    def create(self, wait: bool = False) -> ResourceInstance | None:
         """
         Create resource.
 
@@ -780,12 +850,8 @@ class Resource:
 
         Returns:
             bool: True if create succeeded, False otherwise.
-
-        Raises:
-            ValueMismatch: When body value doesn't match class value
         """
-        if not self.res:
-            self.to_dict()
+        self.to_dict()
 
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
@@ -803,22 +869,27 @@ class Resource:
             self.wait()
         return resource_
 
-    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: Dict[str, Any] | None = None) -> bool:
+    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: dict[str, Any] | None = None) -> bool:
         self.logger.info(f"Delete {self.kind} {self.name}")
 
         if self.exists:
-            hashed_data = self.hash_resource_dict(resource_dict=self.instance.to_dict())
-            self.logger.info(f"Deleting {hashed_data}")
-            self.logger.debug(f"\n{yaml.dump(hashed_data)}")
+            _instance_dict = self.instance.to_dict()
+            if isinstance(_instance_dict, dict):
+                hashed_data = self.hash_resource_dict(resource_dict=_instance_dict)
+                self.logger.info(f"Deleting {hashed_data}")
+                self.logger.debug(f"\n{yaml.dump(hashed_data)}")
 
-        try:
+            else:
+                self.logger.warning(f"{self.kind}: {self.name} instance.to_dict() return was not a dict")
+
             self.api.delete(name=self.name, namespace=self.namespace, body=body)
+
             if wait:
-                self.client_wait_deleted(timeout=timeout)
+                return self.wait_deleted(timeout=timeout)
 
-        except (NotFoundError, TimeoutExpiredError):
-            return False
+            return True
 
+        self.logger.warning(f"Resource {self.kind} {self.name} was not found, and wasn't deleted")
         return True
 
     @property
@@ -834,7 +905,7 @@ class Resource:
         self.logger.info(f"Get {self.kind} {self.name} status")
         return self.instance.status.phase
 
-    def update(self, resource_dict: Dict[str, Any]) -> None:
+    def update(self, resource_dict: dict[str, Any]) -> None:
         """
         Update resource with resource dict
 
@@ -850,7 +921,7 @@ class Resource:
             content_type="application/merge-patch+json",
         )
 
-    def update_replace(self, resource_dict: Dict[str, Any]) -> None:
+    def update_replace(self, resource_dict: dict[str, Any]) -> None:
         """
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
@@ -862,12 +933,16 @@ class Resource:
 
     @staticmethod
     def retry_cluster_exceptions(
-        func, exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs: Any
+        func,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        timeout: int = TIMEOUT_10SEC,
+        sleep_time: int = 1,
+        **kwargs: Any,
     ) -> Any:
         try:
             sampler = TimeoutSampler(
-                wait_timeout=TIMEOUT_10SEC,
-                sleep=1,
+                wait_timeout=timeout,
+                sleep=sleep_time,
                 func=func,
                 print_log=False,
                 exceptions_dict=exceptions_dict,
@@ -888,12 +963,12 @@ class Resource:
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator["Resource|ResourceInstance", None, None]:
+    ) -> Generator[Any, None, None]:
         """
         Get resources
 
@@ -937,7 +1012,7 @@ class Resource:
             openshift.dynamic.client.ResourceInstance
         """
 
-        def _instance() -> Optional[ResourceInstance]:
+        def _instance() -> ResourceInstance | None:
             return self.api.get(name=self.name)
 
         return self.retry_cluster_exceptions(func=_instance)
@@ -952,7 +1027,7 @@ class Resource:
         """
         return self.instance.get("metadata", {})["labels"]
 
-    def watcher(self, timeout: int, resource_version: str = "") -> Generator[Dict[str, Any], None, None]:
+    def watcher(self, timeout: int, resource_version: str = "") -> Generator[dict[str, Any], None, None]:
         """
         Get resource for a given timeout.
 
@@ -974,7 +1049,7 @@ class Resource:
             resource_version=resource_version or self.initial_resource_version,
         )
 
-    def wait_for_condition(self, condition: str, status: str, timeout: int = 300) -> None:
+    def wait_for_condition(self, condition: str, status: str, timeout: int = 300, sleep_time: int = 1) -> None:
         """
         Wait for Resource condition to be in desire status.
 
@@ -982,16 +1057,17 @@ class Resource:
             condition (str): Condition to query.
             status (str): Expected condition status.
             timeout (int): Time to wait for the resource.
+            sleep_time(int): Interval between each retry when checking the resource's condition.
 
         Raises:
             TimeoutExpiredError: If Resource condition in not in desire status.
         """
-        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be" f" '{status}'")
+        self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
         for sample in TimeoutSampler(
             wait_timeout=timeout,
-            sleep=1,
+            sleep=sleep_time,
             func=lambda: self.exists,
         ):
             if sample:
@@ -999,7 +1075,7 @@ class Resource:
 
         for sample in TimeoutSampler(
             wait_timeout=timeout_watcher.remaining_time(),
-            sleep=1,
+            sleep=sleep_time,
             func=lambda: self.instance,
         ):
             if sample:
@@ -1007,7 +1083,9 @@ class Resource:
                     if cond["type"] == condition and cond["status"] == status:
                         return
 
-    def api_request(self, method: str, action: str, url: str, **params: Any) -> Dict[str, Any]:
+    def api_request(
+        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
+    ) -> dict[str, Any]:
         """
         Handle API requests to resource.
 
@@ -1015,19 +1093,31 @@ class Resource:
             method (str): Request method (GET/PUT etc.).
             action (str): Action to perform (stop/start/guestosinfo etc.).
             url (str): URL of resource.
+            retry_params (dict): dict of timeout and sleep_time values for retrying the api request call
 
         Returns:
            data(dict): response data
 
         """
-        client: DynamicClient = self.privileged_client or self.client
-        response = client.client.request(
-            method=method,
-            url=f"{url}/{action}",
-            headers=client.client.configuration.api_key,
-            **params,
-        )
-
+        client: DynamicClient = self.client
+        api_request_params = {
+            "url": f"{url}/{action}",
+            "method": method,
+            "headers": client.client.configuration.api_key,
+        }
+        if retry_params:
+            response = self.retry_cluster_exceptions(
+                func=client.client.request,
+                timeout=retry_params.get("timeout", TIMEOUT_10SEC),
+                sleep_time=retry_params.get("sleep_time", TIMEOUT_1SEC),
+                **api_request_params,
+                **params,
+            )
+        else:
+            response = client.client.request(
+                **api_request_params,
+                **params,
+            )
         try:
             return json.loads(response.data)
         except json.decoder.JSONDecodeError:
@@ -1036,7 +1126,7 @@ class Resource:
     def wait_for_conditions(self) -> None:
         timeout_watcher = TimeoutWatch(timeout=30)
         for sample in TimeoutSampler(
-            wait_timeout=30,
+            wait_timeout=TIMEOUT_30SEC,
             sleep=1,
             func=lambda: self.exists,
         ):
@@ -1077,7 +1167,6 @@ class Resource:
         example: reading all CSV Warning events in namespace "my-namespace", with reason of "AnEventReason"
             pod = Pod(client=client, name="pod", namespace="my-namespace")
             for event in pod.events(
-                default_client,
                 namespace="my-namespace",
                 field_selector="involvedObject.kind==ClusterServiceVersion,type==Warning,reason=AnEventReason",
                 timeout=10,
@@ -1099,12 +1188,18 @@ class Resource:
 
     @staticmethod
     def get_all_cluster_resources(
-        config_file: str = "", context: str = "", config_dict: Dict[str, Any] | None = None, *args: Any, **kwargs: Any
+        client: DynamicClient | None = None,
+        config_file: str = "",
+        context: str = "",
+        config_dict: dict[str, Any] | None = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> Generator[ResourceField, None, None]:
         """
         Get all cluster resources
 
         Args:
+            client (DynamicClient): k8s client
             config_file (str): path to a kubeconfig file.
             config_dict (dict): dict with kubeconfig configuration.
             context (str): name of the context to use.
@@ -1118,8 +1213,9 @@ class Resource:
             for resource in get_all_cluster_resources(label_selector="my-label=value"):
                 print(f"Resource: {resource}")
         """
+        if not client:
+            client = get_client(config_file=config_file, config_dict=config_dict, context=context)
 
-        client = get_client(config_file=config_file, config_dict=config_dict, context=context)
         for _resource in client.resources.search():
             try:
                 _resources = client.get(_resource, *args, **kwargs)
@@ -1142,7 +1238,7 @@ class Resource:
         return resource_yaml
 
     @property
-    def keys_to_hash(self) -> List[str]:
+    def keys_to_hash(self) -> list[str]:
         """
         Resource attributes list to hash in the logs.
 
@@ -1150,20 +1246,21 @@ class Resource:
 
          Example:
              given a dict: {"spec": {"data": <value_to_hash>}}
-             To hash spec['data'] key pass: ["spec..data"]
+             To hash spec['data'] key pass: ["spec>data"]
         """
         return []
 
-    def hash_resource_dict(self, resource_dict: Dict[Any, Any]) -> Dict[Any, Any]:
+    def hash_resource_dict(self, resource_dict: dict[Any, Any]) -> dict[Any, Any]:
+        if not isinstance(resource_dict, dict):
+            raise ValueError("Expected a dictionary as the first argument")
+
+        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA", "true") == "false":
+            return resource_dict
+
         if self.keys_to_hash and self.hash_log_data:
             resource_dict = copy.deepcopy(resource_dict)
-            resource_dict = benedict(resource_dict, keypath_separator="..")
-
-            for key in self.keys_to_hash:
-                if key in resource_dict:
-                    resource_dict[key] = "***"
-
-            return resource_dict
+            for key_name in self.keys_to_hash:
+                resource_dict = replace_key_with_hashed_value(resource_dict=resource_dict, key_name=key_name)
 
         return resource_dict
 
@@ -1205,11 +1302,9 @@ class NamespacedResource(Resource):
         name: str = "",
         namespace: str = "",
         teardown: bool = True,
-        timeout: int = TIMEOUT_4MINUTES,
         yaml_file: str = "",
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
-        privileged_client: DynamicClient | None = None,
         ensure_exists: bool = False,
         **kwargs: Any,
     ):
@@ -1217,14 +1312,12 @@ class NamespacedResource(Resource):
             name=name,
             client=client,
             teardown=teardown,
-            timeout=timeout,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
         )
         self.namespace = namespace
-        if not (self.name and self.namespace) and not self.yaml_file:
+        if not (self.name and self.namespace) and not self.yaml_file and not self.kind_dict:
             raise MissingRequiredArgumentError(argument="'name' and 'namespace'")
 
         if ensure_exists:
@@ -1236,12 +1329,12 @@ class NamespacedResource(Resource):
         config_file: str = "",
         context: str = "",
         singular_name: str = "",
-        exceptions_dict: Dict[type[Exception], List[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
-    ) -> Generator["NamespacedResource|ResourceInstance", None, None]:
+    ) -> Generator[Any, None, None]:
         """
         Get resources
 
@@ -1298,25 +1391,23 @@ class NamespacedResource(Resource):
         return self.retry_cluster_exceptions(func=_instance)
 
     def _base_body(self) -> None:
-        if not self.res:
-            super(NamespacedResource, self)._base_body()
-
-        if self.yaml_file:
+        if self.yaml_file or self.kind_dict:
             self.namespace = self.res["metadata"].get("namespace", self.namespace)
+
+        else:
+            self.res["metadata"]["namespace"] = self.namespace
 
         if not self.namespace:
             raise MissingRequiredArgumentError(argument="namespace")
 
-        if not self.yaml_file:
-            self.res["metadata"]["namespace"] = self.namespace
-
     def to_dict(self) -> None:
+        super(NamespacedResource, self)._base_body()
         self._base_body()
 
 
 class ResourceEditor:
     def __init__(
-        self, patches: Dict[Any, Any], action: str = "update", user_backups: Dict[Any, Any] | None = None
+        self, patches: dict[Any, Any], action: str = "update", user_backups: dict[Any, Any] | None = None
     ) -> None:
         """
         Args:
@@ -1344,16 +1435,16 @@ class ResourceEditor:
         self._patches = self._dictify_resourcefield(res=patches)
         self.action = action
         self.user_backups = user_backups
-        self._backups: Dict[Any, Any] = {}
+        self._backups: dict[Any, Any] = {}
 
     @property
-    def backups(self) -> Dict[Any, Any]:
+    def backups(self) -> dict[Any, Any]:
         """Returns a dict {<Resource object>: <backup_as_dict>}
         The backup dict kept for each resource edited"""
         return self._backups
 
     @property
-    def patches(self) -> Dict[Any, Any]:
+    def patches(self) -> dict[Any, Any]:
         """Returns the patches dict provided in the constructor"""
         return self._patches
 
@@ -1395,7 +1486,7 @@ class ResourceEditor:
                         resource_to_patch.append(resource)
                         self._backups[resource] = backup
                     else:
-                        LOGGER.warning("ResourceEdit: no diff found in patch for " f"{resource.name} -- skipping")
+                        LOGGER.warning(f"ResourceEdit: no diff found in patch for {resource.name} -- skipping")
                 if not resource_to_patch:
                     return
         else:
@@ -1437,7 +1528,7 @@ class ResourceEditor:
         return res
 
     @staticmethod
-    def _create_backup(original: Dict[Any, Any], patch: Dict[Any, Any]) -> Dict[Any, Any]:
+    def _create_backup(original: dict[Any, Any], patch: dict[Any, Any]) -> dict[Any, Any]:
         """
         Args:
             original (dict*): source of values to back up if necessary
@@ -1456,7 +1547,7 @@ class ResourceEditor:
 
         # when both are dicts, get the diff (recursively if need be)
         if isinstance(original, dict) and isinstance(patch, dict):
-            diff_dict: Dict[Any, Any] = {}
+            diff_dict: dict[Any, Any] = {}
             for key, value in patch.items():
                 if key not in original:
                     diff_dict[key] = None
@@ -1478,7 +1569,7 @@ class ResourceEditor:
             return None
 
     @staticmethod
-    def _apply_patches(patches: Dict[Any, Any], action_text: str, action: str) -> None:
+    def _apply_patches(patches: dict[Any, Any], action_text: str, action: str) -> None:
         """
         Updates provided Resource objects with provided yaml patches
 
@@ -1490,7 +1581,7 @@ class ResourceEditor:
         """
 
         for resource, patch in patches.items():
-            LOGGER.info(f"ResourceEdits: {action_text} data for " f"resource {resource.kind} {resource.name}")
+            LOGGER.info(f"ResourceEdits: {action_text} data for resource {resource.kind} {resource.name}")
 
             # add name to patch
             if "metadata" not in patch:
@@ -1516,8 +1607,8 @@ class ResourceEditor:
 
                 resource.update_replace(resource_dict=patch)  # replace the resource metadata
 
-    def _apply_patches_sampler(self, patches: Dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
-        exceptions_dict: Dict[type[Exception], List[str]] = {ConflictError: []}
+    def _apply_patches_sampler(self, patches: dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
+        exceptions_dict: dict[type[Exception], list[str]] = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
         return Resource.retry_cluster_exceptions(
             func=self._apply_patches,
@@ -1525,4 +1616,6 @@ class ResourceEditor:
             patches=patches,
             action_text=action_text,
             action=action,
+            timeout=TIMEOUT_30SEC,
+            sleep_time=TIMEOUT_5SEC,
         )

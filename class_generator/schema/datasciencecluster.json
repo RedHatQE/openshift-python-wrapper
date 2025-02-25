@@ -1,0 +1,691 @@
+{
+  "description": "DataScienceCluster is the Schema for the datascienceclusters API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "DataScienceClusterSpec defines the desired state of the cluster.",
+      "type": "object",
+      "properties": {
+        "components": {
+          "description": "Override and fine tune specific component configurations.",
+          "type": "object",
+          "properties": {
+            "codeflare": {
+              "description": "CodeFlare component configuration.\nIf CodeFlare Operator has been installed in the cluster, it should be uninstalled first before enabled component.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "dashboard": {
+              "description": "Dashboard component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "datasciencepipelines": {
+              "description": "DataServicePipeline component configuration.\nRequire OpenShift Pipelines Operator to be installed before enable component",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "kserve": {
+              "description": "Kserve component configuration.\nRequire OpenShift Serverless and OpenShift Service Mesh Operators to be installed before enable component\nDoes not support enabled ModelMeshServing at the same time",
+              "type": "object",
+              "properties": {
+                "defaultDeploymentMode": {
+                  "description": "Configures the default deployment mode for Kserve. This can be set to 'Serverless' or 'RawDeployment'.\nThe value specified in this field will be used to set the default deployment mode in the 'inferenceservice-config' configmap for Kserve.\nThis field is optional. If no default deployment mode is specified, Kserve will use Serverless mode.",
+                  "type": "string",
+                  "pattern": "^(Serverless|RawDeployment)$",
+                  "enum": [
+                    "Serverless",
+                    "RawDeployment"
+                  ]
+                },
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                },
+                "serving": {
+                  "description": "Serving configures the KNative-Serving stack used for model serving. A Service\nMesh (Istio) is prerequisite, since it is used as networking layer.",
+                  "type": "object",
+                  "properties": {
+                    "ingressGateway": {
+                      "description": "IngressGateway allows to customize some parameters for the Istio Ingress Gateway\nthat is bound to KNative-Serving.",
+                      "type": "object",
+                      "properties": {
+                        "certificate": {
+                          "description": "Certificate specifies configuration of the TLS certificate securing communication\nfor the gateway.",
+                          "type": "object",
+                          "properties": {
+                            "secretName": {
+                              "description": "SecretName specifies the name of the Kubernetes Secret resource that contains a\nTLS certificate secure HTTP communications for the KNative network.",
+                              "type": "string"
+                            },
+                            "type": {
+                              "description": "Type specifies if the TLS certificate should be generated automatically, or if the certificate\nis provided by the user. Allowed values are:\n* SelfSigned: A certificate is going to be generated using an own private key.\n* Provided: Pre-existence of the TLS Secret (see SecretName) with a valid certificate is assumed.\n* OpenshiftDefaultIngress: Default ingress certificate configured for OpenShift",
+                              "type": "string",
+                              "enum": [
+                                "SelfSigned",
+                                "Provided",
+                                "OpenshiftDefaultIngress"
+                              ]
+                            }
+                          }
+                        },
+                        "domain": {
+                          "description": "Domain specifies the host name for intercepting incoming requests.\nMost likely, you will want to use a wildcard name, like *.example.com.\nIf not set, the domain of the OpenShift Ingress is used.\nIf you choose to generate a certificate, this is the domain used for the certificate request.",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "managementState": {
+                      "type": "string",
+                      "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                      "enum": [
+                        "Managed",
+                        "Unmanaged",
+                        "Removed"
+                      ]
+                    },
+                    "name": {
+                      "description": "Name specifies the name of the KNativeServing resource that is going to be\ncreated to instruct the KNative Operator to deploy KNative serving components.\nThis resource is created in the \"knative-serving\" namespace.",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "kueue": {
+              "description": "Kueue component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "modelmeshserving": {
+              "description": "ModelMeshServing component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "modelregistry": {
+              "description": "ModelRegistry component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                },
+                "registriesNamespace": {
+                  "description": "Namespace for model registries to be installed, configurable only once when model registry is enabled, defaults to \"rhoai-model-registries\"",
+                  "type": "string",
+                  "maxLength": 63,
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$"
+                }
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "RegistriesNamespace is immutable when model registry is Managed",
+                  "rule": "(self.managementState != 'Managed') || (oldSelf.registriesNamespace == '') || (oldSelf.managementState != 'Managed')|| (self.registriesNamespace == oldSelf.registriesNamespace)"
+                }
+              ]
+            },
+            "ray": {
+              "description": "Ray component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "trainingoperator": {
+              "description": "Training Operator component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "trustyai": {
+              "description": "TrustyAI component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            },
+            "workbenches": {
+              "description": "Workbenches component configuration.",
+              "type": "object",
+              "properties": {
+                "devFlags": {
+                  "description": "Add developer fields",
+                  "type": "object",
+                  "properties": {
+                    "manifests": {
+                      "description": "List of custom manifests for the given component",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "contextDir": {
+                            "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                            "type": "string"
+                          },
+                          "sourcePath": {
+                            "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                            "type": "string"
+                          },
+                          "uri": {
+                            "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "managementState": {
+                  "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
+                  "type": "string",
+                  "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+                  "enum": [
+                    "Managed",
+                    "Removed"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "DataScienceClusterStatus defines the observed state of DataScienceCluster.",
+      "type": "object",
+      "properties": {
+        "components": {
+          "description": "Expose component's specific status",
+          "type": "object",
+          "properties": {
+            "modelregistry": {
+              "description": "ModelRegistry component status",
+              "type": "object",
+              "properties": {
+                "registriesNamespace": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "conditions": {
+          "description": "Conditions describes the state of the DataScienceCluster resource.",
+          "type": "array",
+          "items": {
+            "description": "Condition represents the state of the operator's\nreconciliation functionality.",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ConditionType is the state of the operator's reconciliation functionality.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "installedComponents": {
+          "description": "List of components with status if installed or not",
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "phase": {
+          "description": "Phase describes the Phase of DataScienceCluster reconciliation state\nThis is used by OLM UI to provide status information to the user",
+          "type": "string"
+        },
+        "relatedObjects": {
+          "description": "RelatedObjects is a list of objects created and maintained by this operator.\nObject references will be added to this list after they have been created AND found in the cluster.",
+          "type": "array",
+          "items": {
+            "description": "ObjectReference contains enough information to let you inspect or modify the referred object.",
+            "type": "object",
+            "properties": {
+              "apiVersion": {
+                "description": "API version of the referent.",
+                "type": "string"
+              },
+              "fieldPath": {
+                "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                "type": "string"
+              },
+              "resourceVersion": {
+                "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                "type": "string"
+              },
+              "uid": {
+                "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                "type": "string"
+              }
+            },
+            "x-kubernetes-map-type": "atomic"
+          }
+        },
+        "release": {
+          "description": "Version and release type",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "datasciencecluster.opendatahub.io",
+      "kind": "DataScienceCluster",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

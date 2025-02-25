@@ -1,0 +1,8 @@
+title = "Gitleaks title"
+
+
+[allowlist]
+id = "skip class_generator/schema"
+description = "ignore class_generator/schema"
+path = '''class_generator/schema/'''
+regex = '''^.*\.(yaml|yml)$'''

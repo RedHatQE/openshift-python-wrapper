@@ -1,4 +1,4 @@
-from ocp_resources.constants import (
+from ocp_resources.utils.constants import (
     TIMEOUT_1MINUTE,
     TIMEOUT_2MINUTES,
     TIMEOUT_4MINUTES,
@@ -8,6 +8,7 @@ from ocp_resources.constants import (
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
+from warnings import warn
 
 
 class DataVolume(NamespacedResource):
@@ -88,7 +89,6 @@ class DataVolume(NamespacedResource):
         bind_immediate_annotation=None,
         preallocation=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         api_name="pvc",
@@ -119,7 +119,6 @@ class DataVolume(NamespacedResource):
             should be bound immediately.
             preallocation (bool, default: None): preallocate disk space.
             teardown (bool, default: True): Indicates if this resource would need to be deleted.
-            privileged_client (DynamicClient, default: None): Instance of Dynamic client
             yaml_file (yaml, default: None): yaml file for the resource.
             delete_timeout (int, default: 4 minutes): timeout associated with delete action.
             api_name (str, default: "pvc"): api used for DV, pvc/storage
@@ -130,7 +129,6 @@ class DataVolume(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -155,7 +153,7 @@ class DataVolume(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res.update({
                 "spec": {
                     "source": {self.source: {"url": self.url}},
@@ -230,7 +228,7 @@ class DataVolume(NamespacedResource):
     @property
     def pvc(self):
         return PersistentVolumeClaim(
-            client=self.privileged_client or self.client,
+            client=self.client,
             name=self.name,
             namespace=self.namespace,
         )
@@ -273,7 +271,7 @@ class DataVolume(NamespacedResource):
         self,
         timeout=TIMEOUT_10MINUTES,
         failure_timeout=TIMEOUT_2MINUTES,
-        dv_garbage_collection_enabled=False,
+        dv_garbage_collection_enabled=None,
         stop_status_func=None,
         *stop_status_func_args,
         **stop_status_func_kwargs,
@@ -284,7 +282,8 @@ class DataVolume(NamespacedResource):
         Args:
             timeout (int):  Time to wait for the DataVolume to succeed.
             failure_timeout (int): Time to wait for the DataVolume to have not Pending/None status
-            dv_garbage_collection_enabled (bool, default: False): if True, expect that DV will disappear after success
+            dv_garbage_collection_enabled (bool, default: None): DV garbage collection is deprecated and removed in
+            v4.19
             stop_status_func (function): function that is called inside the TimeoutSampler
                 if it returns True - stop the Sampler and raise TimeoutExpiredError
                 Example:
@@ -310,6 +309,8 @@ class DataVolume(NamespacedResource):
                 wait_timeout=timeout,
                 func=lambda: self.exists,
             ):
+                if dv_garbage_collection_enabled is not None:
+                    warn("garbage collector is deprecated and removed in version v4.19", DeprecationWarning)
                 # DV reach success if the status is Succeeded, or if DV garbage collection enabled and the DV does not exist
                 if sample and sample.get("status", {}).get("phase") == self.Status.SUCCEEDED:
                     break

@@ -1,0 +1,101 @@
+{
+  "description": "FenceAgentsRemediationTemplate is the Schema for the fenceagentsremediationtemplates API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "FenceAgentsRemediationTemplateSpec defines the desired state of FenceAgentsRemediationTemplate",
+      "type": "object",
+      "required": [
+        "template"
+      ],
+      "properties": {
+        "template": {
+          "description": "Template defines the desired state of FenceAgentsRemediationTemplate",
+          "type": "object",
+          "required": [
+            "spec"
+          ],
+          "properties": {
+            "spec": {
+              "description": "FenceAgentsRemediationSpec defines the desired state of FenceAgentsRemediation",
+              "type": "object",
+              "required": [
+                "agent"
+              ],
+              "properties": {
+                "agent": {
+                  "description": "Agent is the name of fence agent that will be used.\nIt should have a fence_ prefix.",
+                  "type": "string",
+                  "pattern": "fence_.+"
+                },
+                "nodeparameters": {
+                  "description": "NodeParameters are passed to the fencing agent according to the node that is fenced, since they are node specific",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "remediationStrategy": {
+                  "description": "RemediationStrategy is the remediation method for unhealthy nodes.\nCurrently, it could be either \"OutOfServiceTaint\" or \"ResourceDeletion\".\nResourceDeletion will iterate over all pods related to the unhealthy node and delete them.\nOutOfServiceTaint will add the out-of-service taint which is a new well-known taint \"node.kubernetes.io/out-of-service\"\nthat enables automatic deletion of pv-attached pods on failed nodes, \"out-of-service\" taint is only supported on clusters with k8s version 1.26+ or OCP/OKD version 4.13+.",
+                  "type": "string",
+                  "enum": [
+                    "ResourceDeletion",
+                    "OutOfServiceTaint"
+                  ]
+                },
+                "retrycount": {
+                  "description": "RetryCount is the number of times the fencing agent will be executed",
+                  "type": "integer"
+                },
+                "retryinterval": {
+                  "description": "RetryInterval is the interval between each fencing agent execution",
+                  "type": "string",
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|ms|s|m|h))+$"
+                },
+                "sharedparameters": {
+                  "description": "SharedParameters are passed to the fencing agent regardless of which node is about to be fenced (i.e., they are common for all the nodes)",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "timeout": {
+                  "description": "Timeout is the timeout for each fencing agent execution",
+                  "type": "string",
+                  "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|ms|s|m|h))+$"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "FenceAgentsRemediationTemplateStatus defines the observed state of FenceAgentsRemediationTemplate",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "fence-agents-remediation.medik8s.io",
+      "kind": "FenceAgentsRemediationTemplate",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

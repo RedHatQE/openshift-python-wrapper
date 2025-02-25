@@ -141,7 +141,7 @@ class IngressController(NamespacedResource):
         self.endpoint_publishing_strategy = endpoint_publishing_strategy
         self.default_certificate = default_certificate
         self.namespace_selector = namespace_selector
-        self.node_selector = node_selector  # type: ignore
+        self.node_selector = node_selector
         self.route_selector = route_selector
         self.tls_security_profile = tls_security_profile
         self.logging = logging
@@ -159,7 +159,7 @@ class IngressController(NamespacedResource):
     def to_dict(self) -> None:
         super().to_dict()
 
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res["spec"] = {}
             _spec = self.res["spec"]
 

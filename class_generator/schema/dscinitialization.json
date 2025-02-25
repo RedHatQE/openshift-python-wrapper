@@ -1,0 +1,270 @@
+{
+  "description": "DSCInitialization is the Schema for the dscinitializations API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "DSCInitializationSpec defines the desired state of DSCInitialization.",
+      "type": "object",
+      "required": [
+        "applicationsNamespace"
+      ],
+      "properties": {
+        "applicationsNamespace": {
+          "description": "Namespace for applications to be installed, non-configurable, default to \"redhat-ods-applications\"",
+          "type": "string",
+          "maxLength": 63,
+          "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$",
+          "x-kubernetes-validations": [
+            {
+              "message": "ApplicationsNamespace is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "devFlags": {
+          "description": "Internal development useful field to test customizations.\nThis is not recommended to be used in production environment.",
+          "type": "object",
+          "properties": {
+            "logmode": {
+              "type": "string",
+              "enum": [
+                "devel",
+                "development",
+                "prod",
+                "production",
+                "default"
+              ]
+            },
+            "manifestsUri": {
+              "description": "Custom manifests uri for odh-manifests",
+              "type": "string"
+            }
+          }
+        },
+        "monitoring": {
+          "description": "Enable monitoring on specified namespace",
+          "type": "object",
+          "properties": {
+            "managementState": {
+              "description": "Set to one of the following values:\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so.\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it.",
+              "type": "string",
+              "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+              "enum": [
+                "Managed",
+                "Removed"
+              ]
+            },
+            "namespace": {
+              "description": "Namespace for monitoring if it is enabled",
+              "type": "string",
+              "maxLength": 63,
+              "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$"
+            }
+          }
+        },
+        "serviceMesh": {
+          "description": "Configures Service Mesh as networking layer for Data Science Clusters components.\nThe Service Mesh is a mandatory prerequisite for single model serving (KServe) and\nyou should review this configuration if you are planning to use KServe.\nFor other components, it enhances user experience; e.g. it provides unified\nauthentication giving a Single Sign On experience.",
+          "type": "object",
+          "properties": {
+            "auth": {
+              "description": "Auth holds configuration of authentication and authorization services\nused by Service Mesh in Opendatahub.",
+              "type": "object",
+              "properties": {
+                "audiences": {
+                  "description": "Audiences is a list of the identifiers that the resource server presented\nwith the token identifies as. Audience-aware token authenticators will verify\nthat the token was intended for at least one of the audiences in this list.\nIf no audiences are provided, the audience will default to the audience of the\nKubernetes apiserver (kubernetes.default.svc).",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "namespace": {
+                  "description": "Namespace where it is deployed. If not provided, the default is to\nuse '-auth-provider' suffix on the ApplicationsNamespace of the DSCI.",
+                  "type": "string",
+                  "maxLength": 63,
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$"
+                }
+              }
+            },
+            "controlPlane": {
+              "description": "ControlPlane holds configuration of Service Mesh used by Opendatahub.",
+              "type": "object",
+              "properties": {
+                "metricsCollection": {
+                  "description": "MetricsCollection specifies if metrics from components on the Mesh namespace\nshould be collected. Setting the value to \"Istio\" will collect metrics from the\ncontrol plane and any proxies on the Mesh namespace (like gateway pods). Setting\nto \"None\" will disable metrics collection.",
+                  "type": "string",
+                  "enum": [
+                    "Istio",
+                    "None"
+                  ]
+                },
+                "name": {
+                  "description": "Name is a name Service Mesh Control Plane. Defaults to \"data-science-smcp\".",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "Namespace is a namespace where Service Mesh is deployed. Defaults to \"istio-system\".",
+                  "type": "string",
+                  "maxLength": 63,
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$"
+                }
+              }
+            },
+            "managementState": {
+              "type": "string",
+              "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+              "enum": [
+                "Managed",
+                "Unmanaged",
+                "Removed"
+              ]
+            }
+          }
+        },
+        "trustedCABundle": {
+          "description": "When set to `Managed`, adds odh-trusted-ca-bundle Configmap to all namespaces that includes\ncluster-wide Trusted CA Bundle in .data[\"ca-bundle.crt\"].\nAdditionally, this fields allows admins to add custom CA bundles to the configmap using the .CustomCABundle field.",
+          "type": "object",
+          "required": [
+            "customCABundle",
+            "managementState"
+          ],
+          "properties": {
+            "customCABundle": {
+              "description": "A custom CA bundle that will be available for  all  components in the\nData Science Cluster(DSC). This bundle will be stored in odh-trusted-ca-bundle\nConfigMap .data.odh-ca-bundle.crt .",
+              "type": "string"
+            },
+            "managementState": {
+              "description": "managementState indicates whether and how the operator should manage customized CA bundle",
+              "type": "string",
+              "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+              "enum": [
+                "Managed",
+                "Removed",
+                "Unmanaged"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "DSCInitializationStatus defines the observed state of DSCInitialization.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions describes the state of the DSCInitializationStatus resource",
+          "type": "array",
+          "items": {
+            "description": "Condition represents the state of the operator's\nreconciliation functionality.",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastHeartbeatTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ConditionType is the state of the operator's reconciliation functionality.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "phase": {
+          "description": "Phase describes the Phase of DSCInitializationStatus\nThis is used by OLM UI to provide status information to the user",
+          "type": "string"
+        },
+        "relatedObjects": {
+          "description": "RelatedObjects is a list of objects created and maintained by this operator.\nObject references will be added to this list after they have been created AND found in the cluster",
+          "type": "array",
+          "items": {
+            "description": "ObjectReference contains enough information to let you inspect or modify the referred object.",
+            "type": "object",
+            "properties": {
+              "apiVersion": {
+                "description": "API version of the referent.",
+                "type": "string"
+              },
+              "fieldPath": {
+                "description": "If referring to a piece of an object instead of an entire object, this string\nshould contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].\nFor example, if the object reference is to a container within a pod, this would take on a value like:\n\"spec.containers{name}\" (where \"name\" refers to the name of the container that triggered\nthe event) or if no container name is specified \"spec.containers[2]\" (container with\nindex 2 in this pod). This syntax is chosen only to have some well-defined way of\nreferencing a part of an object.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referent.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "Namespace of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+                "type": "string"
+              },
+              "resourceVersion": {
+                "description": "Specific resourceVersion to which this reference is made, if any.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency",
+                "type": "string"
+              },
+              "uid": {
+                "description": "UID of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids",
+                "type": "string"
+              }
+            },
+            "x-kubernetes-map-type": "atomic"
+          }
+        },
+        "release": {
+          "description": "Version and release type",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "dscinitialization.opendatahub.io",
+      "kind": "DSCInitialization",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

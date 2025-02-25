@@ -2,7 +2,7 @@
 
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 
-from ocp_resources.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler, TimeoutWatch
 from ocp_resources.virtual_machine import VirtualMachine
@@ -41,7 +41,7 @@ class VirtualMachineRestore(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             spec = self.res.setdefault("spec", {})
             spec.setdefault("target", {})["apiGroup"] = NamespacedResource.ApiGroup.KUBEVIRT_IO
             spec["target"]["kind"] = VirtualMachine.kind

@@ -1,0 +1,4273 @@
+{
+  "oneOf": [
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.Alertmanager"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.AlertmanagerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.PodMonitor"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.PodMonitorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.Probe"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.ProbeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.Prometheus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.PrometheusList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.PrometheusRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.PrometheusRuleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.ServiceMonitor"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.ServiceMonitorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.ThanosRuler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1.ThanosRulerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1alpha1.AlertmanagerConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1alpha1.AlertmanagerConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1beta1.AlertmanagerConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.monitoring.v1beta1.AlertmanagerConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OLMConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OLMConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.Operator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OperatorCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OperatorConditionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OperatorGroup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OperatorGroupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1.OperatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.CatalogSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.CatalogSourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.ClusterServiceVersion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.ClusterServiceVersionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.InstallPlan"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.InstallPlanList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.Subscription"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.SubscriptionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha2.OperatorGroup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha2.OperatorGroupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v2.OperatorCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.coreos.operators.v2.OperatorConditionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.CustomDeploymentStrategyParams"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentCauseImageTrigger"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentConfigRollback"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentConfigRollbackSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentConfigSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentConfigStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentDetails"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentLog"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentTriggerImageChangeParams"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.DeploymentTriggerPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.ExecNewPodHook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.LifecycleHook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.RecreateDeploymentStrategyParams"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.RollingDeploymentStrategyParams"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.apps.v1.TagImageHook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.ClusterRole"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.ClusterRoleBinding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.ClusterRoleBindingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.ClusterRoleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.LocalResourceAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.LocalSubjectAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.PolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.ResourceAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.Role"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.RoleBinding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.RoleBindingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.RoleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.SelfSubjectRulesReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.SelfSubjectRulesReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.SubjectAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.SubjectRulesReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.SubjectRulesReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.authorization.v1.SubjectRulesReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BinaryBuildSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BitbucketWebHookCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.Build"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildConfigSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildConfigStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildLog"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildOutput"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildPostCommitSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildStatusOutput"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildStatusOutputTo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildTriggerCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildTriggerPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildVolume"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildVolumeMount"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.BuildVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ConfigMapBuildSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.CustomBuildStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.DockerBuildStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.DockerStrategyOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.GenericWebHookCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.GitBuildSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.GitHubWebHookCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.GitLabWebHookCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.GitSourceRevision"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageChangeCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageChangeTrigger"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageChangeTriggerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageLabel"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageSourcePath"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.ImageStreamTagReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.JenkinsPipelineBuildStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SecretBuildSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SecretLocalReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SecretSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SourceBuildStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SourceControlUser"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SourceRevision"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.SourceStrategyOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.StageInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.StepInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.build.v1.WebHookTrigger"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.Image"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageBlobReferences"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageImportSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageImportStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageLayer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageLayerData"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageLookupPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageManifest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageSignature"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStream"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamImage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamImport"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamImportSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamImportStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamLayers"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamMapping"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamTag"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageStreamTagList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageTag"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.ImageTagList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.NamedTagEventList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.RepositoryImportSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.RepositoryImportStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.SecretList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.SignatureCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.SignatureIssuer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.SignatureSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.TagEvent"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.TagEventCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.TagImportPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.TagReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.image.v1.TagReferencePolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.ClusterRoleScopeRestriction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthAccessToken"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthAccessTokenList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthAuthorizeToken"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthAuthorizeTokenList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthClient"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthClientAuthorization"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthClientAuthorizationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.OAuthClientList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.ScopeRestriction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.UserOAuthAccessToken"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.oauth.v1.UserOAuthAccessTokenList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.project.v1.Project"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.project.v1.ProjectList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.project.v1.ProjectRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.project.v1.ProjectSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.project.v1.ProjectStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.quota.v1.AppliedClusterResourceQuota"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.quota.v1.AppliedClusterResourceQuotaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.quota.v1.ClusterResourceQuotaSelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.quota.v1.ClusterResourceQuotaSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.quota.v1.ClusterResourceQuotaStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.quota.v1.ResourceQuotaStatusByNamespace"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.LocalObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.Route"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteHTTPHeader"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteHTTPHeaderActionUnion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteHTTPHeaderActions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteHTTPHeaders"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteIngress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteIngressCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RoutePort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteSetHTTPHeader"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.RouteTargetReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.route.v1.TLSConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicyReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicyReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicyReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicySelfSubjectReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicySelfSubjectReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicySubjectReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicySubjectReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.PodSecurityPolicySubjectReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.RangeAllocation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.RangeAllocationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.security.v1.ServiceAccountPodSecurityPolicyReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.BrokerTemplateInstance"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.BrokerTemplateInstanceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.BrokerTemplateInstanceSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.Parameter"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.Template"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstance"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstanceCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstanceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstanceObject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstanceRequester"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstanceSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateInstanceStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.template.v1.TemplateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.Group"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.GroupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.Identity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.IdentityList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.User"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.UserIdentityMapping"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.openshift.api.user.v1.UserList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.lib.version.OperatorVersion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.APIResourceReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.APIServiceDefinitions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.APIServiceDescription"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.ActionDescriptor"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.CRDDescription"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.CustomResourceDefinitions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.InstallMode"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.SpecDescriptor"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.api.pkg.operators.v1alpha1.StatusDescriptor"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.AppLink"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.CSVDescription"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.ChannelEntry"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.Deprecation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.Icon"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.Maintainer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.PackageChannel"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.PackageManifest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.PackageManifestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.PackageManifestSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/com.github.operator-framework.operator-lifecycle-manager.pkg.package-server.apis.operators.v1.PackageManifestStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.CephConnection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.CephConnectionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfileMapping"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.ClientProfileMappingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.Driver"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.DriverList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.OperatorConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.ceph.csi.v1alpha1.OperatorConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.k8s.v1.NetworkAttachmentDefinition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.k8s.v1.NetworkAttachmentDefinitionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.IPPool"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.IPPoolList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.NodeSlicePool"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.NodeSlicePoolList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.OverlappingRangeIPReservation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.OverlappingRangeIPReservationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.AuditAnnotation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ExpressionWarning"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MatchCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MatchResources"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MutatingWebhook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MutatingWebhookConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MutatingWebhookConfigurationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.NamedRuleWithOperations"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ParamKind"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ParamRef"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.RuleWithOperations"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ServiceReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.TypeChecking"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBinding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBindingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyBindingSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicySpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingAdmissionPolicyStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingWebhook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingWebhookConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.ValidatingWebhookConfigurationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.Validation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.Variable"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.WebhookClientConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.AuditAnnotation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ExpressionWarning"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.MatchCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.MatchResources"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.NamedRuleWithOperations"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ParamKind"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ParamRef"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.TypeChecking"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBinding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBindingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyBindingSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicySpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.ValidatingAdmissionPolicyStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.Validation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1beta1.Variable"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ControllerRevision"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ControllerRevisionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DaemonSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DaemonSetCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DaemonSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DaemonSetSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DaemonSetStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DaemonSetUpdateStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.Deployment"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DeploymentCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DeploymentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DeploymentSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DeploymentStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DeploymentStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ReplicaSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ReplicaSetCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ReplicaSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ReplicaSetSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.ReplicaSetStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.RollingUpdateDaemonSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.RollingUpdateDeployment"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.RollingUpdateStatefulSetStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetOrdinals"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetPersistentVolumeClaimRetentionPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.StatefulSetUpdateStrategy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.BoundObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.SelfSubjectReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.SelfSubjectReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.TokenRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.TokenRequestSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.TokenRequestStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.TokenReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.TokenReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.TokenReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.UserInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.FieldSelectorAttributes"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.LabelSelectorAttributes"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.LocalSubjectAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.NonResourceAttributes"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.NonResourceRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.ResourceAttributes"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.ResourceRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SelfSubjectAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SelfSubjectAccessReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SelfSubjectRulesReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SelfSubjectRulesReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SubjectAccessReview"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SubjectAccessReviewSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SubjectAccessReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authorization.v1.SubjectRulesReviewStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.CrossVersionObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.HorizontalPodAutoscaler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.HorizontalPodAutoscalerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.Scale"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.ScaleSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v1.ScaleStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ContainerResourceMetricSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ContainerResourceMetricStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.CrossVersionObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ExternalMetricSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ExternalMetricStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HPAScalingPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HPAScalingRules"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerBehavior"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.HorizontalPodAutoscalerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.MetricIdentifier"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.MetricSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.MetricStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.MetricTarget"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.MetricValueStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ObjectMetricSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ObjectMetricStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.PodsMetricSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.PodsMetricStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ResourceMetricSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.autoscaling.v2.ResourceMetricStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.CronJob"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.CronJobList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.CronJobSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.CronJobStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.Job"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.JobCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.JobList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.JobSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.JobStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.JobTemplateSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.PodFailurePolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.PodFailurePolicyOnExitCodesRequirement"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.PodFailurePolicyOnPodConditionsPattern"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.PodFailurePolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.SuccessPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.SuccessPolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.batch.v1.UncountedTerminatedPods"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.certificates.v1.CertificateSigningRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.certificates.v1.CertificateSigningRequestCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.certificates.v1.CertificateSigningRequestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.certificates.v1.CertificateSigningRequestSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.certificates.v1.CertificateSigningRequestStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.coordination.v1.Lease"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.coordination.v1.LeaseList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.coordination.v1.LeaseSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AWSElasticBlockStoreVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Affinity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AppArmorProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AttachedVolume"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AzureDiskVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AzureFilePersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.AzureFileVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Binding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CSIPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CSIVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Capabilities"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Capabilities_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CephFSPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CephFSVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CephFSVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CephFSVolumeSource_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CinderPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.CinderVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ClaimSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ClientIPConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ClusterTrustBundleProjection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ComponentCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ComponentStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ComponentStatusList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMap"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapEnvSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapEnvSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapKeySelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapKeySelector_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapNodeConfigSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapProjection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapProjection_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ConfigMapVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Container"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerImage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerPort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerResizePolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerStateRunning"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerStateTerminated"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerStateWaiting"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ContainerUser"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Container_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Container_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DaemonEndpoint"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIProjection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIProjection_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIProjection_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIVolumeFile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIVolumeFile_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.DownwardAPIVolumeSource_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EmptyDirVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EndpointAddress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EndpointPort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EndpointSubset"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Endpoints"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EndpointsList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EnvFromSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EnvVar"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EnvVarSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EphemeralContainer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EphemeralContainer_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EphemeralContainer_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EphemeralVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Event"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EventList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EventSeries"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.EventSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ExecAction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ExecAction_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.FCVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.FCVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.FlexPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.FlexVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.FlockerVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GCEPersistentDiskVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GRPCAction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GitRepoVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GlusterfsPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GlusterfsVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HTTPGetAction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HTTPGetAction_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HTTPHeader"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HostAlias"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HostAlias_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HostIP"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.HostPathVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ISCSIPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ISCSIVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ISCSIVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ISCSIVolumeSource_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ImageVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.KeyToPath"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Lifecycle"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LifecycleHandler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LimitRange"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LimitRangeItem"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LimitRangeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LimitRangeSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LinuxContainerUser"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LoadBalancerIngress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LoadBalancerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalObjectReference_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LocalVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ModifyVolumeStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NFSVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Namespace"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Node"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeAddress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeAffinity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeAffinity_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeAffinity_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeConfigSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeConfigStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeDaemonEndpoints"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeFeatures"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeRuntimeHandler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeRuntimeHandlerFeatures"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorRequirement"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorRequirement_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorTerm"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorTerm_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelectorTerm_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelector_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSelector_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NodeSystemInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ObjectFieldSelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolume"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimSpec_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimSpec_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimTemplate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PersistentVolumeStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PhotonPersistentDiskVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Pod"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAffinity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAffinityTerm"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAffinityTerm_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAffinityTerm_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAffinity_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAffinity_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAntiAffinity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAntiAffinity_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodAntiAffinity_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfigOption"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfig_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodIP"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodOS"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodReadinessGate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodResourceClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodResourceClaimStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodResourceClaim_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodSchedulingGate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodSecurityContext"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodSecurityContext_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodSpec_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodSpec_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodTemplate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodTemplateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodTemplateSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PortStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PortworxVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PreferredSchedulingTerm"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Probe"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ProjectedVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ProjectedVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ProjectedVolumeSource_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.QuobyteVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.RBDPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.RBDVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.RBDVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.RBDVolumeSource_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ReplicationController"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ReplicationControllerCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ReplicationControllerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ReplicationControllerSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ReplicationControllerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceClaim_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceFieldSelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceHealth"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuota"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuotaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuotaSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuotaSpec_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceQuotaStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceRequirements"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SELinuxOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ScaleIOPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ScaleIOVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ScopeSelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ScopeSelector_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ScopedResourceSelectorRequirement"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ScopedResourceSelectorRequirement_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SeccompProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Secret"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretEnvSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretEnvSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretKeySelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretKeySelector_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretProjection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretProjection_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecretVolumeSource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecurityContext"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecurityContext_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SecurityContext_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Service"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServiceAccount"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServiceAccountList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServiceAccountTokenProjection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServiceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServicePort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServiceSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ServiceStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SessionAffinityConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.SleepAction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.StorageOSPersistentVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.StorageOSVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Sysctl"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TCPSocketAction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Taint"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Toleration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TopologySelectorLabelRequirement"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TopologySelectorTerm"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TopologySpreadConstraint"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TopologySpreadConstraint_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TopologySpreadConstraint_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TypedLocalObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TypedObjectReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Volume"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeDevice"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeMount"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeMountStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeMount_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeNodeAffinity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeProjection"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeProjection_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeProjection_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeResourceRequirements"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Volume_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Volume_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VsphereVirtualDiskVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.WeightedPodAffinityTerm"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.WindowsSecurityContextOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.Endpoint"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.EndpointConditions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.EndpointHints"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.EndpointPort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.EndpointSlice"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.EndpointSliceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.discovery.v1.ForZone"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.events.v1.Event"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.events.v1.EventList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.events.v1.EventSeries"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.extensions.v1beta1.Scale"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.extensions.v1beta1.ScaleSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.extensions.v1beta1.ScaleStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.ExemptPriorityLevelConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowDistinguisherMethod"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchema"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchemaCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchemaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchemaSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchemaStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.GroupSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.LimitResponse"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.LimitedPriorityLevelConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.NonResourcePolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PolicyRulesWithSubjects"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfigurationStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.QueuingConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.ResourcePolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.ServiceAccountSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.Subject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.UserSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.ExemptPriorityLevelConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowDistinguisherMethod"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchema"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.GroupSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.LimitResponse"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.LimitedPriorityLevelConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.NonResourcePolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PolicyRulesWithSubjects"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.QueuingConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.ResourcePolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.ServiceAccountSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.Subject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.UserSubject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.HTTPIngressPath"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.HTTPIngressRuleValue"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IPBlock"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.Ingress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressBackend"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressClassParametersReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressClassSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressLoadBalancerIngress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressLoadBalancerStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressPortStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressServiceBackend"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.IngressTLS"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicyEgressRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicyIngressRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicyPeer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicyPort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.NetworkPolicySpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.ServiceBackendPort"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.node.v1.Overhead"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.node.v1.RuntimeClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.node.v1.RuntimeClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.node.v1.Scheduling"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.policy.v1.Eviction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.policy.v1.PodDisruptionBudget"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.policy.v1.PodDisruptionBudgetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.policy.v1.PodDisruptionBudgetSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.policy.v1.PodDisruptionBudgetStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.AggregationRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.AggregationRule_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.ClusterRole"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.ClusterRoleBinding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.ClusterRoleBindingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.ClusterRoleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.PolicyRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.Role"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.RoleBinding"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.RoleBindingList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.RoleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.RoleRef"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.rbac.v1.Subject"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.scheduling.v1.PriorityClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.scheduling.v1.PriorityClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSIDriver"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSIDriverList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSIDriverSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSINode"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSINodeDriver"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSINodeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSINodeSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSIStorageCapacity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.CSIStorageCapacityList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.StorageClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.StorageClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.TokenRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeAttachment"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeAttachmentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeAttachmentSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeAttachmentSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeAttachmentStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeError"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.storage.v1.VolumeNodeResources"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceColumnDefinition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceConversion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionNames"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceDefinitionVersion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceSubresourceScale"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceSubresourceStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceSubresources"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.CustomResourceValidation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.ExternalDocumentation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSON"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaProps"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrArray"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrBool"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.JSONSchemaPropsOrStringArray"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.SelectableField"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.ServiceReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.ValidationRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.WebhookClientConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1.WebhookConversion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIGroup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIGroupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v10"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v4"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v5"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v6"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v7"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v8"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResourceList_v9"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIResource_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.APIVersions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Condition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Duration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.FieldSelectorRequirement"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionForDiscovery"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.GroupVersionKind"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector_v4"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector_v5"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.MicroTime"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Patch"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Preconditions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ServerAddressByClientCIDR"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v3"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v4"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v5"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v6"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v7"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v8"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status_v9"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.runtime.RawExtension"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.util.intstr.IntOrString"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.version.Info"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIService"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceSpec"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.APIServiceStatus"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.kube-aggregator.pkg.apis.apiregistration.v1.ServiceReference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.metrics.pkg.apis.metrics.v1beta1.ContainerMetrics"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.metrics.pkg.apis.metrics.v1beta1.NodeMetrics"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.metrics.pkg.apis.metrics.v1beta1.NodeMetricsList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.metrics.pkg.apis.metrics.v1beta1.PodMetrics"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.metrics.pkg.apis.metrics.v1beta1.PodMetricsList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.migration.v1alpha1.StorageState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.migration.v1alpha1.StorageStateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.migration.v1alpha1.StorageVersionMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.migration.v1alpha1.StorageVersionMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.networking.policy.v1alpha1.AdminNetworkPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.networking.policy.v1alpha1.AdminNetworkPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.networking.policy.v1alpha1.BaselineAdminNetworkPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.networking.policy.v1alpha1.BaselineAdminNetworkPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshot"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshotClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshotClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshotContent"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshotContentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshotList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.aaq.v1alpha1.AAQ"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.aaq.v1alpha1.AAQList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.forklift.v1beta1.OpenstackVolumePopulator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.forklift.v1beta1.OpenstackVolumePopulatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.forklift.v1beta1.OvirtVolumePopulator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.forklift.v1beta1.OvirtVolumePopulatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.CDI"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.CDIConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.CDIConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.CDIList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.DataImportCron"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.DataImportCronList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.DataSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.DataSourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.DataVolume"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.DataVolumeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.ObjectTransfer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.ObjectTransferList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.StorageProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.StorageProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.VolumeCloneSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.VolumeCloneSourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.VolumeImportSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.VolumeImportSourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.VolumeUploadSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.cdi.v1beta1.VolumeUploadSourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1alpha1.VirtualMachineClone"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1alpha1.VirtualMachineCloneList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1alpha1.VirtualMachineExport"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1alpha1.VirtualMachineExportList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1beta1.VirtualMachineExport"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1beta1.VirtualMachineExportList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.hco.v1beta1.HyperConverged"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.hco.v1beta1.HyperConvergedList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.hostpathprovisioner.v1beta1.HostPathProvisioner"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.hostpathprovisioner.v1beta1.HostPathProvisionerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachineClusterInstancetype"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachineClusterInstancetypeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachineClusterPreference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachineClusterPreferenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachineInstancetype"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachineInstancetypeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachinePreference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha1.VirtualMachinePreferenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachineClusterInstancetype"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachineClusterInstancetypeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachineClusterPreference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachineClusterPreferenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachineInstancetype"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachineInstancetypeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachinePreference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1alpha2.VirtualMachinePreferenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachineClusterInstancetype"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachineClusterInstancetypeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachineClusterPreference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachineClusterPreferenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachineInstancetype"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachineInstancetypeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachinePreference"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.instancetype.v1beta1.VirtualMachinePreferenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.migrations.v1alpha1.MigrationPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.migrations.v1alpha1.MigrationPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.network.networkaddonsoperator.v1.NetworkAddonsConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.network.networkaddonsoperator.v1.NetworkAddonsConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.network.networkaddonsoperator.v1alpha1.NetworkAddonsConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.network.networkaddonsoperator.v1alpha1.NetworkAddonsConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.pool.v1alpha1.VirtualMachinePool"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.pool.v1alpha1.VirtualMachinePoolList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineRestore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineRestoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineSnapshot"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineSnapshotContent"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineSnapshotContentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1alpha1.VirtualMachineSnapshotList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineRestore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineRestoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineSnapshot"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineSnapshotContent"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineSnapshotContentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.snapshot.v1beta1.VirtualMachineSnapshotList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.ssp.v1beta2.SSP"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.ssp.v1beta2.SSPList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.ssp.v1beta3.SSP"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.ssp.v1beta3.SSPList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.KubeVirt"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.KubeVirtList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachine"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstance"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstanceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstanceMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstanceMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstancePreset"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstancePresetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstanceReplicaSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineInstanceReplicaSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1.VirtualMachineList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.KubeVirt"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.KubeVirtList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachine"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstance"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstanceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstanceMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstanceMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstancePreset"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstancePresetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstanceReplicaSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineInstanceReplicaSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.v1alpha3.VirtualMachineList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.BMCEventSubscription"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.BMCEventSubscriptionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.BareMetalHost"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.BareMetalHostList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.DataImage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.DataImageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.FirmwareSchema"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.FirmwareSchemaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HardwareData"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HardwareDataList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HostFirmwareComponents"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HostFirmwareComponentsList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HostFirmwareSettings"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HostFirmwareSettingsList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HostUpdatePolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.HostUpdatePolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.PreprovisioningImage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.PreprovisioningImageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.Provisioning"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.metal3.v1alpha1.ProvisioningList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1.NMState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1.NMStateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1.NodeNetworkConfigurationPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1.NodeNetworkConfigurationPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationEnactment"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationEnactmentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkStateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NMState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NMStateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkConfigurationEnactment"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkConfigurationEnactmentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkConfigurationPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkConfigurationPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkStateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.BackingStore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.BackingStoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.BucketClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.BucketClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.NamespaceStore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.NamespaceStoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.NooBaa"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.NooBaaAccount"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.NooBaaAccountList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.NooBaaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.objectbucket.v1alpha1.ObjectBucket"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.objectbucket.v1alpha1.ObjectBucketClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.objectbucket.v1alpha1.ObjectBucketClaimList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.objectbucket.v1alpha1.ObjectBucketList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.apiserver.v1.APIRequestCount"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.apiserver.v1.APIRequestCountList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.authorization.v1.RoleBindingRestriction"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.authorization.v1.RoleBindingRestrictionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.autoscaling.v1.ClusterAutoscaler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.autoscaling.v1.ClusterAutoscalerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.autoscaling.v1beta1.MachineAutoscaler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.autoscaling.v1beta1.MachineAutoscalerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.cloudcredential.v1.CredentialsRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.cloudcredential.v1.CredentialsRequestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.APIServer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.APIServerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Authentication"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.AuthenticationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Build"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.BuildList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ClusterOperator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ClusterOperatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ClusterVersion"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ClusterVersionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Console"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ConsoleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.DNS"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.DNSList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.FeatureGate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.FeatureGateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Image"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageContentPolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageContentPolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageDigestMirrorSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageDigestMirrorSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageTagMirrorSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ImageTagMirrorSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Infrastructure"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.InfrastructureList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Ingress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.IngressList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Network"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.NetworkList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Node"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.NodeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.OAuth"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.OAuthList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.OperatorHub"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.OperatorHubList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Project"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ProjectList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Proxy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.ProxyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.Scheduler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.config.v1.SchedulerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleCLIDownload"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleCLIDownloadList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleExternalLogLink"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleExternalLogLinkList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleLink"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleLinkList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleNotification"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleNotificationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsolePlugin"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsolePluginList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleQuickStart"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleQuickStartList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleSample"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleSampleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleYAMLSample"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleYAMLSampleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1alpha1.ConsolePlugin"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.console.v1alpha1.ConsolePluginList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.CSIAddonsNode"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.CSIAddonsNodeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.EncryptionKeyRotationCronJob"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.EncryptionKeyRotationCronJobList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.EncryptionKeyRotationJob"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.EncryptionKeyRotationJobList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.NetworkFence"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.NetworkFenceClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.NetworkFenceClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.NetworkFenceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.ReclaimSpaceCronJob"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.ReclaimSpaceCronJobList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.ReclaimSpaceJob"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.ReclaimSpaceJobList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.helm.v1beta1.HelmChartRepository"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.helm.v1beta1.HelmChartRepositoryList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.helm.v1beta1.ProjectHelmChartRepository"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.helm.v1beta1.ProjectHelmChartRepositoryList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.internal.security.v1.RangeAllocation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.internal.security.v1.RangeAllocationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1.ControlPlaneMachineSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1.ControlPlaneMachineSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.Machine"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.MachineHealthCheck"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.MachineHealthCheckList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.MachineList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.MachineSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machine.v1beta1.MachineSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.ContainerRuntimeConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.ContainerRuntimeConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.ControllerConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.ControllerConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.KubeletConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.KubeletConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.MachineConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.MachineConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.MachineConfigPool"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.MachineConfigPoolList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.monitoring.v1.AlertRelabelConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.monitoring.v1.AlertRelabelConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.monitoring.v1.AlertingRule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.monitoring.v1.AlertingRuleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.network.cloud.v1.CloudPrivateIPConfig"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.network.cloud.v1.CloudPrivateIPConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.OCSInitialization"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.OCSInitializationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageCluster"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageClusterList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageClusterPeer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageClusterPeerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageClaimList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageClient"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageClientList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageConsumer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageConsumerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageRequestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.odf.v1alpha1.StorageSystem"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.odf.v1alpha1.StorageSystemList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.controlplane.v1alpha1.PodNetworkConnectivityCheck"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.controlplane.v1alpha1.PodNetworkConnectivityCheckList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.imageregistry.v1.Config"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.imageregistry.v1.ConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.imageregistry.v1.ImagePruner"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.imageregistry.v1.ImagePrunerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.ingress.v1.DNSRecord"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.ingress.v1.DNSRecordList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.network.v1.EgressRouter"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.network.v1.EgressRouterList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.network.v1.OperatorPKI"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.network.v1.OperatorPKIList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.samples.v1.Config"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.samples.v1.ConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.Authentication"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.AuthenticationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.CSISnapshotController"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.CSISnapshotControllerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.CloudCredential"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.CloudCredentialList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.ClusterCSIDriver"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.ClusterCSIDriverList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.Config"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.ConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.Console"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.ConsoleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.DNS"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.DNSList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.Etcd"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.EtcdList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.IngressController"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.IngressControllerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.InsightsOperator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.InsightsOperatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeAPIServer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeAPIServerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeControllerManager"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeControllerManagerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeScheduler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeSchedulerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeStorageVersionMigrator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.KubeStorageVersionMigratorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.MachineConfiguration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.MachineConfigurationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.Network"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.NetworkList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.OLM"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.OLMList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.OpenShiftAPIServer"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.OpenShiftAPIServerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.OpenShiftControllerManager"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.OpenShiftControllerManagerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.ServiceCA"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.ServiceCAList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.Storage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1.StorageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1alpha1.ImageContentSourcePolicy"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.operator.v1alpha1.ImageContentSourcePolicyList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.performance.v1.PerformanceProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.performance.v1.PerformanceProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.performance.v1alpha1.PerformanceProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.performance.v1alpha1.PerformanceProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.performance.v2.PerformanceProfile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.performance.v2.PerformanceProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.quota.v1.ClusterResourceQuota"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.quota.v1.ClusterResourceQuotaList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ramendr.v1alpha1.Recipe"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.ramendr.v1alpha1.RecipeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.security.v1.SecurityContextConstraints"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.security.v1.SecurityContextConstraintsList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1.LocalVolume"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1.LocalVolumeList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1alpha1.LocalVolumeDiscovery"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1alpha1.LocalVolumeDiscoveryList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1alpha1.LocalVolumeDiscoveryResult"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1alpha1.LocalVolumeDiscoveryResultList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1alpha1.LocalVolumeSet"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.local.v1alpha1.LocalVolumeSetList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeGroupReplication"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeGroupReplicationClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeGroupReplicationClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeGroupReplicationContent"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeGroupReplicationContentList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeGroupReplicationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeReplication"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeReplicationClass"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeReplicationClassList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.storage.replication.v1alpha1.VolumeReplicationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.tuned.v1.Profile"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.tuned.v1.ProfileList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.tuned.v1.Tuned"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.tuned.v1.TunedList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.operatorframework.olm.v1.ClusterCatalog"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.operatorframework.olm.v1.ClusterCatalogList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.operatorframework.olm.v1.ClusterExtension"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.operatorframework.olm.v1.ClusterExtensionList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBlockPool"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBlockPoolList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBlockPoolRadosNamespace"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBlockPoolRadosNamespaceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBucketNotification"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBucketNotificationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBucketTopic"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephBucketTopicList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephCOSIDriver"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephCOSIDriverList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephClient"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephClientList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephCluster"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephClusterList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephFilesystem"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephFilesystemList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephFilesystemMirror"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephFilesystemMirrorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephFilesystemSubVolumeGroup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephFilesystemSubVolumeGroupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephNFS"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephNFSList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectRealm"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectRealmList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectStore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectStoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectStoreUser"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectStoreUserList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectZone"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectZoneGroup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectZoneGroupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephObjectZoneList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephRBDMirror"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephRBDMirrorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1alpha5.Metal3Remediation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1alpha5.Metal3RemediationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1alpha5.Metal3RemediationTemplate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1alpha5.Metal3RemediationTemplateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1beta1.Metal3Remediation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1beta1.Metal3RemediationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1beta1.Metal3RemediationTemplate"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1beta1.Metal3RemediationTemplateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1alpha1.IPAddress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1alpha1.IPAddressClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1alpha1.IPAddressClaimList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1alpha1.IPAddressList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1beta1.IPAddress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1beta1.IPAddressClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1beta1.IPAddressClaimList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.ipam.v1beta1.IPAddressList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.APIResource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.APIResourceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Duration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Time"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.AdminPolicyBasedExternalRoute"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.AdminPolicyBasedExternalRouteList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressFirewall"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressFirewallList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressIP"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressIPList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressQoS"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressQoSList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressService"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressServiceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.AddVolumeOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.BlockSize"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.CDRomTarget"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.CustomBlockSize"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.DataVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.Disk"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.DiskTarget"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.FeatureState"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.FreezeUnfreezeTimeout"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.GuestAgentCommandInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.HotplugVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.LunTarget"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.MigrateOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.PauseOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.PersistentVolumeClaimVolumeSource"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.RemoveVolumeOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.RestartOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.SEVMeasurementInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.SEVPlatformInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.SEVSecretOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.SEVSessionOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.StartOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.StopOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.UnpauseOptions"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceFileSystem"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceFileSystemDisk"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceFileSystemInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceFileSystemList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceGuestAgentInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceGuestOSInfo"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceGuestOSUser"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineInstanceGuestOSUserList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/v1.VirtualMachineMemoryDumpRequest"
+    }
+  ]
+}

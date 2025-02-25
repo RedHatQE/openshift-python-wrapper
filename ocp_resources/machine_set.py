@@ -1,4 +1,4 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
@@ -79,7 +79,7 @@ class MachineSet(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             _spec, _metadata, _labels = ("spec", "metadata", "labels")
             (
                 _cluster_api_cluster,
@@ -178,7 +178,7 @@ class MachineSet(NamespacedResource):
         super().to_dict()
         self.res.update({"spec": {"replicas": replicas}})
 
-        self.logger.info(f"Scale machine-set from {self.desired_replicas} replicas to" f" {replicas} replicas")
+        self.logger.info(f"Scale machine-set from {self.desired_replicas} replicas to {replicas} replicas")
         self.update(resource_dict=self.res)
         if wait:
             return self.wait_for_replicas(timeout=wait_timeout, sleep=sleep)

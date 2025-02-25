@@ -1,0 +1,76 @@
+{
+  "description": "ImageTagMirrorSet holds cluster-wide information about how to handle registry mirror rules on using tag pull specification.\nWhen multiple policies are defined, the outcome of the behavior is defined on each field.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "spec holds user settable values for configuration",
+      "type": "object",
+      "properties": {
+        "imageTagMirrors": {
+          "description": "imageTagMirrors allows images referenced by image tags in pods to be\npulled from alternative mirrored repository locations. The image pull specification\nprovided to the pod will be compared to the source locations described in imageTagMirrors\nand the image may be pulled down from any of the mirrors in the list instead of the\nspecified repository allowing administrators to choose a potentially faster mirror.\nTo use mirrors to pull images using digest specification only, users should configure\na list of mirrors using \"ImageDigestMirrorSet\" CRD.\n\nIf the image pull specification matches the repository of \"source\" in multiple imagetagmirrorset objects,\nonly the objects which define the most specific namespace match will be used.\nFor example, if there are objects using quay.io/libpod and quay.io/libpod/busybox as\nthe \"source\", only the objects using quay.io/libpod/busybox are going to apply\nfor pull specification quay.io/libpod/busybox.\nEach \u201csource\u201d repository is treated independently; configurations for different \u201csource\u201d\nrepositories don\u2019t interact.\n\nIf the \"mirrors\" is not specified, the image will continue to be pulled from the specified\nrepository in the pull spec.\n\nWhen multiple policies are defined for the same \u201csource\u201d repository, the sets of defined\nmirrors will be merged together, preserving the relative order of the mirrors, if possible.\nFor example, if policy A has mirrors `a, b, c` and policy B has mirrors `c, d, e`, the\nmirrors will be used in the order `a, b, c, d, e`.  If the orders of mirror entries conflict\n(e.g. `a, b` vs. `b, a`) the configuration is not rejected but the resulting order is unspecified.\nUsers who want to use a deterministic order of mirrors, should configure them into one list of mirrors using the expected order.",
+          "type": "array",
+          "items": {
+            "description": "ImageTagMirrors holds cluster-wide information about how to handle mirrors in the registries config.",
+            "type": "object",
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "mirrorSourcePolicy": {
+                "description": "mirrorSourcePolicy defines the fallback policy if fails to pull image from the mirrors.\nIf unset, the image will continue to be pulled from the repository in the pull spec.\nsourcePolicy is valid configuration only when one or more mirrors are in the mirror list.",
+                "type": "string",
+                "enum": [
+                  "NeverContactSource",
+                  "AllowContactingSource"
+                ]
+              },
+              "mirrors": {
+                "description": "mirrors is zero or more locations that may also contain the same images. No mirror will be configured if not specified.\nImages can be pulled from these mirrors only if they are referenced by their tags.\nThe mirrored location is obtained by replacing the part of the input reference that\nmatches source by the mirrors entry, e.g. for registry.redhat.io/product/repo reference,\na (source, mirror) pair *.redhat.io, mirror.local/redhat causes a mirror.local/redhat/product/repo\nrepository to be used.\nPulling images by tag can potentially yield different images, depending on which endpoint we pull from.\nConfiguring a list of mirrors using \"ImageDigestMirrorSet\" CRD and forcing digest-pulls for mirrors avoids that issue.\nThe order of mirrors in this list is treated as the user's desired priority, while source\nis by default considered lower priority than all mirrors.\nIf no mirror is specified or all image pulls from the mirror list fail, the image will continue to be\npulled from the repository in the pull spec unless explicitly prohibited by \"mirrorSourcePolicy\".\nOther cluster configuration, including (but not limited to) other imageTagMirrors objects,\nmay impact the exact order mirrors are contacted in, or some mirrors may be contacted\nin parallel, so this should be considered a preference rather than a guarantee of ordering.\n\"mirrors\" uses one of the following formats:\nhost[:port]\nhost[:port]/namespace[/namespace\u2026]\nhost[:port]/namespace[/namespace\u2026]/repo\nfor more information about the format, see the document about the location field:\nhttps://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md#choosing-a-registry-toml-table",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^((?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])(?:(?:\\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+)?(?::[0-9]+)?)(?:(?:/[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?)+)?$"
+                },
+                "x-kubernetes-list-type": "set"
+              },
+              "source": {
+                "description": "source matches the repository that users refer to, e.g. in image pull specifications. Setting source to a registry hostname\ne.g. docker.io. quay.io, or registry.redhat.io, will match the image pull specification of corressponding registry.\n\"source\" uses one of the following formats:\nhost[:port]\nhost[:port]/namespace[/namespace\u2026]\nhost[:port]/namespace[/namespace\u2026]/repo\n[*.]host\nfor more information about the format, see the document about the location field:\nhttps://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md#choosing-a-registry-toml-table",
+                "type": "string",
+                "pattern": "^\\*(?:\\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+$|^((?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])(?:(?:\\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+)?(?::[0-9]+)?)(?:(?:/[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?)+)?$"
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        }
+      }
+    },
+    "status": {
+      "description": "status contains the observed state of the resource.",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "config.openshift.io",
+      "kind": "ImageTagMirrorSet",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

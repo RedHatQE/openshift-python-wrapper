@@ -1,0 +1,259 @@
+{
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "dashboardConfig": {
+          "type": "object",
+          "properties": {
+            "disableAcceleratorProfiles": {
+              "type": "boolean"
+            },
+            "disableBYONImageStream": {
+              "type": "boolean"
+            },
+            "disableClusterManager": {
+              "type": "boolean"
+            },
+            "disableCustomServingRuntimes": {
+              "type": "boolean"
+            },
+            "disableDistributedWorkloads": {
+              "type": "boolean"
+            },
+            "disableHome": {
+              "type": "boolean"
+            },
+            "disableISVBadges": {
+              "type": "boolean"
+            },
+            "disableInfo": {
+              "type": "boolean"
+            },
+            "disableKServe": {
+              "type": "boolean"
+            },
+            "disableKServeAuth": {
+              "type": "boolean"
+            },
+            "disableKServeMetrics": {
+              "type": "boolean"
+            },
+            "disableModelMesh": {
+              "type": "boolean"
+            },
+            "disableModelRegistry": {
+              "type": "boolean"
+            },
+            "disableModelServing": {
+              "type": "boolean"
+            },
+            "disableNIMModelServing": {
+              "type": "boolean"
+            },
+            "disablePerformanceMetrics": {
+              "type": "boolean"
+            },
+            "disablePipelines": {
+              "type": "boolean"
+            },
+            "disableProjectSharing": {
+              "type": "boolean"
+            },
+            "disableProjects": {
+              "type": "boolean"
+            },
+            "disableServingRuntimeParams": {
+              "type": "boolean"
+            },
+            "disableStorageClasses": {
+              "type": "boolean"
+            },
+            "disableSupport": {
+              "type": "boolean"
+            },
+            "disableTracking": {
+              "type": "boolean"
+            },
+            "disableTrustyBiasMetrics": {
+              "type": "boolean"
+            },
+            "disableUserManagement": {
+              "type": "boolean"
+            },
+            "enablement": {
+              "type": "boolean"
+            }
+          }
+        },
+        "groupsConfig": {
+          "type": "object",
+          "required": [
+            "adminGroups",
+            "allowedGroups"
+          ],
+          "properties": {
+            "adminGroups": {
+              "type": "string"
+            },
+            "allowedGroups": {
+              "type": "string"
+            }
+          }
+        },
+        "modelServerSizes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "resources"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "resources": {
+                "type": "object",
+                "properties": {
+                  "limits": {
+                    "type": "object",
+                    "properties": {
+                      "cpu": {
+                        "type": "string"
+                      },
+                      "memory": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "requests": {
+                    "type": "object",
+                    "properties": {
+                      "cpu": {
+                        "type": "string"
+                      },
+                      "memory": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "notebookController": {
+          "type": "object",
+          "required": [
+            "enabled"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "notebookNamespace": {
+              "type": "string"
+            },
+            "notebookTolerationSettings": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "key": {
+                  "type": "string"
+                }
+              }
+            },
+            "pvcSize": {
+              "type": "string"
+            },
+            "storageClassName": {
+              "type": "string"
+            }
+          }
+        },
+        "notebookSizes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "resources"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "resources": {
+                "type": "object",
+                "properties": {
+                  "limits": {
+                    "type": "object",
+                    "properties": {
+                      "cpu": {
+                        "type": "string"
+                      },
+                      "memory": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "requests": {
+                    "type": "object",
+                    "properties": {
+                      "cpu": {
+                        "type": "string"
+                      },
+                      "memory": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "templateDisablement": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "templateOrder": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "opendatahub.io",
+      "kind": "OdhDashboardConfig",
+      "version": "v1alpha"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

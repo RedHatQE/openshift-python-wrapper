@@ -1,6 +1,6 @@
 import kubernetes
 
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,7 +13,6 @@ class Job(NamespacedResource):
         namespace (str): Namespace name.
         client (DynamicClient): Dynamic client for connecting to a remote cluster.
         teardown (bool): Indicates if this resource would need to be deleted.
-        privileged_client (DynamicClient): Instance of Dynamic client.
         yaml_file (str): Yaml file for the resource.
         delete_timeout (int): Timeout associated with delete action.
         backoff_limit (int): The number of retries for a job.
@@ -37,7 +36,6 @@ class Job(NamespacedResource):
         namespace=None,
         client=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         backoff_limit=None,
@@ -52,7 +50,6 @@ class Job(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -65,7 +62,7 @@ class Job(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res.setdefault("spec", {})
 
             if self.backoff_limit is not None:

@@ -1,9 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class StorageMap(NamespacedResource, MTV):
+class StorageMap(NamespacedResource):
     """
     Migration Toolkit For Virtualization (MTV) StorageMap object.
 
@@ -59,9 +58,26 @@ class StorageMap(NamespacedResource, MTV):
         self.source_provider_namespace = source_provider_namespace
         self.destination_provider_name = destination_provider_name
         self.destination_provider_namespace = destination_provider_namespace
-        self.condition_message_ready = self.ConditionMessage.STORAGE_MAP_READY
+
+    @property
+    def map_to_dict(self):
+        return {
+            "spec": {
+                "map": self.mapping,
+                "provider": {
+                    "source": {
+                        "name": self.source_provider_name,
+                        "namespace": self.source_provider_namespace,
+                    },
+                    "destination": {
+                        "name": self.destination_provider_name,
+                        "namespace": self.destination_provider_namespace,
+                    },
+                },
+            }
+        }
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res.update(self.map_to_dict)

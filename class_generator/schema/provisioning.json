@@ -1,0 +1,215 @@
+{
+  "description": "Provisioning contains configuration used by the Provisioning\nservice (Ironic) to provision baremetal hosts.\nProvisioning is created by the OpenShift installer using admin or\nuser provided information about the provisioning network and the\nNIC on the server that can be used to PXE boot it.\nThis CR is a singleton, created by the installer and currently only\nconsumed by the cluster-baremetal-operator to bring up and update\ncontainers in a metal3 cluster.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ProvisioningSpec defines the desired state of Provisioning",
+      "type": "object",
+      "properties": {
+        "additionalNTPServers": {
+          "description": "AdditionalNTPServers is a list of NTP Servers to be used by the\nprovisioning service",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bootIsoSource": {
+          "description": "BootIsoSource provides a way to set the location where the iso image\nto boot the nodes will be served from.\nBy default the boot iso image is cached locally and served from\nthe Provisioning service (Ironic) nodes using an auxiliary httpd server.\nIf the boot iso image is already served by an httpd server, setting\nthis option to http allows to directly provide the image from there;\nin this case, the network (either internal or external) where the\nhttpd server that hosts the boot iso is needs to be accessible\nby the metal3 pod.",
+          "type": "string",
+          "enum": [
+            "local",
+            "http"
+          ]
+        },
+        "disableVirtualMediaTLS": {
+          "description": "DisableVirtualMediaTLS turns off TLS on the virtual media server,\nwhich may be required for hardware that cannot accept HTTPS links.",
+          "type": "boolean"
+        },
+        "preProvisioningOSDownloadURLs": {
+          "description": "PreprovisioningOSDownloadURLs is set of CoreOS Live URLs that would be necessary to provision a worker\neither using virtual media or PXE.",
+          "type": "object",
+          "properties": {
+            "initramfsURL": {
+              "description": "InitramfsURL Image URL to be used for PXE deployments",
+              "type": "string"
+            },
+            "isoURL": {
+              "description": "IsoURL Image URL to be used for Live ISO deployments",
+              "type": "string"
+            },
+            "kernelURL": {
+              "description": "KernelURL is an Image URL to be used for PXE deployments",
+              "type": "string"
+            },
+            "rootfsURL": {
+              "description": "RootfsURL Image URL to be used for PXE deployments",
+              "type": "string"
+            }
+          }
+        },
+        "provisioningDHCPExternal": {
+          "description": "ProvisioningDHCPExternal indicates whether the DHCP server\nfor IP addresses in the provisioning DHCP range is present\nwithin the metal3 cluster or external to it. This field is being\ndeprecated in favor of provisioningNetwork.",
+          "type": "boolean"
+        },
+        "provisioningDHCPRange": {
+          "description": "ProvisioningDHCPRange needs to be interpreted along with\nProvisioningDHCPExternal. If the value of\nprovisioningDHCPExternal is set to False, then\nProvisioningDHCPRange represents the range of IP addresses\nthat the DHCP server running within the metal3 cluster can\nuse while provisioning baremetal servers. If the value of\nProvisioningDHCPExternal is set to True, then the value of\nProvisioningDHCPRange will be ignored. When the value of\nProvisioningDHCPExternal is set to False, indicating an\ninternal DHCP server and the value of ProvisioningDHCPRange\nis not set, then the DHCP range is taken to be the default\nrange which goes from .10 to .100 of the\nProvisioningNetworkCIDR. This is the only value in all of\nthe Provisioning configuration that can be changed after\nthe installer has created the CR. This value needs to be\ntwo comma sererated IP addresses within the\nProvisioningNetworkCIDR where the 1st address represents\nthe start of the range and the 2nd address represents the\nlast usable address in the  range.",
+          "type": "string"
+        },
+        "provisioningDNS": {
+          "description": "ProvisioningDNS allows sending the DNS information via DHCP on the\nprovisionig network. It is off by default since the Provisioning\nservice itself (Ironic) does not require DNS, but it may be useful\nfor layered products (e.g. ZTP).",
+          "type": "boolean"
+        },
+        "provisioningIP": {
+          "description": "ProvisioningIP is the IP address assigned to the\nprovisioningInterface of the baremetal server. This IP\naddress should be within the provisioning subnet, and\noutside of the DHCP range.",
+          "type": "string"
+        },
+        "provisioningInterface": {
+          "description": "ProvisioningInterface is the name of the network interface\non a baremetal server to the provisioning network. It can\nhave values like eth1 or ens3.",
+          "type": "string"
+        },
+        "provisioningMacAddresses": {
+          "description": "ProvisioningMacAddresses is a list of mac addresses of network interfaces\non a baremetal server to the provisioning network.\nUse this instead of ProvisioningInterface to allow interfaces of different\nnames. If not provided it will be populated by the BMH.Spec.BootMacAddress\nof each master.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provisioningNetwork": {
+          "description": "ProvisioningNetwork provides a way to indicate the state of the\nunderlying network configuration for the provisioning network.\nThis field can have one of the following values -\n`Managed`- when the provisioning network is completely managed by\nthe Baremetal IPI solution.\n`Unmanaged`- when the provsioning network is present and used but\nthe user is responsible for managing DHCP. Virtual media provisioning\nis recommended but PXE is still available if required.\n`Disabled`- when the provisioning network is fully disabled. User can\nbring up the baremetal cluster using virtual media or assisted\ninstallation. If using metal3 for power management, BMCs must be\naccessible from the machine networks. User should provide two IPs on\nthe external network that would be used for provisioning services.",
+          "type": "string",
+          "enum": [
+            "Managed",
+            "Unmanaged",
+            "Disabled"
+          ]
+        },
+        "provisioningNetworkCIDR": {
+          "description": "ProvisioningNetworkCIDR is the network on which the\nbaremetal nodes are provisioned. The provisioningIP and the\nIPs in the dhcpRange all come from within this network. When using IPv6\nand in a network managed by the Baremetal IPI solution this cannot be a\nnetwork larger than a /64.",
+          "type": "string"
+        },
+        "provisioningOSDownloadURL": {
+          "description": "ProvisioningOSDownloadURL is the location from which the OS\nImage used to boot baremetal host machines can be downloaded\nby the metal3 cluster.",
+          "type": "string"
+        },
+        "virtualMediaViaExternalNetwork": {
+          "description": "VirtualMediaViaExternalNetwork flag when set to \"true\" allows for workers\nto boot via Virtual Media and contact metal3 over the External Network.\nWhen the flag is set to \"false\" (which is the default), virtual media\ndeployments can still happen based on the configuration specified in the\nProvisioningNetwork i.e when in Disabled mode, over the External Network\nand over Provisioning Network when in Managed mode.\nPXE deployments will always use the Provisioning Network and will not be\naffected by this flag.",
+          "type": "boolean"
+        },
+        "watchAllNamespaces": {
+          "description": "WatchAllNamespaces provides a way to explicitly allow use of this\nProvisioning configuration across all Namespaces. It is an\noptional configuration which defaults to false and in that state\nwill be used to provision baremetal hosts in only the\nopenshift-machine-api namespace. When set to true, this provisioning\nconfiguration would be used for baremetal hosts across all namespaces.",
+          "type": "boolean"
+        }
+      }
+    },
+    "status": {
+      "description": "ProvisioningStatus defines the observed state of Provisioning",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "conditions is a list of conditions and their status",
+          "type": "array",
+          "items": {
+            "description": "OperatorCondition is just the standard condition fields.",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "generations": {
+          "description": "generations are used to determine when an item needs to be reconciled or has changed in a way that needs a reaction.",
+          "type": "array",
+          "items": {
+            "description": "GenerationStatus keeps track of the generation for a given resource so that decisions about forced updates can be made.",
+            "type": "object",
+            "properties": {
+              "group": {
+                "description": "group is the group of the thing you're tracking",
+                "type": "string"
+              },
+              "hash": {
+                "description": "hash is an optional field set for resources without generation that are content sensitive like secrets and configmaps",
+                "type": "string"
+              },
+              "lastGeneration": {
+                "description": "lastGeneration is the last generation of the workload controller involved",
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "description": "name is the name of the thing you're tracking",
+                "type": "string"
+              },
+              "namespace": {
+                "description": "namespace is where the thing you're tracking is",
+                "type": "string"
+              },
+              "resource": {
+                "description": "resource is the resource type of the thing you're tracking",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        },
+        "observedGeneration": {
+          "description": "observedGeneration is the last generation change you've dealt with",
+          "type": "integer",
+          "format": "int64"
+        },
+        "readyReplicas": {
+          "description": "readyReplicas indicates how many replicas are ready and at the desired state",
+          "type": "integer",
+          "format": "int32"
+        },
+        "version": {
+          "description": "version is the level this availability applies to",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "metal3.io",
+      "kind": "Provisioning",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

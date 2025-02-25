@@ -1,0 +1,309 @@
+{
+  "description": "LocalQueue is the Schema for the localQueues API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "LocalQueueSpec defines the desired state of LocalQueue",
+      "type": "object",
+      "properties": {
+        "clusterQueue": {
+          "description": "clusterQueue is a reference to a clusterQueue that backs this localQueue.",
+          "type": "string",
+          "maxLength": 253,
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+          "x-kubernetes-validations": [
+            {
+              "message": "field is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "stopPolicy": {
+          "description": "stopPolicy - if set to a value different from None, the LocalQueue is considered Inactive,\nno new reservation being made.\n\n\nDepending on its value, its associated workloads will:\n\n\n- None - Workloads are admitted\n- HoldAndDrain - Admitted workloads are evicted and Reserving workloads will cancel the reservation.\n- Hold - Admitted workloads will run to completion and Reserving workloads will cancel the reservation.",
+          "type": "string",
+          "enum": [
+            "None",
+            "Hold",
+            "HoldAndDrain"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "LocalQueueStatus defines the observed state of LocalQueue",
+      "type": "object",
+      "properties": {
+        "admittedWorkloads": {
+          "description": "admittedWorkloads is the number of workloads in this LocalQueue\nadmitted to a ClusterQueue and that haven't finished yet.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "conditions": {
+          "description": "Conditions hold the latest available observations of the LocalQueue\ncurrent state.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "flavorUsage": {
+          "description": "flavorsUsage are the used quotas, by flavor currently in use by the\nworkloads assigned to this LocalQueue.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "resources"
+            ],
+            "properties": {
+              "name": {
+                "description": "name of the flavor.",
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+              },
+              "resources": {
+                "description": "resources lists the quota usage for the resources in this flavor.",
+                "type": "array",
+                "maxItems": 16,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "description": "name of the resource.",
+                      "type": "string"
+                    },
+                    "total": {
+                      "description": "total is the total quantity of used quota.",
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "x-kubernetes-list-map-keys": [
+                  "name"
+                ],
+                "x-kubernetes-list-type": "map"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "flavors": {
+          "description": "flavors lists all currently available ResourceFlavors in specified ClusterQueue.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "description": "name of the flavor.",
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+              },
+              "nodeLabels": {
+                "description": "nodeLabels are labels that associate the ResourceFlavor with Nodes that\nhave the same labels.",
+                "type": "object",
+                "maxProperties": 8,
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "x-kubernetes-map-type": "atomic"
+              },
+              "nodeTaints": {
+                "description": "nodeTaints are taints that the nodes associated with this ResourceFlavor\nhave.",
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "description": "The node this Taint is attached to has the \"effect\" on\nany pod that does not tolerate the Taint.",
+                  "type": "object",
+                  "required": [
+                    "effect",
+                    "key"
+                  ],
+                  "properties": {
+                    "effect": {
+                      "description": "Required. The effect of the taint on pods\nthat do not tolerate the taint.\nValid effects are NoSchedule, PreferNoSchedule and NoExecute.",
+                      "type": "string"
+                    },
+                    "key": {
+                      "description": "Required. The taint key to be applied to a node.",
+                      "type": "string"
+                    },
+                    "timeAdded": {
+                      "description": "TimeAdded represents the time at which the taint was added.\nIt is only written for NoExecute taints.",
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "value": {
+                      "description": "The taint value corresponding to the taint key.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "resources": {
+                "description": "resources used in the flavor.",
+                "type": "array",
+                "maxItems": 16,
+                "items": {
+                  "description": "ResourceName is the name identifying various resources in a ResourceList.",
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "set"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "flavorsReservation": {
+          "description": "flavorsReservation are the reserved quotas, by flavor currently in use by the\nworkloads assigned to this LocalQueue.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "resources"
+            ],
+            "properties": {
+              "name": {
+                "description": "name of the flavor.",
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+              },
+              "resources": {
+                "description": "resources lists the quota usage for the resources in this flavor.",
+                "type": "array",
+                "maxItems": 16,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "description": "name of the resource.",
+                      "type": "string"
+                    },
+                    "total": {
+                      "description": "total is the total quantity of used quota.",
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "x-kubernetes-list-map-keys": [
+                  "name"
+                ],
+                "x-kubernetes-list-type": "map"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "pendingWorkloads": {
+          "description": "PendingWorkloads is the number of Workloads in the LocalQueue not yet admitted to a ClusterQueue",
+          "type": "integer",
+          "format": "int32"
+        },
+        "reservingWorkloads": {
+          "description": "reservingWorkloads is the number of workloads in this LocalQueue\nreserving quota in a ClusterQueue and that haven't finished yet.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "kueue.x-k8s.io",
+      "kind": "LocalQueue",
+      "version": "v1beta1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
@@ -10,13 +11,13 @@ class CatalogSource(NamespacedResource):
 
     def __init__(
         self,
-        source_type=None,
-        image=None,
-        display_name=None,
-        publisher=None,
-        update_strategy_registry_poll_interval=None,
-        **kwargs,
-    ):
+        source_type: str = "",
+        image: str = "",
+        display_name: str = "",
+        publisher: str = "",
+        update_strategy_registry_poll_interval: str = "",
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
             source_type (str): Name of the source type.
@@ -35,22 +36,17 @@ class CatalogSource(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not all([self.source_type, self.image, self.display_name, self.publisher]):
                 raise MissingRequiredArgumentError(argument="'source_type', 'image', 'display_name' and 'publisher'")
-            self.res.update({
-                "spec": {
-                    "sourceType": self.source_type,
-                    "image": self.image,
-                    "displayName": self.display_name,
-                    "publisher": self.publisher,
-                }
-            })
+
+            self.res["spec"] = {
+                "sourceType": self.source_type,
+                "image": self.image,
+                "displayName": self.display_name,
+                "publisher": self.publisher,
+            }
+            _spec: Dict[str, Any] = self.res["spec"]
+
             if self.update_strategy_registry_poll_interval:
-                self.res["spec"].update({
-                    "updateStrategy": {
-                        "registryPoll": {
-                            "interval": self.update_strategy_registry_poll_interval,
-                        },
-                    },
-                })
+                _spec["updateStrategy"] = {"registryPoll": {"interval": self.update_strategy_registry_poll_interval}}

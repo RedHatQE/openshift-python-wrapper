@@ -1,0 +1,11 @@
+{
+  "description": "SelfSubjectReviewStatus is filled by the kube-apiserver and sent back to a user.",
+  "type": "object",
+  "properties": {
+    "userInfo": {
+      "description": "User attributes of the user making this request.",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.authentication.v1.UserInfo"
+    }
+  },
+  "$schema": "http://json-schema.org/schema#"
+}

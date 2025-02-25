@@ -53,7 +53,7 @@ class PerformanceProfile(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if not self.cpu and not self.node_selector:
                 raise MissingRequiredArgumentError(argument="'cpu' and 'node_selector'")
 

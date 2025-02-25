@@ -1,0 +1,71 @@
+{
+  "description": "Scheduler holds cluster-wide config information to run the Kubernetes Scheduler\nand influence its placement decisions. The canonical name for this config is `cluster`.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "spec holds user settable values for configuration",
+      "type": "object",
+      "properties": {
+        "defaultNodeSelector": {
+          "description": "defaultNodeSelector helps set the cluster-wide default node selector to\nrestrict pod placement to specific nodes. This is applied to the pods\ncreated in all namespaces and creates an intersection with any existing\nnodeSelectors already set on a pod, additionally constraining that pod's selector.\nFor example,\ndefaultNodeSelector: \"type=user-node,region=east\" would set nodeSelector\nfield in pod spec to \"type=user-node,region=east\" to all pods created\nin all namespaces. Namespaces having project-wide node selectors won't be\nimpacted even if this field is set. This adds an annotation section to\nthe namespace.\nFor example, if a new namespace is created with\nnode-selector='type=user-node,region=east',\nthe annotation openshift.io/node-selector: type=user-node,region=east\ngets added to the project. When the openshift.io/node-selector annotation\nis set on the project the value is used in preference to the value we are setting\nfor defaultNodeSelector field.\nFor instance,\nopenshift.io/node-selector: \"type=user-node,region=west\" means\nthat the default of \"type=user-node,region=east\" set in defaultNodeSelector\nwould not be applied.",
+          "type": "string"
+        },
+        "mastersSchedulable": {
+          "description": "MastersSchedulable allows masters nodes to be schedulable. When this flag is\nturned on, all the master nodes in the cluster will be made schedulable,\nso that workload pods can run on them. The default value for this field is false,\nmeaning none of the master nodes are schedulable.\nImportant Note: Once the workload pods start running on the master nodes,\nextreme care must be taken to ensure that cluster-critical control plane components\nare not impacted.\nPlease turn on this field after doing due diligence.",
+          "type": "boolean"
+        },
+        "policy": {
+          "description": "DEPRECATED: the scheduler Policy API has been deprecated and will be removed in a future release.\npolicy is a reference to a ConfigMap containing scheduler policy which has\nuser specified predicates and priorities. If this ConfigMap is not available\nscheduler will default to use DefaultAlgorithmProvider.\nThe namespace for this configmap is openshift-config.",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "name is the metadata.name of the referenced config map",
+              "type": "string"
+            }
+          }
+        },
+        "profile": {
+          "description": "profile sets which scheduling profile should be set in order to configure scheduling\ndecisions for new pods.\n\nValid values are \"LowNodeUtilization\", \"HighNodeUtilization\", \"NoScoring\"\nDefaults to \"LowNodeUtilization\"",
+          "type": "string",
+          "enum": [
+            "",
+            "LowNodeUtilization",
+            "HighNodeUtilization",
+            "NoScoring"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "status holds observed values from the cluster. They may not be overridden.",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "config.openshift.io",
+      "kind": "Scheduler",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

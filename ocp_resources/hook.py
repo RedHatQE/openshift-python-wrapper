@@ -1,9 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class Hook(NamespacedResource, MTV):
+class Hook(NamespacedResource):
     """
     Migration Tool for Virtualization (MTV) Plan's Hook Resource.
     """
@@ -41,7 +40,7 @@ class Hook(NamespacedResource, MTV):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             self.res.update({
                 "spec": {
                     "image": self.image,

@@ -1,4 +1,4 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -16,7 +16,6 @@ class Lease(NamespacedResource):
         namespace=None,
         client=None,
         teardown=True,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         holder_identity=None,
@@ -37,7 +36,6 @@ class Lease(NamespacedResource):
             lease_transitions (int, optional):  number of transitions of a lease between holders.
             acquire_time (time, optional): when the current lease was acquired
             renew_time (time, optional): when current holder of the lease has last updated it
-            privileged_client (DynamicClient): Privileged client for api calls
             yaml_file (str): yaml file for the resource.
             delete_timeout (int): timeout associated with delete action
         """
@@ -46,7 +44,6 @@ class Lease(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
@@ -59,7 +56,7 @@ class Lease(NamespacedResource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if self.acquire_time:
                 self.res["spec"]["acquireTime"] = self.acquire_time
             if self.renew_time:

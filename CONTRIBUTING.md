@@ -32,20 +32,28 @@ pre-commit install
   Add `/cherry-pick <target branch to cherry-pick to>` to the PR comment.
 
 ## General
+
 - Add typing to new code; typing is enforced using [mypy](https://mypy-lang.org/)
 
 ## Adding a new module (resource)
 
+##### Using generator script
+
+- [class_generator](class_generator/README.md)
+
+##### Manual
+
 A new resource must follow rules:
-- A new file named as the resource under `ocp_resources`; If the resource name is composed of multiple words, separate them with an underscore.  
-- A class named as the resource kind.  
-- Inherit from the relevant class; If the resource is cluster-scoped, inherit from `Resource` else from `NamespacedResource`.  
+
+- A new file named as the resource under `ocp_resources`; If the resource name is composed of multiple words, separate them with an underscore.
+- A class named as the resource kind.
+- Inherit from the relevant class; If the resource is cluster-scoped, inherit from `Resource` else from `NamespacedResource`.
 - API group:
   - Under `ocp_resources.resource.Resource.ApiGroup`
   - Resource's apiGroup (`apiVersion` prefix) as `api_group`
 - A link to the resource's API reference.
 - Implement `__init__` function;  
-Define all the required arguments that are **required** to instantiate the new resource. Optional parameters may be added as well.
+  Define all the required arguments that are **required** to instantiate the new resource. Optional parameters may be added as well.
 - Implement `to_dict` function.
 
 Check [ConfigMap](ocp_resources/configmap.py) and [Backup](ocp_resources/backup.py) for reference.

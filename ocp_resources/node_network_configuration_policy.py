@@ -2,7 +2,8 @@ import re
 
 from kubernetes.dynamic.exceptions import ConflictError
 
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
+from ocp_resources.exceptions import NNCPConfigurationFailed
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
     NodeNetworkConfigurationEnactment,
@@ -13,10 +14,6 @@ from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
-
-
-class NNCPConfigurationFailed(Exception):
-    pass
 
 
 class NodeNetworkConfigurationPolicy(Resource):
@@ -112,7 +109,9 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def _nodes(self):
         if self.node_selector:
-            return list(Node.get(dyn_client=self.client, name=self.node_selector))
+            return list(
+                Node.get(dyn_client=self.client, name=self.node_selector[f"{self.ApiGroup.KUBERNETES_IO}/hostname"])
+            )
         if self.node_selector_labels:
             node_labels = ",".join([
                 f"{label_key}={label_value}" for label_key, label_value in self.node_selector_labels.items()
@@ -131,7 +130,7 @@ class NodeNetworkConfigurationPolicy(Resource):
 
     def to_dict(self) -> None:
         super().to_dict()
-        if not self.yaml_file:
+        if not self.kind_dict and not self.yaml_file:
             if self.dns_resolver or self.routes or self.iface:
                 self.res.setdefault("spec", {}).setdefault("desiredState", {})
 
@@ -302,7 +301,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             return self
         except Exception as exp:
             self.logger.error(exp)
-            super().__exit__(exception_type=None, exception_value=None, traceback=None)
+            super().__exit__()
             raise
 
     def clean_up(self):
@@ -313,7 +312,7 @@ class NodeNetworkConfigurationPolicy(Resource):
             except Exception as exp:
                 self.logger.error(exp)
 
-        super().clean_up()
+        return super().clean_up()
 
     def _absent_interface(self):
         for _iface in self.desired_state["interfaces"]:
@@ -375,21 +374,28 @@ class NodeNetworkConfigurationPolicy(Resource):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
-        # if we get here too fast there are no conditions, we need to wait.
-        self.wait_for_configuration_conditions_unknown_or_progressing()
-
-        samples = TimeoutSampler(wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status)
         try:
-            for sample in samples:
-                if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
-                    self.logger.info(f"NNCP {self.name} configured Successfully")
-                    return sample
+            for sample in TimeoutSampler(
+                wait_timeout=self.success_timeout,
+                sleep=5,
+                func=lambda: next(
+                    (
+                        condition
+                        for condition in self.instance.get("status", {}).get("conditions", [])
+                        if condition and condition["type"] == self.Conditions.Type.AVAILABLE
+                    ),
+                    {},
+                ),
+            ):
+                if sample:
+                    if sample["status"] == self.Condition.Status.TRUE:
+                        self.logger.info(f"NNCP {self.name} configured Successfully")
+                        return sample
+                    elif sample.get("reason") == no_match_node_condition_reason:
+                        raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
 
-                elif sample == no_match_node_condition_reason:
-                    raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
-
-                elif sample == failed_condition_reason:
-                    self._process_failed_status(failed_condition_reason=failed_condition_reason)
+                    elif sample.get("reason") == failed_condition_reason:
+                        self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             self.logger.error(

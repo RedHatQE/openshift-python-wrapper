@@ -1,4 +1,4 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
@@ -11,7 +11,6 @@ class OCSInitialization(NamespacedResource):
         namespace=None,
         client=None,
         teardown=False,
-        privileged_client=None,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         enable_ceph_tools=None,
@@ -33,7 +32,6 @@ class OCSInitialization(NamespacedResource):
             namespace=namespace,
             client=client,
             teardown=teardown,
-            privileged_client=privileged_client,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,
