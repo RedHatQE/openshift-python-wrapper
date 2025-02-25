@@ -101,7 +101,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         mtu: Optional[int] = None,
         subnets: Optional[List[str]] = None,
         join_subnets: Optional[List[str]] = None,
-        ipam: Optional[dict[str, Any]] = None,
+        ipam_lifecycle: Optional[str] = None,
         **kwargs,
     ):
         """
@@ -112,7 +112,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             mtu (Optional[int]): mtu is the maximum transmission unit for a network.
             subnets (Optional[List[str]]): subnets are used for the pod network across the cluster.
             join_subnets (Optional[List[str]]): join_subnets are used inside the OVN network topology.
-            ipam (Optional[dict[str, Any]]): ipam section contains IPAM-related configuration for the network.
+            ipam_lifecycle (Optional[str]): ipam_lifecycle controls IP addresses management lifecycle.
         """
         super().__init__(
             topology=self.LAYER2,
@@ -122,7 +122,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
         self.mtu = mtu
         self.subnets = subnets
         self.join_subnets = join_subnets
-        self.ipam = ipam
+        self.ipam_lifecycle = ipam_lifecycle
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -142,8 +142,8 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             if self.join_subnets:
                 _layer2["joinSubnets"] = self.join_subnets
 
-            if self.ipam:
-                _layer2["ipam"] = self.ipam
+            if self.ipam_lifecycle:
+                _layer2["ipamLifecycle"] = self.ipam_lifecycle
 
 
 class Layer3UserDefinedNetwork(UserDefinedNetwork):
