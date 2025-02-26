@@ -18,7 +18,8 @@
     "tagArgs": [],
     "push": true,
     "pushArgs": ["--follow-tags"],
-    "pushRepo": ""
+    "pushRepo": "",
+    "changelog": "git log --pretty=format:\"* %s (%h) by %cn on %as\" ${from}...${to}"
   },
   "github": {
     "release": true,
@@ -36,22 +37,6 @@
     "web": false
   },
   "plugins": {
-    "@release-it/conventional-changelog": {
-      "ignoreRecommendedBump": true,
-      "preset": {
-        "name": "conventionalcommits"
-      },
-      "types": [
-        {
-          "type": "[pre-commit.ci]",
-          "section": "CI"
-        },
-        {
-          "type": "chore(deps)",
-          "section": "CI"
-        }
-      ]
-    },
     "@release-it/bumper": {
       "in": "pyproject.toml",
       "out": { "file": "pyproject.toml", "path": "project.version" }
