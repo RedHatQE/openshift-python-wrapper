@@ -3,6 +3,7 @@
 from typing import Any, Dict, Optional
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 from typing import List
+from warnings import warn
 
 
 class UserDefinedNetwork(NamespacedResource):
@@ -146,7 +147,11 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
                 _layer2["joinSubnets"] = self.join_subnets
 
             if self.ipam_lifecycle:
-                self.logger.warn("ipam_lifecycle is deprecated and will be removed in the future. Use ipam instead.")
+                warn(
+                    message="ipam_lifecycle is deprecated and will be removed in the future. Use ipam instead.",
+                    category=DeprecationWarning,
+                    stacklevel=2,
+                )
                 _layer2["ipam"] = self.ipam_lifecycle
 
             if self.ipam:
