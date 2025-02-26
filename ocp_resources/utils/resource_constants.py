@@ -27,7 +27,7 @@ class ResourceConstants:
         RECONCILE_COMPLETE: str = "ReconcileComplete"
         READY: str = "Ready"
         FAILING: str = "Failing"
-        NETWORK_READY: str = "NetworkReady"
+        NETWORK_CREATED: str = "NetworkCreated"
         ARCHIVED: str = "Archived"
         CANCELED: str = "Canceled"
 
