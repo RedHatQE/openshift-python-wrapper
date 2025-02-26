@@ -154,7 +154,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
                 )
                 _layer2["ipam"] = self.ipam_lifecycle
 
-            if self.ipam:
+            elif self.ipam:
                 _layer2["ipam"] = self.ipam
 
 
