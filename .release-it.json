@@ -40,7 +40,17 @@
       "ignoreRecommendedBump": true,
       "preset": {
         "name": "conventionalcommits"
-      }
+      },
+      "types": [
+        {
+          "type": "[pre-commit.ci]",
+          "section": "CI"
+        },
+        {
+          "type": "chore(deps)",
+          "section": "CI"
+        }
+      ]
     },
     "@release-it/bumper": {
       "in": "pyproject.toml",
