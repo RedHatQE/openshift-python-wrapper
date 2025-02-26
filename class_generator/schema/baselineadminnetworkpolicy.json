@@ -814,7 +814,6 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": "Only one baseline admin network policy with metadata.name=\"default\" can be created in the cluster",

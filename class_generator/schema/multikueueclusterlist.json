@@ -13,7 +13,7 @@
       "description": "List of multikueueclusters. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.x-k8s.kueue.v1alpha1.MultiKueueCluster"
+        "$ref": "_definitions.json#/definitions/io.x-k8s.kueue.v1beta1.MultiKueueCluster"
       }
     },
     "kind": {
@@ -29,9 +29,8 @@
     {
       "group": "kueue.x-k8s.io",
       "kind": "MultiKueueClusterList",
-      "version": "v1alpha1"
+      "version": "v1beta1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

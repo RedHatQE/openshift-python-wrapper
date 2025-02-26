@@ -152,7 +152,7 @@
       "description": "ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name.\n\nThis is an alpha field and requires enabling the DynamicResourceAllocation feature gate.\n\nThis field is immutable.",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodResourceClaim_v2"
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodResourceClaim"
       },
       "x-kubernetes-list-map-keys": [
         "name"
@@ -245,7 +245,7 @@
       "description": "List of volumes that can be mounted by containers belonging to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Volume_v3"
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Volume"
       },
       "x-kubernetes-patch-merge-key": "name",
       "x-kubernetes-patch-strategy": "merge,retainKeys"

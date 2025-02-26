@@ -735,6 +735,9 @@
                 "properties": {
                   "name": {
                     "type": "string"
+                  },
+                  "request": {
+                    "type": "string"
                   }
                 }
               },
@@ -816,6 +819,9 @@
             }
           }
         },
+        "deploymentMode": {
+          "type": "string"
+        },
         "observedGeneration": {
           "type": "integer",
           "format": "int64"
@@ -833,6 +839,5 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

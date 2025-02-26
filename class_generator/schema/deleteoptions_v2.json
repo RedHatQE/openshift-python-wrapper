@@ -87,6 +87,11 @@
       "version": "v1beta1"
     },
     {
+      "group": "apps.openshift.io",
+      "kind": "DeleteOptions",
+      "version": "v1"
+    },
+    {
       "group": "apps",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -100,11 +105,6 @@
       "group": "apps",
       "kind": "DeleteOptions",
       "version": "v1beta2"
-    },
-    {
-      "group": "apps.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
     },
     {
       "group": "authentication.k8s.io",
@@ -194,11 +194,6 @@
     {
       "group": "coordination.k8s.io",
       "kind": "DeleteOptions",
-      "version": "v1alpha1"
-    },
-    {
-      "group": "coordination.k8s.io",
-      "kind": "DeleteOptions",
       "version": "v1beta1"
     },
     {
@@ -252,6 +247,11 @@
       "version": "v1beta1"
     },
     {
+      "group": "oauth.openshift.io",
+      "kind": "DeleteOptions",
+      "version": "v1"
+    },
+    {
       "group": "policy",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -289,7 +289,7 @@
     {
       "group": "resource.k8s.io",
       "kind": "DeleteOptions",
-      "version": "v1alpha3"
+      "version": "v1alpha2"
     },
     {
       "group": "route.openshift.io",
@@ -333,6 +333,11 @@
     },
     {
       "group": "template.openshift.io",
+      "kind": "DeleteOptions",
+      "version": "v1"
+    },
+    {
+      "group": "user.openshift.io",
       "kind": "DeleteOptions",
       "version": "v1"
     }

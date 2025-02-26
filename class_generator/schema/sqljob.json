@@ -31,6 +31,167 @@
               "description": "AntiAffinityEnabled configures PodAntiAffinity so each Pod is scheduled in a different Node, enabling HA.\nMake sure you have at least as many Nodes available as the replicas to not end up with unscheduled Pods.",
               "type": "boolean"
             },
+            "nodeAffinity": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeaffinity-v1-core",
+              "type": "object",
+              "properties": {
+                "preferredDuringSchedulingIgnoredDuringExecution": {
+                  "type": "array",
+                  "items": {
+                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#preferredschedulingterm-v1-core",
+                    "type": "object",
+                    "required": [
+                      "preference",
+                      "weight"
+                    ],
+                    "properties": {
+                      "preference": {
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorterm-v1-core",
+                        "type": "object",
+                        "properties": {
+                          "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "matchFields": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          }
+                        }
+                      },
+                      "weight": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselector-v1-core",
+                  "type": "object",
+                  "required": [
+                    "nodeSelectorTerms"
+                  ],
+                  "properties": {
+                    "nodeSelectorTerms": {
+                      "type": "array",
+                      "items": {
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorterm-v1-core",
+                        "type": "object",
+                        "properties": {
+                          "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "matchFields": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          }
+                        }
+                      },
+                      "x-kubernetes-list-type": "atomic"
+                    }
+                  }
+                }
+              }
+            },
             "podAntiAffinity": {
               "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podantiaffinity-v1-core.",
               "type": "object",
@@ -53,14 +214,13 @@
                         ],
                         "properties": {
                           "labelSelector": {
-                            "description": "A label selector is a label query over a set of resources. The result of matchLabels and\nmatchExpressions are ANDed. An empty label selector matches all objects. A null\nlabel selector matches no objects.",
+                            "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta",
                             "type": "object",
                             "properties": {
                               "matchExpressions": {
-                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
                                 "type": "array",
                                 "items": {
-                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselectorrequirement-v1-meta",
                                   "type": "object",
                                   "required": [
                                     "key",
@@ -68,15 +228,13 @@
                                   ],
                                   "properties": {
                                     "key": {
-                                      "description": "key is the label key that the selector applies to.",
                                       "type": "string"
                                     },
                                     "operator": {
-                                      "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                      "description": "A label selector operator is the set of operators that can be used in a selector requirement.",
                                       "type": "string"
                                     },
                                     "values": {
-                                      "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -88,14 +246,12 @@
                                 "x-kubernetes-list-type": "atomic"
                               },
                               "matchLabels": {
-                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
                                 "type": "object",
                                 "additionalProperties": {
                                   "type": "string"
                                 }
                               }
-                            },
-                            "x-kubernetes-map-type": "atomic"
+                            }
                           },
                           "topologyKey": {
                             "type": "string"
@@ -120,14 +276,13 @@
                     ],
                     "properties": {
                       "labelSelector": {
-                        "description": "A label selector is a label query over a set of resources. The result of matchLabels and\nmatchExpressions are ANDed. An empty label selector matches all objects. A null\nlabel selector matches no objects.",
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta",
                         "type": "object",
                         "properties": {
                           "matchExpressions": {
-                            "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
                             "type": "array",
                             "items": {
-                              "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselectorrequirement-v1-meta",
                               "type": "object",
                               "required": [
                                 "key",
@@ -135,15 +290,13 @@
                               ],
                               "properties": {
                                 "key": {
-                                  "description": "key is the label key that the selector applies to.",
                                   "type": "string"
                                 },
                                 "operator": {
-                                  "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                  "description": "A label selector operator is the set of operators that can be used in a selector requirement.",
                                   "type": "string"
                                 },
                                 "values": {
-                                  "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
                                   "type": "array",
                                   "items": {
                                     "type": "string"
@@ -155,14 +308,12 @@
                             "x-kubernetes-list-type": "atomic"
                           },
                           "matchLabels": {
-                            "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
                             "type": "object",
                             "additionalProperties": {
                               "type": "string"
                             }
                           }
-                        },
-                        "x-kubernetes-map-type": "atomic"
+                        }
                       },
                       "topologyKey": {
                         "type": "string"
@@ -526,6 +677,24 @@
         "timeZone": {
           "description": "TimeZone defines the timezone associated with the cron expression.",
           "type": "string"
+        },
+        "tlsCASecretRef": {
+          "description": "TLSCACertSecretRef is a reference toa CA Secret used to establish trust when executing the SqlJob.\nIf not provided, the CA bundle provided by the referred MariaDB is used.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "tlsClientCertSecretRef": {
+          "description": "TLSClientCertSecretRef is a reference to a Kubernetes TLS Secret used as authentication when executing the SqlJob.\nIf not provided, the client certificate provided by the referred MariaDB is used.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
         },
         "tolerations": {
           "description": "Tolerations to be used in the Pod.",

@@ -22,6 +22,14 @@
         "taskList"
       ],
       "properties": {
+        "allowCodeExecution": {
+          "description": "AllowCodeExecution specifies whether the LMEvalJob can execute remote code. Default is false.",
+          "type": "boolean"
+        },
+        "allowOnline": {
+          "description": "AllowOnly specifies whether the LMEvalJob can directly download remote code, datasets and metrics. Default is false.",
+          "type": "boolean"
+        },
         "batchSize": {
           "description": "Batch size for the evaluation. This is used by the models that run and are loaded\nlocally and not apply for the commercial APIs.",
           "type": "string"
@@ -79,7 +87,7 @@
           "type": "integer"
         },
         "offline": {
-          "description": "Offline specifies settings for running LMEvalJobs in a offline mode",
+          "description": "Offline specifies settings for running LMEvalJobs in an offline mode",
           "type": "object",
           "required": [
             "storage"
@@ -88,12 +96,160 @@
             "storage": {
               "description": "OfflineStorageSpec defines the storage configuration for LMEvalJob's offline mode",
               "type": "object",
-              "required": [
-                "pvcName"
-              ],
               "properties": {
                 "pvcName": {
                   "type": "string"
+                },
+                "s3": {
+                  "type": "object",
+                  "required": [
+                    "accessKeyId",
+                    "bucket",
+                    "endpoint",
+                    "path",
+                    "region",
+                    "secretAccessKey"
+                  ],
+                  "properties": {
+                    "accessKeyId": {
+                      "description": "SecretKeySelector selects a key of a Secret.",
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The key of the secret to select from.  Must be a valid secret key.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        },
+                        "optional": {
+                          "description": "Specify whether the Secret or its key must be defined",
+                          "type": "boolean"
+                        }
+                      },
+                      "x-kubernetes-map-type": "atomic"
+                    },
+                    "bucket": {
+                      "description": "SecretKeySelector selects a key of a Secret.",
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The key of the secret to select from.  Must be a valid secret key.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        },
+                        "optional": {
+                          "description": "Specify whether the Secret or its key must be defined",
+                          "type": "boolean"
+                        }
+                      },
+                      "x-kubernetes-map-type": "atomic"
+                    },
+                    "caBundle": {
+                      "description": "SecretKeySelector selects a key of a Secret.",
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The key of the secret to select from.  Must be a valid secret key.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        },
+                        "optional": {
+                          "description": "Specify whether the Secret or its key must be defined",
+                          "type": "boolean"
+                        }
+                      },
+                      "x-kubernetes-map-type": "atomic"
+                    },
+                    "endpoint": {
+                      "description": "SecretKeySelector selects a key of a Secret.",
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The key of the secret to select from.  Must be a valid secret key.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        },
+                        "optional": {
+                          "description": "Specify whether the Secret or its key must be defined",
+                          "type": "boolean"
+                        }
+                      },
+                      "x-kubernetes-map-type": "atomic"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "region": {
+                      "description": "SecretKeySelector selects a key of a Secret.",
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The key of the secret to select from.  Must be a valid secret key.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        },
+                        "optional": {
+                          "description": "Specify whether the Secret or its key must be defined",
+                          "type": "boolean"
+                        }
+                      },
+                      "x-kubernetes-map-type": "atomic"
+                    },
+                    "secretAccessKey": {
+                      "description": "SecretKeySelector selects a key of a Secret.",
+                      "type": "object",
+                      "required": [
+                        "key"
+                      ],
+                      "properties": {
+                        "key": {
+                          "description": "The key of the secret to select from.  Must be a valid secret key.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        },
+                        "optional": {
+                          "description": "Specify whether the Secret or its key must be defined",
+                          "type": "boolean"
+                        }
+                      },
+                      "x-kubernetes-map-type": "atomic"
+                    },
+                    "verifySSL": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -3730,6 +3886,52 @@
           "description": "Evaluation task list",
           "type": "object",
           "properties": {
+            "custom": {
+              "description": "Custom Unitxt artifacts that can be used in a TaskRecipe",
+              "type": "object",
+              "properties": {
+                "systemPrompts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "Name of the custom artifact",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Value of the custom artifact. It could be a JSON string or plain text\ndepending on the artifact type",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "templates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "Name of the custom artifact",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Value of the custom artifact. It could be a JSON string or plain text\ndepending on the artifact type",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "taskNames": {
               "description": "TaskNames from lm-eval's task list",
               "type": "array",
@@ -3744,8 +3946,7 @@
                 "description": "Use a task recipe to form a custom task. It maps to the Unitxt Recipe\nFind details of the Unitxt Recipe here:\nhttps://www.unitxt.ai/en/latest/unitxt.standard.html#unitxt.standard.StandardRecipe",
                 "type": "object",
                 "required": [
-                  "card",
-                  "template"
+                  "card"
                 ],
                 "properties": {
                   "card": {
@@ -3785,13 +3986,37 @@
                     "description": "Number of fewshot",
                     "type": "integer"
                   },
+                  "systemPrompt": {
+                    "description": "The Unitxt System Prompt",
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "Unitxt System Prompt id",
+                        "type": "string"
+                      },
+                      "ref": {
+                        "description": "The name of the custom systemPrompt in the custom field. Its value is a custom system prompt string",
+                        "type": "string"
+                      }
+                    }
+                  },
                   "task": {
                     "description": "The Unitxt Task",
                     "type": "string"
                   },
                   "template": {
                     "description": "The Unitxt template",
-                    "type": "string"
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "Unitxt template ID",
+                        "type": "string"
+                      },
+                      "ref": {
+                        "description": "The name of the custom template in the custom field. Its value is a JSON string\nfor a custom Unitxt template. Use the documentation here: https://www.unitxt.ai/en/latest/docs/adding_template.html\nto compose a custom template, store it as a JSON file by calling the\nadd_to_catalog API: https://www.unitxt.ai/en/latest/docs/saving_and_loading_from_catalog.html#adding-assets-to-the-catalog,\nand use the JSON content as the value here.",
+                        "type": "string"
+                      }
+                    }
                   }
                 }
               }
@@ -3858,6 +4083,5 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

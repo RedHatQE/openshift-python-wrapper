@@ -1,5 +1,5 @@
 {
-  "description": "ClusterOperator is the Custom Resource object which holds the current state\nof an operator. This object is used by operators to convey their state to\nthe rest of the cluster.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "ClusterOperator is the Custom Resource object which holds the current state of an operator. This object is used by operators to convey their state to the rest of the cluster. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "spec"
@@ -22,14 +22,14 @@
       "type": "object"
     },
     "status": {
-      "description": "status holds the information about the state of an operator.  It is consistent with status information across\nthe Kubernetes ecosystem.",
+      "description": "status holds the information about the state of an operator.  It is consistent with status information across the Kubernetes ecosystem.",
       "type": "object",
       "properties": {
         "conditions": {
           "description": "conditions describes the state of the operator's managed and monitored components.",
           "type": "array",
           "items": {
-            "description": "ClusterOperatorStatusCondition represents the state of the operator's\nmanaged and monitored components.",
+            "description": "ClusterOperatorStatusCondition represents the state of the operator's managed and monitored components.",
             "type": "object",
             "required": [
               "lastTransitionTime",
@@ -43,7 +43,7 @@
                 "format": "date-time"
               },
               "message": {
-                "description": "message provides additional information about the current condition.\nThis is only to be consumed by humans.  It may contain Line Feed\ncharacters (U+000A), which should be rendered as new lines.",
+                "description": "message provides additional information about the current condition. This is only to be consumed by humans.  It may contain Line Feed characters (U+000A), which should be rendered as new lines.",
                 "type": "string"
               },
               "reason": {
@@ -62,11 +62,11 @@
           }
         },
         "extension": {
-          "description": "extension contains any additional status information specific to the\noperator which owns this status object.",
+          "description": "extension contains any additional status information specific to the operator which owns this status object.",
           "x-kubernetes-preserve-unknown-fields": true
         },
         "relatedObjects": {
-          "description": "relatedObjects is a list of objects that are \"interesting\" or related to this operator.  Common uses are:\n1. the detailed resource driving the operator\n2. operator namespaces\n3. operand namespaces",
+          "description": "relatedObjects is a list of objects that are \"interesting\" or related to this operator.  Common uses are: 1. the detailed resource driving the operator 2. operator namespaces 3. operand namespaces",
           "type": "array",
           "items": {
             "description": "ObjectReference contains enough information to let you inspect or modify the referred object.",
@@ -97,7 +97,7 @@
           }
         },
         "versions": {
-          "description": "versions is a slice of operator and operand version tuples.  Operators which manage multiple operands will have multiple\noperand entries in the array.  Available operators must report the version of the operator itself with the name \"operator\".\nAn operator reports a new \"operator\" version when it has rolled out the new version to all of its operands.",
+          "description": "versions is a slice of operator and operand version tuples.  Operators which manage multiple operands will have multiple operand entries in the array.  Available operators must report the version of the operator itself with the name \"operator\". An operator reports a new \"operator\" version when it has rolled out the new version to all of its operands.",
           "type": "array",
           "items": {
             "type": "object",
@@ -111,7 +111,7 @@
                 "type": "string"
               },
               "version": {
-                "description": "version indicates which version of a particular operand is currently being managed.  It must always match the Available\noperand.  If 1.0.0 is Available, then this must indicate 1.0.0 even if the operator is trying to rollout\n1.1.0",
+                "description": "version indicates which version of a particular operand is currently being managed.  It must always match the Available operand.  If 1.0.0 is Available, then this must indicate 1.0.0 even if the operator is trying to rollout 1.1.0",
                 "type": "string"
               }
             }
@@ -127,6 +127,5 @@
       "version": "v1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

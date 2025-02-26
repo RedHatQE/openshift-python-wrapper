@@ -1,5 +1,5 @@
 {
-  "description": "ContainerRuntimeConfig describes a customized Container Runtime configuration.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "ContainerRuntimeConfig describes a customized Container Runtime configuration. \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "spec"
@@ -33,16 +33,16 @@
               "type": "string"
             },
             "logLevel": {
-              "description": "logLevel specifies the verbosity of the logs based on the level it is set to.\nOptions are fatal, panic, error, warn, info, and debug.",
+              "description": "logLevel specifies the verbosity of the logs based on the level it is set to. Options are fatal, panic, error, warn, info, and debug.",
               "type": "string"
             },
             "logSizeMax": {
-              "description": "logSizeMax specifies the Maximum size allowed for the container log file.\nNegative numbers indicate that no size limit is imposed.\nIf it is positive, it must be >= 8192 to match/exceed conmon's read buffer.",
+              "description": "logSizeMax specifies the Maximum size allowed for the container log file. Negative numbers indicate that no size limit is imposed. If it is positive, it must be >= 8192 to match/exceed conmon's read buffer.",
               "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
               "x-kubernetes-int-or-string": true
             },
             "overlaySize": {
-              "description": "overlaySize specifies the maximum size of a container image.\nThis flag can be used to set quota on the size of container images. (default: 10GB)",
+              "description": "overlaySize specifies the maximum size of a container image. This flag can be used to set quota on the size of container images. (default: 10GB)",
               "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
               "x-kubernetes-int-or-string": true
             },
@@ -54,14 +54,14 @@
           }
         },
         "machineConfigPoolSelector": {
-          "description": "MachineConfigPoolSelector selects which pools the ContainerRuntimeConfig shoud apply to.\nA nil selector will result in no pools being selected.",
+          "description": "MachineConfigPoolSelector selects which pools the ContainerRuntimeConfig shoud apply to. A nil selector will result in no pools being selected.",
           "type": "object",
           "properties": {
             "matchExpressions": {
               "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
               "type": "array",
               "items": {
-                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
                 "type": "object",
                 "required": [
                   "key",
@@ -73,11 +73,11 @@
                     "type": "string"
                   },
                   "operator": {
-                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
                     "type": "string"
                   },
                   "values": {
-                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -89,7 +89,7 @@
               "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
-              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
               "type": "object",
               "additionalProperties": {
                 "type": "string"
@@ -116,7 +116,7 @@
                 "format": "date-time"
               },
               "message": {
-                "description": "message provides additional information about the current condition.\nThis is only to be consumed by humans.",
+                "description": "message provides additional information about the current condition. This is only to be consumed by humans.",
                 "type": "string"
               },
               "reason": {
@@ -150,6 +150,5 @@
       "version": "v1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

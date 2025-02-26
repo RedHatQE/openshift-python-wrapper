@@ -38,11 +38,11 @@
           ],
           "properties": {
             "balanceIsolated": {
-              "description": "BalanceIsolated toggles whether or not the Isolated CPU set is eligible for load balancing work loads.\nWhen this option is set to \"false\", the Isolated CPU set will be static, meaning workloads have to\nexplicitly assign each thread to a specific cpu in order to work across multiple CPUs.\nSetting this to \"true\" allows workloads to be balanced across CPUs.\nSetting this to \"false\" offers the most predictable performance for guaranteed workloads, but it\noffloads the complexity of cpu load balancing to the application.\nDefaults to \"true\"",
+              "description": "BalanceIsolated toggles whether or not the Isolated CPU set is eligible for load balancing work loads. When this option is set to \"false\", the Isolated CPU set will be static, meaning workloads have to explicitly assign each thread to a specific cpu in order to work across multiple CPUs. Setting this to \"true\" allows workloads to be balanced across CPUs. Setting this to \"false\" offers the most predictable performance for guaranteed workloads, but it offloads the complexity of cpu load balancing to the application. Defaults to \"true\"",
               "type": "boolean"
             },
             "isolated": {
-              "description": "Isolated defines a set of CPUs that will be used to give to application threads the most execution time possible,\nwhich means removing as many extraneous tasks off a CPU as possible.\nIt is important to notice the CPU manager can choose any CPU to run the workload\nexcept the reserved CPUs. In order to guarantee that your workload will run on the isolated CPU:\n  1. The union of reserved CPUs and isolated CPUs should include all online CPUs\n  2. The isolated CPUs field should be the complementary to reserved CPUs field",
+              "description": "Isolated defines a set of CPUs that will be used to give to application threads the most execution time possible, which means removing as many extraneous tasks off a CPU as possible. It is important to notice the CPU manager can choose any CPU to run the workload except the reserved CPUs. In order to guarantee that your workload will run on the isolated CPU:   1. The union of reserved CPUs and isolated CPUs should include all online CPUs   2. The isolated CPUs field should be the complementary to reserved CPUs field",
               "type": "string"
             },
             "offlined": {
@@ -54,13 +54,13 @@
               "type": "string"
             },
             "shared": {
-              "description": "Shared defines a set of CPUs that will be shared among guaranteed workloads\nthat needs additional cpus which are not exclusive,\nalongside the isolated, exclusive resources that are being used already by those workloads.",
+              "description": "Shared defines a set of CPUs that will be shared among guaranteed workloads that needs additional cpus which are not exclusive, alongside the isolated, exclusive resources that are being used already by those workloads.",
               "type": "string"
             }
           }
         },
         "globallyDisableIrqLoadBalancing": {
-          "description": "GloballyDisableIrqLoadBalancing toggles whether IRQ load balancing will be disabled for the Isolated CPU set.\nWhen the option is set to \"true\" it disables IRQs load balancing for the Isolated CPU set.\nSetting the option to \"false\" allows the IRQs to be balanced across all CPUs, however the IRQs load balancing\ncan be disabled per pod CPUs when using irq-load-balancing.crio.io/cpu-quota.crio.io annotations.\nDefaults to \"false\"",
+          "description": "GloballyDisableIrqLoadBalancing toggles whether IRQ load balancing will be disabled for the Isolated CPU set. When the option is set to \"true\" it disables IRQs load balancing for the Isolated CPU set. Setting the option to \"false\" allows the IRQs to be balanced across all CPUs, however the IRQs load balancing can be disabled per pod CPUs when using irq-load-balancing.crio.io/cpu-quota.crio.io annotations. Defaults to \"false\"",
           "type": "boolean"
         },
         "hardwareTuning": {
@@ -78,7 +78,7 @@
           }
         },
         "hugepages": {
-          "description": "HugePages defines a set of huge pages related parameters.\nIt is possible to set huge pages with multiple size values at the same time.\nFor example, hugepages can be set with 1G and 2M, both values will be set on the node by the Performance Profile Controller.\nIt is important to notice that setting hugepages default size to 1G will remove all 2M related\nfolders from the node and it will be impossible to configure 2M hugepages under the node.",
+          "description": "HugePages defines a set of huge pages related parameters. It is possible to set huge pages with multiple size values at the same time. For example, hugepages can be set with 1G and 2M, both values will be set on the node by the Performance Profile Controller. It is important to notice that setting hugepages default size to 1G will remove all 2M related folders from the node and it will be impossible to configure 2M hugepages under the node.",
           "type": "object",
           "properties": {
             "defaultHugepagesSize": {
@@ -98,7 +98,7 @@
                     "format": "int32"
                   },
                   "node": {
-                    "description": "Node defines the NUMA node where hugepages will be allocated,\nif not specified, pages will be allocated equally between NUMA nodes",
+                    "description": "Node defines the NUMA node where hugepages will be allocated, if not specified, pages will be allocated equally between NUMA nodes",
                     "type": "integer",
                     "format": "int32"
                   },
@@ -112,14 +112,14 @@
           }
         },
         "machineConfigLabel": {
-          "description": "MachineConfigLabel defines the label to add to the MachineConfigs the operator creates. It has to be\nused in the MachineConfigSelector of the MachineConfigPool which targets this performance profile.\nDefaults to \"machineconfiguration.openshift.io/role=<same role as in NodeSelector label key>\"",
+          "description": "MachineConfigLabel defines the label to add to the MachineConfigs the operator creates. It has to be used in the MachineConfigSelector of the MachineConfigPool which targets this performance profile. Defaults to \"machineconfiguration.openshift.io/role=<same role as in NodeSelector label key>\"",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "machineConfigPoolSelector": {
-          "description": "MachineConfigPoolSelector defines the MachineConfigPool label to use in the MachineConfigPoolSelector\nof resources like KubeletConfigs created by the operator.\nDefaults to \"machineconfiguration.openshift.io/role=<same role as in NodeSelector label key>\"",
+          "description": "MachineConfigPoolSelector defines the MachineConfigPool label to use in the MachineConfigPoolSelector of resources like KubeletConfigs created by the operator. Defaults to \"machineconfiguration.openshift.io/role=<same role as in NodeSelector label key>\"",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -130,10 +130,10 @@
           "type": "object",
           "properties": {
             "devices": {
-              "description": "Devices contains a list of network device representations that will be\nset with a netqueue count equal to CPU.Reserved .\nIf no devices are specified then the default is all devices.",
+              "description": "Devices contains a list of network device representations that will be set with a netqueue count equal to CPU.Reserved . If no devices are specified then the default is all devices.",
               "type": "array",
               "items": {
-                "description": "Device defines a way to represent a network device in several options:\ndevice name, vendor ID, model ID, PCI path and MAC address",
+                "description": "Device defines a way to represent a network device in several options: device name, vendor ID, model ID, PCI path and MAC address",
                 "type": "object",
                 "properties": {
                   "deviceID": {
@@ -158,7 +158,7 @@
           }
         },
         "nodeSelector": {
-          "description": "NodeSelector defines the Node label to use in the NodeSelectors of resources like Tuned created by the operator.\nIt most likely should, but does not have to match the node label in the NodeSelector of the MachineConfigPool\nwhich targets this performance profile.\nIn the case when machineConfigLabels or machineConfigPoolSelector are not set, we are expecting a certain NodeSelector format\n<domain>/<role>: \"\" in order to be able to calculate the default values for the former mentioned fields.",
+          "description": "NodeSelector defines the Node label to use in the NodeSelectors of resources like Tuned created by the operator. It most likely should, but does not have to match the node label in the NodeSelector of the MachineConfigPool which targets this performance profile. In the case when machineConfigLabels or machineConfigPoolSelector are not set, we are expecting a certain NodeSelector format <domain>/<role>: \"\" in order to be able to calculate the default values for the former mentioned fields.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -169,7 +169,7 @@
           "type": "object",
           "properties": {
             "topologyPolicy": {
-              "description": "Name of the policy applied when TopologyManager is enabled\nOperator defaults to \"best-effort\"",
+              "description": "Name of the policy applied when TopologyManager is enabled Operator defaults to \"best-effort\"",
               "type": "string"
             }
           }
@@ -185,19 +185,19 @@
           }
         },
         "workloadHints": {
-          "description": "WorkloadHints defines hints for different types of workloads. It will allow defining exact set of tuned and\nkernel arguments that should be applied on top of the node.",
+          "description": "WorkloadHints defines hints for different types of workloads. It will allow defining exact set of tuned and kernel arguments that should be applied on top of the node.",
           "type": "object",
           "properties": {
             "highPowerConsumption": {
-              "description": "HighPowerConsumption defines if the node should be configured in high power consumption mode.\nThe flag will affect the power consumption but will improve the CPUs latency. Defaults to false.",
+              "description": "HighPowerConsumption defines if the node should be configured in high power consumption mode. The flag will affect the power consumption but will improve the CPUs latency. Defaults to false.",
               "type": "boolean"
             },
             "mixedCpus": {
-              "description": "MixedCpus enables the mixed-cpu-node-plugin on the node.\nDefaults to false.",
+              "description": "MixedCpus enables the mixed-cpu-node-plugin on the node. Defaults to false.",
               "type": "boolean"
             },
             "perPodPowerManagement": {
-              "description": "PerPodPowerManagement defines if the node should be configured in per pod power management.\nPerPodPowerManagement and HighPowerConsumption hints can not be enabled together. Defaults to false.",
+              "description": "PerPodPowerManagement defines if the node should be configured in per pod power management. PerPodPowerManagement and HighPowerConsumption hints can not be enabled together. Defaults to false.",
               "type": "boolean"
             },
             "realTime": {
@@ -216,7 +216,7 @@
           "description": "Conditions represents the latest available observations of current state.",
           "type": "array",
           "items": {
-            "description": "Condition represents the state of the operator's\nreconciliation functionality.",
+            "description": "Condition represents the state of the operator's reconciliation functionality.",
             "type": "object",
             "required": [
               "status",
@@ -265,6 +265,5 @@
       "version": "v2"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

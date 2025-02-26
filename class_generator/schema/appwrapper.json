@@ -162,10 +162,10 @@
                 "type": "string"
               },
               "conditions": {
-                "description": "Conditions hold the latest available observations of the Component's current state.\n\n\nThe type of the condition could be:\n\n\n- ResourcesDeployed: The component is deployed on the cluster",
+                "description": "Conditions hold the latest available observations of the Component's current state.\n\nThe type of the condition could be:\n\n- ResourcesDeployed: The component is deployed on the cluster",
                 "type": "array",
                 "items": {
-                  "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+                  "description": "Condition contains details for one aspect of the current state of this API Resource.",
                   "type": "object",
                   "required": [
                     "lastTransitionTime",
@@ -208,7 +208,7 @@
                       ]
                     },
                     "type": {
-                      "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                      "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
                       "type": "string",
                       "maxLength": 316,
                       "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
@@ -254,10 +254,10 @@
           }
         },
         "conditions": {
-          "description": "Conditions hold the latest available observations of the AppWrapper current state.\n\n\nThe type of the condition could be:\n\n\n- QuotaReserved: The AppWrapper was admitted by Kueue and has quota allocated to it\n- ResourcesDeployed: The contained resources are deployed (or being deployed) on the cluster\n- PodsReady: All pods of the contained resources are in the Ready or Succeeded state\n- Unhealthy: One or more of the contained resources is unhealthy\n- DeletingResources: The contained resources are in the process of being deleted from the cluster",
+          "description": "Conditions hold the latest available observations of the AppWrapper current state.\n\nThe type of the condition could be:\n\n- QuotaReserved: The AppWrapper was admitted by Kueue and has quota allocated to it\n- ResourcesDeployed: The contained resources are deployed (or being deployed) on the cluster\n- PodsReady: All pods of the contained resources are in the Ready or Succeeded state\n- Unhealthy: One or more of the contained resources is unhealthy\n- DeletingResources: The contained resources are in the process of being deleted from the cluster",
           "type": "array",
           "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
             "type": "object",
             "required": [
               "lastTransitionTime",
@@ -300,7 +300,7 @@
                 ]
               },
               "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
                 "type": "string",
                 "maxLength": 316,
                 "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
@@ -331,6 +331,5 @@
       "version": "v1beta2"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

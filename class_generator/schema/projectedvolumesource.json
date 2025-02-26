@@ -8,7 +8,7 @@
       "format": "int32"
     },
     "sources": {
-      "description": "sources is the list of volume projections. Each entry in this list handles one source.",
+      "description": "sources is the list of volume projections",
       "type": "array",
       "items": {
         "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeProjection"

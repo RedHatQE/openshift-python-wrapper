@@ -11,7 +11,7 @@
       "description": "sources is the list of volume projections",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeProjection_v2"
+        "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.VolumeProjection"
       }
     }
   },

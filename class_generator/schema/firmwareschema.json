@@ -71,7 +71,7 @@
                 "type": "boolean"
               },
               "unique": {
-                "description": "Whether or not this setting's value is unique to this node, e.g.\na serial number.",
+                "description": "Whether or not this setting's value is unique to this node, e.g. a serial number.",
                 "type": "boolean"
               },
               "upper_bound": {
@@ -91,6 +91,5 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

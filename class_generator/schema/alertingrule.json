@@ -1,5 +1,5 @@
 {
-  "description": "AlertingRule represents a set of user-defined Prometheus rule groups containing\nalerting rules.  This resource is the supported method for cluster admins to\ncreate alerts based on metrics recorded by the platform monitoring stack in\nOpenShift, i.e. the Prometheus instance deployed to the openshift-monitoring\nnamespace.  You might use this to create custom alerting rules not shipped with\nOpenShift based on metrics from components such as the node_exporter, which\nprovides machine-level metrics such as CPU usage, or kube-state-metrics, which\nprovides metrics on Kubernetes usage.\n\nThe API is mostly compatible with the upstream PrometheusRule type from the\nprometheus-operator.  The primary difference being that recording rules are not\nallowed here -- only alerting rules.  For each AlertingRule resource created, a\ncorresponding PrometheusRule will be created in the openshift-monitoring\nnamespace.  OpenShift requires admins to use the AlertingRule resource rather\nthan the upstream type in order to allow better OpenShift specific defaulting\nand validation, while not modifying the upstream APIs directly.\n\nYou can find upstream API documentation for PrometheusRule resources here:\n\nhttps://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "AlertingRule represents a set of user-defined Prometheus rule groups containing alerting rules.  This resource is the supported method for cluster admins to create alerts based on metrics recorded by the platform monitoring stack in OpenShift, i.e. the Prometheus instance deployed to the openshift-monitoring namespace.  You might use this to create custom alerting rules not shipped with OpenShift based on metrics from components such as the node_exporter, which provides machine-level metrics such as CPU usage, or kube-state-metrics, which provides metrics on Kubernetes usage. \n The API is mostly compatible with the upstream PrometheusRule type from the prometheus-operator.  The primary difference being that recording rules are not allowed here -- only alerting rules.  For each AlertingRule resource created, a corresponding PrometheusRule will be created in the openshift-monitoring namespace.  OpenShift requires admins to use the AlertingRule resource rather than the upstream type in order to allow better OpenShift specific defaulting and validation, while not modifying the upstream APIs directly. \n You can find upstream API documentation for PrometheusRule resources here: \n https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "required": [
     "spec"
@@ -25,7 +25,7 @@
       ],
       "properties": {
         "groups": {
-          "description": "groups is a list of grouped alerting rules.  Rule groups are the unit at\nwhich Prometheus parallelizes rule processing.  All rules in a single group\nshare a configured evaluation interval.  All rules in the group will be\nprocessed together on this interval, sequentially, and all rules will be\nprocessed.\n\nIt's common to group related alerting rules into a single AlertingRule\nresources, and within that resource, closely related alerts, or simply\nalerts with the same interval, into individual groups.  You are also free\nto create AlertingRule resources with only a single rule group, but be\naware that this can have a performance impact on Prometheus if the group is\nextremely large or has very complex query expressions to evaluate.\nSpreading very complex rules across multiple groups to allow them to be\nprocessed in parallel is also a common use-case.",
+          "description": "groups is a list of grouped alerting rules.  Rule groups are the unit at which Prometheus parallelizes rule processing.  All rules in a single group share a configured evaluation interval.  All rules in the group will be processed together on this interval, sequentially, and all rules will be processed. \n It's common to group related alerting rules into a single AlertingRule resources, and within that resource, closely related alerts, or simply alerts with the same interval, into individual groups.  You are also free to create AlertingRule resources with only a single rule group, but be aware that this can have a performance impact on Prometheus if the group is extremely large or has very complex query expressions to evaluate. Spreading very complex rules across multiple groups to allow them to be processed in parallel is also a common use-case.",
           "type": "array",
           "minItems": 1,
           "items": {
@@ -37,7 +37,7 @@
             ],
             "properties": {
               "interval": {
-                "description": "interval is how often rules in the group are evaluated.  If not specified,\nit defaults to the global.evaluation_interval configured in Prometheus,\nwhich itself defaults to 30 seconds.  You can check if this value has been\nmodified from the default on your cluster by inspecting the platform\nPrometheus configuration:\nThe relevant field in that resource is: spec.evaluationInterval",
+                "description": "interval is how often rules in the group are evaluated.  If not specified, it defaults to the global.evaluation_interval configured in Prometheus, which itself defaults to 30 seconds.  You can check if this value has been modified from the default on your cluster by inspecting the platform Prometheus configuration: The relevant field in that resource is: spec.evaluationInterval",
                 "type": "string",
                 "maxLength": 2048,
                 "pattern": "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
@@ -49,11 +49,11 @@
                 "minLength": 1
               },
               "rules": {
-                "description": "rules is a list of sequentially evaluated alerting rules.  Prometheus may\nprocess rule groups in parallel, but rules within a single group are always\nprocessed sequentially, and all rules are processed.",
+                "description": "rules is a list of sequentially evaluated alerting rules.  Prometheus may process rule groups in parallel, but rules within a single group are always processed sequentially, and all rules are processed.",
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                  "description": "Rule describes an alerting rule.\nSee Prometheus documentation:\n- https://www.prometheus.io/docs/prometheus/latest/configuration/alerting_rules",
+                  "description": "Rule describes an alerting rule. See Prometheus documentation: - https://www.prometheus.io/docs/prometheus/latest/configuration/alerting_rules",
                   "type": "object",
                   "required": [
                     "alert",
@@ -61,30 +61,30 @@
                   ],
                   "properties": {
                     "alert": {
-                      "description": "alert is the name of the alert. Must be a valid label value, i.e. may\ncontain any Unicode character.",
+                      "description": "alert is the name of the alert. Must be a valid label value, i.e. may contain any Unicode character.",
                       "type": "string",
                       "maxLength": 2048,
                       "minLength": 1
                     },
                     "annotations": {
-                      "description": "annotations to add to each alert.  These are values that can be used to\nstore longer additional information that you won't query on, such as alert\ndescriptions or runbook links.",
+                      "description": "annotations to add to each alert.  These are values that can be used to store longer additional information that you won't query on, such as alert descriptions or runbook links.",
                       "type": "object",
                       "additionalProperties": {
                         "type": "string"
                       }
                     },
                     "expr": {
-                      "description": "expr is the PromQL expression to evaluate. Every evaluation cycle this is\nevaluated at the current time, and all resultant time series become pending\nor firing alerts.  This is most often a string representing a PromQL\nexpression, e.g.: mapi_current_pending_csr > mapi_max_pending_csr\nIn rare cases this could be a simple integer, e.g. a simple \"1\" if the\nintent is to create an alert that is always firing.  This is sometimes used\nto create an always-firing \"Watchdog\" alert in order to ensure the alerting\npipeline is functional.",
+                      "description": "expr is the PromQL expression to evaluate. Every evaluation cycle this is evaluated at the current time, and all resultant time series become pending or firing alerts.  This is most often a string representing a PromQL expression, e.g.: mapi_current_pending_csr > mapi_max_pending_csr In rare cases this could be a simple integer, e.g. a simple \"1\" if the intent is to create an alert that is always firing.  This is sometimes used to create an always-firing \"Watchdog\" alert in order to ensure the alerting pipeline is functional.",
                       "x-kubernetes-int-or-string": true
                     },
                     "for": {
-                      "description": "for is the time period after which alerts are considered firing after first\nreturning results.  Alerts which have not yet fired for long enough are\nconsidered pending.",
+                      "description": "for is the time period after which alerts are considered firing after first returning results.  Alerts which have not yet fired for long enough are considered pending.",
                       "type": "string",
                       "maxLength": 2048,
                       "pattern": "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     },
                     "labels": {
-                      "description": "labels to add or overwrite for each alert.  The results of the PromQL\nexpression for the alert will result in an existing set of labels for the\nalert, after evaluating the expression, for any label specified here with\nthe same name as a label in that set, the label here wins and overwrites\nthe previous value.  These should typically be short identifying values\nthat may be useful to query against.  A common example is the alert\nseverity, where one sets `severity: warning` under the `labels` key:",
+                      "description": "labels to add or overwrite for each alert.  The results of the PromQL expression for the alert will result in an existing set of labels for the alert, after evaluating the expression, for any label specified here with the same name as a label in that set, the label here wins and overwrites the previous value.  These should typically be short identifying values that may be useful to query against.  A common example is the alert severity, where one sets `severity: warning` under the `labels` key:",
                       "type": "object",
                       "additionalProperties": {
                         "type": "string"
@@ -112,7 +112,7 @@
           "format": "int64"
         },
         "prometheusRule": {
-          "description": "prometheusRule is the generated PrometheusRule for this AlertingRule.  Each\nAlertingRule instance results in a generated PrometheusRule object in the\nsame namespace, which is always the openshift-monitoring namespace.",
+          "description": "prometheusRule is the generated PrometheusRule for this AlertingRule.  Each AlertingRule instance results in a generated PrometheusRule object in the same namespace, which is always the openshift-monitoring namespace.",
           "type": "object",
           "required": [
             "name"
@@ -136,6 +136,5 @@
       "version": "v1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

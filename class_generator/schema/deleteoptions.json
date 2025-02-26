@@ -180,11 +180,6 @@
     {
       "group": "coordination.k8s.io",
       "kind": "DeleteOptions",
-      "version": "v1alpha1"
-    },
-    {
-      "group": "coordination.k8s.io",
-      "kind": "DeleteOptions",
       "version": "v1beta1"
     },
     {
@@ -273,11 +268,6 @@
       "version": "v1beta1"
     },
     {
-      "group": "oauth.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
-    },
-    {
       "group": "policy",
       "kind": "DeleteOptions",
       "version": "v1"
@@ -305,7 +295,7 @@
     {
       "group": "resource.k8s.io",
       "kind": "DeleteOptions",
-      "version": "v1alpha3"
+      "version": "v1alpha2"
     },
     {
       "group": "scheduling.k8s.io",
@@ -341,11 +331,6 @@
       "group": "storagemigration.k8s.io",
       "kind": "DeleteOptions",
       "version": "v1alpha1"
-    },
-    {
-      "group": "user.openshift.io",
-      "kind": "DeleteOptions",
-      "version": "v1"
     }
   ],
   "$schema": "http://json-schema.org/schema#"

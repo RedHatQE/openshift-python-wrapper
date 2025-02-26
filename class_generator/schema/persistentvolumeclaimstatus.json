@@ -22,10 +22,10 @@
       "additionalProperties": {
         "type": "string",
         "enum": [
+          "ControllerResizeFailed",
           "ControllerResizeInProgress",
-          "ControllerResizeInfeasible",
+          "NodeResizeFailed",
           "NodeResizeInProgress",
-          "NodeResizeInfeasible",
           "NodeResizePending"
         ]
       },
@@ -59,11 +59,11 @@
       "x-kubernetes-patch-strategy": "merge"
     },
     "currentVolumeAttributesClassName": {
-      "description": "currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is a beta field and requires enabling VolumeAttributesClass feature (off by default).",
+      "description": "currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is an alpha field and requires enabling VolumeAttributesClass feature.",
       "type": "string"
     },
     "modifyVolumeStatus": {
-      "description": "ModifyVolumeStatus represents the status object of ControllerModifyVolume operation. When this is unset, there is no ModifyVolume operation being attempted. This is a beta field and requires enabling VolumeAttributesClass feature (off by default).",
+      "description": "ModifyVolumeStatus represents the status object of ControllerModifyVolume operation. When this is unset, there is no ModifyVolume operation being attempted. This is an alpha field and requires enabling VolumeAttributesClass feature.",
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ModifyVolumeStatus"
     },
     "phase": {

@@ -22,7 +22,7 @@
       ],
       "properties": {
         "managedResources": {
-          "description": "managedResources contains the list of resources managed by the autoscaling.\n\n\nIf empty, all resources are considered managed.\n\n\nIf not empty, the ProvisioningRequest will contain only the podsets that are\nrequesting at least one of them.\n\n\nIf none of the workloads podsets is requesting at least a managed resource,\nthe workload is considered ready.",
+          "description": "managedResources contains the list of resources managed by the autoscaling.\n\nIf empty, all resources are considered managed.\n\nIf not empty, the ProvisioningRequest will contain only the podsets that are\nrequesting at least one of them.\n\nIf none of the workloads podsets is requesting at least a managed resource,\nthe workload is considered ready.",
           "type": "array",
           "maxItems": 100,
           "items": {
@@ -46,6 +46,27 @@
           "type": "string",
           "maxLength": 253,
           "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+        },
+        "retryStrategy": {
+          "description": "retryStrategy defines strategy for retrying ProvisioningRequest.\nIf null, then the default configuration is applied with the following parameter values:\nbackoffLimitCount:  3\nbackoffBaseSeconds: 60 - 1 min\nbackoffMaxSeconds:  1800 - 30 mins\n\nTo switch off retry mechanism\nset retryStrategy.backoffLimitCount to 0.",
+          "type": "object",
+          "properties": {
+            "backoffBaseSeconds": {
+              "description": "BackoffBaseSeconds defines the base for the exponential backoff for\nre-queuing an evicted workload.\n\nDefaults to 60.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "backoffLimitCount": {
+              "description": "BackoffLimitCount defines the maximum number of re-queuing retries.\nOnce the number is reached, the workload is deactivated (`.spec.activate`=`false`).\n\nEvery backoff duration is about \"b*2^(n-1)+Rand\" where:\n- \"b\" represents the base set by \"BackoffBaseSeconds\" parameter,\n- \"n\" represents the \"workloadStatus.requeueState.count\",\n- \"Rand\" represents the random jitter.\nDuring this time, the workload is taken as an inadmissible and\nother workloads will have a chance to be admitted.\nBy default, the consecutive requeue delays are around: (60s, 120s, 240s, ...).\n\nDefaults to 3.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "backoffMaxSeconds": {
+              "description": "BackoffMaxSeconds defines the maximum backoff time to re-queue an evicted workload.\n\nDefaults to 1800.",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         }
       }
     }
@@ -57,6 +78,5 @@
       "version": "v1beta1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

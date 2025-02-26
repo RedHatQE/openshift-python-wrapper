@@ -1,5 +1,5 @@
 {
-  "description": "MachineConfig defines the configuration for a machine\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
+  "description": "MachineConfig defines the configuration for a machine \n Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -19,7 +19,7 @@
       "type": "object",
       "properties": {
         "baseOSExtensionsContainerImage": {
-          "description": "BaseOSExtensionsContainerImage specifies the remote location that will be used\nto fetch the extensions container matching a new-format OS image",
+          "description": "BaseOSExtensionsContainerImage specifies the remote location that will be used to fetch the extensions container matching a new-format OS image",
           "type": "string"
         },
         "config": {
@@ -43,11 +43,11 @@
           "x-kubernetes-list-type": "atomic"
         },
         "kernelType": {
-          "description": "kernelType contains which kernel we want to be running like default\n(traditional), realtime, 64k-pages (aarch64 only).",
+          "description": "kernelType contains which kernel we want to be running like default (traditional), realtime, 64k-pages (aarch64 only).",
           "type": "string"
         },
         "osImageURL": {
-          "description": "OSImageURL specifies the remote location that will be used to\nfetch the OS.",
+          "description": "OSImageURL specifies the remote location that will be used to fetch the OS.",
           "type": "string"
         }
       }
@@ -60,6 +60,5 @@
       "version": "v1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

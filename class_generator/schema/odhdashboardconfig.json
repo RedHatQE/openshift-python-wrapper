@@ -37,6 +37,9 @@
             "disableDistributedWorkloads": {
               "type": "boolean"
             },
+            "disableHardwareProfiles": {
+              "type": "boolean"
+            },
             "disableHome": {
               "type": "boolean"
             },
@@ -59,6 +62,9 @@
               "type": "boolean"
             },
             "disableModelRegistry": {
+              "type": "boolean"
+            },
+            "disableModelRegistrySecureDB": {
               "type": "boolean"
             },
             "disableModelServing": {
@@ -115,7 +121,13 @@
             "allowedGroups": {
               "type": "string"
             }
-          }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "Can no longer modify group configurations here, see the Auth resource instead",
+              "rule": "self == oldSelf"
+            }
+          ]
         },
         "modelServerSizes": {
           "type": "array",
@@ -254,6 +266,5 @@
       "version": "v1alpha"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

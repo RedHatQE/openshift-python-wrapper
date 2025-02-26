@@ -18,13 +18,6 @@
       "description": "ProvisioningSpec defines the desired state of Provisioning",
       "type": "object",
       "properties": {
-        "additionalNTPServers": {
-          "description": "AdditionalNTPServers is a list of NTP Servers to be used by the\nprovisioning service",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
         "bootIsoSource": {
           "description": "BootIsoSource provides a way to set the location where the iso image\nto boot the nodes will be served from.\nBy default the boot iso image is cached locally and served from\nthe Provisioning service (Ironic) nodes using an auxiliary httpd server.\nIf the boot iso image is already served by an httpd server, setting\nthis option to http allows to directly provide the image from there;\nin this case, the network (either internal or external) where the\nhttpd server that hosts the boot iso is needs to be accessible\nby the metal3 pod.",
           "type": "string",
@@ -210,6 +203,5 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
