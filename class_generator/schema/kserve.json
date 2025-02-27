@@ -1,0 +1,215 @@
+{
+  "description": "Kserve is the Schema for the kserves API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "KserveSpec defines the desired state of Kserve",
+      "type": "object",
+      "properties": {
+        "defaultDeploymentMode": {
+          "description": "Configures the default deployment mode for Kserve. This can be set to 'Serverless' or 'RawDeployment'.\nThe value specified in this field will be used to set the default deployment mode in the 'inferenceservice-config' configmap for Kserve.\nThis field is optional. If no default deployment mode is specified, Kserve will use Serverless mode.",
+          "type": "string",
+          "pattern": "^(Serverless|RawDeployment)$",
+          "enum": [
+            "Serverless",
+            "RawDeployment"
+          ]
+        },
+        "devFlags": {
+          "description": "Add developer fields",
+          "type": "object",
+          "properties": {
+            "manifests": {
+              "description": "List of custom manifests for the given component",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "contextDir": {
+                    "description": "contextDir is the relative path to the folder containing manifests in a repository, default value \"manifests\"",
+                    "type": "string"
+                  },
+                  "sourcePath": {
+                    "description": "sourcePath is the subpath within contextDir where kustomize builds start. Examples include any sub-folder or path: `base`, `overlays/dev`, `default`, `odh` etc.",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "description": "uri is the URI point to a git repo with tag/branch. e.g.  https://github.com/org/repo/tarball/<tag/branch>",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "nim": {
+          "description": "Configures and enables NVIDIA NIM integration",
+          "type": "object",
+          "properties": {
+            "managementState": {
+              "type": "string",
+              "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+              "enum": [
+                "Managed",
+                "Removed"
+              ]
+            }
+          }
+        },
+        "serving": {
+          "description": "Serving configures the KNative-Serving stack used for model serving. A Service\nMesh (Istio) is prerequisite, since it is used as networking layer.",
+          "type": "object",
+          "properties": {
+            "ingressGateway": {
+              "description": "IngressGateway allows to customize some parameters for the Istio Ingress Gateway\nthat is bound to KNative-Serving.",
+              "type": "object",
+              "properties": {
+                "certificate": {
+                  "description": "Certificate specifies configuration of the TLS certificate securing communication\nfor the gateway.",
+                  "type": "object",
+                  "properties": {
+                    "secretName": {
+                      "description": "SecretName specifies the name of the Kubernetes Secret resource that contains a\nTLS certificate secure HTTP communications for the KNative network.",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Type specifies if the TLS certificate should be generated automatically, or if the certificate\nis provided by the user. Allowed values are:\n* SelfSigned: A certificate is going to be generated using an own private key.\n* Provided: Pre-existence of the TLS Secret (see SecretName) with a valid certificate is assumed.\n* OpenshiftDefaultIngress: Default ingress certificate configured for OpenShift",
+                      "type": "string",
+                      "enum": [
+                        "SelfSigned",
+                        "Provided",
+                        "OpenshiftDefaultIngress"
+                      ]
+                    }
+                  }
+                },
+                "domain": {
+                  "description": "Domain specifies the host name for intercepting incoming requests.\nMost likely, you will want to use a wildcard name, like *.example.com.\nIf not set, the domain of the OpenShift Ingress is used.\nIf you choose to generate a certificate, this is the domain used for the certificate request.",
+                  "type": "string"
+                }
+              }
+            },
+            "managementState": {
+              "type": "string",
+              "pattern": "^(Managed|Unmanaged|Force|Removed)$",
+              "enum": [
+                "Managed",
+                "Unmanaged",
+                "Removed"
+              ]
+            },
+            "name": {
+              "description": "Name specifies the name of the KNativeServing resource that is going to be\ncreated to instruct the KNative Operator to deploy KNative serving components.\nThis resource is created in the \"knative-serving\" namespace.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "KserveStatus defines the observed state of Kserve",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "defaultDeploymentMode": {
+          "description": "DefaultDeploymentMode is the value of the defaultDeploymentMode field\nas read from the \"deploy\" JSON in the inferenceservice-config ConfigMap",
+          "type": "string"
+        },
+        "observedGeneration": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "serverlessMode": {
+          "type": "string",
+          "pattern": "^(Managed|Unmanaged|Force|Removed)$"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "components.platform.opendatahub.io",
+      "kind": "Kserve",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-validations": [
+    {
+      "message": "Kserve name must be default-kserve",
+      "rule": "self.metadata.name == 'default-kserve'"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
