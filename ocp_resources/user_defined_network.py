@@ -148,7 +148,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
 
             if self.ipam_lifecycle:
                 warn(
-                    message="ipam_lifecycle is deprecated and will be removed in the future. Use ipam instead.",
+                    message="ipam_lifecycle is deprecated and will be removed in v4.19. Use ipam instead.",
                     category=DeprecationWarning,
                     stacklevel=2,
                 )
