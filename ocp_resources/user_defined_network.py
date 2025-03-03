@@ -146,10 +146,10 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
             if self.join_subnets:
                 _layer2["joinSubnets"] = self.join_subnets
 
-            if self.ipam_lifecycle and self.ipam:
-                raise ValueError("Cannot use both 'ipam_lifecycle' and 'ipam'.")
-
             if self.ipam_lifecycle:
+                if self.ipam:
+                    raise ValueError("Cannot use both 'ipam_lifecycle' and 'ipam'.")
+
                 warn(
                     message="ipam_lifecycle is deprecated and will be removed in v4.19. Use ipam instead.",
                     category=DeprecationWarning,
