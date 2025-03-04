@@ -147,6 +147,7 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
                 _layer2["joinSubnets"] = self.join_subnets
 
             if self.ipam_lifecycle:
+                _layer2["ipamLifecycle"] = self.ipam_lifecycle
                 if self.ipam:
                     raise ValueError("Cannot use both 'ipam_lifecycle' and 'ipam'.")
 
@@ -155,8 +156,9 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
                     category=DeprecationWarning,
                     stacklevel=2,
                 )
-
-            _layer2["ipam"] = self.ipam_lifecycle or self.ipam
+                _layer2["ipam"] = self.ipam_lifecycle
+            if self.ipam:
+                _layer2["ipam"] = self.ipam
 
 
 class Layer3UserDefinedNetwork(UserDefinedNetwork):
