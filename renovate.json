@@ -3,8 +3,7 @@
   "extends": [
     ":dependencyDashboard",
     ":maintainLockFilesWeekly",
-    ":prHourlyLimitNone",
-    ":semanticCommitTypeAll(ci)"
+    ":prHourlyLimitNone"
   ],
   "prConcurrentLimit": 0,
   "lockFileMaintenance": {
