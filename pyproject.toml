@@ -80,7 +80,7 @@ dependencies = [
   "ruff>=0.6.9",
   "testcontainers>=4.9.0",
   "timeout-sampler>=0.0.46",
-  "xmltodict>=0.13.0"
+  "xmltodict>=0.13.0",
 ]
 
   [[project.authors]]
