@@ -53,7 +53,7 @@ dev-dependencies = [ "ipdb>=0.13.13", "ipython>=8.12.3" ]
 [project]
 requires-python = ">=3.9"
 name = "openshift-python-wrapper"
-version = "11.0.35"
+version = "11.0.36"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
@@ -80,7 +80,7 @@ dependencies = [
   "ruff>=0.6.9",
   "testcontainers>=4.9.0",
   "timeout-sampler>=0.0.46",
-  "xmltodict>=0.13.0",
+  "xmltodict>=0.13.0"
 ]
 
   [[project.authors]]
