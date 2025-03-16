@@ -1,8 +1,9 @@
 import re
+from datetime import datetime
 
 from kubernetes.dynamic.exceptions import ConflictError
 
-from ocp_resources.utils.constants import TIMEOUT_4MINUTES
+from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 from ocp_resources.exceptions import NNCPConfigurationFailed
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
@@ -10,7 +11,7 @@ from ocp_resources.node_network_configuration_enactment import (
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -447,3 +448,33 @@ class NodeNetworkConfigurationPolicy(Resource):
             for nnce_cond in nnce.instance.status.conditions:
                 if nnce_cond.type == "Failing" and nnce_cond.status == Resource.Condition.Status.TRUE:
                     yield nnce
+
+    def _get_nncp_configured_last_transition_time(self):
+        for condition in self.instance.status.conditions:
+            if (
+                condition["type"] == NodeNetworkConfigurationPolicy.Conditions.Type.AVAILABLE
+                and condition["status"] == "True"
+                and condition["reason"] == NodeNetworkConfigurationPolicy.Conditions.Reason.SUCCESSFULLY_CONFIGURED
+            ):
+                return condition["lastTransitionTime"]
+
+    @retry(
+        wait_timeout=TIMEOUT_1MINUTE,
+        sleep=TIMEOUT_5SEC,
+    )
+    def _wait_for_nncp_with_different_transition_time(self, initial_transition_time):
+        date_format = "%Y-%m-%dT%H:%M:%SZ"
+        for condition in self.instance.get("status", {}).get("conditions", []):
+            if (
+                condition
+                and condition["type"] == NodeNetworkConfigurationPolicy.Conditions.Type.AVAILABLE
+                and datetime.strptime(condition["lastTransitionTime"], date_format)
+                > datetime.strptime(initial_transition_time, date_format)
+            ):
+                return True
+        return False
+
+    def update(self, resource_dict=None):
+        initial_transition_time = self._get_nncp_configured_last_transition_time()
+        super().update(resource_dict=resource_dict)
+        self._wait_for_nncp_with_different_transition_time(initial_transition_time=initial_transition_time)
