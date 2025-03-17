@@ -412,14 +412,14 @@ wheels = [
 
 [[package]]
 name = "deepdiff"
-version = "8.4.0"
+version = "8.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "orderly-set" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a1/f1/f448ddeedbbc5f5bb1f6d9e4d7d2d6a1454252b0cba0c2bf317881427f09/deepdiff-8.4.0.tar.gz", hash = "sha256:13bdc83c51a2a698d001e367b5766fcf2f74cec4984124bd5d7c15bac9ecee53", size = 513880 }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/71/33faf2bda374c202eab1be46b9c200685b283b5ea0f19e886766f598f770/deepdiff-8.4.1.tar.gz", hash = "sha256:b863d2552909160eccfeae2c9882bf1f75c69888499a04ca1597c706d12fe87f", size = 514141 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/b1/33a7df1d8365c7e6e90440aa3e02b947498fce478f18d6948440a6645844/deepdiff-8.4.0-py3-none-any.whl", hash = "sha256:b21afed96e26b84f9be3731b63ddff403118f7d6abaca0cf8dbc7eabbbba44d2", size = 87005 },
+    { url = "https://files.pythonhosted.org/packages/f2/ee/f6582d9a9be852cb4635b8b95ab3af2c013ddf0af438642d35897006af33/deepdiff-8.4.1-py3-none-any.whl", hash = "sha256:c853011336f3b6bc0f48f1ef564656f84a2cd78fbc8ee5da2033a3e017f52e79", size = 87125 },
 ]
 
 [[package]]
