@@ -464,12 +464,13 @@ class NodeNetworkConfigurationPolicy(Resource):
     )
     def _wait_for_nncp_with_different_transition_time(self, initial_transition_time):
         date_format = "%Y-%m-%dT%H:%M:%SZ"
+        formatted_initial_transition_time = datetime.strptime(initial_transition_time, date_format)
         for condition in self.instance.get("status", {}).get("conditions", []):
             if (
                 condition
                 and condition["type"] == NodeNetworkConfigurationPolicy.Conditions.Type.AVAILABLE
                 and datetime.strptime(condition["lastTransitionTime"], date_format)
-                > datetime.strptime(initial_transition_time, date_format)
+                > formatted_initial_transition_time
             ):
                 return True
         return False
