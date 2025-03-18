@@ -5337,7 +5337,6 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": ".metadata.name must match: '[<prefix>.](rbd|cephfs|nfs).csi.ceph.com'",

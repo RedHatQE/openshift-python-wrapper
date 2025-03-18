@@ -747,3 +747,6 @@ org.kubeflow.v1.PaddleJobList
 io.opendatahub.platform.components.v1alpha1.DataSciencePipelinesList
 io.opendatahub.platform.components.v1alpha1.TrainingOperatorList
 io.opendatahub.trustyai.v1alpha1.GuardrailsOrchestratorList
+org.ovn.k8s.v1.UserDefinedNetworkList
+org.ovn.k8s.v1.ClusterUserDefinedNetworkList
+io.cncf.cni.k8s.v1alpha1.IPAMClaimList
