@@ -330,7 +330,10 @@ class NodeNetworkConfigurationPolicy(Resource):
     def update(self, resource_dict=None):
         initial_transition_time = self._get_nncp_configured_last_transition_time()
         super().update(resource_dict=resource_dict)
-        self._wait_for_nncp_status_update(initial_transition_time=initial_transition_time)
+
+        # If the setup NNCP failed - we don't need to verify its teardown status time is updated.
+        if initial_transition_time:
+            self._wait_for_nncp_status_update(initial_transition_time=initial_transition_time)
 
     def _get_nncp_configured_last_transition_time(self):
         for condition in self.instance.status.conditions:
@@ -348,13 +351,11 @@ class NodeNetworkConfigurationPolicy(Resource):
     def _wait_for_nncp_status_update(self, initial_transition_time):
         date_format = "%Y-%m-%dT%H:%M:%SZ"
         formatted_initial_transition_time = datetime.strptime(initial_transition_time, date_format)
-        if any(
+        return any(
             condition["type"] == NodeNetworkConfigurationPolicy.Conditions.Type.AVAILABLE
             and datetime.strptime(condition["lastTransitionTime"], date_format) > formatted_initial_transition_time
             for condition in self.instance.get("status", {}).get("conditions", [])
-        ):
-            return True
-        return False
+        )
 
     @property
     def status(self):
