@@ -323,13 +323,10 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.ports:
             self.add_ports()
 
+        initial_transition_time = self._get_nncp_configured_last_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
-
-    def update(self, resource_dict=None):
-        initial_transition_time = self._get_nncp_configured_last_transition_time()
-        super().update(resource_dict=resource_dict)
 
         # If the setup NNCP failed - we don't need to verify its teardown status time is updated.
         if initial_transition_time:
