@@ -1720,6 +1720,5 @@
       "version": "v1beta3"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

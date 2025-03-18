@@ -799,6 +799,12 @@
       "$ref": "_definitions.json#/definitions/io.cncf.cni.k8s.v1.NetworkAttachmentDefinitionList"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.k8s.v1alpha1.IPAMClaim"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.cncf.cni.k8s.v1alpha1.IPAMClaimList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.cncf.cni.whereabouts.v1alpha1.IPPool"
     },
     {
@@ -2812,6 +2818,66 @@
       "$ref": "_definitions.json#/definitions/io.k8s.storage.snapshot.v1.VolumeSnapshotList"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.ForkliftController"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.ForkliftControllerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.Hook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.HookList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.Host"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.HostList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.Migration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.MigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.NetworkMap"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.NetworkMapList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.OpenstackVolumePopulator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.OpenstackVolumePopulatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.OvirtVolumePopulator"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.OvirtVolumePopulatorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.Plan"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.PlanList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.Provider"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.ProviderList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.StorageMap"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.konveyor.forklift.v1beta1.StorageMapList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.kubevirt.aaq.v1alpha1.AAQ"
     },
     {
@@ -3652,12 +3718,6 @@
       "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageClusterPeerList"
     },
     {
-      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageProfile"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.StorageProfileList"
-    },
-    {
       "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1alpha1.StorageClaim"
     },
     {
@@ -4147,6 +4207,12 @@
       "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.AdminPolicyBasedExternalRouteList"
     },
     {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.ClusterUserDefinedNetwork"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.ClusterUserDefinedNetworkList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressFirewall"
     },
     {
@@ -4169,6 +4235,12 @@
     },
     {
       "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.EgressServiceList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.UserDefinedNetwork"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/org.ovn.k8s.v1.UserDefinedNetworkList"
     },
     {
       "$ref": "_definitions.json#/definitions/v1.AddVolumeOptions"
