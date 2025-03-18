@@ -24,7 +24,7 @@ class NMState(Resource):
         tolerations: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
               handler DaemonSet manifest.

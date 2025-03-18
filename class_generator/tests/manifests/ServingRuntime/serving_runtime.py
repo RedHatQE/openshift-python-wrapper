@@ -35,7 +35,7 @@ class ServingRuntime(NamespacedResource):
         volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             affinity (dict[str, Any]): No field description from API; please add description
 

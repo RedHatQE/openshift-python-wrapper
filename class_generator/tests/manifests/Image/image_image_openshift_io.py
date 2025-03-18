@@ -29,7 +29,7 @@ class Image(Resource):
         signatures: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             docker_image_config (str): DockerImageConfig is a JSON blob that the runtime uses to set up the
               container. This is a part of manifest schema v2. Will not be set
