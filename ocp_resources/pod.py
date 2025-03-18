@@ -1,14 +1,17 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
+
 import json
-from typing import Any, Dict, List
+from typing import Any
+
 import kubernetes
 from timeout_sampler import TimeoutWatch
-from ocp_resources.utils.constants import TIMEOUT_5SEC
+
 from ocp_resources.exceptions import ExecOnPodError
 from ocp_resources.node import Node
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.utils.constants import TIMEOUT_5SEC
 
 
 class Pod(NamespacedResource):
@@ -465,7 +468,7 @@ class Pod(NamespacedResource):
 
     # End of generated code
 
-    def execute(self, command: List[str], timeout: int = 60, container: str = "", ignore_rc: bool = False) -> str:
+    def execute(self, command: list[str], timeout: int = 60, container: str = "", ignore_rc: bool = False) -> str:
         """
         Run command on Pod
 
@@ -481,7 +484,7 @@ class Pod(NamespacedResource):
         Raises:
             ExecOnPodError: If the command failed.
         """
-        error_channel: Dict[Any, Any] = {}
+        error_channel: dict[Any, Any] = {}
         stream_closed_error: str = "stream resp is closed"
         self.logger.info(f"Execute {command} on {self.name} ({self.node.name})")
         resp = kubernetes.stream.stream(
