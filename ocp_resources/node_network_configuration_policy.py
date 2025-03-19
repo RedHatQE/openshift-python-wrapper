@@ -323,21 +323,22 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.ports:
             self.add_ports()
 
-        initial_transition_time = self._get_nncp_configured_last_transition_time()
+        initial_success_status_time = self._get_last_successful_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
 
-        # If the setup NNCP failed - we don't need to verify its teardown status time is updated.
-        if initial_transition_time:
-            self._wait_for_nncp_status_update(initial_transition_time=initial_transition_time)
+        # If the NNCP failed on setup, then at this point it's not in AVAILABLE status, so the next time it will be in
+        # AVAILABLE status will necessarily be the updated one.
+        if initial_success_status_time:
+            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
-    def _get_nncp_configured_last_transition_time(self):
+    def _get_last_successful_transition_time(self) -> str:
         for condition in self.instance.status.conditions:
             if (
-                condition["type"] == NodeNetworkConfigurationPolicy.Conditions.Type.AVAILABLE
-                and condition["status"] == "True"
-                and condition["reason"] == NodeNetworkConfigurationPolicy.Conditions.Reason.SUCCESSFULLY_CONFIGURED
+                condition["type"] == self.Conditions.Type.AVAILABLE
+                and condition["status"] == Resource.Condition.Status.TRUE
+                and condition["reason"] == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED
             ):
                 return condition["lastTransitionTime"]
 
@@ -345,14 +346,15 @@ class NodeNetworkConfigurationPolicy(Resource):
         wait_timeout=TIMEOUT_1MINUTE,
         sleep=TIMEOUT_5SEC,
     )
-    def _wait_for_nncp_status_update(self, initial_transition_time):
+    def _wait_for_nncp_status_update(self, initial_transition_time: str) -> bool:
         date_format = "%Y-%m-%dT%H:%M:%SZ"
         formatted_initial_transition_time = datetime.strptime(initial_transition_time, date_format)
-        return any(
-            condition["type"] == NodeNetworkConfigurationPolicy.Conditions.Type.AVAILABLE
-            and datetime.strptime(condition["lastTransitionTime"], date_format) > formatted_initial_transition_time
-            for condition in self.instance.get("status", {}).get("conditions", [])
-        )
+        for condition in self.instance.get("status", {}).get("conditions", []):
+            if (
+                condition["type"] == self.Conditions.Type.AVAILABLE
+                and datetime.strptime(condition["lastTransitionTime"], date_format) > formatted_initial_transition_time
+            ):
+                return True
 
     @property
     def status(self):
