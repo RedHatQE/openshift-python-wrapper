@@ -333,7 +333,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         if initial_success_status_time:
             self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
-    def _get_last_successful_transition_time(self) -> str:
+    def _get_last_successful_transition_time(self) -> str | None:
         for condition in self.instance.status.conditions:
             if (
                 condition["type"] == self.Conditions.Type.AVAILABLE
@@ -341,6 +341,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 and condition["reason"] == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED
             ):
                 return condition["lastTransitionTime"]
+        return None
 
     @retry(
         wait_timeout=TIMEOUT_1MINUTE,
@@ -355,6 +356,7 @@ class NodeNetworkConfigurationPolicy(Resource):
                 and datetime.strptime(condition["lastTransitionTime"], date_format) > formatted_initial_transition_time
             ):
                 return True
+        return False
 
     @property
     def status(self):
