@@ -325,9 +325,42 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.ports:
             self.add_ports()
 
+        # The current time-stamp of the NNCP's available status will change after the NNCP is updated, therefore
+        # it must be fetched and stored before the update, and compared with the new time-stamp after.
+        initial_success_status_time = self._get_last_successful_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
+
+        # If the NNCP failed on setup, then its tear-down AVAIALBLE status will necessarily be the first.
+        if initial_success_status_time:
+            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
+
+    def _get_last_successful_transition_time(self) -> str | None:
+        for condition in self.instance.status.conditions:
+            if (
+                condition["type"] == self.Conditions.Type.AVAILABLE
+                and condition["status"] == Resource.Condition.Status.TRUE
+                and condition["reason"] == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED
+            ):
+                return condition["lastTransitionTime"]
+        return None
+
+    @retry(
+        wait_timeout=TIMEOUT_1MINUTE,
+        sleep=TIMEOUT_5SEC,
+    )
+    def _wait_for_nncp_status_update(self, initial_transition_time: str) -> bool:
+        date_format = "%Y-%m-%dT%H:%M:%SZ"
+        formatted_initial_transition_time = datetime.strptime(initial_transition_time, date_format)
+        for condition in self.instance.get("status", {}).get("conditions", []):
+            if (
+                condition["type"] == self.Conditions.Type.AVAILABLE
+                and condition["status"] == Resource.Condition.Status.TRUE
+                and datetime.strptime(condition["lastTransitionTime"], date_format) > formatted_initial_transition_time
+            ):
+                return True
+        return False
 
     @property
     def status(self):
