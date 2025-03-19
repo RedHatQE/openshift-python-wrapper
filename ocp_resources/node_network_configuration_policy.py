@@ -323,6 +323,8 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.ports:
             self.add_ports()
 
+        # The time-stamp that is returned by _get_last_successful_transition_time() will chnage after the call to
+        # update(), therefore it must be fetched and stored before, and comapred with the new time-stamp after.
         initial_success_status_time = self._get_last_successful_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
