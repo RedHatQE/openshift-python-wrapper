@@ -58,6 +58,7 @@ fcn_exclude_functions =
     click,
     ast,
     filecmp,
+    datetime,
 
 enable-extensions =
     FCN,
