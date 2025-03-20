@@ -23,7 +23,7 @@ class Machine(NamespacedResource):
         taints: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             lifecycle_hooks (dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
               certain predefined points within the machine lifecycle.

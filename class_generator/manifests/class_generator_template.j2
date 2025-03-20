@@ -30,7 +30,7 @@ class {{ kind }}({{ base_class }}):
         **kwargs: Any,
     ) -> None:
         {% if all_types_for_class_args %}
-        """
+        r"""
         Args:
             {% for value in all_names_types_for_docstring %}
             {{ value }}

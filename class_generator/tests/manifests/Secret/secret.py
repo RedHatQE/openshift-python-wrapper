@@ -21,7 +21,7 @@ class Secret(NamespacedResource):
         type: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             data (dict[str, Any]): Data contains the secret data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. The serialized form of the secret

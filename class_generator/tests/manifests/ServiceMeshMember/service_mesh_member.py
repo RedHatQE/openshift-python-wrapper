@@ -18,7 +18,7 @@ class ServiceMeshMember(NamespacedResource):
         control_plane_ref: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             control_plane_ref (dict[str, Any]): No field description from API; please add description
 
