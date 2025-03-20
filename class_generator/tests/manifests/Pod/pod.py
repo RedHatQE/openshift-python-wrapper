@@ -56,7 +56,7 @@ class Pod(NamespacedResource):
         volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             active_deadline_seconds (int): Optional duration in seconds the pod may be active on the node
               relative to StartTime before the system will actively try to mark

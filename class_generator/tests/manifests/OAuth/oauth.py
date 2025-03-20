@@ -24,7 +24,7 @@ class OAuth(Resource):
         token_config: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             identity_providers (list[Any]): identityProviders is an ordered list of ways for a user to identify
               themselves. When this list is empty, no identities are provisioned

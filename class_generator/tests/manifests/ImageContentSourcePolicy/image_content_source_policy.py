@@ -21,7 +21,7 @@ class ImageContentSourcePolicy(Resource):
         repository_digest_mirrors: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             repository_digest_mirrors (list[Any]): repositoryDigestMirrors allows images referenced by image digests in
               pods to be pulled from alternative mirrored repository locations.

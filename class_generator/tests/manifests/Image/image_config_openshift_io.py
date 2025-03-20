@@ -28,7 +28,7 @@ class Image(Resource):
         registry_sources: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             additional_trusted_ca (dict[str, Any]): additionalTrustedCA is a reference to a ConfigMap containing
               additional CAs that should be trusted during imagestream import,
