@@ -6,20 +6,6 @@ import sys
 from collections import OrderedDict
 
 
-def remove_at_index(chr_index: int, string_: str) -> str:
-    """
-    Remove a character at the specified index from a string.
-
-    Args:
-        chr_index: The index of the character to remove
-        string_: The original string
-
-    Returns:
-        The string with the character at chr_index removed
-    """
-    return string_[:chr_index] + string_[chr_index + 1 :]
-
-
 def format_line_for_json(line: str) -> str:
     # In case line is not formatted for json for example:
     # '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)", "commit": "137331fd", "author": "Meni Yakove", "date": "2025-02-16"}'
@@ -33,17 +19,60 @@ def format_line_for_json(line: str) -> str:
         quote_match = [match.start() for match in re.finditer('"', title_split)]
 
         # Remove first and last matched `"`
-        quote_to_remove = quote_match[1:-1]
+        inner_quotes = quote_match[1:-1]
 
-        for idx, _index in enumerate(quote_to_remove):
-            # send _index -1 if not the first iter since the title_split changed (removed one character on first iter)
-            _index_to_send = _index if idx == 0 else _index - 1
-            title_split = remove_at_index(chr_index=_index_to_send, string_=title_split)
+        for index in reversed(inner_quotes):
+            title_split = title_split[:index] + title_split[index + 1 :]
 
         line_split.insert(0, f"{title_key}: {title_split.strip()}")
         line = ",".join(line_split)
 
     return line
+
+
+def execute_git_log(from_tag: str, to_tag: str) -> str:
+    """Executes git log and returns the output, or raises an exception on error."""
+    _format: str = '{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}'
+
+    try:
+        command = f"git log --pretty=format:'{_format}' {from_tag}...{to_tag}"
+        proc = subprocess.run(
+            shlex.split(command), stdout=subprocess.PIPE, text=True, check=True
+        )  # Use check=True to raise an exception for non-zero return codes
+        return proc.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing git log: {e}")
+        sys.exit(1)
+    except FileNotFoundError:
+        print("Error: git not found.  Please ensure git is installed and in your PATH.")
+        sys.exit(1)
+
+
+def parse_commit_line(line: str) -> dict:
+    """Parses a single JSON formatted git log line."""
+    try:
+        return json.loads(format_line_for_json(line))
+    except json.decoder.JSONDecodeError as e:
+        print(f"Error parsing JSON: {line} - {e}")
+        return {}
+
+
+def categorize_commit(commit: dict, title_to_type_map: dict, default_category: str = "Other Changes:") -> str:
+    """Categorizes a commit based on its title prefix."""
+    if not commit or "title" not in commit:
+        return default_category
+    title = commit["title"]
+    try:
+        prefix = title.split(":", 1)[0].lower()  # Extract the prefix before the first colon
+        return title_to_type_map.get(prefix, default_category)
+    except IndexError:
+        return default_category
+
+
+def format_changelog_entry(change: dict, section: str) -> str:
+    """Formats a single changelog entry."""
+    title = change["title"].split(":", 1)[1] if section != "Other Changes:" else change["title"]
+    return f"- {title} ({change['commit']}) by {change['author']} on {change['date']}\n"
 
 
 def main(from_tag: str, to_tag: str) -> str:
@@ -72,52 +101,22 @@ def main(from_tag: str, to_tag: str) -> str:
     ])
 
     changelog: str = "## What's Changed\n"
-    _format: str = """{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}"""
 
-    try:
-        proc = subprocess.run(
-            shlex.split(f"git log --pretty=format:'{_format}' {from_tag}...{to_tag}"),
-            stdout=subprocess.PIPE,
-            text=True,
-        )
-        if proc.returncode != 0:
-            print("Error executing git log command")
-            sys.exit(1)
-
-        res = proc.stdout
-    except Exception as ex:
-        print(f"Error executing git log command: {ex}")
-        sys.exit(1)
+    res = execute_git_log(from_tag=from_tag, to_tag=to_tag)
 
     for line in res.splitlines():
-        line = format_line_for_json(line=line)
+        commit = parse_commit_line(line=line)
+        if commit:
+            category = categorize_commit(commit=commit, title_to_type_map=title_to_type_map)
+            changelog_dict[category].append(commit)
 
-        try:
-            _json_line = json.loads(line)
-        except json.decoder.JSONDecodeError as ex:
-            print(f"Error parsing json line {line}: {ex}")
-            sys.exit(1)
-
-        try:
-            prefix = _json_line["title"].split(":", 1)[0]
-            if prefix.lower() in title_to_type_map:
-                _map = title_to_type_map[prefix]
-                changelog_dict[_map].append(_json_line)
-
-            else:
-                changelog_dict["Other Changes:"].append(_json_line)
-        except IndexError:
-            changelog_dict["Other Changes:"].append(_json_line)
-
-    for section, _changelogs in changelog_dict.items():
-        if not _changelogs:
+    for section, changes in changelog_dict.items():
+        if not changes:
             continue
 
         changelog += f"#### {section}\n"
-        for _change in _changelogs:
-            _title = _change["title"].split(":", 1)[1] if section != "Other Changes:" else _change["title"]
-            changelog += f"-{_title} ({_change['commit']}) by {_change['author']} on {_change['date']}\n"
-
+        for change in changes:
+            changelog += format_changelog_entry(change, section)
         changelog += "\n"
 
     changelog += (
