@@ -19,7 +19,7 @@
     "push": true,
     "pushArgs": ["--follow-tags"],
     "pushRepo": "",
-    "changelog": "git log --pretty=format:\"* %s (%h) by %an on %as\" ${from}...${to}"
+    "changelog": "uv run scripts/generate_changelog.py ${from} ${to}"
   },
   "github": {
     "release": true,
