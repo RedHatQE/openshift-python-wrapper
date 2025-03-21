@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+import threading
 from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
@@ -582,7 +583,8 @@ class Resource(ResourceConstants):
         self._base_body()
 
     def __enter__(self) -> Any:
-        signal(SIGINT, self._sigint_handler)
+        if threading.current_thread().native_id == threading.main_thread().native_id:
+            signal(SIGINT, self._sigint_handler)
         return self.deploy(wait=self.wait_for_resource)
 
     def __exit__(
