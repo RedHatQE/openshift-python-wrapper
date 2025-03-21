@@ -6,9 +6,6 @@ from collections import OrderedDict
 
 
 def main(from_tag: str, to_tag: str) -> str:
-    """
-    Generate a changelog between two tags, output as markdown
-    """
     title_to_type_map: dict[str, str] = {
         "ci": "CI:",
         "docs": "Docs:",
@@ -35,9 +32,21 @@ def main(from_tag: str, to_tag: str) -> str:
 
     changelog: str = "## What's Changed\n"
     _format: str = '{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}'
-    res = subprocess.run(
-        shlex.split(f"git log --pretty=format:'{_format}' {from_tag}...{to_tag}"), stdout=subprocess.PIPE, text=True
-    ).stdout
+
+    try:
+        proc = subprocess.run(
+            shlex.split(f"git log --pretty=format:'{_format}' {from_tag}...{to_tag}"),
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        if proc.returncode != 0:
+            print("Error executing git log command")
+            sys.exit(1)
+
+        res = proc.stdout
+    except Exception as ex:
+        print(f"Error executing git log command: {ex}")
+        sys.exit(1)
 
     for line in res.splitlines():
         _json_line = json.loads(line)
@@ -67,4 +76,13 @@ def main(from_tag: str, to_tag: str) -> str:
 
 
 if __name__ == "__main__":
+    """
+    Generate a changelog between two tags, output as markdown
+
+    Usage: python generate-changelog.py <from_tag> <to_tag>
+    """
+    if len(sys.argv) != 3:
+        print("Usage: python generate-changelog.py <from_tag> <to_tag>")
+        sys.exit(1)
+
     print(main(from_tag=sys.argv[1], to_tag=sys.argv[2]))
