@@ -10,7 +10,7 @@ def main(from_tag: str, to_tag: str) -> str:
         "ci": "CI:",
         "docs": "Docs:",
         "feat": "New Feature:",
-        "fix": "Bugfix:",
+        "fix": "Bugfixs:",
         "refactor": "Refactor:",
         "test": "Tests:",
         "release": "New Release:",
@@ -19,7 +19,7 @@ def main(from_tag: str, to_tag: str) -> str:
     }
     changelog_dict: OrderedDict[str, list[dict[str, str]]] = OrderedDict([
         ("New Feature:", []),
-        ("Bugfix:", []),
+        ("Bugfixs:", []),
         ("CI:", []),
         ("New Release:", []),
         ("Docs:", []),
@@ -30,7 +30,7 @@ def main(from_tag: str, to_tag: str) -> str:
         ("Merge:", []),
     ])
 
-    changelog: str = ""
+    changelog: str = "## What's Changed\n"
     _format = '{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}'
     res = subprocess.run(
         shlex.split(f"git log --pretty=format:'{_format}' {from_tag}...{to_tag}"), stdout=subprocess.PIPE, text=True
@@ -49,12 +49,16 @@ def main(from_tag: str, to_tag: str) -> str:
         if not _changelogs:
             continue
 
-        changelog += f"{section}\n"
+        changelog += f"#### {section}\n"
         for _change in _changelogs:
             _title = _change["title"].split(":", 1)[1] if section != "Other Changes:" else _change["title"]
-            changelog += f"    {_title} ({_change['commit']}) by {_change['author']} on {_change['date']}\n"
+            changelog += f"-{_title} ({_change['commit']}) by {_change['author']} on {_change['date']}\n"
 
         changelog += "\n"
+
+    changelog += (
+        f"**Full Changelog**: https://github.com/RedHatQE/openshift-python-wrapper/compare/{from_tag}...{to_tag}"
+    )
 
     return changelog
 
