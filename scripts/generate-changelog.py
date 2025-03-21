@@ -81,7 +81,12 @@ def main(from_tag: str, to_tag: str) -> str:
 
     for line in res.splitlines():
         line = format_line_for_json(line=line)
-        _json_line = json.loads(line)
+
+        try:
+            _json_line = json.loads(line)
+        except json.decoder.JSONDecodeError:
+            print(f"Error parsing json line: {line}")
+            sys.exit(1)
 
         try:
             prefix = _json_line["title"].split(":", 1)[0]
