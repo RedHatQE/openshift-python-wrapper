@@ -6,6 +6,9 @@ from collections import OrderedDict
 
 
 def main(from_tag: str, to_tag: str) -> str:
+    """
+    Generate a changelog between two tags, output as markdown
+    """
     title_to_type_map: dict[str, str] = {
         "ci": "CI:",
         "docs": "Docs:",
@@ -31,7 +34,7 @@ def main(from_tag: str, to_tag: str) -> str:
     ])
 
     changelog: str = "## What's Changed\n"
-    _format = '{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}'
+    _format: str = '{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}'
     res = subprocess.run(
         shlex.split(f"git log --pretty=format:'{_format}' {from_tag}...{to_tag}"), stdout=subprocess.PIPE, text=True
     ).stdout
@@ -64,6 +67,4 @@ def main(from_tag: str, to_tag: str) -> str:
 
 
 if __name__ == "__main__":
-    from_tag, to_tag = sys.argv[1], sys.argv[2]
-    generated_changelog = main(from_tag=from_tag, to_tag=to_tag)
-    print(generated_changelog)
+    print(main(from_tag=sys.argv[1], to_tag=sys.argv[2]))
