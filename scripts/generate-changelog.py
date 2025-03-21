@@ -1,8 +1,39 @@
 import json
+import re
 import shlex
 import subprocess
 import sys
 from collections import OrderedDict
+
+
+def remove_at_index(chr_index: int, string_: str) -> str:
+    return string_[:chr_index] + string_[chr_index + 1 :]
+
+
+def format_line_for_json(line: str) -> str:
+    # In case line is not formatted for json for example:
+    # '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)", "commit": "137331fd", "author": "Meni Yakove", "date": "2025-02-16"}'
+    # title have `"` inside the external `"` `"Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)"`
+    line_split = line.split(",")
+    title_key = line_split[0].split(":")[0]
+    title_split = line_split.pop(0).split(":", 1)[-1]
+
+    if title_split.count('"') > 2:
+        # Find all `"` indexes
+        quote_match = [match.start() for match in re.finditer('"', title_split)]
+
+        # Remove first and last matched `"`
+        quote_to_remove = quote_match[1:-1]
+
+        for idx, _index in enumerate(quote_to_remove):
+            # send _index -1 if not the first iter since the title_split changed (removed one character on first iter)
+            _index_to_send = _index if idx == 0 else _index - 1
+            title_split = remove_at_index(chr_index=_index_to_send, string_=title_split)
+
+        line_split.insert(0, f"{title_key}: {title_split.strip()}")
+        line = ",".join(line_split)
+
+    return line
 
 
 def main(from_tag: str, to_tag: str) -> str:
@@ -10,16 +41,16 @@ def main(from_tag: str, to_tag: str) -> str:
         "ci": "CI:",
         "docs": "Docs:",
         "feat": "New Feature:",
-        "fix": "Bugfixs:",
+        "fix": "Bugfixes:",
         "refactor": "Refactor:",
         "test": "Tests:",
         "release": "New Release:",
-        "CherryPicked": "Cherry Pick:",
+        "cherrypicked": "Cherry Pick:",
         "merge": "Merge:",
     }
     changelog_dict: OrderedDict[str, list[dict[str, str]]] = OrderedDict([
         ("New Feature:", []),
-        ("Bugfixs:", []),
+        ("Bugfixes:", []),
         ("CI:", []),
         ("New Release:", []),
         ("Docs:", []),
@@ -31,7 +62,7 @@ def main(from_tag: str, to_tag: str) -> str:
     ])
 
     changelog: str = "## What's Changed\n"
-    _format: str = '{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}'
+    _format: str = """{"title": "%s", "commit": "%h", "author": "%an", "date": "%as"}"""
 
     try:
         proc = subprocess.run(
@@ -49,12 +80,18 @@ def main(from_tag: str, to_tag: str) -> str:
         sys.exit(1)
 
     for line in res.splitlines():
+        line = format_line_for_json(line=line)
         _json_line = json.loads(line)
 
         try:
-            _map = title_to_type_map[_json_line["title"].split(":", 1)[0]]
-            changelog_dict[_map].append(_json_line)
-        except Exception:
+            prefix = _json_line["title"].split(":", 1)[0]
+            if prefix.lower() in title_to_type_map:
+                _map = title_to_type_map[prefix]
+                changelog_dict[_map].append(_json_line)
+
+            else:
+                changelog_dict["Other Changes:"].append(_json_line)
+        except IndexError:
             changelog_dict["Other Changes:"].append(_json_line)
 
     for section, _changelogs in changelog_dict.items():
