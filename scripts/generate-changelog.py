@@ -7,6 +7,16 @@ from collections import OrderedDict
 
 
 def remove_at_index(chr_index: int, string_: str) -> str:
+    """
+    Remove a character at the specified index from a string.
+
+    Args:
+        chr_index: The index of the character to remove
+        string_: The original string
+
+    Returns:
+        The string with the character at chr_index removed
+    """
     return string_[:chr_index] + string_[chr_index + 1 :]
 
 
@@ -119,6 +129,18 @@ def main(from_tag: str, to_tag: str) -> str:
 
 if __name__ == "__main__":
     """
+    Generate a changelog between two Git tags, formatted as markdown.
+
+    This script parses Git commit logs between two specified tags and categorizes them
+    by commit type (feat, fix, ci, etc.). It formats the output as a markdown document
+    with sections for different types of changes, intended for use with release-it.
+
+    Each commit is expected to follow the conventional commit format:
+    <type>: <description>
+
+    where <type> is one of: feat, fix, docs, style, refactor, test, chore, etc.
+    Commits that don't follow this format are categorized under "Other Changes".
+
     Generate a changelog between two tags, output as markdown
 
     Usage: python generate-changelog.py <from_tag> <to_tag>
