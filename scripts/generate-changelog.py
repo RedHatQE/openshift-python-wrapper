@@ -94,8 +94,8 @@ def main(from_tag: str, to_tag: str) -> str:
 
         try:
             _json_line = json.loads(line)
-        except json.decoder.JSONDecodeError:
-            print(f"Error parsing json line: {line}")
+        except json.decoder.JSONDecodeError as ex:
+            print(f"Error parsing json line {line}: {ex}")
             sys.exit(1)
 
         try:
