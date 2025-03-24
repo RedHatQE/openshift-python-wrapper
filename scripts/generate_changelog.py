@@ -6,7 +6,7 @@ import sys
 from collections import OrderedDict
 
 
-def format_line_for_json(line: str) -> str:
+def json_line(line: str) -> dict:
     """
     Format str line to str that can be parsed with json.
 
@@ -14,24 +14,27 @@ def format_line_for_json(line: str) -> str:
     '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)", "commit": "137331fd", "author": "Meni Yakove", "date": "2025-02-16"}'
     title have `"` inside the external `"` `"Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)"`
     """
-    line_split = line.split(",")
-    title_key = line_split[0].split(":")[0]
-    title_split = line_split.pop(0).split(":", 1)[-1]
+    try:
+        return json.loads(line)
+    except json.JSONDecodeError:
+        line_split = line.split(",")
+        title_key = line_split[0].split(":")[0]
+        title_split = line_split.pop(0).split(":", 1)[-1]
 
-    if title_split.count('"') > 2:
-        # Find all `"` indexes
-        quote_match = [match.start() for match in re.finditer('"', title_split)]
+        if title_split.count('"') > 2:
+            # Find all `"` indexes
+            quote_match = [match.start() for match in re.finditer('"', title_split)]
 
-        # Remove first and last matched `"`
-        inner_quotes = quote_match[1:-1]
+            # Remove first and last matched `"`
+            inner_quotes = quote_match[1:-1]
 
-        for index in reversed(inner_quotes):
-            title_split = title_split[:index] + title_split[index + 1 :]
+            for index in reversed(inner_quotes):
+                title_split = title_split[:index] + title_split[index + 1 :]
 
-        line_split.insert(0, f"{title_key}: {title_split.strip()}")
-        line = ",".join(line_split)
+            line_split.insert(0, f"{title_key}: {title_split.strip()}")
+            line = ",".join(line_split)
 
-    return line
+        return json.loads(line)
 
 
 def execute_git_log(from_tag: str, to_tag: str) -> str:
@@ -55,9 +58,9 @@ def execute_git_log(from_tag: str, to_tag: str) -> str:
 def parse_commit_line(line: str) -> dict:
     """Parses a single JSON formatted git log line."""
     try:
-        return json.loads(format_line_for_json(line))
-    except json.decoder.JSONDecodeError as e:
-        print(f"Error parsing JSON: {line} - {e}")
+        return json_line(line=line)
+    except json.decoder.JSONDecodeError as ex:
+        print(f"Error parsing JSON: {line} - {ex}")
         return {}
 
 
