@@ -47,8 +47,8 @@ def execute_git_log(from_tag: str, to_tag: str) -> str:
             shlex.split(command), stdout=subprocess.PIPE, text=True, check=True
         )  # Use check=True to raise an exception for non-zero return codes
         return proc.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing git log: {e}")
+    except subprocess.CalledProcessError as ex:
+        print(f"Error executing git log: {ex}")
         sys.exit(1)
     except FileNotFoundError:
         print("Error: git not found.  Please ensure git is installed and in your PATH.")
