@@ -7,9 +7,13 @@ from collections import OrderedDict
 
 
 def format_line_for_json(line: str) -> str:
-    # In case line is not formatted for json for example:
-    # '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)", "commit": "137331fd", "author": "Meni Yakove", "date": "2025-02-16"}'
-    # title have `"` inside the external `"` `"Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)"`
+    """
+    Format str line to str that can be parsed with json.
+
+    In case line is not formatted for json for example:
+    '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)", "commit": "137331fd", "author": "Meni Yakove", "date": "2025-02-16"}'
+    title have `"` inside the external `"` `"Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)"`
+    """
     line_split = line.split(",")
     title_key = line_split[0].split(":")[0]
     title_split = line_split.pop(0).split(":", 1)[-1]
