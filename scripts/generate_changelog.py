@@ -1,5 +1,4 @@
 import json
-import re
 import shlex
 import subprocess
 import sys
@@ -17,21 +16,21 @@ def json_line(line: str) -> dict:
     try:
         return json.loads(line)
     except json.JSONDecodeError:
+        # split line like by `,`
+        # '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)", "commit": "137331fd", "author": "Meni Yakove", "date": "2025-02-16"}'
         line_split = line.split(",")
-        title_key = line_split[0].split(":")[0]
-        title_split = line_split.pop(0).split(":", 1)[-1]
 
-        if title_split.count('"') > 2:
-            # Find all `"` indexes
-            quote_match = [match.start() for match in re.finditer('"', title_split)]
+        # Pop and save `title key` and `title body` from '{"title": "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)"'
+        title_key, title_body = line_split.pop(0).split(":", 1)
 
-            # Remove first and last matched `"`
-            inner_quotes = quote_match[1:-1]
+        if title_body.count('"') > 2:
+            # reconstruct the `title_body` without the extra `"`
+            # "Revert "feat: Use git cliff to generate the change log. (#2322)" (#2324)"'
+            # replace all `"` with empty char and add `"` char to the beginning and the end of the string
+            stripted_body = title_body.replace('"', "")
+            title_body = f'"{stripted_body}"'
 
-            for index in reversed(inner_quotes):
-                title_split = title_split[:index] + title_split[index + 1 :]
-
-            line_split.insert(0, f"{title_key}: {title_split.strip()}")
+            line_split.append(f"{title_key}: {title_body.strip()}")
             line = ",".join(line_split)
 
         return json.loads(line)
