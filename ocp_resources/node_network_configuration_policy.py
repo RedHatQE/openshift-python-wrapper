@@ -12,6 +12,7 @@ from ocp_resources.node_network_configuration_enactment import (
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
+from typing import Any
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -359,6 +360,12 @@ class NodeNetworkConfigurationPolicy(Resource):
             ):
                 return True
         return False
+
+    def update(self, resource_dict: dict[str, Any]) -> None:
+        initial_success_status_time = self._get_last_successful_transition_time()
+        super().update(resource_dict=resource_dict)
+        if resource_dict["spec"] and initial_success_status_time:
+            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     @property
     def status(self):
