@@ -34,7 +34,7 @@ LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
-MISSING_DESCRIPTION_STR: str = "No field description from API; please add description"
+MISSING_DESCRIPTION_STR: str = "No field description from API"
 
 
 def _is_kind_and_namespaced(

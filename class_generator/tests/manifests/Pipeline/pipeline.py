@@ -8,7 +8,7 @@ from ocp_resources.resource import NamespacedResource
 
 class Pipeline(NamespacedResource):
     """
-    No field description from API; please add description
+    No field description from API
     """
 
     api_group: str = NamespacedResource.ApiGroup.TEKTON_DEV
