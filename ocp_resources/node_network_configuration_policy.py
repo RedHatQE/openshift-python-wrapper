@@ -364,7 +364,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     def update(self, resource_dict: dict[str, Any]) -> None:
         initial_success_status_time = self._get_last_successful_transition_time()
         super().update(resource_dict=resource_dict)
-        if resource_dict["spec"] and initial_success_status_time:
+        if resource_dict.get("spec") and initial_success_status_time:
             self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     @property
