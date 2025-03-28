@@ -8,7 +8,7 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 
 class ServingRuntime(NamespacedResource):
     """
-    No field description from API; please add description
+    No field description from API
     """
 
     api_group: str = NamespacedResource.ApiGroup.SERVING_KSERVE_IO
@@ -37,41 +37,41 @@ class ServingRuntime(NamespacedResource):
     ) -> None:
         r"""
         Args:
-            affinity (dict[str, Any]): No field description from API; please add description
+            affinity (dict[str, Any]): No field description from API
 
-            spec_annotations (dict[str, Any]): No field description from API; please add description
+            spec_annotations (dict[str, Any]): No field description from API
 
-            built_in_adapter (dict[str, Any]): No field description from API; please add description
+            built_in_adapter (dict[str, Any]): No field description from API
 
-            containers (list[Any]): No field description from API; please add description
+            containers (list[Any]): No field description from API
 
-            disabled (bool): No field description from API; please add description
+            disabled (bool): No field description from API
 
-            grpc_data_endpoint (str): No field description from API; please add description
+            grpc_data_endpoint (str): No field description from API
 
-            grpc_endpoint (str): No field description from API; please add description
+            grpc_endpoint (str): No field description from API
 
-            http_data_endpoint (str): No field description from API; please add description
+            http_data_endpoint (str): No field description from API
 
-            image_pull_secrets (list[Any]): No field description from API; please add description
+            image_pull_secrets (list[Any]): No field description from API
 
-            spec_labels (dict[str, Any]): No field description from API; please add description
+            spec_labels (dict[str, Any]): No field description from API
 
-            multi_model (bool): No field description from API; please add description
+            multi_model (bool): No field description from API
 
-            node_selector (dict[str, Any]): No field description from API; please add description
+            node_selector (dict[str, Any]): No field description from API
 
-            protocol_versions (list[Any]): No field description from API; please add description
+            protocol_versions (list[Any]): No field description from API
 
-            replicas (int): No field description from API; please add description
+            replicas (int): No field description from API
 
-            storage_helper (dict[str, Any]): No field description from API; please add description
+            storage_helper (dict[str, Any]): No field description from API
 
-            supported_model_formats (list[Any]): No field description from API; please add description
+            supported_model_formats (list[Any]): No field description from API
 
-            tolerations (list[Any]): No field description from API; please add description
+            tolerations (list[Any]): No field description from API
 
-            volumes (list[Any]): No field description from API; please add description
+            volumes (list[Any]): No field description from API
 
         """
         super().__init__(**kwargs)
