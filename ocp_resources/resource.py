@@ -36,7 +36,12 @@ from timeout_sampler import (
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.event import Event
-from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError, ResourceTeardownError
+from ocp_resources.exceptions import (
+    MissingRequiredArgumentError,
+    MissingResourceResError,
+    ResourceTeardownError,
+    ResourceVersionUpdatedError,
+)
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -918,6 +923,7 @@ class Resource(ResourceConstants):
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
+
         self.api.patch(
             body=resource_dict,
             namespace=self.namespace,
@@ -1571,8 +1577,9 @@ class ResourceEditor:
             # this return value will be received by key_diff above
             return None
 
-    @staticmethod
-    def _apply_patches(patches: dict[Any, Any], action_text: str, action: str) -> None:
+    def _apply_patches(
+        self, patches: dict[Any, Any], action_text: str, action: str, wait_for_resource_version_update: bool = False
+    ) -> None:
         """
         Updates provided Resource objects with provided yaml patches
 
@@ -1596,7 +1603,14 @@ class ResourceEditor:
                 patch["metadata"]["name"] = resource.name
 
             if action == "update":
+                _current_resource_version = resource.instance.metadata.resourceVersion
                 resource.update(resource_dict=patch)  # update the resource
+
+                if wait_for_resource_version_update:
+                    if not self._wait_for_resource_version_update(
+                        resource=resource, resource_version=_current_resource_version
+                    ):
+                        raise ResourceVersionUpdatedError()
 
             if action == "replace":
                 if "metadata" not in patch:
@@ -1622,3 +1636,16 @@ class ResourceEditor:
             timeout=TIMEOUT_30SEC,
             sleep_time=TIMEOUT_5SEC,
         )
+
+    @staticmethod
+    def _wait_for_resource_version_update(resource: Resource, resource_version: str) -> bool:
+        """
+        Wait for the resource to be updated to the new resource version.
+        """
+        for _sample in TimeoutSampler(
+            wait_timeout=TIMEOUT_30SEC, sleep=1, func=lambda: resource.instance.metadata.resourceVersion
+        ):
+            if _sample > resource_version:
+                return True
+
+        return False

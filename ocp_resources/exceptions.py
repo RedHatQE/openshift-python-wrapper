@@ -61,3 +61,7 @@ class ResourceTeardownError(Exception):
 
     def __str__(self):
         return f"Failed to execute teardown for resource {self.resource}"
+
+
+class ResourceVersionUpdatedError(Exception):
+    pass
