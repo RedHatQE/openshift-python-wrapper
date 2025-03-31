@@ -1416,7 +1416,11 @@ class NamespacedResource(Resource):
 
 class ResourceEditor:
     def __init__(
-        self, patches: dict[Any, Any], action: str = "update", user_backups: dict[Any, Any] | None = None
+        self,
+        patches: dict[Any, Any],
+        action: str = "update",
+        user_backups: dict[Any, Any] | None = None,
+        wait_for_resource_version_update: bool = False,
     ) -> None:
         """
         Args:
@@ -1445,6 +1449,7 @@ class ResourceEditor:
         self.action = action
         self.user_backups = user_backups
         self._backups: dict[Any, Any] = {}
+        self.wait_for_resource_version_update = wait_for_resource_version_update
 
     @property
     def backups(self) -> dict[Any, Any]:
@@ -1504,7 +1509,11 @@ class ResourceEditor:
         patches_to_apply = {resource: self._patches[resource] for resource in resource_to_patch}
 
         # apply changes
-        self._apply_patches_sampler(patches=patches_to_apply, action_text="Updating", action=self.action)
+        self._apply_patches_sampler(
+            patches=patches_to_apply,
+            action_text="Updating",
+            action=self.action,
+        )
 
     def restore(self) -> None:
         self._apply_patches_sampler(patches=self._backups, action_text="Restoring", action=self.action)
@@ -1578,7 +1587,10 @@ class ResourceEditor:
             return None
 
     def _apply_patches(
-        self, patches: dict[Any, Any], action_text: str, action: str, wait_for_resource_version_update: bool = False
+        self,
+        patches: dict[Any, Any],
+        action_text: str,
+        action: str,
     ) -> None:
         """
         Updates provided Resource objects with provided yaml patches
@@ -1606,7 +1618,7 @@ class ResourceEditor:
                 _current_resource_version = resource.instance.metadata.resourceVersion
                 resource.update(resource_dict=patch)  # update the resource
 
-                if wait_for_resource_version_update:
+                if self.wait_for_resource_version_update:
                     if not self._wait_for_resource_version_update(
                         resource=resource, resource_version=_current_resource_version
                     ):
@@ -1624,7 +1636,12 @@ class ResourceEditor:
 
                 resource.update_replace(resource_dict=patch)  # replace the resource metadata
 
-    def _apply_patches_sampler(self, patches: dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
+    def _apply_patches_sampler(
+        self,
+        patches: dict[Any, Any],
+        action_text: str,
+        action: str,
+    ) -> ResourceInstance:
         exceptions_dict: dict[type[Exception], list[str]] = {ConflictError: []}
         exceptions_dict.update(DEFAULT_CLUSTER_RETRY_EXCEPTIONS)
         return Resource.retry_cluster_exceptions(
