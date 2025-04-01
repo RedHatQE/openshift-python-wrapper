@@ -325,7 +325,8 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         # The current time-stamp of the NNCP's available status will change after the NNCP is updated, therefore
         # it must be fetched and stored before the update, and compared with the new time-stamp after.
-        # initial_success_status_time = self._get_last_successful_transition_time()
+        initial_success_status_time = self._get_last_successful_transition_time()
+        self.logger.error(f"absent_ifaces: Before update resource: {initial_success_status_time}")
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
@@ -390,6 +391,8 @@ class NodeNetworkConfigurationPolicy(Resource):
                     or sample[0]["reason"] == self.Conditions.Reason.CONFIGURATION_PROGRESSING
                 )
             ):
+                initial_success_status_time = self._get_last_successful_transition_time()
+                self.logger.error(f"absent_ifaces: Before update resource: {initial_success_status_time}")
                 return sample
 
     def _process_failed_status(self, failed_condition_reason):
