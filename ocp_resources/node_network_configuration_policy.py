@@ -324,16 +324,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.ports:
             self.add_ports()
 
-        # The current time-stamp of the NNCP's available status will change after the NNCP is updated, therefore
-        # it must be fetched and stored before the update, and compared with the new time-stamp after.
-        initial_success_status_time = self._get_last_successful_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
-
-        # If the NNCP failed on setup, then its tear-down AVAIALBLE status will necessarily be the first.
-        if initial_success_status_time:
-            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     def _get_last_successful_transition_time(self) -> str | None:
         for condition in self.instance.status.conditions:
