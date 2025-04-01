@@ -408,28 +408,21 @@ class NodeNetworkConfigurationPolicy(Resource):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
-        try:
-            for sample in TimeoutSampler(
-                wait_timeout=self.success_timeout,
-                sleep=5,
-                func=lambda: next(
-                    (
-                        condition
-                        for condition in self.instance.get("status", {}).get("conditions", [])
-                        if condition and condition["type"] == self.Conditions.Type.AVAILABLE
-                    ),
-                    {},
-                ),
-            ):
-                if sample:
-                    if sample["status"] == self.Condition.Status.TRUE:
-                        self.logger.info(f"NNCP {self.name} configured Successfully")
-                        return sample
-                    elif sample.get("reason") == no_match_node_condition_reason:
-                        raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
+        # if we get here too fast there are no conditions, we need to wait.
+        self.wait_for_configuration_conditions_unknown_or_progressing()
 
-                    elif sample.get("reason") == failed_condition_reason:
-                        self._process_failed_status(failed_condition_reason=failed_condition_reason)
+        samples = TimeoutSampler(wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status)
+        try:
+            for sample in samples:
+                if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
+                    self.logger.info(f"NNCP {self.name} configured Successfully")
+                    return sample
+
+                elif sample == no_match_node_condition_reason:
+                    raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
+
+                elif sample == failed_condition_reason:
+                    self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             self.logger.error(
