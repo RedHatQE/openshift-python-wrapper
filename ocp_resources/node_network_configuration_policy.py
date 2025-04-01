@@ -2,8 +2,8 @@ import re
 from datetime import datetime
 
 from kubernetes.dynamic.exceptions import ConflictError
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
 
-from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 from ocp_resources.exceptions import NNCPConfigurationFailed
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
@@ -11,7 +11,7 @@ from ocp_resources.node_network_configuration_enactment import (
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
+from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -325,14 +325,14 @@ class NodeNetworkConfigurationPolicy(Resource):
 
         # The current time-stamp of the NNCP's available status will change after the NNCP is updated, therefore
         # it must be fetched and stored before the update, and compared with the new time-stamp after.
-        initial_success_status_time = self._get_last_successful_transition_time()
+        # initial_success_status_time = self._get_last_successful_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
 
         # If the NNCP failed on setup, then its tear-down AVAIALBLE status will necessarily be the first.
-        if initial_success_status_time:
-            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
+        # if initial_success_status_time:
+        #     self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     def _get_last_successful_transition_time(self) -> str | None:
         for condition in self.instance.status.conditions:
