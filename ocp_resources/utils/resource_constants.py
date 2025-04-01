@@ -69,3 +69,4 @@ class ResourceConstants:
         OPENSHIFT: str = "openshift"
         RHV: str = "ovirt"
         OVA: str = "ova"
+        OPENSTACK: str = "openstack"
