@@ -131,10 +131,11 @@ def get_client(
                 )
             client_configuration.proxy = proxy
 
+        kwargs["client_configuration"] = client_configuration
+
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(
                 config_file=config_file,
-                client_configuration=client_configuration,
                 context=context or None,
                 **kwargs,
             )
