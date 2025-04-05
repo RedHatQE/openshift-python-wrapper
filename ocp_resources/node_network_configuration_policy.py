@@ -2,8 +2,8 @@ import re
 from datetime import datetime
 
 from kubernetes.dynamic.exceptions import ConflictError
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
 
-from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 from ocp_resources.exceptions import NNCPConfigurationFailed
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
@@ -11,7 +11,7 @@ from ocp_resources.node_network_configuration_enactment import (
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
+from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -326,13 +326,14 @@ class NodeNetworkConfigurationPolicy(Resource):
         # The current time-stamp of the NNCP's available status will change after the NNCP is updated, therefore
         # it must be fetched and stored before the update, and compared with the new time-stamp after.
         initial_success_status_time = self._get_last_successful_transition_time()
+        self.logger.error(f"absent_ifaces: Before update resource: {initial_success_status_time}")
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
 
         # If the NNCP failed on setup, then its tear-down AVAIALBLE status will necessarily be the first.
-        if initial_success_status_time:
-            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
+        # if initial_success_status_time:
+        #     self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     def _get_last_successful_transition_time(self) -> str | None:
         for condition in self.instance.status.conditions:
@@ -390,6 +391,8 @@ class NodeNetworkConfigurationPolicy(Resource):
                     or sample[0]["reason"] == self.Conditions.Reason.CONFIGURATION_PROGRESSING
                 )
             ):
+                initial_success_status_time = self._get_last_successful_transition_time()
+                self.logger.error(f"absent_ifaces: Before update resource: {initial_success_status_time}")
                 return sample
 
     def _process_failed_status(self, failed_condition_reason):
@@ -408,28 +411,21 @@ class NodeNetworkConfigurationPolicy(Resource):
         failed_condition_reason = self.Conditions.Reason.FAILED_TO_CONFIGURE
         no_match_node_condition_reason = self.Conditions.Reason.NO_MATCHING_NODE
 
-        try:
-            for sample in TimeoutSampler(
-                wait_timeout=self.success_timeout,
-                sleep=5,
-                func=lambda: next(
-                    (
-                        condition
-                        for condition in self.instance.get("status", {}).get("conditions", [])
-                        if condition and condition["type"] == self.Conditions.Type.AVAILABLE
-                    ),
-                    {},
-                ),
-            ):
-                if sample:
-                    if sample["status"] == self.Condition.Status.TRUE:
-                        self.logger.info(f"NNCP {self.name} configured Successfully")
-                        return sample
-                    elif sample.get("reason") == no_match_node_condition_reason:
-                        raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
+        # if we get here too fast there are no conditions, we need to wait.
+        self.wait_for_configuration_conditions_unknown_or_progressing()
 
-                    elif sample.get("reason") == failed_condition_reason:
-                        self._process_failed_status(failed_condition_reason=failed_condition_reason)
+        samples = TimeoutSampler(wait_timeout=self.success_timeout, sleep=1, func=lambda: self.status)
+        try:
+            for sample in samples:
+                if sample == self.Conditions.Reason.SUCCESSFULLY_CONFIGURED:
+                    self.logger.info(f"NNCP {self.name} configured Successfully")
+                    return sample
+
+                elif sample == no_match_node_condition_reason:
+                    raise NNCPConfigurationFailed(f"{self.name}. Reason: {no_match_node_condition_reason}")
+
+                elif sample == failed_condition_reason:
+                    self._process_failed_status(failed_condition_reason=failed_condition_reason)
 
         except (TimeoutExpiredError, NNCPConfigurationFailed):
             self.logger.error(
