@@ -12,6 +12,7 @@ from ocp_resources.node_network_configuration_enactment import (
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
+from typing import Any
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"
@@ -323,16 +324,9 @@ class NodeNetworkConfigurationPolicy(Resource):
         if self.ports:
             self.add_ports()
 
-        # The current time-stamp of the NNCP's available status will change after the NNCP is updated, therefore
-        # it must be fetched and stored before the update, and compared with the new time-stamp after.
-        initial_success_status_time = self._get_last_successful_transition_time()
         ResourceEditor(
             patches={self: {"spec": {"desiredState": {"interfaces": self.desired_state["interfaces"]}}}}
         ).update()
-
-        # If the NNCP failed on setup, then its tear-down AVAIALBLE status will necessarily be the first.
-        if initial_success_status_time:
-            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     def _get_last_successful_transition_time(self) -> str | None:
         for condition in self.instance.status.conditions:
@@ -359,6 +353,12 @@ class NodeNetworkConfigurationPolicy(Resource):
             ):
                 return True
         return False
+
+    def update(self, resource_dict: dict[str, Any]) -> None:
+        initial_success_status_time = self._get_last_successful_transition_time()
+        super().update(resource_dict=resource_dict)
+        if resource_dict.get("spec") and initial_success_status_time:
+            self._wait_for_nncp_status_update(initial_transition_time=initial_success_status_time)
 
     @property
     def status(self):
