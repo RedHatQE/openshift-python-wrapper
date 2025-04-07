@@ -53,7 +53,7 @@ dev-dependencies = [ "ipdb>=0.13.13", "ipython>=8.12.3" ]
 [project]
 requires-python = ">=3.9"
 name = "openshift-python-wrapper"
-version = "11.0.44"
+version = "11.0.45"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
@@ -77,7 +77,7 @@ dependencies = [
   "rich>=13.9.2",
   "ruff>=0.6.9",
   "timeout-sampler>=0.0.46",
-  "xmltodict>=0.13.0",
+  "xmltodict>=0.13.0"
 ]
 
   [[project.authors]]
@@ -111,7 +111,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 tests = [
-    "pytest>=8.3.5",
-    "pytest-cov>=6.1.1",
-    "testcontainers>=4.10.0",
+  "pytest>=8.3.5",
+  "pytest-cov>=6.1.1",
+  "testcontainers>=4.10.0"
 ]
