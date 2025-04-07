@@ -71,16 +71,13 @@ dependencies = [
   "kubernetes>=31.0.0",
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
-  "pytest-cov>=6.0.0",
-  "pytest>=8.3.3",
   "python-benedict>=0.33.2",
   "python-simple-logger>=1.0.40",
   "requests>=2.32.3",
   "rich>=13.9.2",
   "ruff>=0.6.9",
-  "testcontainers>=4.9.0",
   "timeout-sampler>=0.0.46",
-  "xmltodict>=0.13.0"
+  "xmltodict>=0.13.0",
 ]
 
   [[project.authors]]
@@ -111,3 +108,10 @@ dependencies = [
 [build-system]
 requires = [ "hatchling" ]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+tests = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "testcontainers>=4.10.0",
+]

@@ -776,14 +776,11 @@ dependencies = [
     { name = "kubernetes" },
     { name = "packaging" },
     { name = "pyhelper-utils" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "python-benedict" },
     { name = "python-simple-logger" },
     { name = "requests" },
     { name = "rich" },
     { name = "ruff" },
-    { name = "testcontainers" },
     { name = "timeout-sampler" },
     { name = "xmltodict" },
 ]
@@ -794,6 +791,11 @@ dev = [
     { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "ipython", version = "8.34.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
     { name = "ipython", version = "9.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
+tests = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "testcontainers" },
 ]
 
 [package.metadata]
@@ -806,14 +808,11 @@ requires-dist = [
     { name = "kubernetes", specifier = ">=31.0.0" },
     { name = "packaging", specifier = ">=24.1" },
     { name = "pyhelper-utils", specifier = ">=0.0.42" },
-    { name = "pytest", specifier = ">=8.3.3" },
-    { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "python-benedict", specifier = ">=0.33.2" },
     { name = "python-simple-logger", specifier = ">=1.0.40" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "rich", specifier = ">=13.9.2" },
     { name = "ruff", specifier = ">=0.6.9" },
-    { name = "testcontainers", specifier = ">=4.9.0" },
     { name = "timeout-sampler", specifier = ">=0.0.46" },
     { name = "xmltodict", specifier = ">=0.13.0" },
 ]
@@ -822,6 +821,11 @@ requires-dist = [
 dev = [
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "ipython", specifier = ">=8.12.3" },
+]
+tests = [
+    { name = "pytest", specifier = ">=8.3.5" },
+    { name = "pytest-cov", specifier = ">=6.1.1" },
+    { name = "testcontainers", specifier = ">=4.10.0" },
 ]
 
 [[package]]
