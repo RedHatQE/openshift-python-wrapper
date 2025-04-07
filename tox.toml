@@ -4,4 +4,4 @@ env_list = ["unittests"]
 [env.unittests]
 description = "Run unittests"
 deps = ["uv"]
-commands = [["uv", "run", "pytest"]]
+commands = [["uv", "run", "--group", "tests", "pytest"]]
