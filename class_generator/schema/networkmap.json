@@ -48,11 +48,12 @@
                     "type": "string"
                   },
                   "type": {
-                    "description": "The network type.",
+                    "description": "Type of network to use for the destination.\nValid values:\n- pod: Use the Kubernetes pod network\n- multus: Use a Multus additional network\n- ignored: Network is excluded from mapping",
                     "type": "string",
                     "enum": [
                       "pod",
-                      "multus"
+                      "multus",
+                      "ignored"
                     ]
                   }
                 }
@@ -260,5 +261,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

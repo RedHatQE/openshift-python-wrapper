@@ -6,7 +6,7 @@
       "description": "`conditions` is a list of the current states of FlowSchema.",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaCondition"
+        "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchemaCondition"
       },
       "x-kubernetes-list-map-keys": [
         "type"

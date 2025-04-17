@@ -22,7 +22,7 @@
       "type": "object",
       "properties": {
         "dataVolumeTTLSeconds": {
-          "description": "DataVolumeTTLSeconds is the time in seconds after DataVolume completion it can be garbage collected. Disabled by default.",
+          "description": "DataVolumeTTLSeconds is the time in seconds after DataVolume completion it can be garbage collected. Disabled by default.\nDeprecated: Removed in v1.62.",
           "type": "integer",
           "format": "int32"
         },
@@ -321,5 +321,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

@@ -13,7 +13,7 @@
       "description": "List of restores. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/com.mariadb.k8s.v1alpha1.Restore"
+        "$ref": "_definitions.json#/definitions/io.velero.v1.Restore"
       }
     },
     "kind": {
@@ -27,10 +27,11 @@
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "k8s.mariadb.com",
+      "group": "velero.io",
       "kind": "RestoreList",
-      "version": "v1alpha1"
+      "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

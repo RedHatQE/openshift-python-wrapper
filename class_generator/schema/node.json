@@ -22,7 +22,7 @@
       "type": "object",
       "properties": {
         "cgroupMode": {
-          "description": "CgroupMode determines the cgroups version on the node",
+          "description": "cgroupMode determines the cgroups version on the node",
           "type": "string",
           "enum": [
             "v1",
@@ -31,7 +31,7 @@
           ]
         },
         "workerLatencyProfile": {
-          "description": "WorkerLatencyProfile determins the how fast the kubelet is updating\nthe status and corresponding reaction of the cluster",
+          "description": "workerLatencyProfile determins the how fast the kubelet is updating\nthe status and corresponding reaction of the cluster",
           "type": "string",
           "enum": [
             "Default",
@@ -114,5 +114,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

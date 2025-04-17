@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "migration.openshift.io",
+      "kind": "MigrationController",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

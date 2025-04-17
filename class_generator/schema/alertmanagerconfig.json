@@ -6132,6 +6132,11 @@
                       "description": "Message template",
                       "type": "string"
                     },
+                    "messageThreadID": {
+                      "description": "The Telegram Group Topic ID.\nIt requires Alertmanager >= 0.26.0.",
+                      "type": "integer",
+                      "format": "int64"
+                    },
                     "parseMode": {
                       "description": "Parse mode for telegram message",
                       "type": "string",
@@ -9024,5 +9029,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

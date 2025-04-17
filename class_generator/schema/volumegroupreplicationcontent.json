@@ -20,8 +20,7 @@
       "required": [
         "provisioner",
         "source",
-        "volumeGroupReplicationHandle",
-        "volumeGroupReplicationRef"
+        "volumeGroupReplicationClassName"
       ],
       "properties": {
         "provisioner": {
@@ -29,7 +28,7 @@
           "type": "string"
         },
         "source": {
-          "description": "Source specifies whether the snapshot is (or should be) dynamically provisioned\nor already exists, and just requires a Kubernetes object representation.\nThis field is immutable after creation.\nRequired.",
+          "description": "Source specifies whether the volume group is (or should be) dynamically provisioned\nor already exists using the volumes listed here, and just requires a\nKubernetes object representation.\nRequired.",
           "type": "object",
           "required": [
             "volumeHandles"
@@ -45,7 +44,7 @@
           }
         },
         "volumeGroupReplicationClassName": {
-          "description": "VolumeGroupReplicationClassName is the name of the VolumeGroupReplicationClass from\nwhich this group replication was (or will be) created.",
+          "description": "VolumeGroupReplicationClassName is the name of the VolumeGroupReplicationClass from\nwhich this group replication was (or will be) created.\nRequired.",
           "type": "string"
         },
         "volumeGroupReplicationHandle": {
@@ -53,7 +52,7 @@
           "type": "string"
         },
         "volumeGroupReplicationRef": {
-          "description": "VolumeGroupreplicationRef specifies the VolumeGroupReplication object to which this\nVolumeGroupReplicationContent object is bound.\nVolumeGroupReplication.Spec.VolumeGroupReplicationContentName field must reference to\nthis VolumeGroupReplicationContent's name for the bidirectional binding to be valid.\nFor a pre-existing VolumeGroupReplicationContent object, name and namespace of the\nVolumeGroupReplication object MUST be provided for binding to happen.\nThis field is immutable after creation.\nRequired.",
+          "description": "VolumeGroupreplicationRef specifies the VolumeGroupReplication object to which this\nVolumeGroupReplicationContent object is bound.\nVolumeGroupReplication.Spec.VolumeGroupReplicationContentName field must reference to\nthis VolumeGroupReplicationContent's name for the bidirectional binding to be valid.\nFor a pre-existing VolumeGroupReplication object, MUST provide an empty/nil value for\nVolumeGroupReplicationRef for the auto-binding to happen.",
           "type": "object",
           "properties": {
             "apiVersion": {
@@ -88,12 +87,8 @@
           "x-kubernetes-map-type": "atomic",
           "x-kubernetes-validations": [
             {
-              "message": "both volumeGroupReplicationRef.name and volumeGroupReplicationRef.namespace must be set",
-              "rule": "has(self.name) && has(self.__namespace__)"
-            },
-            {
-              "message": "volumeGroupReplicationRef is immutable",
-              "rule": "self == oldSelf"
+              "message": "volumeGroupReplicationRef.name, volumeGroupReplicationRef.namespace and volumeGroupReplicationRef.uid must be set if volumeGroupReplicationRef is defined",
+              "rule": "self != null ? has(self.name) && has(self.__namespace__) && has(self.uid) : true"
             }
           ]
         }
@@ -104,7 +99,7 @@
       "type": "object",
       "properties": {
         "persistentVolumeRefList": {
-          "description": "PersistentVolumeRefList is the list of of PV for the group replication\nThe maximum number of allowed PV in the group is 100.",
+          "description": "PersistentVolumeRefList is the list of PV for the group replication\nThe maximum number of allowed PV in the group is 100.",
           "type": "array",
           "items": {
             "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
@@ -128,5 +123,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

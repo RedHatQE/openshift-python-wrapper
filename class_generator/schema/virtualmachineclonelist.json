@@ -13,7 +13,7 @@
       "description": "List of virtualmachineclones. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1alpha1.VirtualMachineClone"
+        "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1beta1.VirtualMachineClone"
       }
     },
     "kind": {
@@ -29,8 +29,9 @@
     {
       "group": "clone.kubevirt.io",
       "kind": "VirtualMachineCloneList",
-      "version": "v1alpha1"
+      "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

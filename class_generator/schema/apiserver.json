@@ -26,7 +26,8 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-kubernetes-list-type": "atomic"
         },
         "audit": {
           "description": "audit specifies the settings for audit configuration to be applied to all OpenShift-provided\nAPI servers in the cluster.",
@@ -122,7 +123,8 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   },
                   "servingCertificate": {
                     "description": "servingCertificate references a kubernetes.io/tls type secret containing the TLS cert info for serving secure traffic.\nThe secret must exist in the openshift-config namespace and contain the following required fields:\n- Secret.Data[\"tls.key\"] - TLS private key.\n- Secret.Data[\"tls.crt\"] - TLS certificate.",
@@ -138,7 +140,8 @@
                     }
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             }
           }
         },
@@ -184,5 +187,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

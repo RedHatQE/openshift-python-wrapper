@@ -182,6 +182,10 @@
       "x-kubernetes-patch-merge-key": "name",
       "x-kubernetes-patch-strategy": "merge,retainKeys"
     },
+    "resources": {
+      "description": "Resources is the total amount of CPU and Memory resources required by all containers in the pod. It supports specifying Requests and Limits for \"cpu\" and \"memory\" resource names only. ResourceClaims are not supported.\n\nThis field enables fine-grained control over resource allocation for the entire pod, allowing resource sharing among containers in a pod.\n\nThis is an alpha field and requires enabling the PodLevelResources feature gate.",
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ResourceRequirements"
+    },
     "restartPolicy": {
       "description": "Restart policy for all containers within the pod. One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy\n\nPossible enum values:\n - `\"Always\"`\n - `\"Never\"`\n - `\"OnFailure\"`",
       "type": "string",
@@ -225,7 +229,7 @@
       "type": "string"
     },
     "setHostnameAsFQDN": {
-      "description": "If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.",
+      "description": "If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default). In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname). In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters to FQDN. If a pod does not have FQDN, this has no effect. Default to false.",
       "type": "boolean"
     },
     "shareProcessNamespace": {

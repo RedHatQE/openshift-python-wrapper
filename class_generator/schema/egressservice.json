@@ -1,5 +1,5 @@
 {
-  "description": "EgressService is a CRD that allows the user to request that the source IP of egress packets originating from all of the pods that are endpoints of the corresponding LoadBalancer Service would be its ingress IP. In addition, it allows the user to request that egress packets originating from all of the pods that are endpoints of the LoadBalancer service would use a different network than the main one.",
+  "description": "EgressService is a CRD that allows the user to request that the source\nIP of egress packets originating from all of the pods that are endpoints\nof the corresponding LoadBalancer Service would be its ingress IP.\nIn addition, it allows the user to request that egress packets originating from\nall of the pods that are endpoints of the LoadBalancer service would use a different\nnetwork than the main one.",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -19,18 +19,18 @@
       "type": "object",
       "properties": {
         "network": {
-          "description": "The network which this service should send egress and corresponding ingress replies to. This is typically implemented as VRF mapping, representing a numeric id or string name of a routing table which by omission uses the default host routing.",
+          "description": "The network which this service should send egress and corresponding ingress replies to.\nThis is typically implemented as VRF mapping, representing a numeric id or string name\nof a routing table which by omission uses the default host routing.",
           "type": "string"
         },
         "nodeSelector": {
-          "description": "Allows limiting the nodes that can be selected to handle the service's traffic when sourceIPBy=LoadBalancerIP. When present only a node whose labels match the specified selectors can be selected for handling the service's traffic. When it is not specified any node in the cluster can be chosen to manage the service's traffic.",
+          "description": "Allows limiting the nodes that can be selected to handle the service's traffic when sourceIPBy=LoadBalancerIP.\nWhen present only a node whose labels match the specified selectors can be selected\nfor handling the service's traffic.\nWhen it is not specified any node in the cluster can be chosen to manage the service's traffic.",
           "type": "object",
           "properties": {
             "matchExpressions": {
               "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
               "type": "array",
               "items": {
-                "description": "A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.",
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
                 "type": "object",
                 "required": [
                   "key",
@@ -42,21 +42,23 @@
                     "type": "string"
                   },
                   "operator": {
-                    "description": "operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.",
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
                     "type": "string"
                   },
                   "values": {
-                    "description": "values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.",
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   }
                 }
-              }
+              },
+              "x-kubernetes-list-type": "atomic"
             },
             "matchLabels": {
-              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is \"key\", the operator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
               "type": "object",
               "additionalProperties": {
                 "type": "string"
@@ -66,7 +68,7 @@
           "x-kubernetes-map-type": "atomic"
         },
         "sourceIPBy": {
-          "description": "Determines the source IP of egress traffic originating from the pods backing the LoadBalancer Service. When `LoadBalancerIP` the source IP is set to its LoadBalancer ingress IP. When `Network` the source IP is set according to the interface of the Network, leveraging the masquerade rules that are already in place. Typically these rules specify SNAT to the IP of the outgoing interface, which means the packet will typically leave with the IP of the node.",
+          "description": "Determines the source IP of egress traffic originating from the pods backing the LoadBalancer Service.\nWhen `LoadBalancerIP` the source IP is set to its LoadBalancer ingress IP.\nWhen `Network` the source IP is set according to the interface of the Network,\nleveraging the masquerade rules that are already in place.\nTypically these rules specify SNAT to the IP of the outgoing interface,\nwhich means the packet will typically leave with the IP of the node.",
           "type": "string",
           "enum": [
             "LoadBalancerIP",
@@ -83,7 +85,7 @@
       ],
       "properties": {
         "host": {
-          "description": "The name of the node selected to handle the service's traffic. In case sourceIPBy=Network the field will be set to \"ALL\".",
+          "description": "The name of the node selected to handle the service's traffic.\nIn case sourceIPBy=Network the field will be set to \"ALL\".",
           "type": "string"
         }
       }
@@ -96,5 +98,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

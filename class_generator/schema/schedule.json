@@ -1,0 +1,213 @@
+{
+  "description": "Schedule is a Velero resource that represents a pre-scheduled or\nperiodic Backup that should be run.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ScheduleSpec defines the specification for a Velero schedule",
+      "type": "object",
+      "required": [
+        "schedule",
+        "template"
+      ],
+      "properties": {
+        "paused": {
+          "description": "Paused specifies whether the schedule is paused or not",
+          "type": "boolean"
+        },
+        "schedule": {
+          "description": "Schedule is a Cron expression defining when to run\nthe Backup.",
+          "type": "string"
+        },
+        "skipImmediately": {
+          "description": "SkipImmediately specifies whether to skip backup if schedule is due immediately from `schedule.status.lastBackup` timestamp when schedule is unpaused or if schedule is new.\nIf true, backup will be skipped immediately when schedule is unpaused if it is due based on .Status.LastBackupTimestamp or schedule is new, and will run at next schedule time.\nIf false, backup will not be skipped immediately when schedule is unpaused, but will run at next schedule time.\nIf empty, will follow server configuration (default: false).",
+          "type": "boolean"
+        },
+        "template": {
+          "description": "Template is the definition of the Backup to be run\non the provided schedule",
+          "type": "object",
+          "properties": {
+            "csiSnapshotTimeout": {
+              "description": "CSISnapshotTimeout specifies the time used to wait for CSI VolumeSnapshot status turns to\nReadyToUse during creation, before returning error as timeout.\nThe default value is 10 minute.",
+              "type": "string"
+            },
+            "datamover": {
+              "description": "DataMover specifies the data mover to be used by the backup.\nIf DataMover is \"\" or \"velero\", the built-in data mover will be used.",
+              "type": "string"
+            },
+            "defaultVolumesToFsBackup": {
+              "description": "DefaultVolumesToFsBackup specifies whether pod volume file system backup should be used\nfor all volumes by default."
+            },
+            "defaultVolumesToRestic": {
+              "description": "DefaultVolumesToRestic specifies whether restic should be used to take a\nbackup of all pod volumes by default.\n\n\nDeprecated: this field is no longer used and will be removed entirely in future. Use DefaultVolumesToFsBackup instead."
+            },
+            "excludedClusterScopedResources": {
+              "description": "ExcludedClusterScopedResources is a slice of cluster-scoped\nresource type names to exclude from the backup.\nIf set to \"*\", all cluster-scoped resource types are excluded.\nThe default value is empty."
+            },
+            "excludedNamespaceScopedResources": {
+              "description": "ExcludedNamespaceScopedResources is a slice of namespace-scoped\nresource type names to exclude from the backup.\nIf set to \"*\", all namespace-scoped resource types are excluded.\nThe default value is empty."
+            },
+            "excludedNamespaces": {
+              "description": "ExcludedNamespaces contains a list of namespaces that are not\nincluded in the backup."
+            },
+            "excludedResources": {
+              "description": "ExcludedResources is a slice of resource names that are not\nincluded in the backup."
+            },
+            "hooks": {
+              "description": "Hooks represent custom behaviors that should be executed at different phases of the backup.",
+              "type": "object",
+              "properties": {
+                "resources": {
+                  "description": "Resources are hooks that should be executed when backing up individual instances of a resource."
+                }
+              }
+            },
+            "includeClusterResources": {
+              "description": "IncludeClusterResources specifies whether cluster-scoped resources\nshould be included for consideration in the backup."
+            },
+            "includedClusterScopedResources": {
+              "description": "IncludedClusterScopedResources is a slice of cluster-scoped\nresource type names to include in the backup.\nIf set to \"*\", all cluster-scoped resource types are included.\nThe default value is empty, which means only related\ncluster-scoped resources are included."
+            },
+            "includedNamespaceScopedResources": {
+              "description": "IncludedNamespaceScopedResources is a slice of namespace-scoped\nresource type names to include in the backup.\nThe default value is \"*\"."
+            },
+            "includedNamespaces": {
+              "description": "IncludedNamespaces is a slice of namespace names to include objects\nfrom. If empty, all namespaces are included."
+            },
+            "includedResources": {
+              "description": "IncludedResources is a slice of resource names to include\nin the backup. If empty, all resources are included."
+            },
+            "itemOperationTimeout": {
+              "description": "ItemOperationTimeout specifies the time used to wait for asynchronous BackupItemAction operations\nThe default value is 4 hour.",
+              "type": "string"
+            },
+            "labelSelector": {
+              "description": "LabelSelector is a metav1.LabelSelector to filter with\nwhen adding individual objects to the backup. If empty\nor nil, all objects are included. Optional.",
+              "x-kubernetes-map-type": "atomic"
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "orLabelSelectors": {
+              "description": "OrLabelSelectors is list of metav1.LabelSelector to filter with\nwhen adding individual objects to the backup. If multiple provided\nthey will be joined by the OR operator. LabelSelector as well as\nOrLabelSelectors cannot co-exist in backup request, only one of them\ncan be used."
+            },
+            "orderedResources": {
+              "description": "OrderedResources specifies the backup order of resources of specific Kind.\nThe map key is the resource name and value is a list of object names separated by commas.\nEach resource name has format \"namespace/objectname\".  For cluster resources, simply use \"objectname\".",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "resourcePolicy": {
+              "description": "ResourcePolicy specifies the referenced resource policies that backup should follow",
+              "type": "object",
+              "required": [
+                "kind",
+                "name"
+              ],
+              "properties": {
+                "apiGroup": {
+                  "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Kind is the type of resource being referenced",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name is the name of resource being referenced",
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "snapshotMoveData": {
+              "description": "SnapshotMoveData specifies whether snapshot data should be moved"
+            },
+            "snapshotVolumes": {
+              "description": "SnapshotVolumes specifies whether to take snapshots\nof any PV's referenced in the set of objects included\nin the Backup."
+            },
+            "storageLocation": {
+              "description": "StorageLocation is a string containing the name of a BackupStorageLocation where the backup should be stored.",
+              "type": "string"
+            },
+            "ttl": {
+              "description": "TTL is a time.Duration-parseable string describing how long\nthe Backup should be retained for.",
+              "type": "string"
+            },
+            "uploaderConfig": {
+              "description": "UploaderConfig specifies the configuration for the uploader."
+            },
+            "volumeSnapshotLocations": {
+              "description": "VolumeSnapshotLocations is a list containing names of VolumeSnapshotLocations associated with this backup.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "useOwnerReferencesInBackup": {
+          "description": "UseOwnerReferencesBackup specifies whether to use\nOwnerReferences on backups created by this Schedule."
+        }
+      }
+    },
+    "status": {
+      "description": "ScheduleStatus captures the current state of a Velero schedule",
+      "type": "object",
+      "properties": {
+        "lastBackup": {
+          "description": "LastBackup is the last time a Backup was run for this\nSchedule schedule",
+          "format": "date-time"
+        },
+        "lastSkipped": {
+          "description": "LastSkipped is the last time a Schedule was skipped",
+          "format": "date-time"
+        },
+        "phase": {
+          "description": "Phase is the current phase of the Schedule",
+          "type": "string",
+          "enum": [
+            "New",
+            "Enabled",
+            "FailedValidation"
+          ]
+        },
+        "validationErrors": {
+          "description": "ValidationErrors is a slice of all validation errors (if\napplicable)",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "velero.io",
+      "kind": "Schedule",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

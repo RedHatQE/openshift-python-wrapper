@@ -1,0 +1,106 @@
+{
+  "description": "MigHook is the Schema for the mighooks API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "MigHookSpec defines the desired state of MigHook",
+      "type": "object",
+      "required": [
+        "custom",
+        "image",
+        "targetCluster"
+      ],
+      "properties": {
+        "activeDeadlineSeconds": {
+          "description": "Specifies the highest amount of time for which the hook will run.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "custom": {
+          "description": "Specifies whether the hook is a custom Ansible playbook or a pre-built image. This is a required field.",
+          "type": "boolean"
+        },
+        "image": {
+          "description": "Specifies the image of the hook to be executed. This is a required field.",
+          "type": "string"
+        },
+        "playbook": {
+          "description": "Specifies the contents of the custom Ansible playbook in base64 format, it is used in conjunction with the custom boolean flag.",
+          "type": "string"
+        },
+        "targetCluster": {
+          "description": "Specifies the cluster on which the hook is to be executed. This is a required field.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "MigHookStatus defines the observed state of MigHook",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition\nType - The condition type.\nStatus - The condition status.\nReason - The reason for the condition.\nMessage - The human readable description of the condition.\nDurable - The condition is not un-staged.\nItems - A list of `items` associated with the condition used to replace [] in `Message`.\nstaging - A condition has been explicitly set/updated.",
+            "type": "object",
+            "required": [
+              "category",
+              "lastTransitionTime",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "durable": {
+                "type": "boolean"
+              },
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "observedGeneration": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "migration.openshift.io",
+      "kind": "MigHook",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -13,7 +13,7 @@
       "description": "`items` is a list of request-priorities.",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfiguration"
+        "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.PriorityLevelConfiguration"
       }
     },
     "kind": {
@@ -29,7 +29,7 @@
     {
       "group": "flowcontrol.apiserver.k8s.io",
       "kind": "PriorityLevelConfigurationList",
-      "version": "v1beta3"
+      "version": "v1"
     }
   ],
   "$schema": "http://json-schema.org/schema#"

@@ -15,17 +15,17 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "Spec defines the matcher.",
+      "description": "spec defines the matcher.",
       "type": "object",
       "properties": {
         "grouprestriction": {
-          "description": "GroupRestriction matches against group subjects."
+          "description": "grouprestriction matches against group subjects."
         },
         "serviceaccountrestriction": {
-          "description": "ServiceAccountRestriction matches against service-account subjects."
+          "description": "serviceaccountrestriction matches against service-account subjects."
         },
         "userrestriction": {
-          "description": "UserRestriction matches against user subjects."
+          "description": "userrestriction matches against user subjects."
         }
       }
     }
@@ -37,5 +37,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
