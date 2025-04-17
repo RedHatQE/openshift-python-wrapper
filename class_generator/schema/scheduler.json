@@ -26,7 +26,7 @@
           "type": "string"
         },
         "mastersSchedulable": {
-          "description": "MastersSchedulable allows masters nodes to be schedulable. When this flag is\nturned on, all the master nodes in the cluster will be made schedulable,\nso that workload pods can run on them. The default value for this field is false,\nmeaning none of the master nodes are schedulable.\nImportant Note: Once the workload pods start running on the master nodes,\nextreme care must be taken to ensure that cluster-critical control plane components\nare not impacted.\nPlease turn on this field after doing due diligence.",
+          "description": "mastersSchedulable allows masters nodes to be schedulable. When this flag is\nturned on, all the master nodes in the cluster will be made schedulable,\nso that workload pods can run on them. The default value for this field is false,\nmeaning none of the master nodes are schedulable.\nImportant Note: Once the workload pods start running on the master nodes,\nextreme care must be taken to ensure that cluster-critical control plane components\nare not impacted.\nPlease turn on this field after doing due diligence.",
           "type": "boolean"
         },
         "policy": {
@@ -66,5 +66,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

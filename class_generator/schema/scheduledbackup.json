@@ -1,0 +1,151 @@
+{
+  "description": "ScheduledBackup is the Schema for the scheduledbackups API",
+  "type": "object",
+  "required": [
+    "metadata",
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Specification of the desired behavior of the ScheduledBackup.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+      "type": "object",
+      "required": [
+        "cluster",
+        "schedule"
+      ],
+      "properties": {
+        "backupOwnerReference": {
+          "description": "Indicates which ownerReference should be put inside the created backup resources.<br />\n- none: no owner reference for created backup objects (same behavior as before the field was introduced)<br />\n- self: sets the Scheduled backup object as owner of the backup<br />\n- cluster: set the cluster as owner of the backup<br />",
+          "type": "string",
+          "enum": [
+            "none",
+            "self",
+            "cluster"
+          ]
+        },
+        "cluster": {
+          "description": "The cluster to backup",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name of the referent.",
+              "type": "string"
+            }
+          }
+        },
+        "immediate": {
+          "description": "If the first backup has to be immediately start after creation or not",
+          "type": "boolean"
+        },
+        "method": {
+          "description": "The backup method to be used, possible options are `barmanObjectStore`,\n`volumeSnapshot` or `plugin`. Defaults to: `barmanObjectStore`.",
+          "type": "string",
+          "enum": [
+            "barmanObjectStore",
+            "volumeSnapshot",
+            "plugin"
+          ]
+        },
+        "online": {
+          "description": "Whether the default type of backup with volume snapshots is\nonline/hot (`true`, default) or offline/cold (`false`)\nOverrides the default setting specified in the cluster field '.spec.backup.volumeSnapshot.online'",
+          "type": "boolean"
+        },
+        "onlineConfiguration": {
+          "description": "Configuration parameters to control the online/hot backup with volume snapshots\nOverrides the default settings specified in the cluster '.backup.volumeSnapshot.onlineConfiguration' stanza",
+          "type": "object",
+          "properties": {
+            "immediateCheckpoint": {
+              "description": "Control whether the I/O workload for the backup initial checkpoint will\nbe limited, according to the `checkpoint_completion_target` setting on\nthe PostgreSQL server. If set to true, an immediate checkpoint will be\nused, meaning PostgreSQL will complete the checkpoint as soon as\npossible. `false` by default.",
+              "type": "boolean"
+            },
+            "waitForArchive": {
+              "description": "If false, the function will return immediately after the backup is completed,\nwithout waiting for WAL to be archived.\nThis behavior is only useful with backup software that independently monitors WAL archiving.\nOtherwise, WAL required to make the backup consistent might be missing and make the backup useless.\nBy default, or when this parameter is true, pg_backup_stop will wait for WAL to be archived when archiving is\nenabled.\nOn a standby, this means that it will wait only when archive_mode = always.\nIf write activity on the primary is low, it may be useful to run pg_switch_wal on the primary in order to trigger\nan immediate segment switch.",
+              "type": "boolean"
+            }
+          }
+        },
+        "pluginConfiguration": {
+          "description": "Configuration parameters passed to the plugin managing this backup",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name is the name of the plugin managing this backup",
+              "type": "string"
+            },
+            "parameters": {
+              "description": "Parameters are the configuration parameters passed to the backup\nplugin for this backup",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "schedule": {
+          "description": "The schedule does not follow the same format used in Kubernetes CronJobs\nas it includes an additional seconds specifier,\nsee https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format",
+          "type": "string"
+        },
+        "suspend": {
+          "description": "If this backup is suspended or not",
+          "type": "boolean"
+        },
+        "target": {
+          "description": "The policy to decide which instance should perform this backup. If empty,\nit defaults to `cluster.spec.backup.target`.\nAvailable options are empty string, `primary` and `prefer-standby`.\n`primary` to have backups run always on primary instances,\n`prefer-standby` to have backups run preferably on the most updated\nstandby, if available.",
+          "type": "string",
+          "enum": [
+            "primary",
+            "prefer-standby"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "Most recently observed status of the ScheduledBackup. This data may not be up\nto date. Populated by the system. Read-only.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+      "type": "object",
+      "properties": {
+        "lastCheckTime": {
+          "description": "The latest time the schedule",
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastScheduleTime": {
+          "description": "Information when was the last time that backup was successfully scheduled.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextScheduleTime": {
+          "description": "Next time we will run a backup",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "postgresql.cnpg.noobaa.io",
+      "kind": "ScheduledBackup",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

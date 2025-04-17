@@ -42,12 +42,13 @@
           ]
         },
         "managedBootImages": {
-          "description": "managedBootImages allows configuration for the management of boot images for machine\nresources within the cluster. This configuration allows users to select resources that should\nbe updated to the latest boot images during cluster upgrades, ensuring that new machines\nalways boot with the current cluster version's boot image. When omitted, no boot images\nwill be updated.",
+          "description": "managedBootImages allows configuration for the management of boot images for machine\nresources within the cluster. This configuration allows users to select resources that should\nbe updated to the latest boot images during cluster upgrades, ensuring that new machines\nalways boot with the current cluster version's boot image. When omitted, this means no opinion\nand the platform is left to choose a reasonable default, which is subject to change over time.\nThe default for each machine manager mode is All for GCP and AWS platforms, and None for all\nother platforms.",
           "type": "object",
           "properties": {
             "machineManagers": {
               "description": "machineManagers can be used to register machine management resources for boot image updates. The Machine Config Operator\nwill watch for changes to this list. Only one entry is permitted per type of machine management resource.",
               "type": "array",
+              "maxItems": 5,
               "items": {
                 "description": "MachineManager describes a target machine resource that is registered for boot image updates. It stores identifying information\nsuch as the resource type and the API Group of the resource. It also provides granular control via the selection field.",
                 "type": "object",
@@ -79,11 +80,12 @@
                     ],
                     "properties": {
                       "mode": {
-                        "description": "mode determines how machine managers will be selected for updates.\nValid values are All and Partial.\nAll means that every resource matched by the machine manager will be updated.\nPartial requires specified selector(s) and allows customisation of which resources matched by the machine manager will be updated.",
+                        "description": "mode determines how machine managers will be selected for updates.\nValid values are All and Partial.\nAll means that every resource matched by the machine manager will be updated.\nPartial requires specified selector(s) and allows customisation of which resources matched by the machine manager will be updated.\nNone means that every resource matched by the machine manager will not be updated.",
                         "type": "string",
                         "enum": [
                           "All",
-                          "Partial"
+                          "Partial",
+                          "None"
                         ]
                       },
                       "partial": {
@@ -606,6 +608,125 @@
           ],
           "x-kubernetes-list-type": "map"
         },
+        "managedBootImagesStatus": {
+          "description": "managedBootImagesStatus reflects what the latest cluster-validated boot image configuration is\nand will be used by Machine Config Controller while performing boot image updates.",
+          "type": "object",
+          "properties": {
+            "machineManagers": {
+              "description": "machineManagers can be used to register machine management resources for boot image updates. The Machine Config Operator\nwill watch for changes to this list. Only one entry is permitted per type of machine management resource.",
+              "type": "array",
+              "maxItems": 5,
+              "items": {
+                "description": "MachineManager describes a target machine resource that is registered for boot image updates. It stores identifying information\nsuch as the resource type and the API Group of the resource. It also provides granular control via the selection field.",
+                "type": "object",
+                "required": [
+                  "apiGroup",
+                  "resource",
+                  "selection"
+                ],
+                "properties": {
+                  "apiGroup": {
+                    "description": "apiGroup is name of the APIGroup that the machine management resource belongs to.\nThe only current valid value is machine.openshift.io.\nmachine.openshift.io means that the machine manager will only register resources that belong to OpenShift machine API group.",
+                    "type": "string",
+                    "enum": [
+                      "machine.openshift.io"
+                    ]
+                  },
+                  "resource": {
+                    "description": "resource is the machine management resource's type.\nThe only current valid value is machinesets.\nmachinesets means that the machine manager will only register resources of the kind MachineSet.",
+                    "type": "string",
+                    "enum": [
+                      "machinesets"
+                    ]
+                  },
+                  "selection": {
+                    "description": "selection allows granular control of the machine management resources that will be registered for boot image updates.",
+                    "type": "object",
+                    "required": [
+                      "mode"
+                    ],
+                    "properties": {
+                      "mode": {
+                        "description": "mode determines how machine managers will be selected for updates.\nValid values are All and Partial.\nAll means that every resource matched by the machine manager will be updated.\nPartial requires specified selector(s) and allows customisation of which resources matched by the machine manager will be updated.\nNone means that every resource matched by the machine manager will not be updated.",
+                        "type": "string",
+                        "enum": [
+                          "All",
+                          "Partial",
+                          "None"
+                        ]
+                      },
+                      "partial": {
+                        "description": "partial provides label selector(s) that can be used to match machine management resources.\nOnly permitted when mode is set to \"Partial\".",
+                        "type": "object",
+                        "required": [
+                          "machineResourceSelector"
+                        ],
+                        "properties": {
+                          "machineResourceSelector": {
+                            "description": "machineResourceSelector is a label selector that can be used to select machine resources like MachineSets.",
+                            "type": "object",
+                            "properties": {
+                              "matchExpressions": {
+                                "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                                "type": "array",
+                                "items": {
+                                  "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                                  "type": "object",
+                                  "required": [
+                                    "key",
+                                    "operator"
+                                  ],
+                                  "properties": {
+                                    "key": {
+                                      "description": "key is the label key that the selector applies to.",
+                                      "type": "string"
+                                    },
+                                    "operator": {
+                                      "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                                      "type": "string"
+                                    },
+                                    "values": {
+                                      "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
+                                    }
+                                  }
+                                },
+                                "x-kubernetes-list-type": "atomic"
+                              },
+                              "matchLabels": {
+                                "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                                "type": "object",
+                                "additionalProperties": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "x-kubernetes-map-type": "atomic"
+                          }
+                        }
+                      }
+                    },
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "Partial is required when type is partial, and forbidden otherwise",
+                        "rule": "has(self.mode) && self.mode == 'Partial' ?  has(self.partial) : !has(self.partial)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "x-kubernetes-list-map-keys": [
+                "resource",
+                "apiGroup"
+              ],
+              "x-kubernetes-list-type": "map"
+            }
+          }
+        },
         "nodeDisruptionPolicyStatus": {
           "description": "nodeDisruptionPolicyStatus status reflects what the latest cluster-validated policies are,\nand will be used by the Machine Config Daemon during future node updates.",
           "type": "object",
@@ -984,5 +1105,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

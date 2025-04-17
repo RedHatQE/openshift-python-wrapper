@@ -1,4 +1,5 @@
 {
+  "description": "TypedObjectReference contains enough information to let you locate the typed referenced object",
   "type": "object",
   "required": [
     "kind",

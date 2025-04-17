@@ -110,11 +110,11 @@
           "x-kubernetes-validations": [
             {
               "message": "cannot set both Architecture and Image",
-              "rule": "has(self.architecture) && has(self.image) ? (self.architecture == '' || self.image == '') : true"
+              "rule": "has(self.architecture) && has(self.image) ? (self.architecture == \"\" || self.image == \"\") : true"
             },
             {
               "message": "Version must be set if Architecture is set",
-              "rule": "has(self.architecture) && self.architecture != '' ? self.version != '' : true"
+              "rule": "has(self.architecture) && self.architecture != \"\" ? self.version != \"\" : true"
             }
           ]
         },
@@ -369,14 +369,14 @@
                         ],
                         "properties": {
                           "promql": {
-                            "description": "promQL represents a cluster condition based on PromQL.",
+                            "description": "promql represents a cluster condition based on PromQL.",
                             "type": "object",
                             "required": [
                               "promql"
                             ],
                             "properties": {
                               "promql": {
-                                "description": "PromQL is a PromQL query classifying clusters. This query\nquery should return a 1 in the match case and a 0 in the\ndoes-not-match case. Queries which return no time\nseries, or which return values besides 0 or 1, are\nevaluation failures.",
+                                "description": "promql is a PromQL query classifying clusters. This query\nquery should return a 1 in the match case and a 0 in the\ndoes-not-match case. Queries which return no time\nseries, or which return values besides 0 or 1, are\nevaluation failures.",
                                 "type": "string"
                               }
                             }
@@ -555,6 +555,7 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": "the `marketplace` capability requires the `OperatorLifecycleManager` capability, which is neither explicitly or implicitly enabled in this cluster, please enable the `OperatorLifecycleManager` capability",

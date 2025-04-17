@@ -29,6 +29,9 @@
         "allowPostCopy": {
           "type": "boolean"
         },
+        "allowWorkloadDisruption": {
+          "type": "boolean"
+        },
         "bandwidthPerMigration": {
           "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
           "x-kubernetes-int-or-string": true
@@ -65,5 +68,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

@@ -1534,6 +1534,9 @@
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GRPCAction"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GRPCAction_v2"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.GitRepoVolumeSource"
     },
     {
@@ -1588,6 +1591,12 @@
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LifecycleHandler"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LifecycleHandler_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LifecycleHandler_v3"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.LimitRange"
     },
     {
@@ -1628,6 +1637,9 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceCondition"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceCondition_v2"
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.NamespaceList"
@@ -1798,7 +1810,13 @@
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfigOption"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfigOption_v2"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfig_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodDNSConfig_v3"
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.PodIP"
@@ -1862,6 +1880,12 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Probe"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Probe_v2"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Probe_v3"
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.ProjectedVolumeSource"
@@ -2071,6 +2095,9 @@
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TypedObjectReference"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.TypedObjectReference_v2"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.k8s.api.core.v1.Volume"
     },
     {
@@ -2222,75 +2249,6 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.UserSubject"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.ExemptPriorityLevelConfiguration"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowDistinguisherMethod"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchema"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaCondition"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaSpec"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchemaStatus"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.GroupSubject"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.LimitResponse"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.LimitedPriorityLevelConfiguration"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.NonResourcePolicyRule"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PolicyRulesWithSubjects"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfiguration"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationCondition"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationReference"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationSpec"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.PriorityLevelConfigurationStatus"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.QueuingConfiguration"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.ResourcePolicyRule"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.ServiceAccountSubject"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.Subject"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.UserSubject"
     },
     {
       "$ref": "_definitions.json#/definitions/io.k8s.api.networking.v1.HTTPIngressPath"
@@ -2629,6 +2587,9 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions_v2"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions_v3"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Duration"
     },
     {
@@ -2962,6 +2923,12 @@
       "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1alpha1.VirtualMachineCloneList"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1beta1.VirtualMachineClone"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.kubevirt.clone.v1beta1.VirtualMachineCloneList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.kubevirt.export.v1alpha1.VirtualMachineExport"
     },
     {
@@ -3274,24 +3241,6 @@
       "$ref": "_definitions.json#/definitions/io.nmstate.v1.NodeNetworkConfigurationPolicyList"
     },
     {
-      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationEnactment"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationEnactmentList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationPolicy"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkConfigurationPolicyList"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkState"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.nmstate.v1alpha1.NodeNetworkStateList"
-    },
-    {
       "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NMState"
     },
     {
@@ -3314,6 +3263,60 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.nmstate.v1beta1.NodeNetworkStateList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Backup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.BackupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Cluster"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ClusterImageCatalog"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ClusterImageCatalogList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ClusterList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Database"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.DatabaseList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ImageCatalog"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ImageCatalogList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Pooler"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.PoolerList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Publication"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.PublicationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ScheduledBackup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.ScheduledBackupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Subscription"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.SubscriptionList"
     },
     {
       "$ref": "_definitions.json#/definitions/io.noobaa.v1alpha1.BackingStore"
@@ -3562,12 +3565,6 @@
       "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsoleYAMLSampleList"
     },
     {
-      "$ref": "_definitions.json#/definitions/io.openshift.console.v1alpha1.ConsolePlugin"
-    },
-    {
-      "$ref": "_definitions.json#/definitions/io.openshift.console.v1alpha1.ConsolePluginList"
-    },
-    {
       "$ref": "_definitions.json#/definitions/io.openshift.csiaddons.v1alpha1.CSIAddonsNode"
     },
     {
@@ -3682,6 +3679,72 @@
       "$ref": "_definitions.json#/definitions/io.openshift.machineconfiguration.v1.MachineConfigPoolList"
     },
     {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectImageMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectImageMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectImageStreamMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectImageStreamMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectVolumeMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectVolumeMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectVolumeMigrationProgress"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.DirectVolumeMigrationProgressList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigAnalytic"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigAnalyticList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigCluster"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigClusterList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigHook"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigHookList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigMigration"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigMigrationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigPlan"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigPlanList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigStorage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigStorageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigrationController"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.migration.v1alpha1.MigrationControllerList"
+    },
+    {
       "$ref": "_definitions.json#/definitions/io.openshift.monitoring.v1.AlertRelabelConfig"
     },
     {
@@ -3698,6 +3761,18 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.openshift.network.cloud.v1.CloudPrivateIPConfigList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.oadp.v1alpha1.CloudStorage"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.oadp.v1alpha1.CloudStorageList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.oadp.v1alpha1.DataProtectionApplication"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.openshift.oadp.v1alpha1.DataProtectionApplicationList"
     },
     {
       "$ref": "_definitions.json#/definitions/io.openshift.ocs.v1.OCSInitialization"
@@ -4136,6 +4211,84 @@
     },
     {
       "$ref": "_definitions.json#/definitions/io.rook.ceph.v1.CephRBDMirrorList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.Backup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.BackupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.BackupRepository"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.BackupRepositoryList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.BackupStorageLocation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.BackupStorageLocationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.DeleteBackupRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.DeleteBackupRequestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.DownloadRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.DownloadRequestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.PodVolumeBackup"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.PodVolumeBackupList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.PodVolumeRestore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.PodVolumeRestoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.Restore"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.RestoreList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.Schedule"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.ScheduleList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.ServerStatusRequest"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.ServerStatusRequestList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.VolumeSnapshotLocation"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v1.VolumeSnapshotLocationList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v2alpha1.DataDownload"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v2alpha1.DataDownloadList"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v2alpha1.DataUpload"
+    },
+    {
+      "$ref": "_definitions.json#/definitions/io.velero.v2alpha1.DataUploadList"
     },
     {
       "$ref": "_definitions.json#/definitions/io.x-k8s.cluster.infrastructure.v1alpha5.Metal3Remediation"

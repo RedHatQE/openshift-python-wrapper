@@ -301,6 +301,9 @@
         "preserveFilesystemOnDelete": {
           "type": "boolean"
         },
+        "preservePoolNames": {
+          "type": "boolean"
+        },
         "preservePoolsOnDelete": {
           "type": "boolean"
         },
@@ -320,5 +323,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }
