@@ -190,6 +190,7 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": "olm is a singleton, .metadata.name must be 'cluster'",

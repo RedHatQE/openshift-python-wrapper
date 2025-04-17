@@ -1,4 +1,5 @@
 {
+  "description": "GRPCAction specifies an action involving a GRPC service.",
   "type": "object",
   "required": [
     "port"

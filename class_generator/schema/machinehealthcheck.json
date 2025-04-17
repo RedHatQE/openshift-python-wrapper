@@ -29,7 +29,7 @@
           "pattern": "^0|([0-9]+(\\.[0-9]+)?(ns|us|\u00b5s|ms|s|m|h))+$"
         },
         "remediationTemplate": {
-          "description": "RemediationTemplate is a reference to a remediation template\nprovided by an infrastructure provider.\n\nThis field is completely optional, when filled, the MachineHealthCheck controller\ncreates a new object from the template referenced and hands off remediation of the machine to\na controller that lives outside of Machine API Operator.",
+          "description": "remediationTemplate is a reference to a remediation template\nprovided by an infrastructure provider.\n\nThis field is completely optional, when filled, the MachineHealthCheck controller\ncreates a new object from the template referenced and hands off remediation of the machine to\na controller that lives outside of Machine API Operator.",
           "type": "object",
           "properties": {
             "apiVersion": {
@@ -109,7 +109,7 @@
           "x-kubernetes-map-type": "atomic"
         },
         "unhealthyConditions": {
-          "description": "UnhealthyConditions contains a list of the conditions that determine\nwhether a node is considered unhealthy.  The conditions are combined in a\nlogical OR, i.e. if any of the conditions is met, the node is unhealthy.",
+          "description": "unhealthyConditions contains a list of the conditions that determine\nwhether a node is considered unhealthy.  The conditions are combined in a\nlogical OR, i.e. if any of the conditions is met, the node is unhealthy.",
           "type": "array",
           "minItems": 1,
           "items": {
@@ -139,7 +139,7 @@
       "type": "object",
       "properties": {
         "conditions": {
-          "description": "Conditions defines the current state of the MachineHealthCheck",
+          "description": "conditions defines the current state of the MachineHealthCheck",
           "type": "array",
           "items": {
             "description": "Condition defines an observation of a Machine API resource operational state.",
@@ -164,15 +164,15 @@
                 "type": "string"
               },
               "severity": {
-                "description": "Severity provides an explicit classification of Reason code, so the users or machines can immediately\nunderstand the current situation and act accordingly.\nThe Severity field MUST be set only when Status=False.",
+                "description": "severity provides an explicit classification of Reason code, so the users or machines can immediately\nunderstand the current situation and act accordingly.\nThe Severity field MUST be set only when Status=False.",
                 "type": "string"
               },
               "status": {
-                "description": "Status of the condition, one of True, False, Unknown.",
+                "description": "status of the condition, one of True, False, Unknown.",
                 "type": "string"
               },
               "type": {
-                "description": "Type of condition in CamelCase or in foo.example.com/CamelCase.\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions\ncan be useful (see .node.status.conditions), the ability to deconflict is important.",
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions\ncan be useful (see .node.status.conditions), the ability to deconflict is important.",
                 "type": "string"
               }
             }
@@ -193,7 +193,7 @@
           "minimum": 0
         },
         "remediationsAllowed": {
-          "description": "RemediationsAllowed is the number of further remediations allowed by this machine health check before\nmaxUnhealthy short circuiting will be applied",
+          "description": "remediationsAllowed is the number of further remediations allowed by this machine health check before\nmaxUnhealthy short circuiting will be applied",
           "type": "integer",
           "format": "int32",
           "minimum": 0
@@ -208,5 +208,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

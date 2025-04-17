@@ -311,6 +311,14 @@
           },
           "x-kubernetes-validations": [
             {
+              "message": "spec.layer3 is required when topology is Layer3 and forbidden otherwise",
+              "rule": "has(self.topology) && self.topology == 'Layer3' ? has(self.layer3): !has(self.layer3)"
+            },
+            {
+              "message": "spec.layer2 is required when topology is Layer2 and forbidden otherwise",
+              "rule": "has(self.topology) && self.topology == 'Layer2' ? has(self.layer2): !has(self.layer2)"
+            },
+            {
               "message": "Network spec is immutable",
               "rule": "self == oldSelf"
             }
@@ -391,5 +399,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

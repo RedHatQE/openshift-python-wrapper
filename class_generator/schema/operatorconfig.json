@@ -828,6 +828,10 @@
                     }
                   }
                 },
+                "hostNetwork": {
+                  "description": "hostNetwork setting to be propagated to CSI controller plugin pods",
+                  "type": "boolean"
+                },
                 "imagePullPolicy": {
                   "description": "To indicate the image pull policy to be applied to all the containers in the csi driver pods.",
                   "type": "string"
@@ -5355,5 +5359,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

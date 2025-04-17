@@ -24,7 +24,7 @@
       ],
       "properties": {
         "replicas": {
-          "description": "Replicas defines how many Control Plane Machines should be\ncreated by this ControlPlaneMachineSet.\nThis field is immutable and cannot be changed after cluster\ninstallation.\nThe ControlPlaneMachineSet only operates with 3 or 5 node control planes,\n3 and 5 are the only valid values for this field.",
+          "description": "replicas defines how many Control Plane Machines should be\ncreated by this ControlPlaneMachineSet.\nThis field is immutable and cannot be changed after cluster\ninstallation.\nThe ControlPlaneMachineSet only operates with 3 or 5 node control planes,\n3 and 5 are the only valid values for this field.",
           "type": "integer",
           "format": "int32",
           "enum": [
@@ -90,7 +90,7 @@
           ]
         },
         "state": {
-          "description": "State defines whether the ControlPlaneMachineSet is Active or Inactive.\nWhen Inactive, the ControlPlaneMachineSet will not take any action on the\nstate of the Machines within the cluster.\nWhen Active, the ControlPlaneMachineSet will reconcile the Machines and\nwill update the Machines as necessary.\nOnce Active, a ControlPlaneMachineSet cannot be made Inactive. To prevent\nfurther action please remove the ControlPlaneMachineSet.",
+          "description": "state defines whether the ControlPlaneMachineSet is Active or Inactive.\nWhen Inactive, the ControlPlaneMachineSet will not take any action on the\nstate of the Machines within the cluster.\nWhen Active, the ControlPlaneMachineSet will reconcile the Machines and\nwill update the Machines as necessary.\nOnce Active, a ControlPlaneMachineSet cannot be made Inactive. To prevent\nfurther action please remove the ControlPlaneMachineSet.",
           "type": "string",
           "enum": [
             "Active",
@@ -104,11 +104,11 @@
           ]
         },
         "strategy": {
-          "description": "Strategy defines how the ControlPlaneMachineSet will update\nMachines when it detects a change to the ProviderSpec.",
+          "description": "strategy defines how the ControlPlaneMachineSet will update\nMachines when it detects a change to the ProviderSpec.",
           "type": "object",
           "properties": {
             "type": {
-              "description": "Type defines the type of update strategy that should be\nused when updating Machines owned by the ControlPlaneMachineSet.\nValid values are \"RollingUpdate\" and \"OnDelete\".\nThe current default value is \"RollingUpdate\".",
+              "description": "type defines the type of update strategy that should be\nused when updating Machines owned by the ControlPlaneMachineSet.\nValid values are \"RollingUpdate\" and \"OnDelete\".\nThe current default value is \"RollingUpdate\".",
               "type": "string",
               "enum": [
                 "RollingUpdate",
@@ -118,14 +118,14 @@
           }
         },
         "template": {
-          "description": "Template describes the Control Plane Machines that will be created\nby this ControlPlaneMachineSet.",
+          "description": "template describes the Control Plane Machines that will be created\nby this ControlPlaneMachineSet.",
           "type": "object",
           "required": [
             "machineType"
           ],
           "properties": {
             "machineType": {
-              "description": "MachineType determines the type of Machines that should be managed by the ControlPlaneMachineSet.\nCurrently, the only valid value is machines_v1beta1_machine_openshift_io.",
+              "description": "machineType determines the type of Machines that should be managed by the ControlPlaneMachineSet.\nCurrently, the only valid value is machines_v1beta1_machine_openshift_io.",
               "type": "string",
               "enum": [
                 "machines_v1beta1_machine_openshift_io"
@@ -140,14 +140,14 @@
               ],
               "properties": {
                 "failureDomains": {
-                  "description": "FailureDomains is the list of failure domains (sometimes called\navailability zones) in which the ControlPlaneMachineSet should balance\nthe Control Plane Machines.\nThis will be merged into the ProviderSpec given in the template.\nThis field is optional on platforms that do not require placement information.",
+                  "description": "failureDomains is the list of failure domains (sometimes called\navailability zones) in which the ControlPlaneMachineSet should balance\nthe Control Plane Machines.\nThis will be merged into the ProviderSpec given in the template.\nThis field is optional on platforms that do not require placement information.",
                   "type": "object",
                   "required": [
                     "platform"
                   ],
                   "properties": {
                     "aws": {
-                      "description": "AWS configures failure domain information for the AWS platform.",
+                      "description": "aws configures failure domain information for the AWS platform.",
                       "type": "array",
                       "items": {
                         "description": "AWSFailureDomain configures failure domain information for the AWS platform.",
@@ -155,31 +155,31 @@
                         "minProperties": 1,
                         "properties": {
                           "placement": {
-                            "description": "Placement configures the placement information for this instance.",
+                            "description": "placement configures the placement information for this instance.",
                             "type": "object",
                             "required": [
                               "availabilityZone"
                             ],
                             "properties": {
                               "availabilityZone": {
-                                "description": "AvailabilityZone is the availability zone of the instance.",
+                                "description": "availabilityZone is the availability zone of the instance.",
                                 "type": "string"
                               }
                             }
                           },
                           "subnet": {
-                            "description": "Subnet is a reference to the subnet to use for this instance.",
+                            "description": "subnet is a reference to the subnet to use for this instance.",
                             "type": "object",
                             "required": [
                               "type"
                             ],
                             "properties": {
                               "arn": {
-                                "description": "ARN of resource.",
+                                "description": "arn of resource.",
                                 "type": "string"
                               },
                               "filters": {
-                                "description": "Filters is a set of filters used to identify a resource.",
+                                "description": "filters is a set of filters used to identify a resource.",
                                 "type": "array",
                                 "items": {
                                   "description": "AWSResourceFilter is a filter used to identify an AWS resource",
@@ -189,11 +189,11 @@
                                   ],
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the filter. Filter names are case-sensitive.",
+                                      "description": "name of the filter. Filter names are case-sensitive.",
                                       "type": "string"
                                     },
                                     "values": {
-                                      "description": "Values includes one or more filter values. Filter values are case-sensitive.",
+                                      "description": "values includes one or more filter values. Filter values are case-sensitive.",
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -205,11 +205,11 @@
                                 "x-kubernetes-list-type": "atomic"
                               },
                               "id": {
-                                "description": "ID of resource.",
+                                "description": "id of resource.",
                                 "type": "string"
                               },
                               "type": {
-                                "description": "Type determines how the reference will fetch the AWS resource.",
+                                "description": "type determines how the reference will fetch the AWS resource.",
                                 "type": "string",
                                 "enum": [
                                   "ID",
@@ -238,7 +238,7 @@
                       "x-kubernetes-list-type": "atomic"
                     },
                     "azure": {
-                      "description": "Azure configures failure domain information for the Azure platform.",
+                      "description": "azure configures failure domain information for the Azure platform.",
                       "type": "array",
                       "items": {
                         "description": "AzureFailureDomain configures failure domain information for the Azure platform.",
@@ -262,7 +262,7 @@
                       "x-kubernetes-list-type": "atomic"
                     },
                     "gcp": {
-                      "description": "GCP configures failure domain information for the GCP platform.",
+                      "description": "gcp configures failure domain information for the GCP platform.",
                       "type": "array",
                       "items": {
                         "description": "GCPFailureDomain configures failure domain information for the GCP platform",
@@ -272,7 +272,7 @@
                         ],
                         "properties": {
                           "zone": {
-                            "description": "Zone is the zone in which the GCP machine provider will create the VM.",
+                            "description": "zone is the zone in which the GCP machine provider will create the VM.",
                             "type": "string"
                           }
                         }
@@ -304,7 +304,7 @@
                       "x-kubernetes-list-type": "map"
                     },
                     "openstack": {
-                      "description": "OpenStack configures failure domain information for the OpenStack platform.",
+                      "description": "openstack configures failure domain information for the OpenStack platform.",
                       "type": "array",
                       "items": {
                         "description": "OpenStackFailureDomain configures failure domain information for the OpenStack platform.",
@@ -351,7 +351,7 @@
                       "x-kubernetes-list-type": "atomic"
                     },
                     "platform": {
-                      "description": "Platform identifies the platform for which the FailureDomain represents.\nCurrently supported values are AWS, Azure, GCP, OpenStack, VSphere and Nutanix.",
+                      "description": "platform identifies the platform for which the FailureDomain represents.\nCurrently supported values are AWS, Azure, GCP, OpenStack, VSphere and Nutanix.",
                       "type": "string",
                       "enum": [
                         "",
@@ -430,7 +430,7 @@
                   ],
                   "properties": {
                     "annotations": {
-                      "description": "Annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
+                      "description": "annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
                       "type": "object",
                       "additionalProperties": {
                         "type": "string"
@@ -460,15 +460,15 @@
                   }
                 },
                 "spec": {
-                  "description": "Spec contains the desired configuration of the Control Plane Machines.\nThe ProviderSpec within contains platform specific details\nfor creating the Control Plane Machines.\nThe ProviderSe should be complete apart from the platform specific\nfailure domain field. This will be overriden when the Machines\nare created based on the FailureDomains field.",
+                  "description": "spec contains the desired configuration of the Control Plane Machines.\nThe ProviderSpec within contains platform specific details\nfor creating the Control Plane Machines.\nThe ProviderSe should be complete apart from the platform specific\nfailure domain field. This will be overriden when the Machines\nare created based on the FailureDomains field.",
                   "type": "object",
                   "properties": {
                     "lifecycleHooks": {
-                      "description": "LifecycleHooks allow users to pause operations on the machine at\ncertain predefined points within the machine lifecycle.",
+                      "description": "lifecycleHooks allow users to pause operations on the machine at\ncertain predefined points within the machine lifecycle.",
                       "type": "object",
                       "properties": {
                         "preDrain": {
-                          "description": "PreDrain hooks prevent the machine from being drained.\nThis also blocks further lifecycle events, such as termination.",
+                          "description": "preDrain hooks prevent the machine from being drained.\nThis also blocks further lifecycle events, such as termination.",
                           "type": "array",
                           "items": {
                             "description": "LifecycleHook represents a single instance of a lifecycle hook",
@@ -479,14 +479,14 @@
                             ],
                             "properties": {
                               "name": {
-                                "description": "Name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
+                                "description": "name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
                                 "type": "string",
                                 "maxLength": 256,
                                 "minLength": 3,
                                 "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
                               },
                               "owner": {
-                                "description": "Owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
+                                "description": "owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
                                 "type": "string",
                                 "maxLength": 512,
                                 "minLength": 3
@@ -499,7 +499,7 @@
                           "x-kubernetes-list-type": "map"
                         },
                         "preTerminate": {
-                          "description": "PreTerminate hooks prevent the machine from being terminated.\nPreTerminate hooks be actioned after the Machine has been drained.",
+                          "description": "preTerminate hooks prevent the machine from being terminated.\nPreTerminate hooks be actioned after the Machine has been drained.",
                           "type": "array",
                           "items": {
                             "description": "LifecycleHook represents a single instance of a lifecycle hook",
@@ -510,14 +510,14 @@
                             ],
                             "properties": {
                               "name": {
-                                "description": "Name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
+                                "description": "name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
                                 "type": "string",
                                 "maxLength": 256,
                                 "minLength": 3,
                                 "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
                               },
                               "owner": {
-                                "description": "Owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
+                                "description": "owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
                                 "type": "string",
                                 "maxLength": 512,
                                 "minLength": 3
@@ -536,14 +536,14 @@
                       "type": "object",
                       "properties": {
                         "annotations": {
-                          "description": "Annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
+                          "description": "annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
                           "type": "object",
                           "additionalProperties": {
                             "type": "string"
                           }
                         },
                         "generateName": {
-                          "description": "GenerateName is an optional prefix, used by the server, to generate a unique\nname ONLY IF the Name field has not been provided.\nIf this field is used, the name returned to the client will be different\nthan the name passed. This value will also be combined with a unique suffix.\nThe provided value has the same validation rules as the Name field,\nand may be truncated by the length of the suffix required to make the value\nunique on the server.\n\nIf this field is specified and the generated name exists, the server will\nNOT return a 409 - instead, it will either return 201 Created or 500 with Reason\nServerTimeout indicating a unique name could not be found in the time allotted, and the client\nshould retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency",
+                          "description": "generateName is an optional prefix, used by the server, to generate a unique\nname ONLY IF the Name field has not been provided.\nIf this field is used, the name returned to the client will be different\nthan the name passed. This value will also be combined with a unique suffix.\nThe provided value has the same validation rules as the Name field,\nand may be truncated by the length of the suffix required to make the value\nunique on the server.\n\nIf this field is specified and the generated name exists, the server will\nNOT return a 409 - instead, it will either return 201 Created or 500 with Reason\nServerTimeout indicating a unique name could not be found in the time allotted, and the client\nshould retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency",
                           "type": "string"
                         },
                         "labels": {
@@ -554,11 +554,11 @@
                           }
                         },
                         "name": {
-                          "description": "Name must be unique within a namespace. Is required when creating resources, although\nsome resources may allow a client to request the generation of an appropriate name\nautomatically. Name is primarily intended for creation idempotence and configuration\ndefinition.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/identifiers#names",
+                          "description": "name must be unique within a namespace. Is required when creating resources, although\nsome resources may allow a client to request the generation of an appropriate name\nautomatically. Name is primarily intended for creation idempotence and configuration\ndefinition.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/identifiers#names",
                           "type": "string"
                         },
                         "namespace": {
-                          "description": "Namespace defines the space within each name must be unique. An empty namespace is\nequivalent to the \"default\" namespace, but \"default\" is the canonical representation.\nNot all objects are required to be scoped to a namespace - the value of this field for\nthose objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/namespaces",
+                          "description": "namespace defines the space within each name must be unique. An empty namespace is\nequivalent to the \"default\" namespace, but \"default\" is the canonical representation.\nNot all objects are required to be scoped to a namespace - the value of this field for\nthose objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/namespaces",
                           "type": "string"
                         },
                         "ownerReferences": {
@@ -609,15 +609,15 @@
                       }
                     },
                     "providerID": {
-                      "description": "ProviderID is the identification ID of the machine provided by the provider.\nThis field must match the provider ID as seen on the node object corresponding to this machine.\nThis field is required by higher level consumers of cluster-api. Example use case is cluster autoscaler\nwith cluster-api as provider. Clean-up logic in the autoscaler compares machines to nodes to find out\nmachines at provider which could not get registered as Kubernetes nodes. With cluster-api as a\ngeneric out-of-tree provider for autoscaler, this field is required by autoscaler to be\nable to have a provider view of the list of machines. Another list of nodes is queried from the k8s apiserver\nand then a comparison is done to find out unregistered machines and are marked for delete.\nThis field will be set by the actuators and consumed by higher level entities like autoscaler that will\nbe interfacing with cluster-api as generic provider.",
+                      "description": "providerID is the identification ID of the machine provided by the provider.\nThis field must match the provider ID as seen on the node object corresponding to this machine.\nThis field is required by higher level consumers of cluster-api. Example use case is cluster autoscaler\nwith cluster-api as provider. Clean-up logic in the autoscaler compares machines to nodes to find out\nmachines at provider which could not get registered as Kubernetes nodes. With cluster-api as a\ngeneric out-of-tree provider for autoscaler, this field is required by autoscaler to be\nable to have a provider view of the list of machines. Another list of nodes is queried from the k8s apiserver\nand then a comparison is done to find out unregistered machines and are marked for delete.\nThis field will be set by the actuators and consumed by higher level entities like autoscaler that will\nbe interfacing with cluster-api as generic provider.",
                       "type": "string"
                     },
                     "providerSpec": {
-                      "description": "ProviderSpec details Provider-specific configuration to use during node creation.",
+                      "description": "providerSpec details Provider-specific configuration to use during node creation.",
                       "type": "object",
                       "properties": {
                         "value": {
-                          "description": "Value is an inlined, serialized representation of the resource\nconfiguration. It is recommended that providers maintain their own\nversioned API types that should be serialized/deserialized from this\nfield, akin to component config.",
+                          "description": "value is an inlined, serialized representation of the resource\nconfiguration. It is recommended that providers maintain their own\nversioned API types that should be serialized/deserialized from this\nfield, akin to component config.",
                           "x-kubernetes-preserve-unknown-fields": true
                         }
                       }
@@ -673,7 +673,7 @@
       "type": "object",
       "properties": {
         "conditions": {
-          "description": "Conditions represents the observations of the ControlPlaneMachineSet's current state.\nKnown .status.conditions.type are: Available, Degraded and Progressing.",
+          "description": "conditions represents the observations of the ControlPlaneMachineSet's current state.\nKnown .status.conditions.type are: Available, Degraded and Progressing.",
           "type": "array",
           "items": {
             "description": "Condition contains details for one aspect of the current state of this API Resource.",
@@ -732,27 +732,27 @@
           "x-kubernetes-list-type": "map"
         },
         "observedGeneration": {
-          "description": "ObservedGeneration is the most recent generation observed for this\nControlPlaneMachineSet. It corresponds to the ControlPlaneMachineSets's generation,\nwhich is updated on mutation by the API Server.",
+          "description": "observedGeneration is the most recent generation observed for this\nControlPlaneMachineSet. It corresponds to the ControlPlaneMachineSets's generation,\nwhich is updated on mutation by the API Server.",
           "type": "integer",
           "format": "int64"
         },
         "readyReplicas": {
-          "description": "ReadyReplicas is the number of Control Plane Machines created by the\nControlPlaneMachineSet controller which are ready.\nNote that this value may be higher than the desired number of replicas\nwhile rolling updates are in-progress.",
+          "description": "readyReplicas is the number of Control Plane Machines created by the\nControlPlaneMachineSet controller which are ready.\nNote that this value may be higher than the desired number of replicas\nwhile rolling updates are in-progress.",
           "type": "integer",
           "format": "int32"
         },
         "replicas": {
-          "description": "Replicas is the number of Control Plane Machines created by the\nControlPlaneMachineSet controller.\nNote that during update operations this value may differ from the\ndesired replica count.",
+          "description": "replicas is the number of Control Plane Machines created by the\nControlPlaneMachineSet controller.\nNote that during update operations this value may differ from the\ndesired replica count.",
           "type": "integer",
           "format": "int32"
         },
         "unavailableReplicas": {
-          "description": "UnavailableReplicas is the number of Control Plane Machines that are\nstill required before the ControlPlaneMachineSet reaches the desired\navailable capacity. When this value is non-zero, the number of\nReadyReplicas is less than the desired Replicas.",
+          "description": "unavailableReplicas is the number of Control Plane Machines that are\nstill required before the ControlPlaneMachineSet reaches the desired\navailable capacity. When this value is non-zero, the number of\nReadyReplicas is less than the desired Replicas.",
           "type": "integer",
           "format": "int32"
         },
         "updatedReplicas": {
-          "description": "UpdatedReplicas is the number of non-terminated Control Plane Machines\ncreated by the ControlPlaneMachineSet controller that have the desired\nprovider spec and are ready.\nThis value is set to 0 when a change is detected to the desired spec.\nWhen the update strategy is RollingUpdate, this will also coincide\nwith starting the process of updating the Machines.\nWhen the update strategy is OnDelete, this value will remain at 0 until\na user deletes an existing replica and its replacement has become ready.",
+          "description": "updatedReplicas is the number of non-terminated Control Plane Machines\ncreated by the ControlPlaneMachineSet controller that have the desired\nprovider spec and are ready.\nThis value is set to 0 when a change is detected to the desired spec.\nWhen the update strategy is RollingUpdate, this will also coincide\nwith starting the process of updating the Machines.\nWhen the update strategy is OnDelete, this value will remain at 0 until\na user deletes an existing replica and its replacement has become ready.",
           "type": "integer",
           "format": "int32"
         }
@@ -766,5 +766,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

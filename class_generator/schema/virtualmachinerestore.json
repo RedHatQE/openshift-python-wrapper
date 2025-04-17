@@ -56,6 +56,10 @@
           },
           "x-kubernetes-map-type": "atomic"
         },
+        "targetReadinessPolicy": {
+          "description": "TargetReadinessPolicy defines how to handle the restore in case\nthe target is not ready",
+          "type": "string"
+        },
         "virtualMachineSnapshotName": {
           "type": "string"
         }
@@ -149,5 +153,6 @@
       "version": "v1beta1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

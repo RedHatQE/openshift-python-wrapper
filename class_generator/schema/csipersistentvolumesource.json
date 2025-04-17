@@ -1,5 +1,5 @@
 {
-  "description": "Represents storage that is managed by an external CSI volume driver (Beta feature)",
+  "description": "Represents storage that is managed by an external CSI volume driver",
   "type": "object",
   "required": [
     "driver",

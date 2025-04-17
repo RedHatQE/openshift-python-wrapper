@@ -18,14 +18,14 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "ContainerRuntimeConfigSpec defines the desired state of ContainerRuntimeConfig",
+      "description": "spec contains the desired container runtime configuration.",
       "type": "object",
       "required": [
         "containerRuntimeConfig"
       ],
       "properties": {
         "containerRuntimeConfig": {
-          "description": "ContainerRuntimeConfiguration defines the tuneables of the container runtime",
+          "description": "containerRuntimeConfig defines the tuneables of the container runtime.",
           "type": "object",
           "properties": {
             "defaultRuntime": {
@@ -54,7 +54,7 @@
           }
         },
         "machineConfigPoolSelector": {
-          "description": "MachineConfigPoolSelector selects which pools the ContainerRuntimeConfig shoud apply to.\nA nil selector will result in no pools being selected.",
+          "description": "machineConfigPoolSelector selects which pools the ContainerRuntimeConfig shoud apply to.\nA nil selector will result in no pools being selected.",
           "type": "object",
           "properties": {
             "matchExpressions": {
@@ -101,7 +101,7 @@
       }
     },
     "status": {
-      "description": "ContainerRuntimeConfigStatus defines the observed state of a ContainerRuntimeConfig",
+      "description": "status contains observed information about the container runtime configuration.",
       "type": "object",
       "properties": {
         "conditions": {
@@ -150,5 +150,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

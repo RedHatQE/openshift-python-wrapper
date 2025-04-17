@@ -281,10 +281,11 @@
                             "type": "string"
                           },
                           "status": {
+                            "description": "Status is the status of the condition.\nCan be True, False, Unknown.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required",
                             "type": "string"
                           },
                           "type": {
-                            "description": "PersistentVolumeClaimConditionType defines the condition of PV claim.\nValid values are:\n  - \"Resizing\", \"FileSystemResizePending\"\n\nIf RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:\n  - \"ControllerResizeError\", \"NodeResizeError\"\n\nIf VolumeAttributesClass feature gate is enabled, then following additional values can be expected:\n  - \"ModifyVolumeError\", \"ModifyingVolume\"",
+                            "description": "Type is the type of the condition.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about",
                             "type": "string"
                           }
                         }
@@ -547,6 +548,159 @@
                 "disableStorageClass": {
                   "type": "boolean"
                 },
+                "poolSpec": {
+                  "description": "PoolSpec specifies the pool specification for the default cephBlockPool",
+                  "type": "object",
+                  "properties": {
+                    "application": {
+                      "description": "The application name to set on the pool. Only expected to be set for rgw pools.",
+                      "type": "string"
+                    },
+                    "compressionMode": {
+                      "description": "DEPRECATED: use Parameters instead, e.g., Parameters[\"compression_mode\"] = \"force\"\nThe inline compression mode in Bluestore OSD to set to (options are: none, passive, aggressive, force)\nDo NOT set a default value for kubebuilder as this will override the Parameters",
+                      "enum": [
+                        "none",
+                        "passive",
+                        "aggressive",
+                        "force",
+                        ""
+                      ]
+                    },
+                    "crushRoot": {
+                      "description": "The root of the crush hierarchy utilized by the pool"
+                    },
+                    "deviceClass": {
+                      "description": "The device class the OSD should set to for use in the pool"
+                    },
+                    "enableCrushUpdates": {
+                      "description": "Allow rook operator to change the pool CRUSH tunables once the pool is created",
+                      "type": "boolean"
+                    },
+                    "enableRBDStats": {
+                      "description": "EnableRBDStats is used to enable gathering of statistics for all RBD images in the pool",
+                      "type": "boolean"
+                    },
+                    "erasureCoded": {
+                      "description": "The erasure code settings",
+                      "type": "object",
+                      "required": [
+                        "codingChunks",
+                        "dataChunks"
+                      ],
+                      "properties": {
+                        "algorithm": {
+                          "description": "The algorithm for erasure coding",
+                          "type": "string"
+                        },
+                        "codingChunks": {
+                          "description": "Number of coding chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThis is the number of OSDs that can be lost simultaneously before data cannot be recovered.",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "dataChunks": {
+                          "description": "Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThe number of chunks required to recover an object when any single OSD is lost is the same\nas dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.",
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    "failureDomain": {
+                      "description": "The failure domain: osd/host/(region or zone if available) - technically also any type in the crush map",
+                      "type": "string"
+                    },
+                    "mirroring": {
+                      "description": "The mirroring settings",
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "description": "Enabled whether this pool is mirrored or not",
+                          "type": "boolean"
+                        },
+                        "mode": {
+                          "description": "Mode is the mirroring mode: either pool or image",
+                          "type": "string"
+                        },
+                        "peers": {
+                          "description": "Peers represents the peers spec"
+                        },
+                        "snapshotSchedules": {
+                          "description": "SnapshotSchedules is the scheduling of snapshot for mirrored images/pools",
+                          "type": "array",
+                          "items": {
+                            "description": "SnapshotScheduleSpec represents the snapshot scheduling settings of a mirrored pool",
+                            "type": "object",
+                            "properties": {
+                              "interval": {
+                                "description": "Interval represent the periodicity of the snapshot.",
+                                "type": "string"
+                              },
+                              "path": {
+                                "description": "Path is the path to snapshot, only valid for CephFS",
+                                "type": "string"
+                              },
+                              "startTime": {
+                                "description": "StartTime indicates when to start the snapshot",
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "parameters": {
+                      "description": "Parameters is a list of properties to enable on a given pool",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "x-kubernetes-preserve-unknown-fields": true
+                    },
+                    "quotas": {
+                      "description": "The quota settings"
+                    },
+                    "replicated": {
+                      "description": "The replication settings",
+                      "type": "object",
+                      "required": [
+                        "size"
+                      ],
+                      "properties": {
+                        "hybridStorage": {
+                          "description": "HybridStorage represents hybrid storage tier settings",
+                          "required": [
+                            "primaryDeviceClass",
+                            "secondaryDeviceClass"
+                          ]
+                        },
+                        "replicasPerFailureDomain": {
+                          "description": "ReplicasPerFailureDomain the number of replica in the specified failure domain",
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "requireSafeReplicaSize": {
+                          "description": "RequireSafeReplicaSize if false allows you to set replica 1",
+                          "type": "boolean"
+                        },
+                        "size": {
+                          "description": "Size - Number of copies per object in a replicated storage pool, including the object itself (required for replicated pool type)",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "subFailureDomain": {
+                          "description": "SubFailureDomain the name of the sub-failure domain",
+                          "type": "string"
+                        },
+                        "targetSizeRatio": {
+                          "description": "TargetSizeRatio gives a hint (%) to Ceph in terms of expected consumption of the total cluster capacity",
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "statusCheck": {
+                      "description": "The mirroring statusCheck",
+                      "x-kubernetes-preserve-unknown-fields": true
+                    }
+                  }
+                },
                 "reconcileStrategy": {
                   "type": "string"
                 },
@@ -585,6 +739,309 @@
                   "description": "FullRatio is the ratio at which the cluster is considered full and ceph will stop accepting writes. Default is 0.85.",
                   "maximum": 1,
                   "minimum": 0
+                },
+                "healthCheck": {
+                  "description": "CephClusterHealthCheckSpec represent the healthcheck for Ceph daemons",
+                  "type": "object",
+                  "properties": {
+                    "daemonHealth": {
+                      "description": "DaemonHealth is the health check for a given daemon"
+                    },
+                    "livenessProbe": {
+                      "description": "LivenessProbe allows changing the livenessProbe configuration for a given daemon",
+                      "type": "object",
+                      "additionalProperties": {
+                        "description": "ProbeSpec is a wrapper around Probe so it can be enabled or disabled for a Ceph daemon",
+                        "type": "object",
+                        "properties": {
+                          "disabled": {
+                            "description": "Disabled determines whether probe is disable or not",
+                            "type": "boolean"
+                          },
+                          "probe": {
+                            "description": "Probe describes a health check to be performed against a container to determine whether it is\nalive or ready to receive traffic.",
+                            "type": "object",
+                            "properties": {
+                              "exec": {
+                                "description": "Exec specifies a command to execute in the container.",
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "description": "Command is the command line to execute inside the container, the working directory for the\ncommand  is root ('/') in the container's filesystem. The command is simply exec'd, it is\nnot run inside a shell, so traditional shell instructions ('|', etc) won't work. To use\na shell, you need to explicitly call out to that shell.\nExit status of 0 is treated as live/healthy and non-zero is unhealthy.",
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "x-kubernetes-list-type": "atomic"
+                                  }
+                                }
+                              },
+                              "failureThreshold": {
+                                "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded.\nDefaults to 3. Minimum value is 1.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "grpc": {
+                                "description": "GRPC specifies a GRPC HealthCheckRequest.",
+                                "type": "object",
+                                "required": [
+                                  "port"
+                                ],
+                                "properties": {
+                                  "port": {
+                                    "description": "Port number of the gRPC service. Number must be in the range 1 to 65535.",
+                                    "type": "integer",
+                                    "format": "int32"
+                                  },
+                                  "service": {
+                                    "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "httpGet": {
+                                "description": "HTTPGet specifies an HTTP GET request to perform.",
+                                "type": "object",
+                                "required": [
+                                  "port"
+                                ],
+                                "properties": {
+                                  "host": {
+                                    "description": "Host name to connect to, defaults to the pod IP. You probably want to set\n\"Host\" in httpHeaders instead.",
+                                    "type": "string"
+                                  },
+                                  "httpHeaders": {
+                                    "description": "Custom headers to set in the request. HTTP allows repeated headers.",
+                                    "type": "array",
+                                    "items": {
+                                      "description": "HTTPHeader describes a custom header to be used in HTTP probes",
+                                      "type": "object",
+                                      "required": [
+                                        "name",
+                                        "value"
+                                      ],
+                                      "properties": {
+                                        "name": {
+                                          "description": "The header field name.\nThis will be canonicalized upon output, so case-variant names will be understood as the same header.",
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "description": "The header field value",
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "x-kubernetes-list-type": "atomic"
+                                  },
+                                  "path": {
+                                    "description": "Path to access on the HTTP server.",
+                                    "type": "string"
+                                  },
+                                  "port": {
+                                    "description": "Name or number of the port to access on the container.\nNumber must be in the range 1 to 65535.\nName must be an IANA_SVC_NAME.",
+                                    "x-kubernetes-int-or-string": true
+                                  },
+                                  "scheme": {
+                                    "description": "Scheme to use for connecting to the host.\nDefaults to HTTP.",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "initialDelaySeconds": {
+                                "description": "Number of seconds after the container has started before liveness probes are initiated.\nMore info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "periodSeconds": {
+                                "description": "How often (in seconds) to perform the probe.\nDefault to 10 seconds. Minimum value is 1.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "successThreshold": {
+                                "description": "Minimum consecutive successes for the probe to be considered successful after having failed.\nDefaults to 1. Must be 1 for liveness and startup. Minimum value is 1.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "tcpSocket": {
+                                "description": "TCPSocket specifies a connection to a TCP port.",
+                                "type": "object",
+                                "required": [
+                                  "port"
+                                ],
+                                "properties": {
+                                  "host": {
+                                    "description": "Optional: Host name to connect to, defaults to the pod IP.",
+                                    "type": "string"
+                                  },
+                                  "port": {
+                                    "description": "Number or name of the port to access on the container.\nNumber must be in the range 1 to 65535.\nName must be an IANA_SVC_NAME.",
+                                    "x-kubernetes-int-or-string": true
+                                  }
+                                }
+                              },
+                              "terminationGracePeriodSeconds": {
+                                "description": "Optional duration in seconds the pod needs to terminate gracefully upon probe failure.\nThe grace period is the duration in seconds after the processes running in the pod are sent\na termination signal and the time when the processes are forcibly halted with a kill signal.\nSet this value longer than the expected cleanup time for your process.\nIf this value is nil, the pod's terminationGracePeriodSeconds will be used. Otherwise, this\nvalue overrides the value provided by the pod spec.\nValue must be non-negative integer. The value zero indicates stop immediately via\nthe kill signal (no opportunity to shut down).\nThis is a beta field and requires enabling ProbeTerminationGracePeriod feature gate.\nMinimum value is 1. spec.terminationGracePeriodSeconds is used if unset.",
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "timeoutSeconds": {
+                                "description": "Number of seconds after which the probe times out.\nDefaults to 1 second. Minimum value is 1.\nMore info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+                                "type": "integer",
+                                "format": "int32"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "startupProbe": {
+                      "description": "StartupProbe allows changing the startupProbe configuration for a given daemon",
+                      "type": "object",
+                      "additionalProperties": {
+                        "description": "ProbeSpec is a wrapper around Probe so it can be enabled or disabled for a Ceph daemon",
+                        "type": "object",
+                        "properties": {
+                          "disabled": {
+                            "description": "Disabled determines whether probe is disable or not",
+                            "type": "boolean"
+                          },
+                          "probe": {
+                            "description": "Probe describes a health check to be performed against a container to determine whether it is\nalive or ready to receive traffic.",
+                            "type": "object",
+                            "properties": {
+                              "exec": {
+                                "description": "Exec specifies a command to execute in the container.",
+                                "type": "object",
+                                "properties": {
+                                  "command": {
+                                    "description": "Command is the command line to execute inside the container, the working directory for the\ncommand  is root ('/') in the container's filesystem. The command is simply exec'd, it is\nnot run inside a shell, so traditional shell instructions ('|', etc) won't work. To use\na shell, you need to explicitly call out to that shell.\nExit status of 0 is treated as live/healthy and non-zero is unhealthy.",
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "x-kubernetes-list-type": "atomic"
+                                  }
+                                }
+                              },
+                              "failureThreshold": {
+                                "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded.\nDefaults to 3. Minimum value is 1.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "grpc": {
+                                "description": "GRPC specifies a GRPC HealthCheckRequest.",
+                                "type": "object",
+                                "required": [
+                                  "port"
+                                ],
+                                "properties": {
+                                  "port": {
+                                    "description": "Port number of the gRPC service. Number must be in the range 1 to 65535.",
+                                    "type": "integer",
+                                    "format": "int32"
+                                  },
+                                  "service": {
+                                    "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "httpGet": {
+                                "description": "HTTPGet specifies an HTTP GET request to perform.",
+                                "type": "object",
+                                "required": [
+                                  "port"
+                                ],
+                                "properties": {
+                                  "host": {
+                                    "description": "Host name to connect to, defaults to the pod IP. You probably want to set\n\"Host\" in httpHeaders instead.",
+                                    "type": "string"
+                                  },
+                                  "httpHeaders": {
+                                    "description": "Custom headers to set in the request. HTTP allows repeated headers.",
+                                    "type": "array",
+                                    "items": {
+                                      "description": "HTTPHeader describes a custom header to be used in HTTP probes",
+                                      "type": "object",
+                                      "required": [
+                                        "name",
+                                        "value"
+                                      ],
+                                      "properties": {
+                                        "name": {
+                                          "description": "The header field name.\nThis will be canonicalized upon output, so case-variant names will be understood as the same header.",
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "description": "The header field value",
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "x-kubernetes-list-type": "atomic"
+                                  },
+                                  "path": {
+                                    "description": "Path to access on the HTTP server.",
+                                    "type": "string"
+                                  },
+                                  "port": {
+                                    "description": "Name or number of the port to access on the container.\nNumber must be in the range 1 to 65535.\nName must be an IANA_SVC_NAME.",
+                                    "x-kubernetes-int-or-string": true
+                                  },
+                                  "scheme": {
+                                    "description": "Scheme to use for connecting to the host.\nDefaults to HTTP.",
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "initialDelaySeconds": {
+                                "description": "Number of seconds after the container has started before liveness probes are initiated.\nMore info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "periodSeconds": {
+                                "description": "How often (in seconds) to perform the probe.\nDefault to 10 seconds. Minimum value is 1.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "successThreshold": {
+                                "description": "Minimum consecutive successes for the probe to be considered successful after having failed.\nDefaults to 1. Must be 1 for liveness and startup. Minimum value is 1.",
+                                "type": "integer",
+                                "format": "int32"
+                              },
+                              "tcpSocket": {
+                                "description": "TCPSocket specifies a connection to a TCP port.",
+                                "type": "object",
+                                "required": [
+                                  "port"
+                                ],
+                                "properties": {
+                                  "host": {
+                                    "description": "Optional: Host name to connect to, defaults to the pod IP.",
+                                    "type": "string"
+                                  },
+                                  "port": {
+                                    "description": "Number or name of the port to access on the container.\nNumber must be in the range 1 to 65535.\nName must be an IANA_SVC_NAME.",
+                                    "x-kubernetes-int-or-string": true
+                                  }
+                                }
+                              },
+                              "terminationGracePeriodSeconds": {
+                                "description": "Optional duration in seconds the pod needs to terminate gracefully upon probe failure.\nThe grace period is the duration in seconds after the processes running in the pod are sent\na termination signal and the time when the processes are forcibly halted with a kill signal.\nSet this value longer than the expected cleanup time for your process.\nIf this value is nil, the pod's terminationGracePeriodSeconds will be used. Otherwise, this\nvalue overrides the value provided by the pod spec.\nValue must be non-negative integer. The value zero indicates stop immediately via\nthe kill signal (no opportunity to shut down).\nThis is a beta field and requires enabling ProbeTerminationGracePeriod feature gate.\nMinimum value is 1. spec.terminationGracePeriodSeconds is used if unset.",
+                                "type": "integer",
+                                "format": "int64"
+                              },
+                              "timeoutSeconds": {
+                                "description": "Number of seconds after which the probe times out.\nDefaults to 1 second. Minimum value is 1.\nMore info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
+                                "type": "integer",
+                                "format": "int32"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "mgrCount": {
                   "type": "integer",
@@ -977,6 +1434,159 @@
                 "disableStorageClass": {
                   "type": "boolean"
                 },
+                "metadataPoolSpec": {
+                  "description": "MetadataPoolSpec specifies the pool specification for the default cephFS metadata pool",
+                  "type": "object",
+                  "properties": {
+                    "application": {
+                      "description": "The application name to set on the pool. Only expected to be set for rgw pools.",
+                      "type": "string"
+                    },
+                    "compressionMode": {
+                      "description": "DEPRECATED: use Parameters instead, e.g., Parameters[\"compression_mode\"] = \"force\"\nThe inline compression mode in Bluestore OSD to set to (options are: none, passive, aggressive, force)\nDo NOT set a default value for kubebuilder as this will override the Parameters",
+                      "enum": [
+                        "none",
+                        "passive",
+                        "aggressive",
+                        "force",
+                        ""
+                      ]
+                    },
+                    "crushRoot": {
+                      "description": "The root of the crush hierarchy utilized by the pool"
+                    },
+                    "deviceClass": {
+                      "description": "The device class the OSD should set to for use in the pool"
+                    },
+                    "enableCrushUpdates": {
+                      "description": "Allow rook operator to change the pool CRUSH tunables once the pool is created",
+                      "type": "boolean"
+                    },
+                    "enableRBDStats": {
+                      "description": "EnableRBDStats is used to enable gathering of statistics for all RBD images in the pool",
+                      "type": "boolean"
+                    },
+                    "erasureCoded": {
+                      "description": "The erasure code settings",
+                      "type": "object",
+                      "required": [
+                        "codingChunks",
+                        "dataChunks"
+                      ],
+                      "properties": {
+                        "algorithm": {
+                          "description": "The algorithm for erasure coding",
+                          "type": "string"
+                        },
+                        "codingChunks": {
+                          "description": "Number of coding chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThis is the number of OSDs that can be lost simultaneously before data cannot be recovered.",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "dataChunks": {
+                          "description": "Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThe number of chunks required to recover an object when any single OSD is lost is the same\nas dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.",
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    "failureDomain": {
+                      "description": "The failure domain: osd/host/(region or zone if available) - technically also any type in the crush map",
+                      "type": "string"
+                    },
+                    "mirroring": {
+                      "description": "The mirroring settings",
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "description": "Enabled whether this pool is mirrored or not",
+                          "type": "boolean"
+                        },
+                        "mode": {
+                          "description": "Mode is the mirroring mode: either pool or image",
+                          "type": "string"
+                        },
+                        "peers": {
+                          "description": "Peers represents the peers spec"
+                        },
+                        "snapshotSchedules": {
+                          "description": "SnapshotSchedules is the scheduling of snapshot for mirrored images/pools",
+                          "type": "array",
+                          "items": {
+                            "description": "SnapshotScheduleSpec represents the snapshot scheduling settings of a mirrored pool",
+                            "type": "object",
+                            "properties": {
+                              "interval": {
+                                "description": "Interval represent the periodicity of the snapshot.",
+                                "type": "string"
+                              },
+                              "path": {
+                                "description": "Path is the path to snapshot, only valid for CephFS",
+                                "type": "string"
+                              },
+                              "startTime": {
+                                "description": "StartTime indicates when to start the snapshot",
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "parameters": {
+                      "description": "Parameters is a list of properties to enable on a given pool",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "x-kubernetes-preserve-unknown-fields": true
+                    },
+                    "quotas": {
+                      "description": "The quota settings"
+                    },
+                    "replicated": {
+                      "description": "The replication settings",
+                      "type": "object",
+                      "required": [
+                        "size"
+                      ],
+                      "properties": {
+                        "hybridStorage": {
+                          "description": "HybridStorage represents hybrid storage tier settings",
+                          "required": [
+                            "primaryDeviceClass",
+                            "secondaryDeviceClass"
+                          ]
+                        },
+                        "replicasPerFailureDomain": {
+                          "description": "ReplicasPerFailureDomain the number of replica in the specified failure domain",
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "requireSafeReplicaSize": {
+                          "description": "RequireSafeReplicaSize if false allows you to set replica 1",
+                          "type": "boolean"
+                        },
+                        "size": {
+                          "description": "Size - Number of copies per object in a replicated storage pool, including the object itself (required for replicated pool type)",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "subFailureDomain": {
+                          "description": "SubFailureDomain the name of the sub-failure domain",
+                          "type": "string"
+                        },
+                        "targetSizeRatio": {
+                          "description": "TargetSizeRatio gives a hint (%) to Ceph in terms of expected consumption of the total cluster capacity",
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "statusCheck": {
+                      "description": "The mirroring statusCheck",
+                      "x-kubernetes-preserve-unknown-fields": true
+                    }
+                  }
+                },
                 "reconcileStrategy": {
                   "type": "string"
                 },
@@ -999,6 +1609,13 @@
                 },
                 "enable": {
                   "type": "boolean"
+                },
+                "parameters": {
+                  "description": "Parameters is a list of properties to enable on the non-resilient cephBlockPools",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-preserve-unknown-fields": true
                 },
                 "resources": {
                   "description": "ResourceRequirements (requests/limits) for the devices",
@@ -1308,10 +1925,11 @@
                                 "type": "string"
                               },
                               "status": {
+                                "description": "Status is the status of the condition.\nCan be True, False, Unknown.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required",
                                 "type": "string"
                               },
                               "type": {
-                                "description": "PersistentVolumeClaimConditionType defines the condition of PV claim.\nValid values are:\n  - \"Resizing\", \"FileSystemResizePending\"\n\nIf RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:\n  - \"ControllerResizeError\", \"NodeResizeError\"\n\nIf VolumeAttributesClass feature gate is enabled, then following additional values can be expected:\n  - \"ModifyVolumeError\", \"ModifyingVolume\"",
+                                "description": "Type is the type of the condition.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about",
                                 "type": "string"
                               }
                             }
@@ -1365,6 +1983,159 @@
               "description": "ManageCephObjectStores defines how to reconcile CephObjectStores",
               "type": "object",
               "properties": {
+                "dataPoolSpec": {
+                  "description": "DataPoolSpec specifies the pool specification for the default cephObjectStore data pool",
+                  "type": "object",
+                  "properties": {
+                    "application": {
+                      "description": "The application name to set on the pool. Only expected to be set for rgw pools.",
+                      "type": "string"
+                    },
+                    "compressionMode": {
+                      "description": "DEPRECATED: use Parameters instead, e.g., Parameters[\"compression_mode\"] = \"force\"\nThe inline compression mode in Bluestore OSD to set to (options are: none, passive, aggressive, force)\nDo NOT set a default value for kubebuilder as this will override the Parameters",
+                      "enum": [
+                        "none",
+                        "passive",
+                        "aggressive",
+                        "force",
+                        ""
+                      ]
+                    },
+                    "crushRoot": {
+                      "description": "The root of the crush hierarchy utilized by the pool"
+                    },
+                    "deviceClass": {
+                      "description": "The device class the OSD should set to for use in the pool"
+                    },
+                    "enableCrushUpdates": {
+                      "description": "Allow rook operator to change the pool CRUSH tunables once the pool is created",
+                      "type": "boolean"
+                    },
+                    "enableRBDStats": {
+                      "description": "EnableRBDStats is used to enable gathering of statistics for all RBD images in the pool",
+                      "type": "boolean"
+                    },
+                    "erasureCoded": {
+                      "description": "The erasure code settings",
+                      "type": "object",
+                      "required": [
+                        "codingChunks",
+                        "dataChunks"
+                      ],
+                      "properties": {
+                        "algorithm": {
+                          "description": "The algorithm for erasure coding",
+                          "type": "string"
+                        },
+                        "codingChunks": {
+                          "description": "Number of coding chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThis is the number of OSDs that can be lost simultaneously before data cannot be recovered.",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "dataChunks": {
+                          "description": "Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThe number of chunks required to recover an object when any single OSD is lost is the same\nas dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.",
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    "failureDomain": {
+                      "description": "The failure domain: osd/host/(region or zone if available) - technically also any type in the crush map",
+                      "type": "string"
+                    },
+                    "mirroring": {
+                      "description": "The mirroring settings",
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "description": "Enabled whether this pool is mirrored or not",
+                          "type": "boolean"
+                        },
+                        "mode": {
+                          "description": "Mode is the mirroring mode: either pool or image",
+                          "type": "string"
+                        },
+                        "peers": {
+                          "description": "Peers represents the peers spec"
+                        },
+                        "snapshotSchedules": {
+                          "description": "SnapshotSchedules is the scheduling of snapshot for mirrored images/pools",
+                          "type": "array",
+                          "items": {
+                            "description": "SnapshotScheduleSpec represents the snapshot scheduling settings of a mirrored pool",
+                            "type": "object",
+                            "properties": {
+                              "interval": {
+                                "description": "Interval represent the periodicity of the snapshot.",
+                                "type": "string"
+                              },
+                              "path": {
+                                "description": "Path is the path to snapshot, only valid for CephFS",
+                                "type": "string"
+                              },
+                              "startTime": {
+                                "description": "StartTime indicates when to start the snapshot",
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "parameters": {
+                      "description": "Parameters is a list of properties to enable on a given pool",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "x-kubernetes-preserve-unknown-fields": true
+                    },
+                    "quotas": {
+                      "description": "The quota settings"
+                    },
+                    "replicated": {
+                      "description": "The replication settings",
+                      "type": "object",
+                      "required": [
+                        "size"
+                      ],
+                      "properties": {
+                        "hybridStorage": {
+                          "description": "HybridStorage represents hybrid storage tier settings",
+                          "required": [
+                            "primaryDeviceClass",
+                            "secondaryDeviceClass"
+                          ]
+                        },
+                        "replicasPerFailureDomain": {
+                          "description": "ReplicasPerFailureDomain the number of replica in the specified failure domain",
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "requireSafeReplicaSize": {
+                          "description": "RequireSafeReplicaSize if false allows you to set replica 1",
+                          "type": "boolean"
+                        },
+                        "size": {
+                          "description": "Size - Number of copies per object in a replicated storage pool, including the object itself (required for replicated pool type)",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "subFailureDomain": {
+                          "description": "SubFailureDomain the name of the sub-failure domain",
+                          "type": "string"
+                        },
+                        "targetSizeRatio": {
+                          "description": "TargetSizeRatio gives a hint (%) to Ceph in terms of expected consumption of the total cluster capacity",
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "statusCheck": {
+                      "description": "The mirroring statusCheck",
+                      "x-kubernetes-preserve-unknown-fields": true
+                    }
+                  }
+                },
                 "disableRoute": {
                   "type": "boolean"
                 },
@@ -1376,6 +2147,159 @@
                 },
                 "hostNetwork": {
                   "type": "boolean"
+                },
+                "metadataPoolSpec": {
+                  "description": "MetadataPoolSpec specifies the pool specification for the default cephObjectStore metadata pool",
+                  "type": "object",
+                  "properties": {
+                    "application": {
+                      "description": "The application name to set on the pool. Only expected to be set for rgw pools.",
+                      "type": "string"
+                    },
+                    "compressionMode": {
+                      "description": "DEPRECATED: use Parameters instead, e.g., Parameters[\"compression_mode\"] = \"force\"\nThe inline compression mode in Bluestore OSD to set to (options are: none, passive, aggressive, force)\nDo NOT set a default value for kubebuilder as this will override the Parameters",
+                      "enum": [
+                        "none",
+                        "passive",
+                        "aggressive",
+                        "force",
+                        ""
+                      ]
+                    },
+                    "crushRoot": {
+                      "description": "The root of the crush hierarchy utilized by the pool"
+                    },
+                    "deviceClass": {
+                      "description": "The device class the OSD should set to for use in the pool"
+                    },
+                    "enableCrushUpdates": {
+                      "description": "Allow rook operator to change the pool CRUSH tunables once the pool is created",
+                      "type": "boolean"
+                    },
+                    "enableRBDStats": {
+                      "description": "EnableRBDStats is used to enable gathering of statistics for all RBD images in the pool",
+                      "type": "boolean"
+                    },
+                    "erasureCoded": {
+                      "description": "The erasure code settings",
+                      "type": "object",
+                      "required": [
+                        "codingChunks",
+                        "dataChunks"
+                      ],
+                      "properties": {
+                        "algorithm": {
+                          "description": "The algorithm for erasure coding",
+                          "type": "string"
+                        },
+                        "codingChunks": {
+                          "description": "Number of coding chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThis is the number of OSDs that can be lost simultaneously before data cannot be recovered.",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "dataChunks": {
+                          "description": "Number of data chunks per object in an erasure coded storage pool (required for erasure-coded pool type).\nThe number of chunks required to recover an object when any single OSD is lost is the same\nas dataChunks so be aware that the larger the number of data chunks, the higher the cost of recovery.",
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    "failureDomain": {
+                      "description": "The failure domain: osd/host/(region or zone if available) - technically also any type in the crush map",
+                      "type": "string"
+                    },
+                    "mirroring": {
+                      "description": "The mirroring settings",
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "description": "Enabled whether this pool is mirrored or not",
+                          "type": "boolean"
+                        },
+                        "mode": {
+                          "description": "Mode is the mirroring mode: either pool or image",
+                          "type": "string"
+                        },
+                        "peers": {
+                          "description": "Peers represents the peers spec"
+                        },
+                        "snapshotSchedules": {
+                          "description": "SnapshotSchedules is the scheduling of snapshot for mirrored images/pools",
+                          "type": "array",
+                          "items": {
+                            "description": "SnapshotScheduleSpec represents the snapshot scheduling settings of a mirrored pool",
+                            "type": "object",
+                            "properties": {
+                              "interval": {
+                                "description": "Interval represent the periodicity of the snapshot.",
+                                "type": "string"
+                              },
+                              "path": {
+                                "description": "Path is the path to snapshot, only valid for CephFS",
+                                "type": "string"
+                              },
+                              "startTime": {
+                                "description": "StartTime indicates when to start the snapshot",
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "parameters": {
+                      "description": "Parameters is a list of properties to enable on a given pool",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "x-kubernetes-preserve-unknown-fields": true
+                    },
+                    "quotas": {
+                      "description": "The quota settings"
+                    },
+                    "replicated": {
+                      "description": "The replication settings",
+                      "type": "object",
+                      "required": [
+                        "size"
+                      ],
+                      "properties": {
+                        "hybridStorage": {
+                          "description": "HybridStorage represents hybrid storage tier settings",
+                          "required": [
+                            "primaryDeviceClass",
+                            "secondaryDeviceClass"
+                          ]
+                        },
+                        "replicasPerFailureDomain": {
+                          "description": "ReplicasPerFailureDomain the number of replica in the specified failure domain",
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "requireSafeReplicaSize": {
+                          "description": "RequireSafeReplicaSize if false allows you to set replica 1",
+                          "type": "boolean"
+                        },
+                        "size": {
+                          "description": "Size - Number of copies per object in a replicated storage pool, including the object itself (required for replicated pool type)",
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "subFailureDomain": {
+                          "description": "SubFailureDomain the name of the sub-failure domain",
+                          "type": "string"
+                        },
+                        "targetSizeRatio": {
+                          "description": "TargetSizeRatio gives a hint (%) to Ceph in terms of expected consumption of the total cluster capacity",
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "statusCheck": {
+                      "description": "The mirroring statusCheck",
+                      "x-kubernetes-preserve-unknown-fields": true
+                    }
+                  }
                 },
                 "reconcileStrategy": {
                   "type": "string"
@@ -1697,10 +2621,11 @@
                         "type": "string"
                       },
                       "status": {
+                        "description": "Status is the status of the condition.\nCan be True, False, Unknown.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required",
                         "type": "string"
                       },
                       "type": {
-                        "description": "PersistentVolumeClaimConditionType defines the condition of PV claim.\nValid values are:\n  - \"Resizing\", \"FileSystemResizePending\"\n\nIf RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:\n  - \"ControllerResizeError\", \"NodeResizeError\"\n\nIf VolumeAttributesClass feature gate is enabled, then following additional values can be expected:\n  - \"ModifyVolumeError\", \"ModifyingVolume\"",
+                        "description": "Type is the type of the condition.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about",
                         "type": "string"
                       }
                     }
@@ -3254,10 +4179,11 @@
                               "type": "string"
                             },
                             "status": {
+                              "description": "Status is the status of the condition.\nCan be True, False, Unknown.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required",
                               "type": "string"
                             },
                             "type": {
-                              "description": "PersistentVolumeClaimConditionType defines the condition of PV claim.\nValid values are:\n  - \"Resizing\", \"FileSystemResizePending\"\n\nIf RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:\n  - \"ControllerResizeError\", \"NodeResizeError\"\n\nIf VolumeAttributesClass feature gate is enabled, then following additional values can be expected:\n  - \"ModifyVolumeError\", \"ModifyingVolume\"",
+                              "description": "Type is the type of the condition.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about",
                               "type": "string"
                             }
                           }
@@ -3577,10 +4503,11 @@
                               "type": "string"
                             },
                             "status": {
+                              "description": "Status is the status of the condition.\nCan be True, False, Unknown.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required",
                               "type": "string"
                             },
                             "type": {
-                              "description": "PersistentVolumeClaimConditionType defines the condition of PV claim.\nValid values are:\n  - \"Resizing\", \"FileSystemResizePending\"\n\nIf RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:\n  - \"ControllerResizeError\", \"NodeResizeError\"\n\nIf VolumeAttributesClass feature gate is enabled, then following additional values can be expected:\n  - \"ModifyVolumeError\", \"ModifyingVolume\"",
+                              "description": "Type is the type of the condition.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about",
                               "type": "string"
                             }
                           }
@@ -5702,10 +6629,11 @@
                               "type": "string"
                             },
                             "status": {
+                              "description": "Status is the status of the condition.\nCan be True, False, Unknown.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=state%20of%20pvc-,conditions.status,-(string)%2C%20required",
                               "type": "string"
                             },
                             "type": {
-                              "description": "PersistentVolumeClaimConditionType defines the condition of PV claim.\nValid values are:\n  - \"Resizing\", \"FileSystemResizePending\"\n\nIf RecoverVolumeExpansionFailure feature gate is enabled, then following additional values can be expected:\n  - \"ControllerResizeError\", \"NodeResizeError\"\n\nIf VolumeAttributesClass feature gate is enabled, then following additional values can be expected:\n  - \"ModifyVolumeError\", \"ModifyingVolume\"",
+                              "description": "Type is the type of the condition.\nMore info: https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#:~:text=set%20to%20%27ResizeStarted%27.-,PersistentVolumeClaimCondition,-contains%20details%20about",
                               "type": "string"
                             }
                           }
@@ -5958,5 +6886,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

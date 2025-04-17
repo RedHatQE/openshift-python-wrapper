@@ -18,7 +18,7 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "MachineConfigPoolSpec is the spec for MachineConfigPool resource.",
+      "description": "spec contains the desired machine config pool configuration.",
       "type": "object",
       "properties": {
         "configuration": {
@@ -197,7 +197,7 @@
       }
     },
     "status": {
-      "description": "MachineConfigPoolStatus is the status for MachineConfigPool resource.",
+      "description": "status contains observed information about the machine config pool.",
       "type": "object",
       "properties": {
         "certExpirys": {
@@ -374,5 +374,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

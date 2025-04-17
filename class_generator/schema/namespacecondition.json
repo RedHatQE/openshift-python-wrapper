@@ -7,12 +7,15 @@
   ],
   "properties": {
     "lastTransitionTime": {
+      "description": "Last time the condition transitioned from one status to another.",
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
     },
     "message": {
+      "description": "Human-readable message indicating details about last transition.",
       "type": "string"
     },
     "reason": {
+      "description": "Unique, one-word, CamelCase reason for the condition's last transition.",
       "type": "string"
     },
     "status": {
