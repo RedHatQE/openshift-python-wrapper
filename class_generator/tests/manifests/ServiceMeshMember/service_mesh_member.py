@@ -8,7 +8,7 @@ from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentEr
 
 class ServiceMeshMember(NamespacedResource):
     """
-    No field description from API; please add description
+    No field description from API
     """
 
     api_group: str = NamespacedResource.ApiGroup.MAISTRA_IO
@@ -18,9 +18,9 @@ class ServiceMeshMember(NamespacedResource):
         control_plane_ref: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            control_plane_ref (dict[str, Any]): No field description from API; please add description
+            control_plane_ref (dict[str, Any]): No field description from API
 
         """
         super().__init__(**kwargs)

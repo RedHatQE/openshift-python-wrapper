@@ -211,9 +211,15 @@
             ],
             "properties": {
               "currentRevision": {
-                "description": "currentRevision is the generation of the most recently successful deployment",
+                "description": "currentRevision is the generation of the most recently successful deployment.\nCan not be set on creation of a nodeStatus. Updates must only increase the value.",
                 "type": "integer",
-                "format": "int32"
+                "format": "int32",
+                "x-kubernetes-validations": [
+                  {
+                    "message": "must only increase",
+                    "rule": "self >= oldSelf"
+                  }
+                ]
               },
               "lastFailedCount": {
                 "description": "lastFailedCount is how often the installer pod of the last failed revision failed.",
@@ -250,16 +256,41 @@
                 "type": "string"
               },
               "targetRevision": {
-                "description": "targetRevision is the generation of the deployment we're trying to apply",
+                "description": "targetRevision is the generation of the deployment we're trying to apply.\nCan not be set on creation of a nodeStatus.",
                 "type": "integer",
                 "format": "int32"
               }
-            }
+            },
+            "x-kubernetes-validations": [
+              {
+                "fieldPath": ".currentRevision",
+                "message": "cannot be unset once set",
+                "rule": "has(self.currentRevision) || !has(oldSelf.currentRevision)"
+              },
+              {
+                "fieldPath": ".currentRevision",
+                "message": "currentRevision can not be set on creation of a nodeStatus",
+                "optionalOldSelf": true,
+                "rule": "oldSelf.hasValue() || !has(self.currentRevision)"
+              },
+              {
+                "fieldPath": ".targetRevision",
+                "message": "targetRevision can not be set on creation of a nodeStatus",
+                "optionalOldSelf": true,
+                "rule": "oldSelf.hasValue() || !has(self.targetRevision)"
+              }
+            ]
           },
           "x-kubernetes-list-map-keys": [
             "nodeName"
           ],
-          "x-kubernetes-list-type": "map"
+          "x-kubernetes-list-type": "map",
+          "x-kubernetes-validations": [
+            {
+              "message": "no more than 1 node status may have a nonzero targetRevision",
+              "rule": "size(self.filter(status, status.?targetRevision.orValue(0) != 0)) <= 1"
+            }
+          ]
         },
         "observedGeneration": {
           "description": "observedGeneration is the last generation change you've dealt with",

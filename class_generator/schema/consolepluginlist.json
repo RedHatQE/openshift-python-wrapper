@@ -13,7 +13,7 @@
       "description": "List of consoleplugins. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.openshift.console.v1alpha1.ConsolePlugin"
+        "$ref": "_definitions.json#/definitions/io.openshift.console.v1.ConsolePlugin"
       }
     },
     "kind": {
@@ -29,7 +29,7 @@
     {
       "group": "console.openshift.io",
       "kind": "ConsolePluginList",
-      "version": "v1alpha1"
+      "version": "v1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

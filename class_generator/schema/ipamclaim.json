@@ -1,0 +1,59 @@
+{
+  "description": "IPAMClaim is the Schema for the IPAMClaim API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "interface",
+        "network"
+      ],
+      "properties": {
+        "interface": {
+          "description": "The pod interface name for which this allocation was created",
+          "type": "string"
+        },
+        "network": {
+          "description": "The network name for which this persistent allocation was created",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "required": [
+        "ips"
+      ],
+      "properties": {
+        "ips": {
+          "description": "The list of IP addresses (v4, v6) that were allocated for the pod interface",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "k8s.cni.cncf.io",
+      "kind": "IPAMClaim",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

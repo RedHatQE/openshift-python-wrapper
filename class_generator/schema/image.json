@@ -99,7 +99,13 @@
               },
               "x-kubernetes-list-type": "atomic"
             }
-          }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "Only one of blockedRegistries or allowedRegistries may be set",
+              "rule": "has(self.blockedRegistries) ? !has(self.allowedRegistries) : true"
+            }
+          ]
         }
       }
     },

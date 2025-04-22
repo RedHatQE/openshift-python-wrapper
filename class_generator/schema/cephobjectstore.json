@@ -49,6 +49,7 @@
         "protocols": {
           "type": "object",
           "properties": {
+            "enableAPIs": {},
             "s3": {},
             "swift": {}
           }

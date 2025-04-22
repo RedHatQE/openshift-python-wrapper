@@ -18,7 +18,7 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "KubeletConfigSpec defines the desired state of KubeletConfig",
+      "description": "spec contains the desired kubelet configuration.",
       "type": "object",
       "properties": {
         "autoSizingReserved": {
@@ -33,7 +33,7 @@
           "format": "int32"
         },
         "machineConfigPoolSelector": {
-          "description": "MachineConfigPoolSelector selects which pools the KubeletConfig shoud apply to.\nA nil selector will result in no pools being selected.",
+          "description": "machineConfigPoolSelector selects which pools the KubeletConfig shoud apply to.\nA nil selector will result in no pools being selected.",
           "type": "object",
           "properties": {
             "matchExpressions": {
@@ -108,7 +108,7 @@
       }
     },
     "status": {
-      "description": "KubeletConfigStatus defines the observed state of a KubeletConfig",
+      "description": "status contains observed information about the kubelet configuration.",
       "type": "object",
       "properties": {
         "conditions": {

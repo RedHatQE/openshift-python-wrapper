@@ -13,7 +13,7 @@
       "description": "List of subscriptions. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/com.coreos.operators.v1alpha1.Subscription"
+        "$ref": "_definitions.json#/definitions/io.noobaa.cnpg.postgresql.v1.Subscription"
       }
     },
     "kind": {
@@ -27,9 +27,9 @@
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "operators.coreos.com",
+      "group": "postgresql.cnpg.noobaa.io",
       "kind": "SubscriptionList",
-      "version": "v1alpha1"
+      "version": "v1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

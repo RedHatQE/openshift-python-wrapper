@@ -111,6 +111,10 @@
             }
           }
         },
+        "kernelPageSize": {
+          "description": "KernelPageSize defines the kernel page size. 4k is the default, 64k is only supported on aarch64",
+          "type": "string"
+        },
         "machineConfigLabel": {
           "description": "MachineConfigLabel defines the label to add to the MachineConfigs the operator creates. It has to be\nused in the MachineConfigSelector of the MachineConfigPool which targets this performance profile.\nDefaults to \"machineconfiguration.openshift.io/role=<same role as in NodeSelector label key>\"",
           "type": "object",

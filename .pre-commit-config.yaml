@@ -5,6 +5,10 @@ default_install_hook_types: [pre-commit, commit-msg]
 default_language_version:
   python: python3
 
+ci:
+  autofix_prs: false
+  autoupdate_commit_msg: "ci: [pre-commit.ci] pre-commit autoupdate"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: "v5.0.0"
@@ -20,7 +24,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/PyCQA/flake8
-    rev: "7.1.2"
+    rev: "7.2.0"
     hooks:
       - id: flake8
         args: [--config=.flake8]
@@ -41,13 +45,13 @@ repos:
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.7
+    rev: v0.11.6
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.24.0
+    rev: v8.24.3
     hooks:
       - id: gitleaks
 
@@ -57,12 +61,3 @@ repos:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)
         additional_dependencies: ["types-PyYAML", "types-requests"]
-
-  - repo: https://github.com/espressif/conventional-precommit-linter
-    rev: v1.10.0 # The version tag you wish to use
-    hooks:
-      - id: conventional-precommit-linter
-        stages: [commit-msg]
-        args:
-          - --types=ci,docs,feat,fix,refactor,test,release
-          - --subject-min-length=15

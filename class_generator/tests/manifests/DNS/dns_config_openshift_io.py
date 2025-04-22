@@ -23,7 +23,7 @@ class DNS(Resource):
         public_zone: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             base_domain (str): baseDomain is the base domain of the cluster. All managed DNS records
               will be sub-domains of this base.  For example, given the base

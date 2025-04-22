@@ -1,5 +1,5 @@
 {
-  "description": "StorageProfile is the Schema for the storageprofiles API",
+  "description": "StorageProfile provides a CDI specific recommendation for storage parameters",
   "type": "object",
   "required": [
     "spec"
@@ -18,55 +18,119 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "StorageProfileSpec defines the desired state of StorageProfile",
+      "description": "StorageProfileSpec defines specification for StorageProfile",
       "type": "object",
-      "required": [
-        "deviceClass"
-      ],
       "properties": {
-        "blockPoolConfiguration": {
-          "description": "configurations to use for  profile specific blockpool.",
-          "type": "object",
-          "properties": {
-            "parameters": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
+        "claimPropertySets": {
+          "description": "ClaimPropertySets is a provided set of properties applicable to PVC",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "description": "ClaimPropertySet is a set of properties applicable to PVC",
+            "type": "object",
+            "required": [
+              "accessModes",
+              "volumeMode"
+            ],
+            "properties": {
+              "accessModes": {
+                "description": "AccessModes contains the desired access modes the volume should have.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1",
+                "type": "array",
+                "maxItems": 4,
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-validations": [
+                  {
+                    "message": "Illegal AccessMode",
+                    "rule": "self.all(am, am in ['ReadWriteOnce', 'ReadOnlyMany', 'ReadWriteMany', 'ReadWriteOncePod'])"
+                  }
+                ]
+              },
+              "volumeMode": {
+                "description": "VolumeMode defines what type of volume is required by the claim.\nValue of Filesystem is implied when not included in claim spec.",
+                "type": "string",
+                "enum": [
+                  "Block",
+                  "Filesystem"
+                ]
               }
             }
           }
         },
-        "deviceClass": {
-          "description": "DeviceClass is the deviceclass name.",
-          "type": "string",
-          "maxLength": 512
+        "cloneStrategy": {
+          "description": "CloneStrategy defines the preferred method for performing a CDI clone",
+          "type": "string"
         },
-        "sharedFilesystemConfiguration": {
-          "description": "configurations to use for cephfilesystem.",
-          "type": "object",
-          "properties": {
-            "parameters": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
+        "dataImportCronSourceFormat": {
+          "description": "DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources",
+          "type": "string"
+        },
+        "snapshotClass": {
+          "description": "SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.",
+          "type": "string"
         }
-      },
-      "x-kubernetes-validations": [
-        {
-          "message": "spec is immutable",
-          "rule": "oldSelf == self"
-        }
-      ]
+      }
     },
     "status": {
-      "description": "StorageProfileStatus defines the observed state of StorageProfile",
+      "description": "StorageProfileStatus provides the most recently observed status of the StorageProfile",
       "type": "object",
       "properties": {
-        "phase": {
-          "description": "Phase describes the Phase of StorageProfile\nThis is used by OLM UI to provide status information\nto the user",
+        "claimPropertySets": {
+          "description": "ClaimPropertySets computed from the spec and detected in the system",
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "description": "ClaimPropertySet is a set of properties applicable to PVC",
+            "type": "object",
+            "required": [
+              "accessModes",
+              "volumeMode"
+            ],
+            "properties": {
+              "accessModes": {
+                "description": "AccessModes contains the desired access modes the volume should have.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1",
+                "type": "array",
+                "maxItems": 4,
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-validations": [
+                  {
+                    "message": "Illegal AccessMode",
+                    "rule": "self.all(am, am in ['ReadWriteOnce', 'ReadOnlyMany', 'ReadWriteMany', 'ReadWriteOncePod'])"
+                  }
+                ]
+              },
+              "volumeMode": {
+                "description": "VolumeMode defines what type of volume is required by the claim.\nValue of Filesystem is implied when not included in claim spec.",
+                "type": "string",
+                "enum": [
+                  "Block",
+                  "Filesystem"
+                ]
+              }
+            }
+          }
+        },
+        "cloneStrategy": {
+          "description": "CloneStrategy defines the preferred method for performing a CDI clone",
+          "type": "string"
+        },
+        "dataImportCronSourceFormat": {
+          "description": "DataImportCronSourceFormat defines the format of the DataImportCron-created disk image sources",
+          "type": "string"
+        },
+        "provisioner": {
+          "description": "The Storage class provisioner plugin name",
+          "type": "string"
+        },
+        "snapshotClass": {
+          "description": "SnapshotClass is optional specific VolumeSnapshotClass for CloneStrategySnapshot. If not set, a VolumeSnapshotClass is chosen according to the provisioner.",
+          "type": "string"
+        },
+        "storageClass": {
+          "description": "The StorageClass name for which capabilities are defined",
           "type": "string"
         }
       }
@@ -74,9 +138,9 @@
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "ocs.openshift.io",
+      "group": "cdi.kubevirt.io",
       "kind": "StorageProfile",
-      "version": "v1"
+      "version": "v1beta1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

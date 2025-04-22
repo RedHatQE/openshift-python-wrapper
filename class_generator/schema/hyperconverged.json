@@ -870,6 +870,10 @@
           "description": "DefaultRuntimeClass defines a cluster default for the RuntimeClass to be used for VMIs pods if not set there.\nDefault RuntimeClass can be changed when kubevirt is running, existing VMIs are not impacted till\nthe next restart/live-migration when they are eventually going to consume the new default RuntimeClass.",
           "type": "string"
         },
+        "enableCommonBootImageImport": {
+          "description": "Opt-in to automatic delivery/updates of the common data import cron templates.\nThere are two sources for the data import cron templates: hard coded list of common templates, and custom (user\ndefined) templates that can be added to the dataImportCronTemplates field. This field only controls the common\ntemplates. It is possible to use custom templates by adding them to the dataImportCronTemplates field.",
+          "type": "boolean"
+        },
         "evictionStrategy": {
           "description": "EvictionStrategy defines at the cluster level if the VirtualMachineInstance should be\nmigrated instead of shut-off in case of a node drain. If the VirtualMachineInstance specific\nfield is set it overrides the cluster level one.\nAllowed values:\n- `None` no eviction strategy at cluster level.\n- `LiveMigrate` migrate the VM on eviction; a not live migratable VM with no specific strategy will block the drain of the node util manually evicted.\n- `LiveMigrateIfPossible` migrate the VM on eviction if live migration is possible, otherwise directly evict.\n- `External` block the drain, track eviction and notify an external controller.\nDefaults to LiveMigrate with multiple worker nodes, None on single worker clusters.",
           "type": "string",
@@ -889,7 +893,7 @@
               "type": "boolean"
             },
             "autoResourceLimits": {
-              "description": "Enable KubeVirt to set automatic limits when they are needed.\nIf ResourceQuota with set memory limits is associated with a namespace, each pod in that namespace must have memory limits set.\nBy default, KubeVirt does not set such limits to the virt-launcher pod.\nWhen this feature gate is enabled, KubeVirt will set limits to the virt-launcher pod if they are not set manually\nand if a resource quota with memory limits is associated with the creation namespace.\nNote: this feature is in Developer Preview.",
+              "description": "Deprecated: this field is ignored and will be removed in the next version of the API.",
               "type": "boolean"
             },
             "deployKubeSecondaryDNS": {
@@ -921,7 +925,7 @@
               "type": "boolean"
             },
             "enableCommonBootImageImport": {
-              "description": "Opt-in to automatic delivery/updates of the common data import cron templates.\nThere are two sources for the data import cron templates: hard coded list of common templates, and custom\ntemplates that can be added to the dataImportCronTemplates field. This feature gates only control the common\ntemplates. It is possible to use custom templates by adding them to the dataImportCronTemplates field.",
+              "description": "Opt-in to automatic delivery/updates of the common data import cron templates.\nThere are two sources for the data import cron templates: hard coded list of common templates, and custom\ntemplates that can be added to the dataImportCronTemplates field. This feature gates only control the common\ntemplates. It is possible to use custom templates by adding them to the dataImportCronTemplates field.\nDeprecated: This field is ignored. Use spec.enableCommonBootImageImport instead",
               "type": "boolean"
             },
             "enableManagedTenantQuota": {
@@ -1779,6 +1783,20 @@
                   }
                 }
               }
+            }
+          }
+        },
+        "instancetypeConfig": {
+          "description": "InstancetypeConfig holds the configuration of instance type related functionality within KubeVirt.",
+          "type": "object",
+          "properties": {
+            "referencePolicy": {
+              "description": "ReferencePolicy defines how an instance type or preference should be referenced by the VM after submission, supported values are:\nreference (default) - Where a copy of the original object is stashed in a ControllerRevision and referenced by the VM.\nexpand - Where the instance type or preference are expanded into the VM if no revisionNames have been populated.\nexpandAll - Where the instance type or preference are expanded into the VM regardless of revisionNames previously being populated.",
+              "enum": [
+                "reference",
+                "expand",
+                "expandAll"
+              ]
             }
           }
         },

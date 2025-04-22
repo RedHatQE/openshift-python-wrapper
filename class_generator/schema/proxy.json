@@ -18,7 +18,7 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "Spec holds user-settable values for the proxy configuration",
+      "description": "spec holds user-settable values for the proxy configuration",
       "type": "object",
       "properties": {
         "httpProxy": {

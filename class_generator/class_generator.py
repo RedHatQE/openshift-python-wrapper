@@ -34,7 +34,7 @@ LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
-MISSING_DESCRIPTION_STR: str = "No field description from API; please add description"
+MISSING_DESCRIPTION_STR: str = "No field description from API"
 
 
 def _is_kind_and_namespaced(
@@ -623,6 +623,7 @@ def class_generator(
     output_dir: str = "",
     add_tests: bool = False,
     called_from_cli: bool = True,
+    update_schema_executed: bool = False,
 ) -> list[str]:
     """
     Generates a class for a given Kind.
@@ -630,12 +631,34 @@ def class_generator(
     LOGGER.info(f"Generating class for {kind}")
     kind = kind.lower()
     kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
-
     if not kind_and_namespaced_mappings:
-        LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run with --update-schema")
         if called_from_cli:
-            sys.exit(1)
+            if update_schema_executed:
+                LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed.")
+                sys.exit(1)
+
+            run_update_schema = input(
+                f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]"
+            )
+            if run_update_schema.lower() == "n":
+                sys.exit(1)
+
+            elif run_update_schema.lower() == "y":
+                update_kind_schema()
+
+                class_generator(
+                    overwrite=overwrite,
+                    dry_run=dry_run,
+                    kind=kind,
+                    output_file=output_file,
+                    output_dir=output_dir,
+                    add_tests=add_tests,
+                    called_from_cli=True,
+                    update_schema_executed=True,
+                )
+
         else:
+            LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema.")
             return []
 
     resources = parse_explain(kind=kind)

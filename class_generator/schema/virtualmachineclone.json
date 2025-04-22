@@ -172,7 +172,7 @@
     {
       "group": "clone.kubevirt.io",
       "kind": "VirtualMachineClone",
-      "version": "v1alpha1"
+      "version": "v1beta1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

@@ -41,6 +41,9 @@
         "source": {
           "description": "Source specifies where a group replications will be created from.\nThis field is immutable after creation.\nRequired.",
           "type": "object",
+          "required": [
+            "selector"
+          ],
           "properties": {
             "selector": {
               "description": "Selector is a label query over persistent volume claims that are to be\ngrouped together for replication.",
@@ -122,11 +125,11 @@
           ]
         },
         "volumeReplicationClassName": {
-          "description": "volumeReplicationClassName is the volumeReplicationClass name for VolumeReplication object",
+          "description": "volumeReplicationClassName is the volumeReplicationClass name for the VolumeReplication object\ncreated for this volumeGroupReplication",
           "type": "string",
           "x-kubernetes-validations": [
             {
-              "message": "volumReplicationClassName is immutable",
+              "message": "volumeReplicationClassName is immutable",
               "rule": "self == oldSelf"
             }
           ]

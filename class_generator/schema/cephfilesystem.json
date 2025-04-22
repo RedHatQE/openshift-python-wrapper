@@ -301,6 +301,9 @@
         "preserveFilesystemOnDelete": {
           "type": "boolean"
         },
+        "preservePoolNames": {
+          "type": "boolean"
+        },
         "preservePoolsOnDelete": {
           "type": "boolean"
         },

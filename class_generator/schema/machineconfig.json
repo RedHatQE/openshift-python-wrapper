@@ -19,11 +19,11 @@
       "type": "object",
       "properties": {
         "baseOSExtensionsContainerImage": {
-          "description": "BaseOSExtensionsContainerImage specifies the remote location that will be used\nto fetch the extensions container matching a new-format OS image",
+          "description": "baseOSExtensionsContainerImage specifies the remote location that will be used\nto fetch the extensions container matching a new-format OS image",
           "type": "string"
         },
         "config": {
-          "description": "Config is a Ignition Config object.",
+          "description": "config is a Ignition Config object.",
           "x-kubernetes-preserve-unknown-fields": true
         },
         "extensions": {
@@ -47,7 +47,7 @@
           "type": "string"
         },
         "osImageURL": {
-          "description": "OSImageURL specifies the remote location that will be used to\nfetch the OS.",
+          "description": "osImageURL specifies the remote location that will be used to\nfetch the OS.",
           "type": "string"
         }
       }

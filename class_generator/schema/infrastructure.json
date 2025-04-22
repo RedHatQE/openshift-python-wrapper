@@ -26,7 +26,7 @@
           "type": "object",
           "properties": {
             "key": {
-              "description": "Key allows pointing to a specific key/value inside of the configmap.  This is useful for logical file references.",
+              "description": "key allows pointing to a specific key/value inside of the configmap.  This is useful for logical file references.",
               "type": "string"
             },
             "name": {
@@ -39,11 +39,11 @@
           "type": "object",
           "properties": {
             "alibabaCloud": {
-              "description": "AlibabaCloud contains settings specific to the Alibaba Cloud infrastructure provider.",
+              "description": "alibabaCloud contains settings specific to the Alibaba Cloud infrastructure provider.",
               "type": "object"
             },
             "aws": {
-              "description": "AWS contains settings specific to the Amazon Web Services infrastructure provider.",
+              "description": "aws contains settings specific to the Amazon Web Services infrastructure provider.",
               "type": "object",
               "properties": {
                 "serviceEndpoints": {
@@ -70,11 +70,11 @@
               }
             },
             "azure": {
-              "description": "Azure contains settings specific to the Azure infrastructure provider.",
+              "description": "azure contains settings specific to the Azure infrastructure provider.",
               "type": "object"
             },
             "baremetal": {
-              "description": "BareMetal contains settings specific to the BareMetal platform.",
+              "description": "baremetal contains settings specific to the BareMetal platform.",
               "type": "object",
               "properties": {
                 "apiServerInternalIPs": {
@@ -161,7 +161,7 @@
               ]
             },
             "equinixMetal": {
-              "description": "EquinixMetal contains settings specific to the Equinix Metal infrastructure provider.",
+              "description": "equinixMetal contains settings specific to the Equinix Metal infrastructure provider.",
               "type": "object"
             },
             "external": {
@@ -169,7 +169,7 @@
               "type": "object",
               "properties": {
                 "platformName": {
-                  "description": "PlatformName holds the arbitrary string representing the infrastructure provider name, expected to be set at the installation time.\nThis field is solely for informational and reporting purposes and is not expected to be used for decision-making.",
+                  "description": "platformName holds the arbitrary string representing the infrastructure provider name, expected to be set at the installation time.\nThis field is solely for informational and reporting purposes and is not expected to be used for decision-making.",
                   "type": "string",
                   "x-kubernetes-validations": [
                     {
@@ -181,19 +181,19 @@
               }
             },
             "gcp": {
-              "description": "GCP contains settings specific to the Google Cloud Platform infrastructure provider.",
+              "description": "gcp contains settings specific to the Google Cloud Platform infrastructure provider.",
               "type": "object"
             },
             "ibmcloud": {
-              "description": "IBMCloud contains settings specific to the IBMCloud infrastructure provider.",
+              "description": "ibmcloud contains settings specific to the IBMCloud infrastructure provider.",
               "type": "object"
             },
             "kubevirt": {
-              "description": "Kubevirt contains settings specific to the kubevirt infrastructure provider.",
+              "description": "kubevirt contains settings specific to the kubevirt infrastructure provider.",
               "type": "object"
             },
             "nutanix": {
-              "description": "Nutanix contains settings specific to the Nutanix infrastructure provider.",
+              "description": "nutanix contains settings specific to the Nutanix infrastructure provider.",
               "type": "object",
               "required": [
                 "prismCentral",
@@ -373,7 +373,7 @@
               }
             },
             "openstack": {
-              "description": "OpenStack contains settings specific to the OpenStack infrastructure provider.",
+              "description": "openstack contains settings specific to the OpenStack infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIPs": {
@@ -460,11 +460,11 @@
               ]
             },
             "ovirt": {
-              "description": "Ovirt contains settings specific to the oVirt infrastructure provider.",
+              "description": "ovirt contains settings specific to the oVirt infrastructure provider.",
               "type": "object"
             },
             "powervs": {
-              "description": "PowerVS contains settings specific to the IBM Power Systems Virtual Servers infrastructure provider.",
+              "description": "powervs contains settings specific to the IBM Power Systems Virtual Servers infrastructure provider.",
               "type": "object",
               "properties": {
                 "serviceEndpoints": {
@@ -537,7 +537,7 @@
               ]
             },
             "vsphere": {
-              "description": "VSphere contains settings specific to the VSphere infrastructure provider.",
+              "description": "vsphere contains settings specific to the VSphere infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIPs": {
@@ -568,7 +568,7 @@
                   "description": "failureDomains contains the definition of region, zone and the vCenter topology.\nIf this is omitted failure domains (regions and zones) will not be used.",
                   "type": "array",
                   "items": {
-                    "description": "VSpherePlatformFailureDomainSpec holds the region and zone failure domain and\nthe vCenter topology of that failure domain.",
+                    "description": "VSpherePlatformFailureDomainSpec holds the region and zone failure domain and the vCenter topology of that failure domain.",
                     "type": "object",
                     "required": [
                       "name",
@@ -590,6 +590,23 @@
                         "maxLength": 80,
                         "minLength": 1
                       },
+                      "regionAffinity": {
+                        "description": "regionAffinity holds the type of region, Datacenter or ComputeCluster.\nWhen set to Datacenter, this means the region is a vCenter Datacenter as defined in topology.\nWhen set to ComputeCluster, this means the region is a vCenter Cluster as defined in topology.",
+                        "type": "object",
+                        "required": [
+                          "type"
+                        ],
+                        "properties": {
+                          "type": {
+                            "description": "type determines the vSphere object type for a region within this failure domain.\nAvailable types are Datacenter and ComputeCluster.\nWhen set to Datacenter, this means the vCenter Datacenter defined is the region.\nWhen set to ComputeCluster, this means the vCenter cluster defined is the region.",
+                            "type": "string",
+                            "enum": [
+                              "ComputeCluster",
+                              "Datacenter"
+                            ]
+                          }
+                        }
+                      },
                       "server": {
                         "description": "server is the fully-qualified domain name or the IP address of the vCenter server.",
                         "type": "string",
@@ -597,7 +614,7 @@
                         "minLength": 1
                       },
                       "topology": {
-                        "description": "Topology describes a given failure domain using vSphere constructs",
+                        "description": "topology describes a given failure domain using vSphere constructs",
                         "type": "object",
                         "required": [
                           "computeCluster",
@@ -659,6 +676,58 @@
                         "type": "string",
                         "maxLength": 80,
                         "minLength": 1
+                      },
+                      "zoneAffinity": {
+                        "description": "zoneAffinity holds the type of the zone and the hostGroup which\nvmGroup and the hostGroup names in vCenter corresponds to\na vm-host group of type Virtual Machine and Host respectively. Is also\ncontains the vmHostRule which is an affinity vm-host rule in vCenter.",
+                        "type": "object",
+                        "required": [
+                          "type"
+                        ],
+                        "properties": {
+                          "hostGroup": {
+                            "description": "hostGroup holds the vmGroup and the hostGroup names in vCenter\ncorresponds to a vm-host group of type Virtual Machine and Host respectively. Is also\ncontains the vmHostRule which is an affinity vm-host rule in vCenter.",
+                            "type": "object",
+                            "required": [
+                              "hostGroup",
+                              "vmGroup",
+                              "vmHostRule"
+                            ],
+                            "properties": {
+                              "hostGroup": {
+                                "description": "hostGroup is the name of the vm-host group of type host within vCenter for this failure domain.\nhostGroup is limited to 80 characters.\nThis field is required when the VSphereFailureDomain ZoneType is HostGroup",
+                                "type": "string",
+                                "maxLength": 80,
+                                "minLength": 1
+                              },
+                              "vmGroup": {
+                                "description": "vmGroup is the name of the vm-host group of type virtual machine within vCenter for this failure domain.\nvmGroup is limited to 80 characters.\nThis field is required when the VSphereFailureDomain ZoneType is HostGroup",
+                                "type": "string",
+                                "maxLength": 80,
+                                "minLength": 1
+                              },
+                              "vmHostRule": {
+                                "description": "vmHostRule is the name of the affinity vm-host rule within vCenter for this failure domain.\nvmHostRule is limited to 80 characters.\nThis field is required when the VSphereFailureDomain ZoneType is HostGroup",
+                                "type": "string",
+                                "maxLength": 80,
+                                "minLength": 1
+                              }
+                            }
+                          },
+                          "type": {
+                            "description": "type determines the vSphere object type for a zone within this failure domain.\nAvailable types are ComputeCluster and HostGroup.\nWhen set to ComputeCluster, this means the vCenter cluster defined is the zone.\nWhen set to HostGroup, hostGroup must be configured with hostGroup, vmGroup and vmHostRule and\nthis means the zone is defined by the grouping of those fields.",
+                            "type": "string",
+                            "enum": [
+                              "HostGroup",
+                              "ComputeCluster"
+                            ]
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "hostGroup is required when type is HostGroup, and forbidden otherwise",
+                            "rule": "has(self.type) && self.type == 'HostGroup' ?  has(self.hostGroup) : !has(self.hostGroup)"
+                          }
+                        ]
                       }
                     }
                   },
@@ -919,7 +988,7 @@
           "type": "object",
           "properties": {
             "alibabaCloud": {
-              "description": "AlibabaCloud contains settings specific to the Alibaba Cloud infrastructure provider.",
+              "description": "alibabaCloud contains settings specific to the Alibaba Cloud infrastructure provider.",
               "type": "object",
               "required": [
                 "region"
@@ -969,7 +1038,7 @@
               }
             },
             "aws": {
-              "description": "AWS contains settings specific to the Amazon Web Services infrastructure provider.",
+              "description": "aws contains settings specific to the Amazon Web Services infrastructure provider.",
               "type": "object",
               "properties": {
                 "region": {
@@ -989,25 +1058,35 @@
                     ],
                     "properties": {
                       "key": {
-                        "description": "key is the key of the tag",
+                        "description": "key sets the key of the AWS resource tag key-value pair. Key is required when defining an AWS resource tag.\nKey should consist of between 1 and 128 characters, and may\ncontain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', and '@'.",
                         "type": "string",
                         "maxLength": 128,
                         "minLength": 1,
-                        "pattern": "^[0-9A-Za-z_.:/=+-@]+$"
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "invalid AWS resource tag key. The string can contain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', '@'",
+                            "rule": "self.matches('^[0-9A-Za-z_.:/=+-@ ]+$')"
+                          }
+                        ]
                       },
                       "value": {
-                        "description": "value is the value of the tag.\nSome AWS service do not support empty values. Since tags are added to resources in many services, the\nlength of the tag value must meet the requirements of all services.",
+                        "description": "value sets the value of the AWS resource tag key-value pair. Value is required when defining an AWS resource tag.\nValue should consist of between 1 and 256 characters, and may\ncontain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', and '@'.\nSome AWS service do not support empty values. Since tags are added to resources in many services, the\nlength of the tag value must meet the requirements of all services.",
                         "type": "string",
                         "maxLength": 256,
                         "minLength": 1,
-                        "pattern": "^[0-9A-Za-z_.:/=+-@]+$"
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "invalid AWS resource tag value. The string can contain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', '@'",
+                            "rule": "self.matches('^[0-9A-Za-z_.:/=+-@ ]+$')"
+                          }
+                        ]
                       }
                     }
                   },
                   "x-kubernetes-list-type": "atomic"
                 },
                 "serviceEndpoints": {
-                  "description": "ServiceEndpoints list contains custom endpoints which will override default\nservice endpoint of AWS Services.\nThere must be only one ServiceEndpoint for a service.",
+                  "description": "serviceEndpoints list contains custom endpoints which will override default\nservice endpoint of AWS Services.\nThere must be only one ServiceEndpoint for a service.",
                   "type": "array",
                   "items": {
                     "description": "AWSServiceEndpoint store the configuration of a custom url to\noverride existing defaults of AWS Services.",
@@ -1030,7 +1109,7 @@
               }
             },
             "azure": {
-              "description": "Azure contains settings specific to the Azure infrastructure provider.",
+              "description": "azure contains settings specific to the Azure infrastructure provider.",
               "type": "object",
               "properties": {
                 "armEndpoint": {
@@ -1102,7 +1181,7 @@
               ]
             },
             "baremetal": {
-              "description": "BareMetal contains settings specific to the BareMetal platform.",
+              "description": "baremetal contains settings specific to the BareMetal platform.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
@@ -1195,7 +1274,7 @@
               }
             },
             "equinixMetal": {
-              "description": "EquinixMetal contains settings specific to the Equinix Metal infrastructure provider.",
+              "description": "equinixMetal contains settings specific to the Equinix Metal infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
@@ -1209,7 +1288,7 @@
               }
             },
             "external": {
-              "description": "External contains settings specific to the generic External infrastructure provider.",
+              "description": "external contains settings specific to the generic External infrastructure provider.",
               "type": "object",
               "properties": {
                 "cloudControllerManager": {
@@ -1248,7 +1327,7 @@
               ]
             },
             "gcp": {
-              "description": "GCP contains settings specific to the Google Cloud Platform infrastructure provider.",
+              "description": "gcp contains settings specific to the Google Cloud Platform infrastructure provider.",
               "type": "object",
               "properties": {
                 "projectID": {
@@ -1364,31 +1443,31 @@
               ]
             },
             "ibmcloud": {
-              "description": "IBMCloud contains settings specific to the IBMCloud infrastructure provider.",
+              "description": "ibmcloud contains settings specific to the IBMCloud infrastructure provider.",
               "type": "object",
               "properties": {
                 "cisInstanceCRN": {
-                  "description": "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing\nthe DNS zone for the cluster's base domain",
+                  "description": "cisInstanceCRN is the CRN of the Cloud Internet Services instance managing\nthe DNS zone for the cluster's base domain",
                   "type": "string"
                 },
                 "dnsInstanceCRN": {
-                  "description": "DNSInstanceCRN is the CRN of the DNS Services instance managing the DNS zone\nfor the cluster's base domain",
+                  "description": "dnsInstanceCRN is the CRN of the DNS Services instance managing the DNS zone\nfor the cluster's base domain",
                   "type": "string"
                 },
                 "location": {
-                  "description": "Location is where the cluster has been deployed",
+                  "description": "location is where the cluster has been deployed",
                   "type": "string"
                 },
                 "providerType": {
-                  "description": "ProviderType indicates the type of cluster that was created",
+                  "description": "providerType indicates the type of cluster that was created",
                   "type": "string"
                 },
                 "resourceGroupName": {
-                  "description": "ResourceGroupName is the Resource Group for new IBMCloud resources created for the cluster.",
+                  "description": "resourceGroupName is the Resource Group for new IBMCloud resources created for the cluster.",
                   "type": "string"
                 },
                 "serviceEndpoints": {
-                  "description": "serviceEndpoints is a list of custom endpoints which will override the default\nservice endpoints of an IBM Cloud service. These endpoints are consumed by\ncomponents within the cluster to reach the respective IBM Cloud Services.",
+                  "description": "serviceEndpoints is a list of custom endpoints which will override the default\nservice endpoints of an IBM service. These endpoints are used by components\nwithin the cluster when trying to reach the IBM Cloud Services that have been\noverriden. The CCCMO reads in the IBMCloudPlatformSpec and validates each\nendpoint is resolvable. Once validated, the cloud config and IBMCloudPlatformStatus\nare updated to reflect the same custom endpoints.",
                   "type": "array",
                   "items": {
                     "description": "IBMCloudServiceEndpoint stores the configuration of a custom url to\noverride existing defaults of IBM Cloud Services.",
@@ -1418,8 +1497,9 @@
                         ]
                       },
                       "url": {
-                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty.",
+                        "description": "url is fully qualified URI with scheme https, that overrides the default generated\nendpoint for a client.\nThis must be provided and cannot be empty. The path must follow the pattern\n/v[0,9]+ or /api/v[0,9]+",
                         "type": "string",
+                        "maxLength": 300,
                         "x-kubernetes-validations": [
                           {
                             "message": "url must be a valid absolute URL",
@@ -1437,7 +1517,7 @@
               }
             },
             "kubevirt": {
-              "description": "Kubevirt contains settings specific to the kubevirt infrastructure provider.",
+              "description": "kubevirt contains settings specific to the kubevirt infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
@@ -1451,7 +1531,7 @@
               }
             },
             "nutanix": {
-              "description": "Nutanix contains settings specific to the Nutanix infrastructure provider.",
+              "description": "nutanix contains settings specific to the Nutanix infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
@@ -1517,7 +1597,7 @@
               }
             },
             "openstack": {
-              "description": "OpenStack contains settings specific to the OpenStack infrastructure provider.",
+              "description": "openstack contains settings specific to the OpenStack infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
@@ -1614,7 +1694,7 @@
               }
             },
             "ovirt": {
-              "description": "Ovirt contains settings specific to the oVirt infrastructure provider.",
+              "description": "ovirt contains settings specific to the oVirt infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {
@@ -1684,15 +1764,15 @@
               }
             },
             "powervs": {
-              "description": "PowerVS contains settings specific to the Power Systems Virtual Servers infrastructure provider.",
+              "description": "powervs contains settings specific to the Power Systems Virtual Servers infrastructure provider.",
               "type": "object",
               "properties": {
                 "cisInstanceCRN": {
-                  "description": "CISInstanceCRN is the CRN of the Cloud Internet Services instance managing\nthe DNS zone for the cluster's base domain",
+                  "description": "cisInstanceCRN is the CRN of the Cloud Internet Services instance managing\nthe DNS zone for the cluster's base domain",
                   "type": "string"
                 },
                 "dnsInstanceCRN": {
-                  "description": "DNSInstanceCRN is the CRN of the DNS Services instance managing the DNS zone\nfor the cluster's base domain",
+                  "description": "dnsInstanceCRN is the CRN of the DNS Services instance managing the DNS zone\nfor the cluster's base domain",
                   "type": "string"
                 },
                 "region": {
@@ -1791,7 +1871,7 @@
               ]
             },
             "vsphere": {
-              "description": "VSphere contains settings specific to the VSphere infrastructure provider.",
+              "description": "vsphere contains settings specific to the VSphere infrastructure provider.",
               "type": "object",
               "properties": {
                 "apiServerInternalIP": {

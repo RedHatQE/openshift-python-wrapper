@@ -13,7 +13,7 @@
       "description": "`items` is a list of FlowSchemas.",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1beta3.FlowSchema"
+        "$ref": "_definitions.json#/definitions/io.k8s.api.flowcontrol.v1.FlowSchema"
       }
     },
     "kind": {
@@ -29,7 +29,7 @@
     {
       "group": "flowcontrol.apiserver.k8s.io",
       "kind": "FlowSchemaList",
-      "version": "v1beta3"
+      "version": "v1"
     }
   ],
   "$schema": "http://json-schema.org/schema#"

@@ -1559,7 +1559,7 @@
                                 "type": "object"
                               },
                               "state": {
-                                "description": "State represents the requested operational state of the interface.\nThe (only) value supported is 'absent', expressing a request to remove the interface.",
+                                "description": "State represents the requested operational state of the interface.\nThe supported values are:\n'absent', expressing a request to remove the interface.\n'down', expressing a request to set the link down.\n'up', expressing a request to set the link up.\nEmpty value functions as 'up'.",
                                 "type": "string"
                               },
                               "tag": {
@@ -1960,6 +1960,17 @@
                         "uuid": {
                           "description": "UUID reported by the vmi bios.\nDefaults to a random generated uid.",
                           "type": "string"
+                        }
+                      }
+                    },
+                    "ioThreads": {
+                      "description": "IOThreads specifies the IOThreads options.",
+                      "type": "object",
+                      "properties": {
+                        "supplementalPoolThreadCount": {
+                          "description": "SupplementalPoolThreadCount specifies how many iothreads are allocated for the supplementalPool policy.",
+                          "type": "integer",
+                          "format": "int32"
                         }
                       }
                     },
@@ -2663,7 +2674,7 @@
                             "type": "boolean"
                           },
                           "name": {
-                            "description": "Name of both the DataVolume and the PVC in the same namespace.\nAfter PVC population the DataVolume is garbage collected by default.",
+                            "description": "Name of both the DataVolume and the PVC in the same namespace.",
                             "type": "string"
                           }
                         }

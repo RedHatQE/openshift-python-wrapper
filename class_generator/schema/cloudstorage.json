@@ -1,0 +1,99 @@
+{
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "creationSecret",
+        "name",
+        "provider"
+      ],
+      "properties": {
+        "creationSecret": {
+          "description": "creationSecret is the secret that is needed to be used while creating the bucket.",
+          "type": "object",
+          "required": [
+            "key"
+          ],
+          "properties": {
+            "key": {
+              "description": "The key of the secret to select from.  Must be a valid secret key.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+              "type": "string"
+            },
+            "optional": {
+              "description": "Specify whether the Secret or its key must be defined",
+              "type": "boolean"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "enableSharedConfig": {
+          "description": "enableSharedConfig enable the use of shared config loading for AWS Buckets",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "name is the name requested for the bucket (aws, gcp) or container (azure)",
+          "type": "string"
+        },
+        "provider": {
+          "description": "provider is the provider of the cloud storage",
+          "type": "string",
+          "enum": [
+            "aws"
+          ]
+        },
+        "region": {
+          "description": "region for the bucket to be in, will be us-east-1 if not set.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "tags for the bucket",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "lastSyncTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "oadp.openshift.io",
+      "kind": "CloudStorage",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

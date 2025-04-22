@@ -25,7 +25,7 @@ class Deployment(NamespacedResource):
         template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             min_ready_seconds (int): Minimum number of seconds for which a newly created pod should be
               ready without any of its container crashing, for it to be

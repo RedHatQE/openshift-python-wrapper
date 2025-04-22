@@ -19,7 +19,7 @@
       "type": "object",
       "properties": {
         "deletePolicy": {
-          "description": "DeletePolicy defines the policy used to identify nodes to delete when downscaling.\nDefaults to \"Random\".  Valid values are \"Random, \"Newest\", \"Oldest\"",
+          "description": "deletePolicy defines the policy used to identify nodes to delete when downscaling.\nDefaults to \"Random\".  Valid values are \"Random, \"Newest\", \"Oldest\"",
           "type": "string",
           "enum": [
             "Random",
@@ -28,17 +28,17 @@
           ]
         },
         "minReadySeconds": {
-          "description": "MinReadySeconds is the minimum number of seconds for which a newly created machine should be ready.\nDefaults to 0 (machine will be considered available as soon as it is ready)",
+          "description": "minReadySeconds is the minimum number of seconds for which a newly created machine should be ready.\nDefaults to 0 (machine will be considered available as soon as it is ready)",
           "type": "integer",
           "format": "int32"
         },
         "replicas": {
-          "description": "Replicas is the number of desired replicas.\nThis is a pointer to distinguish between explicit zero and unspecified.\nDefaults to 1.",
+          "description": "replicas is the number of desired replicas.\nThis is a pointer to distinguish between explicit zero and unspecified.\nDefaults to 1.",
           "type": "integer",
           "format": "int32"
         },
         "selector": {
-          "description": "Selector is a label query over machines that should match the replica count.\nLabel keys and values that must match in order to be controlled by this MachineSet.\nIt must match the machine template's labels.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
+          "description": "selector is a label query over machines that should match the replica count.\nLabel keys and values that must match in order to be controlled by this MachineSet.\nIt must match the machine template's labels.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors",
           "type": "object",
           "properties": {
             "matchExpressions": {
@@ -83,7 +83,7 @@
           "x-kubernetes-map-type": "atomic"
         },
         "template": {
-          "description": "Template is the object that describes the machine that will be created if\ninsufficient replicas are detected.",
+          "description": "template is the object that describes the machine that will be created if\ninsufficient replicas are detected.",
           "type": "object",
           "properties": {
             "metadata": {
@@ -91,14 +91,14 @@
               "type": "object",
               "properties": {
                 "annotations": {
-                  "description": "Annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
+                  "description": "annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
                   "type": "object",
                   "additionalProperties": {
                     "type": "string"
                   }
                 },
                 "generateName": {
-                  "description": "GenerateName is an optional prefix, used by the server, to generate a unique\nname ONLY IF the Name field has not been provided.\nIf this field is used, the name returned to the client will be different\nthan the name passed. This value will also be combined with a unique suffix.\nThe provided value has the same validation rules as the Name field,\nand may be truncated by the length of the suffix required to make the value\nunique on the server.\n\nIf this field is specified and the generated name exists, the server will\nNOT return a 409 - instead, it will either return 201 Created or 500 with Reason\nServerTimeout indicating a unique name could not be found in the time allotted, and the client\nshould retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency",
+                  "description": "generateName is an optional prefix, used by the server, to generate a unique\nname ONLY IF the Name field has not been provided.\nIf this field is used, the name returned to the client will be different\nthan the name passed. This value will also be combined with a unique suffix.\nThe provided value has the same validation rules as the Name field,\nand may be truncated by the length of the suffix required to make the value\nunique on the server.\n\nIf this field is specified and the generated name exists, the server will\nNOT return a 409 - instead, it will either return 201 Created or 500 with Reason\nServerTimeout indicating a unique name could not be found in the time allotted, and the client\nshould retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency",
                   "type": "string"
                 },
                 "labels": {
@@ -109,11 +109,11 @@
                   }
                 },
                 "name": {
-                  "description": "Name must be unique within a namespace. Is required when creating resources, although\nsome resources may allow a client to request the generation of an appropriate name\nautomatically. Name is primarily intended for creation idempotence and configuration\ndefinition.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/identifiers#names",
+                  "description": "name must be unique within a namespace. Is required when creating resources, although\nsome resources may allow a client to request the generation of an appropriate name\nautomatically. Name is primarily intended for creation idempotence and configuration\ndefinition.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/identifiers#names",
                   "type": "string"
                 },
                 "namespace": {
-                  "description": "Namespace defines the space within each name must be unique. An empty namespace is\nequivalent to the \"default\" namespace, but \"default\" is the canonical representation.\nNot all objects are required to be scoped to a namespace - the value of this field for\nthose objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/namespaces",
+                  "description": "namespace defines the space within each name must be unique. An empty namespace is\nequivalent to the \"default\" namespace, but \"default\" is the canonical representation.\nNot all objects are required to be scoped to a namespace - the value of this field for\nthose objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/namespaces",
                   "type": "string"
                 },
                 "ownerReferences": {
@@ -168,11 +168,11 @@
               "type": "object",
               "properties": {
                 "lifecycleHooks": {
-                  "description": "LifecycleHooks allow users to pause operations on the machine at\ncertain predefined points within the machine lifecycle.",
+                  "description": "lifecycleHooks allow users to pause operations on the machine at\ncertain predefined points within the machine lifecycle.",
                   "type": "object",
                   "properties": {
                     "preDrain": {
-                      "description": "PreDrain hooks prevent the machine from being drained.\nThis also blocks further lifecycle events, such as termination.",
+                      "description": "preDrain hooks prevent the machine from being drained.\nThis also blocks further lifecycle events, such as termination.",
                       "type": "array",
                       "items": {
                         "description": "LifecycleHook represents a single instance of a lifecycle hook",
@@ -183,14 +183,14 @@
                         ],
                         "properties": {
                           "name": {
-                            "description": "Name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
+                            "description": "name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
                             "type": "string",
                             "maxLength": 256,
                             "minLength": 3,
                             "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
                           },
                           "owner": {
-                            "description": "Owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
+                            "description": "owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
                             "type": "string",
                             "maxLength": 512,
                             "minLength": 3
@@ -203,7 +203,7 @@
                       "x-kubernetes-list-type": "map"
                     },
                     "preTerminate": {
-                      "description": "PreTerminate hooks prevent the machine from being terminated.\nPreTerminate hooks be actioned after the Machine has been drained.",
+                      "description": "preTerminate hooks prevent the machine from being terminated.\nPreTerminate hooks be actioned after the Machine has been drained.",
                       "type": "array",
                       "items": {
                         "description": "LifecycleHook represents a single instance of a lifecycle hook",
@@ -214,14 +214,14 @@
                         ],
                         "properties": {
                           "name": {
-                            "description": "Name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
+                            "description": "name defines a unique name for the lifcycle hook.\nThe name should be unique and descriptive, ideally 1-3 words, in CamelCase or\nit may be namespaced, eg. foo.example.com/CamelCase.\nNames must be unique and should only be managed by a single entity.",
                             "type": "string",
                             "maxLength": 256,
                             "minLength": 3,
                             "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
                           },
                           "owner": {
-                            "description": "Owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
+                            "description": "owner defines the owner of the lifecycle hook.\nThis should be descriptive enough so that users can identify\nwho/what is responsible for blocking the lifecycle.\nThis could be the name of a controller (e.g. clusteroperator/etcd)\nor an administrator managing the hook.",
                             "type": "string",
                             "maxLength": 512,
                             "minLength": 3
@@ -240,14 +240,14 @@
                   "type": "object",
                   "properties": {
                     "annotations": {
-                      "description": "Annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
+                      "description": "annotations is an unstructured key value map stored with a resource that may be\nset by external tools to store and retrieve arbitrary metadata. They are not\nqueryable and should be preserved when modifying objects.\nMore info: http://kubernetes.io/docs/user-guide/annotations",
                       "type": "object",
                       "additionalProperties": {
                         "type": "string"
                       }
                     },
                     "generateName": {
-                      "description": "GenerateName is an optional prefix, used by the server, to generate a unique\nname ONLY IF the Name field has not been provided.\nIf this field is used, the name returned to the client will be different\nthan the name passed. This value will also be combined with a unique suffix.\nThe provided value has the same validation rules as the Name field,\nand may be truncated by the length of the suffix required to make the value\nunique on the server.\n\nIf this field is specified and the generated name exists, the server will\nNOT return a 409 - instead, it will either return 201 Created or 500 with Reason\nServerTimeout indicating a unique name could not be found in the time allotted, and the client\nshould retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency",
+                      "description": "generateName is an optional prefix, used by the server, to generate a unique\nname ONLY IF the Name field has not been provided.\nIf this field is used, the name returned to the client will be different\nthan the name passed. This value will also be combined with a unique suffix.\nThe provided value has the same validation rules as the Name field,\nand may be truncated by the length of the suffix required to make the value\nunique on the server.\n\nIf this field is specified and the generated name exists, the server will\nNOT return a 409 - instead, it will either return 201 Created or 500 with Reason\nServerTimeout indicating a unique name could not be found in the time allotted, and the client\nshould retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency",
                       "type": "string"
                     },
                     "labels": {
@@ -258,11 +258,11 @@
                       }
                     },
                     "name": {
-                      "description": "Name must be unique within a namespace. Is required when creating resources, although\nsome resources may allow a client to request the generation of an appropriate name\nautomatically. Name is primarily intended for creation idempotence and configuration\ndefinition.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/identifiers#names",
+                      "description": "name must be unique within a namespace. Is required when creating resources, although\nsome resources may allow a client to request the generation of an appropriate name\nautomatically. Name is primarily intended for creation idempotence and configuration\ndefinition.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/identifiers#names",
                       "type": "string"
                     },
                     "namespace": {
-                      "description": "Namespace defines the space within each name must be unique. An empty namespace is\nequivalent to the \"default\" namespace, but \"default\" is the canonical representation.\nNot all objects are required to be scoped to a namespace - the value of this field for\nthose objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/namespaces",
+                      "description": "namespace defines the space within each name must be unique. An empty namespace is\nequivalent to the \"default\" namespace, but \"default\" is the canonical representation.\nNot all objects are required to be scoped to a namespace - the value of this field for\nthose objects will be empty.\n\nMust be a DNS_LABEL.\nCannot be updated.\nMore info: http://kubernetes.io/docs/user-guide/namespaces",
                       "type": "string"
                     },
                     "ownerReferences": {
@@ -313,15 +313,15 @@
                   }
                 },
                 "providerID": {
-                  "description": "ProviderID is the identification ID of the machine provided by the provider.\nThis field must match the provider ID as seen on the node object corresponding to this machine.\nThis field is required by higher level consumers of cluster-api. Example use case is cluster autoscaler\nwith cluster-api as provider. Clean-up logic in the autoscaler compares machines to nodes to find out\nmachines at provider which could not get registered as Kubernetes nodes. With cluster-api as a\ngeneric out-of-tree provider for autoscaler, this field is required by autoscaler to be\nable to have a provider view of the list of machines. Another list of nodes is queried from the k8s apiserver\nand then a comparison is done to find out unregistered machines and are marked for delete.\nThis field will be set by the actuators and consumed by higher level entities like autoscaler that will\nbe interfacing with cluster-api as generic provider.",
+                  "description": "providerID is the identification ID of the machine provided by the provider.\nThis field must match the provider ID as seen on the node object corresponding to this machine.\nThis field is required by higher level consumers of cluster-api. Example use case is cluster autoscaler\nwith cluster-api as provider. Clean-up logic in the autoscaler compares machines to nodes to find out\nmachines at provider which could not get registered as Kubernetes nodes. With cluster-api as a\ngeneric out-of-tree provider for autoscaler, this field is required by autoscaler to be\nable to have a provider view of the list of machines. Another list of nodes is queried from the k8s apiserver\nand then a comparison is done to find out unregistered machines and are marked for delete.\nThis field will be set by the actuators and consumed by higher level entities like autoscaler that will\nbe interfacing with cluster-api as generic provider.",
                   "type": "string"
                 },
                 "providerSpec": {
-                  "description": "ProviderSpec details Provider-specific configuration to use during node creation.",
+                  "description": "providerSpec details Provider-specific configuration to use during node creation.",
                   "type": "object",
                   "properties": {
                     "value": {
-                      "description": "Value is an inlined, serialized representation of the resource\nconfiguration. It is recommended that providers maintain their own\nversioned API types that should be serialized/deserialized from this\nfield, akin to component config.",
+                      "description": "value is an inlined, serialized representation of the resource\nconfiguration. It is recommended that providers maintain their own\nversioned API types that should be serialized/deserialized from this\nfield, akin to component config.",
                       "x-kubernetes-preserve-unknown-fields": true
                     }
                   }
@@ -374,7 +374,7 @@
           "format": "int32"
         },
         "conditions": {
-          "description": "Conditions defines the current state of the MachineSet",
+          "description": "conditions defines the current state of the MachineSet",
           "type": "array",
           "items": {
             "description": "Condition defines an observation of a Machine API resource operational state.",
@@ -399,15 +399,15 @@
                 "type": "string"
               },
               "severity": {
-                "description": "Severity provides an explicit classification of Reason code, so the users or machines can immediately\nunderstand the current situation and act accordingly.\nThe Severity field MUST be set only when Status=False.",
+                "description": "severity provides an explicit classification of Reason code, so the users or machines can immediately\nunderstand the current situation and act accordingly.\nThe Severity field MUST be set only when Status=False.",
                 "type": "string"
               },
               "status": {
-                "description": "Status of the condition, one of True, False, Unknown.",
+                "description": "status of the condition, one of True, False, Unknown.",
                 "type": "string"
               },
               "type": {
-                "description": "Type of condition in CamelCase or in foo.example.com/CamelCase.\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions\ncan be useful (see .node.status.conditions), the ability to deconflict is important.",
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions\ncan be useful (see .node.status.conditions), the ability to deconflict is important.",
                 "type": "string"
               }
             }
@@ -430,7 +430,7 @@
           "format": "int32"
         },
         "observedGeneration": {
-          "description": "ObservedGeneration reflects the generation of the most recently observed MachineSet.",
+          "description": "observedGeneration reflects the generation of the most recently observed MachineSet.",
           "type": "integer",
           "format": "int64"
         },
@@ -440,7 +440,7 @@
           "format": "int32"
         },
         "replicas": {
-          "description": "Replicas is the most recently observed number of replicas.",
+          "description": "replicas is the most recently observed number of replicas.",
           "type": "integer",
           "format": "int32"
         }

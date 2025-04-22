@@ -183,7 +183,7 @@
               }
             },
             "vSphere": {
-              "description": "vsphere is used to configure the vsphere CSI driver.",
+              "description": "vSphere is used to configure the vsphere CSI driver.",
               "type": "object",
               "properties": {
                 "globalMaxSnapshotsPerBlockVolume": {
@@ -257,7 +257,7 @@
           ]
         },
         "storageClassState": {
-          "description": "StorageClassState determines if CSI operator should create and manage storage classes.\nIf this field value is empty or Managed - CSI operator will continuously reconcile\nstorage class and create if necessary.\nIf this field value is Unmanaged - CSI operator will not reconcile any previously created\nstorage class.\nIf this field value is Removed - CSI operator will delete the storage class it created previously.\nWhen omitted, this means the user has no opinion and the platform chooses a reasonable default,\nwhich is subject to change over time.\nThe current default behaviour is Managed.",
+          "description": "storageClassState determines if CSI operator should create and manage storage classes.\nIf this field value is empty or Managed - CSI operator will continuously reconcile\nstorage class and create if necessary.\nIf this field value is Unmanaged - CSI operator will not reconcile any previously created\nstorage class.\nIf this field value is Removed - CSI operator will delete the storage class it created previously.\nWhen omitted, this means the user has no opinion and the platform chooses a reasonable default,\nwhich is subject to change over time.\nThe current default behaviour is Managed.",
           "type": "string",
           "enum": [
             "",

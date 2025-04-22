@@ -1490,7 +1490,7 @@
                         "type": "object"
                       },
                       "state": {
-                        "description": "State represents the requested operational state of the interface.\nThe (only) value supported is 'absent', expressing a request to remove the interface.",
+                        "description": "State represents the requested operational state of the interface.\nThe supported values are:\n'absent', expressing a request to remove the interface.\n'down', expressing a request to set the link down.\n'up', expressing a request to set the link up.\nEmpty value functions as 'up'.",
                         "type": "string"
                       },
                       "tag": {
@@ -1891,6 +1891,17 @@
                 "uuid": {
                   "description": "UUID reported by the vmi bios.\nDefaults to a random generated uid.",
                   "type": "string"
+                }
+              }
+            },
+            "ioThreads": {
+              "description": "IOThreads specifies the IOThreads options.",
+              "type": "object",
+              "properties": {
+                "supplementalPoolThreadCount": {
+                  "description": "SupplementalPoolThreadCount specifies how many iothreads are allocated for the supplementalPool policy.",
+                  "type": "integer",
+                  "format": "int32"
                 }
               }
             },
@@ -2594,7 +2605,7 @@
                     "type": "boolean"
                   },
                   "name": {
-                    "description": "Name of both the DataVolume and the PVC in the same namespace.\nAfter PVC population the DataVolume is garbage collected by default.",
+                    "description": "Name of both the DataVolume and the PVC in the same namespace.",
                     "type": "string"
                   }
                 }
@@ -2986,6 +2997,10 @@
                   "type": "string"
                 }
               },
+              "linkState": {
+                "description": "LinkState Reports the current operational link state'. values: up, down.",
+                "type": "string"
+              },
               "mac": {
                 "description": "Hardware address of a Virtual Machine interface",
                 "type": "string"
@@ -3225,13 +3240,17 @@
                   "description": "AllowPostCopy enables post-copy live migrations. Such migrations allow even the busiest VMIs\nto successfully live-migrate. However, events like a network failure can cause a VMI crash.\nIf set to true, migrations will still start in pre-copy, but switch to post-copy when\nCompletionTimeoutPerGiB triggers. Defaults to false",
                   "type": "boolean"
                 },
+                "allowWorkloadDisruption": {
+                  "description": "AllowWorkloadDisruption indicates that the migration shouldn't be\ncanceled after acceptableCompletionTime is exceeded. Instead, if\npermitted, migration will be switched to post-copy or the VMI will be\npaused to allow the migration to complete",
+                  "type": "boolean"
+                },
                 "bandwidthPerMigration": {
                   "description": "BandwidthPerMigration limits the amount of network bandwidth live migrations are allowed to use.\nThe value is in quantity per second. Defaults to 0 (no limit)",
                   "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
                   "x-kubernetes-int-or-string": true
                 },
                 "completionTimeoutPerGiB": {
-                  "description": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take.\nIf a live-migration takes longer to migrate than this value multiplied by the size of the VMI,\nthe migration will be cancelled, unless AllowPostCopy is true. Defaults to 150",
+                  "description": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take.\nIf the timeout is reached, the migration will be either paused, switched\nto post-copy or cancelled depending on other settings. Defaults to 150",
                   "type": "integer",
                   "format": "int64"
                 },

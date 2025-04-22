@@ -57,7 +57,7 @@
           "x-kubernetes-preserve-unknown-fields": true
         },
         "vsphereStorageDriver": {
-          "description": "VSphereStorageDriver indicates the storage driver to use on VSphere clusters.\nOnce this field is set to CSIWithMigrationDriver, it can not be changed.\nIf this is empty, the platform will choose a good default,\nwhich may change over time without notice.\nThe current default is CSIWithMigrationDriver and may not be changed.\nDEPRECATED: This field will be removed in a future release.",
+          "description": "vsphereStorageDriver indicates the storage driver to use on VSphere clusters.\nOnce this field is set to CSIWithMigrationDriver, it can not be changed.\nIf this is empty, the platform will choose a good default,\nwhich may change over time without notice.\nThe current default is CSIWithMigrationDriver and may not be changed.\nDEPRECATED: This field will be removed in a future release.",
           "type": "string",
           "enum": [
             "",

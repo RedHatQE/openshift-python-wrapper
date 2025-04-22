@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+import threading
 from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
@@ -130,10 +131,11 @@ def get_client(
                 )
             client_configuration.proxy = proxy
 
+        kwargs["client_configuration"] = client_configuration
+
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.new_client_from_config(
                 config_file=config_file,
-                client_configuration=client_configuration,
                 context=context or None,
                 **kwargs,
             )
@@ -355,6 +357,7 @@ class Resource(ResourceConstants):
         MAISTRA_IO: str = "maistra.io"
         METALLB_IO: str = "metallb.io"
         METRICS_K8S_IO: str = "metrics.k8s.io"
+        MIGRATION_OPENSHIFT_IO: str = "migration.openshift.io"
         MIGRATIONS_KUBEVIRT_IO: str = "migrations.kubevirt.io"
         MODELREGISTRY_OPENDATAHUB_IO: str = "modelregistry.opendatahub.io"
         MONITORING_COREOS_COM: str = "monitoring.coreos.com"
@@ -378,6 +381,7 @@ class Resource(ResourceConstants):
         POLICY: str = "policy"
         POOL_KUBEVIRT_IO: str = "pool.kubevirt.io"
         PROJECT_OPENSHIFT_IO: str = "project.openshift.io"
+        QUOTA_OPENSHIFT_IO: str = "quota.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO: str = "rbac.authorization.k8s.io"
         REMEDIATION_MEDIK8S_IO: str = "remediation.medik8s.io"
         RIPSAW_CLOUDBULLDOZER_IO: str = "ripsaw.cloudbulldozer.io"
@@ -582,7 +586,8 @@ class Resource(ResourceConstants):
         self._base_body()
 
     def __enter__(self) -> Any:
-        signal(SIGINT, self._sigint_handler)
+        if threading.current_thread().native_id == threading.main_thread().native_id:
+            signal(SIGINT, self._sigint_handler)
         return self.deploy(wait=self.wait_for_resource)
 
     def __exit__(

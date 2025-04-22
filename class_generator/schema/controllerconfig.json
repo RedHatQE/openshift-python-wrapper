@@ -18,7 +18,7 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "ControllerConfigSpec is the spec for ControllerConfig resource.",
+      "description": "spec contains the desired controller config configuration.",
       "type": "object",
       "required": [
         "baseOSContainerImage",
@@ -36,15 +36,15 @@
           "format": "byte"
         },
         "baseOSContainerImage": {
-          "description": "BaseOSContainerImage is the new-format container image for operating system updates.",
+          "description": "baseOSContainerImage is the new-format container image for operating system updates.",
           "type": "string"
         },
         "baseOSExtensionsContainerImage": {
-          "description": "BaseOSExtensionsContainerImage is the matching extensions container for the new-format container",
+          "description": "baseOSExtensionsContainerImage is the matching extensions container for the new-format container",
           "type": "string"
         },
         "cloudProviderCAData": {
-          "description": "cloudProvider specifies the cloud provider CA data",
+          "description": "cloudProviderCAData specifies the cloud provider CA data",
           "format": "byte"
         },
         "cloudProviderConfig": {
@@ -174,7 +174,7 @@
           "format": "byte"
         },
         "network": {
-          "description": "Network contains additional network related information",
+          "description": "network contains additional network related information",
           "required": [
             "mtuMigration"
           ]
@@ -184,7 +184,7 @@
           "type": "string"
         },
         "osImageURL": {
-          "description": "OSImageURL is the old-format container image that contains the OS update payload.",
+          "description": "osImageURL is the old-format container image that contains the OS update payload.",
           "type": "string"
         },
         "platform": {
@@ -241,7 +241,7 @@
       }
     },
     "status": {
-      "description": "ControllerConfigStatus is the status for ControllerConfig",
+      "description": "status contains observed information about the controller config.",
       "type": "object",
       "properties": {
         "conditions": {

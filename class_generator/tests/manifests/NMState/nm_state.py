@@ -20,28 +20,30 @@ class NMState(Resource):
         infra_node_selector: dict[str, Any] | None = None,
         infra_tolerations: list[Any] | None = None,
         node_selector: dict[str, Any] | None = None,
+        probe_configuration: dict[str, Any] | None = None,
         self_sign_configuration: dict[str, Any] | None = None,
         tolerations: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
               handler DaemonSet manifest.
 
-            infra_affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
-              webhook & certmanager Deployment manifests.
+            infra_affinity (dict[str, Any]): InfraAffinity is an optional affinity selector that will be added to
+              webhook, metrics & console-plugin Deployment manifests.
 
             infra_node_selector (dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
-              webhook & certmanager Deployment manifests If InfraNodeSelector is
-              specified, the webhook and certmanager will run only on nodes that
-              have each of the indicated key-value pairs as labels applied to
-              the node.
+              webhook, metrics & console-plugin Deployment manifests If
+              InfraNodeSelector is specified, the webhook, metrics and the
+              console plugin will run only on nodes that have each of the
+              indicated key-value pairs as labels applied to the node.
 
             infra_tolerations (list[Any]): InfraTolerations is an optional list of tolerations to be added to
-              webhook & certmanager Deployment manifests If InfraTolerations is
-              specified, the webhook and certmanager will be able to be
-              scheduled on nodes with corresponding taints
+              webhook, metrics & console-plugin Deployment manifests If
+              InfraTolerations is specified, the webhook, metrics and the
+              console plugin will be able to be scheduled on nodes with
+              corresponding taints
 
             node_selector (dict[str, Any]): NodeSelector is an optional selector that will be added to handler
               DaemonSet manifest for both workers and control-plane
@@ -49,6 +51,11 @@ class NMState(Resource):
               nmstate/blob/main/deploy/handler/operator.yaml). If NodeSelector
               is specified, the handler will run only on nodes that have each of
               the indicated key-value pairs as labels applied to the node.
+
+            probe_configuration (dict[str, Any]): ProbeConfiguration is an optional configuration of NMstate probes
+              testing various functionalities. If ProbeConfiguration is
+              specified, the handler will use the config defined here instead of
+              its default values.
 
             self_sign_configuration (dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
 
@@ -65,6 +72,7 @@ class NMState(Resource):
         self.infra_node_selector = infra_node_selector
         self.infra_tolerations = infra_tolerations
         self.node_selector = node_selector
+        self.probe_configuration = probe_configuration
         self.self_sign_configuration = self_sign_configuration
         self.tolerations = tolerations
 
@@ -89,6 +97,9 @@ class NMState(Resource):
 
             if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
+
+            if self.probe_configuration is not None:
+                _spec["probeConfiguration"] = self.probe_configuration
 
             if self.self_sign_configuration is not None:
                 _spec["selfSignConfiguration"] = self.self_sign_configuration
