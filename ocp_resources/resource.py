@@ -317,6 +317,7 @@ class Resource(ResourceConstants):
         APIREGISTRATION_K8S_IO: str = "apiregistration.k8s.io"
         APP_KUBERNETES_IO: str = "app.kubernetes.io"
         APPS: str = "apps"
+        AUTHENTICATION_K8S_IO: str = "authentication.k8s.io"
         BATCH: str = "batch"
         BITNAMI_COM: str = "bitnami.com"
         CACHING_INTERNAL_KNATIVE_DEV: str = "caching.internal.knative.dev"
