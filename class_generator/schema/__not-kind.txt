@@ -788,3 +788,8 @@ io.noobaa.cnpg.postgresql.v1.ClusterImageCatalogList
 io.noobaa.cnpg.postgresql.v1.BackupList
 io.kubevirt.clone.v1beta1.VirtualMachineCloneList
 io.kubevirt.clone.v1alpha1.VirtualMachineClone
+org.kubeflow.v1.JAXJobList
+com.jhouse.cache.v1alpha1.NFSProvisionerList
+io.openshift.nfd.v1alpha1.NodeFeatureGroupList
+io.opendatahub.platform.components.v1alpha1.FeastOperatorList
+io.kuadrant.authorino.v1beta3.AuthConfigList
