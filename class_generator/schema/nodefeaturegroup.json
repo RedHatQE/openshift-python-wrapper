@@ -1,0 +1,264 @@
+{
+  "description": "NodeFeatureGroup resource holds Node pools by featureGroup",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Spec defines the rules to be evaluated.",
+      "type": "object",
+      "required": [
+        "featureGroupRules"
+      ],
+      "properties": {
+        "featureGroupRules": {
+          "description": "List of rules to evaluate to determine nodes that belong in this group.",
+          "type": "array",
+          "items": {
+            "description": "GroupRule defines a rule for nodegroup filtering.",
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "matchAny": {
+                "description": "MatchAny specifies a list of matchers one of which must match.",
+                "type": "array",
+                "items": {
+                  "description": "MatchAnyElem specifies one sub-matcher of MatchAny.",
+                  "type": "object",
+                  "required": [
+                    "matchFeatures"
+                  ],
+                  "properties": {
+                    "matchFeatures": {
+                      "description": "MatchFeatures specifies a set of matcher terms all of which must match.",
+                      "type": "array",
+                      "items": {
+                        "description": "FeatureMatcherTerm defines requirements against one feature set. All\nrequirements (specified as MatchExpressions) are evaluated against each\nelement in the feature set.",
+                        "type": "object",
+                        "required": [
+                          "feature"
+                        ],
+                        "properties": {
+                          "feature": {
+                            "description": "Feature is the name of the feature set to match against.",
+                            "type": "string"
+                          },
+                          "matchExpressions": {
+                            "description": "MatchExpressions is the set of per-element expressions evaluated. These\nmatch against the value of the specified elements.",
+                            "type": "object",
+                            "additionalProperties": {
+                              "description": "MatchExpression specifies an expression to evaluate against a set of input\nvalues. It contains an operator that is applied when matching the input and\nan array of values that the operator evaluates the input against.",
+                              "type": "object",
+                              "required": [
+                                "op"
+                              ],
+                              "properties": {
+                                "op": {
+                                  "description": "Op is the operator to be applied.",
+                                  "type": "string",
+                                  "enum": [
+                                    "In",
+                                    "NotIn",
+                                    "InRegexp",
+                                    "Exists",
+                                    "DoesNotExist",
+                                    "Gt",
+                                    "Lt",
+                                    "GtLt",
+                                    "IsTrue",
+                                    "IsFalse"
+                                  ]
+                                },
+                                "value": {
+                                  "description": "Value is the list of values that the operand evaluates the input\nagainst. Value should be empty if the operator is Exists, DoesNotExist,\nIsTrue or IsFalse. Value should contain exactly one element if the\noperator is Gt or Lt and exactly two elements if the operator is GtLt.\nIn other cases Value should contain at least one element.",
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "matchName": {
+                            "description": "MatchName in an expression that is matched against the name of each\nelement in the feature set.",
+                            "type": "object",
+                            "required": [
+                              "op"
+                            ],
+                            "properties": {
+                              "op": {
+                                "description": "Op is the operator to be applied.",
+                                "type": "string",
+                                "enum": [
+                                  "In",
+                                  "NotIn",
+                                  "InRegexp",
+                                  "Exists",
+                                  "DoesNotExist",
+                                  "Gt",
+                                  "Lt",
+                                  "GtLt",
+                                  "IsTrue",
+                                  "IsFalse"
+                                ]
+                              },
+                              "value": {
+                                "description": "Value is the list of values that the operand evaluates the input\nagainst. Value should be empty if the operator is Exists, DoesNotExist,\nIsTrue or IsFalse. Value should contain exactly one element if the\noperator is Gt or Lt and exactly two elements if the operator is GtLt.\nIn other cases Value should contain at least one element.",
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "matchFeatures": {
+                "description": "MatchFeatures specifies a set of matcher terms all of which must match.",
+                "type": "array",
+                "items": {
+                  "description": "FeatureMatcherTerm defines requirements against one feature set. All\nrequirements (specified as MatchExpressions) are evaluated against each\nelement in the feature set.",
+                  "type": "object",
+                  "required": [
+                    "feature"
+                  ],
+                  "properties": {
+                    "feature": {
+                      "description": "Feature is the name of the feature set to match against.",
+                      "type": "string"
+                    },
+                    "matchExpressions": {
+                      "description": "MatchExpressions is the set of per-element expressions evaluated. These\nmatch against the value of the specified elements.",
+                      "type": "object",
+                      "additionalProperties": {
+                        "description": "MatchExpression specifies an expression to evaluate against a set of input\nvalues. It contains an operator that is applied when matching the input and\nan array of values that the operator evaluates the input against.",
+                        "type": "object",
+                        "required": [
+                          "op"
+                        ],
+                        "properties": {
+                          "op": {
+                            "description": "Op is the operator to be applied.",
+                            "type": "string",
+                            "enum": [
+                              "In",
+                              "NotIn",
+                              "InRegexp",
+                              "Exists",
+                              "DoesNotExist",
+                              "Gt",
+                              "Lt",
+                              "GtLt",
+                              "IsTrue",
+                              "IsFalse"
+                            ]
+                          },
+                          "value": {
+                            "description": "Value is the list of values that the operand evaluates the input\nagainst. Value should be empty if the operator is Exists, DoesNotExist,\nIsTrue or IsFalse. Value should contain exactly one element if the\noperator is Gt or Lt and exactly two elements if the operator is GtLt.\nIn other cases Value should contain at least one element.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "matchName": {
+                      "description": "MatchName in an expression that is matched against the name of each\nelement in the feature set.",
+                      "type": "object",
+                      "required": [
+                        "op"
+                      ],
+                      "properties": {
+                        "op": {
+                          "description": "Op is the operator to be applied.",
+                          "type": "string",
+                          "enum": [
+                            "In",
+                            "NotIn",
+                            "InRegexp",
+                            "Exists",
+                            "DoesNotExist",
+                            "Gt",
+                            "Lt",
+                            "GtLt",
+                            "IsTrue",
+                            "IsFalse"
+                          ]
+                        },
+                        "value": {
+                          "description": "Value is the list of values that the operand evaluates the input\nagainst. Value should be empty if the operator is Exists, DoesNotExist,\nIsTrue or IsFalse. Value should contain exactly one element if the\noperator is Gt or Lt and exactly two elements if the operator is GtLt.\nIn other cases Value should contain at least one element.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "name": {
+                "description": "Name of the rule.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "Status of the NodeFeatureGroup after the most recent evaluation of the\nspecification.",
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "description": "Nodes is a list of FeatureGroupNode in the cluster that match the featureGroupRules",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "description": "Name of the node.",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "nfd.openshift.io",
+      "kind": "NodeFeatureGroup",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
