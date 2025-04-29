@@ -38,3 +38,14 @@ class Namespace(Resource):
                 _spec["finalizers"] = self.finalizers
 
     # End of generated code
+
+    def __str__(self) -> str:
+        """Return human-readable string "name" rather than default __repr__.
+
+        Calling str, format or print on a Namespace object will result in it being resolved
+        to its name attribute if found else the repr will be returned.
+
+        Returns:
+            str: Human-readable string "name" or the output of __repr__.
+        """
+        return name if (name := getattr(self, "name", None)) else self.__repr__()
