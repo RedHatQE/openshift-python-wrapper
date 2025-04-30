@@ -17,9 +17,6 @@
     "spec": {
       "description": "DSCInitializationSpec defines the desired state of DSCInitialization.",
       "type": "object",
-      "required": [
-        "applicationsNamespace"
-      ],
       "properties": {
         "applicationsNamespace": {
           "description": "Namespace for applications to be installed, non-configurable, default to \"redhat-ods-applications\"",
@@ -37,7 +34,12 @@
           "description": "Internal development useful field to test customizations.\nThis is not recommended to be used in production environment.",
           "type": "object",
           "properties": {
+            "logLevel": {
+              "description": "Override Zap log level. Can be \"debug\", \"info\", \"error\" or a number (more verbose).",
+              "type": "string"
+            },
             "logmode": {
+              "description": "## DEPRECATED ##: Ignored, use LogLevel instead",
               "type": "string",
               "enum": [
                 "devel",
@@ -48,7 +50,7 @@
               ]
             },
             "manifestsUri": {
-              "description": "Custom manifests uri for odh-manifests",
+              "description": "## DEPRECATED ## : ManifestsUri set on DSCI is not maintained.\nCustom manifests uri for odh-manifests",
               "type": "string"
             }
           }
@@ -58,7 +60,7 @@
           "type": "object",
           "properties": {
             "managementState": {
-              "description": "Set to one of the following values:\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so.\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it.",
+              "description": "Set to one of the following values:\n\n- \"Managed\" : the operator is actively managing the component and trying to keep it active.\n              It will only upgrade the component if it is safe to do so\n\n- \"Removed\" : the operator is actively managing the component and will not install it,\n              or if it is installed, the operator will try to remove it",
               "type": "string",
               "pattern": "^(Managed|Unmanaged|Force|Removed)$",
               "enum": [
@@ -67,10 +69,16 @@
               ]
             },
             "namespace": {
-              "description": "Namespace for monitoring if it is enabled",
+              "description": "monitoring spec exposed to DSCI api\nNamespace for monitoring if it is enabled",
               "type": "string",
               "maxLength": 63,
-              "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$"
+              "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$",
+              "x-kubernetes-validations": [
+                {
+                  "message": "MonitoringNamespace is immutable",
+                  "rule": "self == oldSelf"
+                }
+              ]
             }
           }
         },

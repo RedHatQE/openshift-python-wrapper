@@ -25,6 +25,9 @@
             "disableAcceleratorProfiles": {
               "type": "boolean"
             },
+            "disableAdminConnectionTypes": {
+              "type": "boolean"
+            },
             "disableBYONImageStream": {
               "type": "boolean"
             },
@@ -35,6 +38,12 @@
               "type": "boolean"
             },
             "disableDistributedWorkloads": {
+              "type": "boolean"
+            },
+            "disableFineTuning": {
+              "type": "boolean"
+            },
+            "disableHardwareProfiles": {
               "type": "boolean"
             },
             "disableHome": {
@@ -55,10 +64,19 @@
             "disableKServeMetrics": {
               "type": "boolean"
             },
+            "disableKServeRaw": {
+              "type": "boolean"
+            },
+            "disableModelCatalog": {
+              "type": "boolean"
+            },
             "disableModelMesh": {
               "type": "boolean"
             },
             "disableModelRegistry": {
+              "type": "boolean"
+            },
+            "disableModelRegistrySecureDB": {
               "type": "boolean"
             },
             "disableModelServing": {
@@ -71,6 +89,9 @@
               "type": "boolean"
             },
             "disablePipelines": {
+              "type": "boolean"
+            },
+            "disableProjectScoped": {
               "type": "boolean"
             },
             "disableProjectSharing": {
@@ -115,7 +136,13 @@
             "allowedGroups": {
               "type": "string"
             }
-          }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "Can no longer modify group configurations here, see the Auth resource instead",
+              "rule": "self == oldSelf"
+            }
+          ]
         },
         "modelServerSizes": {
           "type": "array",

@@ -22,6 +22,18 @@
         "replicas"
       ],
       "properties": {
+        "enableBuiltInDetectors": {
+          "description": "Boolean flag to enable/disable built-in detectors",
+          "type": "boolean"
+        },
+        "enableGuardrailsGateway": {
+          "description": "Boolean flag to enable/disable the guardrails sidecar gateway",
+          "type": "boolean"
+        },
+        "guardrailsGatewayConfig": {
+          "description": " Name of the configmap containing guadrails sidecar gateway arguments",
+          "type": "string"
+        },
         "orchestratorConfig": {
           "description": "Name of configmap containing generator,detector,and chunker arguments",
           "type": "string"
@@ -64,10 +76,6 @@
           "description": "Number of replicas",
           "type": "integer",
           "format": "int32"
-        },
-        "vllmGatewayConfig": {
-          "description": " Name of the configmap containg vLLM gateway arguments",
-          "type": "string"
         }
       }
     },
@@ -116,5 +124,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

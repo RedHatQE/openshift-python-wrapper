@@ -25,7 +25,6 @@
           "description": "cgroupMode determines the cgroups version on the node",
           "type": "string",
           "enum": [
-            "v1",
             "v2",
             ""
           ]

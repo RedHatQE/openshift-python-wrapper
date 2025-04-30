@@ -150,6 +150,7 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": "FeastOperator name must be 'default-feastoperator'",

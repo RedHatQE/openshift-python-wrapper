@@ -204,9 +204,9 @@ def update_kind_schema():
     cluster_version = cluster_version.split("+")[0]
     ocp_openapi_json_file = Path(gettempdir()) / f"__k8s-openapi-{cluster_version}__.json"
 
-    newer_version: bool = Version(cluster_version) > Version(last_cluster_version_generated)
+    same_or_newer_version: bool = Version(cluster_version) >= Version(last_cluster_version_generated)
 
-    if newer_version:
+    if same_or_newer_version:
         with open(cluster_version_file, "w") as fd:
             fd.write(cluster_version)
 
@@ -219,7 +219,7 @@ def update_kind_schema():
         LOGGER.error("Failed to generate schema.")
         sys.exit(1)
 
-    if newer_version:
+    if same_or_newer_version:
         # copy all files from tmp_schema_dir to schema dir
         shutil.copytree(src=tmp_schema_dir, dst=SCHEMA_DIR, dirs_exist_ok=True)
 
@@ -236,7 +236,7 @@ def update_kind_schema():
                     sys.exit(1)
 
     map_kind_to_namespaced(
-        client=client, newer_cluster_version=newer_version, schema_definition_file=ocp_openapi_json_file
+        client=client, newer_cluster_version=same_or_newer_version, schema_definition_file=ocp_openapi_json_file
     )
 
 

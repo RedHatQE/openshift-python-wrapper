@@ -13,7 +13,7 @@
       "description": "List of modelregistries. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.opendatahub.modelregistry.v1alpha1.ModelRegistry"
+        "$ref": "_definitions.json#/definitions/io.opendatahub.platform.components.v1alpha1.ModelRegistry"
       }
     },
     "kind": {
@@ -27,7 +27,7 @@
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "modelregistry.opendatahub.io",
+      "group": "components.platform.opendatahub.io",
       "kind": "ModelRegistryList",
       "version": "v1alpha1"
     }
