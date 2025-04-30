@@ -39,6 +39,10 @@
               "description": "CleanPodPolicy defines the policy to kill pods after the job completes.\nDefault to None.",
               "type": "string"
             },
+            "managedBy": {
+              "description": "ManagedBy is used to indicate the controller or entity that manages a job.\nThe value must be either an empty, 'kubeflow.org/training-operator' or\n'kueue.x-k8s.io/multikueue'.\nThe training-operator reconciles a job which doesn't have this\nfield at all or the field value is the reserved string\n'kubeflow.org/training-operator', but delegates reconciling the job\nwith 'kueue.x-k8s.",
+              "type": "string"
+            },
             "schedulingPolicy": {
               "description": "SchedulingPolicy defines the policy related to scheduling, e.g. gang-scheduling",
               "type": "object",
@@ -58,7 +62,13 @@
                   "type": "string"
                 },
                 "queue": {
-                  "type": "string"
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "spec.runPolicy.schedulingPolicy.queue is immutable",
+                      "rule": "self == oldSelf"
+                    }
+                  ]
                 },
                 "scheduleTimeoutSeconds": {
                   "type": "integer",
@@ -185,10 +195,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "matchFields": {
                                           "description": "A list of node selector requirements by node's fields.",
@@ -214,10 +226,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       },
                                       "x-kubernetes-map-type": "atomic"
@@ -228,7 +242,8 @@
                                       "format": "int32"
                                     }
                                   }
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               },
                               "requiredDuringSchedulingIgnoredDuringExecution": {
                                 "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to an update), the system\nmay or may not try to eventually evict the pod from its node.",
@@ -268,10 +283,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "matchFields": {
                                           "description": "A list of node selector requirements by node's fields.",
@@ -297,14 +314,17 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       },
                                       "x-kubernetes-map-type": "atomic"
-                                    }
+                                    },
+                                    "x-kubernetes-list-type": "atomic"
                                   }
                                 },
                                 "x-kubernetes-map-type": "atomic"
@@ -361,10 +381,12 @@
                                                     "type": "array",
                                                     "items": {
                                                       "type": "string"
-                                                    }
+                                                    },
+                                                    "x-kubernetes-list-type": "atomic"
                                                   }
                                                 }
-                                              }
+                                              },
+                                              "x-kubernetes-list-type": "atomic"
                                             },
                                             "matchLabels": {
                                               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -377,7 +399,7 @@
                                           "x-kubernetes-map-type": "atomic"
                                         },
                                         "matchLabelKeys": {
-                                          "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                          "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                           "type": "array",
                                           "items": {
                                             "type": "string"
@@ -385,7 +407,7 @@
                                           "x-kubernetes-list-type": "atomic"
                                         },
                                         "mismatchLabelKeys": {
-                                          "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                          "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                           "type": "array",
                                           "items": {
                                             "type": "string"
@@ -420,10 +442,12 @@
                                                     "type": "array",
                                                     "items": {
                                                       "type": "string"
-                                                    }
+                                                    },
+                                                    "x-kubernetes-list-type": "atomic"
                                                   }
                                                 }
-                                              }
+                                              },
+                                              "x-kubernetes-list-type": "atomic"
                                             },
                                             "matchLabels": {
                                               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -440,7 +464,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "topologyKey": {
                                           "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
@@ -454,7 +479,8 @@
                                       "format": "int32"
                                     }
                                   }
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               },
                               "requiredDuringSchedulingIgnoredDuringExecution": {
                                 "description": "If the affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.",
@@ -494,10 +520,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "matchLabels": {
                                           "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -510,7 +538,7 @@
                                       "x-kubernetes-map-type": "atomic"
                                     },
                                     "matchLabelKeys": {
-                                      "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                      "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -518,7 +546,7 @@
                                       "x-kubernetes-list-type": "atomic"
                                     },
                                     "mismatchLabelKeys": {
-                                      "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                      "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -553,10 +581,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "matchLabels": {
                                           "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -573,14 +603,16 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "topologyKey": {
                                       "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
                                       "type": "string"
                                     }
                                   }
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               }
                             }
                           },
@@ -634,10 +666,12 @@
                                                     "type": "array",
                                                     "items": {
                                                       "type": "string"
-                                                    }
+                                                    },
+                                                    "x-kubernetes-list-type": "atomic"
                                                   }
                                                 }
-                                              }
+                                              },
+                                              "x-kubernetes-list-type": "atomic"
                                             },
                                             "matchLabels": {
                                               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -650,7 +684,7 @@
                                           "x-kubernetes-map-type": "atomic"
                                         },
                                         "matchLabelKeys": {
-                                          "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                          "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                           "type": "array",
                                           "items": {
                                             "type": "string"
@@ -658,7 +692,7 @@
                                           "x-kubernetes-list-type": "atomic"
                                         },
                                         "mismatchLabelKeys": {
-                                          "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                          "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                           "type": "array",
                                           "items": {
                                             "type": "string"
@@ -693,10 +727,12 @@
                                                     "type": "array",
                                                     "items": {
                                                       "type": "string"
-                                                    }
+                                                    },
+                                                    "x-kubernetes-list-type": "atomic"
                                                   }
                                                 }
-                                              }
+                                              },
+                                              "x-kubernetes-list-type": "atomic"
                                             },
                                             "matchLabels": {
                                               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -713,7 +749,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "topologyKey": {
                                           "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
@@ -727,7 +764,8 @@
                                       "format": "int32"
                                     }
                                   }
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               },
                               "requiredDuringSchedulingIgnoredDuringExecution": {
                                 "description": "If the anti-affinity requirements specified by this field are not met at\nscheduling time, the pod will not be scheduled onto the node.\nIf the anti-affinity requirements specified by this field cease to be met\nat some point during pod execution (e.g. due to a pod label update), the\nsystem may or may not try to eventually evict the pod from its node.",
@@ -767,10 +805,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "matchLabels": {
                                           "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -783,7 +823,7 @@
                                       "x-kubernetes-map-type": "atomic"
                                     },
                                     "matchLabelKeys": {
-                                      "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                      "description": "MatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -791,7 +831,7 @@
                                       "x-kubernetes-list-type": "atomic"
                                     },
                                     "mismatchLabelKeys": {
-                                      "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `LabelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
+                                      "description": "MismatchLabelKeys is a set of pod label keys to select which pods will\nbe taken into consideration. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`\nto select the group of existing pods which pods will be taken into consideration\nfor the incoming pod's pod (anti) affinity.",
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -826,10 +866,12 @@
                                                 "type": "array",
                                                 "items": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "matchLabels": {
                                           "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -846,14 +888,16 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "topologyKey": {
                                       "description": "This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching\nthe labelSelector in the specified namespaces, where co-located is defined as running on a node\nwhose value of the label with key topologyKey matches that of any node on which any of the\nselected pods is running.\nEmpty topologyKey is not allowed.",
                                       "type": "string"
                                     }
                                   }
-                                }
+                                },
+                                "x-kubernetes-list-type": "atomic"
                               }
                             }
                           }
@@ -878,14 +922,16 @@
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "command": {
                               "description": "Entrypoint array. Not executed within a shell.\nThe container image's ENTRYPOINT is used if this is not provided.\nVariable references $(VAR_NAME) are expanded using the container's environment. If a variable\ncannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced\nto a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.",
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "env": {
                               "description": "List of environment variables to set in the container.\nCannot be updated.",
@@ -921,7 +967,7 @@
                                             "type": "string"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -984,7 +1030,7 @@
                                             "type": "string"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -997,7 +1043,11 @@
                                     }
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "name"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "envFrom": {
                               "description": "List of sources to populate environment variables in the container.\nThe keys defined within a source must be a C_IDENTIFIER. All invalid keys\nwill be reported as an event when the container is starting. When a key exists in multiple\nsources, the value associated with the last source will take precedence.\nValues defined by an Env with a duplicate key will take precedence.\nCannot be updated.",
@@ -1011,7 +1061,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -1030,7 +1080,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -1041,7 +1091,8 @@
                                     "x-kubernetes-map-type": "atomic"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "image": {
                               "description": "Container image name.\nMore info: https://kubernetes.io/docs/concepts/containers/images\nThis field is optional to allow higher level config management to default or override\ncontainer images in workload controllers like Deployments and StatefulSets.",
@@ -1068,7 +1119,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       }
                                     },
@@ -1103,7 +1155,8 @@
                                                 "type": "string"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "path": {
                                           "description": "Path to access on the HTTP server.",
@@ -1165,7 +1218,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       }
                                     },
@@ -1200,7 +1254,8 @@
                                                 "type": "string"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "path": {
                                           "description": "Path to access on the HTTP server.",
@@ -1264,7 +1319,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -1286,7 +1342,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -1322,7 +1378,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -1439,7 +1496,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -1461,7 +1519,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -1497,7 +1555,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -1585,7 +1644,7 @@
                               "type": "object",
                               "properties": {
                                 "claims": {
-                                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\n\nThis field is immutable. It can only be set for containers.",
+                                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
                                   "type": "array",
                                   "items": {
                                     "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
@@ -1596,6 +1655,10 @@
                                     "properties": {
                                       "name": {
                                         "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
+                                        "type": "string"
+                                      },
+                                      "request": {
+                                        "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
                                         "type": "string"
                                       }
                                     }
@@ -1635,6 +1698,23 @@
                                   "description": "AllowPrivilegeEscalation controls whether a process can gain more\nprivileges than its parent process. This bool directly controls if\nthe no_new_privs flag will be set on the container process.\nAllowPrivilegeEscalation is true always when the container is:\n1) run as Privileged\n2) has CAP_SYS_ADMIN\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "boolean"
                                 },
+                                "appArmorProfile": {
+                                  "description": "appArmorProfile is the AppArmor options to use by this container. If set, this profile\noverrides the pod's appArmorProfile.\nNote that this field cannot be set when spec.os.name is windows.",
+                                  "type": "object",
+                                  "required": [
+                                    "type"
+                                  ],
+                                  "properties": {
+                                    "localhostProfile": {
+                                      "description": "localhostProfile indicates a profile loaded on the node that should be used.\nThe profile must be preconfigured on the node to work.\nMust match the loaded name of the profile.\nMust be set if and only if type is \"Localhost\".",
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "description": "type indicates which kind of AppArmor profile will be applied.\nValid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
+                                      "type": "string"
+                                    }
+                                  }
+                                },
                                 "capabilities": {
                                   "description": "The capabilities to add/drop when running containers.\nDefaults to the default set of capabilities granted by the container runtime.\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "object",
@@ -1645,7 +1725,8 @@
                                       "items": {
                                         "description": "Capability represent POSIX capabilities type",
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "drop": {
                                       "description": "Removed capabilities",
@@ -1653,7 +1734,8 @@
                                       "items": {
                                         "description": "Capability represent POSIX capabilities type",
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -1662,7 +1744,7 @@
                                   "type": "boolean"
                                 },
                                 "procMount": {
-                                  "description": "procMount denotes the type of proc mount to use for the containers.\nThe default is DefaultProcMount which uses the container runtime defaults for\nreadonly paths and masked paths.\nThis requires the ProcMountType feature flag to be enabled.\nNote that this field cannot be set when spec.os.name is windows.",
+                                  "description": "procMount denotes the type of proc mount to use for the containers.\nThe default value is Default which uses the container runtime defaults for\nreadonly paths and masked paths.\nThis requires the ProcMountType feature flag to be enabled.\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "string"
                                 },
                                 "readOnlyRootFilesystem": {
@@ -1717,7 +1799,7 @@
                                       "type": "string"
                                     },
                                     "type": {
-                                      "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
+                                      "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
                                       "type": "string"
                                     }
                                   }
@@ -1759,7 +1841,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -1781,7 +1864,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -1817,7 +1900,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -1917,7 +2001,11 @@
                                     "type": "string"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "devicePath"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "volumeMounts": {
                               "description": "Pod volumes to mount into the container's filesystem.\nCannot be updated.",
@@ -1935,7 +2023,7 @@
                                     "type": "string"
                                   },
                                   "mountPropagation": {
-                                    "description": "mountPropagation determines how mounts are propagated from the host\nto container and the other way around.\nWhen not set, MountPropagationNone is used.\nThis field is beta in 1.10.",
+                                    "description": "mountPropagation determines how mounts are propagated from the host\nto container and the other way around.\nWhen not set, MountPropagationNone is used.\nThis field is beta in 1.10.\nWhen RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified\n(which defaults to None).",
                                     "type": "string"
                                   },
                                   "name": {
@@ -1946,6 +2034,10 @@
                                     "description": "Mounted read-only if true, read-write otherwise (false or unspecified).\nDefaults to false.",
                                     "type": "boolean"
                                   },
+                                  "recursiveReadOnly": {
+                                    "description": "RecursiveReadOnly specifies whether read-only mounts should be handled\nrecursively.\n\nIf ReadOnly is false, this field has no meaning and must be unspecified.\n\nIf ReadOnly is true, and this field is set to Disabled, the mount is not made\nrecursively read-only.  If this field is set to IfPossible, the mount is made\nrecursively read-only, if it is supported by the container runtime.",
+                                    "type": "string"
+                                  },
                                   "subPath": {
                                     "description": "Path within the volume from which the container's volume should be mounted.\nDefaults to \"\" (volume's root).",
                                     "type": "string"
@@ -1955,14 +2047,22 @@
                                     "type": "string"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "mountPath"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "workingDir": {
                               "description": "Container's working directory.\nIf not specified, the container runtime's default will be used, which\nmight be configured in the container image.\nCannot be updated.",
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-map-keys": [
+                          "name"
+                        ],
+                        "x-kubernetes-list-type": "map"
                       },
                       "dnsConfig": {
                         "description": "Specifies the DNS parameters of a pod.\nParameters specified here will be merged to the generated DNS\nconfiguration based on DNSPolicy.",
@@ -1973,7 +2073,8 @@
                             "type": "array",
                             "items": {
                               "type": "string"
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
                           },
                           "options": {
                             "description": "A list of DNS resolver options.\nThis will be merged with the base options generated from DNSPolicy.\nDuplicated entries will be removed. Resolution options given in Options\nwill override those that appear in the base DNSPolicy.",
@@ -1990,14 +2091,16 @@
                                   "type": "string"
                                 }
                               }
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
                           },
                           "searches": {
                             "description": "A list of DNS search domains for host-name lookup.\nThis will be appended to the base search paths generated from DNSPolicy.\nDuplicated search paths will be removed.",
                             "type": "array",
                             "items": {
                               "type": "string"
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
                           }
                         }
                       },
@@ -2024,14 +2127,16 @@
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "command": {
                               "description": "Entrypoint array. Not executed within a shell.\nThe image's ENTRYPOINT is used if this is not provided.\nVariable references $(VAR_NAME) are expanded using the container's environment. If a variable\ncannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced\nto a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.",
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "env": {
                               "description": "List of environment variables to set in the container.\nCannot be updated.",
@@ -2067,7 +2172,7 @@
                                             "type": "string"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -2130,7 +2235,7 @@
                                             "type": "string"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -2143,7 +2248,11 @@
                                     }
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "name"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "envFrom": {
                               "description": "List of sources to populate environment variables in the container.\nThe keys defined within a source must be a C_IDENTIFIER. All invalid keys\nwill be reported as an event when the container is starting. When a key exists in multiple\nsources, the value associated with the last source will take precedence.\nValues defined by an Env with a duplicate key will take precedence.\nCannot be updated.",
@@ -2157,7 +2266,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -2176,7 +2285,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -2187,7 +2296,8 @@
                                     "x-kubernetes-map-type": "atomic"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "image": {
                               "description": "Container image name.\nMore info: https://kubernetes.io/docs/concepts/containers/images",
@@ -2214,7 +2324,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       }
                                     },
@@ -2249,7 +2360,8 @@
                                                 "type": "string"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "path": {
                                           "description": "Path to access on the HTTP server.",
@@ -2311,7 +2423,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       }
                                     },
@@ -2346,7 +2459,8 @@
                                                 "type": "string"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "path": {
                                           "description": "Path to access on the HTTP server.",
@@ -2410,7 +2524,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -2432,7 +2547,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -2468,7 +2583,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -2585,7 +2701,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -2607,7 +2724,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -2643,7 +2760,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -2731,7 +2849,7 @@
                               "type": "object",
                               "properties": {
                                 "claims": {
-                                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\n\nThis field is immutable. It can only be set for containers.",
+                                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
                                   "type": "array",
                                   "items": {
                                     "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
@@ -2742,6 +2860,10 @@
                                     "properties": {
                                       "name": {
                                         "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
+                                        "type": "string"
+                                      },
+                                      "request": {
+                                        "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
                                         "type": "string"
                                       }
                                     }
@@ -2781,6 +2903,23 @@
                                   "description": "AllowPrivilegeEscalation controls whether a process can gain more\nprivileges than its parent process. This bool directly controls if\nthe no_new_privs flag will be set on the container process.\nAllowPrivilegeEscalation is true always when the container is:\n1) run as Privileged\n2) has CAP_SYS_ADMIN\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "boolean"
                                 },
+                                "appArmorProfile": {
+                                  "description": "appArmorProfile is the AppArmor options to use by this container. If set, this profile\noverrides the pod's appArmorProfile.\nNote that this field cannot be set when spec.os.name is windows.",
+                                  "type": "object",
+                                  "required": [
+                                    "type"
+                                  ],
+                                  "properties": {
+                                    "localhostProfile": {
+                                      "description": "localhostProfile indicates a profile loaded on the node that should be used.\nThe profile must be preconfigured on the node to work.\nMust match the loaded name of the profile.\nMust be set if and only if type is \"Localhost\".",
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "description": "type indicates which kind of AppArmor profile will be applied.\nValid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
+                                      "type": "string"
+                                    }
+                                  }
+                                },
                                 "capabilities": {
                                   "description": "The capabilities to add/drop when running containers.\nDefaults to the default set of capabilities granted by the container runtime.\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "object",
@@ -2791,7 +2930,8 @@
                                       "items": {
                                         "description": "Capability represent POSIX capabilities type",
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "drop": {
                                       "description": "Removed capabilities",
@@ -2799,7 +2939,8 @@
                                       "items": {
                                         "description": "Capability represent POSIX capabilities type",
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -2808,7 +2949,7 @@
                                   "type": "boolean"
                                 },
                                 "procMount": {
-                                  "description": "procMount denotes the type of proc mount to use for the containers.\nThe default is DefaultProcMount which uses the container runtime defaults for\nreadonly paths and masked paths.\nThis requires the ProcMountType feature flag to be enabled.\nNote that this field cannot be set when spec.os.name is windows.",
+                                  "description": "procMount denotes the type of proc mount to use for the containers.\nThe default value is Default which uses the container runtime defaults for\nreadonly paths and masked paths.\nThis requires the ProcMountType feature flag to be enabled.\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "string"
                                 },
                                 "readOnlyRootFilesystem": {
@@ -2863,7 +3004,7 @@
                                       "type": "string"
                                     },
                                     "type": {
-                                      "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
+                                      "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
                                       "type": "string"
                                     }
                                   }
@@ -2905,7 +3046,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -2927,7 +3069,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -2963,7 +3105,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -3032,7 +3175,7 @@
                               "type": "boolean"
                             },
                             "targetContainerName": {
-                              "description": "If set, the name of the container from PodSpec that this ephemeral container targets.\nThe ephemeral container will be run in the namespaces (IPC, PID, etc) of this container.\nIf not set then the ephemeral container uses the namespaces configured in the Pod spec.\n\n\nThe container runtime must implement support for this feature.",
+                              "description": "If set, the name of the container from PodSpec that this ephemeral container targets.\nThe ephemeral container will be run in the namespaces (IPC, PID, etc) of this container.\nIf not set then the ephemeral container uses the namespaces configured in the Pod spec.\n\nThe container runtime must implement support for this feature.",
                               "type": "string"
                             },
                             "terminationMessagePath": {
@@ -3067,7 +3210,11 @@
                                     "type": "string"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "devicePath"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "volumeMounts": {
                               "description": "Pod volumes to mount into the container's filesystem. Subpath mounts are not allowed for ephemeral containers.\nCannot be updated.",
@@ -3085,7 +3232,7 @@
                                     "type": "string"
                                   },
                                   "mountPropagation": {
-                                    "description": "mountPropagation determines how mounts are propagated from the host\nto container and the other way around.\nWhen not set, MountPropagationNone is used.\nThis field is beta in 1.10.",
+                                    "description": "mountPropagation determines how mounts are propagated from the host\nto container and the other way around.\nWhen not set, MountPropagationNone is used.\nThis field is beta in 1.10.\nWhen RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified\n(which defaults to None).",
                                     "type": "string"
                                   },
                                   "name": {
@@ -3096,6 +3243,10 @@
                                     "description": "Mounted read-only if true, read-write otherwise (false or unspecified).\nDefaults to false.",
                                     "type": "boolean"
                                   },
+                                  "recursiveReadOnly": {
+                                    "description": "RecursiveReadOnly specifies whether read-only mounts should be handled\nrecursively.\n\nIf ReadOnly is false, this field has no meaning and must be unspecified.\n\nIf ReadOnly is true, and this field is set to Disabled, the mount is not made\nrecursively read-only.  If this field is set to IfPossible, the mount is made\nrecursively read-only, if it is supported by the container runtime.",
+                                    "type": "string"
+                                  },
                                   "subPath": {
                                     "description": "Path within the volume from which the container's volume should be mounted.\nDefaults to \"\" (volume's root).",
                                     "type": "string"
@@ -3105,35 +3256,51 @@
                                     "type": "string"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "mountPath"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "workingDir": {
                               "description": "Container's working directory.\nIf not specified, the container runtime's default will be used, which\nmight be configured in the container image.\nCannot be updated.",
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-map-keys": [
+                          "name"
+                        ],
+                        "x-kubernetes-list-type": "map"
                       },
                       "hostAliases": {
-                        "description": "HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts\nfile if specified. This is only valid for non-hostNetwork pods.",
+                        "description": "HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts\nfile if specified.",
                         "type": "array",
                         "items": {
                           "description": "HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the\npod's hosts file.",
                           "type": "object",
+                          "required": [
+                            "ip"
+                          ],
                           "properties": {
                             "hostnames": {
                               "description": "Hostnames for the above IP address.",
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "ip": {
                               "description": "IP address of the host file entry.",
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-map-keys": [
+                          "ip"
+                        ],
+                        "x-kubernetes-list-type": "map"
                       },
                       "hostIPC": {
                         "description": "Use the host's ipc namespace.\nOptional: Default to false.",
@@ -3163,12 +3330,16 @@
                           "type": "object",
                           "properties": {
                             "name": {
-                              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                               "type": "string"
                             }
                           },
                           "x-kubernetes-map-type": "atomic"
-                        }
+                        },
+                        "x-kubernetes-list-map-keys": [
+                          "name"
+                        ],
+                        "x-kubernetes-list-type": "map"
                       },
                       "initContainers": {
                         "description": "List of initialization containers belonging to the pod.\nInit containers are executed in order prior to containers being started. If any\ninit container fails, the pod is considered to have failed and is handled according\nto its restartPolicy. The name for an init container or normal container must be\nunique among all containers.",
@@ -3185,14 +3356,16 @@
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "command": {
                               "description": "Entrypoint array. Not executed within a shell.\nThe container image's ENTRYPOINT is used if this is not provided.\nVariable references $(VAR_NAME) are expanded using the container's environment. If a variable\ncannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced\nto a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.",
                               "type": "array",
                               "items": {
                                 "type": "string"
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "env": {
                               "description": "List of environment variables to set in the container.\nCannot be updated.",
@@ -3228,7 +3401,7 @@
                                             "type": "string"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -3291,7 +3464,7 @@
                                             "type": "string"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -3304,7 +3477,11 @@
                                     }
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "name"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "envFrom": {
                               "description": "List of sources to populate environment variables in the container.\nThe keys defined within a source must be a C_IDENTIFIER. All invalid keys\nwill be reported as an event when the container is starting. When a key exists in multiple\nsources, the value associated with the last source will take precedence.\nValues defined by an Env with a duplicate key will take precedence.\nCannot be updated.",
@@ -3318,7 +3495,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -3337,7 +3514,7 @@
                                     "type": "object",
                                     "properties": {
                                       "name": {
-                                        "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                        "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                         "type": "string"
                                       },
                                       "optional": {
@@ -3348,7 +3525,8 @@
                                     "x-kubernetes-map-type": "atomic"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-type": "atomic"
                             },
                             "image": {
                               "description": "Container image name.\nMore info: https://kubernetes.io/docs/concepts/containers/images\nThis field is optional to allow higher level config management to default or override\ncontainer images in workload controllers like Deployments and StatefulSets.",
@@ -3375,7 +3553,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       }
                                     },
@@ -3410,7 +3589,8 @@
                                                 "type": "string"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "path": {
                                           "description": "Path to access on the HTTP server.",
@@ -3472,7 +3652,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         }
                                       }
                                     },
@@ -3507,7 +3688,8 @@
                                                 "type": "string"
                                               }
                                             }
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "path": {
                                           "description": "Path to access on the HTTP server.",
@@ -3571,7 +3753,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -3593,7 +3776,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -3629,7 +3812,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -3746,7 +3930,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -3768,7 +3953,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -3804,7 +3989,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -3892,7 +4078,7 @@
                               "type": "object",
                               "properties": {
                                 "claims": {
-                                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\n\nThis field is immutable. It can only be set for containers.",
+                                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
                                   "type": "array",
                                   "items": {
                                     "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
@@ -3903,6 +4089,10 @@
                                     "properties": {
                                       "name": {
                                         "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
+                                        "type": "string"
+                                      },
+                                      "request": {
+                                        "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
                                         "type": "string"
                                       }
                                     }
@@ -3942,6 +4132,23 @@
                                   "description": "AllowPrivilegeEscalation controls whether a process can gain more\nprivileges than its parent process. This bool directly controls if\nthe no_new_privs flag will be set on the container process.\nAllowPrivilegeEscalation is true always when the container is:\n1) run as Privileged\n2) has CAP_SYS_ADMIN\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "boolean"
                                 },
+                                "appArmorProfile": {
+                                  "description": "appArmorProfile is the AppArmor options to use by this container. If set, this profile\noverrides the pod's appArmorProfile.\nNote that this field cannot be set when spec.os.name is windows.",
+                                  "type": "object",
+                                  "required": [
+                                    "type"
+                                  ],
+                                  "properties": {
+                                    "localhostProfile": {
+                                      "description": "localhostProfile indicates a profile loaded on the node that should be used.\nThe profile must be preconfigured on the node to work.\nMust match the loaded name of the profile.\nMust be set if and only if type is \"Localhost\".",
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "description": "type indicates which kind of AppArmor profile will be applied.\nValid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
+                                      "type": "string"
+                                    }
+                                  }
+                                },
                                 "capabilities": {
                                   "description": "The capabilities to add/drop when running containers.\nDefaults to the default set of capabilities granted by the container runtime.\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "object",
@@ -3952,7 +4159,8 @@
                                       "items": {
                                         "description": "Capability represent POSIX capabilities type",
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "drop": {
                                       "description": "Removed capabilities",
@@ -3960,7 +4168,8 @@
                                       "items": {
                                         "description": "Capability represent POSIX capabilities type",
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -3969,7 +4178,7 @@
                                   "type": "boolean"
                                 },
                                 "procMount": {
-                                  "description": "procMount denotes the type of proc mount to use for the containers.\nThe default is DefaultProcMount which uses the container runtime defaults for\nreadonly paths and masked paths.\nThis requires the ProcMountType feature flag to be enabled.\nNote that this field cannot be set when spec.os.name is windows.",
+                                  "description": "procMount denotes the type of proc mount to use for the containers.\nThe default value is Default which uses the container runtime defaults for\nreadonly paths and masked paths.\nThis requires the ProcMountType feature flag to be enabled.\nNote that this field cannot be set when spec.os.name is windows.",
                                   "type": "string"
                                 },
                                 "readOnlyRootFilesystem": {
@@ -4024,7 +4233,7 @@
                                       "type": "string"
                                     },
                                     "type": {
-                                      "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
+                                      "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
                                       "type": "string"
                                     }
                                   }
@@ -4066,7 +4275,8 @@
                                       "type": "array",
                                       "items": {
                                         "type": "string"
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     }
                                   }
                                 },
@@ -4088,7 +4298,7 @@
                                       "format": "int32"
                                     },
                                     "service": {
-                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\n\nIf this is not specified, the default behavior is defined by gRPC.",
+                                      "description": "Service is the name of the service to place in the gRPC HealthCheckRequest\n(see https://github.com/grpc/grpc/blob/master/doc/health-checking.md).\n\nIf this is not specified, the default behavior is defined by gRPC.",
                                       "type": "string"
                                     }
                                   }
@@ -4124,7 +4334,8 @@
                                             "type": "string"
                                           }
                                         }
-                                      }
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
                                     },
                                     "path": {
                                       "description": "Path to access on the HTTP server.",
@@ -4224,7 +4435,11 @@
                                     "type": "string"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "devicePath"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "volumeMounts": {
                               "description": "Pod volumes to mount into the container's filesystem.\nCannot be updated.",
@@ -4242,7 +4457,7 @@
                                     "type": "string"
                                   },
                                   "mountPropagation": {
-                                    "description": "mountPropagation determines how mounts are propagated from the host\nto container and the other way around.\nWhen not set, MountPropagationNone is used.\nThis field is beta in 1.10.",
+                                    "description": "mountPropagation determines how mounts are propagated from the host\nto container and the other way around.\nWhen not set, MountPropagationNone is used.\nThis field is beta in 1.10.\nWhen RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified\n(which defaults to None).",
                                     "type": "string"
                                   },
                                   "name": {
@@ -4253,6 +4468,10 @@
                                     "description": "Mounted read-only if true, read-write otherwise (false or unspecified).\nDefaults to false.",
                                     "type": "boolean"
                                   },
+                                  "recursiveReadOnly": {
+                                    "description": "RecursiveReadOnly specifies whether read-only mounts should be handled\nrecursively.\n\nIf ReadOnly is false, this field has no meaning and must be unspecified.\n\nIf ReadOnly is true, and this field is set to Disabled, the mount is not made\nrecursively read-only.  If this field is set to IfPossible, the mount is made\nrecursively read-only, if it is supported by the container runtime.",
+                                    "type": "string"
+                                  },
                                   "subPath": {
                                     "description": "Path within the volume from which the container's volume should be mounted.\nDefaults to \"\" (volume's root).",
                                     "type": "string"
@@ -4262,17 +4481,25 @@
                                     "type": "string"
                                   }
                                 }
-                              }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "mountPath"
+                              ],
+                              "x-kubernetes-list-type": "map"
                             },
                             "workingDir": {
                               "description": "Container's working directory.\nIf not specified, the container runtime's default will be used, which\nmight be configured in the container image.\nCannot be updated.",
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-map-keys": [
+                          "name"
+                        ],
+                        "x-kubernetes-list-type": "map"
                       },
                       "nodeName": {
-                        "description": "NodeName is a request to schedule this pod onto a specific node. If it is non-empty,\nthe scheduler simply schedules this pod onto that node, assuming that it fits resource\nrequirements.",
+                        "description": "NodeName indicates in which node this pod is scheduled.\nIf empty, this pod is a candidate for scheduling by the scheduler defined in schedulerName.\nOnce this field is set, the kubelet for this node becomes responsible for the lifecycle of this pod.\nThis field should not be used to express a desire for the pod to be scheduled on a specific node.\nhttps://kubernetes.",
                         "type": "string"
                       },
                       "nodeSelector": {
@@ -4284,7 +4511,7 @@
                         "x-kubernetes-map-type": "atomic"
                       },
                       "os": {
-                        "description": "Specifies the OS of the containers in the pod.\nSome pod and container fields are restricted if this is set.\n\n\nIf the OS field is set to linux, the following fields must be unset:\n-securityContext.windowsOptions\n\n\nIf the OS field is set to windows, following fields must be unset:\n- spec.hostPID\n- spec.hostIPC\n- spec.hostUsers\n- spec.securityContext.seLinuxOptions\n- spec.securityContext.",
+                        "description": "Specifies the OS of the containers in the pod.\nSome pod and container fields are restricted if this is set.\n\nIf the OS field is set to linux, the following fields must be unset:\n-securityContext.windowsOptions\n\nIf the OS field is set to windows, following fields must be unset:\n- spec.hostPID\n- spec.hostIPC\n- spec.hostUsers\n- spec.securityContext.appArmorProfile\n- spec.securityContext.",
                         "type": "object",
                         "required": [
                           "name"
@@ -4332,13 +4559,14 @@
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-type": "atomic"
                       },
                       "resourceClaims": {
-                        "description": "ResourceClaims defines which ResourceClaims must be allocated\nand reserved before the Pod is allowed to start. The resources\nwill be made available to those containers which consume them\nby name.\n\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\n\nThis field is immutable.",
+                        "description": "ResourceClaims defines which ResourceClaims must be allocated\nand reserved before the Pod is allowed to start. The resources\nwill be made available to those containers which consume them\nby name.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable.",
                         "type": "array",
                         "items": {
-                          "description": "PodResourceClaim references exactly one ResourceClaim through a ClaimSource.\nIt adds a name to it that uniquely identifies the ResourceClaim inside the Pod.\nContainers that need access to the ResourceClaim reference it with this name.",
+                          "description": "PodResourceClaim references exactly one ResourceClaim, either directly\nor by naming a ResourceClaimTemplate which is then turned into a ResourceClaim\nfor the pod.\n\nIt adds a name to it that uniquely identifies the ResourceClaim inside the Pod.\nContainers that need access to the ResourceClaim reference it with this name.",
                           "type": "object",
                           "required": [
                             "name"
@@ -4348,19 +4576,13 @@
                               "description": "Name uniquely identifies this resource claim inside the pod.\nThis must be a DNS_LABEL.",
                               "type": "string"
                             },
-                            "source": {
-                              "description": "Source describes where to find the ResourceClaim.",
-                              "type": "object",
-                              "properties": {
-                                "resourceClaimName": {
-                                  "description": "ResourceClaimName is the name of a ResourceClaim object in the same\nnamespace as this pod.",
-                                  "type": "string"
-                                },
-                                "resourceClaimTemplateName": {
-                                  "description": "ResourceClaimTemplateName is the name of a ResourceClaimTemplate\nobject in the same namespace as this pod.\n\n\nThe template will be used to create a new ResourceClaim, which will\nbe bound to this pod. When this pod is deleted, the ResourceClaim\nwill also be deleted.",
-                                  "type": "string"
-                                }
-                              }
+                            "resourceClaimName": {
+                              "description": "ResourceClaimName is the name of a ResourceClaim object in the same\nnamespace as this pod.\n\nExactly one of ResourceClaimName and ResourceClaimTemplateName must\nbe set.",
+                              "type": "string"
+                            },
+                            "resourceClaimTemplateName": {
+                              "description": "ResourceClaimTemplateName is the name of a ResourceClaimTemplate\nobject in the same namespace as this pod.\n\nThe template will be used to create a new ResourceClaim, which will\nbe bound to this pod. When this pod is deleted, the ResourceClaim\nwill also be deleted.",
+                              "type": "string"
                             }
                           }
                         },
@@ -4382,7 +4604,7 @@
                         "type": "string"
                       },
                       "schedulingGates": {
-                        "description": "SchedulingGates is an opaque list of values that if specified will block scheduling the pod.\nIf schedulingGates is not empty, the pod will stay in the SchedulingGated state and the\nscheduler will not attempt to schedule the pod.\n\n\nSchedulingGates can only be set at pod creation time, and be removed only afterwards.\n\n\nThis is a beta feature enabled by the PodSchedulingReadiness feature gate.",
+                        "description": "SchedulingGates is an opaque list of values that if specified will block scheduling the pod.\nIf schedulingGates is not empty, the pod will stay in the SchedulingGated state and the\nscheduler will not attempt to schedule the pod.\n\nSchedulingGates can only be set at pod creation time, and be removed only afterwards.",
                         "type": "array",
                         "items": {
                           "description": "PodSchedulingGate is associated to a Pod to guard its scheduling.",
@@ -4406,8 +4628,25 @@
                         "description": "SecurityContext holds pod-level security attributes and common container settings.\nOptional: Defaults to empty.  See type description for default values of each field.",
                         "type": "object",
                         "properties": {
+                          "appArmorProfile": {
+                            "description": "appArmorProfile is the AppArmor options to use by the containers in this pod.\nNote that this field cannot be set when spec.os.name is windows.",
+                            "type": "object",
+                            "required": [
+                              "type"
+                            ],
+                            "properties": {
+                              "localhostProfile": {
+                                "description": "localhostProfile indicates a profile loaded on the node that should be used.\nThe profile must be preconfigured on the node to work.\nMust match the loaded name of the profile.\nMust be set if and only if type is \"Localhost\".",
+                                "type": "string"
+                              },
+                              "type": {
+                                "description": "type indicates which kind of AppArmor profile will be applied.\nValid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
+                                "type": "string"
+                              }
+                            }
+                          },
                           "fsGroup": {
-                            "description": "A special supplemental group that applies to all containers in a pod.\nSome volume types allow the Kubelet to change the ownership of that volume\nto be owned by the pod:\n\n\n1. The owning GID will be the FSGroup\n2. The setgid bit is set (new files created in the volume will be owned by FSGroup)\n3.",
+                            "description": "A special supplemental group that applies to all containers in a pod.\nSome volume types allow the Kubelet to change the ownership of that volume\nto be owned by the pod:\n\n1. The owning GID will be the FSGroup\n2. The setgid bit is set (new files created in the volume will be owned by FSGroup)\n3.",
                             "type": "integer",
                             "format": "int64"
                           },
@@ -4463,18 +4702,23 @@
                                 "type": "string"
                               },
                               "type": {
-                                "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
+                                "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
                                 "type": "string"
                               }
                             }
                           },
                           "supplementalGroups": {
-                            "description": "A list of groups applied to the first process run in each container, in addition\nto the container's primary GID, the fsGroup (if specified), and group memberships\ndefined in the container image for the uid of the container process. If unspecified,\nno additional groups are added to any container.",
+                            "description": "A list of groups applied to the first process run in each container, in\naddition to the container's primary GID and fsGroup (if specified).  If\nthe SupplementalGroupsPolicy feature is enabled, the\nsupplementalGroupsPolicy field determines whether these are in addition\nto or instead of any group memberships defined in the container image.",
                             "type": "array",
                             "items": {
                               "type": "integer",
                               "format": "int64"
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "supplementalGroupsPolicy": {
+                            "description": "Defines how supplemental groups of the first container processes are calculated.\nValid values are \"Merge\" and \"Strict\". If not specified, \"Merge\" is used.\n(Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled\nand the container runtime must implement support for this feature.\nNote that this field cannot be set when spec.os.name is windows.",
+                            "type": "string"
                           },
                           "sysctls": {
                             "description": "Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported\nsysctls (by the container runtime) might fail to launch.\nNote that this field cannot be set when spec.os.name is windows.",
@@ -4496,7 +4740,8 @@
                                   "type": "string"
                                 }
                               }
-                            }
+                            },
+                            "x-kubernetes-list-type": "atomic"
                           },
                           "windowsOptions": {
                             "description": "The Windows specific settings applied to all containers.\nIf unspecified, the options within a container's SecurityContext will be used.\nIf set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.\nNote that this field cannot be set when spec.os.name is linux.",
@@ -4523,7 +4768,7 @@
                         }
                       },
                       "serviceAccount": {
-                        "description": "DeprecatedServiceAccount is a depreciated alias for ServiceAccountName.\nDeprecated: Use serviceAccountName instead.",
+                        "description": "DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.\nDeprecated: Use serviceAccountName instead.",
                         "type": "string"
                       },
                       "serviceAccountName": {
@@ -4576,7 +4821,8 @@
                               "type": "string"
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-type": "atomic"
                       },
                       "topologySpreadConstraints": {
                         "description": "TopologySpreadConstraints describes how a group of pods ought to spread across topology\ndomains. Scheduler will schedule pods in a way which abides by the constraints.\nAll topologySpreadConstraints are ANDed.",
@@ -4618,10 +4864,12 @@
                                         "type": "array",
                                         "items": {
                                           "type": "string"
-                                        }
+                                        },
+                                        "x-kubernetes-list-type": "atomic"
                                       }
                                     }
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "matchLabels": {
                                   "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -4652,11 +4900,11 @@
                               "format": "int32"
                             },
                             "nodeAffinityPolicy": {
-                              "description": "NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector\nwhen calculating pod topology spread skew. Options are:\n- Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.\n- Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.\n\n\nIf this value is nil, the behavior is equivalent to the Honor policy.",
+                              "description": "NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector\nwhen calculating pod topology spread skew. Options are:\n- Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.\n- Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.\n\nIf this value is nil, the behavior is equivalent to the Honor policy.",
                               "type": "string"
                             },
                             "nodeTaintsPolicy": {
-                              "description": "NodeTaintsPolicy indicates how we will treat node taints when calculating\npod topology spread skew. Options are:\n- Honor: nodes without taints, along with tainted nodes for which the incoming pod\nhas a toleration, are included.\n- Ignore: node taints are ignored. All nodes are included.\n\n\nIf this value is nil, the behavior is equivalent to the Ignore policy.",
+                              "description": "NodeTaintsPolicy indicates how we will treat node taints when calculating\npod topology spread skew. Options are:\n- Honor: nodes without taints, along with tainted nodes for which the incoming pod\nhas a toleration, are included.\n- Ignore: node taints are ignored. All nodes are included.\n\nIf this value is nil, the behavior is equivalent to the Ignore policy.",
                               "type": "string"
                             },
                             "topologyKey": {
@@ -4693,7 +4941,7 @@
                               ],
                               "properties": {
                                 "fsType": {
-                                  "description": "fsType is the filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore\nTODO: how do we prevent errors in the filesystem from compromising the machine",
+                                  "description": "fsType is the filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore",
                                   "type": "string"
                                 },
                                 "partition": {
@@ -4779,7 +5027,8 @@
                                   "type": "array",
                                   "items": {
                                     "type": "string"
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "path": {
                                   "description": "path is Optional: Used as the mounted root, rather than the full Ceph tree, default is /",
@@ -4798,7 +5047,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -4830,7 +5079,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -4876,10 +5125,11 @@
                                         "type": "string"
                                       }
                                     }
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "name": {
-                                  "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                  "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                   "type": "string"
                                 },
                                 "optional": {
@@ -4909,7 +5159,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -4948,7 +5198,7 @@
                                     ],
                                     "properties": {
                                       "fieldRef": {
-                                        "description": "Required: Selects a field of the pod: only annotations, labels, name and namespace are supported.",
+                                        "description": "Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.",
                                         "type": "object",
                                         "required": [
                                           "fieldPath"
@@ -4998,7 +5248,8 @@
                                         "x-kubernetes-map-type": "atomic"
                                       }
                                     }
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 }
                               }
                             },
@@ -5067,7 +5318,8 @@
                                           "type": "array",
                                           "items": {
                                             "type": "string"
-                                          }
+                                          },
+                                          "x-kubernetes-list-type": "atomic"
                                         },
                                         "dataSource": {
                                           "description": "dataSource field can be used to specify either:\n* An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)\n* An existing PVC (PersistentVolumeClaim)\nIf the provisioner or an external controller can support the specified data source,\nit will create a new volume based on the contents of the specified data source.",
@@ -5168,10 +5420,12 @@
                                                     "type": "array",
                                                     "items": {
                                                       "type": "string"
-                                                    }
+                                                    },
+                                                    "x-kubernetes-list-type": "atomic"
                                                   }
                                                 }
-                                              }
+                                              },
+                                              "x-kubernetes-list-type": "atomic"
                                             },
                                             "matchLabels": {
                                               "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -5210,7 +5464,7 @@
                               "type": "object",
                               "properties": {
                                 "fsType": {
-                                  "description": "fsType is the filesystem type to mount.\nMust be a filesystem type supported by the host operating system.\nEx. \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nTODO: how do we prevent errors in the filesystem from compromising the machine",
+                                  "description": "fsType is the filesystem type to mount.\nMust be a filesystem type supported by the host operating system.\nEx. \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.",
                                   "type": "string"
                                 },
                                 "lun": {
@@ -5227,14 +5481,16 @@
                                   "type": "array",
                                   "items": {
                                     "type": "string"
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "wwids": {
                                   "description": "wwids Optional: FC volume world wide identifiers (wwids)\nEither wwids or combination of targetWWNs and lun must be set, but not both simultaneously.",
                                   "type": "array",
                                   "items": {
                                     "type": "string"
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 }
                               }
                             },
@@ -5269,7 +5525,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -5299,7 +5555,7 @@
                               ],
                               "properties": {
                                 "fsType": {
-                                  "description": "fsType is filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk\nTODO: how do we prevent errors in the filesystem from compromising the machine",
+                                  "description": "fsType is filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk",
                                   "type": "string"
                                 },
                                 "partition": {
@@ -5361,7 +5617,7 @@
                               }
                             },
                             "hostPath": {
-                              "description": "hostPath represents a pre-existing file or directory on the host\nmachine that is directly exposed to the container. This is generally\nused for system agents or other privileged things that are allowed\nto see the host machine. Most containers will NOT need this.\nMore info: https://kubernetes.",
+                              "description": "hostPath represents a pre-existing file or directory on the host\nmachine that is directly exposed to the container. This is generally\nused for system agents or other privileged things that are allowed\nto see the host machine. Most containers will NOT need this.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath",
                               "type": "object",
                               "required": [
                                 "path"
@@ -5373,6 +5629,20 @@
                                 },
                                 "type": {
                                   "description": "type for HostPath Volume\nDefaults to \"\"\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath",
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "image": {
+                              "description": "image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine.\nThe volume is resolved at pod startup depending on which PullPolicy value is provided:\n\n- Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.\n- Never: the kubelet never pulls the reference and only uses a local image or artifact.",
+                              "type": "object",
+                              "properties": {
+                                "pullPolicy": {
+                                  "description": "Policy for pulling OCI objects. Possible values are:\nAlways: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.\nNever: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.\nIfNotPresent: the kubelet pulls if the reference isn't already present on disk.",
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "description": "Required: Image or artifact reference to be used.\nBehaves in the same way as pod.spec.containers[*].image.\nPull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.\nMore info: https://kubernetes.",
                                   "type": "string"
                                 }
                               }
@@ -5395,7 +5665,7 @@
                                   "type": "boolean"
                                 },
                                 "fsType": {
-                                  "description": "fsType is the filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi\nTODO: how do we prevent errors in the filesystem from compromising the machine",
+                                  "description": "fsType is the filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#iscsi",
                                   "type": "string"
                                 },
                                 "initiatorName": {
@@ -5420,7 +5690,8 @@
                                   "type": "array",
                                   "items": {
                                     "type": "string"
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "readOnly": {
                                   "description": "readOnly here will force the ReadOnly setting in VolumeMounts.\nDefaults to false.",
@@ -5431,7 +5702,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -5534,14 +5805,14 @@
                                   "format": "int32"
                                 },
                                 "sources": {
-                                  "description": "sources is the list of volume projections",
+                                  "description": "sources is the list of volume projections. Each entry in this list\nhandles one source.",
                                   "type": "array",
                                   "items": {
-                                    "description": "Projection that may be projected along with other supported volume types",
+                                    "description": "Projection that may be projected along with other supported volume types.\nExactly one of these fields must be set.",
                                     "type": "object",
                                     "properties": {
                                       "clusterTrustBundle": {
-                                        "description": "ClusterTrustBundle allows a pod to access the `.spec.trustBundle` field\nof ClusterTrustBundle objects in an auto-updating file.\n\n\nAlpha, gated by the ClusterTrustBundleProjection feature gate.\n\n\nClusterTrustBundle objects can either be selected by name, or by the\ncombination of signer name and a label selector.",
+                                        "description": "ClusterTrustBundle allows a pod to access the `.spec.trustBundle` field\nof ClusterTrustBundle objects in an auto-updating file.\n\nAlpha, gated by the ClusterTrustBundleProjection feature gate.\n\nClusterTrustBundle objects can either be selected by name, or by the\ncombination of signer name and a label selector.",
                                         "type": "object",
                                         "required": [
                                           "path"
@@ -5575,10 +5846,12 @@
                                                       "type": "array",
                                                       "items": {
                                                         "type": "string"
-                                                      }
+                                                      },
+                                                      "x-kubernetes-list-type": "atomic"
                                                     }
                                                   }
-                                                }
+                                                },
+                                                "x-kubernetes-list-type": "atomic"
                                               },
                                               "matchLabels": {
                                                 "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -5637,10 +5910,11 @@
                                                   "type": "string"
                                                 }
                                               }
-                                            }
+                                            },
+                                            "x-kubernetes-list-type": "atomic"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -5665,7 +5939,7 @@
                                               ],
                                               "properties": {
                                                 "fieldRef": {
-                                                  "description": "Required: Selects a field of the pod: only annotations, labels, name and namespace are supported.",
+                                                  "description": "Required: Selects a field of the pod: only annotations, labels, name, namespace and uid are supported.",
                                                   "type": "object",
                                                   "required": [
                                                     "fieldPath"
@@ -5715,7 +5989,8 @@
                                                   "x-kubernetes-map-type": "atomic"
                                                 }
                                               }
-                                            }
+                                            },
+                                            "x-kubernetes-list-type": "atomic"
                                           }
                                         }
                                       },
@@ -5748,10 +6023,11 @@
                                                   "type": "string"
                                                 }
                                               }
-                                            }
+                                            },
+                                            "x-kubernetes-list-type": "atomic"
                                           },
                                           "name": {
-                                            "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                            "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                             "type": "string"
                                           },
                                           "optional": {
@@ -5784,7 +6060,8 @@
                                         }
                                       }
                                     }
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 }
                               }
                             },
@@ -5831,7 +6108,7 @@
                               ],
                               "properties": {
                                 "fsType": {
-                                  "description": "fsType is the filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#rbd\nTODO: how do we prevent errors in the filesystem from compromising the machine",
+                                  "description": "fsType is the filesystem type of the volume that you want to mount.\nTip: Ensure that the filesystem type is supported by the host operating system.\nExamples: \"ext4\", \"xfs\", \"ntfs\". Implicitly inferred to be \"ext4\" if unspecified.\nMore info: https://kubernetes.io/docs/concepts/storage/volumes#rbd",
                                   "type": "string"
                                 },
                                 "image": {
@@ -5847,7 +6124,8 @@
                                   "type": "array",
                                   "items": {
                                     "type": "string"
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "pool": {
                                   "description": "pool is the rados pool name.\nDefault is rbd.\nMore info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it",
@@ -5862,7 +6140,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -5904,7 +6182,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -5966,7 +6244,8 @@
                                         "type": "string"
                                       }
                                     }
-                                  }
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
                                 },
                                 "optional": {
                                   "description": "optional field specify whether the Secret or its keys must be defined",
@@ -5995,7 +6274,7 @@
                                   "type": "object",
                                   "properties": {
                                     "name": {
-                                      "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+                                      "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
                                       "type": "string"
                                     }
                                   },
@@ -6037,7 +6316,11 @@
                               }
                             }
                           }
-                        }
+                        },
+                        "x-kubernetes-list-map-keys": [
+                          "name"
+                        ],
+                        "x-kubernetes-list-type": "map"
                       }
                     }
                   }
@@ -6147,10 +6430,12 @@
                           "type": "array",
                           "items": {
                             "type": "string"
-                          }
+                          },
+                          "x-kubernetes-list-type": "atomic"
                         }
                       }
-                    }
+                    },
+                    "x-kubernetes-list-type": "atomic"
                   },
                   "matchLabels": {
                     "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
@@ -6189,5 +6474,6 @@
       "version": "v1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

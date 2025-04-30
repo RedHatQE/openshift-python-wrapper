@@ -67,6 +67,9 @@
             "description": {
               "type": "string"
             },
+            "inProgressText": {
+              "type": "string"
+            },
             "link": {
               "type": "string"
             },

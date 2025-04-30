@@ -793,3 +793,4 @@ com.jhouse.cache.v1alpha1.NFSProvisionerList
 io.openshift.nfd.v1alpha1.NodeFeatureGroupList
 io.opendatahub.platform.components.v1alpha1.FeastOperatorList
 io.kuadrant.authorino.v1beta3.AuthConfigList
+dev.feast.v1alpha1.FeatureStoreList

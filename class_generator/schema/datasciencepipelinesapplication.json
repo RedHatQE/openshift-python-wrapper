@@ -24,17 +24,19 @@
           "type": "object",
           "properties": {
             "applyTektonCustomResource": {
-              "description": "Default: true Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: true\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             },
             "archiveLogs": {
-              "description": "Default: false Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: false\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             },
             "argoDriverImage": {
+              "description": "Driver image used during pipeline execution.",
               "type": "string"
             },
             "argoLauncherImage": {
+              "description": "Launcher/Executor image used during pipeline execution.",
               "type": "string"
             },
             "artifactImage": {
@@ -54,15 +56,15 @@
               }
             },
             "artifactSignedURLExpirySeconds": {
-              "description": "The expiry time (seconds) for artifact download links when querying the dsp server via /apis/v2beta1/artifacts/{id}?share_url=true Default: 60",
+              "description": "The expiry time (seconds) for artifact download links when\nquerying the dsp server via /apis/v2beta1/artifacts/{id}?share_url=true\nDefault: 60",
               "type": "integer"
             },
             "autoUpdatePipelineDefaultVersion": {
-              "description": "Default: true Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: true\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             },
             "cABundle": {
-              "description": "If the Object store/DB is behind a TLS secured connection that is unrecognized by the host OpenShift/K8s cluster, then you can provide a PEM formatted CA bundle to be injected into the DSP server pod to trust this connection. CA Bundle should be provided as values within configmaps, mapped to keys.",
+              "description": "If the Object store/DB is behind a TLS secured connection that is\nunrecognized by the host OpenShift/K8s cluster, then you can\nprovide a PEM formatted CA bundle to be injected into the DSP\nserver pod to trust this connection. CA Bundle should be provided\nas values within configmaps, mapped to keys.",
               "type": "object",
               "required": [
                 "configMapKey",
@@ -70,7 +72,7 @@
               ],
               "properties": {
                 "configMapKey": {
-                  "description": "Key should map to a CA bundle. The key is also used to name the CA bundle file (e.g. ca-bundle.crt)",
+                  "description": "Key should map to a CA bundle. The key is also used to name\nthe CA bundle file (e.g. ca-bundle.crt)",
                   "type": "string"
                 },
                 "configMapName": {
@@ -79,11 +81,11 @@
               }
             },
             "caBundleFileMountPath": {
-              "description": "This is the path where the ca bundle will be mounted in the pipeline server and user executor pods",
+              "description": "This is the path where the ca bundle will be mounted in the\npipeline server and user executor pods",
               "type": "string"
             },
             "caBundleFileName": {
-              "description": "This is the filename of the ca bundle that will be created in the pipeline server and user executor pods",
+              "description": "This is the filename of the ca bundle that will be created in the\npipeline server and user executor pods",
               "type": "string"
             },
             "cacheImage": {
@@ -91,15 +93,15 @@
               "type": "string"
             },
             "collectMetrics": {
-              "description": "Default: true Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: true\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             },
             "customKfpLauncherConfigMap": {
-              "description": "When specified, the `data` contents of the `kfp-launcher` ConfigMap that DSPO writes will be fully replaced with the `data` contents of the ConfigMap specified here. This allows the user to fully replace the `data` contents of the kfp-launcher ConfigMap. The `kfp-launcher` component requires a ConfigMap to exist in the namespace where it runs (i.e. the namespace where pipelines run). This ConfigMap contains object storage configuration, as well as pipeline root (object store root path where artifacts will be uploaded) configuration. Currently this ConfigMap *must* be named \"kfp-launcher\". We currently deploy a default copy of the kfp-launcher ConfigMap via DSPO, but a user may want to provide their own ConfigMap configuration, so that they can specify multiple object storage sources and paths.",
+              "description": "When specified, the `data` contents of the `kfp-launcher` ConfigMap that DSPO writes\nwill be fully replaced with the `data` contents of the ConfigMap specified here.\nThis allows the user to fully replace the `data` contents of the kfp-launcher ConfigMap.\nThe `kfp-launcher` component requires a ConfigMap to exist in the namespace\nwhere it runs (i.e. the namespace where pipelines run). This ConfigMap contains\nobject storage configuration, as well as pipeline root (object store root path\nwhere artifacts will be uploaded) configuration. Currently this ConfigMap *must*\nbe named \"kfp-launcher\". We currently deploy a default copy of the kfp-launcher\nConfigMap via DSPO, but a user may want to provide their own ConfigMap configuration,\nso that they can specify multiple object storage sources and paths.",
               "type": "string"
             },
             "customServerConfigMap": {
-              "description": "CustomServerConfig is a custom config file that you can provide for the api server to use instead.",
+              "description": "CustomServerConfig is a custom config file that you can provide\nfor the api server to use instead.",
               "type": "object",
               "properties": {
                 "key": {
@@ -111,7 +113,7 @@
               }
             },
             "dbConfigConMaxLifetimeSec": {
-              "description": "Default: 120 Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: 120\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "integer"
             },
             "deploy": {
@@ -123,19 +125,72 @@
               "type": "boolean"
             },
             "enableSamplePipeline": {
-              "description": "Include sample pipelines with the deployment of this DSP API Server. Default: true",
+              "description": "Include the Iris sample pipeline with the deployment of this DSP API Server. Default: true",
               "type": "boolean"
             },
             "image": {
               "description": "Specify a custom image for DSP API Server.",
               "type": "string"
             },
+            "initResources": {
+              "description": "Specify init container resource requirements. The init container\nis used to build managed-pipelines and store them in a shared volume.",
+              "type": "object",
+              "properties": {
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": {
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    },
+                    "memory": {
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "requests": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": {
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    },
+                    "memory": {
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                }
+              }
+            },
             "injectDefaultScript": {
-              "description": "Inject the archive step script. Default: true Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Inject the archive step script. Default: true\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             },
+            "managedPipelines": {
+              "description": "Enable various managed pipelines on this DSP API server.",
+              "type": "object",
+              "properties": {
+                "instructLab": {
+                  "description": "Configures whether to automatically import the InstructLab pipeline.\nYou must enable the trainingoperator component to run the InstructLab pipeline.",
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "description": "Set to one of the following values:\n\n- \"Managed\" : This pipeline is automatically imported.\n- \"Removed\" : This pipeline is not automatically imported. If previously set to \"Managed\", setting to \"Removed\" does not remove existing managed pipelines but does prevent future updates from being imported.\t//",
+                      "type": "string",
+                      "pattern": "^(Managed|Removed)$",
+                      "enum": [
+                        "Managed",
+                        "Removed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
             "moveResultsImage": {
-              "description": "Image used for internal artifact passing handling within Tekton taskruns. This field specifies the image used in the 'move-all-results-to-tekton-home' step. Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Image used for internal artifact passing handling within Tekton taskruns. This field specifies the image used in the 'move-all-results-to-tekton-home' step.\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "string"
             },
             "resources": {
@@ -170,12 +225,20 @@
                 }
               }
             },
+            "rhelAIImage": {
+              "description": "RhelAI image used for ilab tasks in managed pipelines.",
+              "type": "string"
+            },
+            "runtimeGenericImage": {
+              "description": "Generic runtime image used for building managed pipelines during\napi server init, and for basic runtime operations.",
+              "type": "string"
+            },
             "stripEOF": {
-              "description": "Default: true Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: true\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             },
             "terminateStatus": {
-              "description": "Default: \"Cancelled\" - Allowed Values: \"Cancelled\", \"StoppedRunFinally\", \"CancelledRunFinally\" Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: \"Cancelled\" - Allowed Values: \"Cancelled\", \"StoppedRunFinally\", \"CancelledRunFinally\"\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "string",
               "enum": [
                 "Cancelled",
@@ -183,8 +246,12 @@
                 "CancelledRunFinally"
               ]
             },
+            "toolboxImage": {
+              "description": "Toolbox image used for basic container spec runtime operations\nin managed pipelines.",
+              "type": "string"
+            },
             "trackArtifacts": {
-              "description": "Default: true Deprecated: DSP V1 only, will be removed in the future.",
+              "description": "Default: true\nDeprecated: DSP V1 only, will be removed in the future.",
               "type": "boolean"
             }
           }
@@ -194,7 +261,7 @@
           "type": "object",
           "properties": {
             "customExtraParams": {
-              "description": "CustomExtraParams allow users to further customize the sql dsn parameters used by the Pipeline Server when opening a connection with the Database. ref: https://github.com/go-sql-driver/mysql?tab=readme-ov-file#dsn-data-source-name \n Value must be a JSON string. For example, to disable tls for Pipeline Server DB connection the user can provide a string: {\"tls\":\"true\"} \n If updating post DSPA deployment, then a manual restart of the pipeline server pod will be required so the new configmap may be consumed.",
+              "description": "CustomExtraParams allow users to further customize the sql dsn parameters used by the Pipeline Server\nwhen opening a connection with the Database.\nref: https://github.com/go-sql-driver/mysql?tab=readme-ov-file#dsn-data-source-name\n\nValue must be a JSON string. For example, to disable tls for Pipeline Server DB connection\nthe user can provide a string: {\"tls\":\"true\"}\n\nIf updating post DSPA deployment, then a manual restart of the pipeline server pod will be required\nso the new configmap may be consumed.",
               "type": "string"
             },
             "disableHealthCheck": {
@@ -341,7 +408,7 @@
                   "type": "string"
                 },
                 "resources": {
-                  "description": "ResourceRequirements structures compute resource requirements. Replaces ResourceRequirements from corev1 which also includes optional storage field. We handle storage field separately, and should not include it as a subfield for Resources.",
+                  "description": "ResourceRequirements structures compute resource requirements.\nReplaces ResourceRequirements from corev1 which also includes optional storage field.\nWe handle storage field separately, and should not include it as a subfield for Resources.",
                   "type": "object",
                   "properties": {
                     "limits": {
@@ -384,7 +451,7 @@
                   "type": "string"
                 },
                 "resources": {
-                  "description": "ResourceRequirements structures compute resource requirements. Replaces ResourceRequirements from corev1 which also includes optional storage field. We handle storage field separately, and should not include it as a subfield for Resources.",
+                  "description": "ResourceRequirements structures compute resource requirements.\nReplaces ResourceRequirements from corev1 which also includes optional storage field.\nWe handle storage field separately, and should not include it as a subfield for Resources.",
                   "type": "object",
                   "properties": {
                     "limits": {
@@ -428,7 +495,7 @@
                   "type": "string"
                 },
                 "resources": {
-                  "description": "ResourceRequirements structures compute resource requirements. Replaces ResourceRequirements from corev1 which also includes optional storage field. We handle storage field separately, and should not include it as a subfield for Resources.",
+                  "description": "ResourceRequirements structures compute resource requirements.\nReplaces ResourceRequirements from corev1 which also includes optional storage field.\nWe handle storage field separately, and should not include it as a subfield for Resources.",
                   "type": "object",
                   "properties": {
                     "limits": {
@@ -856,7 +923,7 @@
         "conditions": {
           "type": "array",
           "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, \n type FooStatus struct{ // Represents the observations of a foo's current state. // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge // +listType=map // +listMapKey=type Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }",
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
             "type": "object",
             "required": [
               "lastTransitionTime",
@@ -867,23 +934,23 @@
             ],
             "properties": {
               "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
                 "type": "string",
                 "format": "date-time"
               },
               "message": {
-                "description": "message is a human readable message indicating details about the transition. This may be an empty string.",
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
                 "type": "string",
                 "maxLength": 32768
               },
               "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.",
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
                 "type": "integer",
                 "format": "int64",
                 "minimum": 0
               },
               "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.",
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
                 "type": "string",
                 "maxLength": 1024,
                 "minLength": 1,
@@ -899,7 +966,7 @@
                 ]
               },
               "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase. --- Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be useful (see .node.status.conditions), the ability to deconflict is important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
                 "type": "string",
                 "maxLength": 316,
                 "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"

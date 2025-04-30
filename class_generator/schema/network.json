@@ -348,6 +348,21 @@
                   "description": "ipsecConfig enables and configures IPsec for pods on the pod network within the\ncluster.",
                   "type": "object",
                   "properties": {
+                    "full": {
+                      "description": "full defines configuration parameters for the IPsec `Full` mode.\nThis is permitted only when mode is configured with `Full`,\nand forbidden otherwise.",
+                      "type": "object",
+                      "minProperties": 1,
+                      "properties": {
+                        "encapsulation": {
+                          "description": "encapsulation option to configure libreswan on how inter-pod traffic across nodes\nare encapsulated to handle NAT traversal. When configured it uses UDP port 4500\nfor the encapsulation.\nValid values are Always, Auto and omitted.\nAlways means enable UDP encapsulation regardless of whether NAT is detected.\nAuto means enable UDP encapsulation based on the detection of NAT.\nWhen omitted, this means no opinion and the platform is left to choose a reasonable\ndefault, which is subject to change over time. The current default is Auto.",
+                          "type": "string",
+                          "enum": [
+                            "Always",
+                            "Auto"
+                          ]
+                        }
+                      }
+                    },
                     "mode": {
                       "description": "mode defines the behaviour of the ipsec configuration within the platform.\nValid values are `Disabled`, `External` and `Full`.\nWhen 'Disabled', ipsec will not be enabled at the node level.\nWhen 'External', ipsec is enabled on the node level but requires the user to configure the secure communication parameters.\nThis mode is for external secure communications and the configuration can be done using the k8s-nmstate operator.\nWhen 'Full', ipsec is configured on the node level and inter-pod secure communication within the cluster is configured.\nNote with `Full`, if ipsec is desired for communication with external (to the cluster) entities (such as storage arrays),\nthis is left to the user to configure.",
                       "type": "string",
@@ -362,6 +377,10 @@
                     {
                       "message": "ipsecConfig.mode is required",
                       "rule": "self == oldSelf || has(self.mode)"
+                    },
+                    {
+                      "message": "full is forbidden when mode is not Full",
+                      "rule": "has(self.mode) && self.mode == 'Full' ?  true : !has(self.full)"
                     }
                   ]
                 },
@@ -414,7 +433,7 @@
                   "type": "object",
                   "properties": {
                     "internalJoinSubnet": {
-                      "description": "internalJoinSubnet is a v6 subnet used internally by ovn-kubernetes in case the\ndefault one is being already used by something else. It must not overlap with\nany other subnet being used by OpenShift or by the node network. The size of the\nsubnet must be larger than the number of nodes. The value cannot be changed\nafter installation.\nThe subnet must be large enough to accomadate one IP per node in your cluster\nThe current default value is fd98::/48\nThe value must be in proper IPV6 CIDR format\nNote that IPV6 dual addresses are not permitted",
+                      "description": "internalJoinSubnet is a v6 subnet used internally by ovn-kubernetes in case the\ndefault one is being already used by something else. It must not overlap with\nany other subnet being used by OpenShift or by the node network. The size of the\nsubnet must be larger than the number of nodes. The value cannot be changed\nafter installation.\nThe subnet must be large enough to accomadate one IP per node in your cluster\nThe current default value is fd98::/64\nThe value must be in proper IPV6 CIDR format\nNote that IPV6 dual addresses are not permitted",
                       "type": "string",
                       "maxLength": 48,
                       "x-kubernetes-validations": [
@@ -488,7 +507,7 @@
                   "type": "string"
                 },
                 "v6InternalSubnet": {
-                  "description": "v6InternalSubnet is a v6 subnet used internally by ovn-kubernetes in case the\ndefault one is being already used by something else. It must not overlap with\nany other subnet being used by OpenShift or by the node network. The size of the\nsubnet must be larger than the number of nodes. The value cannot be changed\nafter installation.\nDefault is fd98::/48",
+                  "description": "v6InternalSubnet is a v6 subnet used internally by ovn-kubernetes in case the\ndefault one is being already used by something else. It must not overlap with\nany other subnet being used by OpenShift or by the node network. The size of the\nsubnet must be larger than the number of nodes. The value cannot be changed\nafter installation.\nDefault is fd98::/64",
                   "type": "string"
                 }
               }
@@ -504,7 +523,7 @@
           "type": "boolean"
         },
         "disableMultiNetwork": {
-          "description": "disableMultiNetwork specifies whether or not multiple pod network\nsupport should be disabled. If unset, this property defaults to\n'false' and multiple network support is enabled.",
+          "description": "disableMultiNetwork defaults to 'false' and this setting enables the pod multi-networking capability.\ndisableMultiNetwork when set to 'true' at cluster install time does not install the components, typically the Multus CNI and the network-attachment-definition CRD,\nthat enable the pod multi-networking capability. Setting the parameter to 'true' might be useful when you need install third-party CNI plugins,\nbut these plugins are not supported by Red Hat. Changing the parameter value as a postinstallation cluster task has no effect.",
           "type": "boolean"
         },
         "disableNetworkDiagnostics": {
