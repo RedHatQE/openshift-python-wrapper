@@ -19,7 +19,7 @@
       "type": "object",
       "properties": {
         "nodeLabels": {
-          "description": "nodeLabels are labels that associate the ResourceFlavor with Nodes that\nhave the same labels.\nWhen a Workload is admitted, its podsets can only get assigned\nResourceFlavors whose nodeLabels match the nodeSelector and nodeAffinity\nfields.\nOnce a ResourceFlavor is assigned to a podSet, the ResourceFlavor's\nnodeLabels should be injected into the pods of the Workload by the\ncontroller that integrates with the Workload object.\n\n\nnodeLabels can be up to 8 elements.",
+          "description": "nodeLabels are labels that associate the ResourceFlavor with Nodes that\nhave the same labels.\nWhen a Workload is admitted, its podsets can only get assigned\nResourceFlavors whose nodeLabels match the nodeSelector and nodeAffinity\nfields.\nOnce a ResourceFlavor is assigned to a podSet, the ResourceFlavor's\nnodeLabels should be injected into the pods of the Workload by the\ncontroller that integrates with the Workload object.\n\nnodeLabels can be up to 8 elements.",
           "type": "object",
           "maxProperties": 8,
           "additionalProperties": {
@@ -28,7 +28,7 @@
           "x-kubernetes-map-type": "atomic"
         },
         "nodeTaints": {
-          "description": "nodeTaints are taints that the nodes associated with this ResourceFlavor\nhave.\nWorkloads' podsets must have tolerations for these nodeTaints in order to\nget assigned this ResourceFlavor during admission.\n\n\nAn example of a nodeTaint is\ncloud.provider.com/preemptible=\"true\":NoSchedule\n\n\nnodeTaints can be up to 8 elements.",
+          "description": "nodeTaints are taints that the nodes associated with this ResourceFlavor\nhave.\nWorkloads' podsets must have tolerations for these nodeTaints in order to\nget assigned this ResourceFlavor during admission.\n\nAn example of a nodeTaint is\ncloud.provider.com/preemptible=\"true\":NoSchedule\n\nnodeTaints can be up to 8 elements.",
           "type": "array",
           "maxItems": 8,
           "items": {
@@ -67,7 +67,7 @@
           ]
         },
         "tolerations": {
-          "description": "tolerations are extra tolerations that will be added to the pods admitted in\nthe quota associated with this resource flavor.\n\n\nAn example of a toleration is\ncloud.provider.com/preemptible=\"true\":NoSchedule\n\n\ntolerations can be up to 8 elements.",
+          "description": "tolerations are extra tolerations that will be added to the pods admitted in\nthe quota associated with this resource flavor.\n\nAn example of a toleration is\ncloud.provider.com/preemptible=\"true\":NoSchedule\n\ntolerations can be up to 8 elements.",
           "type": "array",
           "maxItems": 8,
           "items": {
@@ -120,8 +120,24 @@
               "rule": "self.all(x, !has(x.effect) || x.effect in ['NoSchedule', 'PreferNoSchedule', 'NoExecute'])"
             }
           ]
+        },
+        "topologyName": {
+          "description": "topologyName indicates topology for the TAS ResourceFlavor.\nWhen specified, it enables scraping of the topology information from the\nnodes matching to the Resource Flavor node labels.",
+          "type": "string",
+          "maxLength": 253,
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
         }
-      }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "at least one nodeLabel is required when topology is set",
+          "rule": "!has(self.topologyName) || self.nodeLabels.size() >= 1"
+        },
+        {
+          "message": "resourceFlavorSpec are immutable when topologyName is set",
+          "rule": "!has(oldSelf.topologyName) || self == oldSelf"
+        }
+      ]
     }
   },
   "x-kubernetes-group-version-kind": [

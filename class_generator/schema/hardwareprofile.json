@@ -44,7 +44,6 @@
               "displayName",
               "identifier",
               "minCount",
-              "maxCount",
               "defaultCount"
             ],
             "properties": {
@@ -69,31 +68,23 @@
                 "x-kubernetes-int-or-string": true
               },
               "resourceType": {
-                "description": "The type of identifier. could be \"CPU\" or \"Memory\". Leave it undefined for the other types.",
+                "description": "The type of identifier. could be \"CPU\", \"Memory\", or \"Accelerator\". Leave it undefined for the other types.",
                 "type": "string",
                 "enum": [
                   "CPU",
-                  "Memory"
+                  "Memory",
+                  "Accelerator"
                 ]
               }
             }
           }
         },
-        "nodeSelectors": {
-          "description": "Number of node selector available.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "description": "The key for the node selector.",
-                "type": "string"
-              },
-              "value": {
-                "description": "The value for the node selector.",
-                "type": "string"
-              }
-            }
+        "nodeSelector": {
+          "description": "The node selector available.",
+          "type": "object",
+          "additionalProperties": {
+            "description": "The value for the node selector key.",
+            "type": "string"
           }
         },
         "tolerations": {
@@ -138,5 +129,6 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "$schema": "http://json-schema.org/schema#"
 }

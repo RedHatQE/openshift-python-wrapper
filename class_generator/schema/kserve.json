@@ -68,6 +68,15 @@
             }
           }
         },
+        "rawDeploymentServiceConfig": {
+          "description": "Configures the type of service that is created for InferenceServices using RawDeployment.\nThe values for RawDeploymentServiceConfig can be \"Headless\" or \"Headed\".\nHeadless : sets \"ServiceClusterIPNone = true\" in the 'inferenceservice-config' configmap for Kserve.\nHeaded : sets \"ServiceClusterIPNone = false\" in the 'inferenceservice-config' configmap for Kserve.",
+          "type": "string",
+          "pattern": "^(Headless|Headed)$",
+          "enum": [
+            "Headless",
+            "Headed"
+          ]
+        },
         "serving": {
           "description": "Serving configures the KNative-Serving stack used for model serving. A Service\nMesh (Istio) is prerequisite, since it is used as networking layer.",
           "type": "object",
@@ -125,38 +134,39 @@
         "conditions": {
           "type": "array",
           "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.",
             "type": "object",
             "required": [
-              "lastTransitionTime",
-              "message",
-              "reason",
               "status",
               "type"
             ],
             "properties": {
+              "lastHeartbeatTime": {
+                "description": "The last time we got an update on a given condition, this should not be set and is\npresent only for backward compatibility reasons",
+                "type": "string",
+                "format": "date-time"
+              },
               "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.\nIf that is not known, then using the time when the API field changed is acceptable.",
                 "type": "string",
                 "format": "date-time"
               },
               "message": {
-                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
-                "type": "string",
-                "maxLength": 32768
+                "description": "message is a human-readable message indicating details about the transition.",
+                "type": "string"
               },
               "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration\nis 9, the condition is out of date with respect to the current state of the instance.",
                 "type": "integer",
                 "format": "int64",
                 "minimum": 0
               },
               "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
-                "type": "string",
-                "maxLength": 1024,
-                "minLength": 1,
-                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nThe value should be a CamelCase string.",
+                "type": "string"
+              },
+              "severity": {
+                "description": "Severity with which to treat failures of this type of condition.\nWhen this is not specified, it defaults to Error.",
+                "type": "string"
               },
               "status": {
                 "description": "status of the condition, one of True, False, Unknown.",
@@ -175,21 +185,44 @@
               }
             }
           },
-          "x-kubernetes-list-map-keys": [
-            "type"
-          ],
-          "x-kubernetes-list-type": "map"
+          "x-kubernetes-list-type": "atomic"
         },
         "defaultDeploymentMode": {
           "description": "DefaultDeploymentMode is the value of the defaultDeploymentMode field\nas read from the \"deploy\" JSON in the inferenceservice-config ConfigMap",
           "type": "string"
         },
         "observedGeneration": {
+          "description": "The generation observed by the resource controller.",
           "type": "integer",
           "format": "int64"
         },
         "phase": {
           "type": "string"
+        },
+        "releases": {
+          "type": "array",
+          "items": {
+            "description": "ComponentRelease represents the detailed status of a component release.",
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "repoUrl": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
         },
         "serverlessMode": {
           "type": "string",
@@ -205,6 +238,7 @@
       "version": "v1alpha1"
     }
   ],
+  "x-kubernetes-selectable-fields": [],
   "x-kubernetes-validations": [
     {
       "message": "Kserve name must be default-kserve",
