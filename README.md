@@ -107,8 +107,6 @@ export HTTPS_PROXY="http://proxy.example.com:8080"
 export HTTP_PROXY="http://proxy.example.com:8080"
 ```
 
-If neither variable is set when proxy is enabled, a `ValueError` will be raised.
-
 ## Code check
 
 We use pre-commit for code check.
