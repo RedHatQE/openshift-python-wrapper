@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import pytest
 import yaml
 from docker.errors import DockerException
-import kubernetes
 from testcontainers.k3s import K3SContainer
 
 from ocp_resources.exceptions import ResourceTeardownError
@@ -19,13 +20,18 @@ class SecretTestExit(Secret):
         return False
 
 
-@pytest.fixture(scope="session")
-def client():
+@pytest.fixture(scope="class")
+def k3scontainer_config():
     try:
         with K3SContainer() as k3s:
-            yield get_client(config_dict=yaml.safe_load(k3s.config_yaml()))
-    except DockerException:
-        pytest.skip("K3S container not available")
+            yield yaml.safe_load(k3s.config_yaml())
+    except DockerException as ex:
+        pytest.skip(f"K3S container not available. {ex}")
+
+
+@pytest.fixture(scope="class")
+def client(k3scontainer_config):
+    yield get_client(config_dict=k3scontainer_config)
 
 
 @pytest.fixture(scope="class")
@@ -109,25 +115,21 @@ class TestResource:
             with SecretTestExit(name="test-context-manager-exit", namespace="default", client=client):
                 pass
 
-    def test_proxy_enabled_but_no_proxy_set(self, monkeypatch):
-        monkeypatch.setenv(name="OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY", value="1")
 
-        with pytest.raises(
-            ValueError,
-            match="Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set.",
-        ):
-            get_client()
+class TestClient:
+    def test_client_with_proxy(self, monkeypatch, k3scontainer_config):
+        http_proxy = "http://env-http-proxy.com"
+        monkeypatch.setenv(name="HTTPS_PROXY", value=http_proxy)
 
-    def test_proxy_conflict_raises_value_error(self, monkeypatch):
-        monkeypatch.setenv(name="OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY", value="1")
-        monkeypatch.setenv(name="HTTPS_PROXY", value="http://env-proxy.com")
+        client = get_client(config_dict=k3scontainer_config)
+        assert client.configuration.proxy == http_proxy
 
-        client_configuration = kubernetes.client.Configuration()
-        client_configuration.proxy = "http://not-env-proxy.com"
+    def test_proxy_precedence(self, monkeypatch, k3scontainer_config):
+        https_proxy = "https://env-https-proxy.com"
+        http_proxy = "http://env-http-proxy.com"
+        monkeypatch.setenv(name="HTTPS_PROXY", value=https_proxy)
+        monkeypatch.setenv(name="HTTP_PROXY", value=http_proxy)
 
-        with pytest.raises(
-            ValueError,
-            match="Conflicting proxy settings: client_configuration.proxy=http://not-env-proxy.com, "
-            "but the environment variable 'HTTPS_PROXY/HTTP_PROXY' defines proxy as http://env-proxy.com.",
-        ):
-            get_client(client_configuration=client_configuration)
+        client = get_client(config_dict=k3scontainer_config)
+        # Verify HTTPS_PROXY takes precedence over HTTP_PROXY
+        assert client.configuration.proxy == https_proxy
