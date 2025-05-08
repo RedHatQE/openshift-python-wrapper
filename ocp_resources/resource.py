@@ -77,10 +77,13 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str = "",
+    config_file: str | None = None,
     config_dict: dict[str, Any] | None = None,
-    context: str = "",
-    **kwargs: Any,
+    context: str | None = None,
+    client_configuration: kubernetes.client.Configuration | None = None,
+    persist_config: bool = True,
+    temp_file_path: str | None = None,
+    try_refresh_token: bool = True,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -97,24 +100,21 @@ def get_client(
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
         context (str): name of the context to use.
+        persist_config (bool): whether to persist config file.
+        temp_file_path (str): path to a temporary kubeconfig file.
+        try_refresh_token (bool): try to refresh token
 
     Returns:
         DynamicClient: a kubernetes client.
     """
-    client_configuration = kwargs.get("client_configuration", kubernetes.client.Configuration())
-
-    # If the proxy is not set, set it from the environment
-    if not client_configuration.proxy:
-        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
-        if proxy:
-            client_configuration.proxy = proxy
-
-    kwargs["client_configuration"] = client_configuration
-
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
         _client = kubernetes.config.new_client_from_config_dict(
-            config_dict=config_dict, context=context or None, **kwargs
+            config_dict=config_dict,
+            context=context,
+            client_configuration=client_configuration,
+            persist_config=persist_config,
+            temp_file_path=temp_file_path,
         )
     else:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
@@ -127,9 +127,16 @@ def get_client(
 
         _client = kubernetes.config.new_client_from_config(
             config_file=config_file,
-            context=context or None,
-            **kwargs,
+            context=context,
+            client_configuration=client_configuration,
+            persist_config=persist_config,
         )
+
+    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+
+    if not _client.configuration.proxy and proxy:
+        LOGGER.info(f"Setting proxy from environment variable: {proxy}")
+        _client.configuration.proxy = proxy
 
     try:
         return kubernetes.dynamic.DynamicClient(client=_client)
@@ -138,9 +145,8 @@ def get_client(
         LOGGER.info("Trying to get client via incluster_config")
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.incluster_config.load_incluster_config(
-                client_configuration=client_configuration,
-                try_refresh_token=kwargs.get("try_refresh_token", True),
-            )
+                client_configuration=client_configuration, try_refresh_token=try_refresh_token
+            ),
         )
 
 

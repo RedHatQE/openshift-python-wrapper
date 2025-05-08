@@ -1,7 +1,6 @@
 import pytest
 import yaml
 from docker.errors import DockerException
-from kubernetes.config.config_exception import ConfigException
 from testcontainers.k3s import K3SContainer
 
 from ocp_resources.exceptions import ResourceTeardownError
@@ -119,5 +118,5 @@ def test_client_with_proxy(monkeypatch, k3scontainer_config):
     proxy = "http://env-proxy.com"
     monkeypatch.setenv(name="HTTPS_PROXY", value=proxy)
 
-    with pytest.raises(ConfigException, match=r"Service host/port is not set."):
-        get_client(config_dict=k3scontainer_config)
+    client = get_client(config_dict=k3scontainer_config)
+    assert client.configuration.proxy == proxy
