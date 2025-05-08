@@ -116,9 +116,20 @@ class TestResource:
                 pass
 
 
-def test_client_with_proxy(monkeypatch, k3scontainer_config):
-    proxy = "http://env-proxy.com"
-    monkeypatch.setenv(name="HTTPS_PROXY", value=proxy)
+class TestClient:
+    def test_client_with_proxy(self, monkeypatch, k3scontainer_config):
+        http_proxy = "http://env-http-proxy.com"
+        monkeypatch.setenv(name="HTTPS_PROXY", value=http_proxy)
 
-    client = get_client(config_dict=k3scontainer_config)
-    assert client.configuration.proxy == proxy
+        client = get_client(config_dict=k3scontainer_config)
+        assert client.configuration.proxy == http_proxy
+
+    def test_proxy_precedence(self, monkeypatch, k3scontainer_config):
+        https_proxy = "https://env-https-proxy.com"
+        http_proxy = "http://env-http-proxy.com"
+        monkeypatch.setenv(name="HTTPS_PROXY", value=https_proxy)
+        monkeypatch.setenv(name="HTTP_PROXY", value=http_proxy)
+
+        client = get_client(config_dict=k3scontainer_config)
+        # Verify HTTPS_PROXY takes precedence over HTTP_PROXY
+        assert client.configuration.proxy == https_proxy
