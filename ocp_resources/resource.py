@@ -107,6 +107,14 @@ def get_client(
     Returns:
         DynamicClient: a kubernetes client.
     """
+    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+
+    client_configuration = client_configuration or kubernetes.client.Configuration()
+
+    if not client_configuration.proxy and proxy:
+        LOGGER.info(f"Setting proxy from environment variable: {proxy}")
+        client_configuration.proxy = proxy
+
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
         _client = kubernetes.config.new_client_from_config_dict(
@@ -131,12 +139,6 @@ def get_client(
             client_configuration=client_configuration,
             persist_config=persist_config,
         )
-
-    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
-
-    if not _client.configuration.proxy and proxy:
-        LOGGER.info(f"Setting proxy from environment variable: {proxy}")
-        _client.configuration.proxy = proxy
 
     try:
         return kubernetes.dynamic.DynamicClient(client=_client)
