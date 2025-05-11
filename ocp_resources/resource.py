@@ -77,10 +77,13 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
 
 
 def get_client(
-    config_file: str = "",
+    config_file: str | None = None,
     config_dict: dict[str, Any] | None = None,
-    context: str = "",
-    **kwargs: Any,
+    context: str | None = None,
+    client_configuration: kubernetes.client.Configuration | None = None,
+    persist_config: bool = True,
+    temp_file_path: str | None = None,
+    try_refresh_token: bool = True,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -97,19 +100,31 @@ def get_client(
         config_file (str): path to a kubeconfig file.
         config_dict (dict): dict with kubeconfig configuration.
         context (str): name of the context to use.
+        persist_config (bool): whether to persist config file.
+        temp_file_path (str): path to a temporary kubeconfig file.
+        try_refresh_token (bool): try to refresh token
 
     Returns:
         DynamicClient: a kubernetes client.
     """
+    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+
+    client_configuration = client_configuration or kubernetes.client.Configuration()
+
+    if not client_configuration.proxy and proxy:
+        LOGGER.info(f"Setting proxy from environment variable: {proxy}")
+        client_configuration.proxy = proxy
+
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     if config_dict:
-        return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config_dict(
-                config_dict=config_dict, context=context or None, **kwargs
-            )
+        _client = kubernetes.config.new_client_from_config_dict(
+            config_dict=config_dict,
+            context=context,
+            client_configuration=client_configuration,
+            persist_config=persist_config,
+            temp_file_path=temp_file_path,
         )
-    client_configuration = kwargs.get("client_configuration", kubernetes.client.Configuration())
-    try:
+    else:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
         LOGGER.info("Trying to get client via new_client_from_config")
 
@@ -118,36 +133,22 @@ def get_client(
         # is populated during import which comes before setting the variable in code.
         config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
 
-        if os.environ.get("OPENSHIFT_PYTHON_WRAPPER_CLIENT_USE_PROXY"):
-            proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
-            if not proxy:
-                raise ValueError(
-                    "Proxy configuration is enabled but neither HTTPS_PROXY nor HTTP_PROXY environment variables are set."
-                )
-            if client_configuration.proxy and client_configuration.proxy != proxy:
-                raise ValueError(
-                    f"Conflicting proxy settings: client_configuration.proxy={client_configuration.proxy}, "
-                    f"but the environment variable 'HTTPS_PROXY/HTTP_PROXY' defines proxy as {proxy}."
-                )
-            client_configuration.proxy = proxy
-
-        kwargs["client_configuration"] = client_configuration
-
-        return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.new_client_from_config(
-                config_file=config_file,
-                context=context or None,
-                **kwargs,
-            )
+        _client = kubernetes.config.new_client_from_config(
+            config_file=config_file,
+            context=context,
+            client_configuration=client_configuration,
+            persist_config=persist_config,
         )
+
+    try:
+        return kubernetes.dynamic.DynamicClient(client=_client)
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
         LOGGER.info("Trying to get client via incluster_config")
         return kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.incluster_config.load_incluster_config(
-                client_configuration=client_configuration,
-                try_refresh_token=kwargs.get("try_refresh_token", True),
-            )
+                client_configuration=client_configuration, try_refresh_token=try_refresh_token
+            ),
         )
 
 
@@ -429,9 +430,9 @@ class Resource(ResourceConstants):
         dry_run: bool = False,
         node_selector: dict[str, Any] | None = None,
         node_selector_labels: dict[str, str] | None = None,
-        config_file: str = "",
+        config_file: str | None = None,
         config_dict: dict[str, Any] | None = None,
-        context: str = "",
+        context: str | None = None,
         label: dict[str, str] | None = None,
         annotations: dict[str, str] | None = None,
         api_group: str = "",
@@ -486,11 +487,6 @@ class Resource(ResourceConstants):
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
         self.config_file = config_file
-        if not isinstance(self.config_file, str):
-            # If we pass config_file which isn't a string, get_client will fail and it will be very hard to know why.
-            # Better fail here and let the user know.
-            raise ValueError("config_file must be a string")
-
         self.config_dict = config_dict or {}
         self.context = context
         self.label = label
@@ -967,10 +963,10 @@ class Resource(ResourceConstants):
     def get(
         cls,
         config_file: str = "",
-        context: str = "",
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
+        context: str | None = None,
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
@@ -1196,7 +1192,7 @@ class Resource(ResourceConstants):
     def get_all_cluster_resources(
         client: DynamicClient | None = None,
         config_file: str = "",
-        context: str = "",
+        context: str | None = None,
         config_dict: dict[str, Any] | None = None,
         *args: Any,
         **kwargs: Any,
@@ -1333,10 +1329,10 @@ class NamespacedResource(Resource):
     def get(
         cls,
         config_file: str = "",
-        context: str = "",
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
+        context: str | None = None,
         dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
