@@ -13,7 +13,7 @@
       "description": "List of authconfigs. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.kuadrant.authorino.v1beta2.AuthConfig"
+        "$ref": "_definitions.json#/definitions/io.kuadrant.authorino.v1beta3.AuthConfig"
       }
     },
     "kind": {
@@ -29,7 +29,7 @@
     {
       "group": "authorino.kuadrant.io",
       "kind": "AuthConfigList",
-      "version": "v1beta2"
+      "version": "v1beta3"
     }
   ],
   "x-kubernetes-selectable-fields": [],

@@ -18,13 +18,16 @@
       "type": "object",
       "properties": {
         "concurrency": {
-          "description": "The number of worker threads to run."
+          "description": "The number of worker threads to run.",
+          "format": "int32",
+          "minimum": 0
         },
         "environmentVariables": {
           "description": "Additional environment variables for the proxy.",
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 2048
           }
         },
         "image": {
@@ -44,9 +47,27 @@
             "matchLabels": {
               "description": "One or more labels that indicate a specific set of pods/VMs on which a policy should be applied.",
               "type": "object",
+              "maxProperties": 4096,
               "additionalProperties": {
-                "type": "string"
-              }
+                "type": "string",
+                "maxLength": 63,
+                "x-kubernetes-validations": [
+                  {
+                    "message": "wildcard not allowed in label value match",
+                    "rule": "!self.contains('*')"
+                  }
+                ]
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "wildcard not allowed in label key match",
+                  "rule": "self.all(key, !key.contains('*'))"
+                },
+                {
+                  "message": "key must not be empty",
+                  "rule": "self.all(key, key.size() != 0)"
+                }
+              ]
             }
           }
         }

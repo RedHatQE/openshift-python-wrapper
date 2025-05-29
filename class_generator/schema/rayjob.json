@@ -205,6 +205,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -638,6 +641,7 @@
                                     "items": {
                                       "type": "object",
                                       "required": [
+                                        "error",
                                         "port",
                                         "protocol"
                                       ],
@@ -1977,6 +1981,9 @@
                                       "properties": {
                                         "name": {
                                           "type": "string"
+                                        },
+                                        "request": {
+                                          "type": "string"
                                         }
                                       }
                                     },
@@ -2960,6 +2967,9 @@
                                       ],
                                       "properties": {
                                         "name": {
+                                          "type": "string"
+                                        },
+                                        "request": {
                                           "type": "string"
                                         }
                                       }
@@ -3964,6 +3974,9 @@
                                       "properties": {
                                         "name": {
                                           "type": "string"
+                                        },
+                                        "request": {
+                                          "type": "string"
                                         }
                                       }
                                     },
@@ -4357,16 +4370,11 @@
                               "name": {
                                 "type": "string"
                               },
-                              "source": {
-                                "type": "object",
-                                "properties": {
-                                  "resourceClaimName": {
-                                    "type": "string"
-                                  },
-                                  "resourceClaimTemplateName": {
-                                    "type": "string"
-                                  }
-                                }
+                              "resourceClaimName": {
+                                "type": "string"
+                              },
+                              "resourceClaimTemplateName": {
+                                "type": "string"
                               }
                             }
                           },
@@ -4374,6 +4382,46 @@
                             "name"
                           ],
                           "x-kubernetes-list-type": "map"
+                        },
+                        "resources": {
+                          "type": "object",
+                          "properties": {
+                            "claims": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "name"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "request": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "x-kubernetes-list-map-keys": [
+                                "name"
+                              ],
+                              "x-kubernetes-list-type": "map"
+                            },
+                            "limits": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                "x-kubernetes-int-or-string": true
+                              }
+                            },
+                            "requests": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                "x-kubernetes-int-or-string": true
+                              }
+                            }
+                          }
                         },
                         "restartPolicy": {
                           "type": "string"
@@ -4437,6 +4485,9 @@
                               "type": "integer",
                               "format": "int64"
                             },
+                            "seLinuxChangePolicy": {
+                              "type": "string"
+                            },
                             "seLinuxOptions": {
                               "type": "object",
                               "properties": {
@@ -4475,6 +4526,9 @@
                                 "format": "int64"
                               },
                               "x-kubernetes-list-type": "atomic"
+                            },
+                            "supplementalGroupsPolicy": {
+                              "type": "string"
                             },
                             "sysctls": {
                               "type": "array",
@@ -5223,6 +5277,17 @@
                                     "type": "string"
                                   },
                                   "type": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "image": {
+                                "type": "object",
+                                "properties": {
+                                  "pullPolicy": {
+                                    "type": "string"
+                                  },
+                                  "reference": {
                                     "type": "string"
                                   }
                                 }
@@ -7138,6 +7203,9 @@
                                         "properties": {
                                           "name": {
                                             "type": "string"
+                                          },
+                                          "request": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -8121,6 +8189,9 @@
                                         ],
                                         "properties": {
                                           "name": {
+                                            "type": "string"
+                                          },
+                                          "request": {
                                             "type": "string"
                                           }
                                         }
@@ -9125,6 +9196,9 @@
                                         "properties": {
                                           "name": {
                                             "type": "string"
+                                          },
+                                          "request": {
+                                            "type": "string"
                                           }
                                         }
                                       },
@@ -9518,16 +9592,11 @@
                                 "name": {
                                   "type": "string"
                                 },
-                                "source": {
-                                  "type": "object",
-                                  "properties": {
-                                    "resourceClaimName": {
-                                      "type": "string"
-                                    },
-                                    "resourceClaimTemplateName": {
-                                      "type": "string"
-                                    }
-                                  }
+                                "resourceClaimName": {
+                                  "type": "string"
+                                },
+                                "resourceClaimTemplateName": {
+                                  "type": "string"
                                 }
                               }
                             },
@@ -9535,6 +9604,46 @@
                               "name"
                             ],
                             "x-kubernetes-list-type": "map"
+                          },
+                          "resources": {
+                            "type": "object",
+                            "properties": {
+                              "claims": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "name"
+                                  ],
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "request": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "x-kubernetes-list-map-keys": [
+                                  "name"
+                                ],
+                                "x-kubernetes-list-type": "map"
+                              },
+                              "limits": {
+                                "type": "object",
+                                "additionalProperties": {
+                                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                  "x-kubernetes-int-or-string": true
+                                }
+                              },
+                              "requests": {
+                                "type": "object",
+                                "additionalProperties": {
+                                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                                  "x-kubernetes-int-or-string": true
+                                }
+                              }
+                            }
                           },
                           "restartPolicy": {
                             "type": "string"
@@ -9598,6 +9707,9 @@
                                 "type": "integer",
                                 "format": "int64"
                               },
+                              "seLinuxChangePolicy": {
+                                "type": "string"
+                              },
                               "seLinuxOptions": {
                                 "type": "object",
                                 "properties": {
@@ -9636,6 +9748,9 @@
                                   "format": "int64"
                                 },
                                 "x-kubernetes-list-type": "atomic"
+                              },
+                              "supplementalGroupsPolicy": {
+                                "type": "string"
                               },
                               "sysctls": {
                                 "type": "array",
@@ -10384,6 +10499,17 @@
                                       "type": "string"
                                     },
                                     "type": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "image": {
+                                  "type": "object",
+                                  "properties": {
+                                    "pullPolicy": {
+                                      "type": "string"
+                                    },
+                                    "reference": {
                                       "type": "string"
                                     }
                                   }
@@ -12252,6 +12378,9 @@
                               "properties": {
                                 "name": {
                                   "type": "string"
+                                },
+                                "request": {
+                                  "type": "string"
                                 }
                               }
                             },
@@ -13235,6 +13364,9 @@
                               ],
                               "properties": {
                                 "name": {
+                                  "type": "string"
+                                },
+                                "request": {
                                   "type": "string"
                                 }
                               }
@@ -14239,6 +14371,9 @@
                               "properties": {
                                 "name": {
                                   "type": "string"
+                                },
+                                "request": {
+                                  "type": "string"
                                 }
                               }
                             },
@@ -14632,16 +14767,11 @@
                       "name": {
                         "type": "string"
                       },
-                      "source": {
-                        "type": "object",
-                        "properties": {
-                          "resourceClaimName": {
-                            "type": "string"
-                          },
-                          "resourceClaimTemplateName": {
-                            "type": "string"
-                          }
-                        }
+                      "resourceClaimName": {
+                        "type": "string"
+                      },
+                      "resourceClaimTemplateName": {
+                        "type": "string"
                       }
                     }
                   },
@@ -14649,6 +14779,46 @@
                     "name"
                   ],
                   "x-kubernetes-list-type": "map"
+                },
+                "resources": {
+                  "type": "object",
+                  "properties": {
+                    "claims": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "x-kubernetes-list-map-keys": [
+                        "name"
+                      ],
+                      "x-kubernetes-list-type": "map"
+                    },
+                    "limits": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      }
+                    },
+                    "requests": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      }
+                    }
+                  }
                 },
                 "restartPolicy": {
                   "type": "string"
@@ -14712,6 +14882,9 @@
                       "type": "integer",
                       "format": "int64"
                     },
+                    "seLinuxChangePolicy": {
+                      "type": "string"
+                    },
                     "seLinuxOptions": {
                       "type": "object",
                       "properties": {
@@ -14750,6 +14923,9 @@
                         "format": "int64"
                       },
                       "x-kubernetes-list-type": "atomic"
+                    },
+                    "supplementalGroupsPolicy": {
+                      "type": "string"
                     },
                     "sysctls": {
                       "type": "array",
@@ -15498,6 +15674,17 @@
                             "type": "string"
                           },
                           "type": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "image": {
+                        "type": "object",
+                        "properties": {
+                          "pullPolicy": {
+                            "type": "string"
+                          },
+                          "reference": {
                             "type": "string"
                           }
                         }

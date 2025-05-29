@@ -84,7 +84,7 @@
                           "type": "string"
                         },
                         "regex": {
-                          "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                          "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                           "type": "string"
                         }
                       }
@@ -99,7 +99,22 @@
                   },
                   "maxAge": {
                     "description": "Specifies how long the results of a preflight request can be cached.",
-                    "type": "string"
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "must be a valid duration greater than 1ms",
+                        "rule": "duration(self) >= duration('1ms')"
+                      }
+                    ]
+                  },
+                  "unmatchedPreflights": {
+                    "description": "Indicates whether preflight requests not matching the configured allowed origin shouldn't be forwarded to the upstream.\n\nValid Options: FORWARD, IGNORE",
+                    "type": "string",
+                    "enum": [
+                      "UNSPECIFIED",
+                      "FORWARD",
+                      "IGNORE"
+                    ]
                   }
                 }
               },
@@ -140,7 +155,9 @@
                   },
                   "status": {
                     "description": "Specifies the HTTP response status to be returned.",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   }
                 }
               },
@@ -181,11 +198,23 @@
                     "type": "object",
                     "properties": {
                       "exponentialDelay": {
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "fixedDelay": {
                         "description": "Add a fixed delay before forwarding the request.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "percent": {
                         "description": "Percentage of requests on which the delay will be injected (0-100).",
@@ -264,7 +293,7 @@
                   "type": "object",
                   "properties": {
                     "authority": {
-                      "description": "HTTP Authority values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                      "description": "HTTP Authority values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for [RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                       "type": "object",
                       "properties": {
                         "exact": {
@@ -274,7 +303,7 @@
                           "type": "string"
                         },
                         "regex": {
-                          "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                          "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                           "type": "string"
                         }
                       }
@@ -299,7 +328,7 @@
                             "type": "string"
                           },
                           "regex": {
-                            "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                            "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                             "type": "string"
                           }
                         }
@@ -310,7 +339,7 @@
                       "type": "boolean"
                     },
                     "method": {
-                      "description": "HTTP Method values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                      "description": "HTTP Method values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for [RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                       "type": "object",
                       "properties": {
                         "exact": {
@@ -320,7 +349,7 @@
                           "type": "string"
                         },
                         "regex": {
-                          "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                          "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                           "type": "string"
                         }
                       }
@@ -331,7 +360,9 @@
                     },
                     "port": {
                       "description": "Specifies the ports on the host that is being addressed.",
-                      "type": "integer"
+                      "type": "integer",
+                      "maximum": 4294967295,
+                      "minimum": 0
                     },
                     "queryParams": {
                       "description": "Query parameters for matching.",
@@ -346,14 +377,14 @@
                             "type": "string"
                           },
                           "regex": {
-                            "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                            "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                             "type": "string"
                           }
                         }
                       }
                     },
                     "scheme": {
-                      "description": "URI Scheme values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                      "description": "URI Scheme values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for [RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                       "type": "object",
                       "properties": {
                         "exact": {
@@ -363,7 +394,7 @@
                           "type": "string"
                         },
                         "regex": {
-                          "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                          "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                           "type": "string"
                         }
                       }
@@ -384,7 +415,7 @@
                       "type": "string"
                     },
                     "uri": {
-                      "description": "URI to match values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                      "description": "URI to match values are case-sensitive and formatted as follows: - `exact: \"value\"` for exact string match - `prefix: \"value\"` for prefix-based match - `regex: \"value\"` for [RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                       "type": "object",
                       "properties": {
                         "exact": {
@@ -394,7 +425,7 @@
                           "type": "string"
                         },
                         "regex": {
-                          "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                          "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                           "type": "string"
                         }
                       }
@@ -412,7 +443,7 @@
                             "type": "string"
                           },
                           "regex": {
-                            "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                            "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                             "type": "string"
                           }
                         }
@@ -437,7 +468,9 @@
                     "type": "object",
                     "properties": {
                       "number": {
-                        "type": "integer"
+                        "type": "integer",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       }
                     }
                   },
@@ -447,7 +480,10 @@
                   }
                 }
               },
-              "mirrorPercent": {},
+              "mirrorPercent": {
+                "maximum": 4294967295,
+                "minimum": 0
+              },
               "mirrorPercentage": {
                 "description": "Percentage of the traffic to be mirrored by the `mirror` field.",
                 "type": "object",
@@ -458,7 +494,10 @@
                   }
                 }
               },
-              "mirror_percent": {},
+              "mirror_percent": {
+                "maximum": 4294967295,
+                "minimum": 0
+              },
               "mirrors": {
                 "description": "Specifies the destinations to mirror HTTP traffic in addition to the original destination.",
                 "type": "array",
@@ -484,7 +523,9 @@
                           "type": "object",
                           "properties": {
                             "number": {
-                              "type": "integer"
+                              "type": "integer",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             }
                           }
                         },
@@ -520,7 +561,7 @@
                     "type": "string"
                   },
                   "derivePort": {
-                    "description": "On a redirect, dynamically set the port: * FROM_PROTOCOL_DEFAULT: automatically set to 80 for HTTP and 443 for HTTPS.",
+                    "description": "On a redirect, dynamically set the port: * FROM_PROTOCOL_DEFAULT: automatically set to 80 for HTTP and 443 for HTTPS.\n\nValid Options: FROM_PROTOCOL_DEFAULT, FROM_REQUEST_PORT",
                     "type": "string",
                     "enum": [
                       "FROM_PROTOCOL_DEFAULT",
@@ -529,11 +570,15 @@
                   },
                   "port": {
                     "description": "On a redirect, overwrite the port portion of the URL with this value.",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   },
                   "redirectCode": {
                     "description": "On a redirect, Specifies the HTTP status code to use in the redirect response.",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   },
                   "scheme": {
                     "description": "On a redirect, overwrite the scheme portion of the URL with this value.",
@@ -556,7 +601,13 @@
                   },
                   "perTryTimeout": {
                     "description": "Timeout per attempt for a given request, including the initial call and any retries.",
-                    "type": "string"
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "must be a valid duration greater than 1ms",
+                        "rule": "duration(self) >= duration('1ms')"
+                      }
+                    ]
                   },
                   "retryOn": {
                     "description": "Specifies the conditions under which retry takes place.",
@@ -584,7 +635,7 @@
                     "type": "object",
                     "properties": {
                       "match": {
-                        "description": "RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).",
+                        "description": "[RE2 style regex-based match](https://github.com/google/re2/wiki/Syntax).",
                         "type": "string"
                       },
                       "rewrite": {
@@ -620,7 +671,9 @@
                           "type": "object",
                           "properties": {
                             "number": {
-                              "type": "integer"
+                              "type": "integer",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             }
                           }
                         },
@@ -691,7 +744,13 @@
               },
               "timeout": {
                 "description": "Timeout for HTTP requests, default is disabled.",
-                "type": "string"
+                "type": "string",
+                "x-kubernetes-validations": [
+                  {
+                    "message": "must be a valid duration greater than 1ms",
+                    "rule": "duration(self) >= duration('1ms')"
+                  }
+                ]
               }
             }
           }
@@ -724,7 +783,9 @@
                     },
                     "port": {
                       "description": "Specifies the port on the host that is being addressed.",
-                      "type": "integer"
+                      "type": "integer",
+                      "maximum": 4294967295,
+                      "minimum": 0
                     },
                     "sourceLabels": {
                       "description": "One or more labels that constrain the applicability of a rule to workloads with the given labels.",
@@ -768,7 +829,9 @@
                           "type": "object",
                           "properties": {
                             "number": {
-                              "type": "integer"
+                              "type": "integer",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             }
                           }
                         },
@@ -823,7 +886,9 @@
                     },
                     "port": {
                       "description": "Specifies the port on the host that is being addressed.",
-                      "type": "integer"
+                      "type": "integer",
+                      "maximum": 4294967295,
+                      "minimum": 0
                     },
                     "sniHosts": {
                       "description": "SNI (server name indicator) to match on.",
@@ -871,7 +936,9 @@
                           "type": "object",
                           "properties": {
                             "number": {
-                              "type": "integer"
+                              "type": "integer",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             }
                           }
                         },

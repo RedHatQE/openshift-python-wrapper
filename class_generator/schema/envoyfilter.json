@@ -24,7 +24,7 @@
             "type": "object",
             "properties": {
               "applyTo": {
-                "description": "Specifies where in the Envoy configuration, the patch should be applied.",
+                "description": "Specifies where in the Envoy configuration, the patch should be applied.\n\nValid Options: LISTENER, FILTER_CHAIN, NETWORK_FILTER, HTTP_FILTER, ROUTE_CONFIGURATION, VIRTUAL_HOST, HTTP_ROUTE, CLUSTER, EXTENSION_CONFIG, BOOTSTRAP, LISTENER_FILTER",
                 "type": "string",
                 "enum": [
                   "INVALID",
@@ -55,7 +55,9 @@
                       },
                       "portNumber": {
                         "description": "The service port for which this cluster was generated.",
-                        "type": "integer"
+                        "type": "integer",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "service": {
                         "description": "The fully qualified service name for this cluster.",
@@ -68,7 +70,7 @@
                     }
                   },
                   "context": {
-                    "description": "The specific config generation context to match on.",
+                    "description": "The specific config generation context to match on.\n\nValid Options: ANY, SIDECAR_INBOUND, SIDECAR_OUTBOUND, GATEWAY",
                     "type": "string",
                     "enum": [
                       "ANY",
@@ -91,7 +93,9 @@
                           },
                           "destinationPort": {
                             "description": "The destination_port value used by a filter chain's match condition.",
-                            "type": "integer"
+                            "type": "integer",
+                            "maximum": 4294967295,
+                            "minimum": 0
                           },
                           "filter": {
                             "description": "The name of a specific filter to apply the patch to.",
@@ -140,7 +144,9 @@
                       },
                       "portNumber": {
                         "description": "The service port/gateway port to which traffic is being sent/received.",
-                        "type": "integer"
+                        "type": "integer",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       }
                     }
                   },
@@ -149,7 +155,7 @@
                     "type": "object",
                     "properties": {
                       "metadata": {
-                        "description": "Match on the node metadata supplied by a proxy when connecting to Istio Pilot.",
+                        "description": "Match on the node metadata supplied by a proxy when connecting to istiod.",
                         "type": "object",
                         "additionalProperties": {
                           "type": "string"
@@ -179,7 +185,9 @@
                       },
                       "portNumber": {
                         "description": "The service port number or gateway server port number for which this route configuration was generated.",
-                        "type": "integer"
+                        "type": "integer",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "vhost": {
                         "description": "Match a specific virtual host in a route configuration and apply the patch to the virtual host.",
@@ -194,7 +202,7 @@
                             "type": "object",
                             "properties": {
                               "action": {
-                                "description": "Match a route with specific action type.",
+                                "description": "Match a route with specific action type.\n\nValid Options: ANY, ROUTE, REDIRECT, DIRECT_RESPONSE",
                                 "type": "string",
                                 "enum": [
                                   "ANY",
@@ -220,7 +228,7 @@
                 "type": "object",
                 "properties": {
                   "filterClass": {
-                    "description": "Determines the filter insertion order.",
+                    "description": "Determines the filter insertion order.\n\nValid Options: AUTHN, AUTHZ, STATS",
                     "type": "string",
                     "enum": [
                       "UNSPECIFIED",
@@ -230,7 +238,7 @@
                     ]
                   },
                   "operation": {
-                    "description": "Determines how the patch should be applied.",
+                    "description": "Determines how the patch should be applied.\n\nValid Options: MERGE, ADD, REMOVE, INSERT_BEFORE, INSERT_AFTER, INSERT_FIRST, REPLACE",
                     "type": "string",
                     "enum": [
                       "INVALID",
@@ -257,6 +265,55 @@
           "type": "integer",
           "format": "int32"
         },
+        "targetRefs": {
+          "description": "Optional.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "name"
+            ],
+            "properties": {
+              "group": {
+                "description": "group is the group of the target resource.",
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+              },
+              "kind": {
+                "description": "kind is kind of the target resource.",
+                "type": "string",
+                "maxLength": 63,
+                "minLength": 1,
+                "pattern": "^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$"
+              },
+              "name": {
+                "description": "name is the name of the target resource.",
+                "type": "string",
+                "maxLength": 253,
+                "minLength": 1
+              },
+              "namespace": {
+                "description": "namespace is the namespace of the referent.",
+                "type": "string",
+                "x-kubernetes-validations": [
+                  {
+                    "message": "cross namespace referencing is not currently supported",
+                    "rule": "self.size() == 0"
+                  }
+                ]
+              }
+            },
+            "x-kubernetes-validations": [
+              {
+                "message": "Support kinds are core/Service, networking.istio.io/ServiceEntry, gateway.networking.k8s.io/Gateway",
+                "rule": "[self.group, self.kind] in [['core','Service'], ['','Service'], ['gateway.networking.k8s.io','Gateway'], ['networking.istio.io','ServiceEntry']]"
+              }
+            ]
+          }
+        },
         "workloadSelector": {
           "description": "Criteria used to select the specific set of pods/VMs on which this patch configuration should be applied.",
           "type": "object",
@@ -264,13 +321,27 @@
             "labels": {
               "description": "One or more labels that indicate a specific set of pods/VMs on which the configuration should be applied.",
               "type": "object",
+              "maxProperties": 256,
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 63,
+                "x-kubernetes-validations": [
+                  {
+                    "message": "wildcard is not supported in selector",
+                    "rule": "!self.contains('*')"
+                  }
+                ]
               }
             }
           }
         }
-      }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "only one of targetRefs or workloadSelector can be set",
+          "rule": "(has(self.workloadSelector)?1:0)+(has(self.targetRefs)?1:0)<=1"
+        }
+      ]
     },
     "status": {
       "x-kubernetes-preserve-unknown-fields": true

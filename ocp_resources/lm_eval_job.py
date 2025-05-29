@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -13,23 +14,25 @@ class LMEvalJob(NamespacedResource):
 
     def __init__(
         self,
-        allow_code_execution: Optional[bool] = None,
-        allow_online: Optional[bool] = None,
-        batch_size: Optional[str] = "",
-        gen_args: Optional[List[Any]] = None,
-        limit: Optional[str] = "",
-        log_samples: Optional[bool] = None,
-        model: Optional[str] = "",
-        model_args: Optional[List[Any]] = None,
-        num_few_shot: Optional[int] = None,
-        offline: Optional[Dict[str, Any]] = None,
-        outputs: Optional[Dict[str, Any]] = None,
-        pod: Optional[Dict[str, Any]] = None,
-        suspend: Optional[bool] = None,
-        task_list: Optional[Dict[str, Any]] = None,
+        allow_code_execution: bool | None = None,
+        allow_online: bool | None = None,
+        batch_size: str | None = None,
+        chat_template: dict[str, Any] | None = None,
+        gen_args: list[Any] | None = None,
+        limit: str | None = None,
+        log_samples: bool | None = None,
+        model: str | None = None,
+        model_args: list[Any] | None = None,
+        num_few_shot: int | None = None,
+        offline: dict[str, Any] | None = None,
+        outputs: dict[str, Any] | None = None,
+        pod: dict[str, Any] | None = None,
+        suspend: bool | None = None,
+        system_instruction: str | None = None,
+        task_list: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             allow_code_execution (bool): AllowCodeExecution specifies whether the LMEvalJob can execute remote
               code. Default is false.
@@ -40,7 +43,10 @@ class LMEvalJob(NamespacedResource):
             batch_size (str): Batch size for the evaluation. This is used by the models that run and
               are loaded locally and not apply for the commercial APIs.
 
-            gen_args (List[Any]): Map to `--gen_kwargs` parameter for the underlying library.
+            chat_template (dict[str, Any]): ChatTemplate defines whether to apply the default or specified chat
+              template to prompts. This is required for chat-completions models.
+
+            gen_args (list[Any]): Map to `--gen_kwargs` parameter for the underlying library.
 
             limit (str): Accepts an integer, or a float between 0.0 and 1.0 . If passed, will
               limit the number of documents to evaluate to the first X documents
@@ -51,20 +57,23 @@ class LMEvalJob(NamespacedResource):
 
             model (str): Model name
 
-            model_args (List[Any]): Args for the model
+            model_args (list[Any]): Args for the model
 
             num_few_shot (int): Sets the number of few-shot examples to place in context
 
-            offline (Dict[str, Any]): Offline specifies settings for running LMEvalJobs in an offline mode
+            offline (dict[str, Any]): Offline specifies settings for running LMEvalJobs in an offline mode
 
-            outputs (Dict[str, Any]): Outputs specifies storage for evaluation results
+            outputs (dict[str, Any]): Outputs specifies storage for evaluation results
 
-            pod (Dict[str, Any]): Specify extra information for the lm-eval job's pod
+            pod (dict[str, Any]): Specify extra information for the lm-eval job's pod
 
             suspend (bool): Suspend keeps the job but without pods. This is intended to be used by
               the Kueue integration
 
-            task_list (Dict[str, Any]): Evaluation task list
+            system_instruction (str): SystemInstruction will set the system instruction for all prompts
+              passed to the evaluated model
+
+            task_list (dict[str, Any]): Evaluation task list
 
         """
         super().__init__(**kwargs)
@@ -72,6 +81,7 @@ class LMEvalJob(NamespacedResource):
         self.allow_code_execution = allow_code_execution
         self.allow_online = allow_online
         self.batch_size = batch_size
+        self.chat_template = chat_template
         self.gen_args = gen_args
         self.limit = limit
         self.log_samples = log_samples
@@ -82,16 +92,17 @@ class LMEvalJob(NamespacedResource):
         self.outputs = outputs
         self.pod = pod
         self.suspend = suspend
+        self.system_instruction = system_instruction
         self.task_list = task_list
 
     def to_dict(self) -> None:
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.model:
+            if self.model is None:
                 raise MissingRequiredArgumentError(argument="self.model")
 
-            if not self.task_list:
+            if self.task_list is None:
                 raise MissingRequiredArgumentError(argument="self.task_list")
 
             self.res["spec"] = {}
@@ -106,34 +117,40 @@ class LMEvalJob(NamespacedResource):
             if self.allow_online is not None:
                 _spec["allowOnline"] = self.allow_online
 
-            if self.batch_size:
+            if self.batch_size is not None:
                 _spec["batchSize"] = self.batch_size
 
-            if self.gen_args:
+            if self.chat_template is not None:
+                _spec["chatTemplate"] = self.chat_template
+
+            if self.gen_args is not None:
                 _spec["genArgs"] = self.gen_args
 
-            if self.limit:
+            if self.limit is not None:
                 _spec["limit"] = self.limit
 
             if self.log_samples is not None:
                 _spec["logSamples"] = self.log_samples
 
-            if self.model_args:
+            if self.model_args is not None:
                 _spec["modelArgs"] = self.model_args
 
-            if self.num_few_shot:
+            if self.num_few_shot is not None:
                 _spec["numFewShot"] = self.num_few_shot
 
-            if self.offline:
+            if self.offline is not None:
                 _spec["offline"] = self.offline
 
-            if self.outputs:
+            if self.outputs is not None:
                 _spec["outputs"] = self.outputs
 
-            if self.pod:
+            if self.pod is not None:
                 _spec["pod"] = self.pod
 
             if self.suspend is not None:
                 _spec["suspend"] = self.suspend
+
+            if self.system_instruction is not None:
+                _spec["systemInstruction"] = self.system_instruction
 
     # End of generated code

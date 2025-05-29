@@ -794,3 +794,17 @@ io.openshift.nfd.v1alpha1.NodeFeatureGroupList
 io.opendatahub.platform.components.v1alpha1.FeastOperatorList
 io.kuadrant.authorino.v1beta3.AuthConfigList
 dev.feast.v1alpha1.FeatureStoreList
+io.sailoperator.v1alpha1.ZTunnelList
+io.sailoperator.v1.IstioRevisionTagList
+io.sailoperator.v1.IstioRevisionList
+io.sailoperator.v1.IstioList
+io.sailoperator.v1.IstioCNIList
+io.istio.telemetry.v1.TelemetryList
+io.istio.security.v1.PeerAuthenticationList
+io.istio.networking.v1.WorkloadGroupList
+io.istio.networking.v1.WorkloadEntryList
+io.istio.networking.v1.VirtualServiceList
+io.istio.networking.v1.SidecarList
+io.istio.networking.v1.ServiceEntryList
+io.istio.networking.v1.GatewayList
+io.istio.networking.v1.DestinationRuleList

@@ -34,6 +34,21 @@
           "description": "Batch size for the evaluation. This is used by the models that run and are loaded\nlocally and not apply for the commercial APIs.",
           "type": "string"
         },
+        "chatTemplate": {
+          "description": "ChatTemplate defines whether to apply the default or specified chat template to prompts. This is required for chat-completions models.",
+          "type": "object",
+          "required": [
+            "enabled"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
         "genArgs": {
           "description": "Map to `--gen_kwargs` parameter for the underlying library.",
           "type": "array",
@@ -3882,6 +3897,10 @@
           "description": "Suspend keeps the job but without pods. This is intended to be used by the Kueue integration",
           "type": "boolean"
         },
+        "systemInstruction": {
+          "description": "SystemInstruction will set the system instruction for all prompts passed to the evaluated model",
+          "type": "string"
+        },
         "taskList": {
           "description": "Evaluation task list",
           "type": "object",
@@ -3890,7 +3909,50 @@
               "description": "Custom Unitxt artifacts that can be used in a TaskRecipe",
               "type": "object",
               "properties": {
+                "metrics": {
+                  "description": "The Unitxt custom metrics",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "Name of the custom artifact",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Value of the custom artifact. It could be a JSON string or plain text\ndepending on the artifact type",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
                 "systemPrompts": {
+                  "description": "The Unitxt custom System Prompts",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "Name of the custom artifact",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Value of the custom artifact. It could be a JSON string or plain text\ndepending on the artifact type",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "tasks": {
+                  "description": "The Unitxt custom tasks",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -3911,6 +3973,7 @@
                   }
                 },
                 "templates": {
+                  "description": "The Unitxt custom templates",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -4013,7 +4076,17 @@
                     "description": "Metrics",
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "description": "Unitxt metric id",
+                          "type": "string"
+                        },
+                        "ref": {
+                          "description": "The name of the custom metric in the custom field. Its value is a JSON string\nfor a custom Unitxt metric. Use the documentation here: https://www.unitxt.ai/en/latest/docs/adding_metric.html#adding-a-new-instance-metric\nto compose a custom metric, store it as a JSON file by calling the\nadd_to_catalog API: https://www.unitxt.ai/en/latest/docs/saving_and_loading_from_catalog.html#adding-assets-to-the-catalog,\nand use the JSON content as the value here.",
+                          "type": "string"
+                        }
+                      }
                     }
                   },
                   "numDemos": {
@@ -4036,7 +4109,17 @@
                   },
                   "task": {
                     "description": "The Unitxt Task",
-                    "type": "string"
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "Unitxt task id",
+                        "type": "string"
+                      },
+                      "ref": {
+                        "description": "The name of the custom task in the custom field. Its value is a JSON string\nfor a custom Unitxt task. Use the documentation here: https://www.unitxt.ai/en/latest/docs/adding_task.html\nto compose a custom task, store it as a JSON file by calling the\nadd_to_catalog API: https://www.unitxt.ai/en/latest/docs/saving_and_loading_from_catalog.html#adding-assets-to-the-catalog,\nand use the JSON content as the value here.",
+                        "type": "string"
+                      }
+                    }
                   },
                   "template": {
                     "description": "The Unitxt template",
