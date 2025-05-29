@@ -247,7 +247,7 @@ def convert_camel_case_to_snake_case(name: str) -> str:
     Converts a camel case string to snake case.
 
     Args:
-        string_ (str): The camel case string to convert.
+        name (str): The camel case string to convert.
 
     Returns:
         str: The snake case representation of the input string.
@@ -267,10 +267,10 @@ def convert_camel_case_to_snake_case(name: str) -> str:
         - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
           (e.g., "myCamelCaseString").
     """
-    do_not_proccess_list = ["oauth", "kubevirt"]
+    do_not_process_list = ["oauth", "kubevirt"]
 
     # If the input string is in the do_not_proccess_list, return it as it is.
-    if name.lower() in do_not_proccess_list:
+    if name.lower() in do_not_process_list:
         return name.lower()
 
     formatted_str: str = ""
