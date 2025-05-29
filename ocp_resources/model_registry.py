@@ -1,7 +1,17 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Dict, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from warnings import warn
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+
+warn(
+    "model_registry.py module will be removed in the next release, "
+    "please import `ModelRegistry` from model_registry_modelregistry_opendatahub_io.py "
+    "or model_registry_components_platform_opendatahub_io.py instead",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class ModelRegistry(NamespacedResource):

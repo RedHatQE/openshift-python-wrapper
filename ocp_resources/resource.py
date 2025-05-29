@@ -325,6 +325,7 @@ class Resource(ResourceConstants):
         CDI_KUBEVIRT_IO: str = "cdi.kubevirt.io"
         CLONE_KUBEVIRT_IO: str = "clone.kubevirt.io"
         CLUSTER_OPEN_CLUSTER_MANAGEMENT_IO: str = "cluster.open-cluster-management.io"
+        COMPONENTS_PLATFORM_OPENDATAHUB_IO = "components.platform.opendatahub.io"
         CONFIG_OPENSHIFT_IO: str = "config.openshift.io"
         CONSOLE_OPENSHIFT_IO: str = "console.openshift.io"
         COORDINATION_K8S_IO: str = "coordination.k8s.io"
