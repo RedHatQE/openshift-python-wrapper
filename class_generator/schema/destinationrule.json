@@ -63,7 +63,7 @@
                         "type": "object",
                         "properties": {
                           "h2UpgradePolicy": {
-                            "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                            "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.\n\nValid Options: DEFAULT, DO_NOT_UPGRADE, UPGRADE",
                             "type": "string",
                             "enum": [
                               "DEFAULT",
@@ -83,7 +83,18 @@
                           },
                           "idleTimeout": {
                             "description": "The idle timeout for upstream connection pool connections.",
-                            "type": "string"
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
+                          },
+                          "maxConcurrentStreams": {
+                            "description": "The maximum number of concurrent streams allowed for a peer on one HTTP/2 connection.",
+                            "type": "integer",
+                            "format": "int32"
                           },
                           "maxRequestsPerConnection": {
                             "description": "Maximum number of requests per connection to a backend.",
@@ -107,11 +118,27 @@
                         "properties": {
                           "connectTimeout": {
                             "description": "TCP connection timeout.",
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
+                          },
+                          "idleTimeout": {
+                            "description": "The idle timeout for TCP connections.",
                             "type": "string"
                           },
                           "maxConnectionDuration": {
                             "description": "The maximum duration of a connection.",
-                            "type": "string"
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
                           },
                           "maxConnections": {
                             "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
@@ -124,15 +151,29 @@
                             "properties": {
                               "interval": {
                                 "description": "The time duration between keep-alive probes.",
-                                "type": "string"
+                                "type": "string",
+                                "x-kubernetes-validations": [
+                                  {
+                                    "message": "must be a valid duration greater than 1ms",
+                                    "rule": "duration(self) >= duration('1ms')"
+                                  }
+                                ]
                               },
                               "probes": {
                                 "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
-                                "type": "integer"
+                                "type": "integer",
+                                "maximum": 4294967295,
+                                "minimum": 0
                               },
                               "time": {
                                 "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
-                                "type": "string"
+                                "type": "string",
+                                "x-kubernetes-validations": [
+                                  {
+                                    "message": "must be a valid duration greater than 1ms",
+                                    "rule": "duration(self) >= duration('1ms')"
+                                  }
+                                ]
                               }
                             }
                           }
@@ -182,13 +223,15 @@
                             "properties": {
                               "tableSize": {
                                 "description": "The table size for Maglev hashing.",
-                                "type": "integer"
+                                "type": "integer",
+                                "minimum": 0
                               }
                             }
                           },
                           "minimumRingSize": {
                             "description": "Deprecated.",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                           },
                           "ringHash": {
                             "description": "The ring/modulo hash load balancer implements consistent hashing to backend hosts.",
@@ -196,7 +239,8 @@
                             "properties": {
                               "minimumRingSize": {
                                 "description": "The minimum number of virtual nodes to use for the hash ring.",
-                                "type": "integer"
+                                "type": "integer",
+                                "minimum": 0
                               }
                             }
                           },
@@ -223,14 +267,16 @@
                                   "description": "Map of upstream localities to traffic distribution weights.",
                                   "type": "object",
                                   "additionalProperties": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "maximum": 4294967295,
+                                    "minimum": 0
                                   }
                                 }
                               }
                             }
                           },
                           "enabled": {
-                            "description": "enable locality load balancing, this is DestinationRule-level and will override mesh wide settings in entirety."
+                            "description": "Enable locality load balancing."
                           },
                           "failover": {
                             "description": "Optional: only one of distribute, failover or failoverPriority can be set.",
@@ -259,6 +305,7 @@
                         }
                       },
                       "simple": {
+                        "description": "\n\nValid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST",
                         "type": "string",
                         "enum": [
                           "UNSPECIFIED",
@@ -269,9 +316,43 @@
                           "LEAST_REQUEST"
                         ]
                       },
+                      "warmup": {
+                        "description": "Represents the warmup configuration of Service.",
+                        "type": "object",
+                        "required": [
+                          "duration"
+                        ],
+                        "properties": {
+                          "aggression": {
+                            "description": "This parameter controls the speed of traffic increase over the warmup duration.",
+                            "format": "double",
+                            "minimum": 1
+                          },
+                          "duration": {
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
+                          },
+                          "minimumPercent": {
+                            "format": "double",
+                            "maximum": 100,
+                            "minimum": 0
+                          }
+                        }
+                      },
                       "warmupDurationSecs": {
-                        "description": "Represents the warmup duration of Service.",
-                        "type": "string"
+                        "description": "Deprecated: use `warmup` instead.",
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       }
                     }
                   },
@@ -280,24 +361,42 @@
                     "properties": {
                       "baseEjectionTime": {
                         "description": "Minimum ejection duration.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "consecutive5xxErrors": {
-                        "description": "Number of 5xx errors before a host is ejected from the connection pool."
+                        "description": "Number of 5xx errors before a host is ejected from the connection pool.",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "consecutiveErrors": {
                         "type": "integer",
                         "format": "int32"
                       },
                       "consecutiveGatewayErrors": {
-                        "description": "Number of gateway errors before a host is ejected from the connection pool."
+                        "description": "Number of gateway errors before a host is ejected from the connection pool.",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "consecutiveLocalOriginFailures": {
-                        "description": "The number of consecutive locally originated failures before ejection occurs."
+                        "description": "The number of consecutive locally originated failures before ejection occurs.",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "interval": {
                         "description": "Time interval between ejection sweep analysis.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "maxEjectionPercent": {
                         "description": "Maximum % of hosts in the load balancing pool for the upstream service that can be ejected.",
@@ -305,7 +404,7 @@
                         "format": "int32"
                       },
                       "minHealthPercent": {
-                        "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least min_health_percent hosts in healthy mode.",
+                        "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least `minHealthPercent` hosts in healthy mode.",
                         "type": "integer",
                         "format": "int32"
                       },
@@ -318,6 +417,7 @@
                   "portLevelSettings": {
                     "description": "Traffic policies specific to individual ports.",
                     "type": "array",
+                    "maxItems": 4096,
                     "items": {
                       "type": "object",
                       "properties": {
@@ -329,7 +429,7 @@
                               "type": "object",
                               "properties": {
                                 "h2UpgradePolicy": {
-                                  "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                                  "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.\n\nValid Options: DEFAULT, DO_NOT_UPGRADE, UPGRADE",
                                   "type": "string",
                                   "enum": [
                                     "DEFAULT",
@@ -349,7 +449,18 @@
                                 },
                                 "idleTimeout": {
                                   "description": "The idle timeout for upstream connection pool connections.",
-                                  "type": "string"
+                                  "type": "string",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "must be a valid duration greater than 1ms",
+                                      "rule": "duration(self) >= duration('1ms')"
+                                    }
+                                  ]
+                                },
+                                "maxConcurrentStreams": {
+                                  "description": "The maximum number of concurrent streams allowed for a peer on one HTTP/2 connection.",
+                                  "type": "integer",
+                                  "format": "int32"
                                 },
                                 "maxRequestsPerConnection": {
                                   "description": "Maximum number of requests per connection to a backend.",
@@ -373,11 +484,27 @@
                               "properties": {
                                 "connectTimeout": {
                                   "description": "TCP connection timeout.",
+                                  "type": "string",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "must be a valid duration greater than 1ms",
+                                      "rule": "duration(self) >= duration('1ms')"
+                                    }
+                                  ]
+                                },
+                                "idleTimeout": {
+                                  "description": "The idle timeout for TCP connections.",
                                   "type": "string"
                                 },
                                 "maxConnectionDuration": {
                                   "description": "The maximum duration of a connection.",
-                                  "type": "string"
+                                  "type": "string",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "must be a valid duration greater than 1ms",
+                                      "rule": "duration(self) >= duration('1ms')"
+                                    }
+                                  ]
                                 },
                                 "maxConnections": {
                                   "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
@@ -390,15 +517,29 @@
                                   "properties": {
                                     "interval": {
                                       "description": "The time duration between keep-alive probes.",
-                                      "type": "string"
+                                      "type": "string",
+                                      "x-kubernetes-validations": [
+                                        {
+                                          "message": "must be a valid duration greater than 1ms",
+                                          "rule": "duration(self) >= duration('1ms')"
+                                        }
+                                      ]
                                     },
                                     "probes": {
                                       "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
-                                      "type": "integer"
+                                      "type": "integer",
+                                      "maximum": 4294967295,
+                                      "minimum": 0
                                     },
                                     "time": {
                                       "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
-                                      "type": "string"
+                                      "type": "string",
+                                      "x-kubernetes-validations": [
+                                        {
+                                          "message": "must be a valid duration greater than 1ms",
+                                          "rule": "duration(self) >= duration('1ms')"
+                                        }
+                                      ]
                                     }
                                   }
                                 }
@@ -448,13 +589,15 @@
                                   "properties": {
                                     "tableSize": {
                                       "description": "The table size for Maglev hashing.",
-                                      "type": "integer"
+                                      "type": "integer",
+                                      "minimum": 0
                                     }
                                   }
                                 },
                                 "minimumRingSize": {
                                   "description": "Deprecated.",
-                                  "type": "integer"
+                                  "type": "integer",
+                                  "minimum": 0
                                 },
                                 "ringHash": {
                                   "description": "The ring/modulo hash load balancer implements consistent hashing to backend hosts.",
@@ -462,7 +605,8 @@
                                   "properties": {
                                     "minimumRingSize": {
                                       "description": "The minimum number of virtual nodes to use for the hash ring.",
-                                      "type": "integer"
+                                      "type": "integer",
+                                      "minimum": 0
                                     }
                                   }
                                 },
@@ -489,14 +633,16 @@
                                         "description": "Map of upstream localities to traffic distribution weights.",
                                         "type": "object",
                                         "additionalProperties": {
-                                          "type": "integer"
+                                          "type": "integer",
+                                          "maximum": 4294967295,
+                                          "minimum": 0
                                         }
                                       }
                                     }
                                   }
                                 },
                                 "enabled": {
-                                  "description": "enable locality load balancing, this is DestinationRule-level and will override mesh wide settings in entirety."
+                                  "description": "Enable locality load balancing."
                                 },
                                 "failover": {
                                   "description": "Optional: only one of distribute, failover or failoverPriority can be set.",
@@ -525,6 +671,7 @@
                               }
                             },
                             "simple": {
+                              "description": "\n\nValid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST",
                               "type": "string",
                               "enum": [
                                 "UNSPECIFIED",
@@ -535,9 +682,43 @@
                                 "LEAST_REQUEST"
                               ]
                             },
+                            "warmup": {
+                              "description": "Represents the warmup configuration of Service.",
+                              "type": "object",
+                              "required": [
+                                "duration"
+                              ],
+                              "properties": {
+                                "aggression": {
+                                  "description": "This parameter controls the speed of traffic increase over the warmup duration.",
+                                  "format": "double",
+                                  "minimum": 1
+                                },
+                                "duration": {
+                                  "type": "string",
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "must be a valid duration greater than 1ms",
+                                      "rule": "duration(self) >= duration('1ms')"
+                                    }
+                                  ]
+                                },
+                                "minimumPercent": {
+                                  "format": "double",
+                                  "maximum": 100,
+                                  "minimum": 0
+                                }
+                              }
+                            },
                             "warmupDurationSecs": {
-                              "description": "Represents the warmup duration of Service.",
-                              "type": "string"
+                              "description": "Deprecated: use `warmup` instead.",
+                              "type": "string",
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "must be a valid duration greater than 1ms",
+                                  "rule": "duration(self) >= duration('1ms')"
+                                }
+                              ]
                             }
                           }
                         },
@@ -546,24 +727,42 @@
                           "properties": {
                             "baseEjectionTime": {
                               "description": "Minimum ejection duration.",
-                              "type": "string"
+                              "type": "string",
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "must be a valid duration greater than 1ms",
+                                  "rule": "duration(self) >= duration('1ms')"
+                                }
+                              ]
                             },
                             "consecutive5xxErrors": {
-                              "description": "Number of 5xx errors before a host is ejected from the connection pool."
+                              "description": "Number of 5xx errors before a host is ejected from the connection pool.",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             },
                             "consecutiveErrors": {
                               "type": "integer",
                               "format": "int32"
                             },
                             "consecutiveGatewayErrors": {
-                              "description": "Number of gateway errors before a host is ejected from the connection pool."
+                              "description": "Number of gateway errors before a host is ejected from the connection pool.",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             },
                             "consecutiveLocalOriginFailures": {
-                              "description": "The number of consecutive locally originated failures before ejection occurs."
+                              "description": "The number of consecutive locally originated failures before ejection occurs.",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             },
                             "interval": {
                               "description": "Time interval between ejection sweep analysis.",
-                              "type": "string"
+                              "type": "string",
+                              "x-kubernetes-validations": [
+                                {
+                                  "message": "must be a valid duration greater than 1ms",
+                                  "rule": "duration(self) >= duration('1ms')"
+                                }
+                              ]
                             },
                             "maxEjectionPercent": {
                               "description": "Maximum % of hosts in the load balancing pool for the upstream service that can be ejected.",
@@ -571,7 +770,7 @@
                               "format": "int32"
                             },
                             "minHealthPercent": {
-                              "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least min_health_percent hosts in healthy mode.",
+                              "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least `minHealthPercent` hosts in healthy mode.",
                               "type": "integer",
                               "format": "int32"
                             },
@@ -586,7 +785,9 @@
                           "type": "object",
                           "properties": {
                             "number": {
-                              "type": "integer"
+                              "type": "integer",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             }
                           }
                         },
@@ -596,6 +797,10 @@
                           "properties": {
                             "caCertificates": {
                               "description": "OPTIONAL: The path to the file containing certificate authority certificates to use in verifying a presented server certificate.",
+                              "type": "string"
+                            },
+                            "caCrl": {
+                              "description": "OPTIONAL: The path to the file containing the certificate revocation list (CRL) to use in verifying a presented server certificate.",
                               "type": "string"
                             },
                             "clientCertificate": {
@@ -610,7 +815,7 @@
                               "description": "`insecureSkipVerify` specifies whether the proxy should skip verifying the CA signature and SAN for the server certificate corresponding to the host."
                             },
                             "mode": {
-                              "description": "Indicates whether connections to this port should be secured using TLS.",
+                              "description": "Indicates whether connections to this port should be secured using TLS.\n\nValid Options: DISABLE, SIMPLE, MUTUAL, ISTIO_MUTUAL",
                               "type": "string",
                               "enum": [
                                 "DISABLE",
@@ -639,12 +844,30 @@
                       }
                     }
                   },
+                  "proxyProtocol": {
+                    "description": "The upstream PROXY protocol settings.",
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "description": "The PROXY protocol version to use.\n\nValid Options: V1, V2",
+                        "type": "string",
+                        "enum": [
+                          "V1",
+                          "V2"
+                        ]
+                      }
+                    }
+                  },
                   "tls": {
                     "description": "TLS related settings for connections to the upstream service.",
                     "type": "object",
                     "properties": {
                       "caCertificates": {
                         "description": "OPTIONAL: The path to the file containing certificate authority certificates to use in verifying a presented server certificate.",
+                        "type": "string"
+                      },
+                      "caCrl": {
+                        "description": "OPTIONAL: The path to the file containing the certificate revocation list (CRL) to use in verifying a presented server certificate.",
                         "type": "string"
                       },
                       "clientCertificate": {
@@ -659,7 +882,7 @@
                         "description": "`insecureSkipVerify` specifies whether the proxy should skip verifying the CA signature and SAN for the server certificate corresponding to the host."
                       },
                       "mode": {
-                        "description": "Indicates whether connections to this port should be secured using TLS.",
+                        "description": "Indicates whether connections to this port should be secured using TLS.\n\nValid Options: DISABLE, SIMPLE, MUTUAL, ISTIO_MUTUAL",
                         "type": "string",
                         "enum": [
                           "DISABLE",
@@ -703,7 +926,9 @@
                       },
                       "targetPort": {
                         "description": "Specifies a port to which the downstream connection is tunneled.",
-                        "type": "integer"
+                        "type": "integer",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       }
                     }
                   }
@@ -724,7 +949,7 @@
                   "type": "object",
                   "properties": {
                     "h2UpgradePolicy": {
-                      "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                      "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.\n\nValid Options: DEFAULT, DO_NOT_UPGRADE, UPGRADE",
                       "type": "string",
                       "enum": [
                         "DEFAULT",
@@ -744,7 +969,18 @@
                     },
                     "idleTimeout": {
                       "description": "The idle timeout for upstream connection pool connections.",
-                      "type": "string"
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must be a valid duration greater than 1ms",
+                          "rule": "duration(self) >= duration('1ms')"
+                        }
+                      ]
+                    },
+                    "maxConcurrentStreams": {
+                      "description": "The maximum number of concurrent streams allowed for a peer on one HTTP/2 connection.",
+                      "type": "integer",
+                      "format": "int32"
                     },
                     "maxRequestsPerConnection": {
                       "description": "Maximum number of requests per connection to a backend.",
@@ -768,11 +1004,27 @@
                   "properties": {
                     "connectTimeout": {
                       "description": "TCP connection timeout.",
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must be a valid duration greater than 1ms",
+                          "rule": "duration(self) >= duration('1ms')"
+                        }
+                      ]
+                    },
+                    "idleTimeout": {
+                      "description": "The idle timeout for TCP connections.",
                       "type": "string"
                     },
                     "maxConnectionDuration": {
                       "description": "The maximum duration of a connection.",
-                      "type": "string"
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must be a valid duration greater than 1ms",
+                          "rule": "duration(self) >= duration('1ms')"
+                        }
+                      ]
                     },
                     "maxConnections": {
                       "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
@@ -785,15 +1037,29 @@
                       "properties": {
                         "interval": {
                           "description": "The time duration between keep-alive probes.",
-                          "type": "string"
+                          "type": "string",
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "must be a valid duration greater than 1ms",
+                              "rule": "duration(self) >= duration('1ms')"
+                            }
+                          ]
                         },
                         "probes": {
                           "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
-                          "type": "integer"
+                          "type": "integer",
+                          "maximum": 4294967295,
+                          "minimum": 0
                         },
                         "time": {
                           "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
-                          "type": "string"
+                          "type": "string",
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "must be a valid duration greater than 1ms",
+                              "rule": "duration(self) >= duration('1ms')"
+                            }
+                          ]
                         }
                       }
                     }
@@ -843,13 +1109,15 @@
                       "properties": {
                         "tableSize": {
                           "description": "The table size for Maglev hashing.",
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": 0
                         }
                       }
                     },
                     "minimumRingSize": {
                       "description": "Deprecated.",
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": 0
                     },
                     "ringHash": {
                       "description": "The ring/modulo hash load balancer implements consistent hashing to backend hosts.",
@@ -857,7 +1125,8 @@
                       "properties": {
                         "minimumRingSize": {
                           "description": "The minimum number of virtual nodes to use for the hash ring.",
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": 0
                         }
                       }
                     },
@@ -884,14 +1153,16 @@
                             "description": "Map of upstream localities to traffic distribution weights.",
                             "type": "object",
                             "additionalProperties": {
-                              "type": "integer"
+                              "type": "integer",
+                              "maximum": 4294967295,
+                              "minimum": 0
                             }
                           }
                         }
                       }
                     },
                     "enabled": {
-                      "description": "enable locality load balancing, this is DestinationRule-level and will override mesh wide settings in entirety."
+                      "description": "Enable locality load balancing."
                     },
                     "failover": {
                       "description": "Optional: only one of distribute, failover or failoverPriority can be set.",
@@ -920,6 +1191,7 @@
                   }
                 },
                 "simple": {
+                  "description": "\n\nValid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST",
                   "type": "string",
                   "enum": [
                     "UNSPECIFIED",
@@ -930,9 +1202,43 @@
                     "LEAST_REQUEST"
                   ]
                 },
+                "warmup": {
+                  "description": "Represents the warmup configuration of Service.",
+                  "type": "object",
+                  "required": [
+                    "duration"
+                  ],
+                  "properties": {
+                    "aggression": {
+                      "description": "This parameter controls the speed of traffic increase over the warmup duration.",
+                      "format": "double",
+                      "minimum": 1
+                    },
+                    "duration": {
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must be a valid duration greater than 1ms",
+                          "rule": "duration(self) >= duration('1ms')"
+                        }
+                      ]
+                    },
+                    "minimumPercent": {
+                      "format": "double",
+                      "maximum": 100,
+                      "minimum": 0
+                    }
+                  }
+                },
                 "warmupDurationSecs": {
-                  "description": "Represents the warmup duration of Service.",
-                  "type": "string"
+                  "description": "Deprecated: use `warmup` instead.",
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "must be a valid duration greater than 1ms",
+                      "rule": "duration(self) >= duration('1ms')"
+                    }
+                  ]
                 }
               }
             },
@@ -941,24 +1247,42 @@
               "properties": {
                 "baseEjectionTime": {
                   "description": "Minimum ejection duration.",
-                  "type": "string"
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "must be a valid duration greater than 1ms",
+                      "rule": "duration(self) >= duration('1ms')"
+                    }
+                  ]
                 },
                 "consecutive5xxErrors": {
-                  "description": "Number of 5xx errors before a host is ejected from the connection pool."
+                  "description": "Number of 5xx errors before a host is ejected from the connection pool.",
+                  "maximum": 4294967295,
+                  "minimum": 0
                 },
                 "consecutiveErrors": {
                   "type": "integer",
                   "format": "int32"
                 },
                 "consecutiveGatewayErrors": {
-                  "description": "Number of gateway errors before a host is ejected from the connection pool."
+                  "description": "Number of gateway errors before a host is ejected from the connection pool.",
+                  "maximum": 4294967295,
+                  "minimum": 0
                 },
                 "consecutiveLocalOriginFailures": {
-                  "description": "The number of consecutive locally originated failures before ejection occurs."
+                  "description": "The number of consecutive locally originated failures before ejection occurs.",
+                  "maximum": 4294967295,
+                  "minimum": 0
                 },
                 "interval": {
                   "description": "Time interval between ejection sweep analysis.",
-                  "type": "string"
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "must be a valid duration greater than 1ms",
+                      "rule": "duration(self) >= duration('1ms')"
+                    }
+                  ]
                 },
                 "maxEjectionPercent": {
                   "description": "Maximum % of hosts in the load balancing pool for the upstream service that can be ejected.",
@@ -966,7 +1290,7 @@
                   "format": "int32"
                 },
                 "minHealthPercent": {
-                  "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least min_health_percent hosts in healthy mode.",
+                  "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least `minHealthPercent` hosts in healthy mode.",
                   "type": "integer",
                   "format": "int32"
                 },
@@ -979,6 +1303,7 @@
             "portLevelSettings": {
               "description": "Traffic policies specific to individual ports.",
               "type": "array",
+              "maxItems": 4096,
               "items": {
                 "type": "object",
                 "properties": {
@@ -990,7 +1315,7 @@
                         "type": "object",
                         "properties": {
                           "h2UpgradePolicy": {
-                            "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                            "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.\n\nValid Options: DEFAULT, DO_NOT_UPGRADE, UPGRADE",
                             "type": "string",
                             "enum": [
                               "DEFAULT",
@@ -1010,7 +1335,18 @@
                           },
                           "idleTimeout": {
                             "description": "The idle timeout for upstream connection pool connections.",
-                            "type": "string"
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
+                          },
+                          "maxConcurrentStreams": {
+                            "description": "The maximum number of concurrent streams allowed for a peer on one HTTP/2 connection.",
+                            "type": "integer",
+                            "format": "int32"
                           },
                           "maxRequestsPerConnection": {
                             "description": "Maximum number of requests per connection to a backend.",
@@ -1034,11 +1370,27 @@
                         "properties": {
                           "connectTimeout": {
                             "description": "TCP connection timeout.",
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
+                          },
+                          "idleTimeout": {
+                            "description": "The idle timeout for TCP connections.",
                             "type": "string"
                           },
                           "maxConnectionDuration": {
                             "description": "The maximum duration of a connection.",
-                            "type": "string"
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
                           },
                           "maxConnections": {
                             "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
@@ -1051,15 +1403,29 @@
                             "properties": {
                               "interval": {
                                 "description": "The time duration between keep-alive probes.",
-                                "type": "string"
+                                "type": "string",
+                                "x-kubernetes-validations": [
+                                  {
+                                    "message": "must be a valid duration greater than 1ms",
+                                    "rule": "duration(self) >= duration('1ms')"
+                                  }
+                                ]
                               },
                               "probes": {
                                 "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
-                                "type": "integer"
+                                "type": "integer",
+                                "maximum": 4294967295,
+                                "minimum": 0
                               },
                               "time": {
                                 "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
-                                "type": "string"
+                                "type": "string",
+                                "x-kubernetes-validations": [
+                                  {
+                                    "message": "must be a valid duration greater than 1ms",
+                                    "rule": "duration(self) >= duration('1ms')"
+                                  }
+                                ]
                               }
                             }
                           }
@@ -1109,13 +1475,15 @@
                             "properties": {
                               "tableSize": {
                                 "description": "The table size for Maglev hashing.",
-                                "type": "integer"
+                                "type": "integer",
+                                "minimum": 0
                               }
                             }
                           },
                           "minimumRingSize": {
                             "description": "Deprecated.",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                           },
                           "ringHash": {
                             "description": "The ring/modulo hash load balancer implements consistent hashing to backend hosts.",
@@ -1123,7 +1491,8 @@
                             "properties": {
                               "minimumRingSize": {
                                 "description": "The minimum number of virtual nodes to use for the hash ring.",
-                                "type": "integer"
+                                "type": "integer",
+                                "minimum": 0
                               }
                             }
                           },
@@ -1150,14 +1519,16 @@
                                   "description": "Map of upstream localities to traffic distribution weights.",
                                   "type": "object",
                                   "additionalProperties": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "maximum": 4294967295,
+                                    "minimum": 0
                                   }
                                 }
                               }
                             }
                           },
                           "enabled": {
-                            "description": "enable locality load balancing, this is DestinationRule-level and will override mesh wide settings in entirety."
+                            "description": "Enable locality load balancing."
                           },
                           "failover": {
                             "description": "Optional: only one of distribute, failover or failoverPriority can be set.",
@@ -1186,6 +1557,7 @@
                         }
                       },
                       "simple": {
+                        "description": "\n\nValid Options: LEAST_CONN, RANDOM, PASSTHROUGH, ROUND_ROBIN, LEAST_REQUEST",
                         "type": "string",
                         "enum": [
                           "UNSPECIFIED",
@@ -1196,9 +1568,43 @@
                           "LEAST_REQUEST"
                         ]
                       },
+                      "warmup": {
+                        "description": "Represents the warmup configuration of Service.",
+                        "type": "object",
+                        "required": [
+                          "duration"
+                        ],
+                        "properties": {
+                          "aggression": {
+                            "description": "This parameter controls the speed of traffic increase over the warmup duration.",
+                            "format": "double",
+                            "minimum": 1
+                          },
+                          "duration": {
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
+                          },
+                          "minimumPercent": {
+                            "format": "double",
+                            "maximum": 100,
+                            "minimum": 0
+                          }
+                        }
+                      },
                       "warmupDurationSecs": {
-                        "description": "Represents the warmup duration of Service.",
-                        "type": "string"
+                        "description": "Deprecated: use `warmup` instead.",
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       }
                     }
                   },
@@ -1207,24 +1613,42 @@
                     "properties": {
                       "baseEjectionTime": {
                         "description": "Minimum ejection duration.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "consecutive5xxErrors": {
-                        "description": "Number of 5xx errors before a host is ejected from the connection pool."
+                        "description": "Number of 5xx errors before a host is ejected from the connection pool.",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "consecutiveErrors": {
                         "type": "integer",
                         "format": "int32"
                       },
                       "consecutiveGatewayErrors": {
-                        "description": "Number of gateway errors before a host is ejected from the connection pool."
+                        "description": "Number of gateway errors before a host is ejected from the connection pool.",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "consecutiveLocalOriginFailures": {
-                        "description": "The number of consecutive locally originated failures before ejection occurs."
+                        "description": "The number of consecutive locally originated failures before ejection occurs.",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       },
                       "interval": {
                         "description": "Time interval between ejection sweep analysis.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "maxEjectionPercent": {
                         "description": "Maximum % of hosts in the load balancing pool for the upstream service that can be ejected.",
@@ -1232,7 +1656,7 @@
                         "format": "int32"
                       },
                       "minHealthPercent": {
-                        "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least min_health_percent hosts in healthy mode.",
+                        "description": "Outlier detection will be enabled as long as the associated load balancing pool has at least `minHealthPercent` hosts in healthy mode.",
                         "type": "integer",
                         "format": "int32"
                       },
@@ -1247,7 +1671,9 @@
                     "type": "object",
                     "properties": {
                       "number": {
-                        "type": "integer"
+                        "type": "integer",
+                        "maximum": 4294967295,
+                        "minimum": 0
                       }
                     }
                   },
@@ -1257,6 +1683,10 @@
                     "properties": {
                       "caCertificates": {
                         "description": "OPTIONAL: The path to the file containing certificate authority certificates to use in verifying a presented server certificate.",
+                        "type": "string"
+                      },
+                      "caCrl": {
+                        "description": "OPTIONAL: The path to the file containing the certificate revocation list (CRL) to use in verifying a presented server certificate.",
                         "type": "string"
                       },
                       "clientCertificate": {
@@ -1271,7 +1701,7 @@
                         "description": "`insecureSkipVerify` specifies whether the proxy should skip verifying the CA signature and SAN for the server certificate corresponding to the host."
                       },
                       "mode": {
-                        "description": "Indicates whether connections to this port should be secured using TLS.",
+                        "description": "Indicates whether connections to this port should be secured using TLS.\n\nValid Options: DISABLE, SIMPLE, MUTUAL, ISTIO_MUTUAL",
                         "type": "string",
                         "enum": [
                           "DISABLE",
@@ -1300,12 +1730,30 @@
                 }
               }
             },
+            "proxyProtocol": {
+              "description": "The upstream PROXY protocol settings.",
+              "type": "object",
+              "properties": {
+                "version": {
+                  "description": "The PROXY protocol version to use.\n\nValid Options: V1, V2",
+                  "type": "string",
+                  "enum": [
+                    "V1",
+                    "V2"
+                  ]
+                }
+              }
+            },
             "tls": {
               "description": "TLS related settings for connections to the upstream service.",
               "type": "object",
               "properties": {
                 "caCertificates": {
                   "description": "OPTIONAL: The path to the file containing certificate authority certificates to use in verifying a presented server certificate.",
+                  "type": "string"
+                },
+                "caCrl": {
+                  "description": "OPTIONAL: The path to the file containing the certificate revocation list (CRL) to use in verifying a presented server certificate.",
                   "type": "string"
                 },
                 "clientCertificate": {
@@ -1320,7 +1768,7 @@
                   "description": "`insecureSkipVerify` specifies whether the proxy should skip verifying the CA signature and SAN for the server certificate corresponding to the host."
                 },
                 "mode": {
-                  "description": "Indicates whether connections to this port should be secured using TLS.",
+                  "description": "Indicates whether connections to this port should be secured using TLS.\n\nValid Options: DISABLE, SIMPLE, MUTUAL, ISTIO_MUTUAL",
                   "type": "string",
                   "enum": [
                     "DISABLE",
@@ -1364,7 +1812,9 @@
                 },
                 "targetPort": {
                   "description": "Specifies a port to which the downstream connection is tunneled.",
-                  "type": "integer"
+                  "type": "integer",
+                  "maximum": 4294967295,
+                  "minimum": 0
                 }
               }
             }
@@ -1377,9 +1827,27 @@
             "matchLabels": {
               "description": "One or more labels that indicate a specific set of pods/VMs on which a policy should be applied.",
               "type": "object",
+              "maxProperties": 4096,
               "additionalProperties": {
-                "type": "string"
-              }
+                "type": "string",
+                "maxLength": 63,
+                "x-kubernetes-validations": [
+                  {
+                    "message": "wildcard not allowed in label value match",
+                    "rule": "!self.contains('*')"
+                  }
+                ]
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "wildcard not allowed in label key match",
+                  "rule": "self.all(key, !key.contains('*'))"
+                },
+                {
+                  "message": "key must not be empty",
+                  "rule": "self.all(key, key.size() != 0)"
+                }
+              ]
             }
           }
         }

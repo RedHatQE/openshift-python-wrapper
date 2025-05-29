@@ -31,7 +31,7 @@
                 "type": "string"
               },
               "captureMode": {
-                "description": "When the bind address is an IP, the captureMode option dictates how traffic to the listener is expected to be captured (or not).",
+                "description": "When the bind address is an IP, the captureMode option dictates how traffic to the listener is expected to be captured (or not).\n\nValid Options: DEFAULT, IPTABLES, NONE",
                 "type": "string",
                 "enum": [
                   "DEFAULT",
@@ -56,14 +56,18 @@
                   },
                   "number": {
                     "description": "A valid non-negative integer port number.",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   },
                   "protocol": {
                     "description": "The protocol exposed on the port.",
                     "type": "string"
                   },
                   "targetPort": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   }
                 }
               }
@@ -79,7 +83,7 @@
               "type": "object",
               "properties": {
                 "h2UpgradePolicy": {
-                  "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                  "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.\n\nValid Options: DEFAULT, DO_NOT_UPGRADE, UPGRADE",
                   "type": "string",
                   "enum": [
                     "DEFAULT",
@@ -99,7 +103,18 @@
                 },
                 "idleTimeout": {
                   "description": "The idle timeout for upstream connection pool connections.",
-                  "type": "string"
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "must be a valid duration greater than 1ms",
+                      "rule": "duration(self) >= duration('1ms')"
+                    }
+                  ]
+                },
+                "maxConcurrentStreams": {
+                  "description": "The maximum number of concurrent streams allowed for a peer on one HTTP/2 connection.",
+                  "type": "integer",
+                  "format": "int32"
                 },
                 "maxRequestsPerConnection": {
                   "description": "Maximum number of requests per connection to a backend.",
@@ -123,11 +138,27 @@
               "properties": {
                 "connectTimeout": {
                   "description": "TCP connection timeout.",
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "must be a valid duration greater than 1ms",
+                      "rule": "duration(self) >= duration('1ms')"
+                    }
+                  ]
+                },
+                "idleTimeout": {
+                  "description": "The idle timeout for TCP connections.",
                   "type": "string"
                 },
                 "maxConnectionDuration": {
                   "description": "The maximum duration of a connection.",
-                  "type": "string"
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "must be a valid duration greater than 1ms",
+                      "rule": "duration(self) >= duration('1ms')"
+                    }
+                  ]
                 },
                 "maxConnections": {
                   "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
@@ -140,15 +171,29 @@
                   "properties": {
                     "interval": {
                       "description": "The time duration between keep-alive probes.",
-                      "type": "string"
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must be a valid duration greater than 1ms",
+                          "rule": "duration(self) >= duration('1ms')"
+                        }
+                      ]
                     },
                     "probes": {
                       "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
-                      "type": "integer"
+                      "type": "integer",
+                      "maximum": 4294967295,
+                      "minimum": 0
                     },
                     "time": {
                       "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
-                      "type": "string"
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must be a valid duration greater than 1ms",
+                          "rule": "duration(self) >= duration('1ms')"
+                        }
+                      ]
                     }
                   }
                 }
@@ -170,7 +215,7 @@
                 "type": "string"
               },
               "captureMode": {
-                "description": "The captureMode option dictates how traffic to the listener is expected to be captured (or not).",
+                "description": "The captureMode option dictates how traffic to the listener is expected to be captured (or not).\n\nValid Options: DEFAULT, IPTABLES, NONE",
                 "type": "string",
                 "enum": [
                   "DEFAULT",
@@ -187,7 +232,7 @@
                     "type": "object",
                     "properties": {
                       "h2UpgradePolicy": {
-                        "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.",
+                        "description": "Specify if http1.1 connection should be upgraded to http2 for the associated destination.\n\nValid Options: DEFAULT, DO_NOT_UPGRADE, UPGRADE",
                         "type": "string",
                         "enum": [
                           "DEFAULT",
@@ -207,7 +252,18 @@
                       },
                       "idleTimeout": {
                         "description": "The idle timeout for upstream connection pool connections.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
+                      },
+                      "maxConcurrentStreams": {
+                        "description": "The maximum number of concurrent streams allowed for a peer on one HTTP/2 connection.",
+                        "type": "integer",
+                        "format": "int32"
                       },
                       "maxRequestsPerConnection": {
                         "description": "Maximum number of requests per connection to a backend.",
@@ -231,11 +287,27 @@
                     "properties": {
                       "connectTimeout": {
                         "description": "TCP connection timeout.",
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
+                      },
+                      "idleTimeout": {
+                        "description": "The idle timeout for TCP connections.",
                         "type": "string"
                       },
                       "maxConnectionDuration": {
                         "description": "The maximum duration of a connection.",
-                        "type": "string"
+                        "type": "string",
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "must be a valid duration greater than 1ms",
+                            "rule": "duration(self) >= duration('1ms')"
+                          }
+                        ]
                       },
                       "maxConnections": {
                         "description": "Maximum number of HTTP1 /TCP connections to a destination host.",
@@ -248,15 +320,29 @@
                         "properties": {
                           "interval": {
                             "description": "The time duration between keep-alive probes.",
-                            "type": "string"
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
                           },
                           "probes": {
                             "description": "Maximum number of keepalive probes to send without response before deciding the connection is dead.",
-                            "type": "integer"
+                            "type": "integer",
+                            "maximum": 4294967295,
+                            "minimum": 0
                           },
                           "time": {
                             "description": "The time duration a connection needs to be idle before keep-alive probes start being sent.",
-                            "type": "string"
+                            "type": "string",
+                            "x-kubernetes-validations": [
+                              {
+                                "message": "must be a valid duration greater than 1ms",
+                                "rule": "duration(self) >= duration('1ms')"
+                              }
+                            ]
                           }
                         }
                       }
@@ -278,14 +364,18 @@
                   },
                   "number": {
                     "description": "A valid non-negative integer port number.",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   },
                   "protocol": {
                     "description": "The protocol exposed on the port.",
                     "type": "string"
                   },
                   "targetPort": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   }
                 }
               },
@@ -295,6 +385,10 @@
                 "properties": {
                   "caCertificates": {
                     "description": "REQUIRED if mode is `MUTUAL` or `OPTIONAL_MUTUAL`.",
+                    "type": "string"
+                  },
+                  "caCrl": {
+                    "description": "OPTIONAL: The path to the file containing the certificate revocation list (CRL) to use in verifying a presented client side certificate.",
                     "type": "string"
                   },
                   "cipherSuites": {
@@ -313,7 +407,7 @@
                     "type": "boolean"
                   },
                   "maxProtocolVersion": {
-                    "description": "Optional: Maximum TLS protocol version.",
+                    "description": "Optional: Maximum TLS protocol version.\n\nValid Options: TLS_AUTO, TLSV1_0, TLSV1_1, TLSV1_2, TLSV1_3",
                     "type": "string",
                     "enum": [
                       "TLS_AUTO",
@@ -324,7 +418,7 @@
                     ]
                   },
                   "minProtocolVersion": {
-                    "description": "Optional: Minimum TLS protocol version.",
+                    "description": "Optional: Minimum TLS protocol version.\n\nValid Options: TLS_AUTO, TLSV1_0, TLSV1_1, TLSV1_2, TLSV1_3",
                     "type": "string",
                     "enum": [
                       "TLS_AUTO",
@@ -335,7 +429,7 @@
                     ]
                   },
                   "mode": {
-                    "description": "Optional: Indicates whether connections to this port should be secured using TLS.",
+                    "description": "Optional: Indicates whether connections to this port should be secured using TLS.\n\nValid Options: PASSTHROUGH, SIMPLE, MUTUAL, AUTO_PASSTHROUGH, ISTIO_MUTUAL, OPTIONAL_MUTUAL",
                     "type": "string",
                     "enum": [
                       "PASSTHROUGH",
@@ -381,7 +475,7 @@
           }
         },
         "outboundTrafficPolicy": {
-          "description": "Configuration for the outbound traffic policy.",
+          "description": "Set the default behavior of the sidecar for handling outbound traffic from the application.",
           "type": "object",
           "properties": {
             "egressProxy": {
@@ -399,7 +493,9 @@
                   "type": "object",
                   "properties": {
                     "number": {
-                      "type": "integer"
+                      "type": "integer",
+                      "maximum": 4294967295,
+                      "minimum": 0
                     }
                   }
                 },
@@ -410,6 +506,7 @@
               }
             },
             "mode": {
+              "description": "\n\nValid Options: REGISTRY_ONLY, ALLOW_ANY",
               "type": "string",
               "enum": [
                 "REGISTRY_ONLY",
@@ -425,8 +522,16 @@
             "labels": {
               "description": "One or more labels that indicate a specific set of pods/VMs on which the configuration should be applied.",
               "type": "object",
+              "maxProperties": 256,
               "additionalProperties": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 63,
+                "x-kubernetes-validations": [
+                  {
+                    "message": "wildcard is not supported in selector",
+                    "rule": "!self.contains('*')"
+                  }
+                ]
               }
             }
           }

@@ -67,14 +67,18 @@
                   },
                   "number": {
                     "description": "A valid non-negative integer port number.",
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   },
                   "protocol": {
                     "description": "The protocol exposed on the port.",
                     "type": "string"
                   },
                   "targetPort": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 4294967295,
+                    "minimum": 0
                   }
                 }
               },
@@ -84,6 +88,10 @@
                 "properties": {
                   "caCertificates": {
                     "description": "REQUIRED if mode is `MUTUAL` or `OPTIONAL_MUTUAL`.",
+                    "type": "string"
+                  },
+                  "caCrl": {
+                    "description": "OPTIONAL: The path to the file containing the certificate revocation list (CRL) to use in verifying a presented client side certificate.",
                     "type": "string"
                   },
                   "cipherSuites": {
@@ -102,7 +110,7 @@
                     "type": "boolean"
                   },
                   "maxProtocolVersion": {
-                    "description": "Optional: Maximum TLS protocol version.",
+                    "description": "Optional: Maximum TLS protocol version.\n\nValid Options: TLS_AUTO, TLSV1_0, TLSV1_1, TLSV1_2, TLSV1_3",
                     "type": "string",
                     "enum": [
                       "TLS_AUTO",
@@ -113,7 +121,7 @@
                     ]
                   },
                   "minProtocolVersion": {
-                    "description": "Optional: Minimum TLS protocol version.",
+                    "description": "Optional: Minimum TLS protocol version.\n\nValid Options: TLS_AUTO, TLSV1_0, TLSV1_1, TLSV1_2, TLSV1_3",
                     "type": "string",
                     "enum": [
                       "TLS_AUTO",
@@ -124,7 +132,7 @@
                     ]
                   },
                   "mode": {
-                    "description": "Optional: Indicates whether connections to this port should be secured using TLS.",
+                    "description": "Optional: Indicates whether connections to this port should be secured using TLS.\n\nValid Options: PASSTHROUGH, SIMPLE, MUTUAL, AUTO_PASSTHROUGH, ISTIO_MUTUAL, OPTIONAL_MUTUAL",
                     "type": "string",
                     "enum": [
                       "PASSTHROUGH",

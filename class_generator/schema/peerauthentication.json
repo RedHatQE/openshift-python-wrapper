@@ -22,7 +22,7 @@
           "type": "object",
           "properties": {
             "mode": {
-              "description": "Defines the mTLS mode used for peer authentication.",
+              "description": "Defines the mTLS mode used for peer authentication.\n\nValid Options: DISABLE, PERMISSIVE, STRICT",
               "type": "string",
               "enum": [
                 "UNSET",
@@ -36,11 +36,12 @@
         "portLevelMtls": {
           "description": "Port specific mutual TLS settings.",
           "type": "object",
+          "minProperties": 1,
           "additionalProperties": {
             "type": "object",
             "properties": {
               "mode": {
-                "description": "Defines the mTLS mode used for peer authentication.",
+                "description": "Defines the mTLS mode used for peer authentication.\n\nValid Options: DISABLE, PERMISSIVE, STRICT",
                 "type": "string",
                 "enum": [
                   "UNSET",
@@ -50,22 +51,52 @@
                 ]
               }
             }
-          }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "port must be between 1-65535",
+              "rule": "self.all(key, 0 < int(key) && int(key) <= 65535)"
+            }
+          ]
         },
         "selector": {
-          "description": "The selector determines the workloads to apply the ChannelAuthentication on.",
+          "description": "The selector determines the workloads to apply the PeerAuthentication on.",
           "type": "object",
           "properties": {
             "matchLabels": {
               "description": "One or more labels that indicate a specific set of pods/VMs on which a policy should be applied.",
               "type": "object",
+              "maxProperties": 4096,
               "additionalProperties": {
-                "type": "string"
-              }
+                "type": "string",
+                "maxLength": 63,
+                "x-kubernetes-validations": [
+                  {
+                    "message": "wildcard not allowed in label value match",
+                    "rule": "!self.contains('*')"
+                  }
+                ]
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "wildcard not allowed in label key match",
+                  "rule": "self.all(key, !key.contains('*'))"
+                },
+                {
+                  "message": "key must not be empty",
+                  "rule": "self.all(key, key.size() != 0)"
+                }
+              ]
             }
           }
         }
-      }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "portLevelMtls requires selector",
+          "rule": "(has(self.selector) && has(self.selector.matchLabels) && self.selector.matchLabels.size() > 0) || !has(self.portLevelMtls)"
+        }
+      ]
     },
     "status": {
       "x-kubernetes-preserve-unknown-fields": true

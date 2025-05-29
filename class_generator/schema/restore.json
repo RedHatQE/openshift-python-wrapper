@@ -1,5 +1,5 @@
 {
-  "description": "Restore is a Velero resource that represents the application of\nresources from a Velero backup to a target Kubernetes cluster.",
+  "description": "Restore is the Schema for the restores API. It is used to define restore jobs and its restoration source.",
   "type": "object",
   "properties": {
     "apiVersion": {
@@ -15,117 +15,867 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "RestoreSpec defines the specification for a Velero restore.",
+      "description": "RestoreSpec defines the desired state of restore",
       "type": "object",
+      "required": [
+        "mariaDbRef"
+      ],
       "properties": {
-        "backupName": {
-          "description": "BackupName is the unique name of the Velero backup to restore\nfrom.",
-          "type": "string"
-        },
-        "excludedNamespaces": {
-          "description": "ExcludedNamespaces contains a list of namespaces that are not\nincluded in the restore."
-        },
-        "excludedResources": {
-          "description": "ExcludedResources is a slice of resource names that are not\nincluded in the restore."
-        },
-        "existingResourcePolicy": {
-          "description": "ExistingResourcePolicy specifies the restore behavior for the Kubernetes resource to be restored"
-        },
-        "hooks": {
-          "description": "Hooks represent custom behaviors that should be executed during or post restore.",
+        "affinity": {
+          "description": "Affinity to be used in the Pod.",
           "type": "object",
           "properties": {
-            "resources": {
-              "type": "array",
-              "items": {
-                "description": "RestoreResourceHookSpec defines one or more RestoreResrouceHooks that should be executed based on\nthe rules defined for namespaces, resources, and label selector.",
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "excludedNamespaces": {
-                    "description": "ExcludedNamespaces specifies the namespaces to which this hook spec does not apply."
-                  },
-                  "excludedResources": {
-                    "description": "ExcludedResources specifies the resources to which this hook spec does not apply."
-                  },
-                  "includedNamespaces": {
-                    "description": "IncludedNamespaces specifies the namespaces to which this hook spec applies. If empty, it applies\nto all namespaces."
-                  },
-                  "includedResources": {
-                    "description": "IncludedResources specifies the resources to which this hook spec applies. If empty, it applies\nto all resources."
-                  },
-                  "labelSelector": {
-                    "description": "LabelSelector, if specified, filters the resources to which this hook spec applies.",
-                    "x-kubernetes-map-type": "atomic"
-                  },
-                  "name": {
-                    "description": "Name is the name of this hook.",
-                    "type": "string"
-                  },
-                  "postHooks": {
-                    "description": "PostHooks is a list of RestoreResourceHooks to execute during and after restoring a resource.",
-                    "type": "array",
-                    "items": {
-                      "description": "RestoreResourceHook defines a restore hook for a resource.",
-                      "type": "object",
-                      "properties": {
-                        "exec": {
-                          "description": "Exec defines an exec restore hook.",
-                          "type": "object",
-                          "required": [
-                            "command"
-                          ],
-                          "properties": {
-                            "command": {
-                              "description": "Command is the command and arguments to execute from within a container after a pod has been restored.",
-                              "type": "array",
-                              "minItems": 1,
-                              "items": {
-                                "type": "string"
+            "antiAffinityEnabled": {
+              "description": "AntiAffinityEnabled configures PodAntiAffinity so each Pod is scheduled in a different Node, enabling HA.\nMake sure you have at least as many Nodes available as the replicas to not end up with unscheduled Pods.",
+              "type": "boolean"
+            },
+            "nodeAffinity": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeaffinity-v1-core",
+              "type": "object",
+              "properties": {
+                "preferredDuringSchedulingIgnoredDuringExecution": {
+                  "type": "array",
+                  "items": {
+                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#preferredschedulingterm-v1-core",
+                    "type": "object",
+                    "required": [
+                      "preference",
+                      "weight"
+                    ],
+                    "properties": {
+                      "preference": {
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorterm-v1-core",
+                        "type": "object",
+                        "properties": {
+                          "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
                               }
                             },
-                            "container": {
-                              "description": "Container is the container in the pod where the command should be executed. If not specified,\nthe pod's first container is used.",
-                              "type": "string"
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "matchFields": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
                             },
-                            "execTimeout": {
-                              "description": "ExecTimeout defines the maximum amount of time Velero should wait for the hook to complete before\nconsidering the execution a failure.",
-                              "type": "string"
-                            },
-                            "onError": {
-                              "description": "OnError specifies how Velero should behave if it encounters an error executing this hook.",
-                              "type": "string",
-                              "enum": [
-                                "Continue",
-                                "Fail"
-                              ]
-                            },
-                            "waitForReady": {
-                              "description": "WaitForReady ensures command will be launched when container is Ready instead of Running."
-                            },
-                            "waitTimeout": {
-                              "description": "WaitTimeout defines the maximum amount of time Velero should wait for the container to be Ready\nbefore attempting to run the command.",
-                              "type": "string"
-                            }
+                            "x-kubernetes-list-type": "atomic"
                           }
-                        },
-                        "init": {
-                          "description": "Init defines an init restore hook.",
-                          "type": "object",
-                          "properties": {
-                            "initContainers": {
-                              "description": "InitContainers is list of init containers to be added to a pod during its restore.",
-                              "x-kubernetes-preserve-unknown-fields": true
+                        }
+                      },
+                      "weight": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselector-v1-core",
+                  "type": "object",
+                  "required": [
+                    "nodeSelectorTerms"
+                  ],
+                  "properties": {
+                    "nodeSelectorTerms": {
+                      "type": "array",
+                      "items": {
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorterm-v1-core",
+                        "type": "object",
+                        "properties": {
+                          "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
                             },
-                            "timeout": {
-                              "description": "Timeout defines the maximum amount of time Velero should wait for the initContainers to complete.",
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "matchFields": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          }
+                        }
+                      },
+                      "x-kubernetes-list-type": "atomic"
+                    }
+                  }
+                }
+              }
+            },
+            "podAntiAffinity": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podantiaffinity-v1-core.",
+              "type": "object",
+              "properties": {
+                "preferredDuringSchedulingIgnoredDuringExecution": {
+                  "type": "array",
+                  "items": {
+                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#weightedpodaffinityterm-v1-core.",
+                    "type": "object",
+                    "required": [
+                      "podAffinityTerm",
+                      "weight"
+                    ],
+                    "properties": {
+                      "podAffinityTerm": {
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podaffinityterm-v1-core.",
+                        "type": "object",
+                        "required": [
+                          "topologyKey"
+                        ],
+                        "properties": {
+                          "labelSelector": {
+                            "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta",
+                            "type": "object",
+                            "properties": {
+                              "matchExpressions": {
+                                "type": "array",
+                                "items": {
+                                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselectorrequirement-v1-meta",
+                                  "type": "object",
+                                  "required": [
+                                    "key",
+                                    "operator"
+                                  ],
+                                  "properties": {
+                                    "key": {
+                                      "type": "string"
+                                    },
+                                    "operator": {
+                                      "description": "A label selector operator is the set of operators that can be used in a selector requirement.",
+                                      "type": "string"
+                                    },
+                                    "values": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      },
+                                      "x-kubernetes-list-type": "atomic"
+                                    }
+                                  }
+                                },
+                                "x-kubernetes-list-type": "atomic"
+                              },
+                              "matchLabels": {
+                                "type": "object",
+                                "additionalProperties": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "topologyKey": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "weight": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                  "type": "array",
+                  "items": {
+                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podaffinityterm-v1-core.",
+                    "type": "object",
+                    "required": [
+                      "topologyKey"
+                    ],
+                    "properties": {
+                      "labelSelector": {
+                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta",
+                        "type": "object",
+                        "properties": {
+                          "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselectorrequirement-v1-meta",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "operator"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "type": "string"
+                                },
+                                "operator": {
+                                  "description": "A label selector operator is the set of operators that can be used in a selector requirement.",
+                                  "type": "string"
+                                },
+                                "values": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "x-kubernetes-list-type": "atomic"
+                                }
+                              }
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          },
+                          "matchLabels": {
+                            "type": "object",
+                            "additionalProperties": {
                               "type": "string"
                             }
                           }
                         }
+                      },
+                      "topologyKey": {
+                        "type": "string"
                       }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                }
+              }
+            }
+          }
+        },
+        "args": {
+          "description": "Args to be used in the Container.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "backoffLimit": {
+          "description": "BackoffLimit defines the maximum number of attempts to successfully perform a Backup.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "backupRef": {
+          "description": "BackupRef is a reference to a Backup object. It has priority over S3 and Volume.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "database": {
+          "description": "Database defines the logical database to be restored. If not provided, all databases available in the backup are restored.\nIMPORTANT: The database must previously exist.",
+          "type": "string"
+        },
+        "imagePullSecrets": {
+          "description": "ImagePullSecrets is the list of pull Secrets to be used to pull the image.",
+          "type": "array",
+          "items": {
+            "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "inheritMetadata": {
+          "description": "InheritMetadata defines the metadata to be inherited by children resources.",
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Annotations to be added to children resources.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "labels": {
+              "description": "Labels to be added to children resources.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "logLevel": {
+          "description": "LogLevel to be used n the Backup Job. It defaults to 'info'.",
+          "type": "string"
+        },
+        "mariaDbRef": {
+          "description": "MariaDBRef is a reference to a MariaDB object.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            },
+            "waitForIt": {
+              "description": "WaitForIt indicates whether the controller using this reference should wait for MariaDB to be ready.",
+              "type": "boolean"
+            }
+          }
+        },
+        "nodeSelector": {
+          "description": "NodeSelector to be used in the Pod.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "podMetadata": {
+          "description": "PodMetadata defines extra metadata for the Pod.",
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Annotations to be added to children resources.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "labels": {
+              "description": "Labels to be added to children resources.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "podSecurityContext": {
+          "description": "SecurityContext holds pod-level security attributes and common container settings.",
+          "type": "object",
+          "properties": {
+            "appArmorProfile": {
+              "description": "AppArmorProfile defines a pod or container's AppArmor settings.",
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "localhostProfile": {
+                  "description": "localhostProfile indicates a profile loaded on the node that should be used.\nThe profile must be preconfigured on the node to work.\nMust match the loaded name of the profile.\nMust be set if and only if type is \"Localhost\".",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "type indicates which kind of AppArmor profile will be applied.\nValid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
+                  "type": "string"
+                }
+              }
+            },
+            "fsGroup": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "fsGroupChangePolicy": {
+              "description": "PodFSGroupChangePolicy holds policies that will be used for applying fsGroup to a volume\nwhen volume is mounted.",
+              "type": "string"
+            },
+            "runAsGroup": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "runAsNonRoot": {
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "seLinuxOptions": {
+              "description": "SELinuxOptions are the labels to be applied to the container",
+              "type": "object",
+              "properties": {
+                "level": {
+                  "description": "Level is SELinux level label that applies to the container.",
+                  "type": "string"
+                },
+                "role": {
+                  "description": "Role is a SELinux role label that applies to the container.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type is a SELinux type label that applies to the container.",
+                  "type": "string"
+                },
+                "user": {
+                  "description": "User is a SELinux user label that applies to the container.",
+                  "type": "string"
+                }
+              }
+            },
+            "seccompProfile": {
+              "description": "SeccompProfile defines a pod/container's seccomp profile settings.\nOnly one profile source may be set.",
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "localhostProfile": {
+                  "description": "localhostProfile indicates a profile defined in a file on the node should be used.\nThe profile must be preconfigured on the node to work.\nMust be a descending path, relative to the kubelet's configured seccomp profile location.\nMust be set if type is \"Localhost\". Must NOT be set for any other type.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
+                  "type": "string"
+                }
+              }
+            },
+            "supplementalGroups": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "x-kubernetes-list-type": "atomic"
+            }
+          }
+        },
+        "priorityClassName": {
+          "description": "PriorityClassName to be used in the Pod.",
+          "type": "string"
+        },
+        "resources": {
+          "description": "Resouces describes the compute resource requirements.",
+          "type": "object",
+          "properties": {
+            "limits": {
+              "description": "ResourceList is a set of (resource name, quantity) pairs.",
+              "type": "object",
+              "additionalProperties": {
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "x-kubernetes-int-or-string": true
+              }
+            },
+            "requests": {
+              "description": "ResourceList is a set of (resource name, quantity) pairs.",
+              "type": "object",
+              "additionalProperties": {
+                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                "x-kubernetes-int-or-string": true
+              }
+            }
+          }
+        },
+        "restartPolicy": {
+          "description": "RestartPolicy to be added to the Backup Job.",
+          "type": "string",
+          "enum": [
+            "Always",
+            "OnFailure",
+            "Never"
+          ]
+        },
+        "s3": {
+          "description": "S3 defines the configuration to restore backups from a S3 compatible storage. It has priority over Volume.",
+          "type": "object",
+          "required": [
+            "bucket",
+            "endpoint"
+          ],
+          "properties": {
+            "accessKeyIdSecretKeyRef": {
+              "description": "AccessKeyIdSecretKeyRef is a reference to a Secret key containing the S3 access key id.",
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "bucket": {
+              "description": "Bucket is the name Name of the bucket to store backups.",
+              "type": "string"
+            },
+            "endpoint": {
+              "description": "Endpoint is the S3 API endpoint without scheme.",
+              "type": "string"
+            },
+            "prefix": {
+              "description": "Prefix indicates a folder/subfolder in the bucket. For example: mariadb/ or mariadb/backups. A trailing slash '/' is added if not provided.",
+              "type": "string"
+            },
+            "region": {
+              "description": "Region is the S3 region name to use.",
+              "type": "string"
+            },
+            "secretAccessKeySecretKeyRef": {
+              "description": "AccessKeyIdSecretKeyRef is a reference to a Secret key containing the S3 secret key.",
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "sessionTokenSecretKeyRef": {
+              "description": "SessionTokenSecretKeyRef is a reference to a Secret key containing the S3 session token.",
+              "type": "object",
+              "required": [
+                "key"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            },
+            "tls": {
+              "description": "TLS provides the configuration required to establish TLS connections with S3.",
+              "type": "object",
+              "properties": {
+                "caSecretKeyRef": {
+                  "description": "CASecretKeyRef is a reference to a Secret key containing a CA bundle in PEM format used to establish TLS connections with S3.\nBy default, the system trust chain will be used, but you can use this field to add more CAs to the bundle.",
+                  "type": "object",
+                  "required": [
+                    "key"
+                  ],
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "enabled": {
+                  "description": "Enabled is a flag to enable TLS.",
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "securityContext": {
+          "description": "SecurityContext holds security configuration that will be applied to a container.",
+          "type": "object",
+          "properties": {
+            "allowPrivilegeEscalation": {
+              "type": "boolean"
+            },
+            "capabilities": {
+              "description": "Adds and removes POSIX capabilities from running containers.",
+              "type": "object",
+              "properties": {
+                "add": {
+                  "description": "Added capabilities",
+                  "type": "array",
+                  "items": {
+                    "description": "Capability represent POSIX capabilities type",
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "drop": {
+                  "description": "Removed capabilities",
+                  "type": "array",
+                  "items": {
+                    "description": "Capability represent POSIX capabilities type",
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                }
+              }
+            },
+            "privileged": {
+              "type": "boolean"
+            },
+            "readOnlyRootFilesystem": {
+              "type": "boolean"
+            },
+            "runAsGroup": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "runAsNonRoot": {
+              "type": "boolean"
+            },
+            "runAsUser": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "serviceAccountName": {
+          "description": "ServiceAccountName is the name of the ServiceAccount to be used by the Pods.",
+          "type": "string"
+        },
+        "stagingStorage": {
+          "description": "StagingStorage defines the temporary storage used to keep external backups (i.e. S3) while they are being processed.\nIt defaults to an emptyDir volume, meaning that the backups will be temporarily stored in the node where the Restore Job is scheduled.",
+          "type": "object",
+          "properties": {
+            "persistentVolumeClaim": {
+              "description": "PersistentVolumeClaim is a Kubernetes PVC specification.",
+              "type": "object",
+              "properties": {
+                "accessModes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "resources": {
+                  "description": "VolumeResourceRequirements describes the storage resource requirements for a volume.",
+                  "type": "object",
+                  "properties": {
+                    "limits": {
+                      "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                      "type": "object",
+                      "additionalProperties": {
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      }
+                    },
+                    "requests": {
+                      "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                      "type": "object",
+                      "additionalProperties": {
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      }
+                    }
+                  }
+                },
+                "selector": {
+                  "description": "A label selector is a label query over a set of resources. The result of matchLabels and\nmatchExpressions are ANDed. An empty label selector matches all objects. A null\nlabel selector matches no objects.",
+                  "type": "object",
+                  "properties": {
+                    "matchExpressions": {
+                      "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                      "type": "array",
+                      "items": {
+                        "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                        "type": "object",
+                        "required": [
+                          "key",
+                          "operator"
+                        ],
+                        "properties": {
+                          "key": {
+                            "description": "key is the label key that the selector applies to.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                            "type": "string"
+                          },
+                          "values": {
+                            "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "x-kubernetes-list-type": "atomic"
+                          }
+                        }
+                      },
+                      "x-kubernetes-list-type": "atomic"
+                    },
+                    "matchLabels": {
+                      "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "x-kubernetes-map-type": "atomic"
+                },
+                "storageClassName": {
+                  "type": "string"
+                }
+              }
+            },
+            "volume": {
+              "description": "Volume is a Kubernetes volume specification.",
+              "type": "object",
+              "properties": {
+                "csi": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#csivolumesource-v1-core.",
+                  "type": "object",
+                  "required": [
+                    "driver"
+                  ],
+                  "properties": {
+                    "driver": {
+                      "type": "string"
+                    },
+                    "fsType": {
+                      "type": "string"
+                    },
+                    "nodePublishSecretRef": {
+                      "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core.",
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "readOnly": {
+                      "type": "boolean"
+                    },
+                    "volumeAttributes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "emptyDir": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#emptydirvolumesource-v1-core.",
+                  "type": "object",
+                  "properties": {
+                    "medium": {
+                      "description": "StorageMedium defines ways that storage can be allocated to a volume.",
+                      "type": "string"
+                    },
+                    "sizeLimit": {
+                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                      "x-kubernetes-int-or-string": true
+                    }
+                  }
+                },
+                "nfs": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.",
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "server"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "readOnly": {
+                      "type": "boolean"
+                    },
+                    "server": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "persistentVolumeClaim": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#persistentvolumeclaimvolumesource-v1-core.",
+                  "type": "object",
+                  "required": [
+                    "claimName"
+                  ],
+                  "properties": {
+                    "claimName": {
+                      "type": "string"
+                    },
+                    "readOnly": {
+                      "type": "boolean"
                     }
                   }
                 }
@@ -133,128 +883,198 @@
             }
           }
         },
-        "includeClusterResources": {
-          "description": "IncludeClusterResources specifies whether cluster-scoped resources\nshould be included for consideration in the restore. If null, defaults\nto true."
+        "targetRecoveryTime": {
+          "description": "TargetRecoveryTime is a RFC3339 (1970-01-01T00:00:00Z) date and time that defines the point in time recovery objective.\nIt is used to determine the closest restoration source in time.",
+          "type": "string",
+          "format": "date-time"
         },
-        "includedNamespaces": {
-          "description": "IncludedNamespaces is a slice of namespace names to include objects\nfrom. If empty, all namespaces are included."
-        },
-        "includedResources": {
-          "description": "IncludedResources is a slice of resource names to include\nin the restore. If empty, all resources in the backup are included."
-        },
-        "itemOperationTimeout": {
-          "description": "ItemOperationTimeout specifies the time used to wait for RestoreItemAction operations\nThe default value is 4 hour.",
-          "type": "string"
-        },
-        "labelSelector": {
-          "description": "LabelSelector is a metav1.LabelSelector to filter with\nwhen restoring individual objects from the backup. If empty\nor nil, all objects are included. Optional.",
-          "x-kubernetes-map-type": "atomic"
-        },
-        "namespaceMapping": {
-          "description": "NamespaceMapping is a map of source namespace names\nto target namespace names to restore into. Any source\nnamespaces not included in the map will be restored into\nnamespaces of the same name.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
+        "tolerations": {
+          "description": "Tolerations to be used in the Pod.",
+          "type": "array",
+          "items": {
+            "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
+            "type": "object",
+            "properties": {
+              "effect": {
+                "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+                "type": "string"
+              },
+              "key": {
+                "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+                "type": "string"
+              },
+              "operator": {
+                "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.",
+                "type": "string"
+              },
+              "tolerationSeconds": {
+                "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "value": {
+                "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
+                "type": "string"
+              }
+            }
           }
         },
-        "orLabelSelectors": {
-          "description": "OrLabelSelectors is list of metav1.LabelSelector to filter with\nwhen restoring individual objects from the backup. If multiple provided\nthey will be joined by the OR operator. LabelSelector as well as\nOrLabelSelectors cannot co-exist in restore request, only one of them\ncan be used"
-        },
-        "preserveNodePorts": {
-          "description": "PreserveNodePorts specifies whether to restore old nodePorts from backup."
-        },
-        "resourceModifier": {
-          "description": "ResourceModifier specifies the reference to JSON resource patches that should be applied to resources before restoration.",
-          "required": [
-            "kind",
-            "name"
-          ],
-          "x-kubernetes-map-type": "atomic"
-        },
-        "restorePVs": {
-          "description": "RestorePVs specifies whether to restore all included\nPVs from snapshot"
-        },
-        "restoreStatus": {
-          "description": "RestoreStatus specifies which resources we should restore the status\nfield. If nil, no objects are included. Optional."
-        },
-        "scheduleName": {
-          "description": "ScheduleName is the unique name of the Velero schedule to restore\nfrom. If specified, and BackupName is empty, Velero will restore\nfrom the most recent successful backup created from this schedule.",
-          "type": "string"
-        },
-        "uploaderConfig": {
-          "description": "UploaderConfig specifies the configuration for the restore."
+        "volume": {
+          "description": "Volume is a Kubernetes Volume object that contains a backup.",
+          "type": "object",
+          "properties": {
+            "csi": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#csivolumesource-v1-core.",
+              "type": "object",
+              "required": [
+                "driver"
+              ],
+              "properties": {
+                "driver": {
+                  "type": "string"
+                },
+                "fsType": {
+                  "type": "string"
+                },
+                "nodePublishSecretRef": {
+                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core.",
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "volumeAttributes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "emptyDir": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#emptydirvolumesource-v1-core.",
+              "type": "object",
+              "properties": {
+                "medium": {
+                  "description": "StorageMedium defines ways that storage can be allocated to a volume.",
+                  "type": "string"
+                },
+                "sizeLimit": {
+                  "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                  "x-kubernetes-int-or-string": true
+                }
+              }
+            },
+            "nfs": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.",
+              "type": "object",
+              "required": [
+                "path",
+                "server"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "server": {
+                  "type": "string"
+                }
+              }
+            },
+            "persistentVolumeClaim": {
+              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#persistentvolumeclaimvolumesource-v1-core.",
+              "type": "object",
+              "required": [
+                "claimName"
+              ],
+              "properties": {
+                "claimName": {
+                  "type": "string"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
         }
       }
     },
     "status": {
-      "description": "RestoreStatus captures the current status of a Velero restore",
+      "description": "RestoreStatus defines the observed state of restore",
       "type": "object",
       "properties": {
-        "completionTimestamp": {
-          "description": "CompletionTimestamp records the time the restore operation was completed.\nCompletion time is recorded even on failed restore.\nThe server's time is used for StartTimestamps",
-          "format": "date-time"
-        },
-        "errors": {
-          "description": "Errors is a count of all error messages that were generated during\nexecution of the restore. The actual errors are stored in object storage.",
-          "type": "integer"
-        },
-        "failureReason": {
-          "description": "FailureReason is an error that caused the entire restore to fail.",
-          "type": "string"
-        },
-        "hookStatus": {
-          "description": "HookStatus contains information about the status of the hooks."
-        },
-        "phase": {
-          "description": "Phase is the current state of the Restore",
-          "type": "string",
-          "enum": [
-            "New",
-            "FailedValidation",
-            "InProgress",
-            "WaitingForPluginOperations",
-            "WaitingForPluginOperationsPartiallyFailed",
-            "Completed",
-            "PartiallyFailed",
-            "Failed",
-            "Finalizing",
-            "FinalizingPartiallyFailed"
-          ]
-        },
-        "progress": {
-          "description": "Progress contains information about the restore's execution progress. Note\nthat this information is best-effort only -- if Velero fails to update it\nduring a restore for any reason, it may be inaccurate/stale."
-        },
-        "restoreItemOperationsAttempted": {
-          "description": "RestoreItemOperationsAttempted is the total number of attempted\nasync RestoreItemAction operations for this restore.",
-          "type": "integer"
-        },
-        "restoreItemOperationsCompleted": {
-          "description": "RestoreItemOperationsCompleted is the total number of successfully completed\nasync RestoreItemAction operations for this restore.",
-          "type": "integer"
-        },
-        "restoreItemOperationsFailed": {
-          "description": "RestoreItemOperationsFailed is the total number of async\nRestoreItemAction operations for this restore which ended with an error.",
-          "type": "integer"
-        },
-        "startTimestamp": {
-          "description": "StartTimestamp records the time the restore operation was started.\nThe server's time is used for StartTimestamps",
-          "format": "date-time"
-        },
-        "validationErrors": {
-          "description": "ValidationErrors is a slice of all validation errors (if\napplicable)"
-        },
-        "warnings": {
-          "description": "Warnings is a count of all warning messages that were generated during\nexecution of the restore. The actual warnings are stored in object storage.",
-          "type": "integer"
+        "conditions": {
+          "description": "Conditions for the Restore object.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
         }
       }
     }
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "velero.io",
+      "group": "k8s.mariadb.com",
       "kind": "Restore",
-      "version": "v1"
+      "version": "v1alpha1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

@@ -18,7 +18,7 @@
       "type": "object",
       "properties": {
         "action": {
-          "description": "Optional.",
+          "description": "Optional.\n\nValid Options: ALLOW, DENY, AUDIT, CUSTOM",
           "type": "string",
           "enum": [
             "ALLOW",
@@ -239,35 +239,130 @@
             "matchLabels": {
               "description": "One or more labels that indicate a specific set of pods/VMs on which a policy should be applied.",
               "type": "object",
+              "maxProperties": 4096,
               "additionalProperties": {
-                "type": "string"
-              }
+                "type": "string",
+                "maxLength": 63,
+                "x-kubernetes-validations": [
+                  {
+                    "message": "wildcard not allowed in label value match",
+                    "rule": "!self.contains('*')"
+                  }
+                ]
+              },
+              "x-kubernetes-validations": [
+                {
+                  "message": "wildcard not allowed in label key match",
+                  "rule": "self.all(key, !key.contains('*'))"
+                },
+                {
+                  "message": "key must not be empty",
+                  "rule": "self.all(key, key.size() != 0)"
+                }
+              ]
             }
           }
         },
         "targetRef": {
-          "description": "Optional.",
           "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
           "properties": {
             "group": {
               "description": "group is the group of the target resource.",
-              "type": "string"
+              "type": "string",
+              "maxLength": 253,
+              "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
             },
             "kind": {
               "description": "kind is kind of the target resource.",
-              "type": "string"
+              "type": "string",
+              "maxLength": 63,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$"
             },
             "name": {
               "description": "name is the name of the target resource.",
-              "type": "string"
+              "type": "string",
+              "maxLength": 253,
+              "minLength": 1
             },
             "namespace": {
               "description": "namespace is the namespace of the referent.",
-              "type": "string"
+              "type": "string",
+              "x-kubernetes-validations": [
+                {
+                  "message": "cross namespace referencing is not currently supported",
+                  "rule": "self.size() == 0"
+                }
+              ]
             }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "Support kinds are core/Service, networking.istio.io/ServiceEntry, gateway.networking.k8s.io/Gateway",
+              "rule": "[self.group, self.kind] in [['core','Service'], ['','Service'], ['gateway.networking.k8s.io','Gateway'], ['networking.istio.io','ServiceEntry']]"
+            }
+          ]
+        },
+        "targetRefs": {
+          "description": "Optional.",
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "name"
+            ],
+            "properties": {
+              "group": {
+                "description": "group is the group of the target resource.",
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+              },
+              "kind": {
+                "description": "kind is kind of the target resource.",
+                "type": "string",
+                "maxLength": 63,
+                "minLength": 1,
+                "pattern": "^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$"
+              },
+              "name": {
+                "description": "name is the name of the target resource.",
+                "type": "string",
+                "maxLength": 253,
+                "minLength": 1
+              },
+              "namespace": {
+                "description": "namespace is the namespace of the referent.",
+                "type": "string",
+                "x-kubernetes-validations": [
+                  {
+                    "message": "cross namespace referencing is not currently supported",
+                    "rule": "self.size() == 0"
+                  }
+                ]
+              }
+            },
+            "x-kubernetes-validations": [
+              {
+                "message": "Support kinds are core/Service, networking.istio.io/ServiceEntry, gateway.networking.k8s.io/Gateway",
+                "rule": "[self.group, self.kind] in [['core','Service'], ['','Service'], ['gateway.networking.k8s.io','Gateway'], ['networking.istio.io','ServiceEntry']]"
+              }
+            ]
           }
         }
-      }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "only one of targetRefs or selector can be set",
+          "rule": "(has(self.selector)?1:0)+(has(self.targetRef)?1:0)+(has(self.targetRefs)?1:0)<=1"
+        }
+      ]
     },
     "status": {
       "x-kubernetes-preserve-unknown-fields": true
