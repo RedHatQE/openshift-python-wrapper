@@ -13,7 +13,7 @@
       "description": "List of backups. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
       "type": "array",
       "items": {
-        "$ref": "_definitions.json#/definitions/io.velero.v1.Backup"
+        "$ref": "_definitions.json#/definitions/com.mariadb.k8s.v1alpha1.Backup"
       }
     },
     "kind": {
@@ -27,9 +27,9 @@
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "velero.io",
+      "group": "k8s.mariadb.com",
       "kind": "BackupList",
-      "version": "v1"
+      "version": "v1alpha1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

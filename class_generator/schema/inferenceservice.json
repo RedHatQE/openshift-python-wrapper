@@ -1276,6 +1276,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -2262,6 +2265,9 @@
                           ],
                           "properties": {
                             "name": {
+                              "type": "string"
+                            },
+                            "request": {
                               "type": "string"
                             }
                           }
@@ -3310,6 +3316,9 @@
                           "properties": {
                             "name": {
                               "type": "string"
+                            },
+                            "request": {
+                              "type": "string"
                             }
                           }
                         },
@@ -3729,16 +3738,11 @@
                   "name": {
                     "type": "string"
                   },
-                  "source": {
-                    "type": "object",
-                    "properties": {
-                      "resourceClaimName": {
-                        "type": "string"
-                      },
-                      "resourceClaimTemplateName": {
-                        "type": "string"
-                      }
-                    }
+                  "resourceClaimName": {
+                    "type": "string"
+                  },
+                  "resourceClaimTemplateName": {
+                    "type": "string"
                   }
                 }
               },
@@ -3859,6 +3863,9 @@
                     "format": "int64"
                   },
                   "x-kubernetes-list-type": "atomic"
+                },
+                "supplementalGroupsPolicy": {
+                  "type": "string"
                 },
                 "sysctls": {
                   "type": "array",
@@ -4584,6 +4591,17 @@
                         "type": "string"
                       },
                       "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "image": {
+                    "type": "object",
+                    "properties": {
+                      "pullPolicy": {
+                        "type": "string"
+                      },
+                      "reference": {
                         "type": "string"
                       }
                     }
@@ -6422,6 +6440,9 @@
                           "properties": {
                             "name": {
                               "type": "string"
+                            },
+                            "request": {
+                              "type": "string"
                             }
                           }
                         },
@@ -7443,6 +7464,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -8420,6 +8444,9 @@
                           "properties": {
                             "name": {
                               "type": "string"
+                            },
+                            "request": {
+                              "type": "string"
                             }
                           }
                         },
@@ -9351,6 +9378,9 @@
                         ],
                         "properties": {
                           "name": {
+                            "type": "string"
+                          },
+                          "request": {
                             "type": "string"
                           }
                         }
@@ -10345,6 +10375,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -11308,6 +11341,9 @@
                         ],
                         "properties": {
                           "name": {
+                            "type": "string"
+                          },
+                          "request": {
                             "type": "string"
                           }
                         }
@@ -12275,6 +12311,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -13225,6 +13264,9 @@
                         ],
                         "properties": {
                           "name": {
+                            "type": "string"
+                          },
+                          "request": {
                             "type": "string"
                           }
                         }
@@ -14187,6 +14229,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -14562,16 +14607,11 @@
                   "name": {
                     "type": "string"
                   },
-                  "source": {
-                    "type": "object",
-                    "properties": {
-                      "resourceClaimName": {
-                        "type": "string"
-                      },
-                      "resourceClaimTemplateName": {
-                        "type": "string"
-                      }
-                    }
+                  "resourceClaimName": {
+                    "type": "string"
+                  },
+                  "resourceClaimTemplateName": {
+                    "type": "string"
                   }
                 }
               },
@@ -14692,6 +14732,9 @@
                     "format": "int64"
                   },
                   "x-kubernetes-list-type": "atomic"
+                },
+                "supplementalGroupsPolicy": {
+                  "type": "string"
                 },
                 "sysctls": {
                   "type": "array",
@@ -15343,6 +15386,9 @@
                         ],
                         "properties": {
                           "name": {
+                            "type": "string"
+                          },
+                          "request": {
                             "type": "string"
                           }
                         }
@@ -16297,6 +16343,9 @@
                         ],
                         "properties": {
                           "name": {
+                            "type": "string"
+                          },
+                          "request": {
                             "type": "string"
                           }
                         }
@@ -17364,6 +17413,9 @@
                         "properties": {
                           "name": {
                             "type": "string"
+                          },
+                          "request": {
+                            "type": "string"
                           }
                         }
                       },
@@ -18270,6 +18322,17 @@
                         "type": "string"
                       },
                       "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "image": {
+                    "type": "object",
+                    "properties": {
+                      "pullPolicy": {
+                        "type": "string"
+                      },
+                      "reference": {
                         "type": "string"
                       }
                     }
@@ -20084,6 +20147,9 @@
                               "properties": {
                                 "name": {
                                   "type": "string"
+                                },
+                                "request": {
+                                  "type": "string"
                                 }
                               }
                             },
@@ -21063,6 +21129,9 @@
                               ],
                               "properties": {
                                 "name": {
+                                  "type": "string"
+                                },
+                                "request": {
                                   "type": "string"
                                 }
                               }
@@ -22055,6 +22124,9 @@
                               "properties": {
                                 "name": {
                                   "type": "string"
+                                },
+                                "request": {
+                                  "type": "string"
                                 }
                               }
                             },
@@ -22446,16 +22518,11 @@
                       "name": {
                         "type": "string"
                       },
-                      "source": {
-                        "type": "object",
-                        "properties": {
-                          "resourceClaimName": {
-                            "type": "string"
-                          },
-                          "resourceClaimTemplateName": {
-                            "type": "string"
-                          }
-                        }
+                      "resourceClaimName": {
+                        "type": "string"
+                      },
+                      "resourceClaimTemplateName": {
+                        "type": "string"
                       }
                     }
                   },
@@ -22564,6 +22631,9 @@
                         "format": "int64"
                       },
                       "x-kubernetes-list-type": "atomic"
+                    },
+                    "supplementalGroupsPolicy": {
+                      "type": "string"
                     },
                     "sysctls": {
                       "type": "array",
@@ -23288,6 +23358,17 @@
                             "type": "string"
                           },
                           "type": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "image": {
+                        "type": "object",
+                        "properties": {
+                          "pullPolicy": {
+                            "type": "string"
+                          },
+                          "reference": {
                             "type": "string"
                           }
                         }
@@ -24439,6 +24520,9 @@
                         ],
                         "properties": {
                           "name": {
+                            "type": "string"
+                          },
+                          "request": {
                             "type": "string"
                           }
                         }
@@ -26079,6 +26163,9 @@
                           "properties": {
                             "name": {
                               "type": "string"
+                            },
+                            "request": {
+                              "type": "string"
                             }
                           }
                         },
@@ -27126,6 +27213,9 @@
                           "properties": {
                             "name": {
                               "type": "string"
+                            },
+                            "request": {
+                              "type": "string"
                             }
                           }
                         },
@@ -27545,16 +27635,11 @@
                   "name": {
                     "type": "string"
                   },
-                  "source": {
-                    "type": "object",
-                    "properties": {
-                      "resourceClaimName": {
-                        "type": "string"
-                      },
-                      "resourceClaimTemplateName": {
-                        "type": "string"
-                      }
-                    }
+                  "resourceClaimName": {
+                    "type": "string"
+                  },
+                  "resourceClaimTemplateName": {
+                    "type": "string"
                   }
                 }
               },
@@ -27675,6 +27760,9 @@
                     "format": "int64"
                   },
                   "x-kubernetes-list-type": "atomic"
+                },
+                "supplementalGroupsPolicy": {
+                  "type": "string"
                 },
                 "sysctls": {
                   "type": "array",
@@ -28400,6 +28488,17 @@
                         "type": "string"
                       },
                       "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "image": {
+                    "type": "object",
+                    "properties": {
+                      "pullPolicy": {
+                        "type": "string"
+                      },
+                      "reference": {
                         "type": "string"
                       }
                     }

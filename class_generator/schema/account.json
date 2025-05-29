@@ -90,6 +90,16 @@
             }
           },
           "x-kubernetes-map-type": "atomic"
+        },
+        "nimConfigRefreshRate": {
+          "description": "Refresh rate for models data, defaults to 24h",
+          "type": "string",
+          "format": "duration"
+        },
+        "validationRefreshRate": {
+          "description": "Refresh Rate for validation, defaults to 24h",
+          "type": "string",
+          "format": "duration"
         }
       }
     },
@@ -150,6 +160,21 @@
               }
             }
           }
+        },
+        "lastAccountCheck": {
+          "description": "The last time we checked the Account, failed or successful.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastSuccessfulConfigRefresh": {
+          "description": "The last time we refresh the integration config successfully.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastSuccessfulValidation": {
+          "description": "The last time we validated successfully.",
+          "type": "string",
+          "format": "date-time"
         },
         "nimConfig": {
           "description": "A reference to the ConfigMap with data for NIM deployment.",

@@ -20,6 +20,7 @@
       "type": "object",
       "properties": {
         "dashboardConfig": {
+          "description": "Feature flag configurations; intended to just contain overrides",
           "type": "object",
           "properties": {
             "disableAcceleratorProfiles": {
@@ -124,6 +125,7 @@
           }
         },
         "groupsConfig": {
+          "description": "Ignored -- See \"Auth\" Resource",
           "type": "object",
           "required": [
             "adminGroups",
@@ -187,6 +189,7 @@
           }
         },
         "notebookController": {
+          "description": "Jupyter tile configurations",
           "type": "object",
           "required": [
             "enabled"

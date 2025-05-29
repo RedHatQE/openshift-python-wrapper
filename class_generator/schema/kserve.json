@@ -21,7 +21,6 @@
         "defaultDeploymentMode": {
           "description": "Configures the default deployment mode for Kserve. This can be set to 'Serverless' or 'RawDeployment'.\nThe value specified in this field will be used to set the default deployment mode in the 'inferenceservice-config' configmap for Kserve.\nThis field is optional. If no default deployment mode is specified, Kserve will use Serverless mode.",
           "type": "string",
-          "pattern": "^(Serverless|RawDeployment)$",
           "enum": [
             "Serverless",
             "RawDeployment"
@@ -69,9 +68,8 @@
           }
         },
         "rawDeploymentServiceConfig": {
-          "description": "Configures the type of service that is created for InferenceServices using RawDeployment.\nThe values for RawDeploymentServiceConfig can be \"Headless\" or \"Headed\".\nHeadless : sets \"ServiceClusterIPNone = true\" in the 'inferenceservice-config' configmap for Kserve.\nHeaded : sets \"ServiceClusterIPNone = false\" in the 'inferenceservice-config' configmap for Kserve.",
+          "description": "Configures the type of service that is created for InferenceServices using RawDeployment.\nThe values for RawDeploymentServiceConfig can be \"Headless\" (default value) or \"Headed\".\nHeadless: to set \"ServiceClusterIPNone = true\" in the 'inferenceservice-config' configmap for Kserve.\nHeaded: to set \"ServiceClusterIPNone = false\" in the 'inferenceservice-config' configmap for Kserve.",
           "type": "string",
-          "pattern": "^(Headless|Headed)$",
           "enum": [
             "Headless",
             "Headed"
