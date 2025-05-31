@@ -1365,7 +1365,7 @@ class NamespacedResource(Resource):
                         yield cls(
                             client=dyn_client,
                             name=resource_field.metadata.name,
-                            namespace=resource_field.metadata.namespace,
+                            namespace=str(resource_field.metadata.namespace),
                         )
             except TypeError:
                 if raw:
@@ -1374,7 +1374,7 @@ class NamespacedResource(Resource):
                     yield cls(
                         client=dyn_client,
                         name=_resources.metadata.name,
-                        namespace=_resources.metadata.namespace,
+                        namespace=str(_resources.metadata.namespace),
                     )
 
         return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
