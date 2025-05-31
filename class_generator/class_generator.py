@@ -14,7 +14,6 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any
 
-import click
 import cloup
 import pytest
 import requests
@@ -155,13 +154,16 @@ def get_server_version(client: str):
 
 
 def get_client_binary() -> str:
-    if os.system("which oc") == 0:
+    if shutil.which("oc"):
+        LOGGER.debug("Using 'oc' client.")
         return "oc"
 
-    elif os.system("which kubectl") == 0:
+    elif shutil.which("kubectl"):
+        LOGGER.debug("Using 'kubectl' client.")
         return "kubectl"
+
     else:
-        LOGGER.error("Failed to find oc or kubectl")
+        LOGGER.error("Failed to find 'oc' or 'kubectl' in PATH.")
         sys.exit(1)
 
 
@@ -240,12 +242,12 @@ def update_kind_schema():
     )
 
 
-def convert_camel_case_to_snake_case(string_: str) -> str:
+def convert_camel_case_to_snake_case(name: str) -> str:
     """
     Converts a camel case string to snake case.
 
     Args:
-        string_ (str): The camel case string to convert.
+        name (str): The camel case string to convert.
 
     Returns:
         str: The snake case representation of the input string.
@@ -265,19 +267,20 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
         - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
           (e.g., "myCamelCaseString").
     """
-    do_not_proccess_list = ["OAuth", "KubeVirt"]
+    do_not_process_list = ["oauth", "kubevirt"]
+
     # If the input string is in the do_not_proccess_list, return it as it is.
-    if string_.lower() in [_str.lower() for _str in do_not_proccess_list]:
-        return string_.lower()
+    if name.lower() in do_not_process_list:
+        return name.lower()
 
     formatted_str: str = ""
 
-    if string_.islower():
-        return string_
+    if name.islower():
+        return name
 
     # For single words, e.g "Service" or "SERVICE"
-    if string_.istitle() or string_.isupper():
-        return string_.lower()
+    if name.istitle() or name.isupper():
+        return name.lower()
 
     # To decide if underscore is needed before a char, keep the last char format.
     # If previous char is uppercase, underscode should not be added. Also applied for the first char in the string.
@@ -287,9 +290,9 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
     # last word. Underscore should be added before it and all chars from here should be lowercase.
     following_capital_chars: re.Match | None = None
 
-    str_len_for_idx_check = len(string_) - 1
+    str_len_for_idx_check = len(name) - 1
 
-    for idx, char in enumerate(string_):
+    for idx, char in enumerate(name):
         # If lower case, append to formatted string
         if char.islower():
             formatted_str += char
@@ -302,15 +305,15 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
 
         else:
             if idx < str_len_for_idx_check:
-                following_capital_chars = re.search(r"[A-Z]", "".join(string_[idx + 1 :]))
+                following_capital_chars = re.search(r"[A-Z]", "".join(name[idx + 1 :]))
             if last_capital_char:
-                if idx < str_len_for_idx_check and string_[idx + 1].islower():
+                if idx < str_len_for_idx_check and name[idx + 1].islower():
                     if following_capital_chars:
                         formatted_str += f"_{char.lower()}"
                         last_capital_char = True
                         continue
 
-                    remaining_str = "".join(string_[idx:])
+                    remaining_str = "".join(name[idx:])
                     # The 2 letters in the string; uppercase char followed by lowercase char.
                     # Example: `clusterIPs`, handle `Ps` at this point
                     if idx + 1 == str_len_for_idx_check:
@@ -336,25 +339,6 @@ def convert_camel_case_to_snake_case(string_: str) -> str:
                 last_capital_char = True
 
     return formatted_str
-
-
-def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, template_name: str) -> str:
-    env = Environment(
-        loader=FileSystemLoader(template_dir),
-        trim_blocks=True,
-        lstrip_blocks=True,
-        undefined=DebugUndefined,
-    )
-
-    template = env.get_template(name=template_name)
-    rendered = template.render(template_dict)
-    undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
-
-    if undefined_variables:
-        LOGGER.error(f"The following variables are undefined: {undefined_variables}")
-        sys.exit(1)
-
-    return rendered
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
@@ -385,6 +369,25 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
     return user_code, user_imports
 
 
+def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, template_name: str) -> str:
+    env = Environment(
+        loader=FileSystemLoader(template_dir),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        undefined=DebugUndefined,
+    )
+
+    template = env.get_template(name=template_name)
+    rendered = template.render(template_dict)
+    undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
+
+    if undefined_variables:
+        LOGGER.error(f"The following variables are undefined: {undefined_variables}")
+        sys.exit(1)
+
+    return rendered
+
+
 def generate_resource_file_from_dict(
     resource_dict: dict[str, Any],
     overwrite: bool = False,
@@ -405,7 +408,7 @@ def generate_resource_file_from_dict(
     )
 
     output = "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md\n\nfrom __future__ import annotations\n"
-    formatted_kind_str = convert_camel_case_to_snake_case(string_=resource_dict["kind"])
+    formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
     _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
     if add_tests:
@@ -516,7 +519,7 @@ def prepare_property_dict(
 
         val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
-        python_name = convert_camel_case_to_snake_case(string_=f"{dict_key}_{key}" if key in keys_to_rename else key)
+        python_name = convert_camel_case_to_snake_case(name=f"{dict_key}_{key}" if key in keys_to_rename else key)
         resource_dict[dict_key].append({
             "name-for-class-arg": python_name,
             "property-name": key,
@@ -740,7 +743,7 @@ def generate_class_generator_tests() -> None:
 @cloup.option(
     "-k",
     "--kind",
-    type=click.STRING,
+    type=cloup.STRING,
     help="""
     \b
     The Kind to generate the class for, Needs working cluster with admin privileges.
@@ -752,7 +755,7 @@ def generate_class_generator_tests() -> None:
     "-o",
     "--output-file",
     help="The full filename path to generate a python resource file. If not sent, resource kind will be used",
-    type=click.Path(),
+    type=cloup.Path(),
 )
 @cloup.option(
     "--overwrite",

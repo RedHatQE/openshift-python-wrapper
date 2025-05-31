@@ -37,4 +37,4 @@ from class_generator.class_generator import (
     ],
 )
 def test_convert_camel_case_to_snake_case(camel_case_str, expected):
-    assert convert_camel_case_to_snake_case(string_=camel_case_str) == expected
+    assert convert_camel_case_to_snake_case(name=camel_case_str) == expected
