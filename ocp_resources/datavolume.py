@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ocp_resources.utils.constants import (
     TIMEOUT_1MINUTE,
     TIMEOUT_2MINUTES,
@@ -7,8 +9,11 @@ from ocp_resources.utils.constants import (
 )
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
+from ocp_resources.secret import Secret
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 from warnings import warn
+
+from typing import Any
 
 
 class DataVolume(NamespacedResource):
@@ -70,37 +75,37 @@ class DataVolume(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        source=None,
-        size=None,
-        storage_class=None,
-        url=None,
-        content_type=ContentType.KUBEVIRT,
-        access_modes=None,
-        cert_configmap=None,
-        secret=None,
-        client=None,
-        volume_mode=None,
-        hostpath_node=None,
-        source_pvc=None,
-        source_namespace=None,
-        multus_annotation=None,
-        bind_immediate_annotation=None,
-        preallocation=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        api_name="pvc",
-        delete_after_completion=None,
-        **kwargs,
-    ):
+        source: str | None = None,
+        source_dict: dict[str, Any] | None = None,
+        size: str | None = None,
+        storage_class: str | None = None,
+        url: str | None = None,
+        content_type: str | None = None,
+        access_modes: str | None = None,
+        volume_mode: str | None = None,
+        cert_configmap: str | None = None,
+        secret: Secret | None = None,
+        hostpath_node: str | None = None,
+        source_pvc: str | None = None,
+        source_namespace: str | None = None,
+        source_ref_dict: dict[str, Any] | None = None,
+        source_ref_kind: str | None = None,
+        source_ref_name: str | None = None,
+        source_ref_namespace: str | None = None,
+        multus_annotation: str | None = None,
+        bind_immediate_annotation: bool | None = None,
+        preallocation: bool | None = None,
+        api_name: str = "pvc",
+        delete_after_completion: str | None = None,
+        checkpoints: list[Any] | None = None,
+        final_checkpoint: bool | None = None,
+        priority_class_name: str | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         DataVolume object
 
         Args:
-            name (str): DataVolume name.
-            namespace (str): DataVolume namespace.
             source (str): source of DV - upload/http/pvc/registry.
             size (str): DataVolume size - format size+size unit, for example: "5Gi".
             storage_class (str, default: None): storage class name for DataVolume.
@@ -124,15 +129,7 @@ class DataVolume(NamespacedResource):
             api_name (str, default: "pvc"): api used for DV, pvc/storage
             delete_after_completion (str, default: None): annotation for garbage collector - "true"/"false"
         """
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.source = source
         self.url = url
         self.cert_configmap = cert_configmap
@@ -145,58 +142,104 @@ class DataVolume(NamespacedResource):
         self.hostpath_node = hostpath_node
         self.source_pvc = source_pvc
         self.source_namespace = source_namespace
+        self.source_dict = source_dict
+        self.source_ref_dict = source_ref_dict
+        self.source_ref_kind = source_ref_kind
+        self.source_ref_name = source_ref_name
+        self.source_ref_namespace = source_ref_namespace
         self.multus_annotation = multus_annotation
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
         self.api_name = api_name
         self.delete_after_completion = delete_after_completion
+        self.checkpoints = checkpoints
+        self.final_checkpoint = final_checkpoint
+        self.priority_class_name = priority_class_name
 
     def to_dict(self) -> None:
         super().to_dict()
         if not self.kind_dict and not self.yaml_file:
-            self.res.update({
-                "spec": {
-                    "source": {self.source: {"url": self.url}},
-                    self.api_name: {
-                        "resources": {"requests": {"storage": self.size}},
-                    },
-                }
-            })
-            if self.access_modes:
-                self.res["spec"][self.api_name]["accessModes"] = [self.access_modes]
-            if self.content_type:
-                self.res["spec"]["contentType"] = self.content_type
-            if self.storage_class:
-                self.res["spec"][self.api_name]["storageClassName"] = self.storage_class
-            if self.secret:
-                self.res["spec"]["source"][self.source]["secretRef"] = self.secret.name
-            if self.volume_mode:
-                self.res["spec"][self.api_name]["volumeMode"] = self.volume_mode
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            if self.checkpoints is not None:
+                _spec["checkpoints"] = self.checkpoints
+
+            if self.content_type is not None:
+                _spec["contentType"] = self.content_type
+
+            if self.final_checkpoint is not None:
+                _spec["finalCheckpoint"] = self.final_checkpoint
+
+            if self.preallocation is not None:
+                _spec["preallocation"] = self.preallocation
+
+            if self.priority_class_name is not None:
+                _spec["priorityClassName"] = self.priority_class_name
+
+            if self.access_modes is not None:
+                _spec[self.api_name]["accessModes"] = [self.access_modes]
+
+            if self.volume_mode is not None:
+                _spec[self.api_name]["volumeMode"] = self.volume_mode
+
+            if self.storage_class is not None:
+                _spec[self.api_name]["storageClassName"] = self.storage_class
+
+            if self.size is not None:
+                _spec[self.api_name]["resources"]["requests"]["storage"] = self.storage_class
+
+            if self.content_type is not None:
+                _spec["contentType"] = self.content_type
+
+            if self.source_dict is not None:
+                _spec["source"] = self.source_dict
+
             if self.source == "http" or "registry":
-                self.res["spec"]["source"][self.source]["url"] = self.url
-            if self.cert_configmap:
-                self.res["spec"]["source"][self.source]["certConfigMap"] = self.cert_configmap
+                _spec["source"][self.source]["url"] = self.url
+
             if self.source == "upload" or self.source == "blank":
-                self.res["spec"]["source"][self.source] = {}
+                _spec["source"][self.source] = {}
+
+            if self.source == "pvc":
+                _spec["source"][self.source] = {
+                    "name": self.source_pvc,
+                    "namespace": self.source_namespace,
+                }
+
+            if self.secret is not None:
+                _spec["source"][self.source]["secretRef"] = self.secret.name
+
+            if self.cert_configmap is not None:
+                _spec["source"][self.source]["certConfigMap"] = self.cert_configmap
+
+            if self.source_ref_dict is not None:
+                _spec["sourceRef"] = self.source_ref_dict
+
+            if self.source_ref_kind is not None:
+                _spec["sourceRef"]["kind"] = self.source_ref_kind
+
+            if self.source_ref_name is not None:
+                _spec["sourceRef"]["name"] = self.source_ref_name
+
+            if self.source_ref_namespace is not None:
+                _spec["sourceRef"]["namespace"] = self.source_ref_namespace
+
             if self.hostpath_node:
                 self.res["metadata"].setdefault("annotations", {}).update({
                     f"{NamespacedResource.ApiGroup.KUBEVIRT_IO}/provisionOnNode": (self.hostpath_node)
                 })
+
             if self.multus_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update({
                     f"{NamespacedResource.ApiGroup.K8S_V1_CNI_CNCF_IO}/networks": (self.multus_annotation)
                 })
+
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update({
                     f"{self.api_group}/storage.bind.immediate.requested": "true"
                 })
-            if self.source == "pvc":
-                self.res["spec"]["source"]["pvc"] = {
-                    "name": self.source_pvc or "dv-source",
-                    "namespace": self.source_namespace or self.namespace,
-                }
-            if self.preallocation is not None:
-                self.res["spec"]["preallocation"] = self.preallocation
+
             if self.delete_after_completion:
                 self.res["metadata"].setdefault("annotations", {}).update({
                     f"{self.api_group}/storage.deleteAfterCompletion": (self.delete_after_completion)
