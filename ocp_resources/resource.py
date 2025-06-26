@@ -90,11 +90,10 @@ def client_configuration_with_basic_auth(
     host: str,
     configuration: kubernetes.client.Configuration,
 ) -> kubernetes.client.ApiClient:
-    configuration = configuration or kubernetes.client.Configuration()
-
     well_known_url = f"{host}/.well-known/oauth-authorization-server"
 
-    config_response = requests.get(well_known_url, verify=False)
+    verify_ssl = configuration.verify_ssl
+    config_response = requests.get(well_known_url, verify=verify_ssl)
     if config_response.status_code != 200:
         raise ClientWithBasicAuthError("No well-known file found at endpoint")
 
@@ -119,7 +118,7 @@ def client_configuration_with_basic_auth(
     auth_response = requests.get(
         auth_url,
         headers={"Authorization": f"Basic {auth_header}", "X-CSRF-Token": "USER", "Accept": "application/json"},
-        verify=False,
+        verify=verify_ssl,
         allow_redirects=False,
     )
 
@@ -147,7 +146,7 @@ def client_configuration_with_basic_auth(
                     "Accept": "application/json",
                     "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
                 },
-                verify=False,
+                verify=verify_ssl,
             )
 
             if token_response.status_code == 200:

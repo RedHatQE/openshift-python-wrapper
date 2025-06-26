@@ -119,8 +119,8 @@ class TestResource:
                 pass
 
 
+@pytest.mark.xfail(reason="Need debug")
 class TestClientProxy:
-    @pytest.mark.xfail
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
     def test_client_with_proxy(self, k3scontainer_config):
         http_proxy = "http://env-http-proxy.com"
@@ -128,7 +128,6 @@ class TestClientProxy:
         client = get_client(config_dict=k3scontainer_config)
         assert client.configuration.proxy == http_proxy
 
-    @pytest.mark.xfail
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
     @patch.dict(os.environ, {"HTTPS_PROXY": "http://env-http-proxy.com"})
     def test_proxy_precedence(self, k3scontainer_config):
