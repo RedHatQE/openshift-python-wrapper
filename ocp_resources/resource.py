@@ -90,74 +90,97 @@ def client_configuration_with_basic_auth(
     host: str,
     configuration: kubernetes.client.Configuration,
 ) -> kubernetes.client.ApiClient:
-    well_known_url = f"{host}/.well-known/oauth-authorization-server"
-
     verify_ssl = configuration.verify_ssl
-    config_response = requests.get(well_known_url, verify=verify_ssl)
-    if config_response.status_code != 200:
-        raise ClientWithBasicAuthError("No well-known file found at endpoint")
 
-    oauth_config = config_response.json()
+    def _fetch_oauth_config(_host: str, _verify_ssl: bool) -> Any:
+        well_known_url = f"{_host}/.well-known/oauth-authorization-server"
+
+        config_response = requests.get(well_known_url, verify=_verify_ssl)
+        if config_response.status_code != 200:
+            raise ClientWithBasicAuthError("No well-known file found at endpoint")
+
+        return config_response.json()
+
+    def _get_authorization_code(_auth_endpoint: str, _username: str, _password: str, _verify_ssl: bool) -> str:
+        _code = None
+        auth_params = {
+            "client_id": "openshift-challenging-client",
+            "response_type": "code",
+            "state": "USER",
+            "code_challenge_method": "S256",
+        }
+
+        auth_url = f"{_auth_endpoint}?{urlencode(auth_params)}"
+
+        credentials = f"{_username}:{_password}"
+        auth_header = base64.b64encode(credentials.encode()).decode()
+
+        auth_response = requests.get(
+            auth_url,
+            headers={"Authorization": f"Basic {auth_header}", "X-CSRF-Token": "USER", "Accept": "application/json"},
+            verify=_verify_ssl,
+            allow_redirects=False,
+        )
+
+        if auth_response.status_code == requests.status_codes.codes.FOUND:
+            location = auth_response.headers.get("Location", "")
+
+            parsed_url = urlparse(location)
+            query_params = parse_qs(parsed_url.query)
+            _code = query_params.get("code", [None])[0]
+        if _code:
+            return _code
+
+        raise ClientWithBasicAuthError("No authorization code found")
+
+    def _exchange_code_for_token(
+        _token_endpoint: str, _auth_code: str, _verify_ssl: bool
+    ) -> kubernetes.client.ApiClient:
+        _client = None
+
+        token_data = {
+            "grant_type": "authorization_code",
+            "code": _auth_code,
+            "client_id": "openshift-challenging-client",
+        }
+
+        token_response = requests.post(
+            _token_endpoint,
+            data=token_data,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json",
+                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
+            },
+            verify=_verify_ssl,
+        )
+
+        if token_response.status_code == requests.status_codes.codes.OK:
+            token_json = token_response.json()
+            access_token = token_json.get("access_token")
+
+            configuration.host = host
+            configuration.api_key = {"authorization": f"Bearer {access_token}"}
+            _client = kubernetes.client.ApiClient(configuration=configuration)
+
+        if _client:
+            return _client
+
+        raise ClientWithBasicAuthError("Failed to authenticate with basic auth")
+
+    oauth_config = _fetch_oauth_config(_host=host, _verify_ssl=verify_ssl)
 
     auth_endpoint = oauth_config.get("authorization_endpoint")
     if not auth_endpoint:
         raise ClientWithBasicAuthError("No authorization_endpoint found in well-known file")
 
-    auth_params = {
-        "client_id": "openshift-challenging-client",
-        "response_type": "code",
-        "state": "USER",
-        "code_challenge_method": "S256",
-    }
-
-    auth_url = f"{auth_endpoint}?{urlencode(auth_params)}"
-
-    credentials = f"{username}:{password}"
-    auth_header = base64.b64encode(credentials.encode()).decode()
-
-    auth_response = requests.get(
-        auth_url,
-        headers={"Authorization": f"Basic {auth_header}", "X-CSRF-Token": "USER", "Accept": "application/json"},
-        verify=verify_ssl,
-        allow_redirects=False,
+    _code = _get_authorization_code(
+        _auth_endpoint=auth_endpoint, _username=username, _password=password, _verify_ssl=verify_ssl
     )
 
-    if auth_response.status_code == requests.status_codes.codes.FOUND:
-        location = auth_response.headers.get("Location", "")
-
-        parsed_url = urlparse(location)
-        query_params = parse_qs(parsed_url.query)
-        auth_code = query_params.get("code", [None])[0]
-
-        if auth_code:
-            token_endpoint = oauth_config.get("token_endpoint")
-
-            token_data = {
-                "grant_type": "authorization_code",
-                "code": auth_code,
-                "client_id": "openshift-challenging-client",
-            }
-
-            token_response = requests.post(
-                token_endpoint,
-                data=token_data,
-                headers={
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Accept": "application/json",
-                    "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
-                },
-                verify=verify_ssl,
-            )
-
-            if token_response.status_code == requests.status_codes.codes.OK:
-                token_json = token_response.json()
-                access_token = token_json.get("access_token")
-
-                configuration.host = host
-                configuration.api_key = {"authorization": f"Bearer {access_token}"}
-                return kubernetes.client.ApiClient(configuration=configuration)
-
-    raise ClientWithBasicAuthError("Failed to authenticate with basic auth")
+    return _exchange_code_for_token(
+        _token_endpoint=oauth_config.get("token_endpoint"), _auth_code=_code, _verify_ssl=verify_ssl
+    )
 
 
 def get_client(
