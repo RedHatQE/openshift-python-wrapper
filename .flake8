@@ -60,6 +60,8 @@ fcn_exclude_functions =
     filecmp,
     datetime,
     subprocess,
+    urlparse,
+    parse_qs,
 
 enable-extensions =
     FCN,
