@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import contextlib
 import copy
 import json
@@ -12,9 +13,11 @@ from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Any
+from urllib.parse import parse_qs, urlencode, urlparse
 from warnings import warn
 
 import kubernetes
+import requests
 import yaml
 from benedict import benedict
 from kubernetes.dynamic import DynamicClient, ResourceInstance
@@ -36,7 +39,12 @@ from timeout_sampler import (
 from urllib3.exceptions import MaxRetryError
 
 from ocp_resources.event import Event
-from ocp_resources.exceptions import MissingRequiredArgumentError, MissingResourceResError, ResourceTeardownError
+from ocp_resources.exceptions import (
+    ClientWithBasicAuthError,
+    MissingRequiredArgumentError,
+    MissingResourceResError,
+    ResourceTeardownError,
+)
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -76,6 +84,105 @@ def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> st
     return res.group_version
 
 
+def client_configuration_with_basic_auth(
+    username: str,
+    password: str,
+    host: str,
+    configuration: kubernetes.client.Configuration,
+) -> kubernetes.client.ApiClient:
+    verify_ssl = configuration.verify_ssl
+
+    def _fetch_oauth_config(_host: str, _verify_ssl: bool) -> Any:
+        well_known_url = f"{_host}/.well-known/oauth-authorization-server"
+
+        config_response = requests.get(well_known_url, verify=_verify_ssl)
+        if config_response.status_code != 200:
+            raise ClientWithBasicAuthError("No well-known file found at endpoint")
+
+        return config_response.json()
+
+    def _get_authorization_code(_auth_endpoint: str, _username: str, _password: str, _verify_ssl: bool) -> str:
+        _code = None
+        auth_params = {
+            "client_id": "openshift-challenging-client",
+            "response_type": "code",
+            "state": "USER",
+            "code_challenge_method": "S256",
+        }
+
+        auth_url = f"{_auth_endpoint}?{urlencode(auth_params)}"
+
+        credentials = f"{_username}:{_password}"
+        auth_header = base64.b64encode(credentials.encode()).decode()
+
+        auth_response = requests.get(
+            auth_url,
+            headers={"Authorization": f"Basic {auth_header}", "X-CSRF-Token": "USER", "Accept": "application/json"},
+            verify=_verify_ssl,
+            allow_redirects=False,
+        )
+
+        if auth_response.status_code == 302:
+            location = auth_response.headers.get("Location", "")
+
+            parsed_url = urlparse(location)
+            query_params = parse_qs(parsed_url.query)
+            _code = query_params.get("code", [None])[0]
+        if _code:
+            return _code
+
+        raise ClientWithBasicAuthError("No authorization code found")
+
+    def _exchange_code_for_token(
+        _token_endpoint: str, _auth_code: str, _verify_ssl: bool
+    ) -> kubernetes.client.ApiClient:
+        _client = None
+
+        token_data = {
+            "grant_type": "authorization_code",
+            "code": _auth_code,
+            "client_id": "openshift-challenging-client",
+        }
+
+        token_response = requests.post(
+            _token_endpoint,
+            data=token_data,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json",
+                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
+            },
+            verify=_verify_ssl,
+        )
+
+        if token_response.status_code == 200:
+            token_json = token_response.json()
+            access_token = token_json.get("access_token")
+
+            configuration.host = host
+            configuration.api_key = {"authorization": f"Bearer {access_token}"}
+            _client = kubernetes.client.ApiClient(configuration=configuration)
+
+        if _client:
+            return _client
+
+        raise ClientWithBasicAuthError("Failed to authenticate with basic auth")
+
+    oauth_config = _fetch_oauth_config(_host=host, _verify_ssl=verify_ssl)
+
+    auth_endpoint = oauth_config.get("authorization_endpoint")
+    if not auth_endpoint:
+        raise ClientWithBasicAuthError("No authorization_endpoint found in well-known file")
+
+    _code = _get_authorization_code(
+        _auth_endpoint=auth_endpoint, _username=username, _password=password, _verify_ssl=verify_ssl
+    )
+
+    return _exchange_code_for_token(
+        _token_endpoint=oauth_config.get("token_endpoint"), _auth_code=_code, _verify_ssl=verify_ssl
+    )
+
+
 def get_client(
     config_file: str | None = None,
     config_dict: dict[str, Any] | None = None,
@@ -84,6 +191,10 @@ def get_client(
     persist_config: bool = True,
     temp_file_path: str | None = None,
     try_refresh_token: bool = True,
+    username: str | None = None,
+    password: str | None = None,
+    host: str | None = None,
+    verify_ssl: bool | None = None,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -103,6 +214,10 @@ def get_client(
         persist_config (bool): whether to persist config file.
         temp_file_path (str): path to a temporary kubeconfig file.
         try_refresh_token (bool): try to refresh token
+        username (str): username for basic auth
+        password (str): password for basic auth
+        host (str): host for the cluster
+        verify_ssl (bool): whether to verify ssl
 
     Returns:
         DynamicClient: a kubernetes client.
@@ -111,12 +226,20 @@ def get_client(
 
     client_configuration = client_configuration or kubernetes.client.Configuration()
 
+    if verify_ssl is not None:
+        client_configuration.verify_ssl = verify_ssl
+
     if not client_configuration.proxy and proxy:
         LOGGER.info(f"Setting proxy from environment variable: {proxy}")
         client_configuration.proxy = proxy
 
+    if username and password and host:
+        _client = client_configuration_with_basic_auth(
+            username=username, password=password, host=host, configuration=client_configuration
+        )
+
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
-    if config_dict:
+    elif config_dict:
         _client = kubernetes.config.new_client_from_config_dict(
             config_dict=config_dict,
             context=context,
@@ -139,6 +262,8 @@ def get_client(
             client_configuration=client_configuration,
             persist_config=persist_config,
         )
+
+    kubernetes.client.Configuration.set_default(default=client_configuration)
 
     try:
         return kubernetes.dynamic.DynamicClient(client=_client)
