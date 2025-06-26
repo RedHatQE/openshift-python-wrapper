@@ -122,7 +122,7 @@ def client_configuration_with_basic_auth(
             allow_redirects=False,
         )
 
-        if auth_response.status_code == requests.status_codes.codes.FOUND:
+        if auth_response.status_code == 302:
             location = auth_response.headers.get("Location", "")
 
             parsed_url = urlparse(location)
@@ -155,7 +155,7 @@ def client_configuration_with_basic_auth(
             verify=_verify_ssl,
         )
 
-        if token_response.status_code == requests.status_codes.codes.OK:
+        if token_response.status_code == 200:
             token_json = token_response.json()
             access_token = token_json.get("access_token")
 
