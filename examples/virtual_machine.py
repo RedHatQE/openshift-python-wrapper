@@ -1,10 +1,11 @@
-from kubernetes import config
+from ocp_resources.resource import get_client
 from ocp_resources.virtual_machine import VirtualMachine
 
-config.load_kube_config()
+client = get_client()
 
 # Define a VM
 vm = VirtualMachine(
+    client=client,
     name="vm-example",
     namespace="namespace-example",
     body={
