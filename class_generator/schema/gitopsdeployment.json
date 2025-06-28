@@ -1,0 +1,642 @@
+{
+  "description": "GitOpsDeployment is the Schema for the gitopsdeployments API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "GitOpsDeploymentSpec defines the desired state of GitOpsDeployment",
+      "type": "object",
+      "required": [
+        "source",
+        "type"
+      ],
+      "properties": {
+        "destination": {
+          "description": "Destination is a reference to a target namespace/cluster to deploy to. This field may be empty: if it is empty, it is assumed that the destination is the same namespace as the GitOpsDeployment CR.",
+          "type": "object",
+          "properties": {
+            "environment": {
+              "type": "string"
+            },
+            "namespace": {
+              "description": "The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace",
+              "type": "string"
+            }
+          }
+        },
+        "source": {
+          "description": "ApplicationSource contains all required information about the source of an application",
+          "type": "object",
+          "required": [
+            "path",
+            "repoURL"
+          ],
+          "properties": {
+            "path": {
+              "description": "Path is a directory path within the Git repository, and is only valid for applications sourced from Git.",
+              "type": "string"
+            },
+            "repoURL": {
+              "description": "RepoURL is the URL to the repository (Git or Helm) that contains the application manifests",
+              "type": "string"
+            },
+            "targetRevision": {
+              "description": "TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.",
+              "type": "string"
+            }
+          }
+        },
+        "syncPolicy": {
+          "description": "SyncPolicy controls when and how a sync will be performed.",
+          "type": "object",
+          "properties": {
+            "syncOptions": {
+              "description": "Options allow you to specify whole app sync-options. This option may be empty, if and when it is empty it is considered that there are no SyncOptions present.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": {
+          "description": "Two possible values: - Automated: whenever a new commit occurs in the GitOps repository, or the Argo CD Application is out of sync, Argo CD should be told to (re)synchronize. - Manual: Argo CD should never be told to resynchronize. Instead, synchronize operations will be triggered via GitOpsDeploymentSyncRun operations only. - See `GitOpsDeploymentSpecType*` \n Note: This is somewhat of a placeholder for more advanced logic that can be implemented in the future. For an example of this type of logic, see the 'syncPolicy' field of Argo CD Application.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "GitOpsDeploymentStatus defines the observed state of GitOpsDeployment",
+      "type": "object",
+      "required": [
+        "reconciledState"
+      ],
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "GitOpsDeploymentCondition contains details about an GitOpsDeployment condition, which is usually an error or warning",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastProbeTime": {
+                "description": "LastProbeTime is the last time the condition was observed.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time the condition transitioned from one status to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "Message contains human-readable message indicating details about the last condition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Reason is a unique, one-word, CamelCase reason for the condition's last transition.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status is the status of the condition.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type is a GitOpsDeployment condition type",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "health": {
+          "description": "Health contains information about the application's current health status",
+          "type": "object",
+          "properties": {
+            "message": {
+              "description": "Message is a human-readable informational message describing the health status",
+              "type": "string"
+            },
+            "status": {
+              "description": "Status holds the status code of the application or resource",
+              "type": "string"
+            }
+          }
+        },
+        "operationState": {
+          "description": "OperationState contains information about any ongoing operations, such as a sync",
+          "type": "object",
+          "required": [
+            "operation",
+            "phase",
+            "startedAt"
+          ],
+          "properties": {
+            "finishedAt": {
+              "description": "FinishedAt contains time of operation completion",
+              "type": "string",
+              "format": "date-time"
+            },
+            "message": {
+              "description": "Message holds any pertinent messages when attempting to perform operation (typically errors).",
+              "type": "string"
+            },
+            "operation": {
+              "description": "Operation is the original requested operation",
+              "type": "object",
+              "properties": {
+                "info": {
+                  "description": "Info is a list of informational items for this operation",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "initiatedBy": {
+                  "description": "InitiatedBy contains information about who initiated the operations",
+                  "type": "object",
+                  "properties": {
+                    "automated": {
+                      "description": "Automated is set to true if operation was initiated automatically by the application controller.",
+                      "type": "boolean"
+                    },
+                    "username": {
+                      "description": "Username contains the name of a user who started operation",
+                      "type": "string"
+                    }
+                  }
+                },
+                "retry": {
+                  "description": "Retry controls the strategy to apply if a sync fails",
+                  "type": "object",
+                  "properties": {
+                    "backoff": {
+                      "description": "Backoff controls how to backoff on subsequent retries of failed syncs",
+                      "type": "object",
+                      "properties": {
+                        "duration": {
+                          "description": "Duration is the amount to back off. Default unit is seconds, but could also be a duration (e.g. \"2m\", \"1h\")",
+                          "type": "string"
+                        },
+                        "factor": {
+                          "description": "Factor is a factor to multiply the base duration after each failed retry",
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "maxDuration": {
+                          "description": "MaxDuration is the maximum amount of time allowed for the backoff strategy",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "limit": {
+                      "description": "Limit is the maximum number of attempts for retrying a failed sync. If set to 0, no retries will be performed.",
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                },
+                "sync": {
+                  "description": "Sync contains parameters for the operation",
+                  "type": "object",
+                  "properties": {
+                    "dryRun": {
+                      "description": "DryRun specifies to perform a `kubectl apply --dry-run` without actually performing the sync",
+                      "type": "boolean"
+                    },
+                    "manifests": {
+                      "description": "Manifests is an optional field that overrides sync source with a local directory for development",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "prune": {
+                      "description": "Prune specifies to delete resources from the cluster that are no longer tracked in git",
+                      "type": "boolean"
+                    },
+                    "resources": {
+                      "description": "Resources describes which resources shall be part of the sync",
+                      "type": "array",
+                      "items": {
+                        "description": "SyncOperationResource contains resources to sync.",
+                        "type": "object",
+                        "required": [
+                          "kind",
+                          "name"
+                        ],
+                        "properties": {
+                          "group": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "namespace": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "revision": {
+                      "description": "Revision is the revision (Git) or chart version (Helm) which to sync the application to If omitted, will use the revision specified in app spec.",
+                      "type": "string"
+                    },
+                    "revisions": {
+                      "description": "Revisions is the list of revision (Git) or chart version (Helm) which to sync each source in sources field for the application to If omitted, will use the revision specified in app spec.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "source": {
+                      "description": "Source overrides the source definition set in the application. This is typically set in a Rollback operation and is nil during a Sync operation",
+                      "type": "object",
+                      "required": [
+                        "path",
+                        "repoURL"
+                      ],
+                      "properties": {
+                        "path": {
+                          "description": "Path is a directory path within the Git repository, and is only valid for applications sourced from Git.",
+                          "type": "string"
+                        },
+                        "repoURL": {
+                          "description": "RepoURL is the URL to the repository (Git or Helm) that contains the application manifests",
+                          "type": "string"
+                        },
+                        "targetRevision": {
+                          "description": "TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "sources": {
+                      "description": "Sources overrides the source definition set in the application. This is typically set in a Rollback operation and is nil during a Sync operation",
+                      "type": "array",
+                      "items": {
+                        "description": "ApplicationSource contains all required information about the source of an application",
+                        "type": "object",
+                        "required": [
+                          "path",
+                          "repoURL"
+                        ],
+                        "properties": {
+                          "path": {
+                            "description": "Path is a directory path within the Git repository, and is only valid for applications sourced from Git.",
+                            "type": "string"
+                          },
+                          "repoURL": {
+                            "description": "RepoURL is the URL to the repository (Git or Helm) that contains the application manifests",
+                            "type": "string"
+                          },
+                          "targetRevision": {
+                            "description": "TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "syncOptions": {
+                      "description": "SyncOptions provide per-sync sync-options, e.g. Validate=false",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "syncStrategy": {
+                      "description": "SyncStrategy describes how to perform the sync",
+                      "type": "object",
+                      "properties": {
+                        "apply": {
+                          "description": "Apply will perform a `kubectl apply` to perform the sync.",
+                          "type": "object",
+                          "properties": {
+                            "force": {
+                              "description": "Force indicates whether or not to supply the --force flag to `kubectl apply`. The --force flag deletes and re-create the resource, when PATCH encounters conflict and has retried for 5 times.",
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        "hook": {
+                          "description": "Hook will submit any referenced resources to perform the sync. This is the default strategy",
+                          "type": "object",
+                          "properties": {
+                            "force": {
+                              "description": "Force indicates whether or not to supply the --force flag to `kubectl apply`. The --force flag deletes and re-create the resource, when PATCH encounters conflict and has retried for 5 times.",
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "phase": {
+              "description": "Phase is the current phase of the operation",
+              "type": "string"
+            },
+            "retryCount": {
+              "description": "RetryCount contains time of operation retries",
+              "type": "integer",
+              "format": "int64"
+            },
+            "startedAt": {
+              "description": "StartedAt contains time of operation start",
+              "type": "string",
+              "format": "date-time"
+            },
+            "syncResult": {
+              "description": "SyncResult is the result of a Sync operation",
+              "type": "object",
+              "required": [
+                "revision"
+              ],
+              "properties": {
+                "managedNamespaceMetadata": {
+                  "description": "ManagedNamespaceMetadata contains the current sync state of managed namespace metadata",
+                  "type": "object",
+                  "properties": {
+                    "annotations": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "labels": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "resources": {
+                  "description": "Resources contains a list of sync result items for each individual resource in a sync operation",
+                  "type": "array",
+                  "items": {
+                    "description": "ResourceResult holds the operation result details of a specific resource",
+                    "type": "object",
+                    "required": [
+                      "group",
+                      "kind",
+                      "name",
+                      "namespace",
+                      "version"
+                    ],
+                    "properties": {
+                      "group": {
+                        "description": "Group specifies the API group of the resource",
+                        "type": "string"
+                      },
+                      "hookPhase": {
+                        "description": "HookPhase contains the state of any operation associated with this resource OR hook This can also contain values for non-hook resources.",
+                        "type": "string"
+                      },
+                      "hookType": {
+                        "description": "HookType specifies the type of the hook. Empty for non-hook resources",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "description": "Kind specifies the API kind of the resource",
+                        "type": "string"
+                      },
+                      "message": {
+                        "description": "Message contains an informational or error message for the last sync OR operation",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Name specifies the name of the resource",
+                        "type": "string"
+                      },
+                      "namespace": {
+                        "description": "Namespace specifies the target namespace of the resource",
+                        "type": "string"
+                      },
+                      "status": {
+                        "description": "Status holds the final result of the sync. Will be empty if the resources is yet to be applied/pruned and is always zero-value for hooks",
+                        "type": "string"
+                      },
+                      "syncPhase": {
+                        "description": "SyncPhase indicates the particular phase of the sync that this result was acquired in",
+                        "type": "string"
+                      },
+                      "version": {
+                        "description": "Version specifies the API version of the resource",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "revision": {
+                  "description": "Revision holds the revision this sync operation was performed to",
+                  "type": "string"
+                },
+                "revisions": {
+                  "description": "Revisions holds the revision this sync operation was performed for respective indexed source in sources field",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "source": {
+                  "description": "Source records the application source information of the sync, used for comparing auto-sync",
+                  "type": "object",
+                  "required": [
+                    "path",
+                    "repoURL"
+                  ],
+                  "properties": {
+                    "path": {
+                      "description": "Path is a directory path within the Git repository, and is only valid for applications sourced from Git.",
+                      "type": "string"
+                    },
+                    "repoURL": {
+                      "description": "RepoURL is the URL to the repository (Git or Helm) that contains the application manifests",
+                      "type": "string"
+                    },
+                    "targetRevision": {
+                      "description": "TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "sources": {
+                  "description": "Source records the application source information of the sync, used for comparing auto-sync",
+                  "type": "array",
+                  "items": {
+                    "description": "ApplicationSource contains all required information about the source of an application",
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "repoURL"
+                    ],
+                    "properties": {
+                      "path": {
+                        "description": "Path is a directory path within the Git repository, and is only valid for applications sourced from Git.",
+                        "type": "string"
+                      },
+                      "repoURL": {
+                        "description": "RepoURL is the URL to the repository (Git or Helm) that contains the application manifests",
+                        "type": "string"
+                      },
+                      "targetRevision": {
+                        "description": "TargetRevision defines the revision of the source to sync the application to. In case of Git, this can be commit, tag, or branch. If omitted, will equal to HEAD. In case of Helm, this is a semver tag for the Chart's version.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "reconciledState": {
+          "description": "ReconciledState contains the last version of the GitOpsDeployment resource that the ArgoCD Controller reconciled",
+          "type": "object",
+          "required": [
+            "destination",
+            "source"
+          ],
+          "properties": {
+            "destination": {
+              "description": "GitOpsDeploymentDestination contains the information of .status.Sync.CompareTo.Destination field of ArgoCD Application",
+              "type": "object",
+              "required": [
+                "name",
+                "namespace"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": {
+              "description": "GitOpsDeploymentSource contains the information of .status.Sync.CompareTo.Source field of ArgoCD Application",
+              "type": "object",
+              "required": [
+                "branch",
+                "path",
+                "repoURL"
+              ],
+              "properties": {
+                "branch": {
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Path contains path from .status.Sync.CompareTo field of ArgoCD Application",
+                  "type": "string"
+                },
+                "repoURL": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "resources": {
+          "description": "List of Resource created by a deployment",
+          "type": "array",
+          "items": {
+            "description": "ResourceStatus holds the current sync and health status of a resource",
+            "type": "object",
+            "properties": {
+              "group": {
+                "type": "string"
+              },
+              "health": {
+                "description": "HealthStatus contains information about the currently observed health state of an application or resource",
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "description": "Message is a human-readable informational message describing the health status",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Status holds the status code of the application or resource",
+                    "type": "string"
+                  }
+                }
+              },
+              "kind": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "namespace": {
+                "type": "string"
+              },
+              "status": {
+                "description": "SyncStatusCode is a type which represents possible comparison results",
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sync": {
+          "description": "SyncStatus contains information about the currently observed live and desired states of an application",
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "revision": {
+              "description": "Revision contains information about the revision the comparison has been performed to",
+              "type": "string"
+            },
+            "status": {
+              "description": "Status is the sync state of the comparison",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "managed-gitops.redhat.com",
+      "kind": "GitOpsDeployment",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

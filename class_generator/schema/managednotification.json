@@ -1,0 +1,158 @@
+{
+  "description": "ManagedNotification is the Schema for the managednotifications API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ManagedNotificationSpec defines the desired state of ManagedNotification",
+      "type": "object",
+      "required": [
+        "notifications"
+      ],
+      "properties": {
+        "notifications": {
+          "description": "AgentConfig refers to OCM agent config fields separated",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "activeBody",
+              "name",
+              "resendWait",
+              "severity",
+              "summary"
+            ],
+            "properties": {
+              "activeBody": {
+                "description": "The body text of the Service Log notification when the alert is active",
+                "type": "string"
+              },
+              "logType": {
+                "description": "LogType is a categorization property that can be used to group service logs for aggregation and managing notification preferences.",
+                "type": "string"
+              },
+              "name": {
+                "description": "The name of the notification used to associate with an alert",
+                "type": "string"
+              },
+              "references": {
+                "description": "References useful for context or remediation - this could be links to documentation, KB articles, etc",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^https?:\\/\\/.+$"
+                }
+              },
+              "resendWait": {
+                "description": "Measured in hours. The minimum time interval that must elapse between active Service Log notifications",
+                "type": "integer",
+                "format": "int32"
+              },
+              "resolvedBody": {
+                "description": "The body text of the Service Log notification when the alert is resolved",
+                "type": "string"
+              },
+              "severity": {
+                "description": "The severity of the Service Log notification",
+                "type": "string",
+                "enum": [
+                  "Debug",
+                  "Info",
+                  "Warning",
+                  "Major",
+                  "Critical",
+                  "Error",
+                  "Fatal"
+                ]
+              },
+              "summary": {
+                "description": "The summary line of the Service Log notification",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "ManagedNotificationStatus defines the observed state of ManagedNotification",
+      "type": "object",
+      "properties": {
+        "notificationRecords": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "conditions": {
+                "description": "Conditions is a set of Condition instances.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "type"
+                  ],
+                  "properties": {
+                    "lastTransitionTime": {
+                      "description": "Last time the condition transit from one status to another.",
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "reason": {
+                      "description": "(brief) reason for the condition's last transition.",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "Status of condition, one of True, False, Unknown",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Type of Notification condition",
+                      "type": "string",
+                      "enum": [
+                        "AlertFiring",
+                        "AlertResolved",
+                        "ServiceLogSent"
+                      ]
+                    }
+                  }
+                }
+              },
+              "name": {
+                "description": "Name of the notification",
+                "type": "string"
+              },
+              "serviceLogSentCount": {
+                "description": "ServiceLogSentCount records the number of service logs sent for the notification",
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ocmagent.managed.openshift.io",
+      "kind": "ManagedNotification",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

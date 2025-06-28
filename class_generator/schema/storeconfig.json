@@ -1,0 +1,161 @@
+{
+  "description": "A StoreConfig configures how Crossplane controllers should store connection\ndetails in an external secret store.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "A StoreConfigSpec defines the desired state of a StoreConfig.",
+      "type": "object",
+      "required": [
+        "defaultScope"
+      ],
+      "properties": {
+        "defaultScope": {
+          "description": "DefaultScope used for scoping secrets for \"cluster-scoped\" resources.\nIf store type is \"Kubernetes\", this would mean the default namespace to\nstore connection secrets for cluster scoped resources.\nIn case of \"Vault\", this would be used as the default parent path.\nTypically, should be set as Crossplane installation namespace.",
+          "type": "string"
+        },
+        "kubernetes": {
+          "description": "Kubernetes configures a Kubernetes secret store.\nIf the \"type\" is \"Kubernetes\" but no config provided, in cluster config\nwill be used.",
+          "type": "object",
+          "required": [
+            "auth"
+          ],
+          "properties": {
+            "auth": {
+              "description": "Credentials used to connect to the Kubernetes API.",
+              "type": "object",
+              "required": [
+                "source"
+              ],
+              "properties": {
+                "env": {
+                  "description": "Env is a reference to an environment variable that contains credentials\nthat must be used to connect to the provider.",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "description": "Name is the name of an environment variable.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "fs": {
+                  "description": "Fs is a reference to a filesystem location that contains credentials that\nmust be used to connect to the provider.",
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "description": "Path is a filesystem path.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "secretRef": {
+                  "description": "A SecretRef is a reference to a secret key that contains the credentials\nthat must be used to connect to the provider.",
+                  "type": "object",
+                  "required": [
+                    "key",
+                    "name",
+                    "namespace"
+                  ],
+                  "properties": {
+                    "key": {
+                      "description": "The key to select.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name of the secret.",
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "description": "Namespace of the secret.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "source": {
+                  "description": "Source of the credentials.",
+                  "type": "string",
+                  "enum": [
+                    "None",
+                    "Secret",
+                    "Environment",
+                    "Filesystem"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "plugin": {
+          "description": "Plugin configures External secret store as a plugin.",
+          "type": "object",
+          "properties": {
+            "configRef": {
+              "description": "ConfigRef contains store config reference info.",
+              "type": "object",
+              "required": [
+                "apiVersion",
+                "kind",
+                "name"
+              ],
+              "properties": {
+                "apiVersion": {
+                  "description": "APIVersion of the referenced config.",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Kind of the referenced config.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referenced config.",
+                  "type": "string"
+                }
+              }
+            },
+            "endpoint": {
+              "description": "Endpoint is the endpoint of the gRPC server.",
+              "type": "string"
+            }
+          }
+        },
+        "type": {
+          "description": "Type configures which secret store to be used. Only the configuration\nblock for this store will be used and others will be ignored if provided.\nDefault is Kubernetes.",
+          "type": "string",
+          "enum": [
+            "Kubernetes",
+            "Vault",
+            "Plugin"
+          ]
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "secrets.crossplane.io",
+      "kind": "StoreConfig",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

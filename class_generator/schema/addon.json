@@ -1,0 +1,664 @@
+{
+  "description": "Addon is the Schema for the addons API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "AddonSpec defines the desired state of Addon",
+      "type": "object",
+      "required": [
+        "displayName",
+        "install"
+      ],
+      "properties": {
+        "commonAnnotations": {
+          "description": "Annotations to be applied to all resources.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "commonLabels": {
+          "description": "Labels to be applied to all resources.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "correlationID": {
+          "description": "Correlation ID for co-relating current AddonCR revision and reported status.",
+          "type": "string"
+        },
+        "deleteAckRequired": {
+          "description": "Defines whether the addon needs acknowledgment from the underlying addon's operator before deletion.",
+          "type": "boolean"
+        },
+        "displayName": {
+          "description": "Human readable name for this addon.",
+          "type": "string",
+          "minLength": 1
+        },
+        "install": {
+          "description": "Defines how an Addon is installed. This field is immutable.",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "olmAllNamespaces": {
+              "description": "OLMAllNamespaces config parameters. Present only if Type = OLMAllNamespaces.",
+              "type": "object",
+              "required": [
+                "catalogSourceImage",
+                "channel",
+                "namespace",
+                "packageName"
+              ],
+              "properties": {
+                "additionalCatalogSources": {
+                  "description": "Additional catalog source objects to be created in the cluster",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "image",
+                      "name"
+                    ],
+                    "properties": {
+                      "image": {
+                        "description": "Image url of the additional catalog source",
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "description": "Name of the additional catalog source",
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                },
+                "catalogSourceImage": {
+                  "description": "Defines the CatalogSource image.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "channel": {
+                  "description": "Channel for the Subscription object.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "config": {
+                  "description": "Configs to be passed to subscription OLM object",
+                  "type": "object",
+                  "required": [
+                    "env"
+                  ],
+                  "properties": {
+                    "env": {
+                      "description": "Array of env variables to be passed to the subscription object.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "value"
+                        ],
+                        "properties": {
+                          "name": {
+                            "description": "Name of the environment variable",
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "value": {
+                            "description": "Value of the environment variable",
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "namespace": {
+                  "description": "Namespace to install the Addon into.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "packageName": {
+                  "description": "Name of the package to install via OLM. OLM will resove this package name to install the matching bundle.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pullSecretName": {
+                  "description": "Reference to a secret of type kubernetes.io/dockercfg or kubernetes.io/dockerconfigjson in the addon operators installation namespace. The secret referenced here, will be made available to the addon in the addon installation namespace, as addon-pullsecret prior to installing the addon itself.",
+                  "type": "string"
+                }
+              }
+            },
+            "olmOwnNamespace": {
+              "description": "OLMOwnNamespace config parameters. Present only if Type = OLMOwnNamespace.",
+              "type": "object",
+              "required": [
+                "catalogSourceImage",
+                "channel",
+                "namespace",
+                "packageName"
+              ],
+              "properties": {
+                "additionalCatalogSources": {
+                  "description": "Additional catalog source objects to be created in the cluster",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "image",
+                      "name"
+                    ],
+                    "properties": {
+                      "image": {
+                        "description": "Image url of the additional catalog source",
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "description": "Name of the additional catalog source",
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                },
+                "catalogSourceImage": {
+                  "description": "Defines the CatalogSource image.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "channel": {
+                  "description": "Channel for the Subscription object.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "config": {
+                  "description": "Configs to be passed to subscription OLM object",
+                  "type": "object",
+                  "required": [
+                    "env"
+                  ],
+                  "properties": {
+                    "env": {
+                      "description": "Array of env variables to be passed to the subscription object.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "value"
+                        ],
+                        "properties": {
+                          "name": {
+                            "description": "Name of the environment variable",
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "value": {
+                            "description": "Value of the environment variable",
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "namespace": {
+                  "description": "Namespace to install the Addon into.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "packageName": {
+                  "description": "Name of the package to install via OLM. OLM will resove this package name to install the matching bundle.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pullSecretName": {
+                  "description": "Reference to a secret of type kubernetes.io/dockercfg or kubernetes.io/dockerconfigjson in the addon operators installation namespace. The secret referenced here, will be made available to the addon in the addon installation namespace, as addon-pullsecret prior to installing the addon itself.",
+                  "type": "string"
+                }
+              }
+            },
+            "type": {
+              "description": "Type of installation.",
+              "type": "string",
+              "enum": [
+                "OLMOwnNamespace",
+                "OLMAllNamespaces"
+              ]
+            }
+          }
+        },
+        "installAckRequired": {
+          "description": "Defines if the addon needs installation acknowledgment from its corresponding addon instance.",
+          "type": "boolean"
+        },
+        "monitoring": {
+          "description": "Defines how an addon is monitored.",
+          "type": "object",
+          "properties": {
+            "federation": {
+              "description": "Configuration parameters to be injected in the ServiceMonitor used for federation. The target prometheus server found by matchLabels needs to serve service-ca signed TLS traffic (https://docs.openshift.com/container-platform/4.6/security/certificate_types_descriptions/service-ca-certificates.html), and it needs to be running inside the namespace specified by `.monitoring.federation.namespace` with the service name 'prometheus'.",
+              "type": "object",
+              "required": [
+                "matchLabels",
+                "matchNames",
+                "namespace",
+                "portName"
+              ],
+              "properties": {
+                "matchLabels": {
+                  "description": "List of labels used to discover the prometheus server(s) to be federated.",
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "matchNames": {
+                  "description": "List of series names to federate from the prometheus server.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "namespace": {
+                  "description": "Namespace where the prometheus server is running.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "portName": {
+                  "description": "The name of the service port fronting the prometheus server.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "monitoringStack": {
+              "description": "Settings For Monitoring Stack",
+              "type": "object",
+              "properties": {
+                "rhobsRemoteWriteConfig": {
+                  "description": "Settings for RHOBS Remote Write",
+                  "type": "object",
+                  "required": [
+                    "url"
+                  ],
+                  "properties": {
+                    "allowlist": {
+                      "description": "List of metrics to push to RHOBS. Any metric not listed here is dropped.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "oauth2": {
+                      "description": "OAuth2 config for the remote write URL",
+                      "type": "object",
+                      "required": [
+                        "clientId",
+                        "clientSecret",
+                        "tokenUrl"
+                      ],
+                      "properties": {
+                        "clientId": {
+                          "description": "`clientId` specifies a key of a Secret or ConfigMap containing the OAuth2 client's ID.",
+                          "type": "object",
+                          "properties": {
+                            "configMap": {
+                              "description": "ConfigMap containing data to use for the targets.",
+                              "type": "object",
+                              "required": [
+                                "key"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "description": "The key to select.",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                                  "type": "string"
+                                },
+                                "optional": {
+                                  "description": "Specify whether the ConfigMap or its key must be defined",
+                                  "type": "boolean"
+                                }
+                              }
+                            },
+                            "secret": {
+                              "description": "Secret containing data to use for the targets.",
+                              "type": "object",
+                              "required": [
+                                "key"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "description": "The key of the secret to select from.  Must be a valid secret key.",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                                  "type": "string"
+                                },
+                                "optional": {
+                                  "description": "Specify whether the Secret or its key must be defined",
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "clientSecret": {
+                          "description": "`clientSecret` specifies a key of a Secret containing the OAuth2 client's secret.",
+                          "type": "object",
+                          "required": [
+                            "key"
+                          ],
+                          "properties": {
+                            "key": {
+                              "description": "The key of the secret to select from.  Must be a valid secret key.",
+                              "type": "string"
+                            },
+                            "name": {
+                              "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                              "type": "string"
+                            },
+                            "optional": {
+                              "description": "Specify whether the Secret or its key must be defined",
+                              "type": "boolean"
+                            }
+                          }
+                        },
+                        "endpointParams": {
+                          "description": "`endpointParams` configures the HTTP parameters to append to the token URL.",
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "scopes": {
+                          "description": "`scopes` defines the OAuth2 scopes used for the token request.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "tokenUrl": {
+                          "description": "`tokenURL` configures the URL to fetch the token from.",
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    },
+                    "url": {
+                      "description": "RHOBS endpoints where your data is sent to It varies by environment: - Staging: https://observatorium-mst.stage.api.openshift.com/api/metrics/v1/<tenant id>/api/v1/receive - Production: https://observatorium-mst.api.openshift.com/api/metrics/v1/<tenant id>/api/v1/receive",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "namespaces": {
+          "description": "Defines a list of Kubernetes Namespaces that belong to this Addon. Namespaces listed here will be created prior to installation of the Addon and will be removed from the cluster when the Addon is deleted. Collisions with existing Namespaces will result in the existing Namespaces being adopted.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "annotations": {
+                "description": "Annotations to be added to the namespace",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "labels": {
+                "description": "Labels to be added to the namespace",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "name": {
+                "description": "Name of the KubernetesNamespace.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "packageOperator": {
+          "description": "defines the PackageOperator image as part of the addon Spec",
+          "type": "object",
+          "required": [
+            "image"
+          ],
+          "properties": {
+            "image": {
+              "type": "string"
+            }
+          }
+        },
+        "pause": {
+          "description": "Pause reconciliation of Addon when set to True",
+          "type": "boolean"
+        },
+        "secretPropagation": {
+          "description": "Settings for propagating secrets from the Addon Operator install namespace into Addon namespaces.",
+          "type": "object",
+          "required": [
+            "secrets"
+          ],
+          "properties": {
+            "secrets": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "destinationSecret",
+                  "sourceSecret"
+                ],
+                "properties": {
+                  "destinationSecret": {
+                    "description": "Destination secret name in every Addon namespace.",
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "sourceSecret": {
+                    "description": "Source secret name in the Addon Operator install namespace.",
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "upgradePolicy": {
+          "description": "UpgradePolicy enables status reporting via upgrade policies.",
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "description": "Upgrade policy id.",
+              "type": "string"
+            }
+          }
+        },
+        "version": {
+          "description": "Version of the Addon to deploy. Used for reporting via status and metrics.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "AddonStatus defines the observed state of Addon",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions is a list of status conditions ths object is in.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, \n \ttype FooStatus struct{ \t    // Represents the observations of a foo's current state. \t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\" \t    // +patchMergeKey=type \t    // +patchStrategy=merge \t    // +listType=map \t    // +listMapKey=type \t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n \t    // other fields \t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition. This may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase. --- Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be useful (see .node.status.conditions), the ability to deconflict is important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "lastObservedAvailableCSV": {
+          "description": "Namespaced name of the csv(available) that was last observed.",
+          "type": "string"
+        },
+        "observedGeneration": {
+          "description": "The most recent generation observed by the controller.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "observedVersion": {
+          "description": "Observed version of the Addon on the cluster, only present when .spec.version is populated.",
+          "type": "string"
+        },
+        "ocmReportedStatusHash": {
+          "description": "Tracks the last addon status reported to OCM.",
+          "type": "object",
+          "required": [
+            "observedGeneration",
+            "statusHash"
+          ],
+          "properties": {
+            "observedGeneration": {
+              "description": "The most recent generation a status update was based on.",
+              "type": "integer",
+              "format": "int64"
+            },
+            "statusHash": {
+              "description": "Hash of the last reported status.",
+              "type": "string"
+            }
+          }
+        },
+        "phase": {
+          "description": "DEPRECATED: This field is not part of any API contract it will go away as soon as kubectl can print conditions! Human readable status - please use .Conditions from code",
+          "type": "string"
+        },
+        "upgradePolicy": {
+          "description": "Tracks last reported upgrade policy status.",
+          "type": "object",
+          "required": [
+            "id",
+            "observedGeneration",
+            "value"
+          ],
+          "properties": {
+            "id": {
+              "description": "Upgrade policy id.",
+              "type": "string"
+            },
+            "observedGeneration": {
+              "description": "The most recent generation a status update was based on.",
+              "type": "integer",
+              "format": "int64"
+            },
+            "value": {
+              "description": "Upgrade policy value.",
+              "type": "string"
+            },
+            "version": {
+              "description": "Upgrade Policy Version.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "addons.managed.openshift.io",
+      "kind": "Addon",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,181 @@
+{
+  "description": "GrafanaDashboard is the Schema for the grafanadashboards API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "GrafanaDashboardSpec defines the desired state of GrafanaDashboard",
+      "type": "object",
+      "properties": {
+        "configMapRef": {
+          "description": "ConfigMapRef is a reference to a ConfigMap data field containing the dashboard's JSON",
+          "type": "object",
+          "required": [
+            "key"
+          ],
+          "properties": {
+            "key": {
+              "description": "The key to select.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+              "type": "string"
+            },
+            "optional": {
+              "description": "Specify whether the ConfigMap or its key must be defined",
+              "type": "boolean"
+            }
+          }
+        },
+        "contentCacheDuration": {
+          "description": "ContentCacheDuration sets how often the operator should resync with the external source when using the `grafanaCom.id` or `url` field to specify the source of the dashboard. The default value is decided by the `dashboardContentCacheDuration` field in the `Grafana` resource. The default is 0 which is interpreted as never refetching.",
+          "type": "string"
+        },
+        "customFolderName": {
+          "type": "string"
+        },
+        "datasources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "datasourceName",
+              "inputName"
+            ],
+            "properties": {
+              "datasourceName": {
+                "type": "string"
+              },
+              "inputName": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "grafanaCom": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "revision": {
+              "type": "integer"
+            }
+          }
+        },
+        "gzipConfigMapRef": {
+          "description": "GzipConfigMapRef is a reference to a ConfigMap binaryData field containing the dashboard's JSON, compressed with Gzip.",
+          "type": "object",
+          "required": [
+            "key"
+          ],
+          "properties": {
+            "key": {
+              "description": "The key to select.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+              "type": "string"
+            },
+            "optional": {
+              "description": "Specify whether the ConfigMap or its key must be defined",
+              "type": "boolean"
+            }
+          }
+        },
+        "gzipJson": {
+          "description": "GzipJson the dashboard's JSON compressed with Gzip. Base64-encoded when in YAML.",
+          "type": "string",
+          "format": "byte"
+        },
+        "json": {
+          "description": "Json is the dashboard's JSON",
+          "type": "string"
+        },
+        "jsonnet": {
+          "type": "string"
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "description": "GrafanaPlugin contains information about a single plugin",
+            "type": "object",
+            "required": [
+              "name",
+              "version"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "contentCache": {
+          "type": "string",
+          "format": "byte"
+        },
+        "contentTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "contentUrl": {
+          "type": "string"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "error"
+          ],
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "error": {
+              "type": "string"
+            },
+            "retries": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "integreatly.org",
+      "kind": "GrafanaDashboard",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

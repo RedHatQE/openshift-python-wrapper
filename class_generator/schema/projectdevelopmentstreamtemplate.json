@@ -1,0 +1,68 @@
+{
+  "description": "ProjectDevelopmentStreamTemplate is the Schema for the projectdevelopmentstreamtemplates API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ProjectDevelopmentStreamTemplateSpec defines the resources to be generated\nusing a ProjectDevelopmentStreamTemplate",
+      "type": "object",
+      "properties": {
+        "project": {
+          "description": "The name of the project this stream template belongs to",
+          "type": "string"
+        },
+        "resources": {
+          "description": "List of resources to be created for version made from this template\ncertain values for resource properties may include references to\nvariables using the Go-text/template syntax",
+          "type": "array",
+          "items": {
+            "x-kubernetes-preserve-unknown-fields": true
+          }
+        },
+        "variables": {
+          "description": "List of variables to allow customizing the template results. The order\nvariables in the list is significant as earlier variables can be\nreferenced by the default values for later variables",
+          "type": "array",
+          "items": {
+            "description": "Settings for a variable to be used to customize the template results",
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "defaultValue": {
+                "description": "Optional default value for use when a value for the variable is not given\ncan reference values of other previously defined variables using the Go\ntext/template syntax",
+                "type": "string"
+              },
+              "description": {
+                "description": "Optional description for the variable for display in the UI",
+                "type": "string"
+              },
+              "name": {
+                "description": "Variable name",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "projctl.konflux.dev",
+      "kind": "ProjectDevelopmentStreamTemplate",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,150 @@
+{
+  "description": "Webhook connects to a third party API server to handle the secrets generation\nconfiguration parameters in spec.\nYou can specify the server, the token, and additional body parameters.\nSee documentation for the full API specification for requests and responses.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "WebhookSpec controls the behavior of the external generator. Any body parameters should be passed to the server through the parameters field.",
+      "type": "object",
+      "required": [
+        "result",
+        "url"
+      ],
+      "properties": {
+        "body": {
+          "description": "Body",
+          "type": "string"
+        },
+        "caBundle": {
+          "description": "PEM encoded CA bundle used to validate webhook server certificate. Only used\nif the Server URL is using HTTPS protocol. This parameter is ignored for\nplain HTTP protocol connection. If not set the system root certificates\nare used to validate the TLS connection.",
+          "type": "string",
+          "format": "byte"
+        },
+        "caProvider": {
+          "description": "The provider for the CA bundle to use to validate webhook server certificate.",
+          "type": "object",
+          "required": [
+            "name",
+            "type"
+          ],
+          "properties": {
+            "key": {
+              "description": "The key where the CA certificate can be found in the Secret or ConfigMap.",
+              "type": "string",
+              "maxLength": 253,
+              "minLength": 1,
+              "pattern": "^[-._a-zA-Z0-9]+$"
+            },
+            "name": {
+              "description": "The name of the object located at the provider type.",
+              "type": "string",
+              "maxLength": 253,
+              "minLength": 1,
+              "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+            },
+            "namespace": {
+              "description": "The namespace the Provider type is in.",
+              "type": "string",
+              "maxLength": 63,
+              "minLength": 1,
+              "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+            },
+            "type": {
+              "description": "The type of provider to use such as \"Secret\", or \"ConfigMap\".",
+              "type": "string",
+              "enum": [
+                "Secret",
+                "ConfigMap"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "description": "Headers",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "method": {
+          "description": "Webhook Method",
+          "type": "string"
+        },
+        "result": {
+          "description": "Result formatting",
+          "type": "object",
+          "properties": {
+            "jsonPath": {
+              "description": "Json path of return value",
+              "type": "string"
+            }
+          }
+        },
+        "secrets": {
+          "description": "Secrets to fill in templates\nThese secrets will be passed to the templating function as key value pairs under the given name",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "secretRef"
+            ],
+            "properties": {
+              "name": {
+                "description": "Name of this secret in templates",
+                "type": "string"
+              },
+              "secretRef": {
+                "description": "Secret ref to fill in credentials",
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "description": "The key where the token is found.",
+                    "type": "string",
+                    "maxLength": 253,
+                    "minLength": 1,
+                    "pattern": "^[-._a-zA-Z0-9]+$"
+                  },
+                  "name": {
+                    "description": "The name of the Secret resource being referred to.",
+                    "type": "string",
+                    "maxLength": 253,
+                    "minLength": 1,
+                    "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "timeout": {
+          "description": "Timeout",
+          "type": "string"
+        },
+        "url": {
+          "description": "Webhook url to call",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "generators.external-secrets.io",
+      "kind": "Webhook",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

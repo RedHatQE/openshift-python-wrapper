@@ -1,0 +1,130 @@
+{
+  "description": "RouteMonitor is the Schema for the routemonitors API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "RouteMonitorSpec defines the desired state of RouteMonitor",
+      "type": "object",
+      "properties": {
+        "insecureSkipTLSVerify": {
+          "description": "InsecureSkipTLSVerify indicates that the blackbox exporter module used to probe this route\nshould *not* use https",
+          "type": "boolean"
+        },
+        "route": {
+          "description": "RouteMonitorRouteSpec references the observed Route resource",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name is the name of the Route",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "Namespace is the namespace of the Route",
+              "type": "string"
+            },
+            "port": {
+              "description": "Port optionally defines the port we should use while probing",
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "suffix": {
+              "description": "Suffix optionally defines the path we should probe (/livez /readyz etc)",
+              "type": "string"
+            }
+          }
+        },
+        "serviceMonitorType": {
+          "description": "ServiceMonitorType dictates the type of ServiceMonitor the RouteMonitor should create",
+          "type": "string",
+          "enum": [
+            "monitoring.coreos.com",
+            "monitoring.rhobs"
+          ]
+        },
+        "skipPrometheusRule": {
+          "description": "SkipPrometheusRule instructs the controller to skip the creation of PrometheusRule CRs.\nOne common use-case for is for alerts that are defined separately, such as for hosted clusters.",
+          "type": "boolean"
+        },
+        "slo": {
+          "description": "SloSpec defines what is the percentage",
+          "type": "object",
+          "required": [
+            "targetAvailabilityPercent"
+          ],
+          "properties": {
+            "targetAvailabilityPercent": {
+              "description": "TargetAvailabilityPercent defines the percent number to be used",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "RouteMonitorStatus defines the observed state of RouteMonitor",
+      "type": "object",
+      "properties": {
+        "errorStatus": {
+          "type": "string"
+        },
+        "prometheusRuleRef": {
+          "description": "NamespacedName contains the name of a object and its namespace",
+          "type": "object",
+          "required": [
+            "name",
+            "namespace"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        },
+        "routeURL": {
+          "description": "RouteURL is the url extracted from the Route resource",
+          "type": "string"
+        },
+        "serviceMonitorRef": {
+          "description": "NamespacedName contains the name of a object and its namespace",
+          "type": "object",
+          "required": [
+            "name",
+            "namespace"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "monitoring.openshift.io",
+      "kind": "RouteMonitor",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

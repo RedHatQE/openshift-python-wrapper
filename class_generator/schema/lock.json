@@ -1,0 +1,161 @@
+{
+  "description": "Lock is the CRD type that tracks package dependencies.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "description": "LockPackage is a package that is in the lock.",
+        "type": "object",
+        "required": [
+          "dependencies",
+          "name",
+          "source",
+          "version"
+        ],
+        "properties": {
+          "apiVersion": {
+            "description": "APIVersion of the package.",
+            "type": "string"
+          },
+          "dependencies": {
+            "description": "Dependencies are the list of dependencies of this package. The order of\nthe dependencies will dictate the order in which they are resolved.",
+            "type": "array",
+            "items": {
+              "description": "A Dependency is a dependency of a package in the lock.",
+              "type": "object",
+              "required": [
+                "constraints",
+                "package"
+              ],
+              "properties": {
+                "apiVersion": {
+                  "description": "APIVersion of the package.",
+                  "type": "string"
+                },
+                "constraints": {
+                  "description": "Constraints is a valid semver range or a digest, which will be used to select a valid\ndependency version.",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Kind of the package (not the kind of the package revision).",
+                  "type": "string"
+                },
+                "package": {
+                  "description": "Package is the OCI image name without a tag or digest.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type is the type of package. Can be either Configuration or Provider.\nDeprecated: Specify an apiVersion and kind instead.",
+                  "type": "string",
+                  "enum": [
+                    "Configuration",
+                    "Provider",
+                    "Function"
+                  ]
+                }
+              }
+            }
+          },
+          "kind": {
+            "description": "Kind of the package (not the kind of the package revision).",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name corresponds to the name of the package revision for this package.",
+            "type": "string"
+          },
+          "source": {
+            "description": "Source is the OCI image name without a tag or digest.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type is the type of package.\nDeprecated: Specify an apiVersion and kind instead.",
+            "type": "string",
+            "enum": [
+              "Configuration",
+              "Provider",
+              "Function"
+            ]
+          },
+          "version": {
+            "description": "Version is the tag or digest of the OCI image.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "Status of the Lock.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions of the resource.",
+          "type": "array",
+          "items": {
+            "description": "A Condition that may apply to a resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time this condition transitioned from one\nstatus to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "A Message containing details about this condition's last transition from\none status to another, if any.",
+                "type": "string"
+              },
+              "observedGeneration": {
+                "description": "ObservedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "reason": {
+                "description": "A Reason for this condition's last transition from one status to another.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of this condition; is it currently True, False, or Unknown?",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of this condition. At most one of each condition type may apply to\na resource at any point in time.",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "pkg.crossplane.io",
+      "kind": "Lock",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

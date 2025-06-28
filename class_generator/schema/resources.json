@@ -1,0 +1,1197 @@
+{
+  "description": "Resources specifies Patch & Transform resource templates.",
+  "type": "object",
+  "required": [
+    "resources"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "environment": {
+      "description": "Environment represents the Composition environment.\n\nTHIS IS AN ALPHA FIELD.\nDo not use it in production. It may be changed or removed without notice.",
+      "type": "object",
+      "properties": {
+        "patches": {
+          "description": "Patches is a list of environment patches that are executed before a\ncomposition's resources are composed. These patches are between the XR\nand the Environment. Either from the Environment to the XR, or vice\nversa.",
+          "type": "array",
+          "items": {
+            "description": "EnvironmentPatch objects are applied between the composite resource and\nthe environment. Their behaviour depends on the Type selected. The default\nType, FromCompositeFieldPath, copies a value from the composite resource\nto the environment, applying any defined transformers.",
+            "type": "object",
+            "properties": {
+              "combine": {
+                "description": "Combine is the patch configuration for a CombineFromComposite,\nCombineToComposite patch.",
+                "type": "object",
+                "required": [
+                  "strategy",
+                  "variables"
+                ],
+                "properties": {
+                  "strategy": {
+                    "description": "Strategy defines the strategy to use to combine the input variable values.\nCurrently only string is supported.",
+                    "type": "string",
+                    "enum": [
+                      "string"
+                    ]
+                  },
+                  "string": {
+                    "description": "String declares that input variables should be combined into a single\nstring, using the relevant settings for formatting purposes.",
+                    "type": "object",
+                    "required": [
+                      "fmt"
+                    ],
+                    "properties": {
+                      "fmt": {
+                        "description": "Format the input using a Go format string. See\nhttps://golang.org/pkg/fmt/ for details.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "variables": {
+                    "description": "Variables are the list of variables whose values will be retrieved and\ncombined.",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "description": "A CombineVariable defines the source of a value that is combined with\nothers to form and patch an output value. Currently, this only supports\nretrieving values from a field path.",
+                      "type": "object",
+                      "required": [
+                        "fromFieldPath"
+                      ],
+                      "properties": {
+                        "fromFieldPath": {
+                          "description": "FromFieldPath is the path of the field on the source whose value is\nto be used as input.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "fromFieldPath": {
+                "description": "FromFieldPath is the path of the field on the resource whose value is\nto be used as input. Required when type is FromCompositeFieldPath or\nToCompositeFieldPath.",
+                "type": "string"
+              },
+              "policy": {
+                "description": "Policy configures the specifics of patching behaviour.",
+                "type": "object",
+                "properties": {
+                  "fromFieldPath": {
+                    "description": "FromFieldPath specifies how to patch from a field path. The default is\n'Optional', which means the patch will be a no-op if the specified\nfromFieldPath does not exist. Use 'Required' to prevent the creation of a\nnew composed resource until the required path exists.",
+                    "type": "string",
+                    "enum": [
+                      "Optional",
+                      "Required"
+                    ]
+                  },
+                  "toFieldPath": {
+                    "description": "ToFieldPath specifies how to patch to a field path. The default is\n'Replace', which means the patch will completely replace the target field,\nor create it if it does not exist. Use 'MergeObjects' to recursively merge the patch\nobject with the target object, while keeping target object keys, but overwriting any array values, or use\n'MergeObjectsAppendArrays' to recursively merge the patch object with the target object, while keeping\ntarget object keys and appending any array values to target array values, or use\n'ForceMergeObjects' to recursively merge the patch object with the target object, overwriting\nany target object keys, including array values, or use\n'ForceMergeObjectsAppendArrays' to recursively merge the patch object with the target object,\noverwriting target object keys, and appending any array values to target array values.\n'MergeObject' is deprecated, use 'MergeObjects' instead, which is functionally identical.\n'AppendArray' is deprecated, use 'ForceMergeObjectsAppendArrays' instead, which is functionally identical.",
+                    "type": "string",
+                    "enum": [
+                      "Replace",
+                      "MergeObjects",
+                      "MergeObjectsAppendArrays",
+                      "ForceMergeObjects",
+                      "ForceMergeObjectsAppendArrays",
+                      "MergeObject",
+                      "AppendArray"
+                    ]
+                  }
+                }
+              },
+              "toFieldPath": {
+                "description": "ToFieldPath is the path of the field on the resource whose value will\nbe changed with the result of transforms. Leave empty if you'd like to\npropagate to the same path as fromFieldPath.",
+                "type": "string"
+              },
+              "transforms": {
+                "description": "Transforms are the list of functions that are used as a FIFO pipe for the\ninput to be transformed.",
+                "type": "array",
+                "items": {
+                  "description": "Transform is a unit of process whose input is transformed into an output with\nthe supplied configuration.",
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "convert": {
+                      "description": "Convert is used to cast the input into the given output type.",
+                      "type": "object",
+                      "required": [
+                        "toType"
+                      ],
+                      "properties": {
+                        "format": {
+                          "description": "The expected input format.\n\n* `quantity` - parses the input as a K8s [`resource.Quantity`](https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity).\nOnly used during `string -> float64` conversions.\n* `json` - parses the input as a JSON string.\nOnly used during `string -> object` or `string -> list` conversions.\n\nIf this property is null, the default conversion is applied.",
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "quantity",
+                            "json"
+                          ]
+                        },
+                        "toType": {
+                          "description": "ToType is the type of the output of this transform.",
+                          "type": "string",
+                          "enum": [
+                            "string",
+                            "int",
+                            "int64",
+                            "bool",
+                            "float64",
+                            "object",
+                            "array"
+                          ]
+                        }
+                      }
+                    },
+                    "map": {
+                      "description": "Map uses the input as a key in the given map and returns the value.",
+                      "type": "object",
+                      "additionalProperties": {
+                        "x-kubernetes-preserve-unknown-fields": true
+                      }
+                    },
+                    "match": {
+                      "description": "Match is a more complex version of Map that matches a list of patterns.",
+                      "type": "object",
+                      "properties": {
+                        "fallbackTo": {
+                          "description": "Determines to what value the transform should fallback if no pattern matches.",
+                          "type": "string",
+                          "enum": [
+                            "Value",
+                            "Input"
+                          ]
+                        },
+                        "fallbackValue": {
+                          "description": "The fallback value that should be returned by the transform if now pattern\nmatches.",
+                          "x-kubernetes-preserve-unknown-fields": true
+                        },
+                        "patterns": {
+                          "description": "The patterns that should be tested against the input string.\nPatterns are tested in order. The value of the first match is used as\nresult of this transform.",
+                          "type": "array",
+                          "items": {
+                            "description": "MatchTransformPattern is a transform that returns the value that matches a\npattern.",
+                            "type": "object",
+                            "required": [
+                              "result",
+                              "type"
+                            ],
+                            "properties": {
+                              "literal": {
+                                "description": "Literal exactly matches the input string (case sensitive).\nIs required if `type` is `literal`.",
+                                "type": "string"
+                              },
+                              "regexp": {
+                                "description": "Regexp to match against the input string.\nIs required if `type` is `regexp`.",
+                                "type": "string"
+                              },
+                              "result": {
+                                "description": "The value that is used as result of the transform if the pattern matches.",
+                                "x-kubernetes-preserve-unknown-fields": true
+                              },
+                              "type": {
+                                "description": "Type specifies how the pattern matches the input.\n\n* `literal` - the pattern value has to exactly match (case sensitive) the\ninput string. This is the default.\n\n* `regexp` - the pattern treated as a regular expression against\nwhich the input string is tested. Crossplane will throw an error if the\nkey is not a valid regexp.",
+                                "type": "string",
+                                "enum": [
+                                  "literal",
+                                  "regexp"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "math": {
+                      "description": "Math is used to transform the input via mathematical operations such as\nmultiplication.",
+                      "type": "object",
+                      "properties": {
+                        "clampMax": {
+                          "description": "ClampMax makes sure that the value is not bigger than the given value.",
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "clampMin": {
+                          "description": "ClampMin makes sure that the value is not smaller than the given value.",
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "multiply": {
+                          "description": "Multiply the value.",
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "type": {
+                          "description": "Type of the math transform to be run.",
+                          "type": "string",
+                          "enum": [
+                            "Multiply",
+                            "ClampMin",
+                            "ClampMax"
+                          ]
+                        }
+                      }
+                    },
+                    "string": {
+                      "description": "String is used to transform the input into a string or a different kind\nof string. Note that the input does not necessarily need to be a string.",
+                      "type": "object",
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "convert": {
+                          "description": "Optional conversion method to be specified.\n`ToUpper` and `ToLower` change the letter case of the input string.\n`ToBase64` and `FromBase64` perform a base64 conversion based on the input string.\n`ToJson` converts any input value into its raw JSON representation.\n`ToSha1`, `ToSha256` and `ToSha512` generate a hash value based on the input\nconverted to JSON.",
+                          "type": "string",
+                          "enum": [
+                            "ToUpper",
+                            "ToLower",
+                            "ToBase64",
+                            "FromBase64",
+                            "ToJson",
+                            "ToSha1",
+                            "ToSha256",
+                            "ToSha512"
+                          ]
+                        },
+                        "fmt": {
+                          "description": "Format the input using a Go format string. See\nhttps://golang.org/pkg/fmt/ for details.",
+                          "type": "string"
+                        },
+                        "join": {
+                          "description": "Join the input strings.",
+                          "type": "object",
+                          "required": [
+                            "separator"
+                          ],
+                          "properties": {
+                            "separator": {
+                              "description": "Separator to join the input strings.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "regexp": {
+                          "description": "Extract a match from the input using a regular expression.",
+                          "type": "object",
+                          "required": [
+                            "match"
+                          ],
+                          "properties": {
+                            "group": {
+                              "description": "Group number to match. 0 (the default) matches the entire expression.",
+                              "type": "integer"
+                            },
+                            "match": {
+                              "description": "Match string. May optionally include submatches, aka capture groups.\nSee https://pkg.go.dev/regexp/ for details.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "replace": {
+                          "description": "Search/Replace applied to the input string.",
+                          "type": "object",
+                          "required": [
+                            "replace",
+                            "search"
+                          ],
+                          "properties": {
+                            "replace": {
+                              "description": "The Replace string replaces all occurrences of the search string.",
+                              "type": "string"
+                            },
+                            "search": {
+                              "description": "The Search string to match.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "trim": {
+                          "description": "Trim the prefix or suffix from the input",
+                          "type": "string"
+                        },
+                        "type": {
+                          "description": "Type of the string transform to be run.",
+                          "type": "string",
+                          "enum": [
+                            "Format",
+                            "Convert",
+                            "TrimPrefix",
+                            "TrimSuffix",
+                            "Regexp"
+                          ]
+                        }
+                      }
+                    },
+                    "type": {
+                      "description": "Type of the transform to be run.",
+                      "type": "string",
+                      "enum": [
+                        "map",
+                        "match",
+                        "math",
+                        "string",
+                        "convert"
+                      ]
+                    }
+                  }
+                }
+              },
+              "type": {
+                "description": "Type sets the patching behaviour to be used. Each patch type may require\nits own fields to be set on the Patch object.",
+                "type": "string",
+                "enum": [
+                  "FromCompositeFieldPath",
+                  "ToCompositeFieldPath",
+                  "CombineFromComposite",
+                  "CombineToComposite",
+                  "FromEnvironmentFieldPath",
+                  "ToEnvironmentFieldPath"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "patchSets": {
+      "description": "PatchSets define a named set of patches that may be included by any\nresource. PatchSets cannot themselves refer to other PatchSets.",
+      "type": "array",
+      "items": {
+        "description": "A PatchSet is a set of patches that can be reused from all resources.",
+        "type": "object",
+        "required": [
+          "name",
+          "patches"
+        ],
+        "properties": {
+          "name": {
+            "description": "Name of this PatchSet.",
+            "type": "string"
+          },
+          "patches": {
+            "description": "Patches will be applied as an overlay to the base resource.",
+            "type": "array",
+            "items": {
+              "description": "PatchSetPatch defines a set of Patches that can be referenced by name by\nother patches of type PatchSet.",
+              "type": "object",
+              "properties": {
+                "combine": {
+                  "description": "Combine is the patch configuration for a CombineFromComposite,\nCombineToComposite patch.",
+                  "type": "object",
+                  "required": [
+                    "strategy",
+                    "variables"
+                  ],
+                  "properties": {
+                    "strategy": {
+                      "description": "Strategy defines the strategy to use to combine the input variable values.\nCurrently only string is supported.",
+                      "type": "string",
+                      "enum": [
+                        "string"
+                      ]
+                    },
+                    "string": {
+                      "description": "String declares that input variables should be combined into a single\nstring, using the relevant settings for formatting purposes.",
+                      "type": "object",
+                      "required": [
+                        "fmt"
+                      ],
+                      "properties": {
+                        "fmt": {
+                          "description": "Format the input using a Go format string. See\nhttps://golang.org/pkg/fmt/ for details.",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "variables": {
+                      "description": "Variables are the list of variables whose values will be retrieved and\ncombined.",
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "description": "A CombineVariable defines the source of a value that is combined with\nothers to form and patch an output value. Currently, this only supports\nretrieving values from a field path.",
+                        "type": "object",
+                        "required": [
+                          "fromFieldPath"
+                        ],
+                        "properties": {
+                          "fromFieldPath": {
+                            "description": "FromFieldPath is the path of the field on the source whose value is\nto be used as input.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "fromFieldPath": {
+                  "description": "FromFieldPath is the path of the field on the resource whose value is\nto be used as input. Required when type is FromCompositeFieldPath or\nToCompositeFieldPath.",
+                  "type": "string"
+                },
+                "policy": {
+                  "description": "Policy configures the specifics of patching behaviour.",
+                  "type": "object",
+                  "properties": {
+                    "fromFieldPath": {
+                      "description": "FromFieldPath specifies how to patch from a field path. The default is\n'Optional', which means the patch will be a no-op if the specified\nfromFieldPath does not exist. Use 'Required' to prevent the creation of a\nnew composed resource until the required path exists.",
+                      "type": "string",
+                      "enum": [
+                        "Optional",
+                        "Required"
+                      ]
+                    },
+                    "toFieldPath": {
+                      "description": "ToFieldPath specifies how to patch to a field path. The default is\n'Replace', which means the patch will completely replace the target field,\nor create it if it does not exist. Use 'MergeObjects' to recursively merge the patch\nobject with the target object, while keeping target object keys, but overwriting any array values, or use\n'MergeObjectsAppendArrays' to recursively merge the patch object with the target object, while keeping\ntarget object keys and appending any array values to target array values, or use\n'ForceMergeObjects' to recursively merge the patch object with the target object, overwriting\nany target object keys, including array values, or use\n'ForceMergeObjectsAppendArrays' to recursively merge the patch object with the target object,\noverwriting target object keys, and appending any array values to target array values.\n'MergeObject' is deprecated, use 'MergeObjects' instead, which is functionally identical.\n'AppendArray' is deprecated, use 'ForceMergeObjectsAppendArrays' instead, which is functionally identical.",
+                      "type": "string",
+                      "enum": [
+                        "Replace",
+                        "MergeObjects",
+                        "MergeObjectsAppendArrays",
+                        "ForceMergeObjects",
+                        "ForceMergeObjectsAppendArrays",
+                        "MergeObject",
+                        "AppendArray"
+                      ]
+                    }
+                  }
+                },
+                "toFieldPath": {
+                  "description": "ToFieldPath is the path of the field on the resource whose value will\nbe changed with the result of transforms. Leave empty if you'd like to\npropagate to the same path as fromFieldPath.",
+                  "type": "string"
+                },
+                "transforms": {
+                  "description": "Transforms are the list of functions that are used as a FIFO pipe for the\ninput to be transformed.",
+                  "type": "array",
+                  "items": {
+                    "description": "Transform is a unit of process whose input is transformed into an output with\nthe supplied configuration.",
+                    "type": "object",
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "convert": {
+                        "description": "Convert is used to cast the input into the given output type.",
+                        "type": "object",
+                        "required": [
+                          "toType"
+                        ],
+                        "properties": {
+                          "format": {
+                            "description": "The expected input format.\n\n* `quantity` - parses the input as a K8s [`resource.Quantity`](https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity).\nOnly used during `string -> float64` conversions.\n* `json` - parses the input as a JSON string.\nOnly used during `string -> object` or `string -> list` conversions.\n\nIf this property is null, the default conversion is applied.",
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "quantity",
+                              "json"
+                            ]
+                          },
+                          "toType": {
+                            "description": "ToType is the type of the output of this transform.",
+                            "type": "string",
+                            "enum": [
+                              "string",
+                              "int",
+                              "int64",
+                              "bool",
+                              "float64",
+                              "object",
+                              "array"
+                            ]
+                          }
+                        }
+                      },
+                      "map": {
+                        "description": "Map uses the input as a key in the given map and returns the value.",
+                        "type": "object",
+                        "additionalProperties": {
+                          "x-kubernetes-preserve-unknown-fields": true
+                        }
+                      },
+                      "match": {
+                        "description": "Match is a more complex version of Map that matches a list of patterns.",
+                        "type": "object",
+                        "properties": {
+                          "fallbackTo": {
+                            "description": "Determines to what value the transform should fallback if no pattern matches.",
+                            "type": "string",
+                            "enum": [
+                              "Value",
+                              "Input"
+                            ]
+                          },
+                          "fallbackValue": {
+                            "description": "The fallback value that should be returned by the transform if now pattern\nmatches.",
+                            "x-kubernetes-preserve-unknown-fields": true
+                          },
+                          "patterns": {
+                            "description": "The patterns that should be tested against the input string.\nPatterns are tested in order. The value of the first match is used as\nresult of this transform.",
+                            "type": "array",
+                            "items": {
+                              "description": "MatchTransformPattern is a transform that returns the value that matches a\npattern.",
+                              "type": "object",
+                              "required": [
+                                "result",
+                                "type"
+                              ],
+                              "properties": {
+                                "literal": {
+                                  "description": "Literal exactly matches the input string (case sensitive).\nIs required if `type` is `literal`.",
+                                  "type": "string"
+                                },
+                                "regexp": {
+                                  "description": "Regexp to match against the input string.\nIs required if `type` is `regexp`.",
+                                  "type": "string"
+                                },
+                                "result": {
+                                  "description": "The value that is used as result of the transform if the pattern matches.",
+                                  "x-kubernetes-preserve-unknown-fields": true
+                                },
+                                "type": {
+                                  "description": "Type specifies how the pattern matches the input.\n\n* `literal` - the pattern value has to exactly match (case sensitive) the\ninput string. This is the default.\n\n* `regexp` - the pattern treated as a regular expression against\nwhich the input string is tested. Crossplane will throw an error if the\nkey is not a valid regexp.",
+                                  "type": "string",
+                                  "enum": [
+                                    "literal",
+                                    "regexp"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "math": {
+                        "description": "Math is used to transform the input via mathematical operations such as\nmultiplication.",
+                        "type": "object",
+                        "properties": {
+                          "clampMax": {
+                            "description": "ClampMax makes sure that the value is not bigger than the given value.",
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "clampMin": {
+                            "description": "ClampMin makes sure that the value is not smaller than the given value.",
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "multiply": {
+                            "description": "Multiply the value.",
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "type": {
+                            "description": "Type of the math transform to be run.",
+                            "type": "string",
+                            "enum": [
+                              "Multiply",
+                              "ClampMin",
+                              "ClampMax"
+                            ]
+                          }
+                        }
+                      },
+                      "string": {
+                        "description": "String is used to transform the input into a string or a different kind\nof string. Note that the input does not necessarily need to be a string.",
+                        "type": "object",
+                        "required": [
+                          "type"
+                        ],
+                        "properties": {
+                          "convert": {
+                            "description": "Optional conversion method to be specified.\n`ToUpper` and `ToLower` change the letter case of the input string.\n`ToBase64` and `FromBase64` perform a base64 conversion based on the input string.\n`ToJson` converts any input value into its raw JSON representation.\n`ToSha1`, `ToSha256` and `ToSha512` generate a hash value based on the input\nconverted to JSON.",
+                            "type": "string",
+                            "enum": [
+                              "ToUpper",
+                              "ToLower",
+                              "ToBase64",
+                              "FromBase64",
+                              "ToJson",
+                              "ToSha1",
+                              "ToSha256",
+                              "ToSha512"
+                            ]
+                          },
+                          "fmt": {
+                            "description": "Format the input using a Go format string. See\nhttps://golang.org/pkg/fmt/ for details.",
+                            "type": "string"
+                          },
+                          "join": {
+                            "description": "Join the input strings.",
+                            "type": "object",
+                            "required": [
+                              "separator"
+                            ],
+                            "properties": {
+                              "separator": {
+                                "description": "Separator to join the input strings.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "regexp": {
+                            "description": "Extract a match from the input using a regular expression.",
+                            "type": "object",
+                            "required": [
+                              "match"
+                            ],
+                            "properties": {
+                              "group": {
+                                "description": "Group number to match. 0 (the default) matches the entire expression.",
+                                "type": "integer"
+                              },
+                              "match": {
+                                "description": "Match string. May optionally include submatches, aka capture groups.\nSee https://pkg.go.dev/regexp/ for details.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "replace": {
+                            "description": "Search/Replace applied to the input string.",
+                            "type": "object",
+                            "required": [
+                              "replace",
+                              "search"
+                            ],
+                            "properties": {
+                              "replace": {
+                                "description": "The Replace string replaces all occurrences of the search string.",
+                                "type": "string"
+                              },
+                              "search": {
+                                "description": "The Search string to match.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "trim": {
+                            "description": "Trim the prefix or suffix from the input",
+                            "type": "string"
+                          },
+                          "type": {
+                            "description": "Type of the string transform to be run.",
+                            "type": "string",
+                            "enum": [
+                              "Format",
+                              "Convert",
+                              "TrimPrefix",
+                              "TrimSuffix",
+                              "Regexp"
+                            ]
+                          }
+                        }
+                      },
+                      "type": {
+                        "description": "Type of the transform to be run.",
+                        "type": "string",
+                        "enum": [
+                          "map",
+                          "match",
+                          "math",
+                          "string",
+                          "convert"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "type": {
+                  "description": "Type sets the patching behaviour to be used. Each patch type may require\nits own fields to be set on the ComposedPatch object.",
+                  "type": "string",
+                  "enum": [
+                    "FromCompositeFieldPath",
+                    "ToCompositeFieldPath",
+                    "CombineFromComposite",
+                    "CombineToComposite",
+                    "FromEnvironmentFieldPath",
+                    "ToEnvironmentFieldPath",
+                    "CombineFromEnvironment",
+                    "CombineToEnvironment"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "description": "Resources is a list of resource templates that will be used when a\ncomposite resource is created.",
+      "type": "array",
+      "items": {
+        "description": "ComposedTemplate is used to provide information about how the composed\nresource should be processed.",
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "base": {
+            "description": "Base of the composed resource that patches will be applied to and from.\nIf base is omitted, a previous Function within the pipeline must have\nproduced the named composed resource. Patches will be applied to and from\nthat resource. If base is specified, and a previous Function within the\npipeline produced the name composed resource, it will be overwritten.",
+            "x-kubernetes-embedded-resource": true,
+            "x-kubernetes-preserve-unknown-fields": true
+          },
+          "connectionDetails": {
+            "description": "ConnectionDetails lists the propagation secret keys from this composed\nresource to the composition instance connection secret.",
+            "type": "array",
+            "items": {
+              "description": "ConnectionDetail includes the information about the propagation of the connection\ninformation from one secret to another.",
+              "type": "object",
+              "required": [
+                "name",
+                "type"
+              ],
+              "properties": {
+                "fromConnectionSecretKey": {
+                  "description": "FromConnectionSecretKey is the key that will be used to fetch the value\nfrom the composed resource's connection secret.",
+                  "type": "string"
+                },
+                "fromFieldPath": {
+                  "description": "FromFieldPath is the path of the field on the composed resource whose\nvalue to be used as input. Name must be specified if the type is\nFromFieldPath.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the connection secret key that will be propagated to the\nconnection secret of the composed resource.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type sets the connection detail fetching behavior to be used. Each\nconnection detail type may require its own fields to be set on the\nConnectionDetail object.",
+                  "type": "string",
+                  "enum": [
+                    "FromConnectionSecretKey",
+                    "FromFieldPath",
+                    "FromValue"
+                  ]
+                },
+                "value": {
+                  "description": "Value that will be propagated to the connection secret of the composite\nresource. May be set to inject a fixed, non-sensitive connection secret\nvalue, for example a well-known port.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "name": {
+            "description": "A Name uniquely identifies this entry within its resources array.",
+            "type": "string"
+          },
+          "patches": {
+            "description": "Patches to and from the composed resource.",
+            "type": "array",
+            "items": {
+              "description": "ComposedPatch objects are applied between composite and composed resources.\nTheir behaviour depends on the Type selected. The default Type,\nFromCompositeFieldPath, copies a value from the composite resource to the\ncomposed resource, applying any defined transformers.",
+              "type": "object",
+              "properties": {
+                "combine": {
+                  "description": "Combine is the patch configuration for a CombineFromComposite,\nCombineToComposite patch.",
+                  "type": "object",
+                  "required": [
+                    "strategy",
+                    "variables"
+                  ],
+                  "properties": {
+                    "strategy": {
+                      "description": "Strategy defines the strategy to use to combine the input variable values.\nCurrently only string is supported.",
+                      "type": "string",
+                      "enum": [
+                        "string"
+                      ]
+                    },
+                    "string": {
+                      "description": "String declares that input variables should be combined into a single\nstring, using the relevant settings for formatting purposes.",
+                      "type": "object",
+                      "required": [
+                        "fmt"
+                      ],
+                      "properties": {
+                        "fmt": {
+                          "description": "Format the input using a Go format string. See\nhttps://golang.org/pkg/fmt/ for details.",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "variables": {
+                      "description": "Variables are the list of variables whose values will be retrieved and\ncombined.",
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "description": "A CombineVariable defines the source of a value that is combined with\nothers to form and patch an output value. Currently, this only supports\nretrieving values from a field path.",
+                        "type": "object",
+                        "required": [
+                          "fromFieldPath"
+                        ],
+                        "properties": {
+                          "fromFieldPath": {
+                            "description": "FromFieldPath is the path of the field on the source whose value is\nto be used as input.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "fromFieldPath": {
+                  "description": "FromFieldPath is the path of the field on the resource whose value is\nto be used as input. Required when type is FromCompositeFieldPath or\nToCompositeFieldPath.",
+                  "type": "string"
+                },
+                "patchSetName": {
+                  "description": "PatchSetName to include patches from. Required when type is PatchSet.",
+                  "type": "string"
+                },
+                "policy": {
+                  "description": "Policy configures the specifics of patching behaviour.",
+                  "type": "object",
+                  "properties": {
+                    "fromFieldPath": {
+                      "description": "FromFieldPath specifies how to patch from a field path. The default is\n'Optional', which means the patch will be a no-op if the specified\nfromFieldPath does not exist. Use 'Required' to prevent the creation of a\nnew composed resource until the required path exists.",
+                      "type": "string",
+                      "enum": [
+                        "Optional",
+                        "Required"
+                      ]
+                    },
+                    "toFieldPath": {
+                      "description": "ToFieldPath specifies how to patch to a field path. The default is\n'Replace', which means the patch will completely replace the target field,\nor create it if it does not exist. Use 'MergeObjects' to recursively merge the patch\nobject with the target object, while keeping target object keys, but overwriting any array values, or use\n'MergeObjectsAppendArrays' to recursively merge the patch object with the target object, while keeping\ntarget object keys and appending any array values to target array values, or use\n'ForceMergeObjects' to recursively merge the patch object with the target object, overwriting\nany target object keys, including array values, or use\n'ForceMergeObjectsAppendArrays' to recursively merge the patch object with the target object,\noverwriting target object keys, and appending any array values to target array values.\n'MergeObject' is deprecated, use 'MergeObjects' instead, which is functionally identical.\n'AppendArray' is deprecated, use 'ForceMergeObjectsAppendArrays' instead, which is functionally identical.",
+                      "type": "string",
+                      "enum": [
+                        "Replace",
+                        "MergeObjects",
+                        "MergeObjectsAppendArrays",
+                        "ForceMergeObjects",
+                        "ForceMergeObjectsAppendArrays",
+                        "MergeObject",
+                        "AppendArray"
+                      ]
+                    }
+                  }
+                },
+                "toFieldPath": {
+                  "description": "ToFieldPath is the path of the field on the resource whose value will\nbe changed with the result of transforms. Leave empty if you'd like to\npropagate to the same path as fromFieldPath.",
+                  "type": "string"
+                },
+                "transforms": {
+                  "description": "Transforms are the list of functions that are used as a FIFO pipe for the\ninput to be transformed.",
+                  "type": "array",
+                  "items": {
+                    "description": "Transform is a unit of process whose input is transformed into an output with\nthe supplied configuration.",
+                    "type": "object",
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "convert": {
+                        "description": "Convert is used to cast the input into the given output type.",
+                        "type": "object",
+                        "required": [
+                          "toType"
+                        ],
+                        "properties": {
+                          "format": {
+                            "description": "The expected input format.\n\n* `quantity` - parses the input as a K8s [`resource.Quantity`](https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity).\nOnly used during `string -> float64` conversions.\n* `json` - parses the input as a JSON string.\nOnly used during `string -> object` or `string -> list` conversions.\n\nIf this property is null, the default conversion is applied.",
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "quantity",
+                              "json"
+                            ]
+                          },
+                          "toType": {
+                            "description": "ToType is the type of the output of this transform.",
+                            "type": "string",
+                            "enum": [
+                              "string",
+                              "int",
+                              "int64",
+                              "bool",
+                              "float64",
+                              "object",
+                              "array"
+                            ]
+                          }
+                        }
+                      },
+                      "map": {
+                        "description": "Map uses the input as a key in the given map and returns the value.",
+                        "type": "object",
+                        "additionalProperties": {
+                          "x-kubernetes-preserve-unknown-fields": true
+                        }
+                      },
+                      "match": {
+                        "description": "Match is a more complex version of Map that matches a list of patterns.",
+                        "type": "object",
+                        "properties": {
+                          "fallbackTo": {
+                            "description": "Determines to what value the transform should fallback if no pattern matches.",
+                            "type": "string",
+                            "enum": [
+                              "Value",
+                              "Input"
+                            ]
+                          },
+                          "fallbackValue": {
+                            "description": "The fallback value that should be returned by the transform if now pattern\nmatches.",
+                            "x-kubernetes-preserve-unknown-fields": true
+                          },
+                          "patterns": {
+                            "description": "The patterns that should be tested against the input string.\nPatterns are tested in order. The value of the first match is used as\nresult of this transform.",
+                            "type": "array",
+                            "items": {
+                              "description": "MatchTransformPattern is a transform that returns the value that matches a\npattern.",
+                              "type": "object",
+                              "required": [
+                                "result",
+                                "type"
+                              ],
+                              "properties": {
+                                "literal": {
+                                  "description": "Literal exactly matches the input string (case sensitive).\nIs required if `type` is `literal`.",
+                                  "type": "string"
+                                },
+                                "regexp": {
+                                  "description": "Regexp to match against the input string.\nIs required if `type` is `regexp`.",
+                                  "type": "string"
+                                },
+                                "result": {
+                                  "description": "The value that is used as result of the transform if the pattern matches.",
+                                  "x-kubernetes-preserve-unknown-fields": true
+                                },
+                                "type": {
+                                  "description": "Type specifies how the pattern matches the input.\n\n* `literal` - the pattern value has to exactly match (case sensitive) the\ninput string. This is the default.\n\n* `regexp` - the pattern treated as a regular expression against\nwhich the input string is tested. Crossplane will throw an error if the\nkey is not a valid regexp.",
+                                  "type": "string",
+                                  "enum": [
+                                    "literal",
+                                    "regexp"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "math": {
+                        "description": "Math is used to transform the input via mathematical operations such as\nmultiplication.",
+                        "type": "object",
+                        "properties": {
+                          "clampMax": {
+                            "description": "ClampMax makes sure that the value is not bigger than the given value.",
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "clampMin": {
+                            "description": "ClampMin makes sure that the value is not smaller than the given value.",
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "multiply": {
+                            "description": "Multiply the value.",
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "type": {
+                            "description": "Type of the math transform to be run.",
+                            "type": "string",
+                            "enum": [
+                              "Multiply",
+                              "ClampMin",
+                              "ClampMax"
+                            ]
+                          }
+                        }
+                      },
+                      "string": {
+                        "description": "String is used to transform the input into a string or a different kind\nof string. Note that the input does not necessarily need to be a string.",
+                        "type": "object",
+                        "required": [
+                          "type"
+                        ],
+                        "properties": {
+                          "convert": {
+                            "description": "Optional conversion method to be specified.\n`ToUpper` and `ToLower` change the letter case of the input string.\n`ToBase64` and `FromBase64` perform a base64 conversion based on the input string.\n`ToJson` converts any input value into its raw JSON representation.\n`ToSha1`, `ToSha256` and `ToSha512` generate a hash value based on the input\nconverted to JSON.",
+                            "type": "string",
+                            "enum": [
+                              "ToUpper",
+                              "ToLower",
+                              "ToBase64",
+                              "FromBase64",
+                              "ToJson",
+                              "ToSha1",
+                              "ToSha256",
+                              "ToSha512"
+                            ]
+                          },
+                          "fmt": {
+                            "description": "Format the input using a Go format string. See\nhttps://golang.org/pkg/fmt/ for details.",
+                            "type": "string"
+                          },
+                          "join": {
+                            "description": "Join the input strings.",
+                            "type": "object",
+                            "required": [
+                              "separator"
+                            ],
+                            "properties": {
+                              "separator": {
+                                "description": "Separator to join the input strings.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "regexp": {
+                            "description": "Extract a match from the input using a regular expression.",
+                            "type": "object",
+                            "required": [
+                              "match"
+                            ],
+                            "properties": {
+                              "group": {
+                                "description": "Group number to match. 0 (the default) matches the entire expression.",
+                                "type": "integer"
+                              },
+                              "match": {
+                                "description": "Match string. May optionally include submatches, aka capture groups.\nSee https://pkg.go.dev/regexp/ for details.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "replace": {
+                            "description": "Search/Replace applied to the input string.",
+                            "type": "object",
+                            "required": [
+                              "replace",
+                              "search"
+                            ],
+                            "properties": {
+                              "replace": {
+                                "description": "The Replace string replaces all occurrences of the search string.",
+                                "type": "string"
+                              },
+                              "search": {
+                                "description": "The Search string to match.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "trim": {
+                            "description": "Trim the prefix or suffix from the input",
+                            "type": "string"
+                          },
+                          "type": {
+                            "description": "Type of the string transform to be run.",
+                            "type": "string",
+                            "enum": [
+                              "Format",
+                              "Convert",
+                              "TrimPrefix",
+                              "TrimSuffix",
+                              "Regexp"
+                            ]
+                          }
+                        }
+                      },
+                      "type": {
+                        "description": "Type of the transform to be run.",
+                        "type": "string",
+                        "enum": [
+                          "map",
+                          "match",
+                          "math",
+                          "string",
+                          "convert"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "type": {
+                  "description": "Type sets the patching behaviour to be used. Each patch type may require\nits own fields to be set on the ComposedPatch object.",
+                  "type": "string",
+                  "enum": [
+                    "FromCompositeFieldPath",
+                    "PatchSet",
+                    "ToCompositeFieldPath",
+                    "CombineFromComposite",
+                    "CombineToComposite",
+                    "FromEnvironmentFieldPath",
+                    "ToEnvironmentFieldPath",
+                    "CombineFromEnvironment",
+                    "CombineToEnvironment"
+                  ]
+                }
+              }
+            }
+          },
+          "readinessChecks": {
+            "description": "ReadinessChecks allows users to define custom readiness checks. All\nchecks have to return true in order for resource to be considered ready.\nThe default readiness check is to have the \"Ready\" condition to be\n\"True\".",
+            "type": "array",
+            "items": {
+              "description": "ReadinessCheck is used to indicate how to tell whether a resource is ready\nfor consumption",
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "fieldPath": {
+                  "description": "FieldPath shows the path of the field whose value will be used.",
+                  "type": "string"
+                },
+                "matchCondition": {
+                  "description": "MatchCondition specifies the condition you'd like to match if you're using \"MatchCondition\" type.",
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "type"
+                  ],
+                  "properties": {
+                    "status": {
+                      "description": "Status is the status of the condition you'd like to match.",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Type indicates the type of condition you'd like to use.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "matchInteger": {
+                  "description": "MatchInt is the value you'd like to match if you're using \"MatchInt\" type.",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "matchString": {
+                  "description": "MatchString is the value you'd like to match if you're using \"MatchString\" type.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type indicates the type of probe you'd like to use.",
+                  "type": "string",
+                  "enum": [
+                    "MatchString",
+                    "MatchInteger",
+                    "NonEmpty",
+                    "MatchCondition",
+                    "MatchTrue",
+                    "MatchFalse",
+                    "None"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "pt.fn.crossplane.io",
+      "kind": "Resources",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

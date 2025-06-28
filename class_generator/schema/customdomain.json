@@ -1,0 +1,216 @@
+{
+  "description": "CustomDomain is the Schema for the customdomains API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "CustomDomainSpec defines the desired state of CustomDomain",
+      "type": "object",
+      "required": [
+        "certificate",
+        "domain"
+      ],
+      "properties": {
+        "certificate": {
+          "description": "Certificate points to the custom TLS secret",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "name is unique within a namespace to reference a secret resource.",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "namespace defines the space within which the secret name must be unique.",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "domain": {
+          "description": "This field can be used to define the custom domain",
+          "type": "string"
+        },
+        "loadBalancerType": {
+          "description": "This field is used to specify the type of AWS load balancer.\n\n\nValid values are:\n\n\n* \"Classic\": A Classic Load Balancer that makes routing decisions at either the transport layer (TCP/SSL) or the application layer (HTTP/HTTPS). See the following for additional details: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#clb\n\n\n* \"NLB\": A Network Load Balancer that makes routing decisions at the transport layer (TCP/SSL). See the following for additional details: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/load-balancer-types.html#nlb",
+          "type": "string"
+        },
+        "namespaceSelector": {
+          "description": "This field is used to filter the set of namespaces serviced by the\nCustomDomain ingress. This is useful for implementing shards.\n\n\nIf unset, the default is no filtering.",
+          "type": "object",
+          "properties": {
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "type": "object",
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "type": "string"
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "routeSelector": {
+          "description": "This field is used to filter the set of Routes serviced by the ingress\ncontroller. This is useful for implementing shards.\n\n\nIf unset, the default is no filtering.",
+          "type": "object",
+          "properties": {
+            "matchExpressions": {
+              "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+              "type": "array",
+              "items": {
+                "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                "type": "object",
+                "required": [
+                  "key",
+                  "operator"
+                ],
+                "properties": {
+                  "key": {
+                    "description": "key is the label key that the selector applies to.",
+                    "type": "string"
+                  },
+                  "operator": {
+                    "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                    "type": "string"
+                  },
+                  "values": {
+                    "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "matchLabels": {
+              "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "scope": {
+          "description": "This field determines whether the CustomDomain ingress is internal or external. Defaults to External if empty.",
+          "type": "string",
+          "enum": [
+            "External",
+            "Internal"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "CustomDomainStatus defines the observed state of CustomDomain",
+      "type": "object",
+      "required": [
+        "conditions",
+        "dnsRecord",
+        "endpoint"
+      ],
+      "properties": {
+        "conditions": {
+          "description": "The various conditions for the custom domain",
+          "type": "array",
+          "items": {
+            "description": "CustomDomainCondition contains details for the current condition of a custom domain",
+            "type": "object",
+            "properties": {
+              "lastProbeTime": {
+                "description": "LastProbeTime is the last time we probed the condition.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the laste time the condition transitioned from one status to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "Message is a human-readable message indicating details about last transition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Reason is a unique, one-word, CamelCase reason for the condition's last transition.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status is the status of the condition",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type is the type of the condition.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "dnsRecord": {
+          "description": "The DNS record added for the ingress controller",
+          "type": "string"
+        },
+        "endpoint": {
+          "description": "The endpoint is a resolvable DNS address for external DNS to point to",
+          "type": "string"
+        },
+        "scope": {
+          "description": "The scope dictates whether the ingress controller is internal or external",
+          "type": "string"
+        },
+        "state": {
+          "description": "The overall state of the custom domain",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "managed.openshift.io",
+      "kind": "CustomDomain",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

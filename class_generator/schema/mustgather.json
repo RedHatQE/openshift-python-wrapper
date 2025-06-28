@@ -1,0 +1,169 @@
+{
+  "description": "MustGather is the Schema for the mustgathers API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "MustGatherSpec defines the desired state of MustGather",
+      "type": "object",
+      "required": [
+        "caseID",
+        "caseManagementAccountSecretRef"
+      ],
+      "properties": {
+        "audit": {
+          "description": "A flag to specify if audit logs must be collected\nSee documentation for further information.",
+          "type": "boolean"
+        },
+        "caseID": {
+          "description": "The is of the case this must gather will be uploaded to",
+          "type": "string"
+        },
+        "caseManagementAccountSecretRef": {
+          "description": "the secret container a username and password field to be used to authenticate with red hat case management systems",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "internalUser": {
+          "description": "A flag to specify if the upload user provided in the caseManagementAccountSecret is a RH internal user.\nSee documentation for further information.",
+          "type": "boolean"
+        },
+        "mustGatherTimeout": {
+          "description": "A time limit for gather command to complete a floating point number with a suffix:\n\"s\" for seconds, \"m\" for minutes, \"h\" for hours, or \"d\" for days.\nWill default to no time limit.",
+          "type": "string",
+          "format": "duration"
+        },
+        "proxyConfig": {
+          "description": "This represents the proxy configuration to be used. If left empty it will default to the cluster-level proxy configuration.",
+          "type": "object",
+          "properties": {
+            "httpProxy": {
+              "description": "httpProxy is the URL of the proxy for HTTP requests.  Empty means unset and will not result in an env var.",
+              "type": "string"
+            },
+            "httpsProxy": {
+              "description": "httpsProxy is the URL of the proxy for HTTPS requests.  Empty means unset and will not result in an env var.",
+              "type": "string"
+            },
+            "noProxy": {
+              "description": "noProxy is the list of domains for which the proxy should not be used.  Empty means unset and will not result in an env var.",
+              "type": "string"
+            }
+          }
+        },
+        "serviceAccountRef": {
+          "description": "the service account to use to run the must gather job pod, defaults to default\n+kubebuilder:default:=\"{Name:default}\"",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names\nTODO: Add other useful fields. apiVersion, kind, uid?",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        }
+      }
+    },
+    "status": {
+      "description": "MustGatherStatus defines the observed state of MustGather",
+      "type": "object",
+      "required": [
+        "completed"
+      ],
+      "properties": {
+        "completed": {
+          "type": "boolean"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "lastUpdate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "managed.openshift.io",
+      "kind": "MustGather",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
