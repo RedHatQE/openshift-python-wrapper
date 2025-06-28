@@ -1,0 +1,259 @@
+{
+  "description": "A ConfigurationRevision represents a revision of a Configuration. Crossplane\ncreates new revisions when there are changes to a Configuration.\n\nCrossplane creates and manages ConfigurationRevision. Don't directly edit\nConfigurationRevisions.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "PackageRevisionSpec specifies the desired state of a PackageRevision.",
+      "type": "object",
+      "required": [
+        "desiredState",
+        "image",
+        "revision"
+      ],
+      "properties": {
+        "commonLabels": {
+          "description": "Map of string keys and values that can be used to organize and categorize\n(scope and select) objects. May match selectors of replication controllers\nand services.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "desiredState": {
+          "description": "DesiredState of the PackageRevision. Can be either Active or Inactive.",
+          "type": "string"
+        },
+        "ignoreCrossplaneConstraints": {
+          "description": "IgnoreCrossplaneConstraints indicates to the package manager whether to\nhonor Crossplane version constrains specified by the package.\nDefault is false.",
+          "type": "boolean"
+        },
+        "image": {
+          "description": "Package image used by install Pod to extract package contents.",
+          "type": "string"
+        },
+        "packagePullPolicy": {
+          "description": "PackagePullPolicy defines the pull policy for the package. It is also\napplied to any images pulled for the package, such as a provider's\ncontroller image.\nDefault is IfNotPresent.",
+          "type": "string"
+        },
+        "packagePullSecrets": {
+          "description": "PackagePullSecrets are named secrets in the same namespace that can be\nused to fetch packages from private registries. They are also applied to\nany images pulled for the package, such as a provider's controller image.",
+          "type": "array",
+          "items": {
+            "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                "type": "string"
+              }
+            },
+            "x-kubernetes-map-type": "atomic"
+          }
+        },
+        "revision": {
+          "description": "Revision number. Indicates when the revision will be garbage collected\nbased on the parent's RevisionHistoryLimit.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "skipDependencyResolution": {
+          "description": "SkipDependencyResolution indicates to the package manager whether to skip\nresolving dependencies for a package. Setting this value to true may have\nunintended consequences.\nDefault is false.",
+          "type": "boolean"
+        }
+      }
+    },
+    "status": {
+      "description": "PackageRevisionStatus represents the observed state of a PackageRevision.",
+      "type": "object",
+      "properties": {
+        "appliedImageConfigRefs": {
+          "description": "AppliedImageConfigRefs records any image configs that were applied in\nreconciling this revision, and what they were used for.",
+          "type": "array",
+          "items": {
+            "description": "ImageConfigRef is a reference to an image config that indicates how the\nreferenced image config was used by the package manager.",
+            "type": "object",
+            "required": [
+              "name",
+              "reason"
+            ],
+            "properties": {
+              "name": {
+                "description": "Name is the name of the image config.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Reason indicates what the image config was used for.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "conditions": {
+          "description": "Conditions of the resource.",
+          "type": "array",
+          "items": {
+            "description": "A Condition that may apply to a resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time this condition transitioned from one\nstatus to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "A Message containing details about this condition's last transition from\none status to another, if any.",
+                "type": "string"
+              },
+              "observedGeneration": {
+                "description": "ObservedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "reason": {
+                "description": "A Reason for this condition's last transition from one status to another.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of this condition; is it currently True, False, or Unknown?",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of this condition. At most one of each condition type may apply to\na resource at any point in time.",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "foundDependencies": {
+          "description": "Dependency information.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "installedDependencies": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "invalidDependencies": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "objectRefs": {
+          "description": "References to objects owned by PackageRevision.",
+          "type": "array",
+          "items": {
+            "description": "A TypedReference refers to an object by Name, Kind, and APIVersion. It is\ncommonly used to reference cluster-scoped objects or objects where the\nnamespace is already known.",
+            "type": "object",
+            "required": [
+              "apiVersion",
+              "kind",
+              "name"
+            ],
+            "properties": {
+              "apiVersion": {
+                "description": "APIVersion of the referenced object.",
+                "type": "string"
+              },
+              "kind": {
+                "description": "Kind of the referenced object.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the referenced object.",
+                "type": "string"
+              },
+              "uid": {
+                "description": "UID of the referenced object.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "permissionRequests": {
+          "description": "PermissionRequests made by this package. The package declares that its\ncontroller needs these permissions to run. The RBAC manager is\nresponsible for granting them.",
+          "type": "array",
+          "items": {
+            "description": "PolicyRule holds information that describes a policy rule, but does not contain information\nabout who the rule applies to or which namespace the rule applies to.",
+            "type": "object",
+            "required": [
+              "verbs"
+            ],
+            "properties": {
+              "apiGroups": {
+                "description": "APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of\nthe enumerated resources in any API group will be allowed. \"\" represents the core API group and \"*\" represents all API groups.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "nonResourceURLs": {
+                "description": "NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path\nSince non-resource URLs are not namespaced, this field is only applicable for ClusterRoles referenced from a ClusterRoleBinding.\nRules can either apply to API resources (such as \"pods\" or \"secrets\") or non-resource URL paths (such as \"/api\"),  but not both.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "resourceNames": {
+                "description": "ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "resources": {
+                "description": "Resources is a list of resources this rule applies to. '*' represents all resources.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "atomic"
+              },
+              "verbs": {
+                "description": "Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this rule. '*' represents all verbs.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "x-kubernetes-list-type": "atomic"
+              }
+            }
+          }
+        },
+        "resolvedImage": {
+          "description": "ResolvedPackage is the name of the package that was installed. It may be\ndifferent from spec.image if the package path was rewritten using an\nimage config.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "pkg.crossplane.io",
+      "kind": "ConfigurationRevision",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

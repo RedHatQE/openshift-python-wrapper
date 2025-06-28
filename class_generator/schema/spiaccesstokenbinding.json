@@ -1,0 +1,273 @@
+{
+  "description": "SPIAccessTokenBinding is the Schema for the spiaccesstokenbindings API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "SPIAccessTokenBindingSpec defines the desired state of SPIAccessTokenBinding",
+      "type": "object",
+      "required": [
+        "repoUrl",
+        "secret"
+      ],
+      "properties": {
+        "lifetime": {
+          "description": "Lifetime specifies how long the binding and its associated data should live. This is specified as time with a unit (30m, 2h). A special value of \"-1\" means infinite lifetime.",
+          "type": "string"
+        },
+        "permissions": {
+          "description": "Permissions is the set of permissions that the creator of the binding requires the access token to allow in the target repository.",
+          "type": "object",
+          "properties": {
+            "additionalScopes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "required": {
+              "type": "array",
+              "items": {
+                "description": "Permission is an element of Permissions and express a requirement on the service provider scopes in an agnostic manner.",
+                "type": "object",
+                "required": [
+                  "area",
+                  "type"
+                ],
+                "properties": {
+                  "area": {
+                    "description": "Area express the \"area\" in the service provider scopes to which the permission is required.",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Type is the type of the permission required",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "repoUrl": {
+          "description": "RepoUrl is just the URL of the repository for which the access token is requested.",
+          "type": "string"
+        },
+        "secret": {
+          "description": "Secret is the specification of the secret that should contain the access token. The secret will be created in the same namespace as this binding object.",
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Annotations is the keys and values that the created secret should be annotated with.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "fields": {
+              "description": "Fields specifies the mapping from the token record fields to the keys in the secret data.",
+              "type": "object",
+              "properties": {
+                "expiredAfter": {
+                  "description": "ExpiredAfter specifies the data key in which the expiry date of the token should be stored.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name specifies the data key in which the name of the token record should be stored.",
+                  "type": "string"
+                },
+                "scopes": {
+                  "description": "Scopes specifies the data key in which the comma-separated list of token scopes should be stored.",
+                  "type": "string"
+                },
+                "serviceProviderUrl": {
+                  "description": "ServiceProviderUrl specifies the data key in which the url of the service provider should be stored.",
+                  "type": "string"
+                },
+                "serviceProviderUserId": {
+                  "description": "ServiceProviderUserId specifies the data key in which the url of the user id used in the service provider should be stored.",
+                  "type": "string"
+                },
+                "serviceProviderUserName": {
+                  "description": "ServiceProviderUserName specifies the data key in which the url of the user name used in the service provider should be stored.",
+                  "type": "string"
+                },
+                "token": {
+                  "description": "Token specifies the data key in which the token should be stored.",
+                  "type": "string"
+                },
+                "userId": {
+                  "description": "UserId specifies the data key in which the user id as known to the SPI should be stored (note that this is usually different from ServiceProviderUserId, because the former is usually a kubernetes user, while the latter is some arbitrary ID used by the service provider which might or might not correspond to the Kubernetes user id).",
+                  "type": "string"
+                }
+              }
+            },
+            "generateName": {
+              "type": "string"
+            },
+            "keys": {
+              "description": "RequiredKeys are the keys which need to be present in the UploadSecret to successfully upload the SecretData. Furthermore, the UploadSecret needs to contain the keys which are inferred from the Type (and UploadSecret's type, since these have to match) and may contain any additional keys.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "labels": {
+              "description": "Labels contains the labels that the created secret should be labeled with.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "linkedTo": {
+              "description": "LinkedTo specifies the objects that the secret is linked to. Currently, only service accounts are supported.",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "serviceAccount": {
+                    "description": "ServiceAccounts lists the service accounts that the secret is linked to.",
+                    "type": "object",
+                    "properties": {
+                      "as": {
+                        "description": "As specifies how the secret generated by the binding is linked to the service account. This can be either `secret` meaning that the secret is listed as one of the mountable secrets in the `secrets` of the service account, `imagePullSecret` which makes the secret listed as one of the image pull secrets associated with the service account. If not specified, it defaults to `secret`.",
+                        "type": "string"
+                      },
+                      "managed": {
+                        "description": "Managed specifies the service account that is bound to the lifetime of the binding. This service account must not exist and is created and deleted along with the injected secret.",
+                        "type": "object",
+                        "properties": {
+                          "annotations": {
+                            "description": "Annotations is the keys and values that the created service account should be annotated with.",
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          },
+                          "generateName": {
+                            "description": "GenerateName is the generate name to be used when creating the service account. It only really makes sense for the Managed service accounts that are cleaned up with the binding.",
+                            "type": "string"
+                          },
+                          "labels": {
+                            "description": "Labels contains the labels that the created service account should be labeled with.",
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          },
+                          "name": {
+                            "description": "Name is the name of the service account to create/link. Either this or GenerateName must be specified.",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "reference": {
+                        "description": "Reference specifies a pre-existing service account that the secret should be linked to. It is an error if the service account doesn't exist when the operator tries to add a link to a secret with the injected token.",
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?",
+                            "type": "string"
+                          }
+                        },
+                        "x-kubernetes-map-type": "atomic"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "name": {
+              "description": "Name is the name of the secret to be created. If it is not defined a random name based on the name of the binding is used.",
+              "type": "string"
+            },
+            "type": {
+              "description": "Type is the type of the secret to be created in targets. If left empty, the default type used in the cluster is assumed (typically Opaque). The Type has to match type of the UploadSecret. This constraint ensures that the requirements on keys, put forth by Kubernetes (https://kubernetes.io/docs/concepts/configuration/secret/#secret-types), are met and secret can be properly created in targets.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "SPIAccessTokenBindingStatus defines the observed state of SPIAccessTokenBinding",
+      "type": "object",
+      "required": [
+        "linkedAccessTokenName",
+        "phase",
+        "syncedObjectRef"
+      ],
+      "properties": {
+        "errorMessage": {
+          "type": "string"
+        },
+        "errorReason": {
+          "type": "string"
+        },
+        "linkedAccessTokenName": {
+          "type": "string"
+        },
+        "oAuthUrl": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "serviceAccountNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "syncedObjectRef": {
+          "type": "object",
+          "required": [
+            "apiVersion",
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "apiVersion": {
+              "description": "ApiVersion is the api version of the object with the injected data.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind is the kind of the object with the injected data.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of the object with the injected data. This always lives in the same namespace as the AccessTokenSecret object.",
+              "type": "string"
+            }
+          }
+        },
+        "uploadUrl": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "SPIAccessTokenBinding",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

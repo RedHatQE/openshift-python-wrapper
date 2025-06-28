@@ -1,0 +1,283 @@
+{
+  "description": "JBSConfig TODO provide godoc description",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "additionalRecipes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "buildSettings": {
+          "type": "object",
+          "properties": {
+            "buildRequestCPU": {
+              "description": "The requested CPU for the build and deploy steps of a pipeline",
+              "type": "string"
+            },
+            "buildRequestMemory": {
+              "description": "The requested memory for the build and deploy steps of a pipeline",
+              "type": "string"
+            },
+            "taskLimitCPU": {
+              "description": "The CPU limit for all other steps of a pipeline",
+              "type": "string"
+            },
+            "taskLimitMemory": {
+              "description": "The memory limit for all other steps of a pipeline",
+              "type": "string"
+            },
+            "taskRequestCPU": {
+              "description": "The requested CPU for all other steps of a pipeline",
+              "type": "string"
+            },
+            "taskRequestMemory": {
+              "description": "The requested memory for all other steps of a pipeline",
+              "type": "string"
+            }
+          }
+        },
+        "cacheSettings": {
+          "type": "object",
+          "properties": {
+            "disableTLS": {
+              "type": "boolean"
+            },
+            "ioThreads": {
+              "type": "string"
+            },
+            "limitCPU": {
+              "type": "string"
+            },
+            "limitMemory": {
+              "type": "string"
+            },
+            "requestCPU": {
+              "type": "string"
+            },
+            "requestMemory": {
+              "type": "string"
+            },
+            "storage": {
+              "type": "string"
+            },
+            "workerThreads": {
+              "type": "string"
+            }
+          }
+        },
+        "enableRebuilds": {
+          "type": "boolean"
+        },
+        "gitSourceArchive": {
+          "type": "object",
+          "properties": {
+            "disableSSLVerification": {
+              "type": "boolean"
+            },
+            "identity": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        "hermeticBuilds": {
+          "type": "string"
+        },
+        "mavenBaseLocations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "mavenDeployment": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            }
+          }
+        },
+        "registry": {
+          "type": "object",
+          "properties": {
+            "dontReuseExisting": {
+              "type": "boolean"
+            },
+            "host": {
+              "type": "string"
+            },
+            "insecure": {
+              "type": "boolean"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "port": {
+              "type": "string"
+            },
+            "prependTag": {
+              "type": "string"
+            },
+            "private": {
+              "description": "if this is true and we are automatically creating registries then we will make it private",
+              "type": "boolean"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "secretName": {
+              "type": "string"
+            }
+          }
+        },
+        "relocationPatterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "relocationPattern"
+            ],
+            "properties": {
+              "relocationPattern": {
+                "type": "object",
+                "properties": {
+                  "buildPolicy": {
+                    "type": "string"
+                  },
+                  "patterns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "pattern"
+                      ],
+                      "properties": {
+                        "pattern": {
+                          "type": "object",
+                          "required": [
+                            "from",
+                            "to"
+                          ],
+                          "properties": {
+                            "from": {
+                              "type": "string"
+                            },
+                            "to": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requireArtifactVerification": {
+          "description": "If this is true then the build will fail if artifact verification fails otherwise deploy will happen as normal, but a field will be set on the DependencyBuild",
+          "type": "boolean"
+        },
+        "sharedRegistries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "insecure": {
+                "type": "boolean"
+              },
+              "owner": {
+                "type": "string"
+              },
+              "port": {
+                "type": "string"
+              },
+              "prependTag": {
+                "type": "string"
+              },
+              "repository": {
+                "type": "string"
+              },
+              "secretName": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "imageRegistry": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "insecure": {
+              "type": "boolean"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "port": {
+              "type": "string"
+            },
+            "prependTag": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "secretName": {
+              "type": "string"
+            }
+          }
+        },
+        "message": {
+          "type": "string"
+        },
+        "rebuildsPossible": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "jvmbuildservice.io",
+      "kind": "JBSConfig",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

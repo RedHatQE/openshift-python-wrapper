@@ -1,0 +1,138 @@
+{
+  "description": "EventType represents a type of event that can be consumed from a resource.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Spec defines the desired state of the EventType.",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "description": "CloudEvent attribute and extension attributes.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "description": "Name of the CloudEvent attribute.",
+                "type": "string"
+              },
+              "required": {
+                "description": "Indicates whether the attribute is required.",
+                "type": "boolean"
+              },
+              "value": {
+                "description": "Value of the attribute. May be a template string using curly brackets {} to represent variable sections of the string.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "description": {
+          "description": "Description is an optional field used to describe the EventType, in any meaningful way.",
+          "type": "string"
+        },
+        "reference": {
+          "description": "Reference a resource. For example, Broker.",
+          "type": "object",
+          "properties": {
+            "address": {
+              "description": "Address points to a specific Address Name",
+              "type": "string"
+            },
+            "apiVersion": {
+              "description": "API version of the referent.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            },
+            "namespace": {
+              "description": "Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/ This is an optional field, it gets defaulted to the object holding it if left out.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "Status represents the current state of the EventType. This data may be out of date.",
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "description": "Annotations is additional Status fields for the Resource to save some additional State as well as convey more information to the user. This is roughly akin to Annotations on any k8s resource, just the reconciler conveying richer information outwards.",
+          "x-kubernetes-preserve-unknown-fields": true
+        },
+        "conditions": {
+          "description": "Conditions the latest available observations of a resource's current state.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "status"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time the condition transitioned from one status to another. We use VolatileTime in place of metav1.Time to exclude this from creating equality.Semantic differences (all other things held constant).",
+                "type": "string"
+              },
+              "message": {
+                "description": "A human readable message indicating details about the transition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "The reason for the condition's last transition.",
+                "type": "string"
+              },
+              "severity": {
+                "description": "Severity with which to treat failures of this type of condition. When this is not specified, it defaults to Error.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of the condition, one of True, False, Unknown.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of condition.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "observedGeneration": {
+          "description": "ObservedGeneration is the 'Generation' of the Service that was last processed by the controller.",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "eventing.knative.dev",
+      "kind": "EventType",
+      "version": "v1beta3"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

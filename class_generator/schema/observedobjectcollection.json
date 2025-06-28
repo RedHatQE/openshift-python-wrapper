@@ -1,0 +1,239 @@
+{
+  "description": "A ObservedObjectCollection is a provider Kubernetes API type",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ObservedObjectCollectionSpec defines the desired state of ObservedObjectCollection",
+      "type": "object",
+      "required": [
+        "observeObjects"
+      ],
+      "properties": {
+        "objectTemplate": {
+          "description": "Template when defined is used for creating Object instances",
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "description": "Objects metadata",
+              "type": "object",
+              "properties": {
+                "annotations": {
+                  "description": "Annotations of an object",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "labels": {
+                  "description": "Labels of an object",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "observeObjects": {
+          "description": "ObserveObjects declares what criteria object need to fulfil\nto become a member of this collection",
+          "type": "object",
+          "required": [
+            "apiVersion",
+            "kind",
+            "selector"
+          ],
+          "properties": {
+            "apiVersion": {
+              "description": "APIVersion of objects that should be matched by the selector",
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "description": "Kind of objects that should be matched by the selector",
+              "type": "string",
+              "minLength": 1
+            },
+            "namespace": {
+              "description": "Namespace where to look for objects.\nIf omitted, search is performed across all namespaces.\nFor cluster-scoped objects, omit it.",
+              "type": "string"
+            },
+            "selector": {
+              "description": "Selector defines the criteria for including objects into the collection",
+              "type": "object",
+              "properties": {
+                "matchExpressions": {
+                  "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                  "type": "array",
+                  "items": {
+                    "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "key is the label key that the selector applies to.",
+                        "type": "string"
+                      },
+                      "operator": {
+                        "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                        "type": "string"
+                      },
+                      "values": {
+                        "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "x-kubernetes-list-type": "atomic"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "matchLabels": {
+                  "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-kubernetes-map-type": "atomic"
+            }
+          }
+        },
+        "providerConfigRef": {
+          "description": "ProviderConfigReference specifies how the provider that will be used to\ncreate, observe, update, and delete this managed resource should be\nconfigured.",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name of the referenced object.",
+              "type": "string"
+            },
+            "policy": {
+              "description": "Policies for referencing.",
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "description": "Resolution specifies whether resolution of this reference is required.\nThe default is 'Required', which means the reconcile will fail if the\nreference cannot be resolved. 'Optional' means this reference will be\na no-op if it cannot be resolved.",
+                  "type": "string",
+                  "enum": [
+                    "Required",
+                    "Optional"
+                  ]
+                },
+                "resolve": {
+                  "description": "Resolve specifies when this reference should be resolved. The default\nis 'IfNotPresent', which will attempt to resolve the reference only when\nthe corresponding field is not present. Use 'Always' to resolve the\nreference on every reconcile.",
+                  "type": "string",
+                  "enum": [
+                    "Always",
+                    "IfNotPresent"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "ObservedObjectCollectionStatus represents the observed state of a ObservedObjectCollection",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions of the resource.",
+          "type": "array",
+          "items": {
+            "description": "A Condition that may apply to a resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time this condition transitioned from one\nstatus to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "A Message containing details about this condition's last transition from\none status to another, if any.",
+                "type": "string"
+              },
+              "observedGeneration": {
+                "description": "ObservedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "reason": {
+                "description": "A Reason for this condition's last transition from one status to another.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status of this condition; is it currently True, False, or Unknown?",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type of this condition. At most one of each condition type may apply to\na resource at any point in time.",
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "membershipLabel": {
+          "description": "MembershipLabel is the label set on each member of this collection\nand can be used for fetching them.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "observedGeneration": {
+          "description": "ObservedGeneration is the latest metadata.generation\nwhich resulted in either a ready state, or stalled due to error\nit can not recover from without human intervention.",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "kubernetes.crossplane.io",
+      "kind": "ObservedObjectCollection",
+      "version": "v1alpha1"
+    }
+  ],
+  "x-kubernetes-validations": [
+    {
+      "message": "metadata.name max length is 63",
+      "rule": "size(self.metadata.name) < 64"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

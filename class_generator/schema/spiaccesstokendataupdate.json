@@ -1,0 +1,65 @@
+{
+  "description": "SPIAccessTokenDataUpdate is a special CRD that advertises to the controller in the Kubernetes cluster that there has been an update of the data in the secret storage. Because secret storage is out-of-cluster, updates to it are not registered by the controllers. This CRD serves as a \"trigger\" for reconciliation of the SPIAccessToken or RemoteSecret after the data has been updated in the secret storage. The caller that updates the data in the secret storage is responsible for creating an object pointing to the SPIAccessToken or RemoteSecret that should have been affected.",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "SPIAccessTokenDataUpdateSpec defines the desired state of SPIAccessTokenDataUpdate",
+      "type": "object",
+      "required": [
+        "dataOwner"
+      ],
+      "properties": {
+        "dataOwner": {
+          "description": "The owner of the data that has been put to the secret storage.",
+          "type": "object",
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "apiGroup": {
+              "description": "APIGroup is the group for the resource being referenced. If APIGroup is not specified, the specified Kind must be in the core API group. For any other third-party types, APIGroup is required.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Kind is the type of resource being referenced",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name is the name of resource being referenced",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "tokenName": {
+          "description": "TokenName is the name of the SPIAccessToken object in the same namespace as the update object. This field is deprecated!",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "SPIAccessTokenDataUpdate",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

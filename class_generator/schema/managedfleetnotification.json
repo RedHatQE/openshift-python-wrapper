@@ -1,0 +1,91 @@
+{
+  "description": "ManagedFleetNotification is the Schema for the managedfleetnotifications API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "fleetNotification"
+      ],
+      "properties": {
+        "fleetNotification": {
+          "description": "FleetNotification defines the desired spec of ManagedFleetNotification",
+          "type": "object",
+          "required": [
+            "name",
+            "notificationMessage",
+            "resendWait",
+            "severity",
+            "summary"
+          ],
+          "properties": {
+            "limitedSupport": {
+              "description": "Whether or not limited support should be sent for this notification",
+              "type": "boolean"
+            },
+            "logType": {
+              "description": "LogType is a categorization property that can be used to group service logs for aggregation and managing notification preferences.",
+              "type": "string"
+            },
+            "name": {
+              "description": "The name of the notification used to associate with an alert",
+              "type": "string"
+            },
+            "notificationMessage": {
+              "description": "The body text of the notification when the alert is active",
+              "type": "string"
+            },
+            "references": {
+              "description": "References useful for context or remediation - this could be links to documentation, KB articles, etc",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^https?:\\/\\/.+$"
+              }
+            },
+            "resendWait": {
+              "description": "Measured in hours. The minimum time interval that must elapse between active notifications",
+              "type": "integer",
+              "format": "int32"
+            },
+            "severity": {
+              "description": "Re-use the severity definitation in managednotification_types",
+              "type": "string",
+              "enum": [
+                "Debug",
+                "Info",
+                "Warning",
+                "Error",
+                "Fatal"
+              ]
+            },
+            "summary": {
+              "description": "The summary line of the notification",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ocmagent.managed.openshift.io",
+      "kind": "ManagedFleetNotification",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

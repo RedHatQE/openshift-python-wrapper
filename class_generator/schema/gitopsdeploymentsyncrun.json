@@ -1,0 +1,85 @@
+{
+  "description": "GitOpsDeploymentSyncRun is the Schema for the gitopsdeploymentsyncruns API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "GitOpsDeploymentSyncRunSpec defines the desired state of GitOpsDeploymentSyncRun",
+      "type": "object",
+      "required": [
+        "gitopsDeploymentName"
+      ],
+      "properties": {
+        "gitopsDeploymentName": {
+          "description": "Reference to the target GitOpsDeployment to issue the synchronization operation to",
+          "type": "string"
+        },
+        "revisionID": {
+          "description": "Optional: If specified, tells the GitOps Service to deploy a particular git commit SHA",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "GitOpsDeploymentSyncRunStatus defines the observed state of GitOpsDeploymentSyncRun",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "GitOpsDeploymentCondition contains details about an applicationset condition, which is usally an error or warning",
+            "type": "object",
+            "required": [
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the time the condition was last observed",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "Message contains human-readable message indicating details about condition",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Single word camelcase representing the reason for the status eg ErrorOccurred",
+                "type": "string"
+              },
+              "status": {
+                "description": "True/False/Unknown",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type is an applicationset condition type",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "managed-gitops.redhat.com",
+      "kind": "GitOpsDeploymentSyncRun",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

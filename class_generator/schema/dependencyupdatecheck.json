@@ -1,0 +1,79 @@
+{
+  "description": "DependencyUpdateCheck is the Schema for the dependencyupdatechecks API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "DependencyUpdateCheckSpec defines the desired state of DependencyUpdateCheck",
+      "type": "object",
+      "properties": {
+        "namespaces": {
+          "description": "Specifies the list of namespaces for which to run MintMaker.\nIf omitted, MintMaker will run for all namespaces.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "namespace"
+            ],
+            "properties": {
+              "applications": {
+                "description": "Specifies the list of applications in a namespace for which to run MintMaker.\nIf omitted, MintMaker will run for all namespace's applications.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "application"
+                  ],
+                  "properties": {
+                    "application": {
+                      "description": "Specifies the name of the application for which to run Mintmaker.\nRequired.",
+                      "type": "string",
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                    },
+                    "components": {
+                      "description": "Specifies the list of components of an application for which to run MintMaker.\nIf omitted, MintMaker will run for all application's components.",
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 63,
+                        "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                      }
+                    }
+                  }
+                }
+              },
+              "namespace": {
+                "description": "Specifies the name of the namespace for which to run Mintmaker.\nRequired.",
+                "type": "string",
+                "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "DependencyUpdateCheckStatus defines the observed state of DependencyUpdateCheck",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "DependencyUpdateCheck",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
