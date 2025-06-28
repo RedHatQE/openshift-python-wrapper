@@ -195,6 +195,7 @@ def get_client(
     password: str | None = None,
     host: str | None = None,
     verify_ssl: bool | None = None,
+    token: str | None = None,
 ) -> DynamicClient:
     """
     Get a kubernetes client.
@@ -218,6 +219,7 @@ def get_client(
         password (str): password for basic auth
         host (str): host for the cluster
         verify_ssl (bool): whether to verify ssl
+        token (str): Use token to login
 
     Returns:
         DynamicClient: a kubernetes client.
@@ -237,6 +239,11 @@ def get_client(
         _client = client_configuration_with_basic_auth(
             username=username, password=password, host=host, configuration=client_configuration
         )
+
+    elif host and token:
+        client_configuration.host = host
+        client_configuration.api_key = {"authorization": f"Bearer {token}"}
+        _client = kubernetes.client.ApiClient(client_configuration)
 
     # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/kube_config.py
     elif config_dict:
