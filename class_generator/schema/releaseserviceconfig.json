@@ -1,0 +1,85 @@
+{
+  "description": "ReleaseServiceConfig is the Schema for the releaseserviceconfigs API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ReleaseServiceConfigSpec defines the desired state of ReleaseServiceConfig.",
+      "type": "object",
+      "properties": {
+        "EmptyDirOverrides": {
+          "description": "VolumeOverrides is a map containing the volume type for specific Pipeline git refs",
+          "type": "array",
+          "items": {
+            "description": "EmptyDirOverrides defines the values usually set in a PipelineRef using a git resolver.",
+            "type": "object",
+            "required": [
+              "pathInRepo",
+              "revision",
+              "url"
+            ],
+            "properties": {
+              "pathInRepo": {
+                "description": "PathInRepo is the path within the git repository where the Pipeline definition can be found",
+                "type": "string"
+              },
+              "revision": {
+                "description": "Revision is the git revision where the Pipeline definition can be found",
+                "type": "string"
+              },
+              "url": {
+                "description": "Url is the url to the git repo",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "debug": {
+          "description": "Debug is the boolean that specifies whether or not the Release Service should run\nin debug mode",
+          "type": "boolean"
+        },
+        "defaultTimeouts": {
+          "description": "DefaultTimeouts contain the default Tekton timeouts to be used in case they are\nnot specified in the ReleasePlanAdmission resource.",
+          "type": "object",
+          "properties": {
+            "finally": {
+              "description": "Finally sets the maximum allowed duration of this pipeline's finally",
+              "type": "string"
+            },
+            "pipeline": {
+              "description": "Pipeline sets the maximum allowed duration for execution of the entire pipeline. The sum of individual timeouts for tasks and finally must not exceed this value.",
+              "type": "string"
+            },
+            "tasks": {
+              "description": "Tasks sets the maximum allowed duration of this pipeline's tasks",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "ReleaseServiceConfigStatus defines the observed state of ReleaseServiceConfig.",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "ReleaseServiceConfig",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

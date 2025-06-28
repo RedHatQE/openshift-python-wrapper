@@ -1,0 +1,2050 @@
+{
+  "description": "ClusterLogForwarder is an API to configure forwarding logs.\n\nYou configure forwarding by specifying a list of `pipelines`,\nwhich forward from a set of named inputs to a set of named outputs.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ClusterLogForwarderSpec defines the desired state of ClusterLogForwarder",
+      "type": "object",
+      "required": [
+        "outputs",
+        "pipelines",
+        "serviceAccount"
+      ],
+      "properties": {
+        "collector": {
+          "description": "Specification of the Collector deployment to define\nresource limits and workload placement",
+          "type": "object",
+          "properties": {
+            "nodeSelector": {
+              "description": "Define nodes for scheduling the pods.",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "resources": {
+              "description": "The resource requirements for the collector"
+            },
+            "tolerations": {
+              "description": "Define the tolerations the collector pods will accept"
+            }
+          }
+        },
+        "filters": {
+          "description": "Filters are applied to log records passing through a pipeline.\nThere are different types of filter that can select and modify log records in different ways.\nSee [FilterTypeSpec] for a list of filter types.",
+          "type": "array",
+          "items": {
+            "description": "FilterSpec defines a filter for log messages.",
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "drop": {
+                "description": "A drop filter applies a sequence of tests to a log record and drops the record if any test passes.\nEach test contains a sequence of conditions, all conditions must be true for the test to pass.\nA DropTestsSpec contains an array of tests which contains an array of conditions",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "test"
+                  ],
+                  "properties": {
+                    "test": {
+                      "description": "DropConditions is an array of DropCondition which are conditions that are ANDed together",
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "description": "A dot delimited path to a field in the log record. It must start with a `.`.\nThe path can contain alpha-numeric characters and underscores (a-zA-Z0-9_).\nIf segments contain characters outside of this range, the segment must be quoted.\nExamples: `.kubernetes.namespace_name`, `.log_type`, '.kubernetes.labels.foobar', `.kubernetes.labels.\"foo-bar/baz\"`",
+                            "type": "string",
+                            "pattern": "^(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")*$"
+                          },
+                          "matches": {
+                            "description": "A regular expression that the field will match.\nIf the value of the field defined in the DropTest matches the regular expression, the log record will be dropped.\nMust define only one of matches OR notMatches",
+                            "type": "string"
+                          },
+                          "notMatches": {
+                            "description": "A regular expression that the field does not match.\nIf the value of the field defined in the DropTest does not match the regular expression, the log record will be dropped.\nMust define only one of matches or notMatches",
+                            "type": "string"
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "only one of matches or notMatches can be defined per field",
+                            "rule": "!(has(self.matches) && has(self.notMatches))"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "kubeAPIAudit": {
+                "description": "KubeAPIAudit filter Kube API server audit logs, as described in [Kubernetes Auditing].\n\n# Policy Filtering\n\nPolicy event rules are the same format as the [Kube Audit Policy] with some minor extensions.\nThe extensions are described here, see the [Kube Audit Policy] for the standard rule behavior.\nRules are checked in order, checking stops at the first matching rule.\n\nAn audit policy event contains meta-data describing who made the request.\nIt can also include the full body of the API request, and the response that was sent.\nThe `level` of an audit rule determines how much data is included in the event:\n\n  - None: the event is dropped.\n  - Metadata: Only the audit metadata is included, request and response bodies are removed.\n  - Request: Audit metadata and the request body are included, the response body is removed.\n  - RequestResponse: All data is included: metadata, request body and response body. Note the response body can be very large.\n    For example the a command like `oc get -A pods` generates a response body containing the YAML description of every pod in the cluster.\n\n# Extensions\n\nThe following features are extensions to the standard [Kube Audit Policy]\n\n## Wildcards\n\nNames of users, groups, namespaces, and resources can have a leading or trailing '*' character.\nFor example namespace 'openshift-*' matches 'openshift-apiserver' or 'openshift-authentication.\nResource '*/status' matches 'Pod/status' or 'Deployment/status'\n\n## Default Rules\n\nEvents that do not match any rule in the policy are filtered as follows:\n- User events (ie. non-system and non-serviceaccount) are forwarded\n- Read-only system events (get/list/watch etc) are dropped\n- Service account write events that occur within the same namespace as the service account are dropped\n- All other events are forwarded, subject to any configured [rate limits][#rate-lmiting]\n\nIf you want to disable these defaults, end your rules list with rule that has only a `level` field.\nAn empty rule matches any event, and prevents the defaults from taking effect.\n\n## Omit Response Codes\n\nYou can drop events based on the HTTP status code in the response. See the OmitResponseCodes field.\n\n[Kube Audit Policy]: https://kubernetes.io/docs/reference/config-api/apiserver-audit.v1/#audit-k8s-io-v1-Policy\n[Kubernetes Auditing]: https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/",
+                "type": "object",
+                "properties": {
+                  "omitResponseCodes": {
+                    "description": "OmitResponseCodes is a list of HTTP status code for which no events are created.\nIf this field is missing or null, the default value used is [404, 409, 422, 429]\n(NotFound, Conflict, UnprocessableEntity, TooManyRequests)\nIf it is the empty list [], then no status codes are omitted.\nOtherwise, this field should be a list of integer status codes to omit.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "omitStages": {
+                    "description": "OmitStages is a list of stages for which no events are created.\nNote that this can also be specified per rule in which case the union of both are omitted.",
+                    "type": "array",
+                    "items": {
+                      "description": "Stage defines the stages in request handling that audit events may be generated.",
+                      "type": "string"
+                    }
+                  },
+                  "rules": {
+                    "description": "Rules specify the audit Level a request should be recorded at.\nA request may match multiple rules, in which case the FIRST matching rule is used.\nPolicyRules are strictly ordered.\n\nIf Rules is empty or missing default rules apply, see [KubeAPIAudit]",
+                    "type": "array",
+                    "items": {
+                      "description": "PolicyRule maps requests based off metadata to an audit Level.\nRequests must match the rules of every field (an intersection of rules).",
+                      "type": "object",
+                      "required": [
+                        "level"
+                      ],
+                      "properties": {
+                        "level": {
+                          "description": "The Level that requests matching this rule are recorded at.",
+                          "type": "string"
+                        },
+                        "namespaces": {
+                          "description": "Namespaces that this rule matches.\nThe empty string \"\" matches non-namespaced resources.\nAn empty list implies every namespace.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "nonResourceURLs": {
+                          "description": "NonResourceURLs is a set of URL paths that should be audited.\n`*`s are allowed, but only as the full, final step in the path.\nExamples:\n- `/metrics` - Log requests for apiserver metrics\n- `/healthz*` - Log all health checks",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "omitManagedFields": {
+                          "description": "OmitManagedFields indicates whether to omit the managed fields of the request\nand response bodies from being written to the API audit log.\n- a value of 'true' will drop the managed fields from the API audit log\n- a value of 'false' indicates that the managed fileds should be included\n  in the API audit log\nNote that the value, if specified, in this rule will override the global default\nIf a value is not specified then the global default specified in\nPolicy.OmitManagedFields will stand.",
+                          "type": "boolean"
+                        },
+                        "omitStages": {
+                          "description": "OmitStages is a list of stages for which no events are created. Note that this can also\nbe specified policy wide in which case the union of both are omitted.\nAn empty list means no restrictions will apply.",
+                          "type": "array",
+                          "items": {
+                            "description": "Stage defines the stages in request handling that audit events may be generated.",
+                            "type": "string"
+                          }
+                        },
+                        "resources": {
+                          "description": "Resources that this rule matches. An empty list implies all kinds in all API groups.",
+                          "type": "array",
+                          "items": {
+                            "description": "GroupResources represents resource kinds in an API group.",
+                            "type": "object",
+                            "properties": {
+                              "group": {
+                                "description": "Group is the name of the API group that contains the resources.\nThe empty string represents the core API group.",
+                                "type": "string"
+                              },
+                              "resourceNames": {
+                                "description": "ResourceNames is a list of resource instance names that the policy matches.\nUsing this field requires Resources to be specified.\nAn empty list implies that every instance of the resource is matched.",
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "resources": {
+                                "description": "Resources is a list of resources this rule applies to.\n\nFor example:\n- `pods` matches pods.\n- `pods/log` matches the log subresource of pods.\n- `*` matches all resources and their subresources.\n- `pods/*` matches all subresources of pods.\n- `*/scale` matches all scale subresources.\n\nIf wildcard is present, the validation rule will ensure resources do not\noverlap with each other.\n\nAn empty list implies all resources and subresources in this API groups apply.",
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "userGroups": {
+                          "description": "The user groups this rule applies to. A user is considered matching\nif it is a member of any of the UserGroups.\nAn empty list implies every user group.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "users": {
+                          "description": "The users (by authenticated user name) this rule applies to.\nAn empty list implies every user.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verbs": {
+                          "description": "The verbs that match this rule.\nAn empty list implies every verb.",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "name": {
+                "description": "Name used to refer to the filter from a \"pipeline\".",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$"
+              },
+              "openshiftLabels": {
+                "description": "Labels applied to log records passing through a pipeline.\nThese labels appear in the `openshift.labels` map in the log record.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "prune": {
+                "description": "The PruneFilterSpec consists of two arrays, namely in and notIn, which dictate the fields to be pruned.",
+                "type": "object",
+                "properties": {
+                  "in": {
+                    "description": "`In` is an array of dot-delimited field paths. Fields included here are removed from the log record.\n\nEach field path expression must start with a \".\"\n\nThe path can contain alphanumeric characters and underscores (a-zA-Z0-9_).\n\nIf segments contain characters outside of this range, the segment must be quoted otherwise paths do NOT need to be quoted.\n\nExamples:\n\n - `.kubernetes.namespace_name`\n\n - `.log_type`\n\n - '.kubernetes.labels.foobar'\n\n - `.kubernetes.labels.\"foo-bar/baz\"`\n\nNOTE1: `In` CANNOT contain `.log_type` or `.message` as those fields are required and cannot be pruned.\n\nNOTE2: If this filter is used in a pipeline with GoogleCloudLogging, `.hostname` CANNOT be added to this list as it is a required field.",
+                    "type": "array",
+                    "items": {
+                      "description": "FieldPath represents a path to find a value for a given field.  The format must a value that can be converted to a\nvalid collector configuration. It is a dot delimited path to a field in the log record. It must start with a `.`.\nThe path can contain alphanumeric characters and underscores (a-zA-Z0-9_).\nIf segments contain characters outside of this range, the segment must be quoted.\nExamples: `.kubernetes.namespace_name`, `.log_type`, '.kubernetes.labels.foobar', `.kubernetes.labels.\"foo-bar/baz\"`",
+                      "type": "string",
+                      "pattern": "^(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")*$"
+                    }
+                  },
+                  "notIn": {
+                    "description": "`NotIn` is an array of dot-delimited field paths. All fields besides the ones listed here are removed from the log record.\n\nEach field path expression must start with a \".\"\n\nThe path can contain alphanumeric characters and underscores (a-zA-Z0-9_).\n\nIf segments contain characters outside of this range, the segment must be quoted otherwise paths do NOT need to be quoted.\n\nExamples:\n\n - `.kubernetes.namespace_name`\n\n - `.log_type`\n\n - '.kubernetes.labels.foobar'\n\n - `.kubernetes.labels.\"foo-bar/baz\"`\n\nNOTE1: `NotIn` MUST contain `.log_type` and `.message` as those fields are required and cannot be pruned.\n\nNOTE2: If this filter is used in a pipeline with GoogleCloudLogging, `.hostname` MUST be added to this list as it is a required field.",
+                    "type": "array",
+                    "items": {
+                      "description": "FieldPath represents a path to find a value for a given field.  The format must a value that can be converted to a\nvalid collector configuration. It is a dot delimited path to a field in the log record. It must start with a `.`.\nThe path can contain alphanumeric characters and underscores (a-zA-Z0-9_).\nIf segments contain characters outside of this range, the segment must be quoted.\nExamples: `.kubernetes.namespace_name`, `.log_type`, '.kubernetes.labels.foobar', `.kubernetes.labels.\"foo-bar/baz\"`",
+                      "type": "string",
+                      "pattern": "^(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")*$"
+                    }
+                  }
+                }
+              },
+              "type": {
+                "description": "Type of filter.",
+                "type": "string",
+                "enum": [
+                  "openshiftLabels",
+                  "detectMultilineException",
+                  "drop",
+                  "kubeAPIAudit",
+                  "parse",
+                  "prune"
+                ]
+              }
+            },
+            "x-kubernetes-validations": [
+              {
+                "message": "Additional type specific spec is required for the filter type",
+                "rule": "self.type != 'kubeAPIAudit' || has(self.kubeAPIAudit)"
+              },
+              {
+                "message": "Additional type specific spec is required for the filter type",
+                "rule": "self.type != 'drop' || has(self.drop)"
+              },
+              {
+                "message": "Additional type specific spec is required for the filter type",
+                "rule": "self.type != 'prune' || has(self.prune)"
+              },
+              {
+                "message": "Additional type specific spec is required for the filter type",
+                "rule": "self.type != 'openshiftLabels' || has(self.openshiftLabels)"
+              }
+            ]
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "inputs": {
+          "description": "Inputs are named filters for log messages to be forwarded.\n\nThere are three built-in inputs named `application`, `infrastructure` and\n`audit`. You don't need to define inputs here if those are sufficient for\nyour needs. See `inputRefs` for more.",
+          "type": "array",
+          "items": {
+            "description": "InputSpec defines a selector of log messages for a given log type.",
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "application": {
+                "description": "Application, named set of `application` logs that\ncan specify a set of match criteria"
+              },
+              "audit": {
+                "description": "Audit, enables `audit` logs.",
+                "type": "object",
+                "properties": {
+                  "sources": {
+                    "description": "Sources defines the list of audit sources to collect.\nThis field is optional and its exclusion results in the collection of all audit sources.",
+                    "type": "array",
+                    "items": {
+                      "description": "AuditSource defines which type of audit log source is used.",
+                      "type": "string",
+                      "enum": [
+                        "auditd",
+                        "kubeAPI",
+                        "openshiftAPI",
+                        "ovn"
+                      ]
+                    }
+                  }
+                }
+              },
+              "infrastructure": {
+                "description": "Infrastructure, Enables `infrastructure` logs.",
+                "type": "object",
+                "properties": {
+                  "sources": {
+                    "description": "Sources defines the list of infrastructure sources to collect.\nThis field is optional and omission results in the collection of all infrastructure sources.",
+                    "type": "array",
+                    "items": {
+                      "description": "InfrastructureSource defines the type of infrastructure log source to use.",
+                      "type": "string",
+                      "enum": [
+                        "container",
+                        "node"
+                      ]
+                    }
+                  }
+                }
+              },
+              "name": {
+                "description": "Name used to refer to the input of a `pipeline`.",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$"
+              },
+              "receiver": {
+                "description": "Receiver to receive logs from non-cluster sources.",
+                "type": "object",
+                "required": [
+                  "port",
+                  "type"
+                ],
+                "properties": {
+                  "http": {
+                    "description": "HTTPReceiver receives encoded logs as a HTTP endpoint.",
+                    "type": "object",
+                    "required": [
+                      "format"
+                    ],
+                    "properties": {
+                      "format": {
+                        "description": "Format is the format of incoming log data.",
+                        "type": "string",
+                        "enum": [
+                          "kubeAPIAudit"
+                        ]
+                      }
+                    }
+                  },
+                  "port": {
+                    "description": "Port the Receiver listens on. It must be a value between 1024 and 65535",
+                    "type": "integer",
+                    "format": "int32",
+                    "maximum": 65535,
+                    "minimum": 1024
+                  },
+                  "tls": {
+                    "description": "TLS contains settings for controlling options of TLS connections.\n\nThe operator will request certificates from the cluster's cert signing service when TLS is not defined.\nThe certificates are injected into a secret named \"<clusterlogforwarder.name>-<input.name>\" which is mounted into\nthe collector. The collector is configured to use the public and private key provided by the service",
+                    "type": "object",
+                    "properties": {
+                      "ca": {
+                        "description": "CA can be used to specify a custom list of trusted certificate authorities.",
+                        "type": "object",
+                        "required": [
+                          "key"
+                        ],
+                        "properties": {
+                          "configMapName": {
+                            "description": "ConfigMapName contains the name of the ConfigMap containing the referenced value.",
+                            "type": "string"
+                          },
+                          "key": {
+                            "description": "Name of the key used to get the value in either the referenced ConfigMap or Secret.",
+                            "type": "string"
+                          },
+                          "secretName": {
+                            "description": "SecretName contains the name of the Secret containing the referenced value.",
+                            "type": "string"
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Either configMapName or secretName needs to be set",
+                            "rule": "has(self.configMapName) || has(self.secretName)"
+                          },
+                          {
+                            "message": "Only one of configMapName and secretName can be set",
+                            "rule": "!(has(self.configMapName) && has(self.secretName))"
+                          }
+                        ]
+                      },
+                      "certificate": {
+                        "description": "Certificate points to the server certificate to use.",
+                        "type": "object",
+                        "required": [
+                          "key"
+                        ],
+                        "properties": {
+                          "configMapName": {
+                            "description": "ConfigMapName contains the name of the ConfigMap containing the referenced value.",
+                            "type": "string"
+                          },
+                          "key": {
+                            "description": "Name of the key used to get the value in either the referenced ConfigMap or Secret.",
+                            "type": "string"
+                          },
+                          "secretName": {
+                            "description": "SecretName contains the name of the Secret containing the referenced value.",
+                            "type": "string"
+                          }
+                        },
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Either configMapName or secretName needs to be set",
+                            "rule": "has(self.configMapName) || has(self.secretName)"
+                          },
+                          {
+                            "message": "Only one of configMapName and secretName can be set",
+                            "rule": "!(has(self.configMapName) && has(self.secretName))"
+                          }
+                        ]
+                      },
+                      "key": {
+                        "description": "Key points to the private key of the server certificate.",
+                        "type": "object",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ],
+                        "properties": {
+                          "key": {
+                            "description": "Key contains the name of the key inside the referenced Secret.",
+                            "type": "string"
+                          },
+                          "secretName": {
+                            "description": "SecretName contains the name of the Secret containing the referenced value.",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "keyPassphrase": {
+                        "description": "KeyPassphrase points to the passphrase used to unlock the private key.",
+                        "type": "object",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ],
+                        "properties": {
+                          "key": {
+                            "description": "Key contains the name of the key inside the referenced Secret.",
+                            "type": "string"
+                          },
+                          "secretName": {
+                            "description": "SecretName contains the name of the Secret containing the referenced value.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "type": {
+                    "description": "Type of Receiver plugin.",
+                    "type": "string",
+                    "enum": [
+                      "http",
+                      "syslog"
+                    ]
+                  }
+                }
+              },
+              "type": {
+                "description": "Type of output sink.",
+                "type": "string",
+                "enum": [
+                  "audit",
+                  "application",
+                  "infrastructure",
+                  "receiver"
+                ]
+              }
+            },
+            "x-kubernetes-validations": [
+              {
+                "message": "Additional type specific spec is required for the input type",
+                "rule": "self.type != 'application' || has(self.application)"
+              },
+              {
+                "message": "Additional type specific spec is required for the input type",
+                "rule": "self.type != 'infrastructure' || has(self.infrastructure)"
+              },
+              {
+                "message": "Additional type specific spec is required for the input type",
+                "rule": "self.type != 'audit' || has(self.audit)"
+              },
+              {
+                "message": "Additional type specific spec is required for the input type",
+                "rule": "self.type != 'receiver' || has(self.receiver)"
+              }
+            ]
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "managementState": {
+          "description": "Indicator if the resource is 'Managed' or 'Unmanaged' by the operator.",
+          "type": "string",
+          "enum": [
+            "Managed",
+            "Unmanaged"
+          ]
+        },
+        "outputs": {
+          "description": "Outputs are named destinations for log messages.",
+          "type": "array",
+          "items": {
+            "description": "OutputSpec defines a destination for log messages.",
+            "type": "object",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "azureMonitor": {
+                "description": "AzureMonitor configures forwarding log events to the Azure Monitor Logs service",
+                "type": "object",
+                "required": [
+                  "authentication",
+                  "customerId"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "sharedKey": {
+                        "description": "SharedKey points to the secret containing the shared key used for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      }
+                    }
+                  },
+                  "azureResourceId": {
+                    "description": "AzureResourceId the Resource ID of the Azure resource the data should be associated with.\nhttps://learn.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api?tabs=powershell#request-headers",
+                    "type": "string"
+                  },
+                  "customerId": {
+                    "description": "CustomerId che unique identifier for the Log Analytics workspace.\nhttps://learn.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api?tabs=powershell#request-uri-parameters",
+                    "type": "string"
+                  },
+                  "host": {
+                    "description": "Host alternative host for dedicated Azure regions. (for example for China region)\nhttps://docs.azure.cn/en-us/articles/guidance/developerdifferences#check-endpoints-in-azure",
+                    "type": "string"
+                  },
+                  "logType": {
+                    "description": "LogType the record type of the data that is being submitted.\nCan only contain letters, numbers, and underscores (_), and may not exceed 100 characters.\nhttps://learn.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api?tabs=powershell#request-headers",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_]{0,99}$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output",
+                    "type": "object",
+                    "properties": {
+                      "deliveryMode": {
+                        "description": "DeliveryMode sets the delivery mode for log forwarding.",
+                        "type": "string",
+                        "enum": [
+                          "AtLeastOnce",
+                          "AtMostOnce"
+                        ]
+                      },
+                      "maxRetryDuration": {
+                        "description": "MaxRetryDuration is the maximum time to wait between retry attempts after a delivery failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "maxWrite": {
+                        "description": "MaxWrite limits the maximum payload in terms of bytes of a single \"send\" to the output.",
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      },
+                      "minRetryDuration": {
+                        "description": "MinRetryDuration is the minimum time to wait between attempts to retry after delivery a failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      }
+                    }
+                  }
+                }
+              },
+              "cloudwatch": {
+                "description": "Cloudwatch configures forwarding log events to AWS Cloudwatch logs",
+                "type": "object",
+                "required": [
+                  "authentication",
+                  "groupName",
+                  "region"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "awsAccessKey": {
+                        "description": "AWSAccessKey points to the AWS access key id and secret to be used for authentication.",
+                        "required": [
+                          "keyId",
+                          "keySecret"
+                        ]
+                      },
+                      "iamRole": {
+                        "description": "IAMRole points to the secret containing the role ARN to be used for authentication.\nThis can be used for authentication in STS-enabled clusters when additionally specifying\na web identity token",
+                        "required": [
+                          "roleARN",
+                          "token"
+                        ]
+                      },
+                      "type": {
+                        "description": "Type is the type of cloudwatch authentication to configure",
+                        "type": "string",
+                        "enum": [
+                          "awsAccessKey",
+                          "iamRole"
+                        ]
+                      }
+                    },
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "Additional type specific spec is required for authentication",
+                        "rule": "self.type != 'awsAccessKey' || has(self.awsAccessKey)"
+                      },
+                      {
+                        "message": "Additional type specific spec is required for authentication",
+                        "rule": "self.type != 'iamRole' || has(self.iamRole)"
+                      }
+                    ]
+                  },
+                  "groupName": {
+                    "description": "GroupName defines the strategy for grouping logstreams\n\nThe GroupName can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "region": {
+                    "type": "string"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\n\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "self == '' ||  isURL(self)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "elasticsearch": {
+                "description": "Elasticsearch configures forwarding log events to an Elasticsearch cluster",
+                "type": "object",
+                "required": [
+                  "index",
+                  "url",
+                  "version"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "password": {
+                        "description": "Password to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      },
+                      "token": {
+                        "description": "Token specifies a bearer token to be used for authenticating requests.",
+                        "required": [
+                          "from"
+                        ],
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Additional secret spec is required when bearer token is sourced from a secret",
+                            "rule": "self.from != 'secret' || has(self.secret)"
+                          }
+                        ]
+                      },
+                      "username": {
+                        "description": "Username to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      }
+                    }
+                  },
+                  "index": {
+                    "description": "Index is the index for the logs. This supports template syntax to allow dynamic per-event values.\n\nThe Index can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nWhen forwarding logs to the Red Hat Managed Elasticsearch, the index must match the pattern ^(app|infra|audit)-write$\nwhere the prefix depends upon the log_type. This requires defining a distinct output for each log type or distinct pipelines\nwith the openshiftLabels filter. See the product documentation for examples.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output",
+                    "type": "object",
+                    "properties": {
+                      "compression": {
+                        "description": "Compression causes data to be compressed before sending over the network.",
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "gzip",
+                          "zlib"
+                        ]
+                      },
+                      "deliveryMode": {
+                        "description": "DeliveryMode sets the delivery mode for log forwarding.",
+                        "type": "string",
+                        "enum": [
+                          "AtLeastOnce",
+                          "AtMostOnce"
+                        ]
+                      },
+                      "maxRetryDuration": {
+                        "description": "MaxRetryDuration is the maximum time to wait between retry attempts after a delivery failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "maxWrite": {
+                        "description": "MaxWrite limits the maximum payload in terms of bytes of a single \"send\" to the output.",
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      },
+                      "minRetryDuration": {
+                        "description": "MinRetryDuration is the minimum time to wait between attempts to retry after delivery a failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      }
+                    }
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\nBasic TLS is enabled if the URL scheme requires it (for example 'https' or 'tls').\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "isURL(self)"
+                      }
+                    ]
+                  },
+                  "version": {
+                    "description": "Version specifies the version of Elasticsearch to be used.\nMust be one of: 6-8",
+                    "type": "integer",
+                    "maximum": 8,
+                    "minimum": 6
+                  }
+                }
+              },
+              "googleCloudLogging": {
+                "description": "GoogleCloudLogging configures forwarding log events to GCP (formally Stackdriver) Operations",
+                "type": "object",
+                "required": [
+                  "id",
+                  "logId"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "required": [
+                      "credentials"
+                    ],
+                    "properties": {
+                      "credentials": {
+                        "description": "Credentials points to the secret containing the `google-application-credentials.json`.",
+                        "type": "object",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ],
+                        "properties": {
+                          "key": {
+                            "description": "Key contains the name of the key inside the referenced Secret.",
+                            "type": "string"
+                          },
+                          "secretName": {
+                            "description": "SecretName contains the name of the Secret containing the referenced value.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "id": {
+                    "description": "ID must be one of the required ID fields for the output",
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "value"
+                    ],
+                    "properties": {
+                      "type": {
+                        "description": "Type is the ID type provided",
+                        "type": "string",
+                        "enum": [
+                          "billingAccount",
+                          "folder",
+                          "project",
+                          "organization"
+                        ]
+                      },
+                      "value": {
+                        "description": "Value is the value of the ID",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "logId": {
+                    "description": "LogId is the log ID to which to publish logs. This identifies log stream.\n\nThe LogId can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output",
+                    "type": "object",
+                    "properties": {
+                      "deliveryMode": {
+                        "description": "DeliveryMode sets the delivery mode for log forwarding.",
+                        "type": "string",
+                        "enum": [
+                          "AtLeastOnce",
+                          "AtMostOnce"
+                        ]
+                      },
+                      "maxRetryDuration": {
+                        "description": "MaxRetryDuration is the maximum time to wait between retry attempts after a delivery failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "maxWrite": {
+                        "description": "MaxWrite limits the maximum payload in terms of bytes of a single \"send\" to the output.",
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      },
+                      "minRetryDuration": {
+                        "description": "MinRetryDuration is the minimum time to wait between attempts to retry after delivery a failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      }
+                    }
+                  }
+                }
+              },
+              "http": {
+                "description": "HTTP configures forwarding log events to an HTTP server",
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "password": {
+                        "description": "Password to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      },
+                      "token": {
+                        "description": "Token specifies a bearer token to be used for authenticating requests.",
+                        "required": [
+                          "from"
+                        ],
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Additional secret spec is required when bearer token is sourced from a secret",
+                            "rule": "self.from != 'secret' || has(self.secret)"
+                          }
+                        ]
+                      },
+                      "username": {
+                        "description": "Username to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      }
+                    }
+                  },
+                  "headers": {
+                    "description": "Headers specify optional headers to be sent with the request",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "method": {
+                    "description": "Method specifies the Http method to be used for sending logs. If not set, 'POST' is used.",
+                    "type": "string",
+                    "enum": [
+                      "GET",
+                      "HEAD",
+                      "POST",
+                      "PUT",
+                      "DELETE",
+                      "OPTIONS",
+                      "TRACE",
+                      "PATCH"
+                    ]
+                  },
+                  "timeout": {
+                    "description": "Timeout specifies the Http request timeout in seconds. If not set, 10secs is used.",
+                    "type": "integer"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\nBasic TLS is enabled if the URL scheme requires it (for example 'https' or 'tls').\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "isURL(self)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "kafka": {
+                "description": "Kafka configures forwarding log events to Apache Kafka topics",
+                "type": "object",
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "sasl": {
+                        "description": "SASL contains options configuring SASL authentication.",
+                        "type": "object",
+                        "properties": {
+                          "mechanism": {
+                            "description": "Mechanism sets the SASL mechanism to use.",
+                            "type": "string"
+                          },
+                          "password": {
+                            "description": "Username points to the secret to be used as SASL password.",
+                            "type": "object",
+                            "required": [
+                              "key",
+                              "secretName"
+                            ],
+                            "properties": {
+                              "key": {
+                                "description": "Key contains the name of the key inside the referenced Secret.",
+                                "type": "string"
+                              },
+                              "secretName": {
+                                "description": "SecretName contains the name of the Secret containing the referenced value.",
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "username": {
+                            "description": "Username points to the secret to be used as SASL username.",
+                            "type": "object",
+                            "required": [
+                              "key",
+                              "secretName"
+                            ],
+                            "properties": {
+                              "key": {
+                                "description": "Key contains the name of the key inside the referenced Secret.",
+                                "type": "string"
+                              },
+                              "secretName": {
+                                "description": "SecretName contains the name of the Secret containing the referenced value.",
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "brokers": {
+                    "description": "Brokers specifies the list of broker endpoints of a Kafka cluster.\n\nThe list represents only the initial set used by the collector's Kafka client for the\nfirst connection only. The collector's Kafka client fetches constantly an updated list\nfrom Kafka. These updates are not reconciled back to the collector configuration.\n\nIf none provided the target URL from the OutputSpec is used as fallback.",
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "invalid URL",
+                          "rule": "isURL(self)"
+                        }
+                      ]
+                    }
+                  },
+                  "topic": {
+                    "description": "Topic specifies the target topic to send logs to. The value when not specified is 'topic'\n\nThe Topic can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\n\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "self == '' ||  isURL(self)"
+                      }
+                    ]
+                  }
+                },
+                "x-kubernetes-validations": [
+                  {
+                    "message": "URL or brokers required",
+                    "rule": "has(self.url) || self.brokers.size() > 0"
+                  }
+                ]
+              },
+              "loki": {
+                "description": "Loki configures forwarding log events to a Loki aggregation system",
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "password": {
+                        "description": "Password to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      },
+                      "token": {
+                        "description": "Token specifies a bearer token to be used for authenticating requests.",
+                        "required": [
+                          "from"
+                        ],
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Additional secret spec is required when bearer token is sourced from a secret",
+                            "rule": "self.from != 'secret' || has(self.secret)"
+                          }
+                        ]
+                      },
+                      "username": {
+                        "description": "Username to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      }
+                    }
+                  },
+                  "labelKeys": {
+                    "description": "LabelKeys can be used to customize which log record keys are mapped to Loki stream labels.\n\nIf LabelKeys is not set, the default keys are:\n\n- log_type\n\n- kubernetes.container_name\n\n- kubernetes.namespace_name\n\n- kubernetes.pod_name\n\nOne additional label \"kubernetes_host\" is not part of the label keys configuration. It contains the hostname\nwhere the collector is running and is always present.\n\nNote: Loki label names must match the regular expression \"[a-zA-Z_:][a-zA-Z0-9_:]*\"\nLog record keys may contain characters like \".\" and \"/\" that are not allowed in Loki labels.\nLog record keys are translated to Loki labels by replacing any illegal characters with '_'.\n\nFor example the default log record keys translate to these Loki labels:\n\n- log_type\n\n- kubernetes_container_name\n\n- kubernetes_namespace_name\n\n- kubernetes_pod_name\n\nNote: the set of labels should be small, Loki imposes limits on the size and number of labels allowed.\nSee https://grafana.com/docs/loki/latest/configuration/#limits_config for more.\nLoki queries can also query based on any log record field (not just labels) using query filters.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "tenantKey": {
+                    "description": "TenantKey is the tenant for the logs. This supports vector's template syntax to allow dynamic per-event values.\n\nThe TenantKey can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\nBasic TLS is enabled if the URL scheme requires it (for example 'https' or 'tls').\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "isURL(self)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "lokiStack": {
+                "description": "LokiStack configures forwarding log events to a Red Hat managed Loki deployment\nusing the Red Hat tenancy model",
+                "type": "object",
+                "required": [
+                  "authentication",
+                  "target"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "token": {
+                        "description": "Token specifies a bearer token to be used for authenticating requests.",
+                        "required": [
+                          "from"
+                        ],
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Additional secret spec is required when bearer token is sourced from a secret",
+                            "rule": "self.from != 'secret' || has(self.secret)"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "dataModel": {
+                    "description": "DataModel can be used to customize how log data is stored in LokiStack.\n\nThere are two different models to choose from:\n\n - Viaq\n - Otel\n\nWhen the data model is not set, it currently defaults to the \"Viaq\" data model.",
+                    "type": "string",
+                    "enum": [
+                      "Viaq",
+                      "Otel"
+                    ]
+                  },
+                  "labelKeys": {
+                    "description": "LabelKeys can be used to customize which log record keys are mapped to Loki stream labels.\n\nNote: Loki label names must match the regular expression \"[a-zA-Z_:][a-zA-Z0-9_:]*\"\nLog record keys may contain characters like \".\" and \"/\" that are not allowed in Loki labels.\nLog record keys are translated to Loki labels by replacing any illegal characters with '_'.\n\nFor example the default log record keys translate to these Loki labels:\n\n- log_type\n\n- kubernetes_container_name\n\n- kubernetes_namespace_name\n\n- kubernetes_pod_name\n\nNote: the set of labels should be small, Loki imposes limits on the size and number of labels allowed.\nSee https://grafana.com/docs/loki/latest/configuration/#limits_config for more.\nLoki queries can also query based on any log record field (not just labels) using query filters.",
+                    "type": "object",
+                    "properties": {
+                      "application": {
+                        "description": "Application contains the label keys configuration for the \"application\" tenant.",
+                        "type": "object",
+                        "properties": {
+                          "ignoreGlobal": {
+                            "description": "If IgnoreGlobal is true, then the tenant will not use the labels configured in the Global section of the label\nkeys configuration.",
+                            "type": "boolean"
+                          },
+                          "labelKeys": {
+                            "description": "LabelKeys contains a list of log record keys that are mapped to Loki stream labels.\n\nBy default, this list is combined with the labels specified in the Global configuration.\nThis behavior can be changed by setting IgnoreGlobal to true.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "audit": {
+                        "description": "Audit contains the label keys configuration for the \"audit\" tenant.",
+                        "type": "object",
+                        "properties": {
+                          "ignoreGlobal": {
+                            "description": "If IgnoreGlobal is true, then the tenant will not use the labels configured in the Global section of the label\nkeys configuration.",
+                            "type": "boolean"
+                          },
+                          "labelKeys": {
+                            "description": "LabelKeys contains a list of log record keys that are mapped to Loki stream labels.\n\nBy default, this list is combined with the labels specified in the Global configuration.\nThis behavior can be changed by setting IgnoreGlobal to true.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "global": {
+                        "description": "Global contains a list of record keys which are used for all tenants.\n\nIf LabelKeys is not set, the default keys are:\n\n - log_type\n\n - kubernetes.container_name\n\n - kubernetes.namespace_name\n\n - kubernetes.pod_name\n\nOne additional label \"kubernetes_host\" is not part of the label keys configuration. It contains the hostname\nwhere the collector is running and is always present.",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "infrastructure": {
+                        "description": "Infrastructure contains the label keys configuration for the \"infrastructure\" tenant.",
+                        "type": "object",
+                        "properties": {
+                          "ignoreGlobal": {
+                            "description": "If IgnoreGlobal is true, then the tenant will not use the labels configured in the Global section of the label\nkeys configuration.",
+                            "type": "boolean"
+                          },
+                          "labelKeys": {
+                            "description": "LabelKeys contains a list of log record keys that are mapped to Loki stream labels.\n\nBy default, this list is combined with the labels specified in the Global configuration.\nThis behavior can be changed by setting IgnoreGlobal to true.",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "target": {
+                    "description": "Target points to the LokiStack resources that should be used as a target for the output.",
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "namespace"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "Name of the in-cluster LokiStack resource.",
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9-]{2,62}[a-z0-9]$"
+                      },
+                      "namespace": {
+                        "description": "Namespace of the in-cluster LokiStack resource.",
+                        "type": "string",
+                        "minLength": 3
+                      }
+                    }
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output",
+                    "type": "object",
+                    "properties": {
+                      "compression": {
+                        "description": "Compression causes data to be compressed before sending over the network.",
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "gzip",
+                          "snappy"
+                        ]
+                      },
+                      "deliveryMode": {
+                        "description": "DeliveryMode sets the delivery mode for log forwarding.",
+                        "type": "string",
+                        "enum": [
+                          "AtLeastOnce",
+                          "AtMostOnce"
+                        ]
+                      },
+                      "maxRetryDuration": {
+                        "description": "MaxRetryDuration is the maximum time to wait between retry attempts after a delivery failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "maxWrite": {
+                        "description": "MaxWrite limits the maximum payload in terms of bytes of a single \"send\" to the output.",
+                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                        "x-kubernetes-int-or-string": true
+                      },
+                      "minRetryDuration": {
+                        "description": "MinRetryDuration is the minimum time to wait between attempts to retry after delivery a failure.",
+                        "type": "integer",
+                        "format": "int64"
+                      }
+                    }
+                  }
+                },
+                "x-kubernetes-validations": [
+                  {
+                    "message": "'labelKeys' cannot be set when data model is 'Otel'",
+                    "rule": "!has(self.labelKeys) || !has(self.dataModel) || self.dataModel == 'Viaq'"
+                  },
+                  {
+                    "message": "'snappy' compression cannot be used when data model is 'Otel'",
+                    "rule": "!has(self.tuning) || !has(self.tuning.compression) || self.tuning.compression != 'snappy' || !has(self.dataModel) || self.dataModel == 'Viaq'"
+                  }
+                ]
+              },
+              "name": {
+                "description": "Name used to refer to the output from a `pipeline`.",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$"
+              },
+              "otlp": {
+                "description": "OTLP configures forwarding log events to a receiver using the OpenTelemetry Protocol\nwith Red Openshift logging semantic conventions (ref: https://github.com/rhobs/observability-data-model/blob/main/cluster-logging.md)",
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "properties": {
+                      "password": {
+                        "description": "Password to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      },
+                      "token": {
+                        "description": "Token specifies a bearer token to be used for authenticating requests.",
+                        "required": [
+                          "from"
+                        ],
+                        "x-kubernetes-validations": [
+                          {
+                            "message": "Additional secret spec is required when bearer token is sourced from a secret",
+                            "rule": "self.from != 'secret' || has(self.secret)"
+                          }
+                        ]
+                      },
+                      "username": {
+                        "description": "Username to use for authenticating requests.",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ]
+                      }
+                    }
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\n\nAn absolute URL, with a valid http scheme. Must terminate with `/v1/logs`\n\nBasic TLS is enabled if the URL scheme requires it (for example 'https').\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "pattern": "^(https?):\\/\\/\\S+\\/v1\\/logs$",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "isURL(self)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "rateLimit": {
+                "description": "Limit imposes a limit in records-per-second on the total aggregate rate of logs forwarded\nto this output from any given collector container. The total log flow from an individual collector\ncontainer to this output cannot exceed the limit.  Generally, one collector is deployed per cluster node\nLogs may be dropped to enforce the limit. Missing or 0 means no rate limit.",
+                "type": "object",
+                "required": [
+                  "maxRecordsPerSecond"
+                ],
+                "properties": {
+                  "maxRecordsPerSecond": {
+                    "description": "MaxRecordsPerSecond is the maximum number of log records\nallowed per input/output in a pipeline",
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                }
+              },
+              "splunk": {
+                "description": "Splunk configures forwarding log events to Splunk's HTTP event collector",
+                "type": "object",
+                "required": [
+                  "authentication",
+                  "url"
+                ],
+                "properties": {
+                  "authentication": {
+                    "description": "Authentication sets credentials for authenticating the requests.",
+                    "type": "object",
+                    "required": [
+                      "token"
+                    ],
+                    "properties": {
+                      "token": {
+                        "description": "Token points to the secret containing the Splunk HEC token used for authenticating requests.",
+                        "type": "object",
+                        "required": [
+                          "key",
+                          "secretName"
+                        ],
+                        "properties": {
+                          "key": {
+                            "description": "Key contains the name of the key inside the referenced Secret.",
+                            "type": "string"
+                          },
+                          "secretName": {
+                            "description": "SecretName contains the name of the Secret containing the referenced value.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "index": {
+                    "description": "Index is the index for the logs. This supports template syntax to allow dynamic per-event values.\n\nThe Index can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "URL to send log records to.\nBasic TLS is enabled if the URL scheme requires it (for example 'https' or 'tls').\nThe 'username@password' part of `url` is ignored.",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "isURL(self)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "syslog": {
+                "description": "Syslog configures forwarding log events to a receiver using the syslog protocol",
+                "type": "object",
+                "required": [
+                  "rfc",
+                  "url"
+                ],
+                "properties": {
+                  "appName": {
+                    "description": "AppName is APP-NAME part of the syslog-msg header.\n\nAppName needs to be specified if using rfc5424. The maximum length of the final values is truncated to 48\nThis supports template syntax to allow dynamic per-event values.\n\nThe AppName can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}\n",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "enrichment": {
+                    "description": "Enrichment is an additional modification the log message before forwarding it to the receiver",
+                    "type": "string",
+                    "enum": [
+                      "None",
+                      "KubernetesMinimal"
+                    ]
+                  },
+                  "facility": {
+                    "description": "Facility to set on outgoing syslog records.\n\nFacility values are defined in https://tools.ietf.org/html/rfc5424#section-6.2.1.\n\nThe value can be a decimal integer. Facility keywords are not standardized,\nthis API recognizes at least the following case-insensitive keywords\n(defined by https://en.wikipedia.org/wiki/Syslog#Facility_Levels):\n\n    kernel user mail daemon auth syslog lpr news\n    uucp cron authpriv ftp ntp security console solaris-cron\n    local0 local1 local2 local3 local4 local5 local6 local7\n\nThe Facility can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. {.foo||\"user\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "msgId": {
+                    "description": "MsgId is MSGID part of the syslog-msg header. This supports template syntax to allow dynamic per-event values.\n\nThe MsgId can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}\n\nMsgId needs to be specified if using rfc5424.  The maximum length of the final values is truncated to 32",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "payloadKey": {
+                    "description": "PayloadKey specifies record field to use as payload. This supports template syntax to allow dynamic per-event values.\n\nThe PayloadKey must be a single field path encased in single curly brackets `{}`.\n\nField paths must only contain alphanumeric and underscores. Any field with other characters must be quoted.\n\nIf left empty, Syslog will use the whole message as the payload key\n\nExample:\n\n 1. {.bar}\n\n 2. {.foo.bar.baz}\n\n 3. {.foo.bar.\"baz/with/slashes\"}",
+                    "type": "string",
+                    "pattern": "^\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")*\\}$"
+                  },
+                  "procId": {
+                    "description": "ProcId is PROCID part of the syslog-msg header. This supports template syntax to allow dynamic per-event values.\n\nThe ProcId can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\n\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. foo-{.bar||\"none\"}\n\n 2. {.foo||.bar||\"missing\"}\n\n 3. foo.{.bar.baz||.qux.quux.corge||.grault||\"nil\"}-waldo.fred{.plugh||\"none\"}\n\nProcId needs to be specified if using rfc5424. The maximum length of the final values is truncated to 128",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "rfc": {
+                    "description": "The RFC to which the generated messages conform to.\n\nSupported values are:\n1. RFC3164\n2. RFC5424",
+                    "type": "string",
+                    "enum": [
+                      "RFC3164",
+                      "RFC5424"
+                    ]
+                  },
+                  "severity": {
+                    "description": "Severity to set on outgoing syslog records.\n\nSeverity values are defined in https://tools.ietf.org/html/rfc5424#section-6.2.1\n\nThe value can be a decimal integer or one of these case-insensitive keywords:\n\n    Emergency Alert Critical Error Warning Notice Informational Debug\n\nThe Severity can be a combination of static and dynamic values consisting of field paths followed by `||` followed by another field path or a static value.\nA dynamic value is encased in single curly brackets `{}` and MUST end with a static fallback value separated with `||`.\n\nStatic values can only contain alphanumeric characters along with dashes, underscores, dots and forward slashes.\n\nExample:\n\n 1. {.foo||\"Error\"}",
+                    "type": "string",
+                    "pattern": "^(([a-zA-Z0-9-_.\\/])*(\\{(\\.[a-zA-Z0-9_]+|\\.\"[^\"]+\")+((\\|\\|)(\\.[a-zA-Z0-9_]+|\\.?\"[^\"]+\")+)*\\|\\|\"[^\"]*\"\\})*)*$"
+                  },
+                  "tuning": {
+                    "description": "Tuning specs tuning for the output"
+                  },
+                  "url": {
+                    "description": "An absolute URL, with a scheme. Valid schemes are: `tcp`, `tls`, `udp` and `udps`\nFor example, to send syslog records using secure UDP:\n    url: udps://syslog.example.com:1234",
+                    "type": "string",
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "invalid URL",
+                        "rule": "isURL(self)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "tls": {
+                "description": "TLS contains settings for controlling options on TLS client connections.",
+                "type": "object",
+                "properties": {
+                  "ca": {
+                    "description": "CA can be used to specify a custom list of trusted certificate authorities.",
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "configMapName": {
+                        "description": "ConfigMapName contains the name of the ConfigMap containing the referenced value.",
+                        "type": "string"
+                      },
+                      "key": {
+                        "description": "Name of the key used to get the value in either the referenced ConfigMap or Secret.",
+                        "type": "string"
+                      },
+                      "secretName": {
+                        "description": "SecretName contains the name of the Secret containing the referenced value.",
+                        "type": "string"
+                      }
+                    },
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "Either configMapName or secretName needs to be set",
+                        "rule": "has(self.configMapName) || has(self.secretName)"
+                      },
+                      {
+                        "message": "Only one of configMapName and secretName can be set",
+                        "rule": "!(has(self.configMapName) && has(self.secretName))"
+                      }
+                    ]
+                  },
+                  "certificate": {
+                    "description": "Certificate points to the server certificate to use.",
+                    "type": "object",
+                    "required": [
+                      "key"
+                    ],
+                    "properties": {
+                      "configMapName": {
+                        "description": "ConfigMapName contains the name of the ConfigMap containing the referenced value.",
+                        "type": "string"
+                      },
+                      "key": {
+                        "description": "Name of the key used to get the value in either the referenced ConfigMap or Secret.",
+                        "type": "string"
+                      },
+                      "secretName": {
+                        "description": "SecretName contains the name of the Secret containing the referenced value.",
+                        "type": "string"
+                      }
+                    },
+                    "x-kubernetes-validations": [
+                      {
+                        "message": "Either configMapName or secretName needs to be set",
+                        "rule": "has(self.configMapName) || has(self.secretName)"
+                      },
+                      {
+                        "message": "Only one of configMapName and secretName can be set",
+                        "rule": "!(has(self.configMapName) && has(self.secretName))"
+                      }
+                    ]
+                  },
+                  "insecureSkipVerify": {
+                    "description": "If InsecureSkipVerify is true, then the TLS client will be configured to skip validating server certificates.\n\nThis option is *not* recommended for production configurations.",
+                    "type": "boolean"
+                  },
+                  "key": {
+                    "description": "Key points to the private key of the server certificate.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "secretName"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "Key contains the name of the key inside the referenced Secret.",
+                        "type": "string"
+                      },
+                      "secretName": {
+                        "description": "SecretName contains the name of the Secret containing the referenced value.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "keyPassphrase": {
+                    "description": "KeyPassphrase points to the passphrase used to unlock the private key.",
+                    "type": "object",
+                    "required": [
+                      "key",
+                      "secretName"
+                    ],
+                    "properties": {
+                      "key": {
+                        "description": "Key contains the name of the key inside the referenced Secret.",
+                        "type": "string"
+                      },
+                      "secretName": {
+                        "description": "SecretName contains the name of the Secret containing the referenced value.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "securityProfile": {
+                    "description": "TLSSecurityProfile is the security profile to apply to the output connection.",
+                    "type": "object",
+                    "properties": {
+                      "custom": {
+                        "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n  ciphers:\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n  minTLSVersion: VersionTLS11"
+                      },
+                      "intermediate": {
+                        "description": "intermediate is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - DHE-RSA-AES128-GCM-SHA256\n    - DHE-RSA-AES256-GCM-SHA384\n  minTLSVersion: VersionTLS12"
+                      },
+                      "modern": {
+                        "description": "modern is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n  minTLSVersion: VersionTLS13\n\nNOTE: Currently unsupported."
+                      },
+                      "old": {
+                        "description": "old is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - DHE-RSA-AES128-GCM-SHA256\n    - DHE-RSA-AES256-GCM-SHA384\n    - DHE-RSA-CHACHA20-POLY1305\n    - ECDHE-ECDSA-AES128-SHA256\n    - ECDHE-RSA-AES128-SHA256\n    - ECDHE-ECDSA-AES128-SHA\n    - ECDHE-RSA-AES128-SHA\n    - ECDHE-ECDSA-AES256-SHA384\n    - ECDHE-RSA-AES256-SHA384\n    - ECDHE-ECDSA-AES256-SHA\n    - ECDHE-RSA-AES256-SHA\n    - DHE-RSA-AES128-SHA256\n    - DHE-RSA-AES256-SHA256\n    - AES128-GCM-SHA256\n    - AES256-GCM-SHA384\n    - AES128-SHA256\n    - AES256-SHA256\n    - AES128-SHA\n    - AES256-SHA\n    - DES-CBC3-SHA\n  minTLSVersion: VersionTLS10"
+                      },
+                      "type": {
+                        "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides\nthe ability to specify individual TLS security profile parameters.\nOld, Intermediate and Modern are TLS security profiles based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations\n\nThe profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers\nare found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be\nreduced.\n\nNote that the Modern profile is currently not supported because it is not\nyet well adopted by common software libraries.",
+                        "type": "string",
+                        "enum": [
+                          "Old",
+                          "Intermediate",
+                          "Modern",
+                          "Custom"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "type": {
+                "description": "Type of output sink.",
+                "type": "string",
+                "enum": [
+                  "azureMonitor",
+                  "cloudwatch",
+                  "elasticsearch",
+                  "http",
+                  "kafka",
+                  "loki",
+                  "lokiStack",
+                  "googleCloudLogging",
+                  "splunk",
+                  "syslog",
+                  "otlp"
+                ]
+              }
+            },
+            "x-kubernetes-validations": [
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'azureMonitor' || has(self.azureMonitor)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'cloudwatch' || has(self.cloudwatch)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'elasticsearch' || has(self.elasticsearch)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'googleCloudLogging' || has(self.googleCloudLogging)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'http' || has(self.http)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'kafka' || has(self.kafka)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'loki' || has(self.loki)"
+              },
+              {
+                "message": "Additional type specific spec is required for the output type",
+                "rule": "self.type != 'lokiStack' || has(self.lokiStack)"
+              },
+              {
+                "message": "Additional type specific spec is required the for output type",
+                "rule": "self.type != 'splunk' || has(self.splunk)"
+              },
+              {
+                "message": "Additional type specific spec is required the for output type",
+                "rule": "self.type != 'syslog' || has(self.syslog)"
+              },
+              {
+                "message": "Additional type specific spec is required the for output type",
+                "rule": "self.type != 'otlp' || has(self.otlp)"
+              }
+            ]
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "pipelines": {
+          "description": "Pipelines forward the messages selected by a set of inputs to a set of outputs.",
+          "type": "array",
+          "items": {
+            "description": "PipelineSpec links a set of inputs and transformations to a set of outputs.",
+            "type": "object",
+            "required": [
+              "inputRefs",
+              "name",
+              "outputRefs"
+            ],
+            "properties": {
+              "filterRefs": {
+                "description": "Filters lists the names of filters to be applied to records going through this pipeline.\n\nEach filter is applied in order.\nIf a filter drops a records, subsequent filters are not applied.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "inputRefs": {
+                "description": "InputRefs lists the names (`input.name`) of inputs to this pipeline.\n\nThe following built-in input names are always available:\n\n - `application` selects all logs from application pods.\n\n - `infrastructure` selects logs from openshift and kubernetes pods and some node logs.\n\n - `audit` selects node logs related to security audits.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "name": {
+                "description": "Name of the pipeline",
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$"
+              },
+              "outputRefs": {
+                "description": "OutputRefs lists the names (`output.name`) of outputs from this pipeline.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "name"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "serviceAccount": {
+          "description": "ServiceAccount points to the ServiceAccount resource used by the collector pods.",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name of the ServiceAccount to use to deploy the Forwarder.  The ServiceAccount is created by the administrator",
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{2,62}[a-z0-9]$"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "ClusterLogForwarderStatus defines the observed state of ClusterLogForwarder",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "description": "Conditions of the log forwarder.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "filterConditions": {
+          "description": "FilterConditions maps filter name to condition of the filter.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "inputConditions": {
+          "description": "InputConditions maps input name to condition of the input.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "outputConditions": {
+          "description": "OutputConditions maps output name to condition of the output.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "pipelineConditions": {
+          "description": "PipelineConditions maps pipeline name to condition of the pipeline.",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource.",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "observability.openshift.io",
+      "kind": "ClusterLogForwarder",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-validations": [
+    {
+      "message": "Name must be a valid DNS1035 label",
+      "rule": "self.metadata.name.matches('^[a-z][a-z0-9-]{1,61}[a-z0-9]$')"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

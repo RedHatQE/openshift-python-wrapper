@@ -1,0 +1,170 @@
+{
+  "description": "PromotionRun is the Schema for the promotionruns API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "PromotionRunSpec defines the desired state of PromotionRun",
+      "type": "object",
+      "required": [
+        "application",
+        "snapshot"
+      ],
+      "properties": {
+        "application": {
+          "description": "Application is the name of an Application resource defined within the namespaced, and which is the target of the promotion",
+          "type": "string"
+        },
+        "automatedPromotion": {
+          "description": "AutomatedPromotion is for fields specific to automated promotion Only one field should be defined: either 'manualPromotion' or 'automatedPromotion', but not both.",
+          "type": "object",
+          "required": [
+            "initialEnvironment"
+          ],
+          "properties": {
+            "initialEnvironment": {
+              "description": "InitialEnvironment: start iterating through the digraph, beginning with the value specified in 'initialEnvironment'",
+              "type": "string"
+            }
+          }
+        },
+        "manualPromotion": {
+          "description": "ManualPromotion is for fields specific to manual promotion. Only one field should be defined: either 'manualPromotion' or 'automatedPromotion', but not both.",
+          "type": "object",
+          "required": [
+            "targetEnvironment"
+          ],
+          "properties": {
+            "targetEnvironment": {
+              "description": "TargetEnvironment is the environment to promote to",
+              "type": "string"
+            }
+          }
+        },
+        "snapshot": {
+          "description": "Snapshot refers to the name of a Snapshot resource defined within the namespace, used to promote container images between Environments.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "PromotionRunStatus defines the observed state of PromotionRun",
+      "type": "object",
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "activeBindings": {
+          "description": "ActiveBindings is the list of active bindings currently being promoted to: - For an automated promotion, there can be multiple active bindings at a time (one for each env at a particular tree depth) - For a manual promotion, there will be only one.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "completionResult": {
+          "description": "CompletionResult indicates success/failure once the promotion has completed all work. CompletionResult will only have a value if State field is 'Complete'.",
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "PromotionRunCondition contains details about an PromotionRun condition, which is usually an error or warning",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastProbeTime": {
+                "description": "LastProbeTime is the last time the condition was observed.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastTransitionTime": {
+                "description": "LastTransitionTime is the last time the condition transitioned from one status to another.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "Message contains human-readable message indicating details about the last condition.",
+                "type": "string"
+              },
+              "reason": {
+                "description": "Reason is a unique, one-word, CamelCase reason for the condition's last transition.",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status is the status of the condition.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type is a PromotionRun condition type",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "environmentStatus": {
+          "description": "EnvironmentStatus represents the set of steps taken during the  current promotion",
+          "type": "array",
+          "items": {
+            "description": "PromotionRunEnvironmentStatus represents the set of steps taken during the  current promotion: - manual promotions will only have a single step. - automated promotions may have one or more steps, depending on how many environments have been promoted to.",
+            "type": "object",
+            "required": [
+              "displayStatus",
+              "environmentName",
+              "status",
+              "step"
+            ],
+            "properties": {
+              "displayStatus": {
+                "description": "DisplayStatus is human-readible description of the current state/status.",
+                "type": "string"
+              },
+              "environmentName": {
+                "description": "EnvironmentName is the name of the environment that was promoted to in this step",
+                "type": "string"
+              },
+              "status": {
+                "description": "Status is/was the result of promoting to that environment.",
+                "type": "string"
+              },
+              "step": {
+                "description": "Step is the sequential number of the step in the array, starting with 1",
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "promotionStartTime": {
+          "description": "PromotionStartTime is set to the value when the PromotionRun Reconciler first started the promotion.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "state": {
+          "description": "State indicates whether or not the overall promotion (either manual or automated is complete)",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "PromotionRun",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

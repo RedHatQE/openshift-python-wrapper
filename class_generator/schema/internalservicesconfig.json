@@ -1,0 +1,63 @@
+{
+  "description": "InternalServicesConfig is the Schema for the internalservicesconfigs API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "InternalServicesConfigSpec defines the desired state of InternalServicesConfig.",
+      "type": "object",
+      "properties": {
+        "allowList": {
+          "description": "AllowList is the list of remote namespaces that are allowed to execute InternalRequests",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "debug": {
+          "description": "Debug sets the operator to run in debug mode. In this mode, PipelineRuns and PVCs will not be removed",
+          "type": "boolean"
+        },
+        "volumeClaim": {
+          "description": "VolumeClaim holds information about the volume to request for Pipelines requiring a workspace",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name is the workspace name",
+              "type": "string",
+              "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+            },
+            "size": {
+              "description": "Size is the size that will be requested when a workspace is required by a Pipeline",
+              "type": "string",
+              "pattern": "^[1-9][0-9]*(K|M|G)i$"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "InternalServicesConfigStatus defines the observed state of InternalServicesConfig.",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "InternalServicesConfig",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

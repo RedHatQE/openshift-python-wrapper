@@ -1,0 +1,78 @@
+{
+  "description": "ObjectSlice is referenced by ObjectSets or ObjectDeployments and contain objects to\nlimit the size of ObjectSets and ObjectDeployments when big packages are installed.\nThis is necessary to work around the etcd object size limit of ~1.5MiB and to reduce load on the kube-apiserver.",
+  "type": "object",
+  "required": [
+    "objects"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "description": "ObjectSetObject is an object that is part of the phase of an ObjectSet.",
+        "type": "object",
+        "required": [
+          "object"
+        ],
+        "properties": {
+          "collisionProtection": {
+            "description": "Collision protection prevents Package Operator from working on objects already under\nmanagement by a different operator.",
+            "type": "string"
+          },
+          "conditionMappings": {
+            "description": "Maps conditions from this object into the Package Operator APIs.",
+            "type": "array",
+            "items": {
+              "description": "ConditionMapping maps one condition type to another.",
+              "type": "object",
+              "required": [
+                "destinationType",
+                "sourceType"
+              ],
+              "properties": {
+                "destinationType": {
+                  "description": "Destination condition type to report into Package Operator APIs.",
+                  "type": "string",
+                  "pattern": "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\\/([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]"
+                },
+                "sourceType": {
+                  "description": "Source condition type.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "object": {
+            "x-kubernetes-embedded-resource": true,
+            "x-kubernetes-preserve-unknown-fields": true
+          }
+        }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "objects is immutable",
+          "rule": "self == oldSelf"
+        }
+      ]
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "package-operator.run",
+      "kind": "ObjectSlice",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

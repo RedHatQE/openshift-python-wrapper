@@ -1,0 +1,51 @@
+{
+  "description": "DeploymentTargetClass is the Schema for the deploymenttargetclasses API. Defines DeploymentTarget properties that should be abstracted from the controller/user that creates a DTC and wants a DT to be provisioned automatically for it.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "DeploymentTargetClassSpec defines the desired state of DeploymentTargetClass",
+      "type": "object",
+      "required": [
+        "provisioner",
+        "reclaimPolicy"
+      ],
+      "properties": {
+        "parameters": {
+          "description": "Parameters are used to forward additional information to the provisioner.",
+          "type": "object"
+        },
+        "provisioner": {
+          "type": "string"
+        },
+        "reclaimPolicy": {
+          "description": "The reclaimPolicy field will tell the provisioner what to do with the DT once its corresponding DTC is deleted, the values can be Retain or Delete.",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "DeploymentTargetClassStatus defines the observed state of DeploymentTargetClass",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "DeploymentTargetClass",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

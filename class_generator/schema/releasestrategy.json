@@ -1,0 +1,119 @@
+{
+  "description": "ReleaseStrategy is the Schema for the releasestrategies API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "ReleaseStrategySpec defines the desired state of ReleaseStrategy",
+      "type": "object",
+      "required": [
+        "pipelineRef",
+        "policy"
+      ],
+      "properties": {
+        "params": {
+          "description": "Params to pass to the pipeline",
+          "type": "array",
+          "items": {
+            "description": "Params holds the definition of a parameter that should be passed to the release Pipeline",
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "description": "Name is the name of the parameter",
+                "type": "string"
+              },
+              "value": {
+                "description": "Value is the string value of the parameter",
+                "type": "string"
+              },
+              "values": {
+                "description": "Values is a list of values for the parameter",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "persistentVolumeClaim": {
+          "description": "PersistentVolumeClaim is the pvc to use in the Release pipeline namespace",
+          "type": "string",
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+        },
+        "pipelineRef": {
+          "description": "PipelineRef is a reference to the Pipeline to be executed by the release PipelineRun",
+          "type": "object",
+          "required": [
+            "params",
+            "resolver"
+          ],
+          "properties": {
+            "params": {
+              "description": "Params is a slice of parameters for a given resolver",
+              "type": "array",
+              "items": {
+                "description": "Param defines the parameters for a given resolver in PipelineRef",
+                "type": "object",
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "properties": {
+                  "name": {
+                    "description": "Name is the name of the parameter",
+                    "type": "string"
+                  },
+                  "value": {
+                    "description": "Value is the value of the parameter",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "resolver": {
+              "description": "Resolver is the name of a Tekton resolver to be used (e.g. git)",
+              "type": "string"
+            }
+          }
+        },
+        "policy": {
+          "description": "Policy to validate before releasing an artifact",
+          "type": "string",
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+        },
+        "serviceAccount": {
+          "description": "ServiceAccount is the name of the service account to use in the release PipelineRun to gain elevated privileges",
+          "type": "string",
+          "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+        }
+      }
+    },
+    "status": {
+      "description": "ReleaseStrategyStatus defines the observed state of ReleaseStrategy",
+      "type": "object"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "ReleaseStrategy",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

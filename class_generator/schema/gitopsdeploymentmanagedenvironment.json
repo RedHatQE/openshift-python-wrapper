@@ -1,0 +1,124 @@
+{
+  "description": "GitOpsDeploymentManagedEnvironment is the Schema for the gitopsdeploymentmanagedenvironments API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "The GitOpsDeploymentManagedEnvironment CR describes a remote cluster which the GitOps Service will deploy to, via Argo CD. This resource references a Secret resource, of type managed-gitops.redhat.com/managed-environment, that contains the cluster credentials. The Secret should contain credentials to a ServiceAccount/User account on the target cluster. This is referred to as the Argo CD 'ServiceAccount' below.",
+      "type": "object",
+      "required": [
+        "allowInsecureSkipTLSVerify",
+        "apiURL",
+        "credentialsSecret"
+      ],
+      "properties": {
+        "allowInsecureSkipTLSVerify": {
+          "description": "AllowInsecureSkipTLSVerify controls whether Argo CD will accept a Kubernetes API URL with untrusted-TLS certificate. Optional: If true, the GitOps Service will allow Argo CD to connect to the specified cluster even if it is using an invalid or self-signed TLS certificate. Defaults to false.",
+          "type": "boolean"
+        },
+        "apiURL": {
+          "description": "APIURL is the URL of the cluster to connect to",
+          "type": "string"
+        },
+        "clusterResources": {
+          "description": "ClusterResources is used in conjuction with the Namespace field. If the .spec.namespaces field is non-empty, this field will be used to determine whether Argo CD should attempt to manage cluster-scoped resources. - If .spec.namespaces field is empty, this field is ignored. - If you are familiar with Argo CD: this field is equivalent to the field of the same name in the Argo CD Cluster Secret. \n Optional, default to false.",
+          "type": "boolean"
+        },
+        "createNewServiceAccount": {
+          "description": "CreateNewServiceAccount controls whether Argo CD will use the ServiceAccount provided by the user in the Secret, or if a new ServiceAccount should be created. \n Optional, default to false. \n - If true, the GitOps Service will automatically create a ServiceAccount/ClusterRole/ClusterRoleBinding on the target cluster, using the credentials provided by the user in the secret. - Argo CD will then be configured to deploy with that new ServiceAccount. \n - Default: If false, it is assumed that the credentials provided by the user in the Secret are for a ServiceAccount on the cluster, and Argo CD will be configred to use the ServiceAccount referenced by the Secret of the user. No new ServiceAccount will be created. - This should be used, for example, when the ServiceAccount Argo CD does not have full cluster access (*/*/* at cluster scope)",
+          "type": "boolean"
+        },
+        "credentialsSecret": {
+          "description": "ClusterCredentialsSecret is a reference to a Secret that contains cluster connection details. The cluster details should be in the form of a kubeconfig file.",
+          "type": "string"
+        },
+        "namespaces": {
+          "description": "Namespaces allows one to indicate which Namespaces the Secret's ServiceAccount has access to. \n Optional, defaults to empty. If empty, it is assumed that the ServiceAccount has access to all Namespaces. \n The ServiceAccount that GitOps Service/Argo CD uses to deploy may not have access to all of the Namespaces on a cluster. If not specified, it is assumed that the Argo CD ServiceAccount has read/write at cluster-scope. - If you are familiar with Argo CD: this field is equivalent to the field of the same name in the Argo CD Cluster Secret.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "description": "GitOpsDeploymentManagedEnvironmentStatus defines the observed state of GitOpsDeploymentManagedEnvironment",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, \n type FooStatus struct{ // Represents the observations of a foo's current state. // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge // +listType=map // +listMapKey=type Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition. This may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase. --- Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be useful (see .node.status.conditions), the ability to deconflict is important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "managed-gitops.redhat.com",
+      "kind": "GitOpsDeploymentManagedEnvironment",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

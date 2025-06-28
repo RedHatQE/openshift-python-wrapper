@@ -1,0 +1,419 @@
+{
+  "description": "A Red Hat OpenShift Logging instance. ClusterLogging is the Schema for the clusterloggings API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "Specification of the desired behavior of ClusterLogging",
+      "type": "object",
+      "properties": {
+        "collection": {
+          "description": "Specification of the Collection component for the cluster"
+        },
+        "curation": {
+          "description": "Deprecated. Specification of the Curation component for the cluster\nThis component was specifically for use with Elasticsearch and was\nreplaced by index management spec",
+          "required": [
+            "type"
+          ]
+        },
+        "forwarder": {
+          "description": "Deprecated. Specification for Forwarder component for the cluster\nSee spec.collection.fluentd"
+        },
+        "logStore": {
+          "description": "Specification of the Log Storage component for the cluster",
+          "required": [
+            "type"
+          ]
+        },
+        "managementState": {
+          "description": "Indicator if the resource is 'Managed' or 'Unmanaged' by the operator",
+          "type": "string",
+          "enum": [
+            "Managed",
+            "Unmanaged"
+          ]
+        },
+        "visualization": {
+          "description": "Specification of the Visualization component for the cluster",
+          "required": [
+            "type"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "Status defines the observed state of ClusterLogging",
+      "type": "object",
+      "properties": {
+        "collection": {
+          "description": "Deprecated."
+        },
+        "conditions": {
+          "description": "Conditions is a set of Condition instances.",
+          "type": "array",
+          "items": {
+            "description": "Condition represents an observation of an object's state. Conditions are an\nextension mechanism intended to be used when the details of an observation\nare not a priori known or would not apply to all instances of a given Kind.\n\n\nConditions should be added to explicitly convey properties that users and\ncomponents care about rather than requiring those properties to be inferred\nfrom other observations. Once defined, the meaning of a Condition can not be\nchanged arbitrarily - it becomes part of the API, and has the same\nbackwards- and forwards-compatibility concerns of any other part of the API.",
+            "type": "object",
+            "required": [
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "description": "ConditionReason is intended to be a one-word, CamelCase representation of\nthe category of cause of the current status. It is intended to be used in\nconcise output, such as one-line kubectl get output, and in summarizing\noccurrences of causes.",
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "description": "ConditionType is the type of the condition and is typically a CamelCased\nword or short phrase.\n\n\nCondition types should indicate state in the \"abnormal-true\" polarity. For\nexample, if the condition indicates when a policy is invalid, the \"is valid\"\ncase is probably the norm, so the condition should be called \"Invalid\".",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "curation": {
+          "type": "object",
+          "properties": {
+            "curatorStatus": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "clusterCondition": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "`operator-sdk generate crds` does not allow map-of-slice, must use a named type.",
+                      "type": "array",
+                      "items": {
+                        "description": "Condition represents an observation of an object's state. Conditions are an\nextension mechanism intended to be used when the details of an observation\nare not a priori known or would not apply to all instances of a given Kind.\n\n\nConditions should be added to explicitly convey properties that users and\ncomponents care about rather than requiring those properties to be inferred\nfrom other observations. Once defined, the meaning of a Condition can not be\nchanged arbitrarily - it becomes part of the API, and has the same\nbackwards- and forwards-compatibility concerns of any other part of the API.",
+                        "type": "object",
+                        "required": [
+                          "status",
+                          "type"
+                        ],
+                        "properties": {
+                          "lastTransitionTime": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "reason": {
+                            "description": "ConditionReason is intended to be a one-word, CamelCase representation of\nthe category of cause of the current status. It is intended to be used in\nconcise output, such as one-line kubectl get output, and in summarizing\noccurrences of causes.",
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "description": "ConditionType is the type of the condition and is typically a CamelCased\nword or short phrase.\n\n\nCondition types should indicate state in the \"abnormal-true\" polarity. For\nexample, if the condition indicates when a policy is invalid, the \"is valid\"\ncase is probably the norm, so the condition should be called \"Invalid\".",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "cronJobs": {
+                    "type": "string"
+                  },
+                  "schedules": {
+                    "type": "string"
+                  },
+                  "suspended": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "logStore": {
+          "type": "object",
+          "properties": {
+            "elasticsearchStatus": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cluster": {
+                    "type": "object",
+                    "required": [
+                      "activePrimaryShards",
+                      "activeShards",
+                      "initializingShards",
+                      "numDataNodes",
+                      "numNodes",
+                      "pendingTasks",
+                      "relocatingShards",
+                      "status",
+                      "unassignedShards"
+                    ],
+                    "properties": {
+                      "activePrimaryShards": {
+                        "description": "The number of Active Primary Shards for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "activeShards": {
+                        "description": "The number of Active Shards for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "initializingShards": {
+                        "description": "The number of Initializing Shards for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "numDataNodes": {
+                        "description": "The number of Data Nodes for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "numNodes": {
+                        "description": "The number of Nodes for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "pendingTasks": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "relocatingShards": {
+                        "description": "The number of Relocating Shards for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "status": {
+                        "description": "The current Status of the Elasticsearch Cluster",
+                        "type": "string"
+                      },
+                      "unassignedShards": {
+                        "description": "The number of Unassigned Shards for the Elasticsearch Cluster",
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  },
+                  "clusterConditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "lastTransitionTime",
+                        "status",
+                        "type"
+                      ],
+                      "properties": {
+                        "lastTransitionTime": {
+                          "description": "Last time the condition transitioned from one status to another.",
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "message": {
+                          "description": "Human-readable message indicating details about last transition.",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "description": "Unique, one-word, CamelCase reason for the condition's last transition.",
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "description": "ClusterConditionType is a valid value for ClusterCondition.Type",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "clusterHealth": {
+                    "type": "string"
+                  },
+                  "clusterName": {
+                    "type": "string"
+                  },
+                  "deployments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "nodeConditions": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "lastTransitionTime",
+                          "status",
+                          "type"
+                        ],
+                        "properties": {
+                          "lastTransitionTime": {
+                            "description": "Last time the condition transitioned from one status to another.",
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "message": {
+                            "description": "Human-readable message indicating details about last transition.",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "description": "Unique, one-word, CamelCase reason for the condition's last transition.",
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "description": "ClusterConditionType is a valid value for ClusterCondition.Type",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "nodeCount": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "pods": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "replicaSets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "shardAllocationEnabled": {
+                    "type": "string"
+                  },
+                  "statefulSets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "visualization": {
+          "type": "object",
+          "properties": {
+            "kibanaStatus": {
+              "type": "array",
+              "items": {
+                "description": "KibanaStatus defines the observed state of Kibana",
+                "type": "object",
+                "properties": {
+                  "clusterCondition": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "lastTransitionTime",
+                          "status",
+                          "type"
+                        ],
+                        "properties": {
+                          "lastTransitionTime": {
+                            "description": "Last time the condition transitioned from one status to another.",
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "message": {
+                            "description": "Human-readable message indicating details about last transition.",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "description": "Unique, one-word, CamelCase reason for the condition's last transition.",
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "description": "ClusterConditionType is a valid value for ClusterCondition.Type",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "deployment": {
+                    "type": "string"
+                  },
+                  "pods": {
+                    "description": "The status for each of the Kibana pods for the Visualization component",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "replicaSets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "replicas": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "logging.openshift.io",
+      "kind": "ClusterLogging",
+      "version": "v1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,544 @@
+{
+  "description": "DependencyBuild TODO provide godoc description",
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "scm": {
+          "type": "object",
+          "properties": {
+            "commitHash": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "private": {
+              "type": "boolean"
+            },
+            "scmType": {
+              "type": "string"
+            },
+            "scmURL": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          }
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "buildAttempts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "build": {
+                "type": "object",
+                "required": [
+                  "complete",
+                  "pipelineName"
+                ],
+                "properties": {
+                  "complete": {
+                    "type": "boolean"
+                  },
+                  "diagnosticDockerFile": {
+                    "type": "string"
+                  },
+                  "finishTime": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "pipelineName": {
+                    "type": "string"
+                  },
+                  "results": {
+                    "type": "object",
+                    "required": [
+                      "imageDigest"
+                    ],
+                    "properties": {
+                      "contaminated": {
+                        "type": "boolean"
+                      },
+                      "contaminates": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "allowed": {
+                              "type": "boolean"
+                            },
+                            "buildId": {
+                              "type": "string"
+                            },
+                            "contaminatedArtifacts": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "gav": {
+                              "type": "string"
+                            },
+                            "rebuildAvailable": {
+                              "type": "boolean"
+                            },
+                            "source": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "gavs": {
+                        "description": "The produced GAVs",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "gitArchive": {
+                        "description": "The git archive source information",
+                        "type": "object",
+                        "properties": {
+                          "sha": {
+                            "type": "string"
+                          },
+                          "tag": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "hermeticBuildImage": {
+                        "description": "The hermetic build image produced by the build",
+                        "type": "string"
+                      },
+                      "image": {
+                        "description": "the image resulting from the run",
+                        "type": "string"
+                      },
+                      "imageDigest": {
+                        "type": "string"
+                      },
+                      "pipelineResults": {
+                        "description": "The Tekton results",
+                        "type": "object",
+                        "properties": {
+                          "logs": {
+                            "type": "string"
+                          },
+                          "record": {
+                            "type": "string"
+                          },
+                          "result": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "verificationFailures": {
+                        "type": "string"
+                      },
+                      "verified": {
+                        "description": "If the resulting image was verified",
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "startTime": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "succeeded": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "buildId": {
+                "type": "string"
+              },
+              "buildRecipe": {
+                "type": "object",
+                "properties": {
+                  "additionalDownloads": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "binaryPath": {
+                          "type": "string"
+                        },
+                        "fileName": {
+                          "type": "string"
+                        },
+                        "packageName": {
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "additionalMemory": {
+                    "type": "integer"
+                  },
+                  "allowedDifferences": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "commandLine": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "contextPath": {
+                    "type": "string"
+                  },
+                  "disableSubmodules": {
+                    "type": "boolean"
+                  },
+                  "disabledPlugins": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "enforceVersion": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "javaVersion": {
+                    "type": "string"
+                  },
+                  "pipeline": {
+                    "description": "Deprecated",
+                    "type": "string"
+                  },
+                  "postBuildScript": {
+                    "type": "string"
+                  },
+                  "preBuildScript": {
+                    "type": "string"
+                  },
+                  "repositories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "tool": {
+                    "type": "string"
+                  },
+                  "toolVersion": {
+                    "type": "string"
+                  },
+                  "toolVersions": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "builderImages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "baseBuilderImage": {
+                "type": "string"
+              },
+              "builtImageDigest": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "commitTime": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "conditions": {
+          "description": "Conditions for capturing generic status NOTE: inspecting the fabric8 Status class, it looked analogous to k8s Condition, and then I took the liberty of making it an array, given best practices in the k8s/ocp ecosystems",
+          "type": "array",
+          "items": {
+            "description": "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, \n \ttype FooStatus struct{ \t    // Represents the observations of a foo's current state. \t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\" \t    // +patchMergeKey=type \t    // +patchStrategy=merge \t    // +listType=map \t    // +listMapKey=type \t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n \t    // other fields \t}",
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "description": "lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "description": "message is a human readable message indicating details about the transition. This may be an empty string.",
+                "type": "string",
+                "maxLength": 32768
+              },
+              "observedGeneration": {
+                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.",
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0
+              },
+              "reason": {
+                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.",
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 1,
+                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+              },
+              "status": {
+                "description": "status of the condition, one of True, False, Unknown.",
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "description": "type of condition in CamelCase or in foo.example.com/CamelCase. --- Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be useful (see .node.status.conditions), the ability to deconflict is important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        },
+        "contaminates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "allowed": {
+                "type": "boolean"
+              },
+              "buildId": {
+                "type": "string"
+              },
+              "contaminatedArtifacts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "gav": {
+                "type": "string"
+              },
+              "rebuildAvailable": {
+                "type": "boolean"
+              },
+              "source": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "deployedArtifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "discoveryPipelineResults": {
+          "description": "A representation of the Tekton Results records for a pipeline",
+          "type": "object",
+          "properties": {
+            "logs": {
+              "type": "string"
+            },
+            "record": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string"
+            }
+          }
+        },
+        "failedVerification": {
+          "type": "boolean"
+        },
+        "hermetic": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "pipelineRetries": {
+          "type": "integer"
+        },
+        "potentialBuildRecipes": {
+          "description": "PotentialBuildRecipes additional recipes to try if the current recipe fails",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "additionalDownloads": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "binaryPath": {
+                      "type": "string"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "packageName": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "additionalMemory": {
+                "type": "integer"
+              },
+              "allowedDifferences": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "commandLine": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contextPath": {
+                "type": "string"
+              },
+              "disableSubmodules": {
+                "type": "boolean"
+              },
+              "disabledPlugins": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "enforceVersion": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "javaVersion": {
+                "type": "string"
+              },
+              "pipeline": {
+                "description": "Deprecated",
+                "type": "string"
+              },
+              "postBuildScript": {
+                "type": "string"
+              },
+              "preBuildScript": {
+                "type": "string"
+              },
+              "repositories": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "tool": {
+                "type": "string"
+              },
+              "toolVersion": {
+                "type": "string"
+              },
+              "toolVersions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "potentialBuildRecipesIndex": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "jvmbuildservice.io",
+      "kind": "DependencyBuild",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

@@ -1,0 +1,426 @@
+{
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "ciOperator"
+      ],
+      "properties": {
+        "ciOperator": {
+          "description": "CIOperatorSpec contains what is needed to run ci-operator",
+          "type": "object",
+          "properties": {
+            "releases": {
+              "type": "object",
+              "additionalProperties": {
+                "description": "UnresolvedRelease describes a semantic release payload\nidentifier we need to resolve to a pull spec.",
+                "type": "object",
+                "properties": {
+                  "candidate": {
+                    "description": "Candidate describes a candidate release payload",
+                    "type": "object",
+                    "required": [
+                      "product",
+                      "stream",
+                      "version"
+                    ],
+                    "properties": {
+                      "architecture": {
+                        "description": "Architecture is the architecture for the product.\nDefaults to amd64.",
+                        "type": "string"
+                      },
+                      "product": {
+                        "description": "Product is the name of the product being released",
+                        "type": "string"
+                      },
+                      "relative": {
+                        "description": "Relative optionally specifies how old of a release\nis requested from this stream. For instance, a value\nof 1 will resolve to the previous validated release\nfor this stream.",
+                        "type": "integer"
+                      },
+                      "stream": {
+                        "description": "ReleaseStream is the stream from which we pick the latest candidate",
+                        "type": "string"
+                      },
+                      "version": {
+                        "description": "Version is the minor version to search for",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "integration": {
+                    "description": "Integration describes an integration stream which we can create a payload out of",
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "namespace"
+                    ],
+                    "properties": {
+                      "include_built_images": {
+                        "description": "IncludeBuiltImages determines if the release we assemble will include\nimages built during the test itself.",
+                        "type": "boolean"
+                      },
+                      "name": {
+                        "description": "Name is the name of the ImageStream",
+                        "type": "string"
+                      },
+                      "namespace": {
+                        "description": "Namespace is the namespace in which the integration stream lives.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "prerelease": {
+                    "description": "Prerelease describes a yet-to-be released payload",
+                    "type": "object",
+                    "required": [
+                      "product",
+                      "version_bounds"
+                    ],
+                    "properties": {
+                      "architecture": {
+                        "description": "Architecture is the architecture for the product.\nDefaults to amd64.",
+                        "type": "string"
+                      },
+                      "product": {
+                        "description": "Product is the name of the product being released",
+                        "type": "string"
+                      },
+                      "relative": {
+                        "description": "Relative optionally specifies how old of a release\nis requested from this stream. For instance, a value\nof 1 will resolve to the previous validated release\nfor this stream.",
+                        "type": "integer"
+                      },
+                      "version_bounds": {
+                        "description": "VersionBounds describe the allowable version bounds to search in",
+                        "type": "object",
+                        "required": [
+                          "lower",
+                          "upper"
+                        ],
+                        "properties": {
+                          "lower": {
+                            "type": "string"
+                          },
+                          "stream": {
+                            "description": "Stream dictates which stream to search for a version within the specified bounds\ndefaults to 4-stable.",
+                            "type": "string"
+                          },
+                          "upper": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "release": {
+                    "description": "Release describes a released payload",
+                    "type": "object",
+                    "required": [
+                      "channel",
+                      "version"
+                    ],
+                    "properties": {
+                      "architecture": {
+                        "description": "Architecture is the architecture for the release.\nDefaults to amd64.",
+                        "type": "string"
+                      },
+                      "channel": {
+                        "description": "Channel is the release channel to search in",
+                        "type": "string"
+                      },
+                      "version": {
+                        "description": "Version is the minor version to search for",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "resources": {
+              "description": "ResourceConfiguration defines resource overrides for jobs run\nby the operator.",
+              "type": "object",
+              "additionalProperties": {
+                "description": "ResourceRequirements are resource requests and limits applied\nto the individual steps in the job. They are passed directly to\nbuilds or pods.",
+                "type": "object",
+                "properties": {
+                  "limits": {
+                    "description": "Limits are resource limits applied to an individual step in the job.\nThese are directly used in creating the Pods that execute the Job.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "requests": {
+                    "description": "Requests are resource requests applied to an individual step in the job.\nThese are directly used in creating the Pods that execute the Job.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "test": {
+              "description": "TestSpec determines the workflow will be executed by the ci-operator to provision a cluster.",
+              "type": "object",
+              "properties": {
+                "clusterProfile": {
+                  "type": "string"
+                },
+                "env": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "workflow": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "claimRef": {
+          "type": "object",
+          "required": [
+            "apiVersion",
+            "kind",
+            "namespace",
+            "name"
+          ],
+          "properties": {
+            "apiVersion": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        },
+        "compositionRef": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "compositionRevisionRef": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "compositionRevisionSelector": {
+          "type": "object",
+          "required": [
+            "matchLabels"
+          ],
+          "properties": {
+            "matchLabels": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "compositionSelector": {
+          "type": "object",
+          "required": [
+            "matchLabels"
+          ],
+          "properties": {
+            "matchLabels": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "compositionUpdatePolicy": {
+          "type": "string",
+          "enum": [
+            "Automatic",
+            "Manual"
+          ]
+        },
+        "publishConnectionDetailsTo": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "configRef": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "annotations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "resourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "apiVersion",
+              "kind"
+            ],
+            "properties": {
+              "apiVersion": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-type": "atomic"
+        },
+        "tearDownCluster": {
+          "description": "When set to true, signals the controller that the ephemeral cluster is no longer needed,\nallowing decommissioning procedures to begin.",
+          "type": "boolean"
+        },
+        "writeConnectionSecretToRef": {
+          "type": "object",
+          "required": [
+            "name",
+            "namespace"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "claimConditionTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-kubernetes-list-type": "set"
+        },
+        "conditions": {
+          "description": "Conditions of the resource.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "lastTransitionTime",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "lastTransitionTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "message": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "x-kubernetes-list-map-keys": [
+            "type"
+          ],
+          "x-kubernetes-list-type": "map"
+        },
+        "connectionDetails": {
+          "type": "object",
+          "properties": {
+            "lastPublishedTime": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ci.openshift.org",
+      "kind": "XTestPlatformCluster",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

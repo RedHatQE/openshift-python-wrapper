@@ -1,0 +1,190 @@
+{
+  "description": "STSSessionToken uses the GetSessionToken API to retrieve an authorization token.\nThe authorization token is valid for 12 hours.\nThe authorizationToken returned is a base64 encoded string that can be decoded.\nFor more information, see GetSessionToken (https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html).",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "region"
+      ],
+      "properties": {
+        "auth": {
+          "description": "Auth defines how to authenticate with AWS",
+          "type": "object",
+          "properties": {
+            "jwt": {
+              "description": "Authenticate against AWS using service account tokens.",
+              "type": "object",
+              "properties": {
+                "serviceAccountRef": {
+                  "description": "A reference to a ServiceAccount resource.",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "audiences": {
+                      "description": "Audience specifies the `aud` claim for the service account token\nIf the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity\nthen this audiences will be appended to the list",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "name": {
+                      "description": "The name of the ServiceAccount resource being referred to.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+                    },
+                    "namespace": {
+                      "description": "Namespace of the resource being referred to.\nIgnored if referent is not cluster-scoped, otherwise defaults to the namespace of the referent.",
+                      "type": "string",
+                      "maxLength": 63,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                    }
+                  }
+                }
+              }
+            },
+            "secretRef": {
+              "description": "AWSAuthSecretRef holds secret references for AWS credentials\nboth AccessKeyID and SecretAccessKey must be defined in order to properly authenticate.",
+              "type": "object",
+              "properties": {
+                "accessKeyIDSecretRef": {
+                  "description": "The AccessKeyID is used for authentication",
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "description": "A key in the referenced Secret.\nSome instances of this field may be defaulted, in others it may be required.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[-._a-zA-Z0-9]+$"
+                    },
+                    "name": {
+                      "description": "The name of the Secret resource being referred to.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+                    },
+                    "namespace": {
+                      "description": "The namespace of the Secret resource being referred to.\nIgnored if referent is not cluster-scoped, otherwise defaults to the namespace of the referent.",
+                      "type": "string",
+                      "maxLength": 63,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                    }
+                  }
+                },
+                "secretAccessKeySecretRef": {
+                  "description": "The SecretAccessKey is used for authentication",
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "description": "A key in the referenced Secret.\nSome instances of this field may be defaulted, in others it may be required.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[-._a-zA-Z0-9]+$"
+                    },
+                    "name": {
+                      "description": "The name of the Secret resource being referred to.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+                    },
+                    "namespace": {
+                      "description": "The namespace of the Secret resource being referred to.\nIgnored if referent is not cluster-scoped, otherwise defaults to the namespace of the referent.",
+                      "type": "string",
+                      "maxLength": 63,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                    }
+                  }
+                },
+                "sessionTokenSecretRef": {
+                  "description": "The SessionToken used for authentication\nThis must be defined if AccessKeyID and SecretAccessKey are temporary credentials\nsee: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html",
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "description": "A key in the referenced Secret.\nSome instances of this field may be defaulted, in others it may be required.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[-._a-zA-Z0-9]+$"
+                    },
+                    "name": {
+                      "description": "The name of the Secret resource being referred to.",
+                      "type": "string",
+                      "maxLength": 253,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+                    },
+                    "namespace": {
+                      "description": "The namespace of the Secret resource being referred to.\nIgnored if referent is not cluster-scoped, otherwise defaults to the namespace of the referent.",
+                      "type": "string",
+                      "maxLength": 63,
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "region": {
+          "description": "Region specifies the region to operate in.",
+          "type": "string"
+        },
+        "requestParameters": {
+          "description": "RequestParameters contains parameters that can be passed to the STS service.",
+          "type": "object",
+          "properties": {
+            "serialNumber": {
+              "description": "SerialNumber is the identification number of the MFA device that is associated with the IAM user who is making\nthe GetSessionToken call.\nPossible values: hardware device (such as GAHT12345678) or an Amazon Resource Name (ARN) for a virtual device\n(such as arn:aws:iam::123456789012:mfa/user)",
+              "type": "string"
+            },
+            "sessionDuration": {
+              "description": "SessionDuration The duration, in seconds, that the credentials should remain valid. Acceptable durations for\nIAM user sessions range from 900 seconds (15 minutes) to 129,600 seconds (36 hours), with 43,200 seconds\n(12 hours) as the default.",
+              "type": "integer",
+              "format": "int64"
+            },
+            "tokenCode": {
+              "description": "TokenCode is the value provided by the MFA device, if MFA is required.",
+              "type": "string"
+            }
+          }
+        },
+        "role": {
+          "description": "You can assume a role before making calls to the\ndesired AWS service.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "generators.external-secrets.io",
+      "kind": "STSSessionToken",
+      "version": "v1alpha1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

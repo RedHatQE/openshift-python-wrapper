@@ -1,0 +1,65 @@
+{
+  "description": "A GoTemplate is used to provide templates to this Function.",
+  "type": "object",
+  "required": [
+    "source"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "delims": {
+      "description": "Template delimiters",
+      "type": "object",
+      "properties": {
+        "left": {
+          "description": "Template start characters",
+          "type": "string"
+        },
+        "right": {
+          "description": "Template end characters",
+          "type": "string"
+        }
+      }
+    },
+    "fileSystem": {
+      "description": "FileSystem is the folder path where the templates are located",
+      "type": "object",
+      "properties": {
+        "dirPath": {
+          "type": "string"
+        }
+      }
+    },
+    "inline": {
+      "description": "Inline is the inline form input of the templates",
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string"
+        }
+      }
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "source": {
+      "description": "Source specifies the different types of input sources that can be used with this function",
+      "type": "string"
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "gotemplating.fn.crossplane.io",
+      "kind": "GoTemplate",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}

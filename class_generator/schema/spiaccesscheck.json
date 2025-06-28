@@ -1,0 +1,102 @@
+{
+  "description": "SPIAccessCheck is the Schema for the spiaccesschecks API",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "SPIAccessCheckSpec defines the desired state of SPIAccessCheck",
+      "type": "object",
+      "required": [
+        "repoUrl"
+      ],
+      "properties": {
+        "permissions": {
+          "description": "Permissions is a collection of operator-defined permissions (which are translated to service-provider-specific scopes) and potentially additional service-provider-specific scopes that are not covered by the operator defined abstraction. The permissions are used in SPIAccessTokenBinding objects to express the requirements on the tokens as well as in the SPIAccessToken objects to express the \"capabilities\" of the token.",
+          "type": "object",
+          "properties": {
+            "additionalScopes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "required": {
+              "type": "array",
+              "items": {
+                "description": "Permission is an element of Permissions and express a requirement on the service provider scopes in an agnostic manner.",
+                "type": "object",
+                "required": [
+                  "area",
+                  "type"
+                ],
+                "properties": {
+                  "area": {
+                    "description": "Area express the \"area\" in the service provider scopes to which the permission is required.",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Type is the type of the permission required",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "repoUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "description": "SPIAccessCheckStatus defines the observed state of SPIAccessCheck",
+      "type": "object",
+      "required": [
+        "accessibility",
+        "accessible",
+        "repoType",
+        "serviceProvider"
+      ],
+      "properties": {
+        "accessibility": {
+          "type": "string"
+        },
+        "accessible": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "errorReason": {
+          "type": "string"
+        },
+        "repoType": {
+          "type": "string"
+        },
+        "serviceProvider": {
+          "description": "ServiceProviderType defines the set of supported service providers",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "appstudio.redhat.com",
+      "kind": "SPIAccessCheck",
+      "version": "v1beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
