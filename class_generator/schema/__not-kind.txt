@@ -1066,3 +1066,7 @@ io.external-secrets.v1beta1.ClusterExternalSecretList
 io.openshift.managed.v1alpha2.VeleroInstallList
 com.redhat.appstudio.v1beta2.IntegrationTestScenarioList
 io.external-secrets.v1alpha1.SecretStoreList
+io.llamastack.v1alpha1.LlamaStackDistributionList
+org.kubeflow.pipelines.v2beta1.PipelineList
+org.kubeflow.pipelines.v2beta1.PipelineVersionList
+io.opendatahub.platform.components.v1alpha1.LlamaStackOperatorList
