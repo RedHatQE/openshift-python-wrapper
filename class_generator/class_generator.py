@@ -649,7 +649,7 @@ def class_generator(
             elif run_update_schema.lower() == "y":
                 update_kind_schema()
 
-                class_generator(
+                return class_generator(
                     overwrite=overwrite,
                     dry_run=dry_run,
                     kind=kind,
