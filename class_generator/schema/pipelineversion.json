@@ -1,0 +1,91 @@
+{
+  "description": "PipelineVersion is the Schema for the pipelineversions API.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "PipelineVersionSpec defines the desired state of PipelineVersion.",
+      "type": "object",
+      "required": [
+        "pipelineSpec"
+      ],
+      "properties": {
+        "codeSourceURL": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "pipelineName": {
+          "type": "string"
+        },
+        "pipelineSpec": {
+          "x-kubernetes-preserve-unknown-fields": true
+        }
+      }
+    },
+    "status": {
+      "description": "PipelineVersionStatus defines the observed state of PipelineVersion.",
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "description": "SimplifiedCondition is a metav1.Condition without lastTransitionTime since the database model doesn't have such\na concept and it allows a default status in the CRD without a controller setting it.",
+            "type": "object",
+            "required": [
+              "message",
+              "reason",
+              "status",
+              "type"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "maxLength": 32768
+              },
+              "reason": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "True",
+                  "False",
+                  "Unknown"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "maxLength": 316,
+                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "pipelines.kubeflow.org",
+      "kind": "PipelineVersion",
+      "version": "v2beta1"
+    }
+  ],
+  "$schema": "http://json-schema.org/schema#"
+}
