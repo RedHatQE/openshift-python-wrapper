@@ -62,6 +62,9 @@ fcn_exclude_functions =
     subprocess,
     urlparse,
     parse_qs,
+    self,
+    defaultdict,
+    add_row,
 
 enable-extensions =
     FCN,

@@ -1,0 +1,41 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.console_config_openshift_io import Console
+
+
+class TestConsole:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def console(self, client):
+        return Console(
+            client=client,
+            name="test-console",
+        )
+
+    def test_create_console(self, console):
+        """Test creating Console"""
+        deployed_resource = console.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-console"
+        assert console.exists
+
+    def test_get_console(self, console):
+        """Test getting Console"""
+        assert console.instance
+        assert console.kind == "Console"
+
+    def test_update_console(self, console):
+        """Test updating Console"""
+        resource_dict = console.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        console.update(resource_dict=resource_dict)
+        assert console.labels["updated"] == "true"
+
+    def test_delete_console(self, console):
+        """Test deleting Console"""
+        console.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately

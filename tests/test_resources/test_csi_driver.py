@@ -1,0 +1,41 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.csi_driver import CSIDriver
+
+
+class TestCSIDriver:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def csidriver(self, client):
+        return CSIDriver(
+            client=client,
+            name="test-csidriver",
+        )
+
+    def test_create_csidriver(self, csidriver):
+        """Test creating CSIDriver"""
+        deployed_resource = csidriver.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-csidriver"
+        assert csidriver.exists
+
+    def test_get_csidriver(self, csidriver):
+        """Test getting CSIDriver"""
+        assert csidriver.instance
+        assert csidriver.kind == "CSIDriver"
+
+    def test_update_csidriver(self, csidriver):
+        """Test updating CSIDriver"""
+        resource_dict = csidriver.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        csidriver.update(resource_dict=resource_dict)
+        assert csidriver.labels["updated"] == "true"
+
+    def test_delete_csidriver(self, csidriver):
+        """Test deleting CSIDriver"""
+        csidriver.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately

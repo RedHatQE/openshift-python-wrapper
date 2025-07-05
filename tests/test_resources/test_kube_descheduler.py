@@ -1,0 +1,42 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.kube_descheduler import KubeDescheduler
+
+
+class TestKubeDescheduler:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def kubedescheduler(self, client):
+        return KubeDescheduler(
+            client=client,
+            name="test-kubedescheduler",
+            namespace="default",
+        )
+
+    def test_create_kubedescheduler(self, kubedescheduler):
+        """Test creating KubeDescheduler"""
+        deployed_resource = kubedescheduler.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-kubedescheduler"
+        assert kubedescheduler.exists
+
+    def test_get_kubedescheduler(self, kubedescheduler):
+        """Test getting KubeDescheduler"""
+        assert kubedescheduler.instance
+        assert kubedescheduler.kind == "KubeDescheduler"
+
+    def test_update_kubedescheduler(self, kubedescheduler):
+        """Test updating KubeDescheduler"""
+        resource_dict = kubedescheduler.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        kubedescheduler.update(resource_dict=resource_dict)
+        assert kubedescheduler.labels["updated"] == "true"
+
+    def test_delete_kubedescheduler(self, kubedescheduler):
+        """Test deleting KubeDescheduler"""
+        kubedescheduler.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately

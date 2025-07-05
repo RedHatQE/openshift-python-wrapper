@@ -1,0 +1,41 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.virtual_machine_cluster_preference import VirtualMachineClusterPreference
+
+
+class TestVirtualMachineClusterPreference:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def virtualmachineclusterpreference(self, client):
+        return VirtualMachineClusterPreference(
+            client=client,
+            name="test-virtualmachineclusterpreference",
+        )
+
+    def test_create_virtualmachineclusterpreference(self, virtualmachineclusterpreference):
+        """Test creating VirtualMachineClusterPreference"""
+        deployed_resource = virtualmachineclusterpreference.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-virtualmachineclusterpreference"
+        assert virtualmachineclusterpreference.exists
+
+    def test_get_virtualmachineclusterpreference(self, virtualmachineclusterpreference):
+        """Test getting VirtualMachineClusterPreference"""
+        assert virtualmachineclusterpreference.instance
+        assert virtualmachineclusterpreference.kind == "VirtualMachineClusterPreference"
+
+    def test_update_virtualmachineclusterpreference(self, virtualmachineclusterpreference):
+        """Test updating VirtualMachineClusterPreference"""
+        resource_dict = virtualmachineclusterpreference.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        virtualmachineclusterpreference.update(resource_dict=resource_dict)
+        assert virtualmachineclusterpreference.labels["updated"] == "true"
+
+    def test_delete_virtualmachineclusterpreference(self, virtualmachineclusterpreference):
+        """Test deleting VirtualMachineClusterPreference"""
+        virtualmachineclusterpreference.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately

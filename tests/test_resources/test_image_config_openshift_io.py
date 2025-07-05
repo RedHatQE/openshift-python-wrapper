@@ -1,0 +1,41 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.image_config_openshift_io import Image
+
+
+class TestImage:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def image(self, client):
+        return Image(
+            client=client,
+            name="test-image",
+        )
+
+    def test_create_image(self, image):
+        """Test creating Image"""
+        deployed_resource = image.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-image"
+        assert image.exists
+
+    def test_get_image(self, image):
+        """Test getting Image"""
+        assert image.instance
+        assert image.kind == "Image"
+
+    def test_update_image(self, image):
+        """Test updating Image"""
+        resource_dict = image.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        image.update(resource_dict=resource_dict)
+        assert image.labels["updated"] == "true"
+
+    def test_delete_image(self, image):
+        """Test deleting Image"""
+        image.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately

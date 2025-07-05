@@ -1,0 +1,41 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.mtq import MTQ
+
+
+class TestMTQ:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def mtq(self, client):
+        return MTQ(
+            client=client,
+            name="test-mtq",
+        )
+
+    def test_create_mtq(self, mtq):
+        """Test creating MTQ"""
+        deployed_resource = mtq.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-mtq"
+        assert mtq.exists
+
+    def test_get_mtq(self, mtq):
+        """Test getting MTQ"""
+        assert mtq.instance
+        assert mtq.kind == "MTQ"
+
+    def test_update_mtq(self, mtq):
+        """Test updating MTQ"""
+        resource_dict = mtq.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        mtq.update(resource_dict=resource_dict)
+        assert mtq.labels["updated"] == "true"
+
+    def test_delete_mtq(self, mtq):
+        """Test deleting MTQ"""
+        mtq.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately

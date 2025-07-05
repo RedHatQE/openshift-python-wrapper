@@ -1,0 +1,41 @@
+import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.cdi_config import CDIConfig
+
+
+class TestCDIConfig:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def cdiconfig(self, client):
+        return CDIConfig(
+            client=client,
+            name="test-cdiconfig",
+        )
+
+    def test_create_cdiconfig(self, cdiconfig):
+        """Test creating CDIConfig"""
+        deployed_resource = cdiconfig.deploy()
+        assert deployed_resource
+        assert deployed_resource.name == "test-cdiconfig"
+        assert cdiconfig.exists
+
+    def test_get_cdiconfig(self, cdiconfig):
+        """Test getting CDIConfig"""
+        assert cdiconfig.instance
+        assert cdiconfig.kind == "CDIConfig"
+
+    def test_update_cdiconfig(self, cdiconfig):
+        """Test updating CDIConfig"""
+        resource_dict = cdiconfig.instance.to_dict()
+        resource_dict["metadata"]["labels"] = {"updated": "true"}
+        cdiconfig.update(resource_dict=resource_dict)
+        assert cdiconfig.labels["updated"] == "true"
+
+    def test_delete_cdiconfig(self, cdiconfig):
+        """Test deleting CDIConfig"""
+        cdiconfig.clean_up(wait=False)
+        # Note: In real clusters, you might want to verify deletion
+        # but with fake client, clean_up() removes the resource immediately
