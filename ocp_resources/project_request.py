@@ -1,8 +1,9 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any, Optional
-from ocp_resources.resource import Resource
+
 from ocp_resources.project_project_openshift_io import Project
+from ocp_resources.resource import Resource
 
 
 class ProjectRequest(Resource):
@@ -45,4 +46,4 @@ class ProjectRequest(Resource):
     # End of generated code
 
     def clean_up(self, wait: bool = True, timeout: Optional[int] = None) -> bool:
-        return Project(name=self.name).clean_up(wait=wait, timeout=timeout)
+        return Project(name=self.name, client=self.client).clean_up(wait=wait, timeout=timeout)
