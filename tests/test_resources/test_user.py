@@ -38,5 +38,5 @@ class TestUser:
     def test_delete_user(self, user):
         """Test deleting User"""
         user.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not user.exists

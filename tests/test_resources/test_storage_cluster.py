@@ -38,5 +38,5 @@ class TestStorageCluster:
     def test_delete_storagecluster(self, storagecluster):
         """Test deleting StorageCluster"""
         storagecluster.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not storagecluster.exists

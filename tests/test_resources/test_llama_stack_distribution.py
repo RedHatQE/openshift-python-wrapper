@@ -39,5 +39,5 @@ class TestLlamaStackDistribution:
     def test_delete_llamastackdistribution(self, llamastackdistribution):
         """Test deleting LlamaStackDistribution"""
         llamastackdistribution.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not llamastackdistribution.exists

@@ -40,5 +40,5 @@ class TestVirtualMachineInstancetype:
     def test_delete_virtualmachineinstancetype(self, virtualmachineinstancetype):
         """Test deleting VirtualMachineInstancetype"""
         virtualmachineinstancetype.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not virtualmachineinstancetype.exists

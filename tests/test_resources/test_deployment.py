@@ -44,5 +44,5 @@ class TestDeployment:
     def test_delete_deployment(self, deployment):
         """Test deleting Deployment"""
         deployment.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not deployment.exists

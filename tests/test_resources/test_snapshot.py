@@ -39,5 +39,5 @@ class TestSnapshot:
     def test_delete_snapshot(self, snapshot):
         """Test deleting Snapshot"""
         snapshot.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not snapshot.exists

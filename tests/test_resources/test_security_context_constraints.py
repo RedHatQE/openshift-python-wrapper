@@ -44,5 +44,5 @@ class TestSecurityContextConstraints:
     def test_delete_securitycontextconstraints(self, securitycontextconstraints):
         """Test deleting SecurityContextConstraints"""
         securitycontextconstraints.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not securitycontextconstraints.exists

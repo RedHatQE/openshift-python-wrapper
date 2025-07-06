@@ -38,5 +38,5 @@ class TestMachine:
     def test_delete_machine(self, machine):
         """Test deleting Machine"""
         machine.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not machine.exists

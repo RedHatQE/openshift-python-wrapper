@@ -37,5 +37,5 @@ class TestNodeNetworkConfigurationPolicy:
     def test_delete_nodenetworkconfigurationpolicy(self, nodenetworkconfigurationpolicy):
         """Test deleting NodeNetworkConfigurationPolicy"""
         nodenetworkconfigurationpolicy.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not nodenetworkconfigurationpolicy.exists

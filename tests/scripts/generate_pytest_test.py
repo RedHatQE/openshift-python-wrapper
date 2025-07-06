@@ -50,6 +50,13 @@ console = Console()
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+# Static mapping of ephemeral resources to their actual resource types
+EPHEMERAL_RESOURCES = {
+    "ProjectRequest": "Project",  # ProjectRequest creates Project
+    # Add more ephemeral resources here as discovered:
+    # "SomeOtherEphemeralResource": "ActualResourceType",
+}
+
 
 @dataclass
 class ResourceInfo:
@@ -63,6 +70,8 @@ class ResourceInfo:
     required_params: list[str] = field(default_factory=list)
     optional_params: list[str] = field(default_factory=list)
     has_containers: bool = False
+    is_ephemeral: bool = False  # True if resource is ephemeral (e.g. ProjectRequest)
+    actual_resource_type: str | None = None  # The actual resource type created (e.g. "Project")
 
 
 @dataclass
@@ -138,12 +147,15 @@ class ResourceScanner:
     def _extract_resource_info(self, class_node: ast.ClassDef, file_path: Path, content: str) -> ResourceInfo:
         """Extract detailed information from a resource class"""
         name = class_node.name
-        base_class = (
-            "NamespacedResource"
-            if "NamespacedResource"
-            in [base.id if isinstance(base, ast.Name) else base.attr for base in class_node.bases]
-            else "Resource"
-        )
+        # Determine base class type
+        base_class = "Resource"
+        for base in class_node.bases:
+            if isinstance(base, ast.Name) and base.id == "NamespacedResource":
+                base_class = "NamespacedResource"
+                break
+            elif isinstance(base, ast.Attribute) and base.attr == "NamespacedResource":
+                base_class = "NamespacedResource"
+                break
 
         # Analyze __init__ method for parameters
         required_params, optional_params, has_containers = self._analyze_init_method(class_node)
@@ -158,6 +170,9 @@ class ResourceScanner:
         # Extract API version and group from class attributes or content
         api_version, api_group = self._extract_api_info(class_node, content)
 
+        # Detect ephemeral resources
+        is_ephemeral, actual_resource_type = self._handle_ephemeral_resource(name)
+
         return ResourceInfo(
             name=name,
             file_path=str(file_path),
@@ -167,6 +182,8 @@ class ResourceScanner:
             required_params=required_params,
             optional_params=optional_params,
             has_containers=has_containers,
+            is_ephemeral=is_ephemeral,
+            actual_resource_type=actual_resource_type,
         )
 
     def _analyze_init_method(self, class_node: ast.ClassDef) -> tuple[list[str], list[str], bool]:
@@ -254,7 +271,7 @@ class ResourceScanner:
     def _extract_attribute_value(self, attr_node: ast.Attribute) -> str | None:
         """Extract value from attribute access like Resource.ApiVersion.V1"""
         parts = []
-        current = attr_node
+        current: ast.expr = attr_node
 
         while isinstance(current, ast.Attribute):
             parts.append(current.attr)
@@ -264,6 +281,16 @@ class ResourceScanner:
             parts.append(current.id)
 
         return ".".join(reversed(parts)) if parts else None
+
+    def _handle_ephemeral_resource(self, resource_name: str) -> tuple[bool, str | None]:
+        """
+        Check if a resource is ephemeral using static mapping.
+
+        Returns:
+            tuple[bool, str | None]: (is_ephemeral, actual_resource_type)
+        """
+        actual_type = EPHEMERAL_RESOURCES.get(resource_name)
+        return (actual_type is not None, actual_type)
 
 
 class TestAnalyzer:
@@ -338,7 +365,9 @@ class TestGenerator:
 
     def generate_test_for_resource(self, resource: ResourceInfo) -> str:
         """Generate test code for a specific resource"""
-        template = self.template_env.get_template(name="test_template.j2")
+        # Choose template based on whether resource is ephemeral
+        template_name = "ephemeral_template.j2" if resource.is_ephemeral else "test_template.j2"
+        template = self.template_env.get_template(name=template_name)
 
         # Generate test data
         test_data = self._generate_test_data(resource)
@@ -485,9 +514,80 @@ class {{ class_name }}:
     def test_delete_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test deleting {{ resource.name }}"""
         {{ fixture_name }}.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
-'''
+        # Verify resource no longer exists after deletion
+        assert not {{ fixture_name }}.exists
+''',
+            "ephemeral_template.j2": '''import pytest
+from fake_kubernetes_client import FakeDynamicClient
+from ocp_resources.{{ module_name }} import {{ resource.name }}
+{%- if resource.actual_resource_type == "Project" %}
+from ocp_resources.project_project_openshift_io import Project
+{%- endif %}
+
+class {{ class_name }}:
+    @pytest.fixture(scope="class")
+    def client(self):
+        return FakeDynamicClient()
+
+    @pytest.fixture(scope="class")
+    def {{ fixture_name }}(self, client):
+        return {{ resource.name }}(
+            client=client,
+{%- for key, value in test_data.items() %}
+{%- if key == "name" %}
+            name="{{ value }}",
+{%- elif key == "namespace" %}
+            namespace="{{ value }}",
+{%- elif value is string %}
+            {{ key }}="{{ value }}",
+{%- else %}
+            {{ key }}={{ value | python_repr }},
+{%- endif %}
+{%- endfor %}
+        )
+
+    def test_create_{{ fixture_name }}(self, {{ fixture_name }}):
+        """Test creating ephemeral {{ resource.name }} (creates {{ resource.actual_resource_type }})"""
+        # Create the ephemeral resource - this returns raw ResourceInstance
+        actual_resource_instance = {{ fixture_name }}.create()
+
+        # Wrap in proper Resource object to use ocp-resources methods
+        actual_resource = {{ resource.actual_resource_type }}(
+            client={{ fixture_name }}.client,
+            name=actual_resource_instance.metadata.name
+        )
+
+        # Verify the actual resource was created and has correct properties
+        assert actual_resource.name == "{{ test_data.name }}"
+        assert actual_resource.exists
+        assert actual_resource.kind == "{{ resource.actual_resource_type }}"
+        # The ephemeral resource itself should not exist after creation
+        assert not {{ fixture_name }}.exists
+
+    def test_get_{{ fixture_name }}(self, {{ fixture_name }}):
+        """Test getting {{ resource.name }} properties"""
+        # We can still access the ephemeral resource's properties before deployment
+        assert {{ fixture_name }}.kind == "{{ resource.name }}"
+        assert {{ fixture_name }}.name == "{{ test_data.name }}"
+
+    def test_delete_{{ fixture_name }}(self, {{ fixture_name }}):
+        """Test deleting {{ resource.name }} (deletes {{ resource.actual_resource_type }})"""
+        # First create to get the actual resource
+        actual_resource_instance = {{ fixture_name }}.create()
+
+        # Wrap in proper Resource object
+        actual_resource = {{ resource.actual_resource_type }}(
+            client={{ fixture_name }}.client,
+            name=actual_resource_instance.metadata.name
+        )
+        assert actual_resource.exists
+
+        # Clean up should delete the actual resource, not the ephemeral one
+        {{ fixture_name }}.clean_up(wait=False)
+
+        # Verify the actual resource no longer exists using Resource methods
+        assert not actual_resource.exists
+''',
         }
 
 

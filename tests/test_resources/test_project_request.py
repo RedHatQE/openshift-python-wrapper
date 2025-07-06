@@ -1,6 +1,7 @@
 import pytest
 from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.project_request import ProjectRequest
+from ocp_resources.project_project_openshift_io import Project
 
 
 class TestProjectRequest:
@@ -16,26 +17,37 @@ class TestProjectRequest:
         )
 
     def test_create_projectrequest(self, projectrequest):
-        """Test creating ProjectRequest"""
-        deployed_resource = projectrequest.deploy()
-        assert deployed_resource
-        assert deployed_resource.name == "test-projectrequest"
-        assert projectrequest.exists
+        """Test creating ephemeral ProjectRequest (creates Project)"""
+        # Create the ephemeral resource - this returns raw ResourceInstance
+        actual_resource_instance = projectrequest.create()
+
+        # Wrap in proper Resource object to use ocp-resources methods
+        actual_resource = Project(client=projectrequest.client, name=actual_resource_instance.metadata.name)
+
+        # Verify the actual resource was created and has correct properties
+        assert actual_resource.name == "test-projectrequest"
+        assert actual_resource.exists
+        assert actual_resource.kind == "Project"
+        # The ephemeral resource itself should not exist after creation
+        assert not projectrequest.exists
 
     def test_get_projectrequest(self, projectrequest):
-        """Test getting ProjectRequest"""
-        assert projectrequest.instance
+        """Test getting ProjectRequest properties"""
+        # We can still access the ephemeral resource's properties before deployment
         assert projectrequest.kind == "ProjectRequest"
-
-    def test_update_projectrequest(self, projectrequest):
-        """Test updating ProjectRequest"""
-        resource_dict = projectrequest.instance.to_dict()
-        resource_dict["metadata"]["labels"] = {"updated": "true"}
-        projectrequest.update(resource_dict=resource_dict)
-        assert projectrequest.labels["updated"] == "true"
+        assert projectrequest.name == "test-projectrequest"
 
     def test_delete_projectrequest(self, projectrequest):
-        """Test deleting ProjectRequest"""
+        """Test deleting ProjectRequest (deletes Project)"""
+        # First create to get the actual resource
+        actual_resource_instance = projectrequest.create()
+
+        # Wrap in proper Resource object
+        actual_resource = Project(client=projectrequest.client, name=actual_resource_instance.metadata.name)
+        assert actual_resource.exists
+
+        # Clean up should delete the actual resource, not the ephemeral one
         projectrequest.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+
+        # Verify the actual resource no longer exists using Resource methods
+        assert not actual_resource.exists

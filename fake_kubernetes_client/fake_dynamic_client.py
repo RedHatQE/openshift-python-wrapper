@@ -107,14 +107,14 @@ class FakeResourceField:
     def __getattribute__(self, name):
         # Handle special case for 'items' before method lookup
         if name == "items" and hasattr(self, "_data"):
-            data = super().__getattribute__("_data")
+            data = object.__getattribute__(self, "_data")
             if "items" in data:
                 value = data["items"]
                 if isinstance(value, list):
                     return [FakeResourceField(item) if isinstance(item, dict) else item for item in value]
                 return value
         # Default behavior for all other attributes
-        return super().__getattribute__(name)
+        return object.__getattribute__(self, name)
 
     def __getattr__(self, name):
         if name.startswith("_"):
@@ -289,7 +289,15 @@ class FakeResourceInstance:
         # Add realistic status for resources that need it
         self._add_realistic_status(body)
 
-        # Store the resource using correct API version (full API version for schema-discovered resources)
+        # Special case: ProjectRequest is ephemeral - only creates Project (matches real cluster behavior)
+        if self.resource_def["kind"] == "ProjectRequest":
+            project_body = self._create_corresponding_project(body)
+            # Generate events for the Project creation, not ProjectRequest
+            self._generate_resource_events(project_body, "Created", "created")
+            # Return Project data, not ProjectRequest (ProjectRequest is ephemeral)
+            return FakeResourceField(data=project_body)
+
+        # Store the resource using correct API version (for all non-ProjectRequest resources)
         self.storage.store_resource(
             kind=self.resource_def["kind"],
             api_version=storage_api_version,
@@ -302,6 +310,39 @@ class FakeResourceInstance:
         self._generate_resource_events(body, "Created", "created")
 
         return FakeResourceField(data=body)
+
+    def _create_corresponding_project(self, project_request_body):
+        """Create a corresponding Project when ProjectRequest is created (simulates real OpenShift behavior)"""
+        project_name = project_request_body["metadata"]["name"]
+
+        # Create Project with same name and similar metadata
+        project_body = {
+            "apiVersion": "project.openshift.io/v1",
+            "kind": "Project",
+            "metadata": {
+                "name": project_name,
+                "uid": str(uuid.uuid4()),
+                "resourceVersion": self._generate_resource_version(),
+                "creationTimestamp": self._generate_timestamp(),
+                "generation": 1,
+                "labels": project_request_body["metadata"].get("labels", {}),
+                "annotations": project_request_body["metadata"].get("annotations", {}),
+            },
+            "spec": {"finalizers": ["kubernetes"]},
+            "status": {"phase": "Active"},
+        }
+
+        # Store the Project (cluster-scoped resource)
+        self.storage.store_resource(
+            kind="Project",
+            api_version="project.openshift.io/v1",
+            name=project_name,
+            namespace=None,  # Projects are cluster-scoped
+            resource=project_body,
+        )
+
+        # Return the project body for use by create() method
+        return project_body
 
     def _generate_resource_events(self, resource, reason, action):
         """Generate automatic events for resource operations - completely resource-agnostic"""
@@ -667,8 +708,6 @@ class FakeResourceInstance:
                     self._merge_patch(target[key], value)
                 else:
                     target[key] = value
-        else:
-            return patch
 
 
 class FakeResourceRegistry:

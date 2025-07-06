@@ -42,5 +42,5 @@ class TestMigAnalytic:
     def test_delete_miganalytic(self, miganalytic):
         """Test deleting MigAnalytic"""
         miganalytic.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not miganalytic.exists

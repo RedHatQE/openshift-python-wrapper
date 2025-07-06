@@ -37,5 +37,5 @@ class TestOperator:
     def test_delete_operator(self, operator):
         """Test deleting Operator"""
         operator.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not operator.exists

@@ -39,5 +39,5 @@ class TestMigCluster:
     def test_delete_migcluster(self, migcluster):
         """Test deleting MigCluster"""
         migcluster.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not migcluster.exists

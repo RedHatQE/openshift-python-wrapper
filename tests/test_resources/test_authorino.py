@@ -40,5 +40,5 @@ class TestAuthorino:
     def test_delete_authorino(self, authorino):
         """Test deleting Authorino"""
         authorino.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not authorino.exists

@@ -39,5 +39,5 @@ class TestVolumeSnapshot:
     def test_delete_volumesnapshot(self, volumesnapshot):
         """Test deleting VolumeSnapshot"""
         volumesnapshot.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not volumesnapshot.exists

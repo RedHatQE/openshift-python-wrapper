@@ -37,5 +37,5 @@ class TestConsole:
     def test_delete_console(self, console):
         """Test deleting Console"""
         console.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not console.exists

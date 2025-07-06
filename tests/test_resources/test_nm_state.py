@@ -37,5 +37,5 @@ class TestNMState:
     def test_delete_nmstate(self, nmstate):
         """Test deleting NMState"""
         nmstate.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not nmstate.exists

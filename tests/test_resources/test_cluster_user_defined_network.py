@@ -39,5 +39,5 @@ class TestClusterUserDefinedNetwork:
     def test_delete_clusteruserdefinednetwork(self, clusteruserdefinednetwork):
         """Test deleting ClusterUserDefinedNetwork"""
         clusteruserdefinednetwork.clean_up(wait=False)
-        # Note: In real clusters, you might want to verify deletion
-        # but with fake client, clean_up() removes the resource immediately
+        # Verify resource no longer exists after deletion
+        assert not clusteruserdefinednetwork.exists
