@@ -874,6 +874,80 @@ class FakeResourceRegistry:
 
         return FakeResourceInstance(resource_def=resource_def, storage=self.storage, client=None)
 
+    def _find_matching_mapping(self, kind, group, mappings):
+        """Find mapping that matches the requested group"""
+        # Look up the resource in mappings (keys are lowercase)
+        resource_mappings = mappings.get(kind.lower(), [])
+        if not resource_mappings or not isinstance(resource_mappings, list) or not resource_mappings:
+            return None
+
+        # Find the mapping that matches the requested API group
+        for mapping in resource_mappings:
+            # Extract kubernetes metadata from x-kubernetes-group-version-kind
+            k8s_gvk = mapping.get("x-kubernetes-group-version-kind", [])
+            if not k8s_gvk or not isinstance(k8s_gvk, list):
+                continue
+
+            # Check if any of the GVK entries match the requested group
+            for gvk in k8s_gvk:
+                schema_group = gvk.get("group", "")
+                if schema_group == group:
+                    return mapping
+
+        return None
+
+    def _extract_gvk_from_mapping(self, mapping, group):
+        """Extract group/version/kind from mapping"""
+        # Extract kubernetes metadata from the matching mapping
+        k8s_gvk = mapping.get("x-kubernetes-group-version-kind", [])
+        if not k8s_gvk or not isinstance(k8s_gvk, list) or not k8s_gvk:
+            return None
+
+        # Find the GVK entry that matches our group
+        for gvk in k8s_gvk:
+            if gvk.get("group", "") == group:
+                return {"group": gvk.get("group", ""), "version": gvk.get("version"), "kind": gvk.get("kind")}
+
+        return None
+
+    def _build_resource_definition(self, gvk_data, mapping, kind):
+        """Build the final resource definition"""
+        schema_group = gvk_data["group"]
+        schema_version = gvk_data["version"]
+        schema_kind = gvk_data["kind"] or kind
+
+        # Fail if no version found in mappings - don't use hardcoded fallbacks
+        if not schema_version:
+            return None
+
+        # Build full API version
+        if schema_group:
+            full_api_version = f"{schema_group}/{schema_version}"
+        else:
+            full_api_version = schema_version
+
+        # Get namespace info from mappings - NO DEFAULTS
+        is_namespaced = mapping.get("namespaced")
+        if is_namespaced is None:
+            return None
+
+        # Generate plural form
+        plural = self._generate_plural_form(schema_kind)
+
+        return {
+            "kind": schema_kind,
+            "api_version": schema_version,  # Just version part for KubeAPIVersion compatibility
+            "group": schema_group,
+            "version": schema_version,
+            "group_version": full_api_version,  # Full group/version for storage operations
+            "plural": plural,
+            "singular": schema_kind.lower(),
+            "namespaced": is_namespaced,
+            "shortNames": [],
+            "categories": ["all"],
+            "schema_source": "mappings",  # Mark that this came from mappings file
+        }
+
     def _create_resource_def_from_mappings(self, kind, api_version, group=None, version=None):
         """Create resource definition from __resources-mappings.json (single source of truth)"""
         try:
@@ -886,83 +960,18 @@ class FakeResourceRegistry:
             # Get cached mappings
             mappings = self._get_resource_mappings()
 
-            # Look up the resource in mappings (keys are lowercase)
-            resource_mappings = mappings.get(kind.lower(), [])
-            if not resource_mappings or not isinstance(resource_mappings, list) or not resource_mappings:
-                return None
-
             # Find the mapping that matches the requested API group
-            matching_mapping = None
-            for mapping in resource_mappings:
-                # Extract kubernetes metadata from x-kubernetes-group-version-kind
-                k8s_gvk = mapping.get("x-kubernetes-group-version-kind", [])
-                if not k8s_gvk or not isinstance(k8s_gvk, list):
-                    continue
-
-                # Check if any of the GVK entries match the requested group
-                for gvk in k8s_gvk:
-                    schema_group = gvk.get("group", "")
-                    if schema_group == group:
-                        matching_mapping = mapping
-                        break
-
-                if matching_mapping:
-                    break
-
-            # If no matching mapping found, return None to fall back to generic
+            matching_mapping = self._find_matching_mapping(kind, group, mappings)
             if not matching_mapping:
                 return None
 
-            # Extract kubernetes metadata from the matching mapping
-            k8s_gvk = matching_mapping.get("x-kubernetes-group-version-kind", [])
-            if not k8s_gvk or not isinstance(k8s_gvk, list) or not k8s_gvk:
+            # Extract GVK data from the matching mapping
+            gvk_data = self._extract_gvk_from_mapping(matching_mapping, group)
+            if not gvk_data:
                 return None
 
-            # Find the GVK entry that matches our group
-            matching_gvk = None
-            for gvk in k8s_gvk:
-                if gvk.get("group", "") == group:
-                    matching_gvk = gvk
-                    break
-
-            if not matching_gvk:
-                return None
-
-            schema_group = matching_gvk.get("group", "")
-            schema_version = matching_gvk.get("version")
-            schema_kind = matching_gvk.get("kind", kind)
-
-            # Fail if no version found in mappings - don't use hardcoded fallbacks
-            if not schema_version:
-                return None
-
-            # Build full API version
-            if schema_group:
-                full_api_version = f"{schema_group}/{schema_version}"
-            else:
-                full_api_version = schema_version
-
-            # Get namespace info from mappings - NO DEFAULTS
-            is_namespaced = matching_mapping.get("namespaced")
-            if is_namespaced is None:
-                return None
-
-            # Generate plural form
-            plural = self._generate_plural_form(schema_kind)
-
-            return {
-                "kind": schema_kind,
-                "api_version": schema_version,  # Just version part for KubeAPIVersion compatibility
-                "group": schema_group,
-                "version": schema_version,
-                "group_version": full_api_version,  # Full group/version for storage operations
-                "plural": plural,
-                "singular": schema_kind.lower(),
-                "namespaced": is_namespaced,
-                "shortNames": [],
-                "categories": ["all"],
-                "schema_source": "mappings",  # Mark that this came from mappings file
-            }
+            # Build and return the final resource definition
+            return self._build_resource_definition(gvk_data, matching_mapping, kind)
 
         except Exception:
             # If mappings parsing fails, return None to fall back to generic

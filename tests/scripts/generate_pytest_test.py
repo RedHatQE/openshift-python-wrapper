@@ -39,7 +39,7 @@ import sys
 import types
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, get_type_hints, get_origin, get_args
+from typing import Any, Union, get_type_hints, get_origin, get_args
 
 import cloup
 from jinja2 import DictLoader, Environment
@@ -495,7 +495,7 @@ class PytestTestGenerator:
                 return f"test-{param_name}"
 
             # Handle Union types (e.g., bool | None, str | None)
-            if type(param_type) is types.UnionType or get_origin(param_type) is not None:
+            if type(param_type) is types.UnionType or get_origin(param_type) is Union:
                 # Get the non-None type from Union
                 args = get_args(param_type)
                 non_none_types = [arg for arg in args if arg is not type(None)]
