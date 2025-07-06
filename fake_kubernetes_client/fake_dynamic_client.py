@@ -105,34 +105,45 @@ class FakeResourceField:
         self._data = data if data is not None else {}
 
     def __getattribute__(self, name):
-        # Handle special case for 'items' before method lookup
-        if name == "items" and hasattr(self, "_data"):
-            data = object.__getattribute__(self, "_data")
-            if "items" in data:
-                value = data["items"]
-                if isinstance(value, list):
-                    return [FakeResourceField(item) if isinstance(item, dict) else item for item in value]
-                return value
-        # Default behavior for all other attributes
-        return object.__getattribute__(self, name)
+        # ONLY handle essential internal attributes and methods here
+        # Let __getattr__ handle all dynamic attribute access
+        if name.startswith("_") or name in {"to_dict", "keys", "values", "get"}:
+            return object.__getattribute__(self, name)
+
+        # Special case: handle 'items' in __getattribute__ to override method lookup
+        if name == "items":
+            try:
+                data = object.__getattribute__(self, "_data")
+                if "items" in data:
+                    value = data["items"]
+                    if isinstance(value, list):
+                        return [FakeResourceField(item) if isinstance(item, dict) else item for item in value]
+                    return value
+            except AttributeError:
+                pass
+            # Fall back to the method if no items data
+            return object.__getattribute__(self, name)
+
+        # For all other attributes, let __getattr__ handle it
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
     def __getattr__(self, name):
-        if name.startswith("_"):
-            return super().__getattribute__(name)
+        # This is called ONLY when __getattribute__ raises AttributeError
+        # Handle all dynamic attribute access here
 
-        # Special handling for 'items' to avoid conflict with dict.items() method
-        if name == "items" and "items" in self._data:
-            value = self._data["items"]
-            if isinstance(value, list):
-                return [FakeResourceField(item) if isinstance(item, dict) else item for item in value]
-            return value
+        # Direct access to _data without using hasattr (avoids recursion)
+        try:
+            data = object.__getattribute__(self, "_data")
+        except AttributeError:
+            data = {}
 
         # For resource definition access, return simple values for common attributes
         # This ensures compatibility with ocp_resources code that expects strings
         if name in ["api_version", "group_version", "kind", "plural", "singular", "group", "version"]:
-            return self._data.get(name, "")
+            return data.get(name, "")
 
-        value = self._data.get(name)
+        # Handle general data access
+        value = data.get(name)
         if value is None:
             return FakeResourceField(data={})
         elif isinstance(value, dict):
@@ -558,28 +569,28 @@ class FakeResourceInstance:
             if not resource:
                 self._create_not_found_error(name)
             return FakeResourceField(data=resource)
-        else:
-            # List resources using consistent API version
-            storage_api_version = self._get_storage_api_version()
-            resources = self.storage.list_resources(
-                kind=self.resource_def["kind"],
-                api_version=storage_api_version,
-                namespace=namespace,
-                label_selector=label_selector,
-                field_selector=field_selector,
-            )
 
-            # Create list response
-            response = {
-                "apiVersion": self.resource_def["api_version"],
-                "kind": f"{self.resource_def['kind']}List",
-                "metadata": {
-                    "resourceVersion": self._generate_resource_version(),
-                },
-                "items": resources,
-            }
+        # List resources using consistent API version
+        storage_api_version = self._get_storage_api_version()
+        resources = self.storage.list_resources(
+            kind=self.resource_def["kind"],
+            api_version=storage_api_version,
+            namespace=namespace,
+            label_selector=label_selector,
+            field_selector=field_selector,
+        )
 
-            return FakeResourceField(data=response)
+        # Create list response
+        response = {
+            "apiVersion": self.resource_def["api_version"],
+            "kind": f"{self.resource_def['kind']}List",
+            "metadata": {
+                "resourceVersion": self._generate_resource_version(),
+            },
+            "items": resources,
+        }
+
+        return FakeResourceField(data=response)
 
     def delete(self, name=None, namespace=None, body=None, **kwargs):
         """Delete resource(s)"""
@@ -597,9 +608,9 @@ class FakeResourceInstance:
             self._generate_resource_events(deleted, "Deleted", "deleted")
 
             return FakeResourceField(data=deleted)
-        else:
-            # Delete collection - not implemented for safety
-            raise MethodNotAllowedError("Collection deletion not supported")
+
+        # Delete collection - not implemented for safety
+        raise MethodNotAllowedError("Collection deletion not supported")
 
     def patch(self, name=None, body=None, namespace=None, **kwargs):
         """Patch a resource"""
@@ -1154,18 +1165,18 @@ class FakeResourceStorage:
         if namespace is None:
             # Cluster-scoped resource
             return self._cluster_scoped_resources[kind][api_version].get(name)
-        else:
-            # Namespaced resource
-            return self._namespaced_resources[kind][api_version][namespace].get(name)
+
+        # Namespaced resource
+        return self._namespaced_resources[kind][api_version][namespace].get(name)
 
     def delete_resource(self, kind, api_version, name, namespace):
         """Delete any resource type - completely resource-agnostic"""
         if namespace is None:
             # Cluster-scoped resource
             return self._cluster_scoped_resources[kind][api_version].pop(name, None)
-        else:
-            # Namespaced resource
-            return self._namespaced_resources[kind][api_version][namespace].pop(name, None)
+
+        # Namespaced resource
+        return self._namespaced_resources[kind][api_version][namespace].pop(name, None)
 
     def list_resources(self, kind, api_version, namespace=None, label_selector=None, field_selector=None):
         """List any resource type with optional filtering - completely resource-agnostic"""

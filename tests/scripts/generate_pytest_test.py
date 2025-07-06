@@ -32,6 +32,7 @@ License: Same as openshift-python-wrapper project
 """
 
 import ast
+import shlex
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -40,6 +41,7 @@ from typing import Any
 
 import cloup
 from jinja2 import DictLoader, Environment
+from pyhelper_utils.shell import run_command
 from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
@@ -153,7 +155,7 @@ class ResourceScanner:
             if isinstance(base, ast.Name) and base.id == "NamespacedResource":
                 base_class = "NamespacedResource"
                 break
-            elif isinstance(base, ast.Attribute) and base.attr == "NamespacedResource":
+            if isinstance(base, ast.Attribute) and base.attr == "NamespacedResource":
                 base_class = "NamespacedResource"
                 break
 
@@ -591,33 +593,46 @@ class {{ class_name }}:
         }
 
 
-def run_pytest_on_file(test_filepath: str) -> bool:
-    """Run pytest on a specific test file and return True if all tests pass"""
+def run_ruff_on_files(filepaths: list[str]) -> bool:
+    """Run ruff format and check on files"""
     try:
-        console.print(f"\n[bold blue]Running pytest on {test_filepath}...[/bold blue]")
+        file_count = len(filepaths)
+        file_desc = "file" if file_count == 1 else f"{file_count} files"
+        console.print(f"[bold blue]Running ruff format and check on {file_desc}...[/bold blue]")
 
-        # Run pytest with uv and let it show output directly
-        cmd = ["uv", "run", "--group", "tests", "pytest", test_filepath, "-s"]
-        result = subprocess.run(cmd, cwd=Path.cwd())
+        # Run ruff format and check on all files
+        for op in ("format", "check"):
+            cmd_str = f"uvx ruff {op} {' '.join(filepaths)}"
+            rc, _, _ = run_command(
+                command=shlex.split(cmd_str),
+                verify_stderr=False,
+                check=False,
+            )
+            if rc != 0:
+                console.print(f"[yellow]Ruff {op} returned exit code {rc}[/yellow]")
 
-        return result.returncode == 0
+        return True
 
     except Exception as e:
-        console.print(f"[red]Error running pytest on {test_filepath}: {e}[/red]")
+        console.print(f"[red]Error running ruff: {e}[/red]")
         return False
 
 
 def run_pytest_on_files(test_filepaths: list[str]) -> bool:
-    """Run pytest on multiple test files and return True if all tests pass"""
+    """Run pytest on test files and return True if all tests pass"""
     try:
-        # Run pytest with uv and let it show output directly
-        cmd = ["uv", "run", "--group", "tests", "pytest"] + test_filepaths + ["-s"]
+        file_count = len(test_filepaths)
+        file_desc = "file" if file_count == 1 else f"{file_count} files"
+        console.print(f"\n[bold blue]Running pytest on {file_desc}...[/bold blue]")
+
+        # Run pytest with uv and let it show output directly (live output, no coverage)
+        cmd = ["uv", "run", "--group", "tests", "pytest"] + test_filepaths + ["-s", "--no-cov"]
         result = subprocess.run(cmd, cwd=Path.cwd())
 
         return result.returncode == 0
 
     except Exception as e:
-        console.print(f"[red]Error running pytest on multiple files: {e}[/red]")
+        console.print(f"[red]Error running pytest: {e}[/red]")
         return False
 
 
@@ -749,23 +764,17 @@ def main(kind, check_coverage, generate_missing, dry_run):
         for filepath in generated_files:
             console.print(f"  - {filepath}")
 
-        # Run pytest on all generated files at once
-        if len(generated_files) == 1:
-            console.print("\n[bold blue]Running tests on generated file...[/bold blue]")
-            success = run_pytest_on_file(test_filepath=generated_files[0])
+        # Run ruff on all generated files
+        run_ruff_on_files(filepaths=generated_files)
 
-            if success:
-                console.print("[bold green]All tests passed![/bold green]")
-            else:
-                console.print("[bold yellow]Some tests failed. Check the output above for details.[/bold yellow]")
+        # Run pytest on all generated files
+        console.print("\n[bold blue]Running tests on generated files...[/bold blue]")
+        success = run_pytest_on_files(test_filepaths=generated_files)
+
+        if success:
+            console.print("[bold green]All tests passed![/bold green]")
         else:
-            console.print("\n[bold blue]Running tests on all generated files...[/bold blue]")
-            success = run_pytest_on_files(test_filepaths=generated_files)
-
-            if success:
-                console.print("[bold green]All tests passed![/bold green]")
-            else:
-                console.print("[bold yellow]Some tests failed. Check the output above for details.[/bold yellow]")
+            console.print("[bold yellow]Some tests failed. Check the output above for details.[/bold yellow]")
 
     elif dry_run:
         console.print(
@@ -774,4 +783,4 @@ def main(kind, check_coverage, generate_missing, dry_run):
 
 
 if __name__ == "__main__":
-    main()
+    main.main()
