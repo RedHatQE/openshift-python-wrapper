@@ -65,6 +65,8 @@ fcn_exclude_functions =
     self,
     defaultdict,
     add_row,
+    get_args,
+    get_type_hints,
 
 enable-extensions =
     FCN,

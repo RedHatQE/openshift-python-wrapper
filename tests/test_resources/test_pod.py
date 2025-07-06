@@ -3,6 +3,7 @@ from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.pod import Pod
 
 
+@pytest.mark.incremental
 class TestPod:
     @pytest.fixture(scope="class")
     def client(self):
@@ -17,26 +18,26 @@ class TestPod:
             containers=[{"name": "test-container", "image": "nginx:latest"}],
         )
 
-    def test_create_pod(self, pod):
+    def test_01_create_pod(self, pod):
         """Test creating Pod"""
         deployed_resource = pod.deploy()
         assert deployed_resource
         assert deployed_resource.name == "test-pod"
         assert pod.exists
 
-    def test_get_pod(self, pod):
+    def test_02_get_pod(self, pod):
         """Test getting Pod"""
         assert pod.instance
         assert pod.kind == "Pod"
 
-    def test_update_pod(self, pod):
+    def test_03_update_pod(self, pod):
         """Test updating Pod"""
         resource_dict = pod.instance.to_dict()
         resource_dict["metadata"]["labels"] = {"updated": "true"}
         pod.update(resource_dict=resource_dict)
         assert pod.labels["updated"] == "true"
 
-    def test_delete_pod(self, pod):
+    def test_04_delete_pod(self, pod):
         """Test deleting Pod"""
         pod.clean_up(wait=False)
         # Verify resource no longer exists after deletion

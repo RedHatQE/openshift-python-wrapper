@@ -54,6 +54,7 @@ try:
         ResourceNotFoundError,
         ServerTimeoutError,
     )
+    from kubernetes.client.rest import ApiException as K8sApiException
 except ImportError:
     # Fallback implementations if kubernetes module is not available
     class FakeClientApiException(Exception):
@@ -233,11 +234,10 @@ class FakeResourceInstance:
     def _create_not_found_error(self, name):
         """Create proper NotFoundError with Kubernetes-style exception"""
         try:
-            from kubernetes.client.rest import ApiException as K8sApiException
-
             api_exception = K8sApiException(status=404, reason=f"{self.resource_def['kind']} '{name}' not found")
             raise NotFoundError(api_exception)
-        except ImportError:
+        except NameError:
+            # K8sApiException not available (ImportError at module level)
             raise NotFoundError(f"{self.resource_def['kind']} '{name}' not found")
 
     def _generate_resource_version(self):

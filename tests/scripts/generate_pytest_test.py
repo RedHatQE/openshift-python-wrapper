@@ -32,12 +32,14 @@ License: Same as openshift-python-wrapper project
 """
 
 import ast
+import importlib
 import shlex
 import subprocess
 import sys
+import types
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, get_type_hints, get_origin, get_args
 
 import cloup
 from jinja2 import DictLoader, Environment
@@ -385,6 +387,139 @@ class TestGenerator:
             module_name=module_name,
         )
 
+    def _detect_template_type_from_docstring(self, resource: ResourceInfo, param_name: str) -> str:
+        """Detect template type from resource docstring - follows oc explain output"""
+        try:
+            # Import the resource class to get docstring
+            module_name = Path(resource.file_path).stem
+            module = importlib.import_module(f"ocp_resources.{module_name}")
+            resource_class = getattr(module, resource.name)
+
+            # Get the __init__ docstring
+            docstring = resource_class.__init__.__doc__ or ""
+
+            # Extract the template parameter description
+            template_description = self._extract_param_description(docstring, param_name)
+
+            if template_description:
+                desc_lower = template_description.lower()
+
+                # Pattern matching based on docstring keywords (following oc explain)
+                if "dvs to be created" in desc_lower or "datavolume" in desc_lower:
+                    return "datavolume"
+                elif "podtemplatespec" in desc_lower or "pod template" in desc_lower or "pod should have" in desc_lower:
+                    return "pod"
+                elif "pods that will be created" in desc_lower:
+                    return "pod"  # Follow docstring even if seems wrong for VM resources
+                elif "revision to be stamped" in desc_lower or "revision specification" in desc_lower:
+                    return "knative_revision"
+                elif "common templates" in desc_lower and "operand" in desc_lower:
+                    return "vm_template"
+                elif "template validator" in desc_lower:
+                    return "validator_config"
+
+            return "unknown"
+
+        except Exception:
+            return "unknown"
+
+    def _extract_param_description(self, docstring: str, param_name: str) -> str:
+        """Extract parameter description from docstring"""
+        if not docstring or not param_name:
+            return ""
+
+        lines = docstring.split("\n")
+        for i, line in enumerate(lines):
+            # Look for parameter definition: "param_name (type): description"
+            if f"{param_name} (" in line and "):" in line:
+                # Extract description part after "):"
+                desc_start = line.find("):") + 2
+                description = line[desc_start:].strip()
+
+                # Check if description continues on next lines (indented)
+                j = i + 1
+                while j < len(lines) and lines[j].strip() and lines[j].startswith("              "):
+                    description += " " + lines[j].strip()
+                    j += 1
+
+                return description
+
+        return ""
+
+    def _generate_template_by_type(self, template_type: str) -> dict:
+        """Generate template based on detected type from docstring"""
+        if template_type == "datavolume":
+            # DataVolume template (DVTemplateSpec)
+            return {
+                "metadata": {"labels": {"app": "test"}},
+                "spec": {
+                    "source": {"http": {"url": "http://example.com/disk.qcow2"}},
+                    "pvc": {"accessModes": ["ReadWriteOnce"], "resources": {"requests": {"storage": "1Gi"}}},
+                },
+            }
+        elif template_type == "pod":
+            # Pod template (PodTemplateSpec) - follows docstring even if seems wrong
+            return {
+                "metadata": {"labels": {"app": "test"}},
+                "spec": {"containers": [{"name": "test-container", "image": "nginx:latest"}]},
+            }
+        elif template_type == "knative_revision":
+            # Knative Revision template
+            return {"spec": {"containers": [{"image": "nginx:latest", "name": "nginx"}]}}
+        elif template_type == "vm_template":
+            # VM template configuration
+            return {"test-vm-template": "test-value"}
+        elif template_type == "validator_config":
+            # Template validator configuration
+            return {"test-validator": "test-value"}
+        else:
+            # Unknown type - fallback to pod template
+            return {
+                "metadata": {"labels": {"app": "test"}},
+                "spec": {"containers": [{"name": "test-container", "image": "nginx:latest"}]},
+            }
+
+    def _get_type_aware_value(self, resource: ResourceInfo, param_name: str) -> Any:
+        """Generate a test value based on the parameter's actual type hint"""
+        try:
+            # Import the resource class to get type hints
+            module_name = Path(resource.file_path).stem
+            module = importlib.import_module(f"ocp_resources.{module_name}")
+            resource_class = getattr(module, resource.name)
+
+            # Get type hints from the constructor
+            type_hints = get_type_hints(resource_class.__init__)
+            param_type = type_hints.get(param_name)
+
+            if param_type is None:
+                return f"test-{param_name}"
+
+            # Handle Union types (e.g., bool | None, str | None)
+            if type(param_type) is types.UnionType or get_origin(param_type) is not None:
+                # Get the non-None type from Union
+                args = get_args(param_type)
+                non_none_types = [arg for arg in args if arg is not type(None)]
+                if non_none_types:
+                    param_type = non_none_types[0]
+
+            # Generate value based on type
+            if param_type is bool:
+                return True
+            elif param_type is int:
+                return 1
+            elif param_type is str:
+                return f"test-{param_name}"
+            elif param_type is list or (hasattr(param_type, "__origin__") and param_type.__origin__ is list):
+                return [f"test-{param_name}"]
+            elif param_type is dict or (hasattr(param_type, "__origin__") and param_type.__origin__ is dict):
+                return {f"test-{param_name}": "test-value"}
+            else:
+                return f"test-{param_name}"
+
+        except Exception:
+            # Fallback to string if type analysis fails
+            return f"test-{param_name}"
+
     def _generate_test_data(self, resource: ResourceInfo) -> dict[str, Any]:
         """Generate realistic test data for a resource"""
         data: dict[str, Any] = {
@@ -431,6 +566,13 @@ class TestGenerator:
         elif resource.name == "UserDefinedNetwork":
             # This requires topology parameter
             data["topology"] = "Layer2"
+        elif resource.name == "VirtualMachineInstanceReplicaSet":
+            # VirtualMachineInstanceReplicaSet needs selector (template will be auto-detected)
+            data["selector"] = {"matchLabels": {"app": "test"}}
+        elif resource.name == "DataImportCron":
+            # DataImportCron specific parameters (template will be auto-detected)
+            data["managed_data_source"] = "test-managed-data-source"
+            data["schedule"] = "0 2 * * *"  # Daily at 2 AM (cron format)
 
         # Add any additional required parameters from analysis
         for param in resource.required_params:
@@ -447,10 +589,9 @@ class TestGenerator:
                 elif param in ["selector"]:
                     data[param] = {"matchLabels": {"app": "test"}}
                 elif param in ["template"]:
-                    data[param] = {
-                        "metadata": {"labels": {"app": "test"}},
-                        "spec": {"containers": [{"name": "test-container", "image": "nginx:latest"}]},
-                    }
+                    # Auto-detect template type from resource docstring
+                    template_type = self._detect_template_type_from_docstring(resource, param)
+                    data[param] = self._generate_template_by_type(template_type)
                 elif param in ["topology"]:
                     data[param] = "Layer2"
                 elif param.endswith("_policy"):
@@ -460,8 +601,8 @@ class TestGenerator:
                 elif "data" in param.lower():
                     data[param] = {"key1": "value1"}
                 else:
-                    # Generic string parameter
-                    data[param] = f"test-{param}"
+                    # Use type-aware value generation
+                    data[param] = self._get_type_aware_value(resource, param)
 
         return data
 
@@ -472,6 +613,7 @@ class TestGenerator:
 from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.{{ module_name }} import {{ resource.name }}
 
+@pytest.mark.incremental
 class {{ class_name }}:
     @pytest.fixture(scope="class")
     def client(self):
@@ -494,26 +636,26 @@ class {{ class_name }}:
 {%- endfor %}
         )
 
-    def test_create_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_01_create_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test creating {{ resource.name }}"""
         deployed_resource = {{ fixture_name }}.deploy()
         assert deployed_resource
         assert deployed_resource.name == "{{ test_data.name }}"
         assert {{ fixture_name }}.exists
 
-    def test_get_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_02_get_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test getting {{ resource.name }}"""
         assert {{ fixture_name }}.instance
         assert {{ fixture_name }}.kind == "{{ resource.name }}"
 
-    def test_update_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_03_update_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test updating {{ resource.name }}"""
         resource_dict = {{ fixture_name }}.instance.to_dict()
         resource_dict["metadata"]["labels"] = {"updated": "true"}
         {{ fixture_name }}.update(resource_dict=resource_dict)
         assert {{ fixture_name }}.labels["updated"] == "true"
 
-    def test_delete_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_04_delete_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test deleting {{ resource.name }}"""
         {{ fixture_name }}.clean_up(wait=False)
         # Verify resource no longer exists after deletion
@@ -526,6 +668,7 @@ from ocp_resources.{{ module_name }} import {{ resource.name }}
 from ocp_resources.project_project_openshift_io import Project
 {%- endif %}
 
+@pytest.mark.incremental
 class {{ class_name }}:
     @pytest.fixture(scope="class")
     def client(self):
@@ -548,7 +691,7 @@ class {{ class_name }}:
 {%- endfor %}
         )
 
-    def test_create_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_01_create_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test creating ephemeral {{ resource.name }} (creates {{ resource.actual_resource_type }})"""
         # Create the ephemeral resource - this returns raw ResourceInstance
         actual_resource_instance = {{ fixture_name }}.create()
@@ -566,13 +709,13 @@ class {{ class_name }}:
         # The ephemeral resource itself should not exist after creation
         assert not {{ fixture_name }}.exists
 
-    def test_get_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_02_get_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test getting {{ resource.name }} properties"""
         # We can still access the ephemeral resource's properties before deployment
         assert {{ fixture_name }}.kind == "{{ resource.name }}"
         assert {{ fixture_name }}.name == "{{ test_data.name }}"
 
-    def test_delete_{{ fixture_name }}(self, {{ fixture_name }}):
+    def test_03_delete_{{ fixture_name }}(self, {{ fixture_name }}):
         """Test deleting {{ resource.name }} (deletes {{ resource.actual_resource_type }})"""
         # First create to get the actual resource
         actual_resource_instance = {{ fixture_name }}.create()

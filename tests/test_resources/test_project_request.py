@@ -4,6 +4,7 @@ from ocp_resources.project_request import ProjectRequest
 from ocp_resources.project_project_openshift_io import Project
 
 
+@pytest.mark.incremental
 class TestProjectRequest:
     @pytest.fixture(scope="class")
     def client(self):
@@ -16,7 +17,7 @@ class TestProjectRequest:
             name="test-projectrequest",
         )
 
-    def test_create_projectrequest(self, projectrequest):
+    def test_01_create_projectrequest(self, projectrequest):
         """Test creating ephemeral ProjectRequest (creates Project)"""
         # Create the ephemeral resource - this returns raw ResourceInstance
         actual_resource_instance = projectrequest.create()
@@ -31,13 +32,13 @@ class TestProjectRequest:
         # The ephemeral resource itself should not exist after creation
         assert not projectrequest.exists
 
-    def test_get_projectrequest(self, projectrequest):
+    def test_02_get_projectrequest(self, projectrequest):
         """Test getting ProjectRequest properties"""
         # We can still access the ephemeral resource's properties before deployment
         assert projectrequest.kind == "ProjectRequest"
         assert projectrequest.name == "test-projectrequest"
 
-    def test_delete_projectrequest(self, projectrequest):
+    def test_03_delete_projectrequest(self, projectrequest):
         """Test deleting ProjectRequest (deletes Project)"""
         # First create to get the actual resource
         actual_resource_instance = projectrequest.create()
