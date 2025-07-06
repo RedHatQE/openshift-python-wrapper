@@ -4,15 +4,13 @@ import os
 from unittest.mock import patch
 
 import pytest
-import yaml
-from docker.errors import DockerException
-from testcontainers.k3s import K3SContainer
 
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
-from ocp_resources.resource import Resource, get_client
+from ocp_resources.resource import Resource
 from ocp_resources.secret import Secret
+from fake_kubernetes_client import FakeDynamicClient
 
 
 class SecretTestExit(Secret):
@@ -24,17 +22,8 @@ class SecretTestExit(Secret):
 
 
 @pytest.fixture(scope="class")
-def k3scontainer_config():
-    try:
-        with K3SContainer() as k3s:
-            yield yaml.safe_load(k3s.config_yaml())
-    except DockerException as ex:
-        pytest.skip(f"K3S container not available. {ex}")
-
-
-@pytest.fixture(scope="class")
-def client(k3scontainer_config):
-    yield get_client(config_dict=k3scontainer_config)
+def client():
+    yield FakeDynamicClient()
 
 
 @pytest.fixture(scope="class")
@@ -44,7 +33,17 @@ def namespace(client):
 
 @pytest.fixture(scope="class")
 def pod(client):
-    yield list(Pod.get(dyn_client=client))[0]
+    # Create a test pod for testing purposes
+    test_pod = Pod(
+        client=client,
+        name="test-pod",
+        namespace="default",
+        containers=[{"name": "test-container", "image": "nginx:latest"}],
+    )
+    deployed_pod = test_pod.deploy()
+    yield deployed_pod
+    # Cleanup after tests
+    test_pod.clean_up()
 
 
 @pytest.mark.incremental
@@ -122,17 +121,15 @@ class TestResource:
 @pytest.mark.xfail(reason="Need debug")
 class TestClientProxy:
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
-    def test_client_with_proxy(self, k3scontainer_config):
+    def test_client_with_proxy(self, client):
         http_proxy = "http://env-http-proxy.com"
 
-        client = get_client(config_dict=k3scontainer_config)
         assert client.configuration.proxy == http_proxy
 
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
     @patch.dict(os.environ, {"HTTPS_PROXY": "http://env-http-proxy.com"})
-    def test_proxy_precedence(self, k3scontainer_config):
+    def test_proxy_precedence(self, client):
         https_proxy = "https://env-https-proxy.com"
 
-        client = get_client(config_dict=k3scontainer_config)
         # Verify HTTPS_PROXY takes precedence over HTTP_PROXY
         assert client.configuration.proxy == https_proxy
