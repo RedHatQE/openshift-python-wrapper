@@ -79,7 +79,7 @@ class ResourceInfo:
 
 
 @dataclass
-class TestCoverage:
+class CoverageReport:
     """Test coverage analysis results"""
 
     resources_with_tests: dict[str, str]  # {resource_name: test_file_path}
@@ -297,13 +297,13 @@ class ResourceScanner:
         return (actual_type is not None, actual_type)
 
 
-class TestAnalyzer:
+class CoverageAnalyzer:
     """Analyzes existing tests and coverage"""
 
     def __init__(self, tests_path: str = "tests"):
         self.tests_path = Path(tests_path)
 
-    def analyze_coverage(self, resources: list[ResourceInfo]) -> TestCoverage:
+    def analyze_coverage(self, resources: list[ResourceInfo]) -> CoverageReport:
         """Analyze test coverage for discovered resources"""
         existing_tests = self._find_existing_tests()
 
@@ -322,7 +322,7 @@ class TestAnalyzer:
         tested_resources = len(resources_with_tests)
         coverage_percentage = (tested_resources / total_resources * 100) if total_resources > 0 else 0
 
-        return TestCoverage(
+        return CoverageReport(
             resources_with_tests=resources_with_tests,
             resources_without_tests=resources_without_tests,
             invalid_resources=invalid_resources,
@@ -354,7 +354,7 @@ class TestAnalyzer:
         return None
 
 
-class TestGenerator:
+class PytestTestGenerator:
     """Generates pytest tests for resources"""
 
     def __init__(self):
@@ -779,7 +779,7 @@ def run_pytest_on_files(test_filepaths: list[str]) -> bool:
         return False
 
 
-def print_coverage_report(coverage: TestCoverage):
+def print_coverage_report(coverage: CoverageReport):
     """Print a formatted coverage report"""
     console.print("\n[bold blue]Test Coverage Analysis[/bold blue]")
     console.print(f"Total Resources: {coverage.total_resources}")
@@ -825,8 +825,8 @@ def main(kind, check_coverage, generate_missing, dry_run):
 
     # Initialize components
     scanner = ResourceScanner()
-    analyzer = TestAnalyzer()
-    generator = TestGenerator()
+    analyzer = CoverageAnalyzer()
+    generator = PytestTestGenerator()
 
     # Scan for resources
     console.print("Scanning ocp_resources directory...")
