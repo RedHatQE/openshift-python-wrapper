@@ -8,9 +8,20 @@ import pytest
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
-from ocp_resources.resource import Resource
+from ocp_resources.resource import Resource, ResourceList, NamespacedResourceList
+from ocp_resources.role import Role
 from ocp_resources.secret import Secret
 from fake_kubernetes_client import FakeDynamicClient
+
+BASE_NAMESPACE_NAME: str = "test-namespace"
+ROLE_NAME: str = "test-role"
+ROLE_RULES: list[dict[str, list[str]]] = [
+    {
+        "apiGroups": ["serving.kserve.io"],
+        "resources": ["inferenceservices"],
+        "verbs": ["get", "list", "watch"],
+    }
+]
 
 
 class SecretTestExit(Secret):
@@ -28,7 +39,12 @@ def client():
 
 @pytest.fixture(scope="class")
 def namespace(client):
-    return Namespace(client=client, name="test-namespace")
+    return Namespace(client=client, name=BASE_NAMESPACE_NAME)
+
+
+@pytest.fixture(scope="class")
+def namespaces(client):
+    return ResourceList(client=client, resource_class=Namespace, num_resources=3, name=BASE_NAMESPACE_NAME)
 
 
 @pytest.fixture(scope="class")
@@ -45,6 +61,17 @@ def pod(client):
     yield deployed_pod
     # Cleanup after tests
     test_pod.clean_up()
+
+
+@pytest.fixture(scope="class")
+def roles(client, namespaces):
+    return NamespacedResourceList(
+        client=client,
+        resource_class=Role,
+        namespaces=[ns.name for ns in namespaces.resources],
+        name=ROLE_NAME,
+        rules=ROLE_RULES,
+    )
 
 
 @pytest.mark.incremental
@@ -117,6 +144,60 @@ class TestResource:
         with pytest.raises(ResourceTeardownError):
             with SecretTestExit(name="test-context-manager-exit", namespace="default", client=client):
                 pass
+
+
+@pytest.mark.incremental
+class TestResourceList:
+    def test_resource_list_deploy(self, namespaces):
+        namespaces.deploy()
+        assert namespaces
+
+    def test_resource_list_len(self, namespaces):
+        assert len(namespaces) == 3
+
+    def test_resource_list_name(self, namespaces):
+        for i, ns in enumerate(namespaces.resources, start=1):
+            assert ns.name == f"{BASE_NAMESPACE_NAME}-{i}"
+
+    def test_resource_list_teardown(self, namespaces):
+        namespaces.clean_up(wait=False)
+
+    def test_resource_list_context_manager(self, client):
+        with ResourceList(
+            client=client, resource_class=Namespace, name=BASE_NAMESPACE_NAME, num_resources=3
+        ) as namespaces:
+            assert namespaces
+
+
+@pytest.mark.incremental
+class TestNamespacedResourceList:
+    def test_namespaced_resource_list_deploy(self, client, roles):
+        roles.deploy()
+        assert roles
+
+    def test_namespaced_resource_list_len(self, namespaces, roles):
+        assert len(roles) == len(namespaces)
+
+    def test_namespaced_resource_list_name(self, roles):
+        for role in roles.resources:
+            assert role.name == ROLE_NAME
+
+    def test_namespaced_resource_list_namespace(self, namespaces, roles):
+        for role, namespace in zip(roles.resources, namespaces.resources):
+            assert role.namespace == namespace.name
+
+    def test_namespaced_resource_list_teardown(self, roles):
+        roles.clean_up(wait=False)
+
+    def test_namespaced_resource_list_context_manager(self, client, namespaces):
+        with NamespacedResourceList(
+            client=client,
+            resource_class=Role,
+            namespaces=[ns.name for ns in namespaces.resources],
+            name=ROLE_NAME,
+            rules=ROLE_RULES,
+        ) as pods:
+            assert pods
 
 
 @pytest.mark.xfail(reason="Need debug")

@@ -44,7 +44,7 @@ def roles(admin_client, namespaces):
         yield roles
 
 
-def test_dummy(namespaces, roles):
+def test_example(roles):
     for role in roles.resources:
         print(role.name)
         print(role.rules)
