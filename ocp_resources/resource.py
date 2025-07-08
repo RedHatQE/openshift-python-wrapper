@@ -13,7 +13,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Type, List, Union
+from typing import Any, Type, Union
 from urllib.parse import parse_qs, urlencode, urlparse
 from warnings import warn
 
@@ -1768,7 +1768,7 @@ class BaseResourceList(ABC):
     """
 
     def __init__(self, client: "DynamicClient | None" = None):
-        self.resources: List[Union["Resource", "NamespacedResource"]] = []
+        self.resources: list[Union["Resource", "NamespacedResource"]] = []
         self.client = client
 
     def __enter__(self):
@@ -1797,7 +1797,7 @@ class BaseResourceList(ABC):
         """Returns the number of resources in the list."""
         return len(self.resources)
 
-    def deploy(self, wait: bool = False) -> List[Any]:
+    def deploy(self, wait: bool = False) -> list[Resource]:
         """
         Deploys all resources in the list.
 
@@ -1809,7 +1809,7 @@ class BaseResourceList(ABC):
         """
         return [resource.deploy(wait=wait) for resource in self.resources]
 
-    def clean_up(self, wait: bool = True) -> List[bool]:
+    def clean_up(self, wait: bool = True) -> bool:
         """
         Deletes all resources in the list.
 
@@ -1817,10 +1817,10 @@ class BaseResourceList(ABC):
             wait (bool): If True, wait for each resource to be deleted.
 
         Returns:
-            List[bool]: A list of booleans indicating the success of each deletion.
+            bool: Returns True if all resources are cleaned up correclty.
         """
-        # Deleting in reverse order can help resolve dependencies correctly.
-        return [resource.clean_up(wait=wait) for resource in reversed(self.resources)]
+        # Deleting in reverse order to resolve dependencies correctly.
+        return all(resource.clean_up(wait=wait) for resource in reversed(self.resources))
 
     @abstractmethod
     def _create_resources(self, resource_class: Type, **kwargs: Any) -> None:
@@ -1855,9 +1855,6 @@ class ResourceList(BaseResourceList):
         """
         super().__init__(client)
 
-        if "name" not in kwargs:
-            raise MissingRequiredArgumentError(argument="'name' must be provided in kwargs")
-
         self.num_resources = num_resources
         self._create_resources(resource_class, **kwargs)
 
@@ -1865,7 +1862,7 @@ class ResourceList(BaseResourceList):
         """Creates N resources with indexed names."""
         base_name = kwargs["name"]
 
-        for i in range(self.num_resources):
+        for i in range(1, self.num_resources + 1):
             resource_name = f"{base_name}-{i}"
             resource_kwargs = kwargs.copy()
             resource_kwargs["name"] = resource_name
@@ -1885,8 +1882,8 @@ class NamespacedResourceList(BaseResourceList):
     def __init__(
         self,
         resource_class: Type["NamespacedResource"],
-        namespaces: List[str],
-        client: "DynamicClient | None" = None,
+        namespaces: list[str],
+        client: DynamicClient | None = None,
         **kwargs: Any,
     ) -> None:
         """
