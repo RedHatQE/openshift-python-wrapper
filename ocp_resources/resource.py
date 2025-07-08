@@ -1767,8 +1767,8 @@ class BaseResourceList(ABC):
     iteration, indexing, deployment, and cleanup operations.
     """
 
-    def __init__(self, client: "DynamicClient | None" = None):
-        self.resources: list[Union["Resource", "NamespacedResource"]] = []
+    def __init__(self, client: DynamicClient | None = None):
+        self.resources: list["Resource" | "NamespacedResource"] = []
         self.client = client
 
     def __enter__(self):
@@ -1900,9 +1900,6 @@ class NamespacedResourceList(BaseResourceList):
 
         if not namespaces:
             raise ValueError("The 'namespaces' list cannot be empty.")
-
-        if "name" not in kwargs:
-            raise MissingRequiredArgumentError(argument="'name' must be provided in kwargs")
 
         self.namespaces = namespaces
         self._create_resources(resource_class, **kwargs)
