@@ -8,11 +8,12 @@ import os
 import re
 import sys
 import threading
+from abc import abstractmethod, ABC
 from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any
+from typing import Any, Type, List, Union
 from urllib.parse import parse_qs, urlencode, urlparse
 from warnings import warn
 
@@ -1756,3 +1757,165 @@ class ResourceEditor:
             timeout=TIMEOUT_30SEC,
             sleep_time=TIMEOUT_5SEC,
         )
+
+
+class BaseResourceList(ABC):
+    """
+    Abstract base class for managing collections of resources.
+
+    Provides common functionality for resource lists including context management,
+    iteration, indexing, deployment, and cleanup operations.
+    """
+
+    def __init__(self, client: "DynamicClient | None" = None):
+        self.resources: List[Union["Resource", "NamespacedResource"]] = []
+        self.client = client
+
+    def __enter__(self):
+        """Enters the runtime context and deploys all resources."""
+        self.deploy()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """Exits the runtime context and cleans up all resources."""
+        self.clean_up()
+
+    def __iter__(self) -> Generator[Union["Resource", "NamespacedResource"], None, None]:
+        """Allows iteration over the resources in the list."""
+        yield from self.resources
+
+    def __getitem__(self, index: int) -> Union["Resource", "NamespacedResource"]:
+        """Retrieves a resource from the list by its index."""
+        return self.resources[index]
+
+    def __len__(self) -> int:
+        """Returns the number of resources in the list."""
+        return len(self.resources)
+
+    def deploy(self, wait: bool = False) -> List[Any]:
+        """
+        Deploys all resources in the list.
+
+        Args:
+            wait (bool): If True, wait for each resource to be ready.
+
+        Returns:
+            List[Any]: A list of the results from each resource's deploy() call.
+        """
+        return [resource.deploy(wait=wait) for resource in self.resources]
+
+    def clean_up(self, wait: bool = True) -> List[bool]:
+        """
+        Deletes all resources in the list.
+
+        Args:
+            wait (bool): If True, wait for each resource to be deleted.
+
+        Returns:
+            List[bool]: A list of booleans indicating the success of each deletion.
+        """
+        # Deleting in reverse order can help resolve dependencies correctly.
+        return [resource.clean_up(wait=wait) for resource in reversed(self.resources)]
+
+    @abstractmethod
+    def _create_resources(self, resource_class: Type, **kwargs: Any) -> None:
+        """Abstract method to create resources based on specific logic."""
+        pass
+
+
+class ResourceList(BaseResourceList):
+    """
+    A class to manage a collection of a specific resource type.
+
+    This class creates and manages N copies of a given resource,
+    each with a unique name derived from a base name.
+    """
+
+    def __init__(
+        self,
+        resource_class: Type["Resource"],
+        num_resources: int,
+        client: "DynamicClient | None" = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initializes a list of N resource objects.
+
+        Args:
+            resource_class (Type[Resource]): The resource class to instantiate (e.g., Namespace).
+            num_resources (int): The number of resource copies to create.
+            client (DynamicClient | None, optional): The dynamic client to use. Defaults to None.
+            **kwargs (Any): Arguments to be passed to the constructor of the resource_class.
+                              A 'name' key is required in kwargs to serve as the base name for the resources.
+        """
+        super().__init__(client)
+
+        if "name" not in kwargs:
+            raise MissingRequiredArgumentError(argument="'name' must be provided in kwargs")
+
+        self.num_resources = num_resources
+        self._create_resources(resource_class, **kwargs)
+
+    def _create_resources(self, resource_class: Type["Resource"], **kwargs: Any) -> None:
+        """Creates N resources with indexed names."""
+        base_name = kwargs["name"]
+
+        for i in range(self.num_resources):
+            resource_name = f"{base_name}-{i}"
+            resource_kwargs = kwargs.copy()
+            resource_kwargs["name"] = resource_name
+
+            instance = resource_class(client=self.client, **resource_kwargs)
+            self.resources.append(instance)
+
+
+class NamespacedResourceList(BaseResourceList):
+    """
+    Manages a collection of a specific namespaced resource (e.g., Pod, Service, etc), creating one instance per provided namespace.
+
+    This class creates one copy of a given namespaced resource in each of the
+    namespaces provided in a list.
+    """
+
+    def __init__(
+        self,
+        resource_class: Type["NamespacedResource"],
+        namespaces: List[str],
+        client: "DynamicClient | None" = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initializes a list of resource objects, one for each specified namespace.
+
+        Args:
+            resource_class (Type[NamespacedResource]): The namespaced resource class to instantiate (e.g., Pod).
+            namespaces (List[str]): A list of namespace names where the resources will be created.
+            client (DynamicClient | None, optional): The dynamic client to use for cluster communication.
+            **kwargs (Any): Additional arguments to be passed to the resource_class constructor.
+                              A 'name' key is required in kwargs to serve as the base name for the resources.
+        """
+        super().__init__(client)
+
+        if not namespaces:
+            raise ValueError("The 'namespaces' list cannot be empty.")
+
+        if "name" not in kwargs:
+            raise MissingRequiredArgumentError(argument="'name' must be provided in kwargs")
+
+        self.namespaces = namespaces
+        self._create_resources(resource_class, **kwargs)
+
+    def _create_resources(self, resource_class: Type["NamespacedResource"], **kwargs: Any) -> None:
+        """Creates one resource per namespace."""
+        for ns in self.namespaces:
+            instance = resource_class(
+                namespace=ns,
+                client=self.client,
+                **kwargs,
+            )
+            self.resources.append(instance)
