@@ -2,7 +2,7 @@
 
 import copy
 from collections import defaultdict
-from typing import Any, DefaultDict
+from typing import Any, DefaultDict, Union
 
 
 class FakeResourceStorage:
@@ -10,17 +10,19 @@ class FakeResourceStorage:
 
     def __init__(self) -> None:
         # Storage structure: {api_version: {kind: {namespace: {name: resource}}}}
-        self.resources: DefaultDict[str, DefaultDict[str, DefaultDict[str | None, dict[str, Any]]]] = defaultdict(
+        self.resources: DefaultDict[str, DefaultDict[str, DefaultDict[Union[str, None], dict[str, Any]]]] = defaultdict(
             lambda: defaultdict(lambda: defaultdict(dict))
         )
 
     def store_resource(
-        self, kind: str, api_version: str, name: str, namespace: str | None, resource: dict[str, Any]
+        self, kind: str, api_version: str, name: str, namespace: Union[str, None], resource: dict[str, Any]
     ) -> None:
         """Store a resource"""
         self.resources[api_version][kind][namespace][name] = copy.deepcopy(resource)
 
-    def get_resource(self, kind: str, api_version: str, name: str, namespace: str | None) -> dict[str, Any] | None:
+    def get_resource(
+        self, kind: str, api_version: str, name: str, namespace: Union[str, None]
+    ) -> Union[dict[str, Any], None]:
         """Get a specific resource"""
         api_resources = self.resources.get(api_version)
         if not api_resources:
@@ -38,9 +40,9 @@ class FakeResourceStorage:
         self,
         kind: str,
         api_version: str,
-        namespace: str | None = None,
-        label_selector: str | None = None,
-        field_selector: str | None = None,
+        namespace: Union[str, None] = None,
+        label_selector: Union[str, None] = None,
+        field_selector: Union[str, None] = None,
     ) -> list[dict[str, Any]]:
         """List resources with optional filtering"""
         resources: list[dict[str, Any]] = []
@@ -72,7 +74,9 @@ class FakeResourceStorage:
 
         return [copy.deepcopy(r) for r in resources]
 
-    def delete_resource(self, kind: str, api_version: str, name: str, namespace: str | None) -> dict[str, Any] | None:
+    def delete_resource(
+        self, kind: str, api_version: str, name: str, namespace: Union[str, None]
+    ) -> Union[dict[str, Any], None]:
         """Delete a resource"""
         resource = self.get_resource(kind, api_version, name, namespace)
         if resource:

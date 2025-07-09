@@ -3,7 +3,7 @@
 import json
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, DefaultDict
+from typing import Any, DefaultDict, Union
 
 from fake_kubernetes_client.resource_field import FakeResourceField
 
@@ -14,7 +14,7 @@ class FakeResourceRegistry:
     def __init__(self) -> None:
         # Store by kind to allow searching across API groups
         self.resources: DefaultDict[str, list[dict[str, Any]]] = defaultdict(list)
-        self._resource_mappings_cache: dict[str, Any] | None = None
+        self._resource_mappings_cache: Union[dict[str, Any], None] = None
         self._builtin_resources: dict[tuple[str, str], dict[str, Any]] = {}
         self._additional_resources: dict[str, list[dict[str, Any]]] = {}
         self._load_resource_definitions()
@@ -207,7 +207,7 @@ class FakeResourceRegistry:
             self._builtin_resources[key] = resource_def
             self._additional_resources.setdefault(kind, []).append(resource_def)
 
-    def register_resources(self, resources: dict[str, Any] | list[dict[str, Any]]) -> None:
+    def register_resources(self, resources: Union[dict[str, Any], list[dict[str, Any]]]) -> None:
         """
         Register custom resources dynamically.
 
@@ -290,7 +290,11 @@ class FakeResourceRegistry:
             self._additional_resources.setdefault(kind, []).append(complete_def)
 
     def search(
-        self, kind: str | None = None, group: str | None = None, api_version: str | None = None, **kwargs: Any
+        self,
+        kind: Union[str, None] = None,
+        group: Union[str, None] = None,
+        api_version: Union[str, None] = None,
+        **kwargs: Any,
     ) -> list[FakeResourceField]:
         """Search for resource definitions"""
         results = []
@@ -324,7 +328,7 @@ class FakeResourceRegistry:
         """Get all resource definitions for a kind"""
         return self.resources.get(kind, [])
 
-    def get_resource_definition(self, kind: str, api_version: str) -> dict[str, Any] | None:
+    def get_resource_definition(self, kind: str, api_version: str) -> Union[dict[str, Any], None]:
         """Get specific resource definition by kind and API version"""
         definitions = self.resources.get(kind, [])
 
@@ -347,7 +351,7 @@ class FakeResourceRegistry:
 
         return None
 
-    def get_resource_definition_by_plural(self, plural: str, api_version: str) -> dict[str, Any] | None:
+    def get_resource_definition_by_plural(self, plural: str, api_version: str) -> Union[dict[str, Any], None]:
         """Get resource definition by plural name and API version"""
         for kind, definitions in self.resources.items():
             for definition in definitions:

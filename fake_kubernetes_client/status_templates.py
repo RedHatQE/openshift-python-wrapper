@@ -1,12 +1,12 @@
 """Status template methods for fake Kubernetes resources"""
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Union
 
 from fake_kubernetes_client.status_schema_parser import StatusSchemaParser
 
 
-def add_realistic_status(body: dict[str, Any], resource_mappings: dict[str, Any] | None = None) -> None:
+def add_realistic_status(body: dict[str, Any], resource_mappings: Union[dict[str, Any], None] = None) -> None:
     """Add realistic status to resources that need it"""
     kind = body.get("kind", "")
 

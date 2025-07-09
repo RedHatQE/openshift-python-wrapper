@@ -30,7 +30,7 @@ class FakeResourceInstance:
         self.storage = storage
         self.client = client
 
-    def _normalize_namespace(self, namespace: str | None) -> str | None:
+    def _normalize_namespace(self, namespace: Union[str, None]) -> Union[str, None]:
         """Normalize namespace parameter (empty string -> None)"""
         return None if namespace == "" else namespace
 
@@ -68,7 +68,7 @@ class FakeResourceInstance:
         return datetime.now(timezone.utc).isoformat()
 
     def create(
-        self, body: dict[str, Any] | None = None, namespace: str | None = None, **kwargs: Any
+        self, body: Union[dict[str, Any], None] = None, namespace: Union[str, None] = None, **kwargs: Any
     ) -> FakeResourceField:
         """Create a resource"""
         if body is None:
@@ -235,10 +235,10 @@ class FakeResourceInstance:
 
     def get(
         self,
-        name: str | None = None,
-        namespace: str | None = None,
-        label_selector: str | None = None,
-        field_selector: str | None = None,
+        name: Union[str, None] = None,
+        namespace: Union[str, None] = None,
+        label_selector: Union[str, None] = None,
+        field_selector: Union[str, None] = None,
         **kwargs: Any,
     ) -> FakeResourceField:
         """Get resource(s)"""
@@ -278,7 +278,11 @@ class FakeResourceInstance:
         return FakeResourceField(data=response)
 
     def delete(
-        self, name: str | None = None, namespace: str | None = None, body: dict[str, Any] | None = None, **kwargs: Any
+        self,
+        name: Union[str, None] = None,
+        namespace: Union[str, None] = None,
+        body: Union[dict[str, Any], None] = None,
+        **kwargs: Any,
     ) -> FakeResourceField:
         """Delete resource(s)"""
         if name:
@@ -301,7 +305,11 @@ class FakeResourceInstance:
         raise MethodNotAllowedError("Collection deletion not supported")
 
     def patch(
-        self, name: str | None = None, body: dict[str, Any] | None = None, namespace: str | None = None, **kwargs: Any
+        self,
+        name: Union[str, None] = None,
+        body: Union[dict[str, Any], None] = None,
+        namespace: Union[str, None] = None,
+        **kwargs: Any,
     ) -> FakeResourceField:
         """Patch a resource"""
         if not body:
@@ -349,7 +357,11 @@ class FakeResourceInstance:
         return FakeResourceField(data=patched)
 
     def replace(
-        self, name: str | None = None, body: dict[str, Any] | None = None, namespace: str | None = None, **kwargs: Any
+        self,
+        name: Union[str, None] = None,
+        body: Union[dict[str, Any], None] = None,
+        namespace: Union[str, None] = None,
+        **kwargs: Any,
     ) -> FakeResourceField:
         """Replace a resource"""
         if not name:
@@ -418,13 +430,17 @@ class FakeResourceInstance:
         )
 
     def update(
-        self, name: str | None = None, body: dict[str, Any] | None = None, namespace: str | None = None, **kwargs: Any
+        self,
+        name: Union[str, None] = None,
+        body: Union[dict[str, Any], None] = None,
+        namespace: Union[str, None] = None,
+        **kwargs: Any,
     ) -> FakeResourceField:
         """Update a resource (alias for replace)"""
         return self.replace(name=name, body=body, namespace=namespace, **kwargs)
 
     def watch(
-        self, namespace: str | None = None, timeout: int | None = None, **kwargs: Any
+        self, namespace: Union[str, None] = None, timeout: Union[int, None] = None, **kwargs: Any
     ) -> Iterator[dict[str, Any]]:
         """Watch for resource changes"""
         # Simple implementation - yields existing resources as ADDED events

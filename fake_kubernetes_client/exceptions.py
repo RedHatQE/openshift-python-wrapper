@@ -1,5 +1,7 @@
 """Exception classes for fake Kubernetes client"""
 
+from typing import Union
+
 # Import exceptions from kubernetes.dynamic - use real ones for compatibility
 try:
     from kubernetes.dynamic.exceptions import (
@@ -14,7 +16,9 @@ try:
 except ImportError:
     # Fallback implementations if kubernetes module is not available
     class FakeClientApiException(Exception):
-        def __init__(self, status: int | None = None, reason: str | None = None, body: str | None = None) -> None:
+        def __init__(
+            self, status: Union[int, None] = None, reason: Union[str, None] = None, body: Union[str, None] = None
+        ) -> None:
             super().__init__(f"API Exception: {status} - {reason}")
             self.status = status
             self.reason = reason

@@ -2,7 +2,7 @@
 
 import random
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Union
 
 
 class StatusSchemaParser:
@@ -12,7 +12,7 @@ class StatusSchemaParser:
         self.resource_mappings = resource_mappings
         self._definitions_cache: dict[str, Any] = {}
 
-    def get_status_schema_for_resource(self, kind: str, api_version: str) -> dict[str, Any] | None:
+    def get_status_schema_for_resource(self, kind: str, api_version: str) -> Union[dict[str, Any], None]:
         """Get status schema for a specific resource"""
         kind_lower = kind.lower()
         resource_schemas = self.resource_mappings.get(kind_lower, [])
@@ -38,7 +38,7 @@ class StatusSchemaParser:
 
         return None
 
-    def _resolve_reference(self, ref: str) -> dict[str, Any] | None:
+    def _resolve_reference(self, ref: str) -> Union[dict[str, Any], None]:
         """Resolve a $ref to get the actual schema definition"""
         # For now, return a placeholder - in real implementation would follow the ref
         # References are like "#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimStatus"

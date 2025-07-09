@@ -1,6 +1,6 @@
 """FakeResourceManager implementation for fake Kubernetes client"""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
 from fake_kubernetes_client.exceptions import ResourceNotFoundError
 from fake_kubernetes_client.resource_field import FakeResourceField
@@ -20,15 +20,15 @@ class FakeResourceManager:
 
     def get(
         self,
-        api_version: str | None = None,
-        kind: str | None = None,
-        name: str | None = None,
-        singular_name: str | None = None,
-        namespaced: bool | None = None,
-        group: str | None = None,
-        version: str | None = None,
-        preferred: bool | None = None,
-        prefix: str | None = None,
+        api_version: Union[str, None] = None,
+        kind: Union[str, None] = None,
+        name: Union[str, None] = None,
+        singular_name: Union[str, None] = None,
+        namespaced: Union[bool, None] = None,
+        group: Union[str, None] = None,
+        version: Union[str, None] = None,
+        preferred: Union[bool, None] = None,
+        prefix: Union[str, None] = None,
         **kwargs: Any,
     ) -> FakeResourceInstance:
         """Get resource instance for performing operations"""
@@ -64,7 +64,9 @@ class FakeResourceManager:
 
         return FakeResourceInstance(resource_def=resource_def, storage=self.storage, client=self.client)
 
-    def search(self, group: str | None = None, kind: str | None = None, **kwargs: Any) -> list[FakeResourceField]:
+    def search(
+        self, group: Union[str, None] = None, kind: Union[str, None] = None, **kwargs: Any
+    ) -> list[FakeResourceField]:
         """Search for resource definitions"""
         # Delegate to registry's search method
         return self.registry.search(kind=kind, group=group, **kwargs)

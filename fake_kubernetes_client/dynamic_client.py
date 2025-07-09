@@ -74,7 +74,7 @@ class FakeDynamicClient:
         """Get the underlying API client"""
         return self.client
 
-    def register_resources(self, resources: dict[str, Any] | list[dict[str, Any]]) -> None:
+    def register_resources(self, resources: Union[dict[str, Any], list[dict[str, Any]]]) -> None:
         """
         Register custom resources dynamically.
 
