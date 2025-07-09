@@ -53,6 +53,8 @@ class FakeResourceRegistry:
         corrections = {
             # Service is incorrectly marked as non-namespaced in the JSON
             "Service": {"namespaced": True},
+            # Event is incorrectly marked as non-namespaced in the JSON
+            "Event": {"namespaced": True},
             # Add other known corrections here as needed
         }
 
@@ -325,10 +327,24 @@ class FakeResourceRegistry:
     def get_resource_definition(self, kind: str, api_version: str) -> dict[str, Any] | None:
         """Get specific resource definition by kind and API version"""
         definitions = self.resources.get(kind, [])
-        for definition in definitions:
-            # Check both api_version and group_version for compatibility
-            if definition["api_version"] == api_version or definition.get("group_version") == api_version:
-                return definition
+
+        # If api_version doesn't contain '/', it's a core resource (no group)
+        if "/" not in api_version:
+            # First, try to find a core resource (empty group) with this version
+            for definition in definitions:
+                if definition.get("group") == "" and definition["version"] == api_version:
+                    return definition
+
+            # If not found, fall back to checking group_version for compatibility
+            for definition in definitions:
+                if definition.get("group_version") == api_version:
+                    return definition
+        else:
+            # API version contains group, do exact match on group_version
+            for definition in definitions:
+                if definition.get("group_version") == api_version:
+                    return definition
+
         return None
 
     def get_resource_definition_by_plural(self, plural: str, api_version: str) -> dict[str, Any] | None:

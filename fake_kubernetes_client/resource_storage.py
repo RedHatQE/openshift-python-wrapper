@@ -124,10 +124,17 @@ class FakeResourceStorage:
 
     def _matches_field_selector(self, resource: dict[str, Any], selector: str) -> bool:
         """Check if resource matches field selector"""
-        # Handle simple field selectors (field.path=value)
+        # Handle simple field selectors (field.path=value or field.path==value)
         parts = selector.split(",")
         for part in parts:
-            if "=" in part:
+            if "==" in part:
+                # Handle double equals
+                field_path, value = part.split("==", 1)
+                field_value = self._get_field_value(resource, field_path.strip())
+                if str(field_value) != value.strip():
+                    return False
+            elif "=" in part:
+                # Handle single equals
                 field_path, value = part.split("=", 1)
                 field_value = self._get_field_value(resource, field_path.strip())
                 if str(field_value) != value.strip():

@@ -7,6 +7,7 @@ from fake_kubernetes_client.resource_field import FakeResourceField
 from fake_kubernetes_client.resource_manager import FakeResourceManager
 from fake_kubernetes_client.resource_registry import FakeResourceRegistry
 from fake_kubernetes_client.resource_storage import FakeResourceStorage
+from fake_kubernetes_client.resource_instance import FakeResourceInstance
 
 
 class FakeDynamicClient:
@@ -125,3 +126,17 @@ class FakeDynamicClient:
             myapp_api.create(body={...}, namespace="default")
         """
         self.registry.register_resources(resources=resources)
+
+    def get(self, resource: Any, *args: Any, **kwargs: Any) -> Any:
+        """Get resources based on resource definition"""
+        # Extract resource definition from FakeResourceField if needed
+        if hasattr(resource, "data"):
+            resource_def = resource.data
+        else:
+            resource_def = resource
+
+        # Create a resource instance for this resource type
+        resource_instance = FakeResourceInstance(resource_def=resource_def, storage=self.storage, client=self)
+
+        # Call get on the resource instance to list resources
+        return resource_instance.get(*args, **kwargs)

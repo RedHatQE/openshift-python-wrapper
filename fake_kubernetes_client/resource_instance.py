@@ -260,7 +260,7 @@ class FakeResourceInstance:
         resources = self.storage.list_resources(
             kind=self.resource_def["kind"],
             api_version=storage_api_version,
-            namespace=namespace,
+            namespace=self._normalize_namespace(namespace),  # Normalize namespace here too
             label_selector=label_selector,
             field_selector=field_selector,
         )
@@ -429,8 +429,17 @@ class FakeResourceInstance:
         """Watch for resource changes"""
         # Simple implementation - yields existing resources as ADDED events
         storage_api_version = self.resource_def.get("group_version", self.resource_def["api_version"])
+
+        # Extract label and field selectors from kwargs
+        label_selector = kwargs.get("label_selector")
+        field_selector = kwargs.get("field_selector")
+
         resources = self.storage.list_resources(
-            kind=self.resource_def["kind"], api_version=storage_api_version, namespace=namespace
+            kind=self.resource_def["kind"],
+            api_version=storage_api_version,
+            namespace=self._normalize_namespace(namespace),  # Normalize namespace here too
+            label_selector=label_selector,
+            field_selector=field_selector,
         )
 
         for resource in resources:
