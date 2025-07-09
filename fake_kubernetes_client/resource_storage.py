@@ -133,24 +133,68 @@ class FakeResourceStorage:
         for part in parts:
             if "==" in part:
                 # Handle double equals
-                field_path, value = part.split("==", 1)
+                field_path, selector_value = part.split("==", 1)
                 field_value = self._get_field_value(resource, field_path.strip())
-                if str(field_value) != value.strip():
+                if not self._compare_field_values(field_value, selector_value.strip()):
                     return False
             elif "=" in part:
                 # Handle single equals
-                field_path, value = part.split("=", 1)
+                field_path, selector_value = part.split("=", 1)
                 field_value = self._get_field_value(resource, field_path.strip())
-                if str(field_value) != value.strip():
+                if not self._compare_field_values(field_value, selector_value.strip()):
                     return False
         return True
+
+    def _compare_field_values(self, field_value: Any, selector_value: str) -> bool:
+        """
+        Compare field value with selector value using type-aware comparison.
+
+        Attempts to parse the selector value to match the field value's type.
+        """
+        # Handle missing fields - they don't match any selector
+        if field_value is NotImplemented:
+            return False
+
+        # Handle None/null values
+        if field_value is None:
+            return selector_value.lower() in ("none", "null", "")
+
+        # Handle boolean values
+        if isinstance(field_value, bool):
+            if selector_value.lower() == "true":
+                return field_value is True
+            elif selector_value.lower() == "false":
+                return field_value is False
+            else:
+                return False
+
+        # Handle numeric values
+        if isinstance(field_value, (int, float)):
+            try:
+                # Try to parse as number
+                if "." in selector_value:
+                    return field_value == float(selector_value)
+                else:
+                    return field_value == int(selector_value)
+            except ValueError:
+                # If parsing fails, fall back to string comparison
+                return str(field_value) == selector_value
+
+        # Handle string values (default case)
+        return str(field_value) == selector_value
 
     def _get_field_value(self, obj: dict[str, Any], path: str) -> Any:
         """Get value from nested dictionary using dot notation"""
         current = obj
-        for part in path.split("."):
-            if isinstance(current, dict) and part in current:
+        parts = path.split(".")
+
+        for i, part in enumerate(parts):
+            if isinstance(current, dict):
+                if part not in current:
+                    # Return a sentinel value to indicate the field doesn't exist
+                    return NotImplemented
                 current = current[part]
             else:
-                return None
+                return NotImplemented
+
         return current

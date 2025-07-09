@@ -34,7 +34,12 @@ class FakeResourceManager:
         """Get resource instance for performing operations"""
         # Construct API version if group and version provided
         if group is not None and version is not None:
-            api_version = f"{group}/{version}" if group else version
+            # Explicitly check if group is not empty string
+            if group != "":
+                api_version = f"{group}/{version}"
+            else:
+                # If group is empty string, use version alone (core API group)
+                api_version = version
 
         # Find resource definition
         resource_def = None

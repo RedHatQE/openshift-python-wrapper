@@ -1,5 +1,7 @@
 """Status schema parser for generating dynamic status from resource schemas"""
 
+import json
+import os
 import random
 from datetime import datetime, timezone
 from typing import Any, Union
@@ -11,6 +13,22 @@ class StatusSchemaParser:
     def __init__(self, resource_mappings: dict[str, Any]) -> None:
         self.resource_mappings = resource_mappings
         self._definitions_cache: dict[str, Any] = {}
+        self._definitions: dict[str, Any] = {}
+        self._load_definitions()
+
+    def _load_definitions(self) -> None:
+        """Load the definitions file once"""
+        definitions_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "class_generator",
+            "schema",
+            "_definitions.json",
+        )
+
+        if os.path.exists(definitions_path):
+            with open(definitions_path, "r") as f:
+                data = json.load(f)
+                self._definitions = data.get("definitions", {})
 
     def get_status_schema_for_resource(self, kind: str, api_version: str) -> Union[dict[str, Any], None]:
         """Get status schema for a specific resource"""
@@ -40,14 +58,42 @@ class StatusSchemaParser:
 
     def _resolve_reference(self, ref: str) -> Union[dict[str, Any], None]:
         """Resolve a $ref to get the actual schema definition"""
-        # For now, return a placeholder - in real implementation would follow the ref
-        # References are like "#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimStatus"
-        ref_parts = ref.split("/")
-        if len(ref_parts) > 2 and ref_parts[-1]:
-            definition_name = ref_parts[-1]
+        # Check cache first
+        if ref in self._definitions_cache:
+            return self._definitions_cache[ref]
 
-            # Try to find the definition in our mappings
-            # This is simplified - real implementation would load from schema files
+        # Parse the reference
+        # References are like "#/definitions/io.k8s.api.core.v1.PersistentVolumeClaimStatus"
+        if not ref.startswith("#/"):
+            # External references not supported for now
+            return None
+
+        # Remove the leading '#/' and split the path
+        ref_path = ref[2:].split("/")
+
+        # Navigate the schema structure
+        current = None
+        if ref_path[0] == "definitions" and len(ref_path) > 1:
+            definition_name = ref_path[1]
+            if definition_name in self._definitions:
+                current = self._definitions[definition_name]
+
+                # Navigate any additional path segments
+                for segment in ref_path[2:]:
+                    if isinstance(current, dict) and segment in current:
+                        current = current[segment]
+                    else:
+                        current = None
+                        break
+
+        # Cache the result
+        if current is not None:
+            self._definitions_cache[ref] = current
+            return current
+
+        # Fallback to the old method if definition not found
+        if len(ref_path) > 1:
+            definition_name = ref_path[-1]
             return self._get_status_schema_by_type(definition_name)
 
         return None
@@ -156,60 +202,92 @@ class StatusSchemaParser:
         status = {}
         properties = schema.get("properties", {})
 
+        # Check if resource is configured as not ready
+        is_ready = self._is_resource_ready(resource_body)
+
         for field_name, field_schema in properties.items():
-            value = self._generate_value_for_field(field_name, field_schema, resource_body)
+            # Resolve any $ref in the field schema
+            if "$ref" in field_schema:
+                resolved_schema = self._resolve_reference(field_schema["$ref"])
+                if resolved_schema:
+                    field_schema = resolved_schema
+
+            value = self._generate_value_for_field(field_name, field_schema, resource_body, is_ready)
             if value is not None:
                 status[field_name] = value
 
         return status
 
+    def _is_resource_ready(self, resource_body: dict[str, Any]) -> bool:
+        """Check if resource should be generated as ready"""
+        # Check annotations for test configuration
+        metadata = resource_body.get("metadata", {})
+        annotations = metadata.get("annotations", {})
+
+        # Allow configuration via annotation "fake-client.io/ready"
+        if annotations.get("fake-client.io/ready", "").lower() == "false":
+            return False
+
+        # Also check for a more specific ready status in spec
+        if "readyStatus" in resource_body.get("spec", {}):
+            return bool(resource_body["spec"]["readyStatus"])
+
+        # Default to ready
+        return True
+
     def _generate_value_for_field(
-        self, field_name: str, field_schema: dict[str, Any], resource_body: dict[str, Any]
+        self, field_name: str, field_schema: dict[str, Any], resource_body: dict[str, Any], is_ready: bool = True
     ) -> Any:
         """Generate a value for a specific field based on its schema"""
         field_type = field_schema.get("type", "string")
 
         if "enum" in field_schema:
             # For enums, pick an appropriate value
-            return self._pick_enum_value(field_name, field_schema["enum"])
+            return self._pick_enum_value(field_name, field_schema["enum"], is_ready)
 
         if field_type == "string":
-            return self._generate_string_value(field_name)
+            return self._generate_string_value(field_name, is_ready)
         elif field_type == "integer":
-            return self._generate_integer_value(field_name, resource_body)
+            return self._generate_integer_value(field_name, resource_body, is_ready)
         elif field_type == "boolean":
-            return self._generate_boolean_value(field_name)
+            return self._generate_boolean_value(field_name, is_ready)
         elif field_type == "array":
-            return self._generate_array_value(field_name, field_schema, resource_body)
+            return self._generate_array_value(field_name, field_schema, resource_body, is_ready)
         elif field_type == "object":
-            return self._generate_object_value(field_name, field_schema, resource_body)
+            return self._generate_object_value(field_name, field_schema, resource_body, is_ready)
 
         return None
 
-    def _pick_enum_value(self, field_name: str, enum_values: list[str]) -> str:
+    def _pick_enum_value(self, field_name: str, enum_values: list[str], is_ready: bool = True) -> str:
         """Pick an appropriate enum value based on field name"""
         if not enum_values:
             return ""
 
-        # Smart selection based on field name
+        # Smart selection based on field name and ready status
         if field_name == "phase":
-            # Prefer positive states
-            positive_states = ["Bound", "Running", "Active", "Ready", "Available", "Succeeded", "Complete"]
-            for state in positive_states:
-                if state in enum_values:
-                    return state
-            # Fallback to first non-negative state
-            negative_states = ["Failed", "Error", "Terminating", "Unknown", "Pending"]
-            for value in enum_values:
-                if value not in negative_states:
-                    return value
+            if is_ready:
+                # Prefer positive states
+                positive_states = ["Bound", "Running", "Active", "Ready", "Available", "Succeeded", "Complete"]
+                for state in positive_states:
+                    if state in enum_values:
+                        return state
+            else:
+                # Prefer negative/pending states
+                negative_states = ["Failed", "Error", "Terminating", "Pending", "Unknown"]
+                for state in negative_states:
+                    if state in enum_values:
+                        return state
+            # Fallback to first value
+            return enum_values[0]
 
         elif field_name == "status" or field_name.endswith("Status"):
-            # For condition statuses, prefer "True"
-            if "True" in enum_values:
+            # For condition statuses
+            if is_ready and "True" in enum_values:
                 return "True"
-            elif "Active" in enum_values:
-                return "Active"
+            elif not is_ready and "False" in enum_values:
+                return "False"
+            elif "Unknown" in enum_values:
+                return "Unknown"
 
         elif field_name == "type" or field_name.endswith("Type"):
             # For condition types, prefer "Ready" or "Available"
@@ -221,14 +299,14 @@ class StatusSchemaParser:
         # Default to first value
         return enum_values[0]
 
-    def _generate_string_value(self, field_name: str) -> str:
+    def _generate_string_value(self, field_name: str, is_ready: bool = True) -> str:
         """Generate a string value based on field name"""
         if "time" in field_name.lower() or "timestamp" in field_name.lower():
             return datetime.now(timezone.utc).isoformat()
         elif field_name == "message":
-            return "Resource is ready"
+            return "Resource is ready" if is_ready else "Resource is not ready"
         elif field_name == "reason":
-            return "ResourceReady"
+            return "ResourceReady" if is_ready else "ResourceNotReady"
         elif field_name.endswith("IP"):
             return f"10.0.0.{random.randint(1, 254)}"
         elif field_name == "hostname":
@@ -238,15 +316,23 @@ class StatusSchemaParser:
         else:
             return f"test-{field_name}"
 
-    def _generate_integer_value(self, field_name: str, resource_body: dict[str, Any]) -> int:
+    def _generate_integer_value(self, field_name: str, resource_body: dict[str, Any], is_ready: bool = True) -> int:
         """Generate an integer value based on field name"""
         if "replicas" in field_name:
             # Match the spec replicas if available
             spec_replicas = resource_body.get("spec", {}).get("replicas", 1)
-            if field_name in ["replicas", "readyReplicas", "availableReplicas", "updatedReplicas"]:
-                return spec_replicas
-            elif field_name == "unavailableReplicas":
-                return 0
+            if is_ready:
+                if field_name in ["replicas", "readyReplicas", "availableReplicas", "updatedReplicas"]:
+                    return spec_replicas
+                elif field_name == "unavailableReplicas":
+                    return 0
+            else:
+                if field_name == "replicas":
+                    return spec_replicas
+                elif field_name in ["readyReplicas", "availableReplicas", "updatedReplicas"]:
+                    return 0
+                elif field_name == "unavailableReplicas":
+                    return spec_replicas
         elif field_name == "observedGeneration":
             return resource_body.get("metadata", {}).get("generation", 1)
         elif field_name == "restartCount":
@@ -257,9 +343,9 @@ class StatusSchemaParser:
             return 1
         return 1
 
-    def _generate_boolean_value(self, field_name: str) -> bool:
+    def _generate_boolean_value(self, field_name: str, is_ready: bool = True) -> bool:
         """Generate a boolean value based on field name"""
-        # Generally prefer positive values
+        # Generally prefer positive values unless not ready
         negative_indicators = ["disabled", "failed", "error", "unavailable", "notready"]
         field_lower = field_name.lower()
 
@@ -267,17 +353,23 @@ class StatusSchemaParser:
             if indicator in field_lower:
                 return False
 
-        return True
+        return is_ready
 
     def _generate_array_value(
-        self, field_name: str, field_schema: dict[str, Any], resource_body: dict[str, Any]
+        self, field_name: str, field_schema: dict[str, Any], resource_body: dict[str, Any], is_ready: bool = True
     ) -> list[Any]:
         """Generate an array value based on field schema"""
         items_schema = field_schema.get("items", {})
 
+        # Resolve $ref in items if present
+        if "$ref" in items_schema:
+            resolved_items = self._resolve_reference(items_schema["$ref"])
+            if resolved_items:
+                items_schema = resolved_items
+
         if field_name == "conditions":
             # Generate standard conditions
-            return self._generate_conditions()
+            return self._generate_conditions(is_ready)
         elif field_name == "accessModes":
             # Use access modes from spec if available
             spec_modes = resource_body.get("spec", {}).get("accessModes", ["ReadWriteOnce"])
@@ -288,11 +380,11 @@ class StatusSchemaParser:
             return resource_body.get("spec", {}).get("ports", [{"port": 80}])
         else:
             # Generate a single item based on the items schema
-            item = self._generate_value_for_field(f"{field_name}_item", items_schema, resource_body)
+            item = self._generate_value_for_field(f"{field_name}_item", items_schema, resource_body, is_ready)
             return [item] if item is not None else []
 
     def _generate_object_value(
-        self, field_name: str, field_schema: dict[str, Any], resource_body: dict[str, Any]
+        self, field_name: str, field_schema: dict[str, Any], resource_body: dict[str, Any], is_ready: bool = True
     ) -> dict[str, Any]:
         """Generate an object value based on field schema"""
         if field_name == "capacity":
@@ -301,12 +393,18 @@ class StatusSchemaParser:
             return requested.copy() if requested else {"storage": "1Gi"}
         elif field_name == "allocatedResources":
             # Match capacity
-            return self._generate_object_value("capacity", field_schema, resource_body)
+            return self._generate_object_value("capacity", field_schema, resource_body, is_ready)
         elif "properties" in field_schema:
             # Generate based on properties
             obj = {}
             for prop_name, prop_schema in field_schema["properties"].items():
-                value = self._generate_value_for_field(prop_name, prop_schema, resource_body)
+                # Resolve any $ref in property schema
+                if "$ref" in prop_schema:
+                    resolved = self._resolve_reference(prop_schema["$ref"])
+                    if resolved:
+                        prop_schema = resolved
+
+                value = self._generate_value_for_field(prop_name, prop_schema, resource_body, is_ready)
                 if value is not None:
                     obj[prop_name] = value
             return obj
@@ -319,21 +417,39 @@ class StatusSchemaParser:
         else:
             return {}
 
-    def _generate_conditions(self) -> list[dict[str, Any]]:
+    def _generate_conditions(self, is_ready: bool = True) -> list[dict[str, Any]]:
         """Generate standard Kubernetes conditions"""
-        return [
-            {
-                "type": "Ready",
-                "status": "True",
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
-                "reason": "ResourceReady",
-                "message": "Resource is ready",
-            },
-            {
-                "type": "Available",
-                "status": "True",
-                "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
-                "reason": "ResourceAvailable",
-                "message": "Resource is available",
-            },
-        ]
+        if is_ready:
+            return [
+                {
+                    "type": "Ready",
+                    "status": "True",
+                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "reason": "ResourceReady",
+                    "message": "Resource is ready",
+                },
+                {
+                    "type": "Available",
+                    "status": "True",
+                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "reason": "ResourceAvailable",
+                    "message": "Resource is available",
+                },
+            ]
+        else:
+            return [
+                {
+                    "type": "Ready",
+                    "status": "False",
+                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "reason": "ResourceNotReady",
+                    "message": "Resource is not ready",
+                },
+                {
+                    "type": "Available",
+                    "status": "False",
+                    "lastTransitionTime": datetime.now(timezone.utc).isoformat(),
+                    "reason": "ResourceUnavailable",
+                    "message": "Resource is unavailable",
+                },
+            ]

@@ -38,7 +38,14 @@ class FakeKubernetesClient:
         _preload_content: Union[bool, None] = None,
         _request_timeout: Union[int, None] = None,
     ) -> Any:
-        """Fake implementation of API calls - delegates to dynamic client if available"""
+        """
+        Fake implementation of API calls.
+
+        Currently only handles GET requests to "/api/v1" for API resource listing.
+        All other requests return None.
+
+        This is a minimal implementation sufficient for basic testing scenarios.
+        """
         if self.dynamic_client and method == "GET" and "/api/v1" in resource_path:
             # Handle API resource listing
             if resource_path == "/api/v1":

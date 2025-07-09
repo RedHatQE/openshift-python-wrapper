@@ -1,11 +1,15 @@
 """FakeResourceRegistry implementation for fake Kubernetes client"""
 
 import json
+import logging
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, DefaultDict, Union
 
 from fake_kubernetes_client.resource_field import FakeResourceField
+
+
+logger = logging.getLogger(__name__)
 
 
 class FakeResourceRegistry:
@@ -35,16 +39,36 @@ class FakeResourceRegistry:
     def _get_resource_mappings(self) -> dict[str, Any]:
         """Load and cache the resource mappings file (expensive operation - only done once)"""
         if self._resource_mappings_cache is None:
+            mappings_file = Path(__file__).parent / "__resources-mappings.json"
+
             try:
                 # Load from local fake client directory
-                mappings_file = Path(__file__).parent / "__resources-mappings.json"
-                if mappings_file.exists():
+                if not mappings_file.exists():
+                    logger.warning(f"Resource mappings file not found at {mappings_file}")
+                    self._resource_mappings_cache = {}
+                else:
                     with open(mappings_file, "r", encoding="utf-8") as f:
                         self._resource_mappings_cache = json.load(f)
-                else:
-                    self._resource_mappings_cache = {}
-            except Exception:
+                        logger.debug(f"Successfully loaded {len(self._resource_mappings_cache)} resource mappings")
+
+            except FileNotFoundError as e:
+                logger.error(f"Resource mappings file not found: {e}")
                 self._resource_mappings_cache = {}
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse resource mappings JSON file: {e}")
+                logger.error(f"File: {mappings_file}, Line: {e.lineno}, Column: {e.colno}")
+                self._resource_mappings_cache = {}
+            except IOError as e:
+                logger.error(f"IO error while reading resource mappings file: {e}")
+                self._resource_mappings_cache = {}
+            except PermissionError as e:
+                logger.error(f"Permission denied while reading resource mappings file: {e}")
+                self._resource_mappings_cache = {}
+            except Exception as e:
+                # Still catch unexpected exceptions but log them
+                logger.exception(f"Unexpected error while loading resource mappings: {type(e).__name__}: {e}")
+                self._resource_mappings_cache = {}
+
         return self._resource_mappings_cache
 
     def _apply_known_corrections(self, kind: str, resource_def: dict[str, Any]) -> dict[str, Any]:

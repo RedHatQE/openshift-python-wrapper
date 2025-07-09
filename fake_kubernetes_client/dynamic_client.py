@@ -2,6 +2,7 @@
 
 from typing import Any, Union
 
+from fake_kubernetes_client.exceptions import NotFoundError
 from fake_kubernetes_client.kubernetes_client import FakeKubernetesClient
 from fake_kubernetes_client.resource_field import FakeResourceField
 from fake_kubernetes_client.resource_manager import FakeResourceManager
@@ -14,15 +15,19 @@ class FakeDynamicClient:
     """Fake implementation of kubernetes.dynamic.DynamicClient"""
 
     def __init__(self, client: Union[FakeKubernetesClient, None] = None) -> None:
-        self.client = client or FakeKubernetesClient(dynamic_client=self)
+        # Distinguish between creating a new client vs using an existing one
+        if client is None:
+            # Create a new client with circular reference
+            self.client = FakeKubernetesClient(dynamic_client=self)
+        else:
+            # Use the provided client without modifying its dynamic_client reference
+            # This respects any intentional null or existing value
+            self.client = client
+
         self.configuration = self.client.configuration
         self.storage = FakeResourceStorage()
         self.registry = FakeResourceRegistry()
         self._resources_manager = FakeResourceManager(client=self)
-
-        # Set dynamic client reference in client if not already set
-        if not self.client.dynamic_client:
-            self.client.dynamic_client = self
 
     @property
     def resources(self) -> FakeResourceManager:
@@ -58,11 +63,13 @@ class FakeDynamicClient:
 
     def ensure_namespace(self, namespace: str) -> FakeResourceField:
         """Ensure namespace exists (fake implementation)"""
+        # Get the namespace resource definition
+        ns_resource = self.resources.get(api_version="v1", kind="Namespace")
+
         # Check if namespace exists
         try:
-            ns_resource = self.resources.get(api_version="v1", kind="Namespace")
             return ns_resource.get(name=namespace)
-        except Exception:
+        except NotFoundError:
             # Create namespace if it doesn't exist
             body = {
                 "metadata": {"name": namespace},

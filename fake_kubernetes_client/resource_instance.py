@@ -329,9 +329,8 @@ class FakeResourceInstance:
         )
         if not existing:
             self._create_not_found_error(name)
-
-        # Type assertion - at this point existing cannot be None
-        assert existing is not None
+            # This line is unreachable but satisfies type checker
+            return FakeResourceField(data={})
 
         # Simple merge patch implementation
         patched = copy.deepcopy(existing)
@@ -377,9 +376,8 @@ class FakeResourceInstance:
         )
         if not existing:
             self._create_not_found_error(name)
-
-        # Type assertion - at this point existing cannot be None
-        assert existing is not None
+            # This line is unreachable but satisfies type checker
+            return FakeResourceField(data={})
 
         # Check for resourceVersion conflict - this is what Kubernetes does
         if "metadata" in body and "resourceVersion" in body["metadata"]:

@@ -27,7 +27,6 @@ except ImportError:
     class FakeClientNotFoundError(FakeClientApiException):
         def __init__(self, reason: str = "Not Found") -> None:
             super().__init__(status=404, reason=reason)
-            self.status = 404
 
     class FakeClientConflictError(FakeClientApiException):
         def __init__(self, reason: str = "Conflict") -> None:
