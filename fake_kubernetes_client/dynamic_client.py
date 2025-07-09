@@ -4,7 +4,6 @@ from typing import Any, Union
 
 from fake_kubernetes_client.kubernetes_client import FakeKubernetesClient
 from fake_kubernetes_client.resource_field import FakeResourceField
-from fake_kubernetes_client.resource_instance import FakeResourceInstance
 from fake_kubernetes_client.resource_manager import FakeResourceManager
 from fake_kubernetes_client.resource_registry import FakeResourceRegistry
 from fake_kubernetes_client.resource_storage import FakeResourceStorage
@@ -73,35 +72,3 @@ class FakeDynamicClient:
     def api_client(self) -> FakeKubernetesClient:
         """Get the underlying API client"""
         return self.client
-
-
-def create_fake_client_with_resources(resources: list[dict[str, Any]]) -> FakeDynamicClient:
-    """Create a fake client with pre-populated resources"""
-    client = FakeDynamicClient()
-
-    for resource in resources:
-        # Extract resource info
-        api_version = resource.get("apiVersion", "v1")
-        kind = resource.get("kind", "")
-        metadata = resource.get("metadata", {})
-        name = metadata.get("name", "")
-        namespace = metadata.get("namespace")
-
-        if not kind or not name:
-            continue
-
-        # Get resource definition
-        resource_def = client.registry.get_resource_definition(kind=kind, api_version=api_version)
-        if not resource_def:
-            # Skip unknown resources
-            continue
-
-        # Create resource instance and store
-        resource_instance = FakeResourceInstance(resource_def=resource_def, storage=client.storage, client=client)
-        try:
-            resource_instance.create(body=resource, namespace=namespace)
-        except Exception:
-            # Skip if creation fails (e.g., duplicate)
-            pass
-
-    return client
