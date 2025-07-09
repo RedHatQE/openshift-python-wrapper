@@ -63,7 +63,7 @@ class FakeDynamicClient:
             ns_resource = self.resources.get(api_version="v1", kind="Namespace")
             return ns_resource.get(name=namespace)
         except Exception:
-            # Create namespace
+            # Create namespace if it doesn't exist
             body = {
                 "metadata": {"name": namespace},
                 "spec": {"finalizers": ["kubernetes"]},
