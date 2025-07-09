@@ -42,6 +42,7 @@ repos:
           [
             "--exclude-files=class_generator/schema/*",
             "--exclude-files=class_generator/__k8s-openapi-.*.json",
+            "--exclude-files=fake_kubernetes_client/__resources-mappings.json",
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit

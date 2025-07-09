@@ -1,47 +1,34 @@
-"""
-Fake Kubernetes DynamicClient for Testing
+"""Fake Kubernetes client for testing"""
 
-This package provides a comprehensive fake implementation of the Kubernetes DynamicClient
-that can be used as a drop-in replacement for unit testing.
-
-Features:
-- Complete CRUD operations (Create, Read, Update, Delete, Patch, Replace)
-- Resource discovery and auto-generation for any resource kind
-- Label and field selectors
-- Watch functionality
-- Automatic event generation
-- Realistic status simulation
-- Universal resource support (works with any Kubernetes/OpenShift resource)
-
-Usage:
-    from fake_kubernetes_client import FakeDynamicClient
-
-    client = FakeDynamicClient()
-
-    # Use exactly like real DynamicClient
-    pod_api = client.resources.get(kind="Pod", api_version="v1")
-    pod = pod_api.create(body=pod_manifest, namespace="default")
-"""
-
-from .fake_dynamic_client import (
-    FakeDynamicClient,
-    create_fake_client_with_resources,
-    create_fake_client_with_custom_resources,
-    FakeResourceField,
-    FakeResourceInstance,
-    FakeResourceRegistry,
-    FakeResourceStorage,
+from fake_kubernetes_client.configuration import FakeConfiguration
+from fake_kubernetes_client.dynamic_client import FakeDynamicClient, create_fake_client_with_resources
+from fake_kubernetes_client.exceptions import (
+    ConflictError,
+    ForbiddenError,
+    MethodNotAllowedError,
+    NotFoundError,
+    ResourceNotFoundError,
+    ServerTimeoutError,
 )
+from fake_kubernetes_client.kubernetes_client import FakeKubernetesClient
+from fake_kubernetes_client.resource_field import FakeResourceField
+from fake_kubernetes_client.resource_instance import FakeResourceInstance
+from fake_kubernetes_client.resource_registry import FakeResourceRegistry
+from fake_kubernetes_client.resource_storage import FakeResourceStorage
 
 __all__ = [
+    "FakeConfiguration",
     "FakeDynamicClient",
-    "create_fake_client_with_resources",
-    "create_fake_client_with_custom_resources",
+    "FakeKubernetesClient",
     "FakeResourceField",
     "FakeResourceInstance",
     "FakeResourceRegistry",
     "FakeResourceStorage",
+    "create_fake_client_with_resources",
+    "ConflictError",
+    "ForbiddenError",
+    "MethodNotAllowedError",
+    "NotFoundError",
+    "ResourceNotFoundError",
+    "ServerTimeoutError",
 ]
-
-# Main export for easy importing
-__version__ = "1.0.0"
