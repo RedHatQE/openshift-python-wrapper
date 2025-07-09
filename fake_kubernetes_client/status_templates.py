@@ -3,11 +3,14 @@
 from datetime import datetime, timezone
 from typing import Any
 
+from fake_kubernetes_client.status_schema_parser import StatusSchemaParser
 
-def add_realistic_status(body: dict[str, Any]) -> None:
+
+def add_realistic_status(body: dict[str, Any], resource_mappings: dict[str, Any] | None = None) -> None:
     """Add realistic status to resources that need it"""
     kind = body.get("kind", "")
 
+    # First check if we have a hardcoded template
     if kind == "Pod":
         status = get_pod_status_template(body=body)
     elif kind == "Deployment":
@@ -17,11 +20,30 @@ def add_realistic_status(body: dict[str, Any]) -> None:
     elif kind == "Namespace":
         status = get_namespace_status_template(body=body)
     else:
-        # Generic status for other resources
-        status = get_generic_status_template(body=body)
+        # Try schema-based generation if mappings are available
+        if resource_mappings:
+            status = generate_dynamic_status(body=body, resource_mappings=resource_mappings)
+        else:
+            # Fallback to generic status
+            status = get_generic_status_template(body=body)
 
     if status:
         body["status"] = status
+
+
+def generate_dynamic_status(body: dict[str, Any], resource_mappings: dict[str, Any]) -> dict[str, Any]:
+    """Generate status dynamically based on resource schema"""
+    kind = body.get("kind", "")
+    api_version = body.get("apiVersion", "v1")
+
+    parser = StatusSchemaParser(resource_mappings=resource_mappings)
+    status_schema = parser.get_status_schema_for_resource(kind=kind, api_version=api_version)
+
+    if status_schema:
+        return parser.generate_status_from_schema(schema=status_schema, resource_body=body)
+    else:
+        # Fallback to generic status
+        return get_generic_status_template(body=body)
 
 
 def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:

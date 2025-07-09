@@ -23,6 +23,18 @@
         "template"
       ],
       "properties": {
+        "machineNamePrefix": {
+          "description": "machineNamePrefix is the prefix used when creating machine names.\nEach machine name will consist of this prefix, followed by\na randomly generated string of 5 characters, and the index of the machine.\nIt must be a lowercase RFC 1123 subdomain, consisting of lowercase\nalphanumeric characters, hyphens ('-'), and periods ('.').\nEach block, separated by periods, must start and end with an alphanumeric character.\nHyphens are not allowed at the start or end of a block, and consecutive periods are not permitted.\nThe prefix must be between 1 and 245 characters in length.\nFor example, if machineNamePrefix is set to 'control-plane',\nand three machines are created, their names might be:\ncontrol-plane-abcde-0, control-plane-fghij-1, control-plane-klmno-2",
+          "type": "string",
+          "maxLength": 245,
+          "minLength": 1,
+          "x-kubernetes-validations": [
+            {
+              "message": "a lowercase RFC 1123 subdomain must consist of lowercase alphanumeric characters, hyphens ('-'), and periods ('.'). Each block, separated by periods, must start and end with an alphanumeric character. Hyphens are not allowed at the start or end of a block, and consecutive periods are not permitted.",
+              "rule": "!format.dns1123Subdomain().validate(self).hasValue()"
+            }
+          ]
+        },
         "replicas": {
           "description": "replicas defines how many Control Plane Machines should be\ncreated by this ControlPlaneMachineSet.\nThis field is immutable and cannot be changed after cluster\ninstallation.\nThe ControlPlaneMachineSet only operates with 3 or 5 node control planes,\n3 and 5 are the only valid values for this field.",
           "type": "integer",

@@ -72,3 +72,56 @@ class FakeDynamicClient:
     def api_client(self) -> FakeKubernetesClient:
         """Get the underlying API client"""
         return self.client
+
+    def register_resources(self, resources: dict[str, Any] | list[dict[str, Any]]) -> None:
+        """
+        Register custom resources dynamically.
+
+        This method allows you to add custom resource definitions to the fake client,
+        which is useful for testing with Custom Resource Definitions (CRDs) or
+        resources that are not included in the default schema.
+
+        Args:
+            resources: Either a single resource definition dict or a list of resource definitions.
+                      Each resource definition should contain:
+                      - kind: Resource kind (required)
+                      - api_version: API version without group (required)
+                      - group: API group (optional, empty string for core resources)
+                      - namespaced: Whether resource is namespaced (optional, defaults to True)
+                      - plural: Plural name (optional, will be generated if not provided)
+                      - singular: Singular name (optional, defaults to lowercase kind)
+
+        Example:
+            # Register a single custom resource
+            client.register_resources({
+                "kind": "MyCustomResource",
+                "api_version": "v1alpha1",
+                "group": "example.com",
+                "namespaced": True
+            })
+
+            # Register multiple resources
+            client.register_resources([
+                {
+                    "kind": "MyApp",
+                    "api_version": "v1",
+                    "group": "apps.example.com",
+                    "namespaced": True,
+                    "plural": "myapps"
+                },
+                {
+                    "kind": "MyConfig",
+                    "api_version": "v1beta1",
+                    "group": "config.example.com",
+                    "namespaced": False  # cluster-scoped
+                }
+            ])
+
+            # After registration, use the resources normally
+            myapp_api = client.resources.get(
+                api_version="apps.example.com/v1",
+                kind="MyApp"
+            )
+            myapp_api.create(body={...}, namespace="default")
+        """
+        self.registry.register_resources(resources=resources)

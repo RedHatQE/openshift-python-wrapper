@@ -47,6 +47,18 @@ class FakeResourceInstance:
             # K8sApiException not available (ImportError at module level)
             raise NotFoundError(f"{self.resource_def['kind']} '{name}' not found")
 
+    def _create_conflict_error(self, name: str) -> None:
+        """Create proper ConflictError with Kubernetes-style exception"""
+        try:
+            # ConflictError expects an ApiException as argument
+            api_exception = K8sApiException(status=409, reason="AlreadyExists")
+            api_exception.body = f'{{"kind":"Status","apiVersion":"v1","metadata":{{}},"status":"Failure","message":"{self.resource_def["kind"]} \\"{name}\\" already exists","reason":"AlreadyExists","code":409}}'
+            raise ConflictError(api_exception)
+        except (NameError, TypeError):
+            # K8sApiException not available (ImportError at module level)
+            # Use our fake ConflictError which has status attribute
+            raise ConflictError(f"{self.resource_def['kind']} '{name}' already exists")
+
     def _generate_resource_version(self) -> str:
         """Generate unique resource version"""
         return str(int(time.time() * 1000))
@@ -90,7 +102,7 @@ class FakeResourceInstance:
             kind=self.resource_def["kind"], api_version=storage_api_version, name=name, namespace=resource_namespace
         )
         if existing:
-            raise ConflictError(f"{self.resource_def['kind']} '{name}' already exists")
+            self._create_conflict_error(name)
 
         # Add generated metadata
         body["metadata"].update({
@@ -107,22 +119,28 @@ class FakeResourceInstance:
         body["kind"] = self.resource_def["kind"]
 
         # Add realistic status for resources that need it
-        add_realistic_status(body=body)
+        # Pass resource mappings from registry if available
+        resource_mappings = None
+        if self.client and hasattr(self.client, "registry"):
+            resource_mappings = self.client.registry._get_resource_mappings()
+
+        add_realistic_status(body=body, resource_mappings=resource_mappings)
 
         # Special case: ProjectRequest is ephemeral - only creates Project (matches real cluster behavior)
         if self.resource_def["kind"] == "ProjectRequest":
+            # Don't store ProjectRequest - it's ephemeral
             project_body = self._create_corresponding_project(body)
             # Generate events for the Project creation, not ProjectRequest
             self._generate_resource_events(project_body, "Created", "created")
             # Return Project data, not ProjectRequest (ProjectRequest is ephemeral)
             return FakeResourceField(data=project_body)
 
-        # Store the resource using correct API version (for all non-ProjectRequest resources)
+        # Store resource with initial metadata and status
         self.storage.store_resource(
+            api_version=storage_api_version,  # Use consistent API version for storage
             kind=self.resource_def["kind"],
-            api_version=storage_api_version,
             name=name,
-            namespace=resource_namespace,
+            namespace=self._normalize_namespace(namespace),  # Normalize namespace (empty string -> None)
             resource=body,
         )
 
@@ -351,6 +369,20 @@ class FakeResourceInstance:
         # Type assertion - at this point existing cannot be None
         assert existing is not None
 
+        # Check for resourceVersion conflict - this is what Kubernetes does
+        if "metadata" in body and "resourceVersion" in body["metadata"]:
+            if body["metadata"]["resourceVersion"] != existing["metadata"]["resourceVersion"]:
+                # Create conflict error with proper message
+                try:
+                    api_exception = K8sApiException(status=409, reason="Conflict")
+                    api_exception.body = f'{{"kind":"Status","apiVersion":"v1","metadata":{{}},"status":"Failure","message":"Operation cannot be fulfilled on {self.resource_def["kind"].lower()}s.{self.resource_def.get("group", "")} \\"{name}\\": the object has been modified; please apply your changes to the latest version and try again","reason":"Conflict","code":409}}'
+                    raise ConflictError(api_exception)
+                except (NameError, TypeError):
+                    # Use our fake ConflictError which has status attribute
+                    raise ConflictError(
+                        f"Operation cannot be fulfilled on {self.resource_def['kind']} '{name}': the object has been modified"
+                    )
+
         # Ensure metadata is preserved
         if "metadata" not in body:
             body["metadata"] = {}
@@ -378,7 +410,18 @@ class FakeResourceInstance:
         # Generate automatic events for resource replacement
         self._generate_resource_events(body, "Updated", "replaced")
 
-        return FakeResourceField(data=body)
+        # Return the stored resource (which has the updated metadata)
+        return FakeResourceField(
+            data=self.storage.get_resource(
+                kind=self.resource_def["kind"], api_version=storage_api_version, name=name, namespace=namespace
+            )
+        )
+
+    def update(
+        self, name: str | None = None, body: dict[str, Any] | None = None, namespace: str | None = None, **kwargs: Any
+    ) -> FakeResourceField:
+        """Update a resource (alias for replace)"""
+        return self.replace(name=name, body=body, namespace=namespace, **kwargs)
 
     def watch(
         self, namespace: str | None = None, timeout: int | None = None, **kwargs: Any

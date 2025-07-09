@@ -22,11 +22,84 @@
           "description": "Enable flag ignores a reconcile if set to false",
           "type": "boolean"
         },
+        "resourceNameMappingConfigMap": {
+          "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "storageClasses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "storageQuotaInGiB": {
           "description": "StorageQuotaInGiB describes quota for the consumer",
           "type": "integer"
+        },
+        "volumeGroupSnapshotClasses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "volumeReplicationClasses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "volumeSnapshotClasses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
         }
-      }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "storageQuotaInGiB cannot be decreased unless setting to 0",
+          "rule": "!(has(self.storageQuotaInGiB) && has(oldSelf.storageQuotaInGiB) && self.storageQuotaInGiB < oldSelf.storageQuotaInGiB && self.storageQuotaInGiB != 0)"
+        }
+      ]
     },
     "status": {
       "description": "StorageConsumerStatus defines the observed state of StorageConsumer",
@@ -62,43 +135,34 @@
           }
         },
         "client": {
-          "description": "Information of storage client received from consumer",
-          "type": "object",
-          "properties": {
-            "clientId": {
-              "description": "ID is the k8s UID of connected storageclient",
-              "type": "string"
-            },
-            "clusterId": {
-              "description": "ClusterID is the id of the openshift cluster",
-              "type": "string"
-            },
-            "clusterName": {
-              "description": "ClusterName is the name of the openshift cluster",
-              "type": "string"
-            },
-            "name": {
-              "description": "Name is the name of connected storageclient",
-              "type": "string"
-            },
-            "operatorVersion": {
-              "description": "StorageClient Operator Version",
-              "type": "string"
-            },
-            "platformVersion": {
-              "description": "StorageClient Platform Version",
-              "type": "string"
-            },
-            "storageQuotaUtilizationRatio": {
-              "description": "StorageQuotaUtilizationRatio is the ratio of utilized quota of connected client",
-              "type": "number"
-            }
-          }
+          "description": "Information of storage client received from consumer"
         },
         "lastHeartbeat": {
           "description": "Timestamp of last heartbeat received from consumer",
           "type": "string",
           "format": "date-time"
+        },
+        "onboardingTicketSecret": {
+          "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "resourceNameMappingConfigMap": {
+          "description": "LocalObjectReference contains enough information to let you locate the\nreferenced object inside the same namespace.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
         },
         "state": {
           "description": "State describes the state of StorageConsumer",

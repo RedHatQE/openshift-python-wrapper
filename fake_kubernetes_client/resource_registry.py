@@ -127,9 +127,22 @@ class FakeResourceRegistry:
                     self._builtin_resources[key] = resource_def
 
     def _register_additional_resources(self) -> None:
-        """Register additional resources that are not in the JSON file but are needed for tests"""
-        # These are resources that don't exist in the OpenShift schema but are used in tests
+        """Register additional resources that are not in OpenShift schema"""
+        # MTQ resources (not in OpenShift schema)
         additional_resources = [
+            {
+                "kind": "MigrationToolkitQuota",
+                "api_version": "v1alpha1",
+                "group": "mtq.kubevirt.io",
+                "version": "v1alpha1",
+                "group_version": "mtq.kubevirt.io/v1alpha1",
+                "plural": "migrationtoolkitquotas",
+                "singular": "migrationtoolkitquota",
+                "namespaced": False,
+                "shortNames": ["mtq"],
+                "categories": ["all"],
+                "schema_source": "additional",
+            },
             {
                 "kind": "MTQ",
                 "api_version": "v1alpha1",
@@ -139,19 +152,6 @@ class FakeResourceRegistry:
                 "plural": "mtqs",
                 "singular": "mtq",
                 "namespaced": False,
-                "shortNames": [],
-                "categories": ["all"],
-                "schema_source": "additional",
-            },
-            {
-                "kind": "Image",
-                "api_version": "v1alpha1",
-                "group": "caching.internal.knative.dev",
-                "version": "v1alpha1",
-                "group_version": "caching.internal.knative.dev/v1alpha1",
-                "plural": "images",
-                "singular": "image",
-                "namespaced": True,
                 "shortNames": [],
                 "categories": ["all"],
                 "schema_source": "additional",
@@ -169,6 +169,32 @@ class FakeResourceRegistry:
                 "categories": ["all"],
                 "schema_source": "additional",
             },
+            {
+                "kind": "PodMetrics",
+                "api_version": "v1beta1",
+                "group": "metrics.k8s.io",
+                "version": "v1beta1",
+                "group_version": "metrics.k8s.io/v1beta1",
+                "plural": "podmetrics",
+                "singular": "podmetrics",
+                "namespaced": True,
+                "shortNames": [],
+                "categories": ["all"],
+                "schema_source": "additional",
+            },
+            {
+                "kind": "Image",
+                "api_version": "v1alpha1",
+                "group": "caching.internal.knative.dev",
+                "version": "v1alpha1",
+                "group_version": "caching.internal.knative.dev/v1alpha1",
+                "plural": "images",
+                "singular": "image",
+                "namespaced": True,
+                "shortNames": [],
+                "categories": ["all"],
+                "schema_source": "additional",
+            },
         ]
 
         for resource_def in additional_resources:
@@ -178,6 +204,88 @@ class FakeResourceRegistry:
             key = (group_version, kind)
             self._builtin_resources[key] = resource_def
             self._additional_resources.setdefault(kind, []).append(resource_def)
+
+    def register_resources(self, resources: dict[str, Any] | list[dict[str, Any]]) -> None:
+        """
+        Register custom resources dynamically.
+
+        Args:
+            resources: Either a single resource definition dict or a list of resource definitions.
+                      Each resource definition should contain:
+                      - kind: Resource kind (required)
+                      - api_version: API version without group (required)
+                      - group: API group (optional, empty string for core resources)
+                      - version: Same as api_version (required)
+                      - group_version: Full group/version string (required)
+                      - plural: Plural name (optional, will be generated if not provided)
+                      - singular: Singular name (optional, defaults to lowercase kind)
+                      - namespaced: Whether resource is namespaced (optional, defaults to True)
+                      - shortNames: List of short names (optional)
+                      - categories: List of categories (optional, defaults to ["all"])
+
+        Example:
+            client.registry.register_resources({
+                "kind": "MyCustomResource",
+                "api_version": "v1alpha1",
+                "group": "example.com",
+                "version": "v1alpha1",
+                "group_version": "example.com/v1alpha1",
+                "plural": "mycustomresources",
+                "singular": "mycustomresource",
+                "namespaced": True,
+                "shortNames": ["mcr"],
+                "categories": ["all"]
+            })
+        """
+        # Convert single resource to list for uniform processing
+        resource_list = [resources] if isinstance(resources, dict) else resources
+
+        for resource_def in resource_list:
+            # Validate required fields
+            if not isinstance(resource_def, dict):
+                raise ValueError(f"Resource definition must be a dictionary, got {type(resource_def)}")
+
+            kind = resource_def.get("kind", "")
+            if not kind:
+                raise ValueError("Resource definition must have 'kind' field")
+
+            api_version = resource_def.get("api_version", "")
+            if not api_version:
+                raise ValueError(f"Resource {kind} must have 'api_version' field")
+
+            # Build complete resource definition with defaults
+            group = resource_def.get("group", "")
+            version = resource_def.get("version", api_version)
+
+            # Generate group_version if not provided
+            if "group_version" not in resource_def:
+                group_version = f"{group}/{version}" if group else version
+            else:
+                group_version = resource_def["group_version"]
+
+            # Generate plural if not provided
+            plural = resource_def.get("plural", self._generate_plural_form(kind))
+
+            # Build complete resource definition
+            complete_def = {
+                "kind": kind,
+                "api_version": api_version,
+                "group": group,
+                "version": version,
+                "group_version": group_version,
+                "plural": plural,
+                "singular": resource_def.get("singular", kind.lower()),
+                "namespaced": resource_def.get("namespaced", True),
+                "shortNames": resource_def.get("shortNames", []),
+                "categories": resource_def.get("categories", ["all"]),
+                "schema_source": "user_defined",
+            }
+
+            # Register the resource
+            self.resources[kind].append(complete_def)
+            key = (str(group_version), str(kind))
+            self._builtin_resources[key] = complete_def
+            self._additional_resources.setdefault(kind, []).append(complete_def)
 
     def search(
         self, kind: str | None = None, group: str | None = None, api_version: str | None = None, **kwargs: Any

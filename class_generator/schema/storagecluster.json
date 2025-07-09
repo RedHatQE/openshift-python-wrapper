@@ -20,7 +20,13 @@
       "properties": {
         "allowRemoteStorageConsumers": {
           "description": "AllowRemoteStorageConsumers Indicates that the OCS cluster should deploy the needed\ncomponents to enable connections from remote consumers.",
-          "type": "boolean"
+          "type": "boolean",
+          "x-kubernetes-validations": [
+            {
+              "message": "allowRemoteStorageConsumers is immutable",
+              "rule": "oldSelf == self"
+            }
+          ]
         },
         "arbiter": {
           "description": "ArbiterSpec specifies the storage cluster options related to arbiter.\nIf Arbiter is enabled, ArbiterLocation in the NodeTopologies must be specified.",
@@ -406,10 +412,6 @@
             }
           }
         },
-        "defaultStorageProfile": {
-          "description": "DefaultStorageProfile is the default storage profile to use for\nthe storagerequest as StorageProfile is optional.",
-          "type": "string"
-        },
         "enableCephTools": {
           "description": "EnableCephTools toggles on whether or not the ceph tools pod\nshould be deployed.\nDefaults to false",
           "type": "boolean"
@@ -540,6 +542,10 @@
               "properties": {
                 "defaultStorageClass": {
                   "description": "if set to true, the storageClass created for cephBlockPools will be annotated as the default for the whole cluster",
+                  "type": "boolean"
+                },
+                "defaultVirtualizationStorageClass": {
+                  "description": "if set to true, the virtualization storageClass will be annotated as the default for kubevirt workloads",
                   "type": "boolean"
                 },
                 "disableSnapshotClass": {
@@ -730,6 +736,16 @@
                   "description": "BackfillFullRatio is the ratio at which the cluster is too full for backfill. Backfill will be disabled if above this threshold. Default is 0.80.",
                   "maximum": 1,
                   "minimum": 0
+                },
+                "cephConfig": {
+                  "description": "Ceph Config options",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "continueUpgradeAfterChecksEvenIfNotHealthy": {
                   "description": "Whether or not continue if PGs are not clean during an upgrade",
@@ -3828,8 +3844,13 @@
           }
         },
         "providerAPIServerServiceType": {
-          "description": "ProviderAPIServerServiceType Indicates the ServiceType for OCS Provider API Server Service.\nThe supported values are NodePort or LoadBalancer. The default ServiceType is NodePort if the value is empty.\nThis will only be used when AllowRemoteStorageConsumers is set to true",
-          "type": "string"
+          "description": "ProviderAPIServerServiceType Indicates the ServiceType for OCS Provider API Server Service.\nThe default ServiceType is derived from hostNetwork field.",
+          "type": "string",
+          "enum": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer"
+          ]
         },
         "resourceProfile": {
           "description": "Resource Profile can be used to choose from a set of predefined resource profiles for the ceph daemons.\nWe have 3 profiles\nlean: suitable for clusters with limited resources,\nbalanced: suitable for most use cases,\nperformance: suitable for clusters with high amount of resources.",

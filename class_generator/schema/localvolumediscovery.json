@@ -140,6 +140,9 @@
           "items": {
             "description": "OperatorCondition is just the standard condition fields.",
             "type": "object",
+            "required": [
+              "type"
+            ],
             "properties": {
               "lastTransitionTime": {
                 "type": "string",

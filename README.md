@@ -41,6 +41,10 @@ From pypi:
 pip install openshift-python-wrapper --user
 ```
 
+## Fake Kubernetes Client
+
+The project includes a comprehensive fake Kubernetes client for testing without a real cluster. See [Fake Kubernetes Client documentation](fake_kubernetes_client/README.md) for details.
+
 ## Release new version
 
 ### requirements
