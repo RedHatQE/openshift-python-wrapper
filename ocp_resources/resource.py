@@ -1797,7 +1797,7 @@ class BaseResourceList(ABC):
         """Returns the number of resources in the list."""
         return len(self.resources)
 
-    def deploy(self, wait: bool = False) -> list[Resource]:
+    def deploy(self, wait: bool = False) -> list[Resource | NamespacedResource]:
         """
         Deploys all resources in the list.
 
@@ -1849,7 +1849,7 @@ class ResourceList(BaseResourceList):
         Args:
             resource_class (Type[Resource]): The resource class to instantiate (e.g., Namespace).
             num_resources (int): The number of resource copies to create.
-            client (DynamicClient | None, optional): The dynamic client to use. Defaults to None.
+            client (DynamicClient): The dynamic client to use. Defaults to None.
             **kwargs (Any): Arguments to be passed to the constructor of the resource_class.
                               A 'name' key is required in kwargs to serve as the base name for the resources.
         """
@@ -1892,7 +1892,7 @@ class NamespacedResourceList(BaseResourceList):
         Args:
             resource_class (Type[NamespacedResource]): The namespaced resource class to instantiate (e.g., Pod).
             namespaces (List[str]): A list of namespace names where the resources will be created.
-            client (DynamicClient | None, optional): The dynamic client to use for cluster communication.
+            client (DynamicClient): The dynamic client to use for cluster communication.
             **kwargs (Any): Additional arguments to be passed to the resource_class constructor.
                               A 'name' key is required in kwargs to serve as the base name for the resources.
         """
