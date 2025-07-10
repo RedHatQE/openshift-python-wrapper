@@ -1,375 +1,278 @@
 # Fake Kubernetes Client
 
-A comprehensive fake implementation of `kubernetes.dynamic.DynamicClient` for unit testing. This package provides a complete in-memory simulation of the Kubernetes API that works as a drop-in replacement for the real client in testing environments.
+A fake/mock implementation of the Kubernetes dynamic client for testing purposes. This allows you to test Kubernetes-related code without needing an actual cluster.
 
-## 🎯 Overview
+## Features
 
-The Fake Kubernetes Client eliminates the need for:
+- Full CRUD operations (Create, Read, Update, Delete) for Kubernetes resources
+- Support for all standard Kubernetes resources and Custom Resources
+- Proper API group/version/kind handling
+- Namespace support
+- Label selector support
+- Field selector support (limited)
+- Watch functionality with event generation
+- Realistic status generation for resources
+- Configurable resource ready/not-ready states
 
-- Real Kubernetes clusters in unit tests
-- Complex mocking setups
-- External dependencies during testing
-- Network calls in test environments
-
-It provides a fully functional, in-memory Kubernetes API simulation that supports all major operations including CRUD, resource discovery, label/field selectors, watch functionality, and automatic event generation.
-
-## 📦 Installation
-
-The fake client is included as part of this project. Simply import it:
+## Installation
 
 ```python
-from fake_kubernetes_client import FakeDynamicClient
+from fake_kubernetes_client import create_fake_client
+
+# Create a fake client
+fake_client = create_fake_client()
+
+# Use it like a real Kubernetes dynamic client
+api = fake_client.resources.get(api_version="v1", kind="Pod")
 ```
 
-## 🚀 Quick Start
+## Basic Usage
 
-### Basic Usage
+### Creating Resources
 
 ```python
-from fake_kubernetes_client import FakeDynamicClient
-
-# Create a fake client (no cluster connection needed)
-client = FakeDynamicClient()
-
-# Use exactly like the real DynamicClient
-pod_api = client.resources.get(kind="Pod", api_version="v1")
-
-# Create a pod
-pod_manifest = {
+# Create a Pod
+pod = {
     "apiVersion": "v1",
     "kind": "Pod",
-    "metadata": {"name": "test-pod", "namespace": "default"},
-    "spec": {"containers": [{"name": "test", "image": "nginx"}]}
+    "metadata": {
+        "name": "test-pod",
+        "namespace": "default"
+    },
+    "spec": {
+        "containers": [{
+            "name": "nginx",
+            "image": "nginx:latest"
+        }]
+    }
 }
 
-created_pod = pod_api.create(body=pod_manifest, namespace="default")
-print(f"Created: {created_pod.metadata.name}")
-
-# Retrieve the pod
-pod = pod_api.get(name="test-pod", namespace="default")
-print(f"Retrieved: {pod.metadata.name}")
-
-# List pods
-pods = pod_api.get(namespace="default")
-print(f"Found {len(pods.items)} pods")
-
-# Delete the pod
-deleted_pod = pod_api.delete(name="test-pod", namespace="default")
-print(f"Deleted: {deleted_pod.metadata.name}")
+created_pod = api.create(body=pod, namespace="default")
+print(created_pod.metadata.name)  # test-pod
+print(created_pod.status.phase)  # Running
 ```
 
-### Test Integration
+### Listing Resources
 
-Perfect for pytest fixtures:
+```python
+# List all pods
+pods = api.get(namespace="default")
+for pod in pods.items:
+    print(pod.metadata.name)
+
+# List with label selector
+pods = api.get(namespace="default", label_selector="app=nginx")
+```
+
+### Updating Resources
+
+```python
+# Update a pod
+pod = api.get(name="test-pod", namespace="default")
+pod.metadata.labels = {"app": "nginx"}
+updated = api.patch(
+    name="test-pod",
+    namespace="default",
+    body=pod
+)
+```
+
+### Deleting Resources
+
+```python
+# Delete a pod
+api.delete(name="test-pod", namespace="default")
+```
+
+### Watch Operations
+
+```python
+# Watch for changes
+count = 0
+for event in api.watch(namespace="default", timeout=5):
+    print(f"{event['type']}: {event['object'].metadata.name}")
+    count += 1
+    if count >= 3:
+        break
+```
+
+## Configuring Resource Ready Status
+
+You can configure resources to be in a "not ready" state for testing scenarios where resources are not fully available. This works for all resource types.
+
+### Using Annotations
+
+Add the `fake-client.io/ready` annotation to any resource:
+
+```python
+# Create a Pod that's not ready
+pod = {
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "name": "not-ready-pod",
+        "namespace": "default",
+        "annotations": {
+            "fake-client.io/ready": "false"  # This makes the pod not ready
+        }
+    },
+    "spec": {
+        "containers": [{
+            "name": "nginx",
+            "image": "nginx:latest"
+        }]
+    }
+}
+
+created_pod = api.create(body=pod, namespace="default")
+print(created_pod.status.conditions)  # Ready condition will be False
+```
+
+### Using Spec Field
+
+Alternatively, you can use `readyStatus` in the spec:
+
+```python
+deployment = {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "name": "not-ready-deployment",
+        "namespace": "default"
+    },
+    "spec": {
+        "readyStatus": False,  # This makes the deployment not ready
+        "replicas": 3,
+        "selector": {"matchLabels": {"app": "nginx"}},
+        "template": {
+            "metadata": {"labels": {"app": "nginx"}},
+            "spec": {
+                "containers": [{
+                    "name": "nginx",
+                    "image": "nginx:latest"
+                }]
+            }
+        }
+    }
+}
+
+created = api.create(body=deployment, namespace="default")
+print(created.status.readyReplicas)  # 0
+print(created.status.conditions)  # Available condition will be False
+```
+
+### Resource-Specific Behavior
+
+Different resources behave differently when not ready:
+
+- **Pods**: Show as not ready with containers in waiting state
+- **Deployments**: Show 0 ready replicas and unavailable condition
+- **Namespaces**: Show as Terminating phase
+- **Other resources**: Show Ready condition as False
+
+For Pods specifically, you can also use the `fake-client.io/pod-ready` annotation for backward compatibility.
+
+## Custom Resources
+
+The fake client automatically supports any Custom Resource:
+
+```python
+# Access a custom resource
+crd_api = fake_client.resources.get(
+    api_version="example.com/v1",
+    kind="MyCustomResource"
+)
+
+# Create custom resource
+custom_resource = {
+    "apiVersion": "example.com/v1",
+    "kind": "MyCustomResource",
+    "metadata": {"name": "my-resource"},
+    "spec": {"foo": "bar"}
+}
+
+created = crd_api.create(body=custom_resource)
+```
+
+## Advanced Features
+
+### Namespace Creation
+
+Namespaces are automatically created when you create resources in non-existent namespaces:
+
+```python
+# This will auto-create the "new-namespace" namespace
+pod = api.create(body=pod_manifest, namespace="new-namespace")
+```
+
+### Resource Status
+
+Resources automatically get realistic status fields:
+
+```python
+pod = api.get(name="test-pod", namespace="default")
+print(pod.status.phase)  # "Running"
+print(pod.status.containerStatuses[0].ready)  # True
+
+deployment = deployment_api.get(name="test-deployment", namespace="default")  
+print(deployment.status.readyReplicas)  # Matches spec.replicas
+print(deployment.status.conditions[0].type)  # "Available"
+```
+
+### OpenShift Resources
+
+The client includes OpenShift-specific resources:
+
+```python
+# Work with OpenShift routes
+route_api = fake_client.resources.get(
+    api_version="route.openshift.io/v1",
+    kind="Route"
+)
+
+# Create a route
+route = route_api.create(body=route_manifest, namespace="default")
+```
+
+## Limitations
+
+- No real networking or pod execution
+- Simplified watch implementation (immediate events only)
+- Limited field selector support (only metadata.name and metadata.namespace)
+- No admission webhooks or validation beyond basic structure
+- Status updates are simplified
+
+## Testing Example
 
 ```python
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
-from ocp_resources.pod import Pod
+from fake_kubernetes_client import create_fake_client
 
-class TestPodOperations:
-    @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
+@pytest.fixture
+def k8s_client():
+    return create_fake_client()
 
-    @pytest.fixture(scope="class")
-    def pod(self, client):
-        return Pod(
-            client=client,
-            name="test-pod",
-            namespace="default",
-            image="nginx"
-        )
+def test_pod_creation(k8s_client):
+    api = k8s_client.resources.get(api_version="v1", kind="Pod")
 
-    def test_pod_creation(self, pod):
-        deployed_pod = pod.deploy()
-        assert deployed_pod
-        assert pod.exists
-        assert pod.status
+    pod = {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {"name": "test-pod", "namespace": "default"},
+        "spec": {
+            "containers": [{
+                "name": "nginx",
+                "image": "nginx:latest"
+            }]
+        }
+    }
+
+    created = api.create(body=pod, namespace="default")
+    assert created.metadata.name == "test-pod"
+    assert created.status.phase == "Running"
+
+    # List pods
+    pods = api.get(namespace="default")
+    assert len(pods.items) == 1
+    assert pods.items[0].metadata.name == "test-pod"
 ```
-
-## 🔧 Advanced Features
-
-### Resource Discovery & Auto-Generation
-
-The client automatically discovers and generates resource definitions for any Kubernetes resource:
-
-```python
-# Works with any resource kind - no pre-configuration needed
-vm_api = client.resources.get(kind="VirtualMachine", api_version="kubevirt.io/v1")
-crd_api = client.resources.get(kind="MyCustomResource", api_version="example.com/v1")
-```
-
-### Label and Field Selectors
-
-Full support for Kubernetes selectors:
-
-```python
-# Label selectors
-pods = pod_api.get(namespace="default", label_selector="app=nginx,env=prod")
-
-# Field selectors
-pods = pod_api.get(namespace="default", field_selector="metadata.name=test-pod")
-```
-
-### Automatic Status Generation
-
-Resources get realistic status based on their type:
-
-```python
-pod = pod_api.create(body=pod_manifest, namespace="default")
-
-# Automatic Pod status with conditions
-print(pod.status.phase)  # "Running"
-print(pod.status.conditions)  # Ready, Initialized, PodScheduled, etc.
-print(pod.status.containerStatuses)  # Container state info
-```
-
-### Event Generation
-
-Automatic Kubernetes events for all operations:
-
-```python
-# Events are automatically created for resource operations
-pod_api.create(body=pod_manifest, namespace="default")
-# → Generates "Created" event
-
-pod_api.delete(name="test-pod", namespace="default")
-# → Generates "Deleted" event
-```
-
-### Pre-loading Test Data
-
-Load multiple resources at once:
-
-```python
-test_resources = [
-    {"apiVersion": "v1", "kind": "Pod", "metadata": {"name": "pod1"}},
-    {"apiVersion": "v1", "kind": "Service", "metadata": {"name": "svc1"}},
-    {"apiVersion": "apps/v1", "kind": "Deployment", "metadata": {"name": "deploy1"}}
-]
-
-client = FakeDynamicClient()
-client.preload_resources(test_resources)
-```
-
-### Custom Resource Definitions
-
-Add custom resources dynamically:
-
-```python
-client.add_custom_resource({
-    "kind": "MyResource",
-    "group": "example.com",
-    "version": "v1",
-    "namespaced": True,
-    "plural": "myresources"
-})
-
-# Now use like any other resource
-my_api = client.resources.get(kind="MyResource", api_version="example.com/v1")
-```
-
-## 🏗️ Architecture
-
-### Single Source of Truth
-
-The fake client uses **only** the `class_generator/schema/__resources-mappings.json` file as its source of truth for resource definitions. This ensures:
-
-- ✅ Accurate API group/version/kind mappings
-- ✅ Correct namespace scoping (cluster vs namespaced)
-- ✅ Real cluster resource compatibility
-- ✅ No hardcoded assumptions
-
-### Resource-Agnostic Design
-
-The storage backend is completely generic and works with any resource type:
-
-```python
-# Supports any resource automatically
-storage.store_resource("CustomKind", "example.com/v1", "name", "namespace", data)
-storage.get_resource("CustomKind", "example.com/v1", "name", "namespace")
-```
-
-### Realistic Simulation
-
-- **Metadata Generation**: UIDs, resource versions, timestamps
-- **Status Templates**: Pod conditions, Deployment replicas, Service endpoints
-- **Event Creation**: Automatic events for all operations
-- **Namespace Isolation**: Proper separation between namespaces
-- **API Version Handling**: Correct group/version parsing and storage
-
-## 🔍 Supported Operations
-
-### CRUD Operations
-
-- ✅ `create()` - Create resources with automatic metadata
-- ✅ `get()` - Retrieve individual resources or lists
-- ✅ `patch()` - Merge patch updates
-- ✅ `replace()` - Full resource replacement
-- ✅ `delete()` - Resource deletion with events
-
-### Advanced Operations
-
-- ✅ `watch()` - Resource change notifications
-- ✅ Label/field selectors with filtering
-- ✅ Namespace isolation and cross-namespace queries
-- ✅ Resource discovery and dynamic registration
-- ✅ Custom resource support
-
-### Metadata Features
-
-- ✅ Automatic UID generation
-- ✅ Resource version tracking
-- ✅ Creation timestamps
-- ✅ Generation counters
-- ✅ Label and annotation support
-
-## 🧪 Testing Utilities
-
-### Resource Counting
-
-```python
-count = client.get_resource_count()
-pod_count = client.get_resource_count(kind="Pod", api_version="v1", namespace="default")
-```
-
-### Storage Inspection
-
-```python
-all_resources = client.list_all_resources()
-client.clear_all_resources()  # Clean slate for tests
-```
-
-### Error Simulation
-
-```python
-# Simulate errors for testing error handling
-client.simulate_error("Pod", "create", ConflictError("Already exists"))
-```
-
-## ⚠️ Known Limitations
-
-### Missing Resources
-
-When a resource is missing, you'll get:
-
-```
-NotImplementedError: Couldn't find ResourceKind in api.group api group
-```
-
-### Workarounds
-
-For missing resources, you can manually add them:
-
-```python
-client.add_custom_resource({
-    "kind": "MTQ",
-    "group": "mtq.kubevirt.io",
-    "version": "v1",
-    "namespaced": False  # cluster-scoped
-})
-```
-
-## 🔧 API Compatibility
-
-### Drop-in Replacement
-
-The fake client implements the same interface as `kubernetes.dynamic.DynamicClient`:
-
-```python
-# Real client
-from kubernetes import dynamic, config
-real_client = dynamic.DynamicClient(config.new_client_from_config())
-
-# Fake client - same interface
-from fake_kubernetes_client import FakeDynamicClient
-fake_client = FakeDynamicClient()
-
-# Use identically
-pod_api = real_client.resources.get(kind="Pod", api_version="v1")
-pod_api = fake_client.resources.get(kind="Pod", api_version="v1")
-```
-
-### Exception Compatibility
-
-Uses real Kubernetes exceptions when available:
-
-```python
-try:
-    pod_api.get(name="nonexistent", namespace="default")
-except kubernetes.dynamic.exceptions.NotFoundError:
-    print("Resource not found")
-```
-
-## 🎭 Usage Patterns
-
-### Unit Test Pattern
-
-```python
-def test_my_kubernetes_function():
-    client = FakeDynamicClient()
-
-    # Setup test data
-    client.preload_resources([test_pod, test_service])
-
-    # Run your function that uses the client
-    result = my_function(client)
-
-    # Verify results
-    assert result.success
-    assert client.get_resource_count(kind="Pod") == 2
-```
-
-### Mock Replacement Pattern
-
-```python
-@patch('my_module.get_kubernetes_client')
-def test_with_fake_client(mock_get_client):
-    mock_get_client.return_value = FakeDynamicClient()
-
-    # Your test code here
-    my_kubernetes_function()
-```
-
-### Class-based Test Pattern
-
-```python
-class TestKubernetesIntegration:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        self.client = FakeDynamicClient()
-        self.pod_api = self.client.resources.get(kind="Pod", api_version="v1")
-
-    def test_pod_lifecycle(self):
-        # Create, update, delete lifecycle test
-        pass
-```
-
-## 🔍 Debugging
-
-### Storage Inspection
-
-```python
-# See all stored resources
-resources = client.list_all_resources()
-for resource in resources:
-    print(f"{resource['kind']}: {resource['metadata']['name']}")
-
-# Check specific resource counts
-print(f"Pods: {client.get_resource_count(kind='Pod', api_version='v1')}")
-print(f"Total: {client.get_resource_count()}")
-```
-
-### Resource Definition Debugging
-
-```python
-pod_api = client.resources.get(kind="Pod", api_version="v1")
-print(f"Resource def: {pod_api.resource_def}")
-print(f"Namespaced: {pod_api.resource_def['namespaced']}")
-print(f"Plural: {pod_api.resource_def['plural']}")
-```
-
-## 📄 License
-
-This fake client is part of the openshift-python-wrapper project and follows the same license terms.

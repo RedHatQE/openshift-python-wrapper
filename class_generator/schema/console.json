@@ -104,7 +104,7 @@
               "x-kubernetes-list-type": "map"
             },
             "customLogoFile": {
-              "description": "customLogoFile replaces the default OpenShift logo in the masthead and about dialog. It is a reference to a\nConfigMap in the openshift-config namespace. This can be created with a command like\n'oc create configmap custom-logo --from-file=/path/to/file -n openshift-config'.\nImage size must be less than 1 MB due to constraints on the ConfigMap size.\nThe ConfigMap key should include a file extension so that the console serves the file\nwith the correct MIME type.\nRecommended logo specifications:\nDimensions: Max height of 68px and max width of 200px\nSVG format preferred",
+              "description": "customLogoFile replaces the default OpenShift logo in the masthead and about dialog. It is a reference to a\nOnly one of customLogoFile or logos can be set at a time.\nConfigMap in the openshift-config namespace. This can be created with a command like\n'oc create configmap custom-logo --from-file=/path/to/file -n openshift-config'.\nImage size must be less than 1 MB due to constraints on the ConfigMap size.\nThe ConfigMap key should include a file extension so that the console serves the file\nwith the correct MIME type.\nThe recommended file format for the logo is SVG, but other file formats are allowed if supported by the browser.\nDeprecated: Use logos instead.",
               "type": "object",
               "properties": {
                 "key": {
@@ -241,6 +241,119 @@
               "description": "documentationBaseURL links to external documentation are shown in various sections\nof the web console.  Providing documentationBaseURL will override the default\ndocumentation URL.\nInvalid value will prevent a console rollout.",
               "type": "string",
               "pattern": "^$|^((https):\\/\\/?)[^\\s()<>]+(?:\\([\\w\\d]+\\)|([^[:punct:]\\s]|\\/?))\\/$"
+            },
+            "logos": {
+              "description": "logos is used to replace the OpenShift Masthead and Favicon logos in the console UI with custom logos.\nlogos is an optional field that allows a list of logos.\nOnly one of logos or customLogoFile can be set at a time.\nIf logos is set, customLogoFile must be unset.\nWhen specified, there must be at least one entry and no more than 2 entries.\nEach type must appear only once in the list.",
+              "type": "array",
+              "maxItems": 2,
+              "items": {
+                "description": "Logo defines a configuration based on theme modes for the console UI logo.",
+                "type": "object",
+                "required": [
+                  "themes",
+                  "type"
+                ],
+                "properties": {
+                  "themes": {
+                    "description": "themes specifies the themes for the console UI logo.\nthemes is a required field that allows a list of themes. Each item in the themes list must have a unique mode and a source field.\nEach mode determines whether the logo is for the dark or light mode of the console UI.\nIf a theme is not specified, the default OpenShift logo will be displayed for that theme.\nThere must be at least one entry and no more than 2 entries.",
+                    "type": "array",
+                    "maxItems": 2,
+                    "minItems": 1,
+                    "items": {
+                      "description": "Theme defines a theme mode for the console UI.",
+                      "type": "object",
+                      "required": [
+                        "mode",
+                        "source"
+                      ],
+                      "properties": {
+                        "mode": {
+                          "description": "mode is used to specify what theme mode a logo will apply to in the console UI.\nmode is a required field that allows values of Dark and Light.\nWhen set to Dark, the logo file referenced in the 'file' field will be used when an end-user of the console UI enables the Dark mode.\nWhen set to Light, the logo file referenced in the 'file' field will be used when an end-user of the console UI enables the Light mode.",
+                          "type": "string",
+                          "enum": [
+                            "Dark",
+                            "Light"
+                          ]
+                        },
+                        "source": {
+                          "description": "source is used by the console to locate the specified file containing a custom logo.\nsource is a required field that references a ConfigMap name and key that contains the custom logo file in the openshift-config namespace.\nYou can create it with a command like:\n- 'oc create configmap custom-logos-config --namespace=openshift-config --from-file=/path/to/file'\nThe ConfigMap key must include the file extension so that the console serves the file with the correct MIME type.\nThe recommended file format for the Masthead and Favicon logos is SVG, but other file formats are allowed if supported by the browser.\nThe logo image size must be less than 1 MB due to constraints on the ConfigMap size.\nFor more information, see the documentation: https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/web_console/customizing-web-console#customizing-web-console",
+                          "type": "object",
+                          "required": [
+                            "from"
+                          ],
+                          "properties": {
+                            "configMap": {
+                              "description": "configMap specifies the ConfigMap sourcing details such as the name of the ConfigMap and the key for the file.\nThe ConfigMap must exist in the openshift-config namespace.\nRequired when from is \"ConfigMap\", and forbidden otherwise.",
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "name"
+                              ],
+                              "properties": {
+                                "key": {
+                                  "description": "key is the logo key inside the referenced ConfigMap.\nMust consist only of alphanumeric characters, dashes (-), underscores (_), and periods (.).\nMust be at most 253 characters in length.\nMust end in a valid file extension.\nA valid file extension must consist of a period followed by 2 to 5 alpha characters.",
+                                  "type": "string",
+                                  "maxLength": 253,
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "The ConfigMap key must consist only of alphanumeric characters, dashes (-), underscores (_), and periods (.).",
+                                      "rule": "self.matches('^[a-zA-Z0-9._-]+$')"
+                                    },
+                                    {
+                                      "message": "The ConfigMap key must end with a valid file extension (2 to 5 letters).",
+                                      "rule": "self.matches('.*\\\\.[a-zA-Z]{2,5}$')"
+                                    }
+                                  ]
+                                },
+                                "name": {
+                                  "description": "name is the name of the ConfigMap.\nname is a required field.\nMust consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.\nMust be at most 253 characters in length.",
+                                  "type": "string",
+                                  "maxLength": 253,
+                                  "x-kubernetes-validations": [
+                                    {
+                                      "message": "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.",
+                                      "rule": "!format.dns1123Subdomain().validate(self).hasValue()"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "from": {
+                              "description": "from is a required field to specify the source type of the file reference.\nAllowed values are ConfigMap.\nWhen set to ConfigMap, the file will be sourced from a ConfigMap in the openshift-config namespace. The configMap field must be set when from is set to ConfigMap.",
+                              "type": "string",
+                              "enum": [
+                                "ConfigMap"
+                              ]
+                            }
+                          },
+                          "x-kubernetes-validations": [
+                            {
+                              "message": "configMap is required when from is 'ConfigMap', and forbidden otherwise.",
+                              "rule": "has(self.from) && self.from == 'ConfigMap' ? has(self.configMap) : !has(self.configMap)"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "x-kubernetes-list-map-keys": [
+                      "mode"
+                    ],
+                    "x-kubernetes-list-type": "map"
+                  },
+                  "type": {
+                    "description": "type specifies the type of the logo for the console UI. It determines whether the logo is for the masthead or favicon.\ntype is a required field that allows values of Masthead and Favicon.\nWhen set to \"Masthead\", the logo will be used in the masthead and about modal of the console UI.\nWhen set to \"Favicon\", the logo will be used as the favicon of the console UI.",
+                    "type": "string",
+                    "enum": [
+                      "Masthead",
+                      "Favicon"
+                    ]
+                  }
+                }
+              },
+              "x-kubernetes-list-map-keys": [
+                "type"
+              ],
+              "x-kubernetes-list-type": "map"
             },
             "perspectives": {
               "description": "perspectives allows enabling/disabling of perspective(s) that user can see in the Perspective switcher dropdown.",
@@ -598,7 +711,13 @@
                 }
               }
             }
-          }
+          },
+          "x-kubernetes-validations": [
+            {
+              "message": "Only one of logos or customLogoFile can be set.",
+              "rule": "!(has(self.logos) && has(self.customLogoFile))"
+            }
+          ]
         },
         "ingress": {
           "description": "ingress allows to configure the alternative ingress for the console.\nThis field is intended for clusters without ingress capability,\nwhere access to routes is not possible.",

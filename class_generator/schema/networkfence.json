@@ -22,7 +22,6 @@
       "type": "object",
       "required": [
         "cidrs",
-        "driver",
         "fenceState"
       ],
       "properties": {
@@ -34,7 +33,7 @@
           }
         },
         "driver": {
-          "description": "Driver contains  the name of CSI driver.",
+          "description": "Driver contains the name of CSI driver, required if NetworkFenceClassName is absent",
           "type": "string",
           "x-kubernetes-validations": [
             {
@@ -49,6 +48,16 @@
           "enum": [
             "Fenced",
             "Unfenced"
+          ]
+        },
+        "networkFenceClassName": {
+          "description": "NetworkFenceClassName contains the name of the NetworkFenceClass",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "networkFenceClassName is immutable",
+              "rule": "self == oldSelf"
+            }
           ]
         },
         "parameters": {
@@ -91,6 +100,10 @@
           },
           "x-kubernetes-validations": [
             {
+              "message": "secrets are immutable",
+              "rule": "self == oldSelf"
+            },
+            {
               "message": "secret is immutable",
               "rule": "self == oldSelf"
             }
@@ -99,12 +112,12 @@
       },
       "x-kubernetes-validations": [
         {
-          "message": "parameters are immutable",
-          "rule": "has(self.parameters) == has(oldSelf.parameters)"
+          "message": "one of driver or networkFenceClassName must be present",
+          "rule": "has(self.driver) || has(self.networkFenceClassName)"
         },
         {
-          "message": "secret is immutable",
-          "rule": "has(self.secret) == has(oldSelf.secret)"
+          "message": "secret must be present when networkFenceClassName is not specified",
+          "rule": "has(self.networkFenceClassName) || has(self.secret)"
         }
       ]
     },

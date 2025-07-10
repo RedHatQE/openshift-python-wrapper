@@ -90,6 +90,16 @@
                 "disableVerifySSL": {
                   "type": "boolean"
                 },
+                "mechanism": {
+                  "type": "string",
+                  "enum": [
+                    "PLAIN",
+                    "SCRAM-SHA-512",
+                    "SCRAM-SHA-256",
+                    "GSSAPI",
+                    "OAUTHBEARER"
+                  ]
+                },
                 "uri": {
                   "type": "string",
                   "minLength": 1

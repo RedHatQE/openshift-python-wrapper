@@ -1533,6 +1533,10 @@
                   "description": "Whether to emulate a TPM device.",
                   "type": "object",
                   "properties": {
+                    "enabled": {
+                      "description": "Enabled allows a user to explictly disable the vTPM even when one is enabled by a preference referenced by the VirtualMachine\nDefaults to True",
+                      "type": "boolean"
+                    },
                     "persistent": {
                       "description": "Persistent indicates the state of the TPM device should be kept accross reboots\nDefaults to false",
                       "type": "boolean"
@@ -1550,6 +1554,16 @@
                     "name"
                   ],
                   "properties": {
+                    "diag288": {
+                      "description": "diag288 watchdog device (specific to s390x architecture).",
+                      "type": "object",
+                      "properties": {
+                        "action": {
+                          "description": "The action to take. Valid values are poweroff, reset, shutdown.\nDefaults to reset.",
+                          "type": "string"
+                        }
+                      }
+                    },
                     "i6300esb": {
                       "description": "i6300esb watchdog device.",
                       "type": "object",
@@ -1906,7 +1920,7 @@
               }
             },
             "ioThreadsPolicy": {
-              "description": "Controls whether or not disks will share IOThreads.\nOmitting IOThreadsPolicy disables use of IOThreads.\nOne of: shared, auto",
+              "description": "Controls whether or not disks will share IOThreads.\nOmitting IOThreadsPolicy disables use of IOThreads.\nOne of: shared, auto, supplementalPool",
               "type": "string"
             },
             "launchSecurity": {

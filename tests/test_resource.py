@@ -39,6 +39,7 @@ def pod(client):
         name="test-pod",
         namespace="default",
         containers=[{"name": "test-container", "image": "nginx:latest"}],
+        annotations={"fake-client.io/ready": "false"},  # Create pod with Ready status FALSE
     )
     deployed_pod = test_pod.deploy()
     yield deployed_pod
@@ -127,7 +128,7 @@ class TestClientProxy:
         assert client.configuration.proxy == http_proxy
 
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
-    @patch.dict(os.environ, {"HTTPS_PROXY": "http://env-http-proxy.com"})
+    @patch.dict(os.environ, {"HTTPS_PROXY": "http://env-https-proxy.com"})
     def test_proxy_precedence(self, client):
         https_proxy = "https://env-https-proxy.com"
 

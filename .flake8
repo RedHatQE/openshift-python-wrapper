@@ -67,6 +67,7 @@ fcn_exclude_functions =
     add_row,
     get_args,
     get_type_hints,
+    shutil,
 
 enable-extensions =
     FCN,

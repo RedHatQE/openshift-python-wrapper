@@ -967,6 +967,86 @@
             }
           }
         },
+        "dbSpec": {
+          "description": "DBSpec (optional) DB spec for a managed postgres cluster",
+          "type": "object",
+          "properties": {
+            "dbConf": {
+              "description": "DBConf (optional) overrides the default postgresql db config",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "dbMinVolumeSize": {
+              "description": "DBMinVolumeSize (optional) The initial size of the database volume.The actual size might be larger.\nIncreasing the size of the volume is supported if the underlying storage class supports volume expansion.\nThe new size should be larger than actualVolumeSize in dbStatus for the volume to be resized.",
+              "type": "string"
+            },
+            "dbResources": {
+              "description": "DBResources (optional) overrides the default resource requirements for the db container",
+              "type": "object",
+              "properties": {
+                "claims": {
+                  "description": "Claims lists the names of resources, defined in spec.resourceClaims,\nthat are used by this container.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate.\n\nThis field is immutable. It can only be set for containers.",
+                  "type": "array",
+                  "items": {
+                    "description": "ResourceClaim references one entry in PodSpec.ResourceClaims.",
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "Name must match the name of one entry in pod.spec.resourceClaims of\nthe Pod where this field is used. It makes that resource available\ninside a container.",
+                        "type": "string"
+                      },
+                      "request": {
+                        "description": "Request is the name chosen for a request in the referenced claim.\nIf empty, everything from the claim is made available, otherwise\nonly the result of this request.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "x-kubernetes-list-map-keys": [
+                    "name"
+                  ],
+                  "x-kubernetes-list-type": "map"
+                },
+                "limits": {
+                  "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                  "type": "object",
+                  "additionalProperties": {
+                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                    "x-kubernetes-int-or-string": true
+                  }
+                },
+                "requests": {
+                  "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                  "type": "object",
+                  "additionalProperties": {
+                    "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+                    "x-kubernetes-int-or-string": true
+                  }
+                }
+              }
+            },
+            "dbStorageClass": {
+              "description": "DBStorageClass (optional) overrides the default cluster StorageClass for the database volume.",
+              "type": "string"
+            },
+            "image": {
+              "description": "DBImage (optional) overrides the default image for the db instances",
+              "type": "string"
+            },
+            "instances": {
+              "description": "Instances (optional) overrides the default number of db instances",
+              "type": "integer"
+            },
+            "postgresMajorVersion": {
+              "description": "PostgresMajorVersion (optional) overrides the default postgres major version\nIt is the user's responsibility to ensure that the postgres image matches the major version.",
+              "type": "integer"
+            }
+          }
+        },
         "dbStorageClass": {
           "description": "DBStorageClass (optional) overrides the default cluster StorageClass for the database volume.\nFor the time being this field is immutable and can only be set on system creation.\nThis affects where the system stores its database which contains system config,\nbuckets, objects meta-data and mapping file parts to storage locations.",
           "type": "string"
@@ -1257,6 +1337,9 @@
         },
         "disableLoadBalancerService": {
           "description": "DisableLoadBalancerService (optional) sets the service type to ClusterIP instead of LoadBalancer"
+        },
+        "disableRoutes": {
+          "description": "DisableRoutes (optional) disables the reconciliation of openshift route resources in the cluster"
         },
         "endpoints": {
           "description": "Endpoints (optional) sets configuration info for the noobaa endpoint\ndeployment.",
@@ -1622,6 +1705,28 @@
                 "description": "ConditionType is the state of the operator's reconciliation functionality.",
                 "type": "string"
               }
+            }
+          }
+        },
+        "dbStatus": {
+          "description": "DBStatus is the status of the postgres cluster",
+          "type": "object",
+          "properties": {
+            "actualVolumeSize": {
+              "description": "ActualVolumeSize is the actual size of the postgres cluster volume. This can be different than the requested size",
+              "type": "string"
+            },
+            "currentPgMajorVersion": {
+              "description": "CurrentPgMajorVersion is the major version of the postgres cluster",
+              "type": "integer"
+            },
+            "dbClusterStatus": {
+              "description": "DBClusterStatus is the status of the postgres cluster",
+              "type": "string"
+            },
+            "dbCurrentImage": {
+              "description": "DBCurrentImage is the image of the postgres cluster",
+              "type": "string"
             }
           }
         },

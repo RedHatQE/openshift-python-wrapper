@@ -291,6 +291,10 @@
               "description": "PreferredTPM optionally defines the preferred TPM device to be used.",
               "type": "object",
               "properties": {
+                "enabled": {
+                  "description": "Enabled allows a user to explictly disable the vTPM even when one is enabled by a preference referenced by the VirtualMachine\nDefaults to True",
+                  "type": "boolean"
+                },
                 "persistent": {
                   "description": "Persistent indicates the state of the TPM device should be kept accross reboots\nDefaults to false",
                   "type": "boolean"

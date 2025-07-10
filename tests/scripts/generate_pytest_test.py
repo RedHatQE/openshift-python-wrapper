@@ -69,13 +69,13 @@ class ResourceInfo:
     name: str  # Class name (e.g., "Pod", "Namespace")
     file_path: str  # Path to the resource file
     base_class: str  # "Resource" or "NamespacedResource"
-    api_version: str | None = None
-    api_group: str | None = None
+    api_version: Union[str, None] = None
+    api_group: Union[str, None] = None
     required_params: list[str] = field(default_factory=list)
     optional_params: list[str] = field(default_factory=list)
     has_containers: bool = False
     is_ephemeral: bool = False  # True if resource is ephemeral (e.g. ProjectRequest)
-    actual_resource_type: str | None = None  # The actual resource type created (e.g. "Project")
+    actual_resource_type: Union[str, None] = None  # The actual resource type created (e.g. "Project")
 
 
 @dataclass
@@ -114,7 +114,7 @@ class ResourceScanner:
 
         return sorted(resources, key=lambda r: r.name)
 
-    def _analyze_resource_file(self, file_path: Path) -> ResourceInfo | None:
+    def _analyze_resource_file(self, file_path: Path) -> Union[ResourceInfo, None]:
         """Analyze a single resource file to extract class information"""
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -244,7 +244,7 @@ class ResourceScanner:
 
         return required_params
 
-    def _extract_api_info(self, class_node: ast.ClassDef, content: str) -> tuple[str | None, str | None]:
+    def _extract_api_info(self, class_node: ast.ClassDef, content: str) -> tuple[Union[str, None], Union[str, None]]:
         """Extract API version and group information"""
         api_version = None
         api_group = None
@@ -272,7 +272,7 @@ class ResourceScanner:
 
         return api_version, api_group
 
-    def _extract_attribute_value(self, attr_node: ast.Attribute) -> str | None:
+    def _extract_attribute_value(self, attr_node: ast.Attribute) -> Union[str, None]:
         """Extract value from attribute access like Resource.ApiVersion.V1"""
         parts = []
         current: ast.expr = attr_node
@@ -286,12 +286,12 @@ class ResourceScanner:
 
         return ".".join(reversed(parts)) if parts else None
 
-    def _handle_ephemeral_resource(self, resource_name: str) -> tuple[bool, str | None]:
+    def _handle_ephemeral_resource(self, resource_name: str) -> tuple[bool, Union[str, None]]:
         """
         Check if a resource is ephemeral using static mapping.
 
         Returns:
-            tuple[bool, str | None]: (is_ephemeral, actual_resource_type)
+            tuple[bool, Union[str, None]]: (is_ephemeral, actual_resource_type)
         """
         actual_type = EPHEMERAL_RESOURCES.get(resource_name)
         return (actual_type is not None, actual_type)
@@ -342,7 +342,7 @@ class CoverageAnalyzer:
 
         return tests
 
-    def _find_test_for_resource(self, resource_name: str, existing_tests: dict[str, str]) -> str | None:
+    def _find_test_for_resource(self, resource_name: str, existing_tests: dict[str, str]) -> Union[str, None]:
         """Find test file for a specific resource"""
         # Convert resource name to potential test file names
         potential_names = [resource_name.lower(), resource_name]
