@@ -2,8 +2,8 @@
 
 from typing import Any, Optional
 
-from ocp_resources.project_project_openshift_io import Project
 from ocp_resources.resource import Resource
+from ocp_resources.project_project_openshift_io import Project
 
 
 class ProjectRequest(Resource):
@@ -44,6 +44,19 @@ class ProjectRequest(Resource):
                 self.res["displayName"] = self.display_name
 
     # End of generated code
+
+    def deploy(self, wait: bool = False) -> Project:
+        super().deploy(wait=wait)
+
+        project = Project(
+            name=self.name,
+            client=self.client,
+            teardown=self.teardown,
+            delete_timeout=self.delete_timeout,
+        )
+        project.wait_for_status(status=project.Status.ACTIVE)
+
+        return project
 
     def clean_up(self, wait: bool = True, timeout: Optional[int] = None) -> bool:
         return Project(name=self.name, client=self.client).clean_up(wait=wait, timeout=timeout)
