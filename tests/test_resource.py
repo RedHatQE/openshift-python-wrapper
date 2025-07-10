@@ -9,19 +9,12 @@ from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
 from ocp_resources.resource import Resource, ResourceList, NamespacedResourceList
-from ocp_resources.role import Role
 from ocp_resources.secret import Secret
 from fake_kubernetes_client import FakeDynamicClient
 
 BASE_NAMESPACE_NAME: str = "test-namespace"
-ROLE_NAME: str = "test-role"
-ROLE_RULES: list[dict[str, list[str]]] = [
-    {
-        "apiGroups": ["serving.kserve.io"],
-        "resources": ["inferenceservices"],
-        "verbs": ["get", "list", "watch"],
-    }
-]
+BASE_POD_NAME: str = "test-pod"
+POD_CONTAINERS: list[dict[str, str]] = [{"name": "test-container", "image": "nginx:latest"}]
 
 
 class SecretTestExit(Secret):
@@ -52,9 +45,9 @@ def pod(client):
     # Create a test pod for testing purposes
     test_pod = Pod(
         client=client,
-        name="test-pod",
+        name=BASE_POD_NAME,
         namespace="default",
-        containers=[{"name": "test-container", "image": "nginx:latest"}],
+        containers=POD_CONTAINERS,
         annotations={"fake-client.io/ready": "false"},  # Create pod with Ready status FALSE
     )
     deployed_pod = test_pod.deploy()
@@ -64,13 +57,13 @@ def pod(client):
 
 
 @pytest.fixture(scope="class")
-def roles(client, namespaces):
+def pods(client, namespaces):
     return NamespacedResourceList(
         client=client,
-        resource_class=Role,
+        resource_class=Pod,
         namespaces=[ns.name for ns in namespaces.resources],
-        name=ROLE_NAME,
-        rules=ROLE_RULES,
+        name=BASE_POD_NAME,
+        containers=POD_CONTAINERS,
     )
 
 
@@ -171,31 +164,31 @@ class TestResourceList:
 
 @pytest.mark.incremental
 class TestNamespacedResourceList:
-    def test_namespaced_resource_list_deploy(self, client, roles):
-        roles.deploy()
-        assert roles
+    def test_namespaced_resource_list_deploy(self, client, pods):
+        pods.deploy()
+        assert pods
 
-    def test_namespaced_resource_list_len(self, namespaces, roles):
-        assert len(roles) == len(namespaces)
+    def test_resource_list_len(self, namespaces, pods):
+        assert len(pods) == len(namespaces)
 
-    def test_namespaced_resource_list_name(self, roles):
-        for role in roles.resources:
-            assert role.name == ROLE_NAME
+    def test_resource_list_name(self, pods):
+        for pod in pods.resources:
+            assert pod.name == BASE_POD_NAME
 
-    def test_namespaced_resource_list_namespace(self, namespaces, roles):
-        for role, namespace in zip(roles.resources, namespaces.resources):
-            assert role.namespace == namespace.name
+    def test_namespaced_resource_list_namespace(self, namespaces, pods):
+        for pod, namespace in zip(pods.resources, namespaces):
+            assert pod.namespace == namespace.name
 
-    def test_namespaced_resource_list_teardown(self, roles):
-        roles.clean_up(wait=False)
+    def test_resource_list_teardown(self, pods):
+        pods.clean_up(wait=False)
 
     def test_namespaced_resource_list_context_manager(self, client, namespaces):
         with NamespacedResourceList(
             client=client,
-            resource_class=Role,
-            namespaces=[ns.name for ns in namespaces.resources],
-            name=ROLE_NAME,
-            rules=ROLE_RULES,
+            resource_class=Pod,
+            namespaces=[ns.name for ns in namespaces],
+            name=BASE_POD_NAME,
+            containers=POD_CONTAINERS,
         ) as pods:
             assert pods
 

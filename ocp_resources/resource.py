@@ -1767,8 +1767,8 @@ class BaseResourceList(ABC):
     iteration, indexing, deployment, and cleanup operations.
     """
 
-    def __init__(self, client: DynamicClient | None = None):
-        self.resources: list["Resource" | "NamespacedResource"] = []
+    def __init__(self, client: DynamicClient):
+        self.resources: list[Resource] = []
         self.client = client
 
     def __enter__(self):
@@ -1838,9 +1838,9 @@ class ResourceList(BaseResourceList):
 
     def __init__(
         self,
-        resource_class: Type["Resource"],
+        resource_class: Type[Resource],
         num_resources: int,
-        client: "DynamicClient | None" = None,
+        client: DynamicClient,
         **kwargs: Any,
     ) -> None:
         """
@@ -1858,7 +1858,7 @@ class ResourceList(BaseResourceList):
         self.num_resources = num_resources
         self._create_resources(resource_class, **kwargs)
 
-    def _create_resources(self, resource_class: Type["Resource"], **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: Type[Resource], **kwargs: Any) -> None:
         """Creates N resources with indexed names."""
         base_name = kwargs["name"]
 
@@ -1881,9 +1881,9 @@ class NamespacedResourceList(BaseResourceList):
 
     def __init__(
         self,
-        resource_class: Type["NamespacedResource"],
+        resource_class: Type[NamespacedResource],
         namespaces: list[str],
-        client: DynamicClient | None = None,
+        client: DynamicClient,
         **kwargs: Any,
     ) -> None:
         """
@@ -1904,7 +1904,7 @@ class NamespacedResourceList(BaseResourceList):
         self.namespaces = namespaces
         self._create_resources(resource_class, **kwargs)
 
-    def _create_resources(self, resource_class: Type["NamespacedResource"], **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: Type[NamespacedResource], **kwargs: Any) -> None:
         """Creates one resource per namespace."""
         for ns in self.namespaces:
             instance = resource_class(
