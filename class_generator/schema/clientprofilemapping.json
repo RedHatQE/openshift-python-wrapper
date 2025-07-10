@@ -17,12 +17,19 @@
     "spec": {
       "description": "ClientProfileMappingSpec defines the desired state of ClientProfileMapping",
       "type": "object",
+      "required": [
+        "mappings"
+      ],
       "properties": {
         "mappings": {
           "type": "array",
           "items": {
             "description": "MappingsSpec define a mapping between a local and remote profiles",
             "type": "object",
+            "required": [
+              "localClientProfile",
+              "remoteClientProfile"
+            ],
             "properties": {
               "blockPoolIdMapping": {
                 "type": "array",

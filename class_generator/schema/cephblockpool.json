@@ -70,7 +70,12 @@
               "type": "boolean"
             },
             "mode": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "pool",
+                "image",
+                "init-only"
+              ]
             },
             "peers": {},
             "snapshotSchedules": {

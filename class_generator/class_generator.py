@@ -241,6 +241,14 @@ def update_kind_schema():
         client=client, newer_cluster_version=same_or_newer_version, schema_definition_file=ocp_openapi_json_file
     )
 
+    # Copy the resources mapping file to fake_kubernetes_client for the fake client to use
+    fake_client_mappings = Path("fake_kubernetes_client/__resources-mappings.json")
+    try:
+        shutil.copy2(RESOURCES_MAPPING_FILE, fake_client_mappings)
+    except (OSError, IOError):
+        # Don't fail the entire process if copy fails
+        pass
+
 
 def convert_camel_case_to_snake_case(name: str) -> str:
     """

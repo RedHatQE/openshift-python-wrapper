@@ -18,6 +18,15 @@
       "description": "HyperConvergedSpec defines the desired state of HyperConverged",
       "type": "object",
       "properties": {
+        "CommonInstancetypesDeployment": {
+          "description": "CommonInstancetypesDeployment holds the configuration of common-instancetypes deployment within KubeVirt.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enabled controls the deployment of common-instancetypes resources, defaults to True."
+            }
+          }
+        },
         "applicationAwareConfig": {
           "description": "ApplicationAwareConfig set the AAQ configurations",
           "type": "object",
@@ -870,6 +879,14 @@
           "description": "DefaultRuntimeClass defines a cluster default for the RuntimeClass to be used for VMIs pods if not set there.\nDefault RuntimeClass can be changed when kubevirt is running, existing VMIs are not impacted till\nthe next restart/live-migration when they are eventually going to consume the new default RuntimeClass.",
           "type": "string"
         },
+        "deployVmConsoleProxy": {
+          "description": "deploy VM console proxy resources in SSP operator",
+          "type": "boolean"
+        },
+        "enableApplicationAwareQuota": {
+          "description": "EnableApplicationAwareQuota if true, enables the Application Aware Quota feature",
+          "type": "boolean"
+        },
         "enableCommonBootImageImport": {
           "description": "Opt-in to automatic delivery/updates of the common data import cron templates.\nThere are two sources for the data import cron templates: hard coded list of common templates, and custom (user\ndefined) templates that can be added to the dataImportCronTemplates field. This field only controls the common\ntemplates. It is possible to use custom templates by adding them to the dataImportCronTemplates field.",
           "type": "boolean"
@@ -901,7 +918,7 @@
               "type": "boolean"
             },
             "deployKubevirtIpamController": {
-              "description": "Deploy KubevirtIpamController by CNAO.\nDeprecated: this field is ignored and will be removed in the next version of the API.",
+              "description": "Deprecated: this field is ignored and will be removed in the next version of the API.",
               "type": "boolean"
             },
             "deployTektonTaskResources": {
@@ -909,7 +926,7 @@
               "type": "boolean"
             },
             "deployVmConsoleProxy": {
-              "description": "deploy VM console proxy resources in SSP operator",
+              "description": "Deprecated: This field is ignored and will be removed on the next version of the API.\nUse spec.deployVmConsoleProxy instead",
               "type": "boolean"
             },
             "disableMDevConfiguration": {
@@ -921,11 +938,11 @@
               "type": "boolean"
             },
             "enableApplicationAwareQuota": {
-              "description": "EnableApplicationAwareQuota if true, enables the Application Aware Quota feature",
+              "description": "Deprecated: This field is ignored and will be removed on the next version of the API.\nUse spec.enableApplicationAwareQuota instead",
               "type": "boolean"
             },
             "enableCommonBootImageImport": {
-              "description": "Opt-in to automatic delivery/updates of the common data import cron templates.\nThere are two sources for the data import cron templates: hard coded list of common templates, and custom\ntemplates that can be added to the dataImportCronTemplates field. This feature gates only control the common\ntemplates. It is possible to use custom templates by adding them to the dataImportCronTemplates field.\nDeprecated: This field is ignored. Use spec.enableCommonBootImageImport instead",
+              "description": "Deprecated: This field is ignored. Use spec.enableCommonBootImageImport instead",
               "type": "boolean"
             },
             "enableManagedTenantQuota": {
@@ -2344,16 +2361,16 @@
           "type": "object",
           "properties": {
             "custom": {
-              "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n  ciphers:\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n  minTLSVersion: TLSv1.1"
+              "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n  ciphers:\n\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-AES128-GCM-SHA256\n\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n\n  minTLSVersion: VersionTLS11"
             },
             "intermediate": {
-              "description": "intermediate is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - DHE-RSA-AES128-GCM-SHA256\n    - DHE-RSA-AES256-GCM-SHA384\n  minTLSVersion: TLSv1.2"
+              "description": "intermediate is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29\n\nand looks like this (yaml):\n\n  ciphers:\n\n    - TLS_AES_128_GCM_SHA256\n\n    - TLS_AES_256_GCM_SHA384\n\n    - TLS_CHACHA20_POLY1305_SHA256\n\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n\n    - ECDHE-RSA-AES128-GCM-SHA256\n\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n\n    - ECDHE-RSA-AES256-GCM-SHA384\n\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-CHACHA20-POLY1305\n\n    - DHE-RSA-AES128-GCM-SHA256\n\n    - DHE-RSA-AES256-GCM-SHA384\n\n  minTLSVersion: VersionTLS12"
             },
             "modern": {
-              "description": "modern is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n  minTLSVersion: TLSv1.3\n\nNOTE: Currently unsupported."
+              "description": "modern is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n\n    - TLS_AES_128_GCM_SHA256\n\n    - TLS_AES_256_GCM_SHA384\n\n    - TLS_CHACHA20_POLY1305_SHA256\n\n  minTLSVersion: VersionTLS13"
             },
             "old": {
-              "description": "old is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - DHE-RSA-AES128-GCM-SHA256\n    - DHE-RSA-AES256-GCM-SHA384\n    - DHE-RSA-CHACHA20-POLY1305\n    - ECDHE-ECDSA-AES128-SHA256\n    - ECDHE-RSA-AES128-SHA256\n    - ECDHE-ECDSA-AES128-SHA\n    - ECDHE-RSA-AES128-SHA\n    - ECDHE-ECDSA-AES256-SHA384\n    - ECDHE-RSA-AES256-SHA384\n    - ECDHE-ECDSA-AES256-SHA\n    - ECDHE-RSA-AES256-SHA\n    - DHE-RSA-AES128-SHA256\n    - DHE-RSA-AES256-SHA256\n    - AES128-GCM-SHA256\n    - AES256-GCM-SHA384\n    - AES128-SHA256\n    - AES256-SHA256\n    - AES128-SHA\n    - AES256-SHA\n    - DES-CBC3-SHA\n  minTLSVersion: TLSv1.0"
+              "description": "old is a TLS security profile based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Old_backward_compatibility\n\nand looks like this (yaml):\n\n  ciphers:\n\n    - TLS_AES_128_GCM_SHA256\n\n    - TLS_AES_256_GCM_SHA384\n\n    - TLS_CHACHA20_POLY1305_SHA256\n\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n\n    - ECDHE-RSA-AES128-GCM-SHA256\n\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n\n    - ECDHE-RSA-AES256-GCM-SHA384\n\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n\n    - ECDHE-RSA-CHACHA20-POLY1305\n\n    - DHE-RSA-AES128-GCM-SHA256\n\n    - DHE-RSA-AES256-GCM-SHA384\n\n    - DHE-RSA-CHACHA20-POLY1305\n\n    - ECDHE-ECDSA-AES128-SHA256\n\n    - ECDHE-RSA-AES128-SHA256\n\n    - ECDHE-ECDSA-AES128-SHA\n\n    - ECDHE-RSA-AES128-SHA\n\n    - ECDHE-ECDSA-AES256-SHA384\n\n    - ECDHE-RSA-AES256-SHA384\n\n    - ECDHE-ECDSA-AES256-SHA\n\n    - ECDHE-RSA-AES256-SHA\n\n    - DHE-RSA-AES128-SHA256\n\n    - DHE-RSA-AES256-SHA256\n\n    - AES128-GCM-SHA256\n\n    - AES256-GCM-SHA384\n\n    - AES128-SHA256\n\n    - AES256-SHA256\n\n    - AES128-SHA\n\n    - AES256-SHA\n\n    - DES-CBC3-SHA\n\n  minTLSVersion: VersionTLS10"
             },
             "type": {
               "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides\nthe ability to specify individual TLS security profile parameters.\nOld, Intermediate and Modern are TLS security profiles based on:\n\nhttps://wiki.mozilla.org/Security/Server_Side_TLS#Recommended_configurations\n\nThe profiles are intent based, so they may change over time as new ciphers are developed and existing ciphers\nare found to be insecure.  Depending on precisely which ciphers are available to a process, the list may be\nreduced.\n\nNote that the Modern profile is currently not supported because it is not\nyet well adopted by common software libraries.",

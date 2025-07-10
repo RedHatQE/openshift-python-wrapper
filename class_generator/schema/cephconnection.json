@@ -35,6 +35,9 @@
         "readAffinity": {
           "description": "ReadAffinitySpec capture Ceph CSI read affinity settings",
           "type": "object",
+          "required": [
+            "crushLocationLabels"
+          ],
           "properties": {
             "crushLocationLabels": {
               "type": "array",

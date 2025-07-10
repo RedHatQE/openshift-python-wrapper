@@ -1,0 +1,87 @@
+{
+  "description": "StorageAutoScaler represents the automatic storage scaling for storage cluster.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "description": "StorageAutoScalerSpec defines the desired state of StorageAutoScaler",
+      "type": "object",
+      "required": [
+        "storageCapacityLimit",
+        "storageCluster"
+      ],
+      "properties": {
+        "deviceClass": {
+          "description": "DeviceClass is the name of the device class for which the storage scaling is to be done.",
+          "type": "string"
+        },
+        "maxOsdSize": {
+          "description": "MaxOsdSize is the maximum size that Osd disk can be expanded to.",
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "x-kubernetes-int-or-string": true
+        },
+        "storageCapacityLimit": {
+          "description": "StorageCapacityLimit is the total aggregate capacity limit for the storage scaling for the specific deviceClass and storagecluster.",
+          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
+          "x-kubernetes-int-or-string": true
+        },
+        "storageCluster": {
+          "description": "StorageCluster is the name of the storage cluster for which the storage scaling is to be done.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+              "type": "string"
+            }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "storageScalingThresholdPercent": {
+          "description": "StorageScalingThresholdPercent is the threshold percentage of the storage capacity that triggers the auto-scaling of the OSDs.\nShould be less than the OsdNearFullThresholdPercentage.",
+          "type": "integer"
+        },
+        "timeoutSeconds": {
+          "description": "TimeoutSeconds is the time in seconds after which the storage auto-scaler will alert the user that the scaling operation has been failed.",
+          "type": "integer"
+        }
+      }
+    },
+    "status": {
+      "description": "StorageAutoScalerStatus defines the observed state of StorageAutoScaler",
+      "type": "object",
+      "properties": {
+        "error": {
+          "description": "Error is the error message in case the storage scaling operation has failed."
+        },
+        "lastExpansion": {},
+        "phase": {
+          "description": "Phase describes the Phase of StorageAutoScaler",
+          "type": "string"
+        },
+        "storageCapacityLimitReached": {
+          "description": "StorageCapacityLimitReached is the flag that indicates if the storage capacity limit has been reached."
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "ocs.openshift.io",
+      "kind": "StorageAutoScaler",
+      "version": "v1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

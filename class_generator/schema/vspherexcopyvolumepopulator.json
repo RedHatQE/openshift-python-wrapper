@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "required": [
+    "spec"
+  ],
+  "properties": {
+    "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+      "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+    },
+    "spec": {
+      "type": "object",
+      "required": [
+        "secretName",
+        "storageVendorProduct",
+        "vmId",
+        "vmdkPath"
+      ],
+      "properties": {
+        "secretName": {
+          "description": "The secret name with vsphere and storage credentials",
+          "type": "string"
+        },
+        "storageVendorProduct": {
+          "description": "StorageVendorProduct is the storage vendor the target disk and PVC are connected to\nSupported values [vantara, ontap, primera3par]",
+          "type": "string"
+        },
+        "vmId": {
+          "description": "VmId is the VM object id in vSphere",
+          "type": "string"
+        },
+        "vmdkPath": {
+          "description": "VmdkPath is the full path the vmdk disk. A valid path format is\n'[] /.vmdk'",
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "progress": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-kubernetes-group-version-kind": [
+    {
+      "group": "forklift.konveyor.io",
+      "kind": "VSphereXcopyVolumePopulator",
+      "version": "v1beta1"
+    }
+  ],
+  "x-kubernetes-selectable-fields": [],
+  "$schema": "http://json-schema.org/schema#"
+}

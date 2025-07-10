@@ -1,6 +1,10 @@
 {
-  "description": "Database is the Schema for the databases API. It is used to define a logical database as if you were running a 'CREATE DATABASE' statement.",
+  "description": "Database is the Schema for the databases API",
   "type": "object",
+  "required": [
+    "metadata",
+    "spec"
+  ],
   "properties": {
     "apiVersion": {
       "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
@@ -15,126 +19,224 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "DatabaseSpec defines the desired state of Database",
+      "description": "Specification of the desired Database.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
       "type": "object",
       "required": [
-        "mariaDbRef"
+        "cluster",
+        "name",
+        "owner"
       ],
       "properties": {
-        "characterSet": {
-          "description": "CharacterSet to use in the Database.",
-          "type": "string"
+        "allowConnections": {
+          "description": "Maps to the `ALLOW_CONNECTIONS` parameter of `CREATE DATABASE` and\n`ALTER DATABASE`. If false then no one can connect to this database.",
+          "type": "boolean"
         },
-        "cleanupPolicy": {
-          "description": "CleanupPolicy defines the behavior for cleaning up a SQL resource.",
+        "builtinLocale": {
+          "description": "Maps to the `BUILTIN_LOCALE` parameter of `CREATE DATABASE`. This\nsetting cannot be changed. Specifies the locale name when the\nbuiltin provider is used. This option requires `localeProvider` to\nbe set to `builtin`. Available from PostgreSQL 17.",
           "type": "string",
-          "enum": [
-            "Skip",
-            "Delete"
+          "x-kubernetes-validations": [
+            {
+              "message": "builtinLocale is immutable",
+              "rule": "self == oldSelf"
+            }
           ]
         },
-        "collate": {
-          "description": "Collate to use in the Database.",
-          "type": "string"
-        },
-        "mariaDbRef": {
-          "description": "MariaDBRef is a reference to a MariaDB object.",
+        "cluster": {
+          "description": "The name of the PostgreSQL cluster hosting the database.",
           "type": "object",
           "properties": {
             "name": {
+              "description": "Name of the referent.\nThis field is effectively required, but due to backwards compatibility is\nallowed to be empty. Instances of this type with an empty value here are\nalmost certainly wrong.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
               "type": "string"
-            },
-            "namespace": {
-              "type": "string"
-            },
-            "waitForIt": {
-              "description": "WaitForIt indicates whether the controller using this reference should wait for MariaDB to be ready.",
-              "type": "boolean"
             }
-          }
+          },
+          "x-kubernetes-map-type": "atomic"
+        },
+        "collationVersion": {
+          "description": "Maps to the `COLLATION_VERSION` parameter of `CREATE DATABASE`. This\nsetting cannot be changed.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "collationVersion is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "connectionLimit": {
+          "description": "Maps to the `CONNECTION LIMIT` clause of `CREATE DATABASE` and\n`ALTER DATABASE`. How many concurrent connections can be made to\nthis database. -1 (the default) means no limit.",
+          "type": "integer"
+        },
+        "databaseReclaimPolicy": {
+          "description": "The policy for end-of-life maintenance of this database.",
+          "type": "string",
+          "enum": [
+            "delete",
+            "retain"
+          ]
+        },
+        "encoding": {
+          "description": "Maps to the `ENCODING` parameter of `CREATE DATABASE`. This setting\ncannot be changed. Character set encoding to use in the database.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "encoding is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "ensure": {
+          "description": "Ensure the PostgreSQL database is `present` or `absent` - defaults to \"present\".",
+          "type": "string",
+          "enum": [
+            "present",
+            "absent"
+          ]
+        },
+        "icuLocale": {
+          "description": "Maps to the `ICU_LOCALE` parameter of `CREATE DATABASE`. This\nsetting cannot be changed. Specifies the ICU locale when the ICU\nprovider is used. This option requires `localeProvider` to be set to\n`icu`. Available from PostgreSQL 15.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "icuLocale is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "icuRules": {
+          "description": "Maps to the `ICU_RULES` parameter of `CREATE DATABASE`. This setting\ncannot be changed. Specifies additional collation rules to customize\nthe behavior of the default collation. This option requires\n`localeProvider` to be set to `icu`. Available from PostgreSQL 16.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "icuRules is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "isTemplate": {
+          "description": "Maps to the `IS_TEMPLATE` parameter of `CREATE DATABASE` and `ALTER\nDATABASE`. If true, this database is considered a template and can\nbe cloned by any user with `CREATEDB` privileges.",
+          "type": "boolean"
+        },
+        "locale": {
+          "description": "Maps to the `LOCALE` parameter of `CREATE DATABASE`. This setting\ncannot be changed. Sets the default collation order and character\nclassification in the new database.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "locale is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "localeCType": {
+          "description": "Maps to the `LC_CTYPE` parameter of `CREATE DATABASE`. This setting\ncannot be changed.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "localeCType is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "localeCollate": {
+          "description": "Maps to the `LC_COLLATE` parameter of `CREATE DATABASE`. This\nsetting cannot be changed.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "localeCollate is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
+        },
+        "localeProvider": {
+          "description": "Maps to the `LOCALE_PROVIDER` parameter of `CREATE DATABASE`. This\nsetting cannot be changed. This option sets the locale provider for\ndatabases created in the new cluster. Available from PostgreSQL 16.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "localeProvider is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
         },
         "name": {
-          "description": "Name overrides the default Database name provided by metadata.name.",
+          "description": "The name of the database to create inside PostgreSQL. This setting cannot be changed.",
           "type": "string",
-          "maxLength": 80
+          "x-kubernetes-validations": [
+            {
+              "message": "name is immutable",
+              "rule": "self == oldSelf"
+            },
+            {
+              "message": "the name postgres is reserved",
+              "rule": "self != 'postgres'"
+            },
+            {
+              "message": "the name template0 is reserved",
+              "rule": "self != 'template0'"
+            },
+            {
+              "message": "the name template1 is reserved",
+              "rule": "self != 'template1'"
+            }
+          ]
         },
-        "requeueInterval": {
-          "description": "RequeueInterval is used to perform requeue reconciliations.",
+        "owner": {
+          "description": "Maps to the `OWNER` parameter of `CREATE DATABASE`.\nMaps to the `OWNER TO` command of `ALTER DATABASE`.\nThe role name of the user who owns the database inside PostgreSQL.",
           "type": "string"
         },
-        "retryInterval": {
-          "description": "RetryInterval is the interval used to perform retries.",
+        "tablespace": {
+          "description": "Maps to the `TABLESPACE` parameter of `CREATE DATABASE`.\nMaps to the `SET TABLESPACE` command of `ALTER DATABASE`.\nThe name of the tablespace (in PostgreSQL) that will be associated\nwith the new database. This tablespace will be the default\ntablespace used for objects created in this database.",
           "type": "string"
+        },
+        "template": {
+          "description": "Maps to the `TEMPLATE` parameter of `CREATE DATABASE`. This setting\ncannot be changed. The name of the template from which to create\nthis database.",
+          "type": "string",
+          "x-kubernetes-validations": [
+            {
+              "message": "template is immutable",
+              "rule": "self == oldSelf"
+            }
+          ]
         }
-      }
+      },
+      "x-kubernetes-validations": [
+        {
+          "message": "builtinLocale is only available when localeProvider is set to `builtin`",
+          "rule": "!has(self.builtinLocale) || self.localeProvider == 'builtin'"
+        },
+        {
+          "message": "icuLocale is only available when localeProvider is set to `icu`",
+          "rule": "!has(self.icuLocale) || self.localeProvider == 'icu'"
+        },
+        {
+          "message": "icuRules is only available when localeProvider is set to `icu`",
+          "rule": "!has(self.icuRules) || self.localeProvider == 'icu'"
+        }
+      ]
     },
     "status": {
-      "description": "DatabaseStatus defines the observed state of Database",
+      "description": "Most recently observed status of the Database. This data may not be up to\ndate. Populated by the system. Read-only.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
       "type": "object",
       "properties": {
-        "conditions": {
-          "description": "Conditions for the Database object.",
-          "type": "array",
-          "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.",
-            "type": "object",
-            "required": [
-              "lastTransitionTime",
-              "message",
-              "reason",
-              "status",
-              "type"
-            ],
-            "properties": {
-              "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
-                "type": "string",
-                "format": "date-time"
-              },
-              "message": {
-                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
-                "type": "string",
-                "maxLength": 32768
-              },
-              "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
-                "type": "integer",
-                "format": "int64",
-                "minimum": 0
-              },
-              "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
-                "type": "string",
-                "maxLength": 1024,
-                "minLength": 1,
-                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
-              },
-              "status": {
-                "description": "status of the condition, one of True, False, Unknown.",
-                "type": "string",
-                "enum": [
-                  "True",
-                  "False",
-                  "Unknown"
-                ]
-              },
-              "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
-                "type": "string",
-                "maxLength": 316,
-                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
-              }
-            }
-          }
+        "applied": {
+          "description": "Applied is true if the database was reconciled correctly",
+          "type": "boolean"
+        },
+        "message": {
+          "description": "Message is the reconciliation output message",
+          "type": "string"
+        },
+        "observedGeneration": {
+          "description": "A sequence number representing the latest\ndesired state that was synchronized",
+          "type": "integer",
+          "format": "int64"
         }
       }
     }
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "k8s.mariadb.com",
+      "group": "postgresql.cnpg.noobaa.io",
       "kind": "Database",
-      "version": "v1alpha1"
+      "version": "v1"
     }
   ],
   "x-kubernetes-selectable-fields": [],

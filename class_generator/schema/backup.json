@@ -1,6 +1,10 @@
 {
-  "description": "Backup is the Schema for the backups API. It is used to define backup jobs and its storage.",
+  "description": "Backup is the Schema for the backups API",
   "type": "object",
+  "required": [
+    "metadata",
+    "spec"
+  ],
   "properties": {
     "apiVersion": {
       "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
@@ -15,1195 +19,441 @@
       "$ref": "_definitions.json#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
     },
     "spec": {
-      "description": "BackupSpec defines the desired state of Backup",
+      "description": "Specification of the desired behavior of the backup.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
       "type": "object",
       "required": [
-        "mariaDbRef",
-        "storage"
+        "cluster"
       ],
       "properties": {
-        "affinity": {
-          "description": "Affinity to be used in the Pod.",
+        "cluster": {
+          "description": "The cluster to backup",
           "type": "object",
-          "properties": {
-            "antiAffinityEnabled": {
-              "description": "AntiAffinityEnabled configures PodAntiAffinity so each Pod is scheduled in a different Node, enabling HA.\nMake sure you have at least as many Nodes available as the replicas to not end up with unscheduled Pods.",
-              "type": "boolean"
-            },
-            "nodeAffinity": {
-              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeaffinity-v1-core",
-              "type": "object",
-              "properties": {
-                "preferredDuringSchedulingIgnoredDuringExecution": {
-                  "type": "array",
-                  "items": {
-                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#preferredschedulingterm-v1-core",
-                    "type": "object",
-                    "required": [
-                      "preference",
-                      "weight"
-                    ],
-                    "properties": {
-                      "preference": {
-                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorterm-v1-core",
-                        "type": "object",
-                        "properties": {
-                          "matchExpressions": {
-                            "type": "array",
-                            "items": {
-                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
-                              "type": "object",
-                              "required": [
-                                "key",
-                                "operator"
-                              ],
-                              "properties": {
-                                "key": {
-                                  "type": "string"
-                                },
-                                "operator": {
-                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
-                                  "type": "string"
-                                },
-                                "values": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  },
-                                  "x-kubernetes-list-type": "atomic"
-                                }
-                              }
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          },
-                          "matchFields": {
-                            "type": "array",
-                            "items": {
-                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
-                              "type": "object",
-                              "required": [
-                                "key",
-                                "operator"
-                              ],
-                              "properties": {
-                                "key": {
-                                  "type": "string"
-                                },
-                                "operator": {
-                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
-                                  "type": "string"
-                                },
-                                "values": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  },
-                                  "x-kubernetes-list-type": "atomic"
-                                }
-                              }
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          }
-                        }
-                      },
-                      "weight": {
-                        "type": "integer",
-                        "format": "int32"
-                      }
-                    }
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                },
-                "requiredDuringSchedulingIgnoredDuringExecution": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselector-v1-core",
-                  "type": "object",
-                  "required": [
-                    "nodeSelectorTerms"
-                  ],
-                  "properties": {
-                    "nodeSelectorTerms": {
-                      "type": "array",
-                      "items": {
-                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorterm-v1-core",
-                        "type": "object",
-                        "properties": {
-                          "matchExpressions": {
-                            "type": "array",
-                            "items": {
-                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
-                              "type": "object",
-                              "required": [
-                                "key",
-                                "operator"
-                              ],
-                              "properties": {
-                                "key": {
-                                  "type": "string"
-                                },
-                                "operator": {
-                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
-                                  "type": "string"
-                                },
-                                "values": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  },
-                                  "x-kubernetes-list-type": "atomic"
-                                }
-                              }
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          },
-                          "matchFields": {
-                            "type": "array",
-                            "items": {
-                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nodeselectorrequirement-v1-core",
-                              "type": "object",
-                              "required": [
-                                "key",
-                                "operator"
-                              ],
-                              "properties": {
-                                "key": {
-                                  "type": "string"
-                                },
-                                "operator": {
-                                  "description": "A node selector operator is the set of operators that can be used in\na node selector requirement.",
-                                  "type": "string"
-                                },
-                                "values": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  },
-                                  "x-kubernetes-list-type": "atomic"
-                                }
-                              }
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          }
-                        }
-                      },
-                      "x-kubernetes-list-type": "atomic"
-                    }
-                  }
-                }
-              }
-            },
-            "podAntiAffinity": {
-              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podantiaffinity-v1-core.",
-              "type": "object",
-              "properties": {
-                "preferredDuringSchedulingIgnoredDuringExecution": {
-                  "type": "array",
-                  "items": {
-                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#weightedpodaffinityterm-v1-core.",
-                    "type": "object",
-                    "required": [
-                      "podAffinityTerm",
-                      "weight"
-                    ],
-                    "properties": {
-                      "podAffinityTerm": {
-                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podaffinityterm-v1-core.",
-                        "type": "object",
-                        "required": [
-                          "topologyKey"
-                        ],
-                        "properties": {
-                          "labelSelector": {
-                            "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta",
-                            "type": "object",
-                            "properties": {
-                              "matchExpressions": {
-                                "type": "array",
-                                "items": {
-                                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselectorrequirement-v1-meta",
-                                  "type": "object",
-                                  "required": [
-                                    "key",
-                                    "operator"
-                                  ],
-                                  "properties": {
-                                    "key": {
-                                      "type": "string"
-                                    },
-                                    "operator": {
-                                      "description": "A label selector operator is the set of operators that can be used in a selector requirement.",
-                                      "type": "string"
-                                    },
-                                    "values": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      },
-                                      "x-kubernetes-list-type": "atomic"
-                                    }
-                                  }
-                                },
-                                "x-kubernetes-list-type": "atomic"
-                              },
-                              "matchLabels": {
-                                "type": "object",
-                                "additionalProperties": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          },
-                          "topologyKey": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "weight": {
-                        "type": "integer",
-                        "format": "int32"
-                      }
-                    }
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                },
-                "requiredDuringSchedulingIgnoredDuringExecution": {
-                  "type": "array",
-                  "items": {
-                    "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podaffinityterm-v1-core.",
-                    "type": "object",
-                    "required": [
-                      "topologyKey"
-                    ],
-                    "properties": {
-                      "labelSelector": {
-                        "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta",
-                        "type": "object",
-                        "properties": {
-                          "matchExpressions": {
-                            "type": "array",
-                            "items": {
-                              "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselectorrequirement-v1-meta",
-                              "type": "object",
-                              "required": [
-                                "key",
-                                "operator"
-                              ],
-                              "properties": {
-                                "key": {
-                                  "type": "string"
-                                },
-                                "operator": {
-                                  "description": "A label selector operator is the set of operators that can be used in a selector requirement.",
-                                  "type": "string"
-                                },
-                                "values": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  },
-                                  "x-kubernetes-list-type": "atomic"
-                                }
-                              }
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          },
-                          "matchLabels": {
-                            "type": "object",
-                            "additionalProperties": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      },
-                      "topologyKey": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                }
-              }
-            }
-          }
-        },
-        "args": {
-          "description": "Args to be used in the Container.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "backoffLimit": {
-          "description": "BackoffLimit defines the maximum number of attempts to successfully take a Backup.",
-          "type": "integer",
-          "format": "int32"
-        },
-        "compression": {
-          "description": "Compression algorithm to be used in the Backup.",
-          "type": "string",
-          "enum": [
-            "none",
-            "bzip2",
-            "gzip"
-          ]
-        },
-        "databases": {
-          "description": "Databases defines the logical databases to be backed up. If not provided, all databases are backed up.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "failedJobsHistoryLimit": {
-          "description": "FailedJobsHistoryLimit defines the maximum number of failed Jobs to be displayed.",
-          "type": "integer",
-          "format": "int32",
-          "minimum": 0
-        },
-        "ignoreGlobalPriv": {
-          "description": "IgnoreGlobalPriv indicates to ignore the mysql.global_priv in backups.\nIf not provided, it will default to true when the referred MariaDB instance has Galera enabled and otherwise to false.\nSee: https://github.com/mariadb-operator/mariadb-operator/issues/556",
-          "type": "boolean"
-        },
-        "imagePullSecrets": {
-          "description": "ImagePullSecrets is the list of pull Secrets to be used to pull the image.",
-          "type": "array",
-          "items": {
-            "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core.",
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "inheritMetadata": {
-          "description": "InheritMetadata defines the metadata to be inherited by children resources.",
-          "type": "object",
-          "properties": {
-            "annotations": {
-              "description": "Annotations to be added to children resources.",
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            "labels": {
-              "description": "Labels to be added to children resources.",
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "logLevel": {
-          "description": "LogLevel to be used n the Backup Job. It defaults to 'info'.",
-          "type": "string"
-        },
-        "mariaDbRef": {
-          "description": "MariaDBRef is a reference to a MariaDB object.",
-          "type": "object",
+          "required": [
+            "name"
+          ],
           "properties": {
             "name": {
+              "description": "Name of the referent.",
               "type": "string"
+            }
+          }
+        },
+        "method": {
+          "description": "The backup method to be used, possible options are `barmanObjectStore`,\n`volumeSnapshot` or `plugin`. Defaults to: `barmanObjectStore`.",
+          "type": "string",
+          "enum": [
+            "barmanObjectStore",
+            "volumeSnapshot",
+            "plugin"
+          ]
+        },
+        "online": {
+          "description": "Whether the default type of backup with volume snapshots is\nonline/hot (`true`, default) or offline/cold (`false`)\nOverrides the default setting specified in the cluster field '.spec.backup.volumeSnapshot.online'",
+          "type": "boolean"
+        },
+        "onlineConfiguration": {
+          "description": "Configuration parameters to control the online/hot backup with volume snapshots\nOverrides the default settings specified in the cluster '.backup.volumeSnapshot.onlineConfiguration' stanza",
+          "type": "object",
+          "properties": {
+            "immediateCheckpoint": {
+              "description": "Control whether the I/O workload for the backup initial checkpoint will\nbe limited, according to the `checkpoint_completion_target` setting on\nthe PostgreSQL server. If set to true, an immediate checkpoint will be\nused, meaning PostgreSQL will complete the checkpoint as soon as\npossible. `false` by default.",
+              "type": "boolean"
             },
-            "namespace": {
-              "type": "string"
-            },
-            "waitForIt": {
-              "description": "WaitForIt indicates whether the controller using this reference should wait for MariaDB to be ready.",
+            "waitForArchive": {
+              "description": "If false, the function will return immediately after the backup is completed,\nwithout waiting for WAL to be archived.\nThis behavior is only useful with backup software that independently monitors WAL archiving.\nOtherwise, WAL required to make the backup consistent might be missing and make the backup useless.\nBy default, or when this parameter is true, pg_backup_stop will wait for WAL to be archived when archiving is\nenabled.\nOn a standby, this means that it will wait only when archive_mode = always.\nIf write activity on the primary is low, it may be useful to run pg_switch_wal on the primary in order to trigger\nan immediate segment switch.",
               "type": "boolean"
             }
           }
         },
-        "maxRetention": {
-          "description": "MaxRetention defines the retention policy for backups. Old backups will be cleaned up by the Backup Job.\nIt defaults to 30 days.",
+        "pluginConfiguration": {
+          "description": "Configuration parameters passed to the plugin managing this backup",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "Name is the name of the plugin managing this backup",
+              "type": "string"
+            },
+            "parameters": {
+              "description": "Parameters are the configuration parameters passed to the backup\nplugin for this backup",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "target": {
+          "description": "The policy to decide which instance should perform this backup. If empty,\nit defaults to `cluster.spec.backup.target`.\nAvailable options are empty string, `primary` and `prefer-standby`.\n`primary` to have backups run always on primary instances,\n`prefer-standby` to have backups run preferably on the most updated\nstandby, if available.",
+          "type": "string",
+          "enum": [
+            "primary",
+            "prefer-standby"
+          ]
+        }
+      }
+    },
+    "status": {
+      "description": "Most recently observed status of the backup. This data may not be up to\ndate. Populated by the system. Read-only.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+      "type": "object",
+      "properties": {
+        "azureCredentials": {
+          "description": "The credentials to use to upload data to Azure Blob Storage",
+          "type": "object",
+          "properties": {
+            "connectionString": {
+              "description": "The connection string to be used",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            },
+            "inheritFromAzureAD": {
+              "description": "Use the Azure AD based authentication without providing explicitly the keys.",
+              "type": "boolean"
+            },
+            "storageAccount": {
+              "description": "The storage account where to upload data",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            },
+            "storageKey": {
+              "description": "The storage account key to be used in conjunction\nwith the storage account name",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            },
+            "storageSasToken": {
+              "description": "A shared-access-signature to be used in conjunction with\nthe storage account name",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "backupId": {
+          "description": "The ID of the Barman backup",
           "type": "string"
         },
-        "nodeSelector": {
-          "description": "NodeSelector to be used in the Pod.",
+        "backupLabelFile": {
+          "description": "Backup label file content as returned by Postgres in case of online (hot) backups",
+          "type": "string",
+          "format": "byte"
+        },
+        "backupName": {
+          "description": "The Name of the Barman backup",
+          "type": "string"
+        },
+        "beginLSN": {
+          "description": "The starting xlog",
+          "type": "string"
+        },
+        "beginWal": {
+          "description": "The starting WAL",
+          "type": "string"
+        },
+        "commandError": {
+          "description": "The backup command output in case of error",
+          "type": "string"
+        },
+        "commandOutput": {
+          "description": "Unused. Retained for compatibility with old versions.",
+          "type": "string"
+        },
+        "destinationPath": {
+          "description": "The path where to store the backup (i.e. s3://bucket/path/to/folder)\nthis path, with different destination folders, will be used for WALs\nand for data. This may not be populated in case of errors.",
+          "type": "string"
+        },
+        "encryption": {
+          "description": "Encryption method required to S3 API",
+          "type": "string"
+        },
+        "endLSN": {
+          "description": "The ending xlog",
+          "type": "string"
+        },
+        "endWal": {
+          "description": "The ending WAL",
+          "type": "string"
+        },
+        "endpointCA": {
+          "description": "EndpointCA store the CA bundle of the barman endpoint.\nUseful when using self-signed certificates to avoid\nerrors with certificate issuer and barman-cloud-wal-archive.",
+          "type": "object",
+          "required": [
+            "key",
+            "name"
+          ],
+          "properties": {
+            "key": {
+              "description": "The key to select",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the referent.",
+              "type": "string"
+            }
+          }
+        },
+        "endpointURL": {
+          "description": "Endpoint to be used to upload data to the cloud,\noverriding the automatic endpoint discovery",
+          "type": "string"
+        },
+        "error": {
+          "description": "The detected error",
+          "type": "string"
+        },
+        "googleCredentials": {
+          "description": "The credentials to use to upload data to Google Cloud Storage",
+          "type": "object",
+          "properties": {
+            "applicationCredentials": {
+              "description": "The secret containing the Google Cloud Storage JSON file with the credentials",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            },
+            "gkeEnvironment": {
+              "description": "If set to true, will presume that it's running inside a GKE environment,\ndefault to false.",
+              "type": "boolean"
+            }
+          }
+        },
+        "instanceID": {
+          "description": "Information to identify the instance where the backup has been taken from",
+          "type": "object",
+          "properties": {
+            "ContainerID": {
+              "description": "The container ID",
+              "type": "string"
+            },
+            "podName": {
+              "description": "The pod name",
+              "type": "string"
+            }
+          }
+        },
+        "method": {
+          "description": "The backup method being used",
+          "type": "string"
+        },
+        "online": {
+          "description": "Whether the backup was online/hot (`true`) or offline/cold (`false`)",
+          "type": "boolean"
+        },
+        "phase": {
+          "description": "The last backup status",
+          "type": "string"
+        },
+        "pluginMetadata": {
+          "description": "A map containing the plugin metadata",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
-        "podMetadata": {
-          "description": "PodMetadata defines extra metadata for the Pod.",
+        "s3Credentials": {
+          "description": "The credentials to use to upload data to S3",
           "type": "object",
           "properties": {
-            "annotations": {
-              "description": "Annotations to be added to children resources.",
+            "accessKeyId": {
+              "description": "The reference to the access key id",
               "type": "object",
-              "additionalProperties": {
-                "type": "string"
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
               }
             },
-            "labels": {
-              "description": "Labels to be added to children resources.",
+            "inheritFromIAMRole": {
+              "description": "Use the role based authentication without providing explicitly the keys.",
+              "type": "boolean"
+            },
+            "region": {
+              "description": "The reference to the secret containing the region name",
               "type": "object",
-              "additionalProperties": {
-                "type": "string"
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            },
+            "secretAccessKey": {
+              "description": "The reference to the secret access key",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
+              }
+            },
+            "sessionToken": {
+              "description": "The references to the session key",
+              "type": "object",
+              "required": [
+                "key",
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "The key to select",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the referent.",
+                  "type": "string"
+                }
               }
             }
           }
         },
-        "podSecurityContext": {
-          "description": "SecurityContext holds pod-level security attributes and common container settings.",
+        "serverName": {
+          "description": "The server name on S3, the cluster name is used if this\nparameter is omitted",
+          "type": "string"
+        },
+        "snapshotBackupStatus": {
+          "description": "Status of the volumeSnapshot backup",
           "type": "object",
           "properties": {
-            "appArmorProfile": {
-              "description": "AppArmorProfile defines a pod or container's AppArmor settings.",
-              "type": "object",
-              "required": [
-                "type"
-              ],
-              "properties": {
-                "localhostProfile": {
-                  "description": "localhostProfile indicates a profile loaded on the node that should be used.\nThe profile must be preconfigured on the node to work.\nMust match the loaded name of the profile.\nMust be set if and only if type is \"Localhost\".",
-                  "type": "string"
-                },
-                "type": {
-                  "description": "type indicates which kind of AppArmor profile will be applied.\nValid options are:\n  Localhost - a profile pre-loaded on the node.\n  RuntimeDefault - the container runtime's default profile.\n  Unconfined - no AppArmor enforcement.",
-                  "type": "string"
-                }
-              }
-            },
-            "fsGroup": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "fsGroupChangePolicy": {
-              "description": "PodFSGroupChangePolicy holds policies that will be used for applying fsGroup to a volume\nwhen volume is mounted.",
-              "type": "string"
-            },
-            "runAsGroup": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "runAsNonRoot": {
-              "type": "boolean"
-            },
-            "runAsUser": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "seLinuxOptions": {
-              "description": "SELinuxOptions are the labels to be applied to the container",
-              "type": "object",
-              "properties": {
-                "level": {
-                  "description": "Level is SELinux level label that applies to the container.",
-                  "type": "string"
-                },
-                "role": {
-                  "description": "Role is a SELinux role label that applies to the container.",
-                  "type": "string"
-                },
-                "type": {
-                  "description": "Type is a SELinux type label that applies to the container.",
-                  "type": "string"
-                },
-                "user": {
-                  "description": "User is a SELinux user label that applies to the container.",
-                  "type": "string"
-                }
-              }
-            },
-            "seccompProfile": {
-              "description": "SeccompProfile defines a pod/container's seccomp profile settings.\nOnly one profile source may be set.",
-              "type": "object",
-              "required": [
-                "type"
-              ],
-              "properties": {
-                "localhostProfile": {
-                  "description": "localhostProfile indicates a profile defined in a file on the node should be used.\nThe profile must be preconfigured on the node to work.\nMust be a descending path, relative to the kubelet's configured seccomp profile location.\nMust be set if type is \"Localhost\". Must NOT be set for any other type.",
-                  "type": "string"
-                },
-                "type": {
-                  "description": "type indicates which kind of seccomp profile will be applied.\nValid options are:\n\nLocalhost - a profile defined in a file on the node should be used.\nRuntimeDefault - the container runtime default profile should be used.\nUnconfined - no profile should be applied.",
-                  "type": "string"
-                }
-              }
-            },
-            "supplementalGroups": {
+            "elements": {
+              "description": "The elements list, populated with the gathered volume snapshots",
               "type": "array",
               "items": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "x-kubernetes-list-type": "atomic"
-            }
-          }
-        },
-        "priorityClassName": {
-          "description": "PriorityClassName to be used in the Pod.",
-          "type": "string"
-        },
-        "resources": {
-          "description": "Resouces describes the compute resource requirements.",
-          "type": "object",
-          "properties": {
-            "limits": {
-              "description": "ResourceList is a set of (resource name, quantity) pairs.",
-              "type": "object",
-              "additionalProperties": {
-                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                "x-kubernetes-int-or-string": true
-              }
-            },
-            "requests": {
-              "description": "ResourceList is a set of (resource name, quantity) pairs.",
-              "type": "object",
-              "additionalProperties": {
-                "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                "x-kubernetes-int-or-string": true
+                "description": "BackupSnapshotElementStatus is a volume snapshot that is part of a volume snapshot method backup",
+                "type": "object",
+                "required": [
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "description": "Name is the snapshot resource name",
+                    "type": "string"
+                  },
+                  "tablespaceName": {
+                    "description": "TablespaceName is the name of the snapshotted tablespace. Only set\nwhen type is PG_TABLESPACE",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Type is tho role of the snapshot in the cluster, such as PG_DATA, PG_WAL and PG_TABLESPACE",
+                    "type": "string"
+                  }
+                }
               }
             }
           }
         },
-        "restartPolicy": {
-          "description": "RestartPolicy to be added to the Backup Pod.",
+        "startedAt": {
+          "description": "When the backup was started",
           "type": "string",
-          "enum": [
-            "Always",
-            "OnFailure",
-            "Never"
-          ]
+          "format": "date-time"
         },
-        "schedule": {
-          "description": "Schedule defines when the Backup will be taken.",
-          "type": "object",
-          "required": [
-            "cron"
-          ],
-          "properties": {
-            "cron": {
-              "description": "Cron is a cron expression that defines the schedule.",
-              "type": "string"
-            },
-            "suspend": {
-              "description": "Suspend defines whether the schedule is active or not.",
-              "type": "boolean"
-            }
-          }
+        "stoppedAt": {
+          "description": "When the backup was terminated",
+          "type": "string",
+          "format": "date-time"
         },
-        "securityContext": {
-          "description": "SecurityContext holds security configuration that will be applied to a container.",
-          "type": "object",
-          "properties": {
-            "allowPrivilegeEscalation": {
-              "type": "boolean"
-            },
-            "capabilities": {
-              "description": "Adds and removes POSIX capabilities from running containers.",
-              "type": "object",
-              "properties": {
-                "add": {
-                  "description": "Added capabilities",
-                  "type": "array",
-                  "items": {
-                    "description": "Capability represent POSIX capabilities type",
-                    "type": "string"
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                },
-                "drop": {
-                  "description": "Removed capabilities",
-                  "type": "array",
-                  "items": {
-                    "description": "Capability represent POSIX capabilities type",
-                    "type": "string"
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                }
-              }
-            },
-            "privileged": {
-              "type": "boolean"
-            },
-            "readOnlyRootFilesystem": {
-              "type": "boolean"
-            },
-            "runAsGroup": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "runAsNonRoot": {
-              "type": "boolean"
-            },
-            "runAsUser": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        },
-        "serviceAccountName": {
-          "description": "ServiceAccountName is the name of the ServiceAccount to be used by the Pods.",
-          "type": "string"
-        },
-        "stagingStorage": {
-          "description": "StagingStorage defines the temporary storage used to keep external backups (i.e. S3) while they are being processed.\nIt defaults to an emptyDir volume, meaning that the backups will be temporarily stored in the node where the Backup Job is scheduled.\nThe staging area gets cleaned up after each backup is completed, consider this for sizing it appropriately.",
-          "type": "object",
-          "properties": {
-            "persistentVolumeClaim": {
-              "description": "PersistentVolumeClaim is a Kubernetes PVC specification.",
-              "type": "object",
-              "properties": {
-                "accessModes": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                },
-                "resources": {
-                  "description": "VolumeResourceRequirements describes the storage resource requirements for a volume.",
-                  "type": "object",
-                  "properties": {
-                    "limits": {
-                      "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                      "type": "object",
-                      "additionalProperties": {
-                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                        "x-kubernetes-int-or-string": true
-                      }
-                    },
-                    "requests": {
-                      "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                      "type": "object",
-                      "additionalProperties": {
-                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                        "x-kubernetes-int-or-string": true
-                      }
-                    }
-                  }
-                },
-                "selector": {
-                  "description": "A label selector is a label query over a set of resources. The result of matchLabels and\nmatchExpressions are ANDed. An empty label selector matches all objects. A null\nlabel selector matches no objects.",
-                  "type": "object",
-                  "properties": {
-                    "matchExpressions": {
-                      "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                      "type": "array",
-                      "items": {
-                        "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                        "type": "object",
-                        "required": [
-                          "key",
-                          "operator"
-                        ],
-                        "properties": {
-                          "key": {
-                            "description": "key is the label key that the selector applies to.",
-                            "type": "string"
-                          },
-                          "operator": {
-                            "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                            "type": "string"
-                          },
-                          "values": {
-                            "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          }
-                        }
-                      },
-                      "x-kubernetes-list-type": "atomic"
-                    },
-                    "matchLabels": {
-                      "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "x-kubernetes-map-type": "atomic"
-                },
-                "storageClassName": {
-                  "type": "string"
-                }
-              }
-            },
-            "volume": {
-              "description": "Volume is a Kubernetes volume specification.",
-              "type": "object",
-              "properties": {
-                "csi": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#csivolumesource-v1-core.",
-                  "type": "object",
-                  "required": [
-                    "driver"
-                  ],
-                  "properties": {
-                    "driver": {
-                      "type": "string"
-                    },
-                    "fsType": {
-                      "type": "string"
-                    },
-                    "nodePublishSecretRef": {
-                      "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core.",
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "readOnly": {
-                      "type": "boolean"
-                    },
-                    "volumeAttributes": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "emptyDir": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#emptydirvolumesource-v1-core.",
-                  "type": "object",
-                  "properties": {
-                    "medium": {
-                      "description": "StorageMedium defines ways that storage can be allocated to a volume.",
-                      "type": "string"
-                    },
-                    "sizeLimit": {
-                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                      "x-kubernetes-int-or-string": true
-                    }
-                  }
-                },
-                "nfs": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.",
-                  "type": "object",
-                  "required": [
-                    "path",
-                    "server"
-                  ],
-                  "properties": {
-                    "path": {
-                      "type": "string"
-                    },
-                    "readOnly": {
-                      "type": "boolean"
-                    },
-                    "server": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "persistentVolumeClaim": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#persistentvolumeclaimvolumesource-v1-core.",
-                  "type": "object",
-                  "required": [
-                    "claimName"
-                  ],
-                  "properties": {
-                    "claimName": {
-                      "type": "string"
-                    },
-                    "readOnly": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "storage": {
-          "description": "Storage defines the final storage for backups.",
-          "type": "object",
-          "properties": {
-            "persistentVolumeClaim": {
-              "description": "PersistentVolumeClaim is a Kubernetes PVC specification.",
-              "type": "object",
-              "properties": {
-                "accessModes": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "x-kubernetes-list-type": "atomic"
-                },
-                "resources": {
-                  "description": "VolumeResourceRequirements describes the storage resource requirements for a volume.",
-                  "type": "object",
-                  "properties": {
-                    "limits": {
-                      "description": "Limits describes the maximum amount of compute resources allowed.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                      "type": "object",
-                      "additionalProperties": {
-                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                        "x-kubernetes-int-or-string": true
-                      }
-                    },
-                    "requests": {
-                      "description": "Requests describes the minimum amount of compute resources required.\nIf Requests is omitted for a container, it defaults to Limits if that is explicitly specified,\notherwise to an implementation-defined value. Requests cannot exceed Limits.\nMore info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                      "type": "object",
-                      "additionalProperties": {
-                        "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                        "x-kubernetes-int-or-string": true
-                      }
-                    }
-                  }
-                },
-                "selector": {
-                  "description": "A label selector is a label query over a set of resources. The result of matchLabels and\nmatchExpressions are ANDed. An empty label selector matches all objects. A null\nlabel selector matches no objects.",
-                  "type": "object",
-                  "properties": {
-                    "matchExpressions": {
-                      "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
-                      "type": "array",
-                      "items": {
-                        "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
-                        "type": "object",
-                        "required": [
-                          "key",
-                          "operator"
-                        ],
-                        "properties": {
-                          "key": {
-                            "description": "key is the label key that the selector applies to.",
-                            "type": "string"
-                          },
-                          "operator": {
-                            "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
-                            "type": "string"
-                          },
-                          "values": {
-                            "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            },
-                            "x-kubernetes-list-type": "atomic"
-                          }
-                        }
-                      },
-                      "x-kubernetes-list-type": "atomic"
-                    },
-                    "matchLabels": {
-                      "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "x-kubernetes-map-type": "atomic"
-                },
-                "storageClassName": {
-                  "type": "string"
-                }
-              }
-            },
-            "s3": {
-              "description": "S3 defines the configuration to store backups in a S3 compatible storage.",
-              "type": "object",
-              "required": [
-                "bucket",
-                "endpoint"
-              ],
-              "properties": {
-                "accessKeyIdSecretKeyRef": {
-                  "description": "AccessKeyIdSecretKeyRef is a reference to a Secret key containing the S3 access key id.",
-                  "type": "object",
-                  "required": [
-                    "key"
-                  ],
-                  "properties": {
-                    "key": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  },
-                  "x-kubernetes-map-type": "atomic"
-                },
-                "bucket": {
-                  "description": "Bucket is the name Name of the bucket to store backups.",
-                  "type": "string"
-                },
-                "endpoint": {
-                  "description": "Endpoint is the S3 API endpoint without scheme.",
-                  "type": "string"
-                },
-                "prefix": {
-                  "description": "Prefix indicates a folder/subfolder in the bucket. For example: mariadb/ or mariadb/backups. A trailing slash '/' is added if not provided.",
-                  "type": "string"
-                },
-                "region": {
-                  "description": "Region is the S3 region name to use.",
-                  "type": "string"
-                },
-                "secretAccessKeySecretKeyRef": {
-                  "description": "AccessKeyIdSecretKeyRef is a reference to a Secret key containing the S3 secret key.",
-                  "type": "object",
-                  "required": [
-                    "key"
-                  ],
-                  "properties": {
-                    "key": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  },
-                  "x-kubernetes-map-type": "atomic"
-                },
-                "sessionTokenSecretKeyRef": {
-                  "description": "SessionTokenSecretKeyRef is a reference to a Secret key containing the S3 session token.",
-                  "type": "object",
-                  "required": [
-                    "key"
-                  ],
-                  "properties": {
-                    "key": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  },
-                  "x-kubernetes-map-type": "atomic"
-                },
-                "tls": {
-                  "description": "TLS provides the configuration required to establish TLS connections with S3.",
-                  "type": "object",
-                  "properties": {
-                    "caSecretKeyRef": {
-                      "description": "CASecretKeyRef is a reference to a Secret key containing a CA bundle in PEM format used to establish TLS connections with S3.\nBy default, the system trust chain will be used, but you can use this field to add more CAs to the bundle.",
-                      "type": "object",
-                      "required": [
-                        "key"
-                      ],
-                      "properties": {
-                        "key": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        }
-                      },
-                      "x-kubernetes-map-type": "atomic"
-                    },
-                    "enabled": {
-                      "description": "Enabled is a flag to enable TLS.",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            },
-            "volume": {
-              "description": "Volume is a Kubernetes volume specification.",
-              "type": "object",
-              "properties": {
-                "csi": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#csivolumesource-v1-core.",
-                  "type": "object",
-                  "required": [
-                    "driver"
-                  ],
-                  "properties": {
-                    "driver": {
-                      "type": "string"
-                    },
-                    "fsType": {
-                      "type": "string"
-                    },
-                    "nodePublishSecretRef": {
-                      "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core.",
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "readOnly": {
-                      "type": "boolean"
-                    },
-                    "volumeAttributes": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "emptyDir": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#emptydirvolumesource-v1-core.",
-                  "type": "object",
-                  "properties": {
-                    "medium": {
-                      "description": "StorageMedium defines ways that storage can be allocated to a volume.",
-                      "type": "string"
-                    },
-                    "sizeLimit": {
-                      "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-                      "x-kubernetes-int-or-string": true
-                    }
-                  }
-                },
-                "nfs": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.",
-                  "type": "object",
-                  "required": [
-                    "path",
-                    "server"
-                  ],
-                  "properties": {
-                    "path": {
-                      "type": "string"
-                    },
-                    "readOnly": {
-                      "type": "boolean"
-                    },
-                    "server": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "persistentVolumeClaim": {
-                  "description": "Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#persistentvolumeclaimvolumesource-v1-core.",
-                  "type": "object",
-                  "required": [
-                    "claimName"
-                  ],
-                  "properties": {
-                    "claimName": {
-                      "type": "string"
-                    },
-                    "readOnly": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "successfulJobsHistoryLimit": {
-          "description": "SuccessfulJobsHistoryLimit defines the maximum number of successful Jobs to be displayed.",
-          "type": "integer",
-          "format": "int32",
-          "minimum": 0
-        },
-        "timeZone": {
-          "description": "TimeZone defines the timezone associated with the cron expression.",
-          "type": "string"
-        },
-        "tolerations": {
-          "description": "Tolerations to be used in the Pod.",
-          "type": "array",
-          "items": {
-            "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
-            "type": "object",
-            "properties": {
-              "effect": {
-                "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
-                "type": "string"
-              },
-              "key": {
-                "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
-                "type": "string"
-              },
-              "operator": {
-                "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.",
-                "type": "string"
-              },
-              "tolerationSeconds": {
-                "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
-                "type": "integer",
-                "format": "int64"
-              },
-              "value": {
-                "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "status": {
-      "description": "BackupStatus defines the observed state of Backup",
-      "type": "object",
-      "properties": {
-        "conditions": {
-          "description": "Conditions for the Backup object.",
-          "type": "array",
-          "items": {
-            "description": "Condition contains details for one aspect of the current state of this API Resource.",
-            "type": "object",
-            "required": [
-              "lastTransitionTime",
-              "message",
-              "reason",
-              "status",
-              "type"
-            ],
-            "properties": {
-              "lastTransitionTime": {
-                "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
-                "type": "string",
-                "format": "date-time"
-              },
-              "message": {
-                "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
-                "type": "string",
-                "maxLength": 32768
-              },
-              "observedGeneration": {
-                "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
-                "type": "integer",
-                "format": "int64",
-                "minimum": 0
-              },
-              "reason": {
-                "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
-                "type": "string",
-                "maxLength": 1024,
-                "minLength": 1,
-                "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
-              },
-              "status": {
-                "description": "status of the condition, one of True, False, Unknown.",
-                "type": "string",
-                "enum": [
-                  "True",
-                  "False",
-                  "Unknown"
-                ]
-              },
-              "type": {
-                "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
-                "type": "string",
-                "maxLength": 316,
-                "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
-              }
-            }
-          }
+        "tablespaceMapFile": {
+          "description": "Tablespace map file content as returned by Postgres in case of online (hot) backups",
+          "type": "string",
+          "format": "byte"
         }
       }
     }
   },
   "x-kubernetes-group-version-kind": [
     {
-      "group": "k8s.mariadb.com",
+      "group": "postgresql.cnpg.noobaa.io",
       "kind": "Backup",
-      "version": "v1alpha1"
+      "version": "v1"
     }
   ],
   "x-kubernetes-selectable-fields": [],
