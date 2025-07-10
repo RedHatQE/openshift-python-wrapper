@@ -13,7 +13,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Type, Union
+from typing import Any, Type
 from urllib.parse import parse_qs, urlencode, urlparse
 from warnings import warn
 
@@ -1785,11 +1785,11 @@ class BaseResourceList(ABC):
         """Exits the runtime context and cleans up all resources."""
         self.clean_up()
 
-    def __iter__(self) -> Generator[Union["Resource", "NamespacedResource"], None, None]:
+    def __iter__(self) -> Generator[Resource | NamespacedResource, None, None]:
         """Allows iteration over the resources in the list."""
         yield from self.resources
 
-    def __getitem__(self, index: int) -> Union["Resource", "NamespacedResource"]:
+    def __getitem__(self, index: int) -> Resource | NamespacedResource:
         """Retrieves a resource from the list by its index."""
         return self.resources[index]
 
