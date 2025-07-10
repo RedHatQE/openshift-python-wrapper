@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import Resource, MissingRequiredArgumentError
 
 
@@ -13,31 +14,31 @@ class DSCInitialization(Resource):
 
     def __init__(
         self,
-        applications_namespace: Optional[str] = "",
-        dev_flags: Optional[Dict[str, Any]] = None,
-        monitoring: Optional[Dict[str, Any]] = None,
-        service_mesh: Optional[Dict[str, Any]] = None,
-        trusted_ca_bundle: Optional[Dict[str, Any]] = None,
+        applications_namespace: str | None = None,
+        dev_flags: dict[str, Any] | None = None,
+        monitoring: dict[str, Any] | None = None,
+        service_mesh: dict[str, Any] | None = None,
+        trusted_ca_bundle: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             applications_namespace (str): Namespace for applications to be installed, non-configurable, default
               to "redhat-ods-applications"
 
-            dev_flags (Dict[str, Any]): Internal development useful field to test customizations. This is not
+            dev_flags (dict[str, Any]): Internal development useful field to test customizations. This is not
               recommended to be used in production environment.
 
-            monitoring (Dict[str, Any]): Enable monitoring on specified namespace
+            monitoring (dict[str, Any]): Enable monitoring on specified namespace
 
-            service_mesh (Dict[str, Any]): Configures Service Mesh as networking layer for Data Science Clusters
+            service_mesh (dict[str, Any]): Configures Service Mesh as networking layer for Data Science Clusters
               components. The Service Mesh is a mandatory prerequisite for
               single model serving (KServe) and you should review this
               configuration if you are planning to use KServe. For other
               components, it enhances user experience; e.g. it provides unified
               authentication giving a Single Sign On experience.
 
-            trusted_ca_bundle (Dict[str, Any]): When set to `Managed`, adds odh-trusted-ca-bundle Configmap to all
+            trusted_ca_bundle (dict[str, Any]): When set to `Managed`, adds odh-trusted-ca-bundle Configmap to all
               namespaces that includes cluster-wide Trusted CA Bundle in
               .data["ca-bundle.crt"]. Additionally, this fields allows admins to
               add custom CA bundles to the configmap using the .CustomCABundle
@@ -56,7 +57,7 @@ class DSCInitialization(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.applications_namespace:
+            if self.applications_namespace is None:
                 raise MissingRequiredArgumentError(argument="self.applications_namespace")
 
             self.res["spec"] = {}
@@ -64,16 +65,16 @@ class DSCInitialization(Resource):
 
             _spec["applicationsNamespace"] = self.applications_namespace
 
-            if self.dev_flags:
+            if self.dev_flags is not None:
                 _spec["devFlags"] = self.dev_flags
 
-            if self.monitoring:
+            if self.monitoring is not None:
                 _spec["monitoring"] = self.monitoring
 
-            if self.service_mesh:
+            if self.service_mesh is not None:
                 _spec["serviceMesh"] = self.service_mesh
 
-            if self.trusted_ca_bundle:
+            if self.trusted_ca_bundle is not None:
                 _spec["trustedCABundle"] = self.trusted_ca_bundle
 
     # End of generated code

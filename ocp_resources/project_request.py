@@ -1,7 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
+from __future__ import annotations
 from typing import Any, Optional
-
 from ocp_resources.resource import Resource
 from ocp_resources.project_project_openshift_io import Project
 
@@ -17,11 +17,11 @@ class ProjectRequest(Resource):
 
     def __init__(
         self,
-        description: Optional[str] = "",
-        display_name: Optional[str] = "",
+        description: str | None = None,
+        display_name: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             description (str): Description is the description to apply to a project
 
@@ -37,10 +37,10 @@ class ProjectRequest(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.description:
+            if self.description is not None:
                 self.res["description"] = self.description
 
-            if self.display_name:
+            if self.display_name is not None:
                 self.res["displayName"] = self.display_name
 
     # End of generated code

@@ -1,8 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
+from __future__ import annotations
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
-
 from typing import Any
 
 
@@ -20,7 +20,7 @@ class VirtualMachineExport(NamespacedResource):
         ttl_duration: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             source (dict[str, Any]): TypedLocalObjectReference contains enough information to let you
               locate the typed referenced object inside the same namespace.
@@ -53,10 +53,10 @@ class VirtualMachineExport(NamespacedResource):
 
             _spec["source"] = self.source
 
-            if self.token_secret_ref:
+            if self.token_secret_ref is not None:
                 _spec["tokenSecretRef"] = self.token_secret_ref
 
-            if self.ttl_duration:
+            if self.ttl_duration is not None:
                 _spec["ttlDuration"] = self.ttl_duration
 
     # End of generated code

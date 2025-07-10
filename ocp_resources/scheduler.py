@@ -1,12 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import Resource
 
 
 class Scheduler(Resource):
     """
-       Scheduler holds cluster-wide config information to run the Kubernetes Scheduler and influence its placement decisions. The canonical name for this config is `cluster`.
+        Scheduler holds cluster-wide config information to run the Kubernetes Scheduler
+    and influence its placement decisions. The canonical name for this config is `cluster`.
+
     Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
     """
 
@@ -14,13 +17,13 @@ class Scheduler(Resource):
 
     def __init__(
         self,
-        default_node_selector: Optional[str] = "",
-        masters_schedulable: Optional[bool] = None,
-        policy: Optional[Dict[str, Any]] = None,
-        profile: Optional[str] = "",
+        default_node_selector: str | None = None,
+        masters_schedulable: bool | None = None,
+        policy: dict[str, Any] | None = None,
+        profile: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             default_node_selector (str): defaultNodeSelector helps set the cluster-wide default node selector
               to restrict pod placement to specific nodes. This is applied to
@@ -42,7 +45,7 @@ class Scheduler(Resource):
               "type=user-node,region=east" set in defaultNodeSelector would not
               be applied.
 
-            masters_schedulable (bool): MastersSchedulable allows masters nodes to be schedulable. When this
+            masters_schedulable (bool): mastersSchedulable allows masters nodes to be schedulable. When this
               flag is turned on, all the master nodes in the cluster will be
               made schedulable, so that workload pods can run on them. The
               default value for this field is false, meaning none of the master
@@ -51,7 +54,7 @@ class Scheduler(Resource):
               ensure that cluster-critical control plane components are not
               impacted. Please turn on this field after doing due diligence.
 
-            policy (Dict[str, Any]): DEPRECATED: the scheduler Policy API has been deprecated and will be
+            policy (dict[str, Any]): DEPRECATED: the scheduler Policy API has been deprecated and will be
               removed in a future release. policy is a reference to a ConfigMap
               containing scheduler policy which has user specified predicates
               and priorities. If this ConfigMap is not available scheduler will
@@ -59,7 +62,7 @@ class Scheduler(Resource):
               configmap is openshift-config.
 
             profile (str): profile sets which scheduling profile should be set in order to
-              configure scheduling decisions for new pods.   Valid values are
+              configure scheduling decisions for new pods.  Valid values are
               "LowNodeUtilization", "HighNodeUtilization", "NoScoring" Defaults
               to "LowNodeUtilization"
 
@@ -78,16 +81,16 @@ class Scheduler(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.default_node_selector:
+            if self.default_node_selector is not None:
                 _spec["defaultNodeSelector"] = self.default_node_selector
 
             if self.masters_schedulable is not None:
                 _spec["mastersSchedulable"] = self.masters_schedulable
 
-            if self.policy:
+            if self.policy is not None:
                 _spec["policy"] = self.policy
 
-            if self.profile:
+            if self.profile is not None:
                 _spec["profile"] = self.profile
 
     # End of generated code

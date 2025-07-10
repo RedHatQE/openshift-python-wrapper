@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -13,39 +14,39 @@ class CDI(Resource):
 
     def __init__(
         self,
-        cert_config: Optional[Dict[str, Any]] = None,
-        clone_strategy_override: Optional[str] = "",
-        config: Optional[Dict[str, Any]] = None,
-        customize_components: Optional[Dict[str, Any]] = None,
-        image_pull_policy: Optional[str] = "",
-        infra: Optional[Dict[str, Any]] = None,
-        priority_class: Optional[str] = "",
-        uninstall_strategy: Optional[str] = "",
-        workload: Optional[Dict[str, Any]] = None,
+        cert_config: dict[str, Any] | None = None,
+        clone_strategy_override: str | None = None,
+        config: dict[str, Any] | None = None,
+        customize_components: dict[str, Any] | None = None,
+        image_pull_policy: str | None = None,
+        infra: dict[str, Any] | None = None,
+        priority_class: str | None = None,
+        uninstall_strategy: str | None = None,
+        workload: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            cert_config (Dict[str, Any]): certificate configuration
+            cert_config (dict[str, Any]): certificate configuration
 
             clone_strategy_override (str): Clone strategy override: should we use a host-assisted copy even if
               snapshots are available?
 
-            config (Dict[str, Any]): CDIConfig at CDI level
+            config (dict[str, Any]): CDIConfig at CDI level
 
-            customize_components (Dict[str, Any]): CustomizeComponents defines patches for components deployed by the CDI
+            customize_components (dict[str, Any]): CustomizeComponents defines patches for components deployed by the CDI
               operator.
 
             image_pull_policy (str): PullPolicy describes a policy for if/when to pull a container image
 
-            infra (Dict[str, Any]): Selectors and tolerations that should apply to cdi infrastructure
+            infra (dict[str, Any]): Selectors and tolerations that should apply to cdi infrastructure
               components
 
             priority_class (str): PriorityClass of the CDI control plane
 
             uninstall_strategy (str): CDIUninstallStrategy defines the state to leave CDI on uninstall
 
-            workload (Dict[str, Any]): Restrict on which nodes CDI workload pods will be scheduled
+            workload (dict[str, Any]): Restrict on which nodes CDI workload pods will be scheduled
 
         """
         super().__init__(**kwargs)
@@ -67,31 +68,31 @@ class CDI(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.cert_config:
+            if self.cert_config is not None:
                 _spec["certConfig"] = self.cert_config
 
-            if self.clone_strategy_override:
+            if self.clone_strategy_override is not None:
                 _spec["cloneStrategyOverride"] = self.clone_strategy_override
 
-            if self.config:
+            if self.config is not None:
                 _spec["config"] = self.config
 
-            if self.customize_components:
+            if self.customize_components is not None:
                 _spec["customizeComponents"] = self.customize_components
 
-            if self.image_pull_policy:
+            if self.image_pull_policy is not None:
                 _spec["imagePullPolicy"] = self.image_pull_policy
 
-            if self.infra:
+            if self.infra is not None:
                 _spec["infra"] = self.infra
 
-            if self.priority_class:
+            if self.priority_class is not None:
                 _spec["priorityClass"] = self.priority_class
 
-            if self.uninstall_strategy:
+            if self.uninstall_strategy is not None:
                 _spec["uninstallStrategy"] = self.uninstall_strategy
 
-            if self.workload:
+            if self.workload is not None:
                 _spec["workload"] = self.workload
 
     # End of generated code

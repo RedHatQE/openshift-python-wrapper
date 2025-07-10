@@ -1,14 +1,14 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
-
+from __future__ import annotations
 from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class InferenceGraph(NamespacedResource):
     """
-    No field description from API; please add description
+    No field description from API
     """
 
     api_group: str = NamespacedResource.ApiGroup.SERVING_KSERVE_IO
@@ -27,21 +27,21 @@ class InferenceGraph(NamespacedResource):
     ) -> None:
         r"""
         Args:
-            affinity (dict[str, Any]): No field description from API; please add description
+            affinity (dict[str, Any]): No field description from API
 
-            max_replicas (int): No field description from API; please add description
+            max_replicas (int): No field description from API
 
-            min_replicas (int): No field description from API; please add description
+            min_replicas (int): No field description from API
 
-            nodes (dict[str, Any]): No field description from API; please add description
+            nodes (dict[str, Any]): No field description from API
 
-            resources (dict[str, Any]): No field description from API; please add description
+            resources (dict[str, Any]): No field description from API
 
-            scale_metric (str): No field description from API; please add description
+            scale_metric (str): No field description from API
 
-            scale_target (int): No field description from API; please add description
+            scale_target (int): No field description from API
 
-            timeout (int): No field description from API; please add description
+            timeout (int): No field description from API
 
         """
         super().__init__(**kwargs)

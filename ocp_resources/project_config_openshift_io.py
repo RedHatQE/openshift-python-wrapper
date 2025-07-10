@@ -1,12 +1,14 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import Resource
 
 
 class Project(Resource):
     """
-       Project holds cluster-wide information about Project.  The canonical name is `cluster`
+        Project holds cluster-wide information about Project.  The canonical name is `cluster`
+
     Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
     """
 
@@ -14,16 +16,16 @@ class Project(Resource):
 
     def __init__(
         self,
-        project_request_message: Optional[str] = "",
-        project_request_template: Optional[Dict[str, Any]] = None,
+        project_request_message: str | None = None,
+        project_request_template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             project_request_message (str): projectRequestMessage is the string presented to a user if they are
               unable to request a project via the projectrequest api endpoint
 
-            project_request_template (Dict[str, Any]): projectRequestTemplate is the template to use for creating projects in
+            project_request_template (dict[str, Any]): projectRequestTemplate is the template to use for creating projects in
               response to projectrequest. This must point to a template in
               'openshift-config' namespace. It is optional. If it is not
               specified, a default template is used.
@@ -41,10 +43,10 @@ class Project(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.project_request_message:
+            if self.project_request_message is not None:
                 _spec["projectRequestMessage"] = self.project_request_message
 
-            if self.project_request_template:
+            if self.project_request_template is not None:
                 _spec["projectRequestTemplate"] = self.project_request_template
 
     # End of generated code

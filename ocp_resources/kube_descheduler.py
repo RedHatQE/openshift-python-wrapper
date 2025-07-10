@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,18 +14,18 @@ class KubeDescheduler(NamespacedResource):
 
     def __init__(
         self,
-        descheduling_interval_seconds: Optional[int] = None,
-        log_level: Optional[str] = "",
-        management_state: Optional[str] = "",
-        mode: Optional[str] = "",
-        observed_config: Optional[Any] = None,
-        operator_log_level: Optional[str] = "",
-        profile_customizations: Optional[Dict[str, Any]] = None,
-        profiles: Optional[List[Any]] = None,
-        unsupported_config_overrides: Optional[Any] = None,
+        descheduling_interval_seconds: int | None = None,
+        log_level: str | None = None,
+        management_state: str | None = None,
+        mode: str | None = None,
+        observed_config: Any | None = None,
+        operator_log_level: str | None = None,
+        profile_customizations: dict[str, Any] | None = None,
+        profiles: list[Any] | None = None,
+        unsupported_config_overrides: Any | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             descheduling_interval_seconds (int): DeschedulingIntervalSeconds is the number of seconds between
               descheduler runs
@@ -51,10 +52,10 @@ class KubeDescheduler(NamespacedResource):
               interpret for themselves.   Valid values are: "Normal", "Debug",
               "Trace", "TraceAll". Defaults to "Normal".
 
-            profile_customizations (Dict[str, Any]): ProfileCustomizations contains various parameters for modifying the
+            profile_customizations (dict[str, Any]): ProfileCustomizations contains various parameters for modifying the
               default behavior of certain profiles
 
-            profiles (List[Any]): Profiles sets which descheduler strategy profiles are enabled
+            profiles (list[Any]): Profiles sets which descheduler strategy profiles are enabled
 
             unsupported_config_overrides (Any): unsupportedConfigOverrides holds a sparse config that will override
               any previously set options.  It only needs to be the fields to
@@ -81,31 +82,31 @@ class KubeDescheduler(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.descheduling_interval_seconds:
+            if self.descheduling_interval_seconds is not None:
                 _spec["deschedulingIntervalSeconds"] = self.descheduling_interval_seconds
 
-            if self.log_level:
+            if self.log_level is not None:
                 _spec["logLevel"] = self.log_level
 
-            if self.management_state:
+            if self.management_state is not None:
                 _spec["managementState"] = self.management_state
 
-            if self.mode:
+            if self.mode is not None:
                 _spec["mode"] = self.mode
 
-            if self.observed_config:
+            if self.observed_config is not None:
                 _spec["observedConfig"] = self.observed_config
 
-            if self.operator_log_level:
+            if self.operator_log_level is not None:
                 _spec["operatorLogLevel"] = self.operator_log_level
 
-            if self.profile_customizations:
+            if self.profile_customizations is not None:
                 _spec["profileCustomizations"] = self.profile_customizations
 
-            if self.profiles:
+            if self.profiles is not None:
                 _spec["profiles"] = self.profiles
 
-            if self.unsupported_config_overrides:
+            if self.unsupported_config_overrides is not None:
                 _spec["unsupportedConfigOverrides"] = self.unsupported_config_overrides
 
     # End of generated code

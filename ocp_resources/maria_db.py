@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,86 +14,86 @@ class MariaDB(NamespacedResource):
 
     def __init__(
         self,
-        affinity: Optional[Dict[str, Any]] = None,
-        args: Optional[List[Any]] = None,
-        bootstrap_from: Optional[Dict[str, Any]] = None,
-        command: Optional[List[Any]] = None,
-        connection: Optional[Dict[str, Any]] = None,
-        database: Optional[str] = "",
-        env: Optional[List[Any]] = None,
-        env_from: Optional[List[Any]] = None,
-        galera: Optional[Dict[str, Any]] = None,
-        image: Optional[str] = "",
-        image_pull_policy: Optional[str] = "",
-        image_pull_secrets: Optional[List[Any]] = None,
-        inherit_metadata: Optional[Dict[str, Any]] = None,
-        init_containers: Optional[List[Any]] = None,
-        liveness_probe: Optional[Dict[str, Any]] = None,
-        max_scale: Optional[Dict[str, Any]] = None,
-        max_scale_ref: Optional[Dict[str, Any]] = None,
-        metrics: Optional[Dict[str, Any]] = None,
-        my_cnf: Optional[str] = "",
-        my_cnf_config_map_key_ref: Optional[Dict[str, Any]] = None,
-        node_selector: Optional[Dict[str, Any]] = None,
-        password_hash_secret_key_ref: Optional[Dict[str, Any]] = None,
-        password_plugin: Optional[Dict[str, Any]] = None,
-        password_secret_key_ref: Optional[Dict[str, Any]] = None,
-        pod_disruption_budget: Optional[Dict[str, Any]] = None,
-        pod_metadata: Optional[Dict[str, Any]] = None,
-        pod_security_context: Optional[Dict[str, Any]] = None,
-        port: Optional[int] = None,
-        primary_connection: Optional[Dict[str, Any]] = None,
-        primary_service: Optional[Dict[str, Any]] = None,
-        priority_class_name: Optional[str] = "",
-        readiness_probe: Optional[Dict[str, Any]] = None,
-        replicas: Optional[int] = None,
-        replicas_allow_even_number: Optional[bool] = None,
-        replication: Optional[Dict[str, Any]] = None,
-        resources: Optional[Dict[str, Any]] = None,
-        root_empty_password: Optional[bool] = None,
-        root_password_secret_key_ref: Optional[Dict[str, Any]] = None,
-        secondary_connection: Optional[Dict[str, Any]] = None,
-        secondary_service: Optional[Dict[str, Any]] = None,
-        security_context: Optional[Dict[str, Any]] = None,
-        service: Optional[Dict[str, Any]] = None,
-        service_account_name: Optional[str] = "",
-        service_ports: Optional[List[Any]] = None,
-        sidecar_containers: Optional[List[Any]] = None,
-        storage: Optional[Dict[str, Any]] = None,
-        suspend: Optional[bool] = None,
-        time_zone: Optional[str] = "",
-        tolerations: Optional[List[Any]] = None,
-        topology_spread_constraints: Optional[List[Any]] = None,
-        update_strategy: Optional[Dict[str, Any]] = None,
-        username: Optional[str] = "",
-        volume_mounts: Optional[List[Any]] = None,
-        volumes: Optional[List[Any]] = None,
+        affinity: dict[str, Any] | None = None,
+        args: list[Any] | None = None,
+        bootstrap_from: dict[str, Any] | None = None,
+        command: list[Any] | None = None,
+        connection: dict[str, Any] | None = None,
+        database: str | None = None,
+        env: list[Any] | None = None,
+        env_from: list[Any] | None = None,
+        galera: dict[str, Any] | None = None,
+        image: str | None = None,
+        image_pull_policy: str | None = None,
+        image_pull_secrets: list[Any] | None = None,
+        inherit_metadata: dict[str, Any] | None = None,
+        init_containers: list[Any] | None = None,
+        liveness_probe: dict[str, Any] | None = None,
+        max_scale: dict[str, Any] | None = None,
+        max_scale_ref: dict[str, Any] | None = None,
+        metrics: dict[str, Any] | None = None,
+        my_cnf: str | None = None,
+        my_cnf_config_map_key_ref: dict[str, Any] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        password_hash_secret_key_ref: dict[str, Any] | None = None,
+        password_plugin: dict[str, Any] | None = None,
+        password_secret_key_ref: dict[str, Any] | None = None,
+        pod_disruption_budget: dict[str, Any] | None = None,
+        pod_metadata: dict[str, Any] | None = None,
+        pod_security_context: dict[str, Any] | None = None,
+        port: int | None = None,
+        primary_connection: dict[str, Any] | None = None,
+        primary_service: dict[str, Any] | None = None,
+        priority_class_name: str | None = None,
+        readiness_probe: dict[str, Any] | None = None,
+        replicas: int | None = None,
+        replicas_allow_even_number: bool | None = None,
+        replication: dict[str, Any] | None = None,
+        resources: dict[str, Any] | None = None,
+        root_empty_password: bool | None = None,
+        root_password_secret_key_ref: dict[str, Any] | None = None,
+        secondary_connection: dict[str, Any] | None = None,
+        secondary_service: dict[str, Any] | None = None,
+        security_context: dict[str, Any] | None = None,
+        service: dict[str, Any] | None = None,
+        service_account_name: str | None = None,
+        service_ports: list[Any] | None = None,
+        sidecar_containers: list[Any] | None = None,
+        storage: dict[str, Any] | None = None,
+        suspend: bool | None = None,
+        time_zone: str | None = None,
+        tolerations: list[Any] | None = None,
+        topology_spread_constraints: list[Any] | None = None,
+        update_strategy: dict[str, Any] | None = None,
+        username: str | None = None,
+        volume_mounts: list[Any] | None = None,
+        volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            affinity (Dict[str, Any]): Affinity to be used in the Pod.
+            affinity (dict[str, Any]): Affinity to be used in the Pod.
 
-            args (List[Any]): Args to be used in the Container.
+            args (list[Any]): Args to be used in the Container.
 
-            bootstrap_from (Dict[str, Any]): BootstrapFrom defines a source to bootstrap from.
+            bootstrap_from (dict[str, Any]): BootstrapFrom defines a source to bootstrap from.
 
-            command (List[Any]): Command to be used in the Container.
+            command (list[Any]): Command to be used in the Container.
 
-            connection (Dict[str, Any]): Connection defines a template to configure the general Connection
+            connection (dict[str, Any]): Connection defines a template to configure the general Connection
               object. This Connection provides the initial User access to the
               initial Database. It will make use of the Service to route network
               traffic to all Pods.
 
             database (str): Database is the name of the initial Database.
 
-            env (List[Any]): Env represents the environment variables to be injected in a
+            env (list[Any]): Env represents the environment variables to be injected in a
               container.
 
-            env_from (List[Any]): EnvFrom represents the references (via ConfigMap and Secrets) to
+            env_from (list[Any]): EnvFrom represents the references (via ConfigMap and Secrets) to
               environment variables to be injected in the container.
 
-            galera (Dict[str, Any]): Replication configures high availability via Galera.
+            galera (dict[str, Any]): Replication configures high availability via Galera.
 
             image (str): Image name to be used by the MariaDB instances. The supported format
               is `<image>:<tag>`. Only MariaDB official images are supported.
@@ -100,114 +101,114 @@ class MariaDB(NamespacedResource):
             image_pull_policy (str): ImagePullPolicy is the image pull policy. One of `Always`, `Never` or
               `IfNotPresent`. If not defined, it defaults to `IfNotPresent`.
 
-            image_pull_secrets (List[Any]): ImagePullSecrets is the list of pull Secrets to be used to pull the
+            image_pull_secrets (list[Any]): ImagePullSecrets is the list of pull Secrets to be used to pull the
               image.
 
-            inherit_metadata (Dict[str, Any]): InheritMetadata defines the metadata to be inherited by children
+            inherit_metadata (dict[str, Any]): InheritMetadata defines the metadata to be inherited by children
               resources.
 
-            init_containers (List[Any]): InitContainers to be used in the Pod.
+            init_containers (list[Any]): InitContainers to be used in the Pod.
 
-            liveness_probe (Dict[str, Any]): LivenessProbe to be used in the Container.
+            liveness_probe (dict[str, Any]): LivenessProbe to be used in the Container.
 
-            max_scale (Dict[str, Any]): MaxScale is the MaxScale specification that defines the MaxScale
+            max_scale (dict[str, Any]): MaxScale is the MaxScale specification that defines the MaxScale
               resource to be used with the current MariaDB. When enabling this
               field, MaxScaleRef is automatically set.
 
-            max_scale_ref (Dict[str, Any]): MaxScaleRef is a reference to a MaxScale resource to be used with the
+            max_scale_ref (dict[str, Any]): MaxScaleRef is a reference to a MaxScale resource to be used with the
               current MariaDB. Providing this field implies delegating high
               availability tasks such as primary failover to MaxScale.
 
-            metrics (Dict[str, Any]): Metrics configures metrics and how to scrape them.
+            metrics (dict[str, Any]): Metrics configures metrics and how to scrape them.
 
             my_cnf (str): MyCnf allows to specify the my.cnf file mounted by Mariadb. Updating
               this field will trigger an update to the Mariadb resource.
 
-            my_cnf_config_map_key_ref (Dict[str, Any]): MyCnfConfigMapKeyRef is a reference to the my.cnf config file provided
+            my_cnf_config_map_key_ref (dict[str, Any]): MyCnfConfigMapKeyRef is a reference to the my.cnf config file provided
               via a ConfigMap. If not provided, it will be defaulted with a
               reference to a ConfigMap containing the MyCnf field. If the
               referred ConfigMap is labeled with "k8s.mariadb.com/watch", an
               update to the Mariadb resource will be triggered when the
               ConfigMap is updated.
 
-            node_selector (Dict[str, Any]): NodeSelector to be used in the Pod.
+            node_selector (dict[str, Any]): NodeSelector to be used in the Pod.
 
-            password_hash_secret_key_ref (Dict[str, Any]): PasswordHashSecretKeyRef is a reference to the password hash to be
+            password_hash_secret_key_ref (dict[str, Any]): PasswordHashSecretKeyRef is a reference to the password hash to be
               used by the initial User. If the referred Secret is labeled with
               "k8s.mariadb.com/watch", updates may be performed to the Secret in
               order to update the password hash.
 
-            password_plugin (Dict[str, Any]): PasswordPlugin is a reference to the password plugin and arguments to
+            password_plugin (dict[str, Any]): PasswordPlugin is a reference to the password plugin and arguments to
               be used by the initial User.
 
-            password_secret_key_ref (Dict[str, Any]): PasswordSecretKeyRef is a reference to a Secret that contains the
+            password_secret_key_ref (dict[str, Any]): PasswordSecretKeyRef is a reference to a Secret that contains the
               password to be used by the initial User. If the referred Secret is
               labeled with "k8s.mariadb.com/watch", updates may be performed to
               the Secret in order to update the password.
 
-            pod_disruption_budget (Dict[str, Any]): PodDisruptionBudget defines the budget for replica availability.
+            pod_disruption_budget (dict[str, Any]): PodDisruptionBudget defines the budget for replica availability.
 
-            pod_metadata (Dict[str, Any]): PodMetadata defines extra metadata for the Pod.
+            pod_metadata (dict[str, Any]): PodMetadata defines extra metadata for the Pod.
 
-            pod_security_context (Dict[str, Any]): SecurityContext holds pod-level security attributes and common
+            pod_security_context (dict[str, Any]): SecurityContext holds pod-level security attributes and common
               container settings.
 
             port (int): Port where the instances will be listening for connections.
 
-            primary_connection (Dict[str, Any]): PrimaryConnection defines a template to configure the primary
+            primary_connection (dict[str, Any]): PrimaryConnection defines a template to configure the primary
               Connection object. This Connection provides the initial User
               access to the initial Database. It will make use of the
               PrimaryService to route network traffic to the primary Pod.
 
-            primary_service (Dict[str, Any]): PrimaryService defines a template to configure the primary Service
+            primary_service (dict[str, Any]): PrimaryService defines a template to configure the primary Service
               object. The network traffic of this Service will be routed to the
               primary Pod.
 
             priority_class_name (str): PriorityClassName to be used in the Pod.
 
-            readiness_probe (Dict[str, Any]): ReadinessProbe to be used in the Container.
+            readiness_probe (dict[str, Any]): ReadinessProbe to be used in the Container.
 
             replicas (int): Replicas indicates the number of desired instances.
 
             replicas_allow_even_number (bool): disables the validation check for an odd number of replicas.
 
-            replication (Dict[str, Any]): Replication configures high availability via replication. This feature
+            replication (dict[str, Any]): Replication configures high availability via replication. This feature
               is still in alpha, use Galera if you are looking for a more
               production-ready HA.
 
-            resources (Dict[str, Any]): Resouces describes the compute resource requirements.
+            resources (dict[str, Any]): Resouces describes the compute resource requirements.
 
             root_empty_password (bool): RootEmptyPassword indicates if the root password should be empty.
               Don't use this feature in production, it is only intended for
               development and test environments.
 
-            root_password_secret_key_ref (Dict[str, Any]): RootPasswordSecretKeyRef is a reference to a Secret key containing the
+            root_password_secret_key_ref (dict[str, Any]): RootPasswordSecretKeyRef is a reference to a Secret key containing the
               root password.
 
-            secondary_connection (Dict[str, Any]): SecondaryConnection defines a template to configure the secondary
+            secondary_connection (dict[str, Any]): SecondaryConnection defines a template to configure the secondary
               Connection object. This Connection provides the initial User
               access to the initial Database. It will make use of the
               SecondaryService to route network traffic to the secondary Pods.
 
-            secondary_service (Dict[str, Any]): SecondaryService defines a template to configure the secondary Service
+            secondary_service (dict[str, Any]): SecondaryService defines a template to configure the secondary Service
               object. The network traffic of this Service will be routed to the
               secondary Pods.
 
-            security_context (Dict[str, Any]): SecurityContext holds security configuration that will be applied to a
+            security_context (dict[str, Any]): SecurityContext holds security configuration that will be applied to a
               container.
 
-            service (Dict[str, Any]): Service defines a template to configure the general Service object.
+            service (dict[str, Any]): Service defines a template to configure the general Service object.
               The network traffic of this Service will be routed to all Pods.
 
             service_account_name (str): ServiceAccountName is the name of the ServiceAccount to be used by the
               Pods.
 
-            service_ports (List[Any]): ServicePorts is the list of additional named ports to be added to the
+            service_ports (list[Any]): ServicePorts is the list of additional named ports to be added to the
               Services created by the operator.
 
-            sidecar_containers (List[Any]): SidecarContainers to be used in the Pod.
+            sidecar_containers (list[Any]): SidecarContainers to be used in the Pod.
 
-            storage (Dict[str, Any]): Storage defines the storage options to be used for provisioning the
+            storage (dict[str, Any]): Storage defines the storage options to be used for provisioning the
               PVCs mounted by MariaDB.
 
             suspend (bool): Suspend indicates whether the current resource should be suspended or
@@ -218,19 +219,19 @@ class MariaDB(NamespacedResource):
             time_zone (str): TimeZone sets the default timezone. If not provided, it defaults to
               SYSTEM and the timezone data is not loaded.
 
-            tolerations (List[Any]): Tolerations to be used in the Pod.
+            tolerations (list[Any]): Tolerations to be used in the Pod.
 
-            topology_spread_constraints (List[Any]): TopologySpreadConstraints to be used in the Pod.
+            topology_spread_constraints (list[Any]): TopologySpreadConstraints to be used in the Pod.
 
-            update_strategy (Dict[str, Any]): UpdateStrategy defines how a MariaDB resource is updated.
+            update_strategy (dict[str, Any]): UpdateStrategy defines how a MariaDB resource is updated.
 
             username (str): Username is the initial username to be created by the operator once
               MariaDB is ready. It has all privileges on the initial database.
               The initial User will have ALL PRIVILEGES in the initial Database.
 
-            volume_mounts (List[Any]): VolumeMounts to be used in the Container.
+            volume_mounts (list[Any]): VolumeMounts to be used in the Container.
 
-            volumes (List[Any]): Volumes to be used in the Pod.
+            volumes (list[Any]): Volumes to be used in the Pod.
 
         """
         super().__init__(**kwargs)
@@ -297,166 +298,166 @@ class MariaDB(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.affinity:
+            if self.affinity is not None:
                 _spec["affinity"] = self.affinity
 
-            if self.args:
+            if self.args is not None:
                 _spec["args"] = self.args
 
-            if self.bootstrap_from:
+            if self.bootstrap_from is not None:
                 _spec["bootstrapFrom"] = self.bootstrap_from
 
-            if self.command:
+            if self.command is not None:
                 _spec["command"] = self.command
 
-            if self.connection:
+            if self.connection is not None:
                 _spec["connection"] = self.connection
 
-            if self.database:
+            if self.database is not None:
                 _spec["database"] = self.database
 
-            if self.env:
+            if self.env is not None:
                 _spec["env"] = self.env
 
-            if self.env_from:
+            if self.env_from is not None:
                 _spec["envFrom"] = self.env_from
 
-            if self.galera:
+            if self.galera is not None:
                 _spec["galera"] = self.galera
 
-            if self.image:
+            if self.image is not None:
                 _spec["image"] = self.image
 
-            if self.image_pull_policy:
+            if self.image_pull_policy is not None:
                 _spec["imagePullPolicy"] = self.image_pull_policy
 
-            if self.image_pull_secrets:
+            if self.image_pull_secrets is not None:
                 _spec["imagePullSecrets"] = self.image_pull_secrets
 
-            if self.inherit_metadata:
+            if self.inherit_metadata is not None:
                 _spec["inheritMetadata"] = self.inherit_metadata
 
-            if self.init_containers:
+            if self.init_containers is not None:
                 _spec["initContainers"] = self.init_containers
 
-            if self.liveness_probe:
+            if self.liveness_probe is not None:
                 _spec["livenessProbe"] = self.liveness_probe
 
-            if self.max_scale:
+            if self.max_scale is not None:
                 _spec["maxScale"] = self.max_scale
 
-            if self.max_scale_ref:
+            if self.max_scale_ref is not None:
                 _spec["maxScaleRef"] = self.max_scale_ref
 
-            if self.metrics:
+            if self.metrics is not None:
                 _spec["metrics"] = self.metrics
 
-            if self.my_cnf:
+            if self.my_cnf is not None:
                 _spec["myCnf"] = self.my_cnf
 
-            if self.my_cnf_config_map_key_ref:
+            if self.my_cnf_config_map_key_ref is not None:
                 _spec["myCnfConfigMapKeyRef"] = self.my_cnf_config_map_key_ref
 
-            if self.node_selector:
+            if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
 
-            if self.password_hash_secret_key_ref:
+            if self.password_hash_secret_key_ref is not None:
                 _spec["passwordHashSecretKeyRef"] = self.password_hash_secret_key_ref
 
-            if self.password_plugin:
+            if self.password_plugin is not None:
                 _spec["passwordPlugin"] = self.password_plugin
 
-            if self.password_secret_key_ref:
+            if self.password_secret_key_ref is not None:
                 _spec["passwordSecretKeyRef"] = self.password_secret_key_ref
 
-            if self.pod_disruption_budget:
+            if self.pod_disruption_budget is not None:
                 _spec["podDisruptionBudget"] = self.pod_disruption_budget
 
-            if self.pod_metadata:
+            if self.pod_metadata is not None:
                 _spec["podMetadata"] = self.pod_metadata
 
-            if self.pod_security_context:
+            if self.pod_security_context is not None:
                 _spec["podSecurityContext"] = self.pod_security_context
 
-            if self.port:
+            if self.port is not None:
                 _spec["port"] = self.port
 
-            if self.primary_connection:
+            if self.primary_connection is not None:
                 _spec["primaryConnection"] = self.primary_connection
 
-            if self.primary_service:
+            if self.primary_service is not None:
                 _spec["primaryService"] = self.primary_service
 
-            if self.priority_class_name:
+            if self.priority_class_name is not None:
                 _spec["priorityClassName"] = self.priority_class_name
 
-            if self.readiness_probe:
+            if self.readiness_probe is not None:
                 _spec["readinessProbe"] = self.readiness_probe
 
-            if self.replicas:
+            if self.replicas is not None:
                 _spec["replicas"] = self.replicas
 
             if self.replicas_allow_even_number is not None:
                 _spec["replicasAllowEvenNumber"] = self.replicas_allow_even_number
 
-            if self.replication:
+            if self.replication is not None:
                 _spec["replication"] = self.replication
 
-            if self.resources:
+            if self.resources is not None:
                 _spec["resources"] = self.resources
 
             if self.root_empty_password is not None:
                 _spec["rootEmptyPassword"] = self.root_empty_password
 
-            if self.root_password_secret_key_ref:
+            if self.root_password_secret_key_ref is not None:
                 _spec["rootPasswordSecretKeyRef"] = self.root_password_secret_key_ref
 
-            if self.secondary_connection:
+            if self.secondary_connection is not None:
                 _spec["secondaryConnection"] = self.secondary_connection
 
-            if self.secondary_service:
+            if self.secondary_service is not None:
                 _spec["secondaryService"] = self.secondary_service
 
-            if self.security_context:
+            if self.security_context is not None:
                 _spec["securityContext"] = self.security_context
 
-            if self.service:
+            if self.service is not None:
                 _spec["service"] = self.service
 
-            if self.service_account_name:
+            if self.service_account_name is not None:
                 _spec["serviceAccountName"] = self.service_account_name
 
-            if self.service_ports:
+            if self.service_ports is not None:
                 _spec["servicePorts"] = self.service_ports
 
-            if self.sidecar_containers:
+            if self.sidecar_containers is not None:
                 _spec["sidecarContainers"] = self.sidecar_containers
 
-            if self.storage:
+            if self.storage is not None:
                 _spec["storage"] = self.storage
 
             if self.suspend is not None:
                 _spec["suspend"] = self.suspend
 
-            if self.time_zone:
+            if self.time_zone is not None:
                 _spec["timeZone"] = self.time_zone
 
-            if self.tolerations:
+            if self.tolerations is not None:
                 _spec["tolerations"] = self.tolerations
 
-            if self.topology_spread_constraints:
+            if self.topology_spread_constraints is not None:
                 _spec["topologySpreadConstraints"] = self.topology_spread_constraints
 
-            if self.update_strategy:
+            if self.update_strategy is not None:
                 _spec["updateStrategy"] = self.update_strategy
 
-            if self.username:
+            if self.username is not None:
                 _spec["username"] = self.username
 
-            if self.volume_mounts:
+            if self.volume_mounts is not None:
                 _spec["volumeMounts"] = self.volume_mounts
 
-            if self.volumes:
+            if self.volumes is not None:
                 _spec["volumes"] = self.volumes
 
     # End of generated code

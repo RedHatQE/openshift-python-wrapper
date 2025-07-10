@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import Resource, MissingRequiredArgumentError
 
 
@@ -15,12 +16,12 @@ class Group(Resource):
 
     def __init__(
         self,
-        users: Optional[List[Any]] = None,
+        users: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            users (List[Any]): Users is the list of users in this group.
+            users (list[Any]): Users is the list of users in this group.
 
         """
         super().__init__(**kwargs)
@@ -31,7 +32,7 @@ class Group(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.users:
+            if self.users is None:
                 raise MissingRequiredArgumentError(argument="self.users")
 
             self.res["users"] = self.users

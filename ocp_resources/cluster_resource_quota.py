@@ -1,7 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
-
+from __future__ import annotations
 from typing import Any
 from ocp_resources.resource import Resource, MissingRequiredArgumentError
 
@@ -24,9 +24,9 @@ class ClusterResourceQuota(Resource):
     ) -> None:
         r"""
         Args:
-            quota (dict[str, Any]): Quota defines the desired quota
+            quota (dict[str, Any]): quota defines the desired quota
 
-            selector (dict[str, Any]): Selector is the selector used to match projects. It should only select
+            selector (dict[str, Any]): selector is the selector used to match projects. It should only select
               active projects on the scale of dozens (though it can select many
               more less active projects).  These projects will contend on object
               creation through this resource.

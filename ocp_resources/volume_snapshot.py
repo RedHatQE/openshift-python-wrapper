@@ -1,25 +1,27 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class VolumeSnapshot(NamespacedResource):
     """
-    VolumeSnapshot is a user's request for either creating a point-in-time snapshot of a persistent volume, or binding to a pre-existing snapshot.
+        VolumeSnapshot is a user's request for either creating a point-in-time
+    snapshot of a persistent volume, or binding to a pre-existing snapshot.
     """
 
     api_group: str = NamespacedResource.ApiGroup.SNAPSHOT_STORAGE_K8S_IO
 
     def __init__(
         self,
-        source: Optional[Dict[str, Any]] = None,
-        volume_snapshot_class_name: Optional[str] = None,
+        source: dict[str, Any] | None = None,
+        volume_snapshot_class_name: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            source (Dict[str, Any]): source specifies where a snapshot will be created from. This field is
+            source (dict[str, Any]): source specifies where a snapshot will be created from. This field is
               immutable after creation. Required.
 
             volume_snapshot_class_name (str): VolumeSnapshotClassName is the name of the VolumeSnapshotClass
@@ -45,7 +47,7 @@ class VolumeSnapshot(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.source:
+            if self.source is None:
                 raise MissingRequiredArgumentError(argument="self.source")
 
             self.res["spec"] = {}

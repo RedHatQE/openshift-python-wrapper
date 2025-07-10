@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -19,12 +20,12 @@ class Project(Resource):
 
     def __init__(
         self,
-        finalizers: Optional[List[Any]] = None,
+        finalizers: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            finalizers (List[Any]): Finalizers is an opaque list of values that must be empty to
+            finalizers (list[Any]): Finalizers is an opaque list of values that must be empty to
               permanently remove object from storage
 
         """
@@ -39,7 +40,7 @@ class Project(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.finalizers:
+            if self.finalizers is not None:
                 _spec["finalizers"] = self.finalizers
 
     # End of generated code

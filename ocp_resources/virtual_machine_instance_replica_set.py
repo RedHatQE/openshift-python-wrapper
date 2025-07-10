@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -13,23 +14,23 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
 
     def __init__(
         self,
-        paused: Optional[bool] = None,
-        replicas: Optional[int] = None,
-        selector: Optional[Dict[str, Any]] = None,
-        template: Optional[Dict[str, Any]] = None,
+        paused: bool | None = None,
+        replicas: int | None = None,
+        selector: dict[str, Any] | None = None,
+        template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             paused (bool): Indicates that the replica set is paused.
 
             replicas (int): Number of desired pods. This is a pointer to distinguish between
               explicit zero and not specified. Defaults to 1.
 
-            selector (Dict[str, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected
+            selector (dict[str, Any]): Label selector for pods. Existing ReplicaSets whose pods are selected
               by this will be the ones affected by this deployment.
 
-            template (Dict[str, Any]): Template describes the pods that will be created.
+            template (dict[str, Any]): Template describes the pods that will be created.
 
         """
         super().__init__(**kwargs)
@@ -43,10 +44,10 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.selector:
+            if self.selector is None:
                 raise MissingRequiredArgumentError(argument="self.selector")
 
-            if not self.template:
+            if self.template is None:
                 raise MissingRequiredArgumentError(argument="self.template")
 
             self.res["spec"] = {}
@@ -58,7 +59,7 @@ class VirtualMachineInstanceReplicaSet(NamespacedResource):
             if self.paused is not None:
                 _spec["paused"] = self.paused
 
-            if self.replicas:
+            if self.replicas is not None:
                 _spec["replicas"] = self.replicas
 
     # End of generated code

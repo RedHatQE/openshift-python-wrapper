@@ -1,13 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
-
+from __future__ import annotations
 from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
 class Notebook(NamespacedResource):
-    """Notebook is the CR for Kubeflow Notebooks 1.x (and OpenShift AI Workbenches)."""
+    """
+    No field description from API
+    """
 
     api_group: str = NamespacedResource.ApiGroup.KUBEFLOW_ORG
 
@@ -16,9 +18,10 @@ class Notebook(NamespacedResource):
         template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            template (dict[str, Any]): Pod template for the notebook pod.
+            template (dict[str, Any]): No field description from API
+
         """
         super().__init__(**kwargs)
 

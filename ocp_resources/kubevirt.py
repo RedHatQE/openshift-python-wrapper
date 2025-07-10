@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,36 +14,36 @@ class KubeVirt(NamespacedResource):
 
     def __init__(
         self,
-        certificate_rotate_strategy: Optional[Dict[str, Any]] = None,
-        configuration: Optional[Dict[str, Any]] = None,
-        customize_components: Optional[Dict[str, Any]] = None,
-        image_pull_policy: Optional[str] = "",
-        image_pull_secrets: Optional[List[Any]] = None,
-        image_registry: Optional[str] = "",
-        image_tag: Optional[str] = "",
-        infra: Optional[Dict[str, Any]] = None,
-        monitor_account: Optional[str] = "",
-        monitor_namespace: Optional[str] = "",
-        product_component: Optional[str] = "",
-        product_name: Optional[str] = "",
-        product_version: Optional[str] = "",
-        service_monitor_namespace: Optional[str] = "",
-        uninstall_strategy: Optional[str] = "",
-        workload_update_strategy: Optional[Dict[str, Any]] = None,
-        workloads: Optional[Dict[str, Any]] = None,
+        certificate_rotate_strategy: dict[str, Any] | None = None,
+        configuration: dict[str, Any] | None = None,
+        customize_components: dict[str, Any] | None = None,
+        image_pull_policy: str | None = None,
+        image_pull_secrets: list[Any] | None = None,
+        image_registry: str | None = None,
+        image_tag: str | None = None,
+        infra: dict[str, Any] | None = None,
+        monitor_account: str | None = None,
+        monitor_namespace: str | None = None,
+        product_component: str | None = None,
+        product_name: str | None = None,
+        product_version: str | None = None,
+        service_monitor_namespace: str | None = None,
+        uninstall_strategy: str | None = None,
+        workload_update_strategy: dict[str, Any] | None = None,
+        workloads: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            certificate_rotate_strategy (Dict[str, Any]): No field description from API; please add description
+            certificate_rotate_strategy (dict[str, Any]): No field description from API
 
-            configuration (Dict[str, Any]): holds kubevirt configurations. same as the virt-configMap
+            configuration (dict[str, Any]): holds kubevirt configurations. same as the virt-configMap
 
-            customize_components (Dict[str, Any]): No field description from API; please add description
+            customize_components (dict[str, Any]): No field description from API
 
             image_pull_policy (str): The ImagePullPolicy to use.
 
-            image_pull_secrets (List[Any]): The imagePullSecrets to pull the container images from Defaults to
+            image_pull_secrets (list[Any]): The imagePullSecrets to pull the container images from Defaults to
               none
 
             image_registry (str): The image registry to pull the container images from Defaults to the
@@ -51,7 +52,7 @@ class KubeVirt(NamespacedResource):
             image_tag (str): The image tag to use for the continer images installed. Defaults to
               the same tag as the operator's container image.
 
-            infra (Dict[str, Any]): selectors and tolerations that should apply to KubeVirt infrastructure
+            infra (dict[str, Any]): selectors and tolerations that should apply to KubeVirt infrastructure
               components
 
             monitor_account (str): The name of the Prometheus service account that needs read-access to
@@ -80,10 +81,10 @@ class KubeVirt(NamespacedResource):
             uninstall_strategy (str): Specifies if kubevirt can be deleted if workloads are still present.
               This is mainly a precaution to avoid accidental data loss
 
-            workload_update_strategy (Dict[str, Any]): WorkloadUpdateStrategy defines at the cluster level how to handle
+            workload_update_strategy (dict[str, Any]): WorkloadUpdateStrategy defines at the cluster level how to handle
               automated workload updates
 
-            workloads (Dict[str, Any]): selectors and tolerations that should apply to KubeVirt workloads
+            workloads (dict[str, Any]): selectors and tolerations that should apply to KubeVirt workloads
 
         """
         super().__init__(**kwargs)
@@ -113,55 +114,55 @@ class KubeVirt(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.certificate_rotate_strategy:
+            if self.certificate_rotate_strategy is not None:
                 _spec["certificateRotateStrategy"] = self.certificate_rotate_strategy
 
-            if self.configuration:
+            if self.configuration is not None:
                 _spec["configuration"] = self.configuration
 
-            if self.customize_components:
+            if self.customize_components is not None:
                 _spec["customizeComponents"] = self.customize_components
 
-            if self.image_pull_policy:
+            if self.image_pull_policy is not None:
                 _spec["imagePullPolicy"] = self.image_pull_policy
 
-            if self.image_pull_secrets:
+            if self.image_pull_secrets is not None:
                 _spec["imagePullSecrets"] = self.image_pull_secrets
 
-            if self.image_registry:
+            if self.image_registry is not None:
                 _spec["imageRegistry"] = self.image_registry
 
-            if self.image_tag:
+            if self.image_tag is not None:
                 _spec["imageTag"] = self.image_tag
 
-            if self.infra:
+            if self.infra is not None:
                 _spec["infra"] = self.infra
 
-            if self.monitor_account:
+            if self.monitor_account is not None:
                 _spec["monitorAccount"] = self.monitor_account
 
-            if self.monitor_namespace:
+            if self.monitor_namespace is not None:
                 _spec["monitorNamespace"] = self.monitor_namespace
 
-            if self.product_component:
+            if self.product_component is not None:
                 _spec["productComponent"] = self.product_component
 
-            if self.product_name:
+            if self.product_name is not None:
                 _spec["productName"] = self.product_name
 
-            if self.product_version:
+            if self.product_version is not None:
                 _spec["productVersion"] = self.product_version
 
-            if self.service_monitor_namespace:
+            if self.service_monitor_namespace is not None:
                 _spec["serviceMonitorNamespace"] = self.service_monitor_namespace
 
-            if self.uninstall_strategy:
+            if self.uninstall_strategy is not None:
                 _spec["uninstallStrategy"] = self.uninstall_strategy
 
-            if self.workload_update_strategy:
+            if self.workload_update_strategy is not None:
                 _spec["workloadUpdateStrategy"] = self.workload_update_strategy
 
-            if self.workloads:
+            if self.workloads is not None:
                 _spec["workloads"] = self.workloads
 
     # End of generated code

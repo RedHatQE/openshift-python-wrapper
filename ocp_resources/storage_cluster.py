@@ -1,7 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
-
+from __future__ import annotations
 from typing import Any
 from ocp_resources.resource import NamespacedResource
 
@@ -19,7 +19,6 @@ class StorageCluster(NamespacedResource):
         arbiter: dict[str, Any] | None = None,
         backing_storage_classes: list[Any] | None = None,
         csi: dict[str, Any] | None = None,
-        default_storage_profile: str | None = None,
         enable_ceph_tools: bool | None = None,
         encryption: dict[str, Any] | None = None,
         external_storage: dict[str, Any] | None = None,
@@ -48,7 +47,7 @@ class StorageCluster(NamespacedResource):
         version: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             allow_remote_storage_consumers (bool): AllowRemoteStorageConsumers Indicates that the OCS cluster should
               deploy the needed components to enable connections from remote
@@ -63,9 +62,6 @@ class StorageCluster(NamespacedResource):
               storageDeviceSets section of the CR.
 
             csi (dict[str, Any]): CSIDriverSpec defines the CSI driver settings for the StorageCluster.
-
-            default_storage_profile (str): DefaultStorageProfile is the default storage profile to use for the
-              storagerequest as StorageProfile is optional.
 
             enable_ceph_tools (bool): EnableCephTools toggles on whether or not the ceph tools pod should be
               deployed. Defaults to false
@@ -83,13 +79,13 @@ class StorageCluster(NamespacedResource):
 
             host_network (bool): HostNetwork defaults to false
 
-            instance_type (str): No field description from API; please add description
+            instance_type (str): No field description from API
 
             label_selector (dict[str, Any]): LabelSelector is used to specify custom labels of nodes to run OCS on
 
             log_collector (Any): Logging represents loggings settings
 
-            manage_nodes (bool): No field description from API; please add description
+            manage_nodes (bool): No field description from API
 
             managed_resources (dict[str, Any]): ManagedResources specifies how to deal with auxiliary resources
               reconciled with the StorageCluster
@@ -100,7 +96,7 @@ class StorageCluster(NamespacedResource):
               cluster. This configuration will only be applied to resources
               managed by the operator.
 
-            mon_data_dir_host_path (str): No field description from API; please add description
+            mon_data_dir_host_path (str): No field description from API
 
             mon_pvc_template (dict[str, Any]): PersistentVolumeClaim is a user's request for and claim to a
               persistent volume
@@ -131,10 +127,8 @@ class StorageCluster(NamespacedResource):
               explicitly
 
             provider_api_server_service_type (str): ProviderAPIServerServiceType Indicates the ServiceType for OCS
-              Provider API Server Service. The supported values are NodePort or
-              LoadBalancer. The default ServiceType is NodePort if the value is
-              empty. This will only be used when AllowRemoteStorageConsumers is
-              set to true
+              Provider API Server Service. The default ServiceType is derived
+              from hostNetwork field.
 
             resource_profile (str): Resource Profile can be used to choose from a set of predefined
               resource profiles for the ceph daemons. We have 3 profiles lean:
@@ -145,7 +139,7 @@ class StorageCluster(NamespacedResource):
             resources (dict[str, Any]): Resources follows the conventions of and is mapped to
               CephCluster.Spec.Resources
 
-            storage_device_sets (list[Any]): No field description from API; please add description
+            storage_device_sets (list[Any]): No field description from API
 
             version (str): Version specifies the version of StorageCluster
 
@@ -156,7 +150,6 @@ class StorageCluster(NamespacedResource):
         self.arbiter = arbiter
         self.backing_storage_classes = backing_storage_classes
         self.csi = csi
-        self.default_storage_profile = default_storage_profile
         self.enable_ceph_tools = enable_ceph_tools
         self.encryption = encryption
         self.external_storage = external_storage
@@ -202,9 +195,6 @@ class StorageCluster(NamespacedResource):
 
             if self.csi is not None:
                 _spec["csi"] = self.csi
-
-            if self.default_storage_profile is not None:
-                _spec["defaultStorageProfile"] = self.default_storage_profile
 
             if self.enable_ceph_tools is not None:
                 _spec["enableCephTools"] = self.enable_ceph_tools
