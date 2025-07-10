@@ -105,4 +105,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1", "testcontainers>=4.10.0"]
+tests = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+]
