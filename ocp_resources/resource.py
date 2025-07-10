@@ -13,7 +13,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Type
+from typing import Any, Type, TYPE_CHECKING
 from urllib.parse import parse_qs, urlencode, urlparse
 from warnings import warn
 
@@ -59,6 +59,9 @@ from ocp_resources.utils.constants import (
 )
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
+
+if TYPE_CHECKING:
+    pass
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -1882,7 +1885,7 @@ class NamespacedResourceList(BaseResourceList):
     def __init__(
         self,
         resource_class: Type[NamespacedResource],
-        namespaces: list[str],
+        namespaces: ResourceList,
         client: DynamicClient,
         **kwargs: Any,
     ) -> None:
@@ -1891,15 +1894,16 @@ class NamespacedResourceList(BaseResourceList):
 
         Args:
             resource_class (Type[NamespacedResource]): The namespaced resource class to instantiate (e.g., Pod).
-            namespaces (List[str]): A list of namespace names where the resources will be created.
+            namespaces (ResourceList): A ResourceList containing namespaces where the resources will be created.
             client (DynamicClient): The dynamic client to use for cluster communication.
             **kwargs (Any): Additional arguments to be passed to the resource_class constructor.
                               A 'name' key is required in kwargs to serve as the base name for the resources.
         """
-        super().__init__(client)
+        for ns in namespaces:
+            if ns.kind != "Namespace":
+                raise TypeError("All the resources in namespaces should be namespaces.")
 
-        if not namespaces:
-            raise ValueError("The 'namespaces' list cannot be empty.")
+        super().__init__(client)
 
         self.namespaces = namespaces
         self._create_resources(resource_class, **kwargs)
@@ -1908,7 +1912,7 @@ class NamespacedResourceList(BaseResourceList):
         """Creates one resource per namespace."""
         for ns in self.namespaces:
             instance = resource_class(
-                namespace=ns,
+                namespace=ns.name,
                 client=self.client,
                 **kwargs,
             )

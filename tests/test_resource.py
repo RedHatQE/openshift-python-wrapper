@@ -61,7 +61,7 @@ def pods(client, namespaces):
     return NamespacedResourceList(
         client=client,
         resource_class=Pod,
-        namespaces=[ns.name for ns in namespaces.resources],
+        namespaces=namespaces,
         name=BASE_POD_NAME,
         containers=POD_CONTAINERS,
     )
@@ -186,7 +186,7 @@ class TestNamespacedResourceList:
         with NamespacedResourceList(
             client=client,
             resource_class=Pod,
-            namespaces=[ns.name for ns in namespaces],
+            namespaces=namespaces,
             name=BASE_POD_NAME,
             containers=POD_CONTAINERS,
         ) as pods:
