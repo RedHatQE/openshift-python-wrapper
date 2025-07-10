@@ -13,7 +13,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Type, TYPE_CHECKING
+from typing import Any, Type
 from urllib.parse import parse_qs, urlencode, urlparse
 from warnings import warn
 
@@ -60,8 +60,6 @@ from ocp_resources.utils.constants import (
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 
-if TYPE_CHECKING:
-    pass
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
