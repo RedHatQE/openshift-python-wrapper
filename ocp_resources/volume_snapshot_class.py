@@ -1,24 +1,28 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+
+from typing import Any
 from ocp_resources.resource import Resource, MissingRequiredArgumentError
 
 
 class VolumeSnapshotClass(Resource):
     """
-    VolumeSnapshotClass specifies parameters that a underlying storage system uses when creating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its name in a VolumeSnapshot object. VolumeSnapshotClasses are non-namespaced
+        VolumeSnapshotClass specifies parameters that a underlying storage system uses when
+    creating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its
+    name in a VolumeSnapshot object.
+    VolumeSnapshotClasses are non-namespaced
     """
 
     api_group: str = Resource.ApiGroup.SNAPSHOT_STORAGE_K8S_IO
 
     def __init__(
         self,
-        deletion_policy: Optional[str] = "",
-        driver: Optional[str] = "",
-        parameters: Optional[Dict[str, Any]] = None,
+        deletion_policy: str | None = None,
+        driver: str | None = None,
+        parameters: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             deletion_policy (str): deletionPolicy determines whether a VolumeSnapshotContent created
               through the VolumeSnapshotClass should be deleted when its bound
@@ -31,7 +35,7 @@ class VolumeSnapshotClass(Resource):
             driver (str): driver is the name of the storage driver that handles this
               VolumeSnapshotClass. Required.
 
-            parameters (Dict[str, Any]): parameters is a key-value map with storage driver specific parameters
+            parameters (dict[str, Any]): parameters is a key-value map with storage driver specific parameters
               for creating snapshots. These values are opaque to Kubernetes.
 
         """
@@ -45,16 +49,16 @@ class VolumeSnapshotClass(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.deletion_policy:
+            if self.deletion_policy is None:
                 raise MissingRequiredArgumentError(argument="self.deletion_policy")
 
-            if not self.driver:
+            if self.driver is None:
                 raise MissingRequiredArgumentError(argument="self.driver")
 
             self.res["deletionPolicy"] = self.deletion_policy
             self.res["driver"] = self.driver
 
-            if self.parameters:
+            if self.parameters is not None:
                 self.res["parameters"] = self.parameters
 
     # End of generated code

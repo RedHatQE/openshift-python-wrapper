@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -40,7 +39,7 @@ class KubeletConfig(Resource):
 
             log_level (int): No field description from API
 
-            machine_config_pool_selector (dict[str, Any]): MachineConfigPoolSelector selects which pools the KubeletConfig shoud
+            machine_config_pool_selector (dict[str, Any]): machineConfigPoolSelector selects which pools the KubeletConfig shoud
               apply to. A nil selector will result in no pools being selected.
 
             tls_security_profile (dict[str, Any]): If unset, the default is based on the

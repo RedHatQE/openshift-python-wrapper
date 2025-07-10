@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,29 +14,29 @@ class Service(NamespacedResource):
 
     def __init__(
         self,
-        allocate_load_balancer_node_ports: Optional[bool] = None,
-        cluster_ip: Optional[str] = "",
-        cluster_ips: Optional[List[Any]] = None,
-        external_ips: Optional[List[Any]] = None,
-        external_name: Optional[str] = "",
-        external_traffic_policy: Optional[str] = "",
-        health_check_node_port: Optional[int] = None,
-        internal_traffic_policy: Optional[str] = "",
-        ip_families: Optional[List[Any]] = None,
-        ip_family_policy: Optional[str] = "",
-        load_balancer_class: Optional[str] = "",
-        load_balancer_ip: Optional[str] = "",
-        load_balancer_source_ranges: Optional[List[Any]] = None,
-        ports: Optional[List[Any]] = None,
-        publish_not_ready_addresses: Optional[bool] = None,
-        selector: Optional[Dict[str, Any]] = None,
-        session_affinity: Optional[str] = "",
-        session_affinity_config: Optional[Dict[str, Any]] = None,
-        traffic_distribution: Optional[str] = "",
-        type: Optional[str] = "",
+        allocate_load_balancer_node_ports: bool | None = None,
+        cluster_ip: str | None = None,
+        cluster_ips: list[Any] | None = None,
+        external_ips: list[Any] | None = None,
+        external_name: str | None = None,
+        external_traffic_policy: str | None = None,
+        health_check_node_port: int | None = None,
+        internal_traffic_policy: str | None = None,
+        ip_families: list[Any] | None = None,
+        ip_family_policy: str | None = None,
+        load_balancer_class: str | None = None,
+        load_balancer_ip: str | None = None,
+        load_balancer_source_ranges: list[Any] | None = None,
+        ports: list[Any] | None = None,
+        publish_not_ready_addresses: bool | None = None,
+        selector: dict[str, Any] | None = None,
+        session_affinity: str | None = None,
+        session_affinity_config: dict[str, Any] | None = None,
+        traffic_distribution: str | None = None,
+        type: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             allocate_load_balancer_node_ports (bool): allocateLoadBalancerNodePorts defines if NodePorts will be
               automatically allocated for services with type LoadBalancer.
@@ -65,7 +66,7 @@ class Service(NamespacedResource):
               https://kubernetes.io/docs/concepts/services-
               networking/service/#virtual-ips-and-service-proxies
 
-            cluster_ips (List[Any]): ClusterIPs is a list of IP addresses assigned to this service, and are
+            cluster_ips (list[Any]): ClusterIPs is a list of IP addresses assigned to this service, and are
               usually assigned randomly.  If an address is specified manually,
               is in-range (as per system configuration), and is not in use, it
               will be allocated to the service; otherwise creation of the
@@ -90,7 +91,7 @@ class Service(NamespacedResource):
               info: https://kubernetes.io/docs/concepts/services-
               networking/service/#virtual-ips-and-service-proxies
 
-            external_ips (List[Any]): externalIPs is a list of IP addresses for which nodes in the cluster
+            external_ips (list[Any]): externalIPs is a list of IP addresses for which nodes in the cluster
               will also accept traffic for this service.  These IPs are not
               managed by Kubernetes.  The user is responsible for ensuring that
               traffic arrives at a node with this IP.  A common example is
@@ -146,7 +147,7 @@ class Service(NamespacedResource):
               traffic only to endpoints on the same node as the client pod
               (dropping the traffic if there are no local endpoints).
 
-            ip_families (List[Any]): IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
+            ip_families (list[Any]): IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
               service. This field is usually assigned automatically based on
               cluster configuration and the ipFamilyPolicy field. If this field
               is specified manually, the requested family is available in the
@@ -216,14 +217,14 @@ class Service(NamespacedResource):
               support dual-stack. Users are encouraged to use implementation-
               specific annotations when available.
 
-            load_balancer_source_ranges (List[Any]): If specified and supported by the platform, this will restrict traffic
+            load_balancer_source_ranges (list[Any]): If specified and supported by the platform, this will restrict traffic
               through the cloud-provider load-balancer will be restricted to the
               specified client IPs. This field will be ignored if the cloud-
               provider does not support the feature." More info:
               https://kubernetes.io/docs/tasks/access-application-
               cluster/create-external-load-balancer/
 
-            ports (List[Any]): The list of ports that are exposed by this service. More info:
+            ports (list[Any]): The list of ports that are exposed by this service. More info:
               https://kubernetes.io/docs/concepts/services-
               networking/service/#virtual-ips-and-service-proxies
 
@@ -239,7 +240,7 @@ class Service(NamespacedResource):
               Endpoints or EndpointSlice resources can safely assume this
               behavior.
 
-            selector (Dict[str, Any]): Route service traffic to pods with label keys and values matching this
+            selector (dict[str, Any]): Route service traffic to pods with label keys and values matching this
               selector. If empty or not present, the service is assumed to have
               an external process managing its endpoints, which Kubernetes will
               not modify. Only applies to types ClusterIP, NodePort, and
@@ -254,7 +255,7 @@ class Service(NamespacedResource):
               values:  - `"ClientIP"` is the Client IP based.  - `"None"` - no
               session affinity.
 
-            session_affinity_config (Dict[str, Any]): SessionAffinityConfig represents the configurations of session
+            session_affinity_config (dict[str, Any]): SessionAffinityConfig represents the configurations of session
               affinity.
 
             traffic_distribution (str): TrafficDistribution offers a way to express preferences for how
@@ -263,7 +264,7 @@ class Service(NamespacedResource):
               adherence. If the field is not set, the implementation will apply
               its default routing strategy. If set to "PreferClose",
               implementations should prioritize endpoints that are topologically
-              close (e.g., same zone). This is an alpha field and requires
+              close (e.g., same zone). This is a beta field and requires
               enabling ServiceTrafficDistribution feature.
 
             type (str): type determines how the Service is exposed. Defaults to ClusterIP.
@@ -326,61 +327,61 @@ class Service(NamespacedResource):
             if self.allocate_load_balancer_node_ports is not None:
                 _spec["allocateLoadBalancerNodePorts"] = self.allocate_load_balancer_node_ports
 
-            if self.cluster_ip:
+            if self.cluster_ip is not None:
                 _spec["clusterIP"] = self.cluster_ip
 
-            if self.cluster_ips:
+            if self.cluster_ips is not None:
                 _spec["clusterIPs"] = self.cluster_ips
 
-            if self.external_ips:
+            if self.external_ips is not None:
                 _spec["externalIPs"] = self.external_ips
 
-            if self.external_name:
+            if self.external_name is not None:
                 _spec["externalName"] = self.external_name
 
-            if self.external_traffic_policy:
+            if self.external_traffic_policy is not None:
                 _spec["externalTrafficPolicy"] = self.external_traffic_policy
 
-            if self.health_check_node_port:
+            if self.health_check_node_port is not None:
                 _spec["healthCheckNodePort"] = self.health_check_node_port
 
-            if self.internal_traffic_policy:
+            if self.internal_traffic_policy is not None:
                 _spec["internalTrafficPolicy"] = self.internal_traffic_policy
 
-            if self.ip_families:
+            if self.ip_families is not None:
                 _spec["ipFamilies"] = self.ip_families
 
-            if self.ip_family_policy:
+            if self.ip_family_policy is not None:
                 _spec["ipFamilyPolicy"] = self.ip_family_policy
 
-            if self.load_balancer_class:
+            if self.load_balancer_class is not None:
                 _spec["loadBalancerClass"] = self.load_balancer_class
 
-            if self.load_balancer_ip:
+            if self.load_balancer_ip is not None:
                 _spec["loadBalancerIP"] = self.load_balancer_ip
 
-            if self.load_balancer_source_ranges:
+            if self.load_balancer_source_ranges is not None:
                 _spec["loadBalancerSourceRanges"] = self.load_balancer_source_ranges
 
-            if self.ports:
+            if self.ports is not None:
                 _spec["ports"] = self.ports
 
             if self.publish_not_ready_addresses is not None:
                 _spec["publishNotReadyAddresses"] = self.publish_not_ready_addresses
 
-            if self.selector:
+            if self.selector is not None:
                 _spec["selector"] = self.selector
 
-            if self.session_affinity:
+            if self.session_affinity is not None:
                 _spec["sessionAffinity"] = self.session_affinity
 
-            if self.session_affinity_config:
+            if self.session_affinity_config is not None:
                 _spec["sessionAffinityConfig"] = self.session_affinity_config
 
-            if self.traffic_distribution:
+            if self.traffic_distribution is not None:
                 _spec["trafficDistribution"] = self.traffic_distribution
 
-            if self.type:
+            if self.type is not None:
                 _spec["type"] = self.type
 
     # End of generated code

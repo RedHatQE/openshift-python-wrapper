@@ -1,5 +1,6 @@
 import ast
 import os
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 
 import click
 
@@ -89,21 +90,14 @@ def main(
 
     if regenerate_generated_files:
         click.echo("Regenerating files...")
-        failed_kinds = []
-        for kind in res["with_end_comment"].keys():
-            try:
-                click.echo(f"Regenerating {kind}...")
-                if not class_generator(kind=kind, called_from_cli=False, overwrite=True):
-                    failed_kinds.append(kind)
+        futures: list[Future] = []
 
-            except Exception as exc:
-                click.echo(f"Failed to regenerate {kind}: {exc}", err=True)
-                failed_kinds.append(kind)
+        with ThreadPoolExecutor() as executor:
+            for kind in res["with_end_comment"].keys():
+                futures.append(executor.submit(class_generator, kind=kind, called_from_cli=False, overwrite=True))
 
-        if failed_kinds:
-            click.echo(f"Failed to regenerate: {', '.join(failed_kinds)}", err=True)
-        else:
-            click.echo("All files regenerated successfully!")
+        for _ in as_completed(futures):
+            ...
 
     if generated_missing_end_comment:
         generate_resource(kinds=list(res["without_end_comment"].keys()), yes=yes)

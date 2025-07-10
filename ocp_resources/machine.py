@@ -1,35 +1,38 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+from __future__ import annotations
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
 class Machine(NamespacedResource):
     """
-    Machine is the Schema for the machines API Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
+        Machine is the Schema for the machines API
+    Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
     """
 
     api_group: str = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
 
     def __init__(
         self,
-        lifecycle_hooks: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-        provider_id: Optional[str] = "",
-        provider_spec: Optional[Dict[str, Any]] = None,
-        taints: Optional[List[Any]] = None,
+        lifecycle_hooks: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
+        provider_id: str | None = None,
+        provider_spec: dict[str, Any] | None = None,
+        taints: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            lifecycle_hooks (Dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
+            lifecycle_hooks (dict[str, Any]): lifecycleHooks allow users to pause operations on the machine at
               certain predefined points within the machine lifecycle.
 
-            metadata (Dict[str, Any]): ObjectMeta will autopopulate the Node created. Use this to indicate
+            metadata (dict[str, Any]): ObjectMeta will autopopulate the Node created. Use this to indicate
               what labels, annotations, name prefix, etc., should be used when
               creating the Node.
 
-            provider_id (str): ProviderID is the identification ID of the machine provided by the
+            provider_id (str): providerID is the identification ID of the machine provided by the
               provider. This field must match the provider ID as seen on the
               node object corresponding to this machine. This field is required
               by higher level consumers of cluster-api. Example use case is
@@ -45,10 +48,10 @@ class Machine(NamespacedResource):
               autoscaler that will be interfacing with cluster-api as generic
               provider.
 
-            provider_spec (Dict[str, Any]): ProviderSpec details Provider-specific configuration to use during
+            provider_spec (dict[str, Any]): providerSpec details Provider-specific configuration to use during
               node creation.
 
-            taints (List[Any]): The list of the taints to be applied to the corresponding Node in
+            taints (list[Any]): The list of the taints to be applied to the corresponding Node in
               additive manner. This list will not overwrite any other taints
               added to the Node on an ongoing basis by other entities. These
               taints should be actively reconciled e.g. if you ask the machine
@@ -72,19 +75,19 @@ class Machine(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.lifecycle_hooks:
+            if self.lifecycle_hooks is not None:
                 _spec["lifecycleHooks"] = self.lifecycle_hooks
 
-            if self.metadata:
+            if self.metadata is not None:
                 _spec["metadata"] = self.metadata
 
-            if self.provider_id:
+            if self.provider_id is not None:
                 _spec["providerID"] = self.provider_id
 
-            if self.provider_spec:
+            if self.provider_spec is not None:
                 _spec["providerSpec"] = self.provider_spec
 
-            if self.taints:
+            if self.taints is not None:
                 _spec["taints"] = self.taints
 
     # End of generated code

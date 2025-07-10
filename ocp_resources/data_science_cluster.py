@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -13,12 +14,12 @@ class DataScienceCluster(Resource):
 
     def __init__(
         self,
-        components: Optional[Dict[str, Any]] = None,
+        components: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            components (Dict[str, Any]): Override and fine tune specific component configurations.
+            components (dict[str, Any]): Override and fine tune specific component configurations.
 
         """
         super().__init__(**kwargs)
@@ -32,7 +33,7 @@ class DataScienceCluster(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.components:
+            if self.components is not None:
                 _spec["components"] = self.components
 
     # End of generated code

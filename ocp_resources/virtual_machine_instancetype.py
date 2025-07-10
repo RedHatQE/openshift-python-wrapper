@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -14,35 +15,35 @@ class VirtualMachineInstancetype(NamespacedResource):
 
     def __init__(
         self,
-        spec_annotations: Optional[Dict[str, Any]] = None,
-        cpu: Optional[Dict[str, Any]] = None,
-        gpus: Optional[List[Any]] = None,
-        host_devices: Optional[List[Any]] = None,
-        io_threads_policy: Optional[str] = "",
-        launch_security: Optional[Dict[str, Any]] = None,
-        memory: Optional[Dict[str, Any]] = None,
-        node_selector: Optional[Dict[str, Any]] = None,
-        scheduler_name: Optional[str] = "",
+        spec_annotations: dict[str, Any] | None = None,
+        cpu: dict[str, Any] | None = None,
+        gpus: list[Any] | None = None,
+        host_devices: list[Any] | None = None,
+        io_threads_policy: str | None = None,
+        launch_security: dict[str, Any] | None = None,
+        memory: dict[str, Any] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        scheduler_name: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            spec_annotations (Dict[str, Any]): Optionally defines the required Annotations to be used by the instance
+            spec_annotations (dict[str, Any]): Optionally defines the required Annotations to be used by the instance
               type and applied to the VirtualMachineInstance
 
-            cpu (Dict[str, Any]): Required CPU related attributes of the instancetype.
+            cpu (dict[str, Any]): Required CPU related attributes of the instancetype.
 
-            gpus (List[Any]): Optionally defines any GPU devices associated with the instancetype.
+            gpus (list[Any]): Optionally defines any GPU devices associated with the instancetype.
 
-            host_devices (List[Any]): Optionally defines any HostDevices associated with the instancetype.
+            host_devices (list[Any]): Optionally defines any HostDevices associated with the instancetype.
 
             io_threads_policy (str): Optionally defines the IOThreadsPolicy to be used by the instancetype.
 
-            launch_security (Dict[str, Any]): Optionally defines the LaunchSecurity to be used by the instancetype.
+            launch_security (dict[str, Any]): Optionally defines the LaunchSecurity to be used by the instancetype.
 
-            memory (Dict[str, Any]): Required Memory related attributes of the instancetype.
+            memory (dict[str, Any]): Required Memory related attributes of the instancetype.
 
-            node_selector (Dict[str, Any]): NodeSelector is a selector which must be true for the vmi to fit on a
+            node_selector (dict[str, Any]): NodeSelector is a selector which must be true for the vmi to fit on a
               node. Selector which must match a node's labels for the vmi to be
               scheduled on that node. More info:
               https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -71,10 +72,10 @@ class VirtualMachineInstancetype(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.cpu:
+            if self.cpu is None:
                 raise MissingRequiredArgumentError(argument="self.cpu")
 
-            if not self.memory:
+            if self.memory is None:
                 raise MissingRequiredArgumentError(argument="self.memory")
 
             self.res["spec"] = {}
@@ -83,25 +84,25 @@ class VirtualMachineInstancetype(NamespacedResource):
             _spec["cpu"] = self.cpu
             _spec["memory"] = self.memory
 
-            if self.spec_annotations:
+            if self.spec_annotations is not None:
                 _spec["annotations"] = self.spec_annotations
 
-            if self.gpus:
+            if self.gpus is not None:
                 _spec["gpus"] = self.gpus
 
-            if self.host_devices:
+            if self.host_devices is not None:
                 _spec["hostDevices"] = self.host_devices
 
-            if self.io_threads_policy:
+            if self.io_threads_policy is not None:
                 _spec["ioThreadsPolicy"] = self.io_threads_policy
 
-            if self.launch_security:
+            if self.launch_security is not None:
                 _spec["launchSecurity"] = self.launch_security
 
-            if self.node_selector:
+            if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
 
-            if self.scheduler_name:
+            if self.scheduler_name is not None:
                 _spec["schedulerName"] = self.scheduler_name
 
     # End of generated code

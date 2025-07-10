@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Optional
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -14,10 +15,10 @@ class VirtualMachineInstanceMigration(NamespacedResource):
 
     def __init__(
         self,
-        vmi_name: Optional[str] = "",
+        vmi_name: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             vmi_name (str): The name of the VMI to perform the migration on. VMI must exist in the
               migration objects namespace
@@ -34,7 +35,7 @@ class VirtualMachineInstanceMigration(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.vmi_name:
+            if self.vmi_name is not None:
                 _spec["vmiName"] = self.vmi_name
 
     # End of generated code

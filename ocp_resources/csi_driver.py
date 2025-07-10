@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -13,17 +14,17 @@ class CSIDriver(Resource):
 
     def __init__(
         self,
-        attach_required: Optional[bool] = None,
-        fs_group_policy: Optional[str] = "",
-        pod_info_on_mount: Optional[bool] = None,
-        requires_republish: Optional[bool] = None,
-        se_linux_mount: Optional[bool] = None,
-        storage_capacity: Optional[bool] = None,
-        token_requests: Optional[List[Any]] = None,
-        volume_lifecycle_modes: Optional[List[Any]] = None,
+        attach_required: bool | None = None,
+        fs_group_policy: str | None = None,
+        pod_info_on_mount: bool | None = None,
+        requires_republish: bool | None = None,
+        se_linux_mount: bool | None = None,
+        storage_capacity: bool | None = None,
+        token_requests: list[Any] | None = None,
+        volume_lifecycle_modes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             attach_required (bool): attachRequired indicates this CSI volume driver requires an attach
               operation (because it implements the CSI ControllerPublishVolume()
@@ -107,7 +108,7 @@ class CSIDriver(Resource):
               information has been published.  This field was immutable in
               Kubernetes <= 1.22 and now is mutable.
 
-            token_requests (List[Any]): tokenRequests indicates the CSI driver needs pods' service account
+            token_requests (list[Any]): tokenRequests indicates the CSI driver needs pods' service account
               tokens it is mounting volume for to do necessary authentication.
               Kubelet will pass the tokens in VolumeContext in the CSI
               NodePublishVolume calls. The CSI driver should parse and validate
@@ -119,7 +120,7 @@ class CSIDriver(Resource):
               receive a new token after expiry, RequiresRepublish can be used to
               trigger NodePublishVolume periodically.
 
-            volume_lifecycle_modes (List[Any]): volumeLifecycleModes defines what kind of volumes this CSI volume
+            volume_lifecycle_modes (list[Any]): volumeLifecycleModes defines what kind of volumes this CSI volume
               driver supports. The default if the list is empty is "Persistent",
               which is the usage defined by the CSI specification and
               implemented in Kubernetes via the usual PV/PVC mechanism.  The
@@ -155,7 +156,7 @@ class CSIDriver(Resource):
             if self.attach_required is not None:
                 _spec["attachRequired"] = self.attach_required
 
-            if self.fs_group_policy:
+            if self.fs_group_policy is not None:
                 _spec["fsGroupPolicy"] = self.fs_group_policy
 
             if self.pod_info_on_mount is not None:
@@ -170,10 +171,10 @@ class CSIDriver(Resource):
             if self.storage_capacity is not None:
                 _spec["storageCapacity"] = self.storage_capacity
 
-            if self.token_requests:
+            if self.token_requests is not None:
                 _spec["tokenRequests"] = self.token_requests
 
-            if self.volume_lifecycle_modes:
+            if self.volume_lifecycle_modes is not None:
                 _spec["volumeLifecycleModes"] = self.volume_lifecycle_modes
 
     # End of generated code
