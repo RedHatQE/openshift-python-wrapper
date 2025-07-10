@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -13,32 +14,32 @@ class AAQ(Resource):
 
     def __init__(
         self,
-        cert_config: Optional[Dict[str, Any]] = None,
-        configuration: Optional[Dict[str, Any]] = None,
-        image_pull_policy: Optional[str] = "",
-        infra: Optional[Dict[str, Any]] = None,
-        namespace_selector: Optional[Dict[str, Any]] = None,
-        priority_class: Optional[str] = "",
-        workload: Optional[Dict[str, Any]] = None,
+        cert_config: dict[str, Any] | None = None,
+        configuration: dict[str, Any] | None = None,
+        image_pull_policy: str | None = None,
+        infra: dict[str, Any] | None = None,
+        namespace_selector: dict[str, Any] | None = None,
+        priority_class: str | None = None,
+        workload: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            cert_config (Dict[str, Any]): certificate configuration
+            cert_config (dict[str, Any]): certificate configuration
 
-            configuration (Dict[str, Any]): holds aaq configurations.
+            configuration (dict[str, Any]): holds aaq configurations.
 
             image_pull_policy (str): PullPolicy describes a policy for if/when to pull a container image
 
-            infra (Dict[str, Any]): Rules on which nodes AAQ infrastructure pods will be scheduled
+            infra (dict[str, Any]): Rules on which nodes AAQ infrastructure pods will be scheduled
 
-            namespace_selector (Dict[str, Any]): namespaces where pods should be gated before scheduling Defaults to
+            namespace_selector (dict[str, Any]): namespaces where pods should be gated before scheduling Defaults to
               targeting namespaces with an "application-aware-quota/enable-
               gating" label key.
 
             priority_class (str): PriorityClass of the AAQ control plane
 
-            workload (Dict[str, Any]): Restrict on which nodes AAQ workload pods will be scheduled
+            workload (dict[str, Any]): Restrict on which nodes AAQ workload pods will be scheduled
 
         """
         super().__init__(**kwargs)
@@ -58,25 +59,25 @@ class AAQ(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.cert_config:
+            if self.cert_config is not None:
                 _spec["certConfig"] = self.cert_config
 
-            if self.configuration:
+            if self.configuration is not None:
                 _spec["configuration"] = self.configuration
 
-            if self.image_pull_policy:
+            if self.image_pull_policy is not None:
                 _spec["imagePullPolicy"] = self.image_pull_policy
 
-            if self.infra:
+            if self.infra is not None:
                 _spec["infra"] = self.infra
 
-            if self.namespace_selector:
+            if self.namespace_selector is not None:
                 _spec["namespaceSelector"] = self.namespace_selector
 
-            if self.priority_class:
+            if self.priority_class is not None:
                 _spec["priorityClass"] = self.priority_class
 
-            if self.workload:
+            if self.workload is not None:
                 _spec["workload"] = self.workload
 
     # End of generated code
