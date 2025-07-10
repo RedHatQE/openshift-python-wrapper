@@ -737,7 +737,7 @@ class Resource(ResourceConstants):
         self.__exit__()
         sys.exit(signal_received)
 
-    def deploy(self, wait: bool = False) -> Any:
+    def deploy(self, wait: bool = False) -> Resource | NamespacedResource:
         """
         For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
         Spaces are important in the export dict
