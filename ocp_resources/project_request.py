@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from __future__ import annotations
+from __future__ import annotations
 from typing import Any, Optional
 from ocp_resources.resource import Resource
 from ocp_resources.project_project_openshift_io import Project
