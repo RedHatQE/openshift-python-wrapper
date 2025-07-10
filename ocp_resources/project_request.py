@@ -2,7 +2,7 @@
 
 from typing import Any, Optional
 
-from ocp_resources.resource import Resource, NamespacedResource
+from ocp_resources.resource import Resource
 from ocp_resources.project_project_openshift_io import Project
 
 
@@ -45,7 +45,7 @@ class ProjectRequest(Resource):
 
     # End of generated code
 
-    def deploy(self, wait: bool = False) -> Resource | NamespacedResource:
+    def deploy(self, wait: bool = False) -> Project:
         super().deploy(wait=wait)
 
         project = Project(
