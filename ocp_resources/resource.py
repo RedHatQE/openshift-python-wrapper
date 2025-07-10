@@ -8,14 +8,13 @@ import os
 import re
 import sys
 import threading
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Any, Type
 from urllib.parse import parse_qs, urlencode, urlparse
-from warnings import warn
 
 import kubernetes
 import requests
@@ -60,7 +59,6 @@ from ocp_resources.utils.constants import (
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 
-
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
@@ -77,13 +75,17 @@ def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: st
 def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> str:
     # Returns api_group/api_version
     res = _find_supported_resource(dyn_client=dyn_client, api_group=api_group, kind=kind)
+    log = f"Couldn't find {kind} in {api_group} api group"
+
     if not res:
-        log = f"Couldn't find {kind} in {api_group} api group"
         LOGGER.warning(log)
         raise NotImplementedError(log)
 
-    LOGGER.info(f"kind: {kind} api version: {res.group_version}")
-    return res.group_version
+    if isinstance(res.group_version, str):
+        LOGGER.info(f"kind: {kind} api version: {res.group_version}")
+        return res.group_version
+
+    raise NotImplementedError(log)
 
 
 def client_configuration_with_basic_auth(
@@ -558,11 +560,10 @@ class Resource(ResourceConstants):
 
     def __init__(
         self,
-        name: str = "",
+        name: str | None = None,
         client: DynamicClient | None = None,
         teardown: bool = True,
-        privileged_client: DynamicClient | None = None,
-        yaml_file: str = "",
+        yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
         dry_run: bool = False,
         node_selector: dict[str, Any] | None = None,
@@ -587,7 +588,6 @@ class Resource(ResourceConstants):
             name (str): Resource name
             client (DynamicClient): Dynamic client for connecting to a remote cluster
             teardown (bool): Indicates if this resource would need to be deleted
-            privileged_client (DynamicClient): Instance of Dynamic client
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
             dry_run (bool): dry run
@@ -604,19 +604,11 @@ class Resource(ResourceConstants):
             kind_dict (dict): dict which represents the resource object
             wait_for_resource (bool): Waits for the resource to be created
         """
-        if privileged_client:
-            warn(
-                "privileged_client is deprecated and will be removed in the future. Use client instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
         self.name = name
         self.teardown = teardown
-        self.privileged_client = client
         self.yaml_file = yaml_file
         self.kind_dict = kind_dict
         self.delete_timeout = delete_timeout
@@ -638,7 +630,7 @@ class Resource(ResourceConstants):
         if not (self.name or self.yaml_file or self.kind_dict):
             raise MissingRequiredArgumentError(argument="name")
 
-        self.namespace: str = ""
+        self.namespace: str | None = None
         self.node_selector_spec = self._prepare_node_selector_spec()
         self.res: dict[Any, Any] = self.kind_dict or {}
         self.yaml_file_contents: str = ""
@@ -711,7 +703,7 @@ class Resource(ResourceConstants):
                 self.res.setdefault("metadata", {}).setdefault("annotations", {}).update(self.annotations)
 
         if not self.res:
-            raise MissingResourceResError(name=self.name)
+            raise MissingResourceResError(name=self.name or "")
 
     def to_dict(self) -> None:
         """
@@ -1438,10 +1430,10 @@ class NamespacedResource(Resource):
 
     def __init__(
         self,
-        name: str = "",
-        namespace: str = "",
+        name: str | None = None,
+        namespace: str | None = None,
         teardown: bool = True,
-        yaml_file: str = "",
+        yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
         client: DynamicClient | None = None,
         ensure_exists: bool = False,
