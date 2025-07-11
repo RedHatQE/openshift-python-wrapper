@@ -1,7 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, List, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from typing import Any
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Image(NamespacedResource):
@@ -13,9 +14,9 @@ class Image(NamespacedResource):
 
     def __init__(
         self,
-        image: Optional[str] = "",
-        image_pull_secrets: Optional[List[Any]] = None,
-        service_account_name: Optional[str] = "",
+        image: str | None = None,
+        image_pull_secrets: list[Any] | None = None,
+        service_account_name: str | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -23,7 +24,7 @@ class Image(NamespacedResource):
             image (str): Image is the name of the container image url to cache across the
               cluster.
 
-            image_pull_secrets (List[Any]): ImagePullSecrets contains the names of the Kubernetes Secrets
+            image_pull_secrets (list[Any]): ImagePullSecrets contains the names of the Kubernetes Secrets
               containing login information used by the Pods which will run this
               container.
 

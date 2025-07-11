@@ -1,12 +1,11 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
-from __future__ import annotations
-from __future__ import annotations
 import json
 from typing import Any
+
 import kubernetes
 from timeout_sampler import TimeoutWatch
+
 from ocp_resources.exceptions import ExecOnPodError
 from ocp_resources.node import Node
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource

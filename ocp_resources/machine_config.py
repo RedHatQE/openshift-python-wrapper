@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from ocp_resources.resource import Resource
 
 
@@ -11,13 +12,13 @@ class MachineConfig(Resource):
 
     def __init__(
         self,
-        os_image_url: Optional[str] = "",
-        config: Optional[Dict[str, Any]] = None,
-        kernel_arguments: Optional[List[str]] = None,
-        extensions: Optional[List[str]] = None,
-        fips: Optional[bool] = None,
-        kernel_type: Optional[str] = "",
-        base_os_extensions_container_image: Optional[str] = "",
+        os_image_url: str | None = None,
+        config: dict[str, Any] | None = None,
+        kernel_arguments: list[str] | None = None,
+        extensions: list[str] | None = None,
+        fips: bool | None = None,
+        kernel_type: str | None = None,
+        base_os_extensions_container_image: str | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -49,20 +50,20 @@ class MachineConfig(Resource):
                         ]
                     }
                 }
-            kernel_arguments (list, optional): List of kernel arguments.
-            extensions (list, optional): List of extensions to install.
+            kernel_arguments (list, optional): list of kernel arguments.
+            extensions (list, optional): list of extensions to install.
             fips (bool, optional): Enable FIPS mode. Defaults to False.
             kernel_type (str, optional): Type of kernel to use.
             base_os_extensions_container_image (str, optional): URL to the base OS extensions container image.
         """
         super().__init__(**kwargs)
-        self.os_image_url: Optional[str] = os_image_url
-        self.config: Optional[Dict[str, Any]] = config
-        self.kernel_arguments: Optional[List[str]] = kernel_arguments
-        self.extensions: Optional[List[str]] = extensions
-        self.fips: Optional[bool] = fips
-        self.kernel_type: Optional[str] = kernel_type
-        self.base_os_extensions_container_image: Optional[str] = base_os_extensions_container_image
+        self.os_image_url = os_image_url
+        self.config = config
+        self.kernel_arguments = kernel_arguments
+        self.extensions = extensions
+        self.fips = fips
+        self.kernel_type = kernel_type
+        self.base_os_extensions_container_image = base_os_extensions_container_image
 
     def to_dict(self) -> None:
         super().to_dict()
