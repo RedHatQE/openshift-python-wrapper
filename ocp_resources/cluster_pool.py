@@ -1,5 +1,5 @@
-from __future__ import annotations
-from typing import Any, Dict
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -14,7 +14,7 @@ class ClusterPool(NamespacedResource):
         self,
         base_domain: str = "",
         image_set_ref_name: str = "",
-        platform: Dict[str, Any] | None = None,
+        platform: dict[str, Any] | None = None,
         pull_secret_ref_name: str = "",
         running_count: int | None = None,
         size: int | None = None,
