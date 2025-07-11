@@ -388,7 +388,7 @@ class KubeAPIVersion(Version):
         self.version: list[str | Any] = []
         super().__init__(version=vstring)
 
-    def parse(self, vstring: str):
+    def parse(self, vstring: str) -> None:
         components = [comp for comp in self.component_re.split(vstring) if comp]
         for idx, obj in enumerate(components):
             with contextlib.suppress(ValueError):
@@ -1064,7 +1064,7 @@ class Resource(ResourceConstants):
 
     @staticmethod
     def retry_cluster_exceptions(
-        func,
+        func: Callable,
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         timeout: int = TIMEOUT_10SEC,
         sleep_time: int = 1,
@@ -1280,7 +1280,7 @@ class Resource(ResourceConstants):
         field_selector: str = "",
         resource_version: str = "",
         timeout: int = TIMEOUT_4MINUTES,
-    ):
+    ) -> Generator[Any, Any, None]:
         """
         get - retrieves K8s events.
 
