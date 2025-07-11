@@ -1,16 +1,14 @@
-from __future__ import annotations
-
 import os
 from unittest.mock import patch
 
 import pytest
 
+from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
-from ocp_resources.resource import Resource, ResourceList, NamespacedResourceList
+from ocp_resources.resource import NamespacedResourceList, Resource, ResourceList
 from ocp_resources.secret import Secret
-from fake_kubernetes_client import FakeDynamicClient
 
 BASE_NAMESPACE_NAME: str = "test-namespace"
 BASE_POD_NAME: str = "test-pod"

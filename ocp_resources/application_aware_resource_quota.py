@@ -1,7 +1,6 @@
 # API reference: https://github.com/kubevirt/application-aware-quota/tree/main/staging/src/kubevirt.io/application-aware-quota-api/pkg/apis/core/v1alpha1
 # TODO: update API reference when OCP doc is available
-from __future__ import annotations
-from typing import Dict, Any, List
+from typing import Any
 
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
@@ -11,9 +10,9 @@ class ApplicationAwareResourceQuota(NamespacedResource):
 
     def __init__(
         self,
-        hard: Dict[str, Any] | None = None,
-        scope_selector: Dict[str, Any] | None = None,
-        scopes: List[str] | None = None,
+        hard: dict[str, Any] | None = None,
+        scope_selector: dict[str, Any] | None = None,
+        scopes: list[str] | None = None,
         **kwargs: Any,
     ) -> None:
         """

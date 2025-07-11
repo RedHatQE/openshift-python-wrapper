@@ -1,8 +1,9 @@
-from typing import Any, Optional
+from typing import Any
 
-from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT, TIMEOUT_30SEC
-from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
+
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT, TIMEOUT_30SEC
 
 
 class Benchmark(NamespacedResource):
@@ -75,7 +76,7 @@ class Benchmark(NamespacedResource):
         """
         return self.workload_arg(arg="kind", default="pod")
 
-    def workload_arg(self, arg: str, default: Optional[Any] = None) -> Any:
+    def workload_arg(self, arg: str, default: Any = None) -> Any:
         """
         Retrieve the value of spec.workload.args[arg]
 

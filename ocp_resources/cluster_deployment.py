@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,8 +14,8 @@ class ClusterDeployment(NamespacedResource):
         self,
         base_domain: str = "",
         cluster_name: str = "",
-        platform: Dict[str, Any] | None = None,
-        provisioning: Dict[str, Any] | None = None,
+        platform: dict[str, Any] | None = None,
+        provisioning: dict[str, Any] | None = None,
         pull_secret_ref_name: str = "",
         **kwargs: Any,
     ) -> None:

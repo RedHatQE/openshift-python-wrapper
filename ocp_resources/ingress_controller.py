@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -11,25 +12,25 @@ class IngressController(NamespacedResource):
 
     def __init__(
         self,
-        domain: Optional[str] = "",
-        replicas: Optional[int] = None,
-        endpoint_publishing_strategy: Optional[Dict[str, Any]] = None,
-        default_certificate: Optional[Dict[str, str]] = None,
-        namespace_selector: Optional[Dict[str, Any]] = None,
-        node_selector: Optional[Dict[str, Any]] = None,
-        route_selector: Optional[Dict[str, Any]] = None,
-        tls_security_profile: Optional[Dict[str, Any]] = None,
-        logging: Optional[Dict[str, Any]] = None,
-        route_admission: Optional[Dict[str, Any]] = None,
-        client_tls: Optional[Dict[str, Any]] = None,
-        trusted_ca: Optional[Dict[str, Any]] = None,
-        http_compression: Optional[Dict[str, str]] = None,
-        http_empty_requests_policy: Optional[str] = "",
-        http_error_code_pages: Optional[Dict[str, Any]] = None,
-        http_headers: Optional[Dict[str, Any]] = None,
-        node_placement: Optional[Dict[str, Any]] = None,
-        tuning_options: Optional[Dict[str, Any]] = None,
-        unsupported_config_overrides: Optional[Dict[str, Any]] = None,
+        domain: str | None = None,
+        replicas: int | None = None,
+        endpoint_publishing_strategy: dict[str, Any] | None = None,
+        default_certificate: dict[str, str] | None = None,
+        namespace_selector: dict[str, Any] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        route_selector: dict[str, Any] | None = None,
+        tls_security_profile: dict[str, Any] | None = None,
+        logging: dict[str, Any] | None = None,
+        route_admission: dict[str, Any] | None = None,
+        client_tls: dict[str, Any] | None = None,
+        trusted_ca: dict[str, Any] | None = None,
+        http_compression: dict[str, str] | None = None,
+        http_empty_requests_policy: str | None = None,
+        http_error_code_pages: dict[str, Any] | None = None,
+        http_headers: dict[str, Any] | None = None,
+        node_placement: dict[str, Any] | None = None,
+        tuning_options: dict[str, Any] | None = None,
+        unsupported_config_overrides: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """

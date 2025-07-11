@@ -1,9 +1,7 @@
-from __future__ import annotations
 import ast
 import json
 import os
 from typing import Any, Generator
-
 
 from ocp_resources.resource import Resource  # noqa
 

@@ -1,15 +1,14 @@
-from __future__ import annotations
 import shlex
 from typing import Any
 
 import xmltodict
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES, TIMEOUT_30SEC, TIMEOUT_5SEC
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES, TIMEOUT_5SEC, TIMEOUT_30SEC
 
 
 class VirtualMachineInstance(NamespacedResource):

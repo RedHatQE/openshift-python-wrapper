@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, Dict, List
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -17,8 +18,8 @@ class ChaosEngine(NamespacedResource):
         return self.instance.status["engineStatus"]
 
     @property
-    def experiments_status(self) -> Dict[str, Dict[str, Any]]:
-        experiments: List[Dict[Any, Any]] = self.instance.status["experiments"]
+    def experiments_status(self) -> dict[str, dict[str, Any]]:
+        experiments: list[dict[Any, Any]] = self.instance.status["experiments"]
         ret_value = {}
         for experiment in experiments:
             exp = {"verdict": experiment["verdict"], "status": experiment["status"]}

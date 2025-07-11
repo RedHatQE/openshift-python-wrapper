@@ -1,5 +1,5 @@
-from __future__ import annotations
 from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -41,7 +41,7 @@ class Plan(NamespacedResource):
         pre_hook_namespace: str | None = None,
         after_hook_name: str | None = None,
         after_hook_namespace: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.source_provider_name = source_provider_name

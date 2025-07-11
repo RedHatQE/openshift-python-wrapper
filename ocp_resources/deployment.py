@@ -1,11 +1,11 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
-from __future__ import annotations
 from typing import Any
+
 from timeout_sampler import TimeoutSampler, TimeoutWatch
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class Deployment(NamespacedResource):
@@ -125,7 +125,7 @@ class Deployment(NamespacedResource):
         self.logger.info(f"Set deployment replicas: {replica_count}")
         return self.update(resource_dict=self.res)
 
-    def wait_for_replicas(self, deployed: bool = True, timeout: int = TIMEOUT_4MINUTES):
+    def wait_for_replicas(self, deployed: bool = True, timeout: int = TIMEOUT_4MINUTES) -> None:
         """
         Wait until all replicas are updated.
 

@@ -1,5 +1,5 @@
-from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
 
 class NodeMaintenance(Resource):
@@ -16,7 +16,6 @@ class NodeMaintenance(Resource):
         node=None,
         reason="TEST Reason",
         teardown=True,
-        timeout=TIMEOUT_4MINUTES,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
         **kwargs,
@@ -25,7 +24,6 @@ class NodeMaintenance(Resource):
             name=name,
             client=client,
             teardown=teardown,
-            timeout=timeout,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,
             **kwargs,

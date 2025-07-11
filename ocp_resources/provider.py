@@ -1,4 +1,5 @@
-from __future__ import annotations
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -16,7 +17,7 @@ class Provider(NamespacedResource):
         secret_name: str | None = None,
         secret_namespace: str | None = None,
         vddk_init_image: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         super().__init__(**kwargs)
         self.provider_type = provider_type

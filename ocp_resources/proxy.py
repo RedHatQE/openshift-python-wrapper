@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from ocp_resources.resource import Resource
 
 
@@ -11,11 +12,11 @@ class Proxy(Resource):
 
     def __init__(
         self,
-        http_proxy: Optional[str] = "",
-        https_proxy: Optional[str] = "",
-        no_proxy: Optional[str] = "",
-        readiness_endpoints: Optional[List[str]] = None,
-        trusted_ca: Optional[Dict[str, str]] = None,
+        http_proxy: str | None = None,
+        https_proxy: str | None = None,
+        no_proxy: str | None = None,
+        readiness_endpoints: list[str] | None = None,
+        trusted_ca: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> None:
         """

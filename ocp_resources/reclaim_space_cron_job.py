@@ -1,6 +1,6 @@
-from __future__ import annotations
-from typing import Any, Dict, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from typing import Any
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class ReclaimSpaceCronJob(NamespacedResource):
@@ -12,11 +12,11 @@ class ReclaimSpaceCronJob(NamespacedResource):
 
     def __init__(
         self,
-        schedule: Optional[str] = "",
-        job_template: Optional[Dict[str, Any]] = None,
-        concurrency_policy: Optional[str] = "",
-        successful_jobs_history_limit: Optional[int] = None,
-        failed_jobs_history_limit: Optional[int] = None,
+        schedule: str | None = None,
+        job_template: dict[str, Any] | None = None,
+        concurrency_policy: str | None = None,
+        successful_jobs_history_limit: int | None = None,
+        failed_jobs_history_limit: int | None = None,
         **kwargs: Any,
     ) -> None:
         """

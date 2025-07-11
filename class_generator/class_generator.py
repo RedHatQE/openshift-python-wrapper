@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import ast
 import filecmp
 import json
@@ -143,7 +141,7 @@ def read_resources_mapping_file() -> dict[Any, Any]:
         return {}
 
 
-def get_server_version(client: str):
+def get_server_version(client: str) -> str:
     rc, out, _ = run_command(command=shlex.split(f"{client} version -o json"), check=False)
     if not rc:
         LOGGER.error("Failed to get server version")

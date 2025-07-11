@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Any, Dict
+from typing import Any
 
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
@@ -15,9 +14,9 @@ class SealedSecret(NamespacedResource):
 
     def __init__(
         self,
-        encrypted_data: Dict[str, Any] | None = None,
-        template: Dict[str, Any] | None = None,
-        data: Dict[str, Any] | None = None,
+        encrypted_data: dict[str, Any] | None = None,
+        template: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """

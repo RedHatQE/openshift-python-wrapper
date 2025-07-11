@@ -1,11 +1,11 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
-from __future__ import annotations
 from typing import Any
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.resource import Resource
+
 from timeout_sampler import TimeoutSampler
+
+from ocp_resources.resource import Resource
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 
 
 class CDIConfig(Resource):

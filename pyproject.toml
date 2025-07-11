@@ -40,9 +40,17 @@ output-format = "grouped"
   exclude = [ ".git", ".venv", ".mypy_cache", ".tox", "__pycache__" ]
 
 [tool.mypy]
+check_untyped_defs = false
+disallow_any_generics = false
+disallow_incomplete_defs = true
+disallow_untyped_defs = false
 no_implicit_optional = true
 show_error_codes = true
 warn_unused_ignores = true
+strict_equality = true
+extra_checks = true
+warn_unused_configs = true
+warn_redundant_casts = true
 
 [tool.hatch.build.targets.wheel]
 packages = [ "ocp_resources", "class_generator", "fake_kubernetes_client" ]

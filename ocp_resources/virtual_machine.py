@@ -1,16 +1,15 @@
-from __future__ import annotations
 from typing import Any
 
+from timeout_sampler import TimeoutSampler
 
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_4MINUTES,
-    TIMEOUT_30SEC,
     TIMEOUT_5SEC,
+    TIMEOUT_30SEC,
 )
-from ocp_resources.resource import NamespacedResource
-from timeout_sampler import TimeoutSampler
 from ocp_resources.virtual_machine_instance import VirtualMachineInstance
 
 

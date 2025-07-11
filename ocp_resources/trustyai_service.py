@@ -1,5 +1,6 @@
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
-from typing import Optional, Any, Dict
+from typing import Any
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class TrustyAIService(NamespacedResource):
@@ -11,13 +12,13 @@ class TrustyAIService(NamespacedResource):
 
     def __init__(
         self,
-        storage: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any]] = None,
-        metrics: Optional[Dict[str, Any]] = None,
-        replicas: Optional[int] = None,
-        image: Optional[str] = None,
-        tag: Optional[str] = None,
-        **kwargs,
+        storage: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        metrics: dict[str, Any] | None = None,
+        replicas: int | None = None,
+        image: str | None = None,
+        tag: str | None = None,
+        **kwargs: Any,
     ) -> None:
         """
         TrustyAIService object

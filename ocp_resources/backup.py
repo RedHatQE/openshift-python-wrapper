@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import annotations
-from typing import Any, List
+from typing import Any
 
 from ocp_resources.resource import NamespacedResource
 
@@ -15,8 +14,8 @@ class Backup(NamespacedResource):
 
     def __init__(
         self,
-        included_namespaces: List[str] | None = None,
-        excluded_resources: List[str] | None = None,
+        included_namespaces: list[str] | None = None,
+        excluded_resources: list[str] | None = None,
         snapshot_move_data: bool = False,
         storage_location: str = "",
         **kwargs: Any,

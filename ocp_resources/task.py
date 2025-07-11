@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from typing import Any
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Task(NamespacedResource):
@@ -12,14 +13,14 @@ class Task(NamespacedResource):
 
     def __init__(
         self,
-        steps: Optional[List[Dict[str, Any]]] = None,
-        description: Optional[str] = None,
-        params: Optional[List[Dict[str, str]]] = None,
-        workspaces: Optional[List[Dict[str, Any]]] = None,
-        results: Optional[List[Dict[str, Any]]] = None,
-        volumes: Optional[List[Dict[str, Dict[str, Any]]]] = None,
-        step_template: Optional[Dict[str, Any]] = None,
-        sidecars: Optional[List[Dict[str, Any]]] = None,
+        steps: list[dict[str, Any]] | None = None,
+        description: str | None = None,
+        params: list[dict[str, str]] | None = None,
+        workspaces: list[dict[str, Any]] | None = None,
+        results: list[dict[str, Any]] | None = None,
+        volumes: list[dict[str, dict[str, Any]]] | None = None,
+        step_template: dict[str, Any] | None = None,
+        sidecars: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ):
         """
@@ -50,6 +51,7 @@ class Task(NamespacedResource):
         if not self.kind_dict and not self.yaml_file:
             if not self.steps:
                 raise MissingRequiredArgumentError(argument="steps")
+
             self.res["spec"] = {}
             _spec = self.res["spec"]
             _spec = {"steps": self.steps}

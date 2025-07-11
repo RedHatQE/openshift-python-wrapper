@@ -1,11 +1,9 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
-from __future__ import annotations
-from typing import Any, Dict, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
-from typing import List
+from typing import Any
 from warnings import warn
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class UserDefinedNetwork(NamespacedResource):
@@ -90,14 +88,14 @@ class Layer2UserDefinedNetwork(UserDefinedNetwork):
 
     def __init__(
         self,
-        role: Optional[str] = None,
-        mtu: Optional[int] = None,
-        subnets: Optional[List[str]] = None,
-        join_subnets: Optional[List[str]] = None,
-        ipam_lifecycle: Optional[str] = None,
-        ipam: Optional[dict[str, Any]] = None,
-        **kwargs,
-    ):
+        role: str | None = None,
+        mtu: int | None = None,
+        subnets: list[str] | None = None,
+        join_subnets: list[str] | None = None,
+        ipam_lifecycle: str | None = None,
+        ipam: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Create and manage UserDefinedNetwork with layer2 configuration
 
@@ -165,11 +163,11 @@ class Layer3UserDefinedNetwork(UserDefinedNetwork):
 
     def __init__(
         self,
-        role: Optional[str] = None,
-        mtu: Optional[int] = None,
-        subnets: Optional[List[Dict[str, Any]]] = None,
-        join_subnets: Optional[List[str]] = None,
-        **kwargs,
+        role: str | None = None,
+        mtu: int | None = None,
+        subnets: list[dict[str, Any]] | None = None,
+        join_subnets: list[str] | None = None,
+        **kwargs: Any,
     ):
         """
         Create and manage UserDefinedNetwork with layer3 configuration

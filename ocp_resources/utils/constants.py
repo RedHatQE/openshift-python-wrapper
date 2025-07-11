@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-from typing import Dict, List
 from kubernetes.dynamic.exceptions import (
     ForbiddenError,
     InternalServerError,
@@ -9,7 +6,7 @@ from kubernetes.dynamic.exceptions import (
 )
 from urllib3.exceptions import MaxRetryError, ProtocolError
 
-DEFAULT_CLUSTER_RETRY_EXCEPTIONS: Dict[type[Exception], List[str]] = {
+DEFAULT_CLUSTER_RETRY_EXCEPTIONS: dict[type[Exception], list[str]] = {
     MaxRetryError: [],
     ConnectionAbortedError: [],
     ConnectionResetError: [],
@@ -22,8 +19,8 @@ DEFAULT_CLUSTER_RETRY_EXCEPTIONS: Dict[type[Exception], List[str]] = {
     ServerTimeoutError: [],
     ForbiddenError: ["context deadline exceeded"],
 }
-PROTOCOL_ERROR_EXCEPTION_DICT: Dict[type[Exception], List[str]] = {ProtocolError: []}
-NOT_FOUND_ERROR_EXCEPTION_DICT: Dict[type[Exception], List[str]] = {NotFoundError: []}
+PROTOCOL_ERROR_EXCEPTION_DICT: dict[type[Exception], list[str]] = {ProtocolError: []}
+NOT_FOUND_ERROR_EXCEPTION_DICT: dict[type[Exception], list[str]] = {NotFoundError: []}
 
 TIMEOUT_1SEC: int = 1
 TIMEOUT_5SEC: int = 5
