@@ -17,10 +17,10 @@ A fake/mock implementation of the Kubernetes dynamic client for testing purposes
 ## Installation
 
 ```python
-from fake_kubernetes_client import create_fake_client
+from ocp_resources.resource import get_client
 
 # Create a fake client
-fake_client = create_fake_client()
+fake_client = get_client(fake=True)
 
 # Use it like a real Kubernetes dynamic client
 api = fake_client.resources.get(api_version="v1", kind="Pod")
@@ -214,7 +214,7 @@ pod = api.get(name="test-pod", namespace="default")
 print(pod.status.phase)  # "Running"
 print(pod.status.containerStatuses[0].ready)  # True
 
-deployment = deployment_api.get(name="test-deployment", namespace="default")  
+deployment = deployment_api.get(name="test-deployment", namespace="default")
 print(deployment.status.readyReplicas)  # Matches spec.replicas
 print(deployment.status.conditions[0].type)  # "Available"
 ```
@@ -246,11 +246,11 @@ route = route_api.create(body=route_manifest, namespace="default")
 
 ```python
 import pytest
-from fake_kubernetes_client import create_fake_client
+from ocp_resources.resource import get_client
 
 @pytest.fixture
 def k8s_client():
-    return create_fake_client()
+    return get_client(fake=True)
 
 def test_pod_creation(k8s_client):
     api = k8s_client.resources.get(api_version="v1", kind="Pod")
