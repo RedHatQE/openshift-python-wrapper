@@ -36,6 +36,7 @@ from timeout_sampler import (
 )
 from urllib3.exceptions import MaxRetryError
 
+from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.event import Event
 from ocp_resources.exceptions import (
     ClientWithBasicAuthError,
@@ -198,7 +199,8 @@ def get_client(
     host: str | None = None,
     verify_ssl: bool | None = None,
     token: str | None = None,
-) -> DynamicClient:
+    fake: bool = False,
+) -> DynamicClient | FakeDynamicClient:
     """
     Get a kubernetes client.
 
@@ -226,6 +228,9 @@ def get_client(
     Returns:
         DynamicClient: a kubernetes client.
     """
+    if fake:
+        return FakeDynamicClient()
+
     proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
 
     client_configuration = client_configuration or kubernetes.client.Configuration()
