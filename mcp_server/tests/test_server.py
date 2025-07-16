@@ -180,21 +180,48 @@ class TestUpdateResource:
         )
         assert create_result["success"] is True
 
-        # Then update it
+        # Then update it - this should succeed with the fake client
         result = update_resource_func(
             resource_type="configmap",
             name="test-update-cm",
             namespace="default",
-            patch={"data": {"newkey": "newvalue"}},
+            patch={"metadata": {"name": "test-update-cm"}, "data": {"key": "updated-value", "newkey": "newvalue"}},
         )
 
-        # Check if it's an error or success
-        if "error" in result:
-            # In fake client, update might fail if resource doesn't exist properly
-            assert "Failed to update" in result["error"]
-        else:
-            assert result["success"] is True
-            assert "updated successfully" in result["message"]
+        # The update should succeed (no error key means success)
+        assert "error" not in result
+        assert result.get("success") is True
+        assert "updated successfully" in result["message"]
+        assert result["resource_type"] == "configmap"
+        assert result["name"] == "test-update-cm"
+        assert result["namespace"] == "default"
+
+    def test_update_resource_not_found(self, fake_client):
+        """Test update of non-existent resource"""
+        # Try to update a resource that doesn't exist
+        result = update_resource_func(
+            resource_type="configmap",
+            name="non-existent-cm",
+            namespace="default",
+            patch={"data": {"key": "value"}},
+        )
+
+        # Should return an error
+        assert "error" in result
+        assert "not found" in result["error"].lower()
+
+    def test_update_resource_unknown_type(self, fake_client):
+        """Test update with unknown resource type"""
+        result = update_resource_func(
+            resource_type="unknown_type",
+            name="test-resource",
+            namespace="default",
+            patch={"spec": {"test": "value"}},
+        )
+
+        # Should return an error for unknown resource type
+        assert "error" in result
+        assert "Unknown resource type" in result["error"]
 
 
 class TestDeleteResource:
