@@ -616,10 +616,24 @@ def get_resource_events(
 ) -> dict[str, Any]:
     """
     Get events related to a specific resource.
+
+    Args:
+        resource_type: Type of the resource (e.g., 'pod', 'deployment')
+        name: Name of the resource
+        namespace: Namespace of the resource
+        limit: Maximum number of events to return (default: 10)
+
+    Returns:
+        Dictionary containing event information
     """
     try:
         LOGGER.info(f"Getting events for {resource_type}/{name} in namespace {namespace}")
         client = get_dynamic_client()
+
+        # Validate resource type and get the resource class
+        resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+        if error_response:
+            return error_response
 
         # Build field selector for events with correct format
         field_selectors = []
@@ -628,8 +642,8 @@ def get_resource_events(
         if namespace:
             field_selectors.append(f"involvedObject.namespace=={namespace}")
         if resource_type:
-            # Capitalize the resource type properly for the kind field
-            kind = resource_type.title() if resource_type.lower() in ["pod", "service", "deployment"] else resource_type
+            # Get the correct Kind value from the resource class
+            kind = resource_class.kind if resource_class else resource_type
             field_selectors.append(f"involvedObject.kind=={kind}")
 
         field_selector = ",".join(field_selectors) if field_selectors else None

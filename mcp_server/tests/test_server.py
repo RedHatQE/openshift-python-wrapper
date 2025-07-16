@@ -2,16 +2,19 @@
 Comprehensive tests for the OpenShift Python Wrapper MCP Server
 """
 
+from unittest.mock import patch
+
 import pytest
 
 import mcp_server.server
 from mcp_server.server import (
-    get_resource_class,
-    format_resource_info,
     _get_available_resource_types,
+    format_resource_info,
+    get_resource_class,
 )
+from ocp_resources.config_map import ConfigMap
+from ocp_resources.event import Event
 from ocp_resources.resource import get_client
-from unittest.mock import patch
 
 # Get the actual function implementations from the decorated tools
 list_resources_func = mcp_server.server.list_resources.fn
@@ -75,10 +78,9 @@ class TestFormatResourceInfo:
 
     def test_format_resource_info_basic(self, fake_client):
         """Test basic resource info formatting"""
-        from ocp_resources.config_map import ConfigMap
-
-        cm = ConfigMap(name="test-cm", namespace="default", data={"key": "value"}, client=fake_client)
-        cm.deploy()
+        # Create a real ConfigMap resource using the fake client
+        cm = ConfigMap(client=fake_client, name="test-cm", namespace="default", data={"key": "value"})
+        cm.create()
 
         result = format_resource_info(resource=cm)
 
@@ -238,14 +240,52 @@ class TestGetResourceEvents:
     """Test get_resource_events function"""
 
     def test_get_resource_events_empty(self, fake_client):
-        """Test resource events retrieval returns empty list"""
-        result = get_resource_events_func(resource_type="pod", name="test-pod", namespace="default")
+        # Mock Event.get() to return an empty generator
+        with patch.object(Event, "get") as mock_get:
+            mock_get.return_value = iter([])  # Empty generator
 
-        assert result["resource_type"] == "pod"
-        assert result["name"] == "test-pod"  # It's "name" not "resource_name"
-        assert result["namespace"] == "default"
-        assert result["event_count"] == 0
-        assert result["events"] == []
+            result = get_resource_events_func(resource_type="pod", name="test-pod", namespace="default")
+
+            assert result["resource_type"] == "pod"
+            assert result["name"] == "test-pod"
+            assert result["namespace"] == "default"
+            assert result["event_count"] == 0
+            assert result["events"] == []
+            # Verify Event.get was called with the correct parameters
+            mock_get.assert_called_once()
+
+    def test_get_resource_events_correct_kind_values(self, fake_client):
+        """Test that different resource types get the correct Kind value in field selector"""
+        test_cases = [
+            ("pod", "Pod"),
+            ("deployment", "Deployment"),
+            ("service", "Service"),
+            ("configmap", "ConfigMap"),
+            ("namespace", "Namespace"),
+            ("node", "Node"),
+            ("secret", "Secret"),
+            ("persistentvolumeclaim", "PersistentVolumeClaim"),
+        ]
+
+        for resource_type, expected_kind in test_cases:
+            with patch.object(Event, "get") as mock_get:
+                mock_get.return_value = iter([])  # Empty generator
+
+                get_resource_events_func(
+                    resource_type=resource_type,
+                    name=f"test-{resource_type}",
+                    namespace="default" if resource_type != "namespace" and resource_type != "node" else None,
+                )
+
+                # Verify the call was made
+                mock_get.assert_called_once()
+                call_args = mock_get.call_args[1]
+
+                # Check the field selector contains the correct Kind
+                field_selector = call_args.get("field_selector", "")
+                assert f"involvedObject.kind=={expected_kind}" in field_selector, (
+                    f"Expected kind {expected_kind} for resource type {resource_type}, but got field_selector: {field_selector}"
+                )
 
 
 class TestApplyYaml:
