@@ -8,8 +8,10 @@ using the ocp_resources library through the Model Context Protocol.
 
 import importlib
 import inspect
+import io
 import os
 import tempfile
+import traceback
 from pathlib import Path
 from typing import Any, Type
 
@@ -94,9 +96,6 @@ LOGGER.info(f"Total resource types found: {len(RESOURCE_TYPES)}")
 
 def get_resource_class(resource_type: str) -> Type[Resource] | None:
     """Get the resource class for a given resource type"""
-    import importlib
-    from pathlib import Path
-
     # Convert resource_type to lowercase for comparison
     resource_type_lower = resource_type.lower()
 
@@ -350,8 +349,6 @@ def create_resource(
 
         if yaml_content:
             # Parse YAML content
-            import io
-
             yaml_data = yaml.safe_load(io.StringIO(yaml_content))
 
             # Extract resource info from YAML
@@ -704,8 +701,6 @@ def get_resource_events(
             "events": events,
         }
     except Exception as e:
-        import traceback
-
         return {
             "error": f"Failed to get events: {str(e)}",
             "type": type(e).__name__,
@@ -726,8 +721,6 @@ def apply_yaml(
         results = []
 
         # Parse YAML content (may contain multiple documents)
-        import io
-
         yaml_docs = yaml.safe_load_all(io.StringIO(yaml_content))
 
         for doc in yaml_docs:
