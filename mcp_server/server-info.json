@@ -64,9 +64,7 @@
             "title": "Limit"
           }
         },
-        "required": [
-          "resource_type"
-        ],
+        "required": ["resource_type"],
         "type": "object"
       },
       "annotations": null,
@@ -105,10 +103,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "resource_type",
-          "name"
-        ],
+        "required": ["resource_type", "name"],
         "type": "object"
       },
       "annotations": null,
@@ -202,10 +197,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "resource_type",
-          "name"
-        ],
+        "required": ["resource_type", "name"],
         "type": "object"
       },
       "annotations": null,
@@ -249,11 +241,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "resource_type",
-          "name",
-          "patch"
-        ],
+        "required": ["resource_type", "name", "patch"],
         "type": "object"
       },
       "annotations": null,
@@ -297,10 +285,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "resource_type",
-          "name"
-        ],
+        "required": ["resource_type", "name"],
         "type": "object"
       },
       "annotations": null,
@@ -363,10 +348,7 @@
             "title": "Since Seconds"
           }
         },
-        "required": [
-          "name",
-          "namespace"
-        ],
+        "required": ["name", "namespace"],
         "type": "object"
       },
       "annotations": null,
@@ -407,11 +389,7 @@
             "title": "Container"
           }
         },
-        "required": [
-          "name",
-          "namespace",
-          "command"
-        ],
+        "required": ["name", "namespace", "command"],
         "type": "object"
       },
       "annotations": null,
@@ -450,10 +428,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "resource_type",
-          "name"
-        ],
+        "required": ["resource_type", "name"],
         "type": "object"
       },
       "annotations": null,
@@ -483,9 +458,7 @@
             "title": "Namespace"
           }
         },
-        "required": [
-          "yaml_content"
-        ],
+        "required": ["yaml_content"],
         "type": "object"
       },
       "annotations": null,
@@ -497,7 +470,13 @@
       "name": "get_resource_types",
       "description": "Get a list of all available resource types that can be managed.",
       "input_schema": {
-        "properties": {},
+        "properties": {
+          "random_string": {
+            "title": "Random String",
+            "type": "string"
+          }
+        },
+        "required": ["random_string"],
         "type": "object"
       },
       "annotations": null,

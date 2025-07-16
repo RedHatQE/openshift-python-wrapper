@@ -93,7 +93,6 @@ dependencies = [
   "timeout-sampler>=0.0.46",
   "xmltodict>=0.13.0",
   "fastmcp>=2.10.4",
-
 ]
 
 [[project.authors]]

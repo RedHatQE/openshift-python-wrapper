@@ -5,6 +5,7 @@ An MCP (Model Context Protocol) server that provides powerful tools to interact 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Python 3.8+
 - Access to an OpenShift/Kubernetes cluster
 - Valid kubeconfig file
@@ -32,15 +33,11 @@ For development or running from source:
 
 ```bash
 # Clone and install in development mode
-git clone https://github.com/openshift-python-wrapper/openshift-python-wrapper.git
+git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
-pip install -e .
-
-# Run using the launch script
-./mcp_server/launch.sh
 
 # Or run directly
-python mcp_server/server.py
+uv run mcp_server/server.py
 ```
 
 ## 📋 Available Tools
@@ -48,9 +45,11 @@ python mcp_server/server.py
 ### Resource Management
 
 #### `list_resources`
+
 List Kubernetes/OpenShift resources with filtering capabilities.
 
 **Parameters:**
+
 - `resource_type` (required): Type of resource (e.g., "pod", "deployment")
 - `namespace` (optional): Namespace to search in
 - `label_selector` (optional): Filter by labels (e.g., "app=nginx")
@@ -58,6 +57,7 @@ List Kubernetes/OpenShift resources with filtering capabilities.
 - `limit` (optional): Maximum number of results
 
 **Example:**
+
 ```python
 # List all pods in the default namespace
 list_resources(resource_type="pod", namespace="default")
@@ -67,24 +67,29 @@ list_resources(resource_type="deployment", label_selector="app=frontend")
 ```
 
 #### `get_resource`
+
 Get detailed information about a specific resource.
 
 **Parameters:**
+
 - `resource_type` (required): Type of resource
 - `name` (required): Resource name
 - `namespace` (optional): Namespace (required for namespaced resources)
 - `output_format` (optional): Format - "info", "yaml", "json", "wide" (default: "info")
 
 **Example:**
+
 ```python
 # Get pod details in YAML format
 get_resource(resource_type="pod", name="nginx", namespace="default", output_format="yaml")
 ```
 
 #### `create_resource`
+
 Create a new resource from YAML or specifications.
 
 **Parameters:**
+
 - `resource_type` (required): Type of resource
 - `name` (required): Resource name
 - `namespace` (optional): Namespace for namespaced resources
@@ -95,6 +100,7 @@ Create a new resource from YAML or specifications.
 - `wait` (optional): Wait for resource to be ready
 
 **Example:**
+
 ```python
 # Create a namespace
 create_resource(resource_type="namespace", name="test-ns", spec={})
@@ -114,9 +120,11 @@ create_resource(resource_type="pod", name="nginx", yaml_content=yaml)
 ```
 
 #### `update_resource`
+
 Update an existing resource using patch operations.
 
 **Parameters:**
+
 - `resource_type` (required): Type of resource
 - `name` (required): Resource name
 - `namespace` (optional): Namespace
@@ -124,6 +132,7 @@ Update an existing resource using patch operations.
 - `patch_type` (optional): "merge", "strategic", "json" (default: "merge")
 
 **Example:**
+
 ```python
 # Scale a deployment
 update_resource(
@@ -135,9 +144,11 @@ update_resource(
 ```
 
 #### `delete_resource`
+
 Delete a resource.
 
 **Parameters:**
+
 - `resource_type` (required): Type of resource
 - `name` (required): Resource name
 - `namespace` (optional): Namespace
@@ -145,18 +156,22 @@ Delete a resource.
 - `timeout` (optional): Deletion timeout in seconds (default: 60)
 
 **Example:**
+
 ```python
 delete_resource(resource_type="pod", name="nginx", namespace="default")
 ```
 
 #### `apply_yaml`
+
 Apply YAML manifests containing one or more resources.
 
 **Parameters:**
+
 - `yaml_content` (required): YAML content with one or more resources
 - `namespace` (optional): Default namespace for resources without namespace
 
 **Example:**
+
 ```python
 yaml_content = """
 ---
@@ -190,9 +205,11 @@ apply_yaml(yaml_content=yaml_content)
 ### Pod Operations
 
 #### `get_pod_logs`
+
 Retrieve logs from pod containers.
 
 **Parameters:**
+
 - `name` (required): Pod name
 - `namespace` (required): Namespace
 - `container` (optional): Container name (for multi-container pods)
@@ -201,6 +218,7 @@ Retrieve logs from pod containers.
 - `previous` (optional): Get logs from previous container instance
 
 **Example:**
+
 ```python
 # Get last 100 lines of logs
 get_pod_logs(name="my-app-abc123", namespace="production", tail_lines=100)
@@ -210,15 +228,18 @@ get_pod_logs(name="my-app-abc123", namespace="production", since_seconds=3600)
 ```
 
 #### `exec_in_pod`
+
 Execute commands inside pod containers.
 
 **Parameters:**
+
 - `name` (required): Pod name
 - `namespace` (required): Namespace
 - `command` (required): Command to execute as list
 - `container` (optional): Container name
 
 **Example:**
+
 ```python
 # Check nginx config
 exec_in_pod(
@@ -238,27 +259,33 @@ exec_in_pod(
 ### Event and Discovery
 
 #### `get_resource_events`
+
 Get Kubernetes events related to a resource.
 
 **Parameters:**
+
 - `resource_type` (required): Type of resource
 - `name` (required): Resource name
 - `namespace` (optional): Namespace
 - `limit` (optional): Maximum events to return (default: 10)
 
 **Example:**
+
 ```python
 # Get pod events
 get_resource_events(resource_type="pod", name="crashloop-pod", namespace="default")
 ```
 
 #### `get_resource_types`
+
 Get all available resource types.
 
 **Parameters:**
+
 - `random_string` (required): Any string (required by MCP protocol)
 
 **Example:**
+
 ```python
 get_resource_types(random_string="x")
 ```
@@ -313,6 +340,7 @@ If you need to specify a custom kubeconfig location:
 ## 🔍 Common Use Cases
 
 ### 1. Troubleshooting a Failing Pod
+
 ```python
 # Check pod status
 pod = get_resource("pod", "failing-app", "production")
@@ -328,6 +356,7 @@ exec_in_pod("failing-app", "production", ["cat", "/etc/app/config.yaml"])
 ```
 
 ### 2. Deploying a Complete Application
+
 ```python
 # Apply all resources at once
 yaml = """
@@ -374,6 +403,7 @@ apply_yaml(yaml)
 ```
 
 ### 3. Checking Cluster Health
+
 ```python
 # List nodes
 nodes = list_resources("node")
@@ -386,6 +416,7 @@ events = list_resources("event", limit=50)
 ```
 
 ### 4. Managing OpenShift Virtualization
+
 ```python
 # Check CNV version
 csv = list_resources("clusterserviceversion", namespace="openshift-cnv")
@@ -402,33 +433,38 @@ vm = get_resource("virtualmachine", "rhel9-vm", "my-vms")
 The server dynamically discovers all available resource types from your cluster. Common types include:
 
 ### Core Kubernetes
+
 - `pod`, `service`, `deployment`, `replicaset`, `daemonset`
 - `configmap`, `secret`, `persistentvolume`, `persistentvolumeclaim`
 - `namespace`, `node`, `event`, `endpoint`
 - `serviceaccount`, `role`, `rolebinding`, `clusterrole`, `clusterrolebinding`
 
 ### OpenShift Specific
+
 - `route`, `project`, `imagestream`, `buildconfig`, `deploymentconfig`
 - `user`, `group`, `oauth`, `securitycontextconstraints`
 
 ### OpenShift Virtualization
+
 - `virtualmachine`, `virtualmachineinstance`, `datavolume`
 - `hyperconverged`, `kubevirt`, `cdi`
 
 ### Operators
+
 - `clusterserviceversion`, `subscription`, `installplan`, `operatorgroup`
 - `catalogsource`, `packagemanifest`
 
 ## 🛡️ Security Best Practices
 
 1. **RBAC**: Ensure your kubeconfig has appropriate permissions
-2. **Namespaces**: Use namespace isolation for multi-tenant environments  
+2. **Namespaces**: Use namespace isolation for multi-tenant environments
 3. **Resource Limits**: Set appropriate limits when listing resources
 4. **Sensitive Data**: Be careful with secrets and configmaps
 
 ## 🐛 Troubleshooting
 
 ### Connection Issues
+
 ```bash
 # Test cluster connectivity
 kubectl cluster-info
@@ -439,12 +475,14 @@ kubectl config current-context
 ```
 
 ### Permission Errors
+
 ```bash
 # Check your permissions
 kubectl auth can-i --list
 ```
 
 ### MCP Server Issues
+
 ```bash
 # Run in debug mode
 SIMPLE_LOGGER_LEVEL=DEBUG python mcp_server/server.py

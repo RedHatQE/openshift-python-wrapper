@@ -7,6 +7,8 @@ using the ocp_resources library through the Model Context Protocol.
 """
 
 import inspect
+import os
+import tempfile
 from typing import Any, Type
 
 import yaml
@@ -15,15 +17,16 @@ from simple_logger.logger import get_logger, logging
 
 import ocp_resources
 from ocp_resources.event import Event
-from ocp_resources.pod import Pod
 from ocp_resources.exceptions import ExecOnPodError
+from ocp_resources.pod import Pod
 
 # OpenShift specific resources
 # Import ocp_resources modules
 from ocp_resources.resource import NamespacedResource, Resource, get_client
 
 # Configure logging to show debug messages
-LOGGER = get_logger(name=__name__, filename="/tmp/mcp_server_debug.log", level=logging.DEBUG)
+log_file = os.path.join(tempfile.gettempdir(), "mcp_server_debug.log")
+LOGGER = get_logger(name=__name__, filename=log_file, level=logging.DEBUG)
 
 # Initialize the MCP server
 mcp = FastMCP(name="openshift-python-wrapper")
