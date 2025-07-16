@@ -923,6 +923,7 @@ dependencies = [
     { name = "cloup" },
     { name = "colorlog" },
     { name = "deepdiff" },
+    { name = "fastmcp" },
     { name = "jinja2" },
     { name = "kubernetes" },
     { name = "packaging" },
@@ -942,9 +943,6 @@ dev = [
     { name = "ipython", version = "8.37.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "ipython", version = "9.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-mcp = [
-    { name = "fastmcp" },
-]
 tests = [
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -955,6 +953,7 @@ requires-dist = [
     { name = "cloup", specifier = ">=3.0.5" },
     { name = "colorlog", specifier = ">=6.8.2" },
     { name = "deepdiff", specifier = ">=8.0.1" },
+    { name = "fastmcp", specifier = ">=2.10.4" },
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "kubernetes", specifier = ">=31.0.0" },
     { name = "packaging", specifier = ">=24.1" },
@@ -973,7 +972,6 @@ dev = [
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "ipython", specifier = ">=8.12.3" },
 ]
-mcp = [{ name = "fastmcp", specifier = ">=2.10.4" }]
 tests = [
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-cov", specifier = ">=6.1.1" },

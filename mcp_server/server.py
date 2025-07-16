@@ -6,45 +6,24 @@ This MCP server provides tools to interact with OpenShift/Kubernetes resources
 using the ocp_resources library through the Model Context Protocol.
 """
 
-from typing import Any
+import inspect
+from typing import Any, Type
 
 import yaml
 from fastmcp import FastMCP
+from simple_logger.logger import get_logger, logging
 
-# Import ocp_resources modules
-from ocp_resources.resource import NamespacedResource, get_client
-from ocp_resources.namespace import Namespace
-from ocp_resources.pod import Pod
-from ocp_resources.deployment import Deployment
-from ocp_resources.service import Service
-from ocp_resources.config_map import ConfigMap
-from ocp_resources.secret import Secret
-from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
-from ocp_resources.job import Job
-from ocp_resources.cron_job import CronJob
-from ocp_resources.daemonset import DaemonSet
-from ocp_resources.replica_set import ReplicaSet
-from ocp_resources.service_account import ServiceAccount
-from ocp_resources.role import Role
-from ocp_resources.role_binding import RoleBinding
-from ocp_resources.cluster_role import ClusterRole
-from ocp_resources.cluster_role_binding import ClusterRoleBinding
-from ocp_resources.network_policy import NetworkPolicy
-from ocp_resources.storage_class import StorageClass
-from ocp_resources.persistent_volume import PersistentVolume
-from ocp_resources.node import Node
+import ocp_resources
 from ocp_resources.event import Event
-from ocp_resources.limit_range import LimitRange
-from ocp_resources.resource_quota import ResourceQuota
-from ocp_resources.pod_disruption_budget import PodDisruptionBudget
-from ocp_resources.priority_class import PriorityClass
-from ocp_resources.custom_resource_definition import CustomResourceDefinition
+from ocp_resources.pod import Pod
+from ocp_resources.exceptions import ExecOnPodError
 
 # OpenShift specific resources
-from ocp_resources.project_project_openshift_io import Project
-from ocp_resources.route import Route
-from ocp_resources.image_stream import ImageStream
-from ocp_resources.template import Template
+# Import ocp_resources modules
+from ocp_resources.resource import NamespacedResource, Resource, get_client
+
+# Configure logging to show debug messages
+LOGGER = get_logger(name=__name__, filename="/tmp/mcp_server_debug.log", level=logging.DEBUG)
 
 # Initialize the MCP server
 mcp = FastMCP(name="openshift-python-wrapper")
@@ -53,60 +32,113 @@ mcp = FastMCP(name="openshift-python-wrapper")
 _client = None
 
 
-def get_dynamic_client(config_file: str | None = None, context: str | None = None):
+def get_dynamic_client(config_file: str | None = None, context: str | None = None) -> Any:
     """Get or create a dynamic client for Kubernetes/OpenShift"""
     global _client
     if _client is None:
+        LOGGER.debug("Creating new dynamic client")
         _client = get_client(config_file=config_file, context=context)
     return _client
 
 
-# Resource type mapping
-RESOURCE_TYPES = {
-    "namespace": Namespace,
-    "pod": Pod,
-    "deployment": Deployment,
-    "service": Service,
-    "configmap": ConfigMap,
-    "secret": Secret,
-    "persistentvolumeclaim": PersistentVolumeClaim,
-    "pvc": PersistentVolumeClaim,
-    "job": Job,
-    "cronjob": CronJob,
-    "daemonset": DaemonSet,
-    "replicaset": ReplicaSet,
-    "serviceaccount": ServiceAccount,
-    "role": Role,
-    "rolebinding": RoleBinding,
-    "clusterrole": ClusterRole,
-    "clusterrolebinding": ClusterRoleBinding,
-    "networkpolicy": NetworkPolicy,
-    "storageclass": StorageClass,
-    "persistentvolume": PersistentVolume,
-    "pv": PersistentVolume,
-    "node": Node,
-    "event": Event,
-    "limitrange": LimitRange,
-    "resourcequota": ResourceQuota,
-    "poddisruptionbudget": PodDisruptionBudget,
-    "pdb": PodDisruptionBudget,
-    "priorityclass": PriorityClass,
-    "customresourcedefinition": CustomResourceDefinition,
-    "crd": CustomResourceDefinition,
-    # OpenShift specific
-    "project": Project,
-    "route": Route,
-    "imagestream": ImageStream,
-    "template": Template,
-}
+def _get_available_resource_types():
+    """Dynamically get all available resource types from ocp_resources module."""
+    import importlib
+    from pathlib import Path
+
+    resource_types = []
+    LOGGER.debug("Starting to scan ocp_resources module for resource types")
+
+    # Get the ocp_resources directory path
+    ocp_resources_path = Path(ocp_resources.__file__).parent
+
+    # Scan all .py files in the ocp_resources directory
+    for file_path in ocp_resources_path.glob("*.py"):
+        if file_path.name.startswith("_") or file_path.name == "utils.py":
+            continue
+
+        module_name = file_path.stem
+        try:
+            # Import the module dynamically
+            module = importlib.import_module(f"ocp_resources.{module_name}")
+
+            # Look for classes in the module
+            for name in dir(module):
+                if name.startswith("_"):
+                    continue
+
+                obj = getattr(module, name)
+                if inspect.isclass(obj) and hasattr(obj, "kind") and hasattr(obj, "api_group"):
+                    try:
+                        if obj.kind:  # Some base classes might not have a kind
+                            resource_types.append(obj.kind.lower())
+                            LOGGER.debug(f"Added resource type from {module_name}: {obj.kind.lower()}")
+                    except Exception as e:
+                        LOGGER.debug(f"Error processing {name} in {module_name}: {e}")
+                        continue
+        except Exception as e:
+            LOGGER.debug(f"Error importing module {module_name}: {e}")
+            continue
+
+    LOGGER.debug(f"Found {len(resource_types)} resource types total")
+    return sorted(set(resource_types))
 
 
-def get_resource_class(resource_type: str):
+# Use it in the server initialization
+RESOURCE_TYPES = _get_available_resource_types()
+LOGGER.info(f"Available resource types: {RESOURCE_TYPES}")
+LOGGER.info(f"Total resource types found: {len(RESOURCE_TYPES)}")
+
+
+def get_resource_class(resource_type: str) -> Type[Resource] | None:
     """Get the resource class for a given resource type"""
-    return RESOURCE_TYPES.get(resource_type.lower())
+    import importlib
+    from pathlib import Path
+
+    # Convert resource_type to lowercase for comparison
+    resource_type_lower = resource_type.lower()
+
+    # Check if the resource type exists in our list
+    if resource_type_lower not in RESOURCE_TYPES:
+        LOGGER.warning(f"Resource type '{resource_type}' not found in RESOURCE_TYPES")
+        return None
+
+    # Get the ocp_resources directory path
+    ocp_resources_path = Path(ocp_resources.__file__).parent
+
+    # Scan all .py files in the ocp_resources directory
+    for file_path in ocp_resources_path.glob("*.py"):
+        if file_path.name.startswith("_") or file_path.name == "utils.py":
+            continue
+
+        module_name = file_path.stem
+        try:
+            # Import the module dynamically
+            module = importlib.import_module(f"ocp_resources.{module_name}")
+
+            # Look for classes in the module
+            for name in dir(module):
+                if name.startswith("_"):
+                    continue
+
+                obj = getattr(module, name)
+                if inspect.isclass(obj) and hasattr(obj, "kind"):
+                    try:
+                        if obj.kind and obj.kind.lower() == resource_type_lower:
+                            LOGGER.debug(
+                                f"Found resource class {name} in module {module_name} for type {resource_type}"
+                            )
+                            return obj
+                    except Exception:
+                        continue
+        except Exception:
+            continue
+
+    LOGGER.warning(f"Could not find class for resource type '{resource_type}'")
+    return None
 
 
-def format_resource_info(resource) -> dict[str, Any]:
+def format_resource_info(resource: Any) -> dict[str, Any]:
     """Format resource information for output"""
     try:
         metadata = resource.instance.metadata
@@ -136,7 +168,7 @@ def format_resource_info(resource) -> dict[str, Any]:
 # Tools for resource management
 
 
-@mcp.tool()
+@mcp.tool
 def list_resources(
     resource_type: str,
     namespace: str | None = None,
@@ -150,14 +182,15 @@ def list_resources(
     Returns a list of resources with their basic information.
     """
     try:
-        resource_class = get_resource_class(resource_type)
+        LOGGER.info(f"Listing resources: type={resource_type}, namespace={namespace}")
+        resource_class = get_resource_class(resource_type=resource_type)
         if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": list(RESOURCE_TYPES.keys())}
+            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
 
         client = get_dynamic_client()
 
         # Build kwargs for the get method
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         if namespace:
             kwargs["namespace"] = namespace
         if label_selector:
@@ -168,6 +201,7 @@ def list_resources(
             kwargs["limit"] = limit
 
         resources = []
+        assert resource_class is not None  # Type checker hint - we already checked this above
         for resource in resource_class.get(dyn_client=client, **kwargs):
             resources.append(format_resource_info(resource))
 
@@ -181,7 +215,7 @@ def list_resources(
         return {"error": f"Failed to list {resource_type} resources: {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def get_resource(
     resource_type: str,
     name: str,
@@ -194,9 +228,9 @@ def get_resource(
     Returns detailed information about the resource.
     """
     try:
-        resource_class = get_resource_class(resource_type)
+        resource_class = get_resource_class(resource_type=resource_type)
         if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": list(RESOURCE_TYPES.keys())}
+            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
 
         client = get_dynamic_client()
 
@@ -287,7 +321,7 @@ def get_resource(
         return {"error": f"Failed to get {resource_type} '{name}': {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def create_resource(
     resource_type: str,
     name: str,
@@ -323,23 +357,23 @@ def create_resource(
             name = yaml_data.get("metadata", {}).get("name", name)
             namespace = yaml_data.get("metadata", {}).get("namespace", namespace)
 
-            resource_class = get_resource_class(resource_type)
+            resource_class = get_resource_class(resource_type=resource_type)
             if not resource_class:
                 return {
                     "error": f"Unknown resource type: {resource_type}",
-                    "available_types": list(RESOURCE_TYPES.keys()),
+                    "available_types": RESOURCE_TYPES,
                 }
 
-            # Create resource from YAML
-            kwargs = {"client": client, "yaml_file": io.StringIO(yaml_content)}
+            # Create resource from parsed YAML using kind_dict
+            kwargs = {"client": client, "kind_dict": yaml_data}
             resource = resource_class(**kwargs)
         else:
             # Create resource from spec
-            resource_class = get_resource_class(resource_type)
+            resource_class = get_resource_class(resource_type=resource_type)
             if not resource_class:
                 return {
                     "error": f"Unknown resource type: {resource_type}",
-                    "available_types": list(RESOURCE_TYPES.keys()),
+                    "available_types": RESOURCE_TYPES,
                 }
 
             # Check if resource is namespaced
@@ -377,7 +411,7 @@ def create_resource(
         return {"error": f"Failed to create {resource_type}: {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def update_resource(
     resource_type: str,
     name: str,
@@ -391,9 +425,9 @@ def update_resource(
     The patch should be a dictionary containing the fields to update.
     """
     try:
-        resource_class = get_resource_class(resource_type)
+        resource_class = get_resource_class(resource_type=resource_type)
         if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": list(RESOURCE_TYPES.keys())}
+            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
 
         client = get_dynamic_client()
 
@@ -431,7 +465,7 @@ def update_resource(
         return {"error": f"Failed to update {resource_type} '{name}': {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def delete_resource(
     resource_type: str,
     name: str,
@@ -443,9 +477,9 @@ def delete_resource(
     Delete a Kubernetes/OpenShift resource.
     """
     try:
-        resource_class = get_resource_class(resource_type)
+        resource_class = get_resource_class(resource_type=resource_type)
         if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": list(RESOURCE_TYPES.keys())}
+            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
 
         client = get_dynamic_client()
 
@@ -484,7 +518,7 @@ def delete_resource(
         return {"error": f"Failed to delete {resource_type} '{name}': {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def get_pod_logs(
     name: str,
     namespace: str,
@@ -504,7 +538,7 @@ def get_pod_logs(
             return {"error": f"Pod '{name}' not found in namespace '{namespace}'"}
 
         # Build kwargs for log method
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         if container:
             kwargs["container"] = container
         if previous:
@@ -521,7 +555,7 @@ def get_pod_logs(
         return {"error": f"Failed to get logs for pod '{name}': {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def exec_in_pod(
     name: str,
     namespace: str,
@@ -539,22 +573,36 @@ def exec_in_pod(
             return {"error": f"Pod '{name}' not found in namespace '{namespace}'"}
 
         # Execute command
-        result = pod.execute(command=command, container=container)
+        try:
+            if container:
+                stdout = pod.execute(command=command, container=container)
+            else:
+                stdout = pod.execute(command=command)
 
-        return {
-            "pod": name,
-            "namespace": namespace,
-            "container": container,
-            "command": command,
-            "stdout": result.get("stdout", ""),
-            "stderr": result.get("stderr", ""),
-            "returncode": result.get("returncode", 0),
-        }
+            return {
+                "pod": name,
+                "namespace": namespace,
+                "container": container,
+                "command": command,
+                "stdout": stdout,
+                "stderr": "",
+                "returncode": 0,
+            }
+        except ExecOnPodError as e:
+            return {
+                "pod": name,
+                "namespace": namespace,
+                "container": container,
+                "command": command,
+                "stdout": e.out,
+                "stderr": str(e.err),
+                "returncode": e.rc,
+            }
     except Exception as e:
         return {"error": f"Failed to execute command in pod '{name}': {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
+@mcp.tool
 def get_resource_events(
     resource_type: str,
     name: str,
@@ -565,34 +613,86 @@ def get_resource_events(
     Get events related to a specific resource.
     """
     try:
+        LOGGER.info(f"Getting events for {resource_type}/{name} in namespace {namespace}")
         client = get_dynamic_client()
 
-        # Build field selector for events
+        # Build field selector for events with correct format
         field_selectors = []
         if name:
-            field_selectors.append(f"involvedObject.name={name}")
+            field_selectors.append(f"involvedObject.name=={name}")
         if namespace:
-            field_selectors.append(f"involvedObject.namespace={namespace}")
+            field_selectors.append(f"involvedObject.namespace=={namespace}")
         if resource_type:
-            field_selectors.append(f"involvedObject.kind={resource_type.title()}")
+            # Capitalize the resource type properly for the kind field
+            kind = resource_type.title() if resource_type.lower() in ["pod", "service", "deployment"] else resource_type
+            field_selectors.append(f"involvedObject.kind=={kind}")
 
         field_selector = ",".join(field_selectors) if field_selectors else None
+        LOGGER.debug(f"Using field selector: {field_selector}")
 
         events = []
-        for event in Event.get(dyn_client=client, namespace=namespace, field_selector=field_selector, limit=limit):
-            event_info = {
-                "type": event.instance.type,
-                "reason": event.instance.reason,
-                "message": event.instance.message,
-                "count": event.instance.count,
-                "firstTimestamp": event.instance.firstTimestamp,
-                "lastTimestamp": event.instance.lastTimestamp,
-                "source": {
-                    "component": getattr(event.instance.source, "component", None),
-                    "host": getattr(event.instance.source, "host", None),
-                },
-            }
-            events.append(event_info)
+        # Event.get() returns a generator of watch events
+        for watch_event in Event.get(
+            client,  # Pass as positional argument, not keyword
+            namespace=namespace,
+            field_selector=field_selector,
+            timeout=5,  # Add timeout to avoid hanging
+        ):
+            # Debug logging to understand the structure
+            LOGGER.debug(f"watch_event type: {type(watch_event)}")
+
+            # Extract the event object from the watch event
+            # The watch event is a dict with keys: ['type', 'object', 'raw_object']
+            if isinstance(watch_event, dict) and "object" in watch_event:
+                event_obj = watch_event["object"]
+                event_type = watch_event.get("type", "UNKNOWN")  # ADDED, MODIFIED, DELETED
+                LOGGER.debug(f"Watch event type: {event_type}, object type: {type(event_obj)}")
+            else:
+                # Fallback for unexpected structure
+                event_obj = watch_event
+                event_type = "UNKNOWN"
+
+            # The event_obj is a kubernetes.dynamic.resource.ResourceInstance
+            # We can access its attributes directly
+            try:
+                event_info = {
+                    "type": event_obj.type,
+                    "reason": event_obj.reason,
+                    "message": event_obj.message,
+                    "count": getattr(event_obj, "count", 1),
+                    "firstTimestamp": str(getattr(event_obj, "firstTimestamp", "")),
+                    "lastTimestamp": str(getattr(event_obj, "lastTimestamp", "")),
+                    "source": {
+                        "component": event_obj.source.get("component") if hasattr(event_obj, "source") else None,
+                        "host": event_obj.source.get("host") if hasattr(event_obj, "source") else None,
+                    },
+                    "involvedObject": {
+                        "kind": event_obj.involvedObject.get("kind") if hasattr(event_obj, "involvedObject") else None,
+                        "name": event_obj.involvedObject.get("name") if hasattr(event_obj, "involvedObject") else None,
+                        "namespace": event_obj.involvedObject.get("namespace")
+                        if hasattr(event_obj, "involvedObject")
+                        else None,
+                    },
+                }
+                events.append(event_info)
+                LOGGER.debug(f"Successfully extracted event: {event_info['reason']} - {event_info['message'][:50]}...")
+            except Exception as e:
+                LOGGER.error(f"Failed to extract event data: {e}")
+                # Try to get whatever we can
+                event_info = {
+                    "type": "Unknown",
+                    "reason": "ExtractionError",
+                    "message": str(e),
+                    "count": 0,
+                    "firstTimestamp": "",
+                    "lastTimestamp": "",
+                    "source": {"component": None, "host": None},
+                    "involvedObject": {"kind": None, "name": None, "namespace": None},
+                }
+                events.append(event_info)
+
+            if len(events) >= limit:
+                break
 
         return {
             "resource_type": resource_type,
@@ -602,10 +702,16 @@ def get_resource_events(
             "events": events,
         }
     except Exception as e:
-        return {"error": f"Failed to get events: {str(e)}", "type": type(e).__name__}
+        import traceback
+
+        return {
+            "error": f"Failed to get events: {str(e)}",
+            "type": type(e).__name__,
+            "traceback": traceback.format_exc(),
+        }
 
 
-@mcp.tool()
+@mcp.tool
 def apply_yaml(
     yaml_content: str,
     namespace: str | None = None,
@@ -629,17 +735,21 @@ def apply_yaml(
             # Extract resource info
             kind = doc.get("kind", "").lower()
             name = doc.get("metadata", {}).get("name", "unknown")
-            ns = doc.get("metadata", {}).get("namespace", namespace)
 
-            resource_class = get_resource_class(kind)
+            # If namespace is provided as parameter and not in the doc, add it
+            if namespace and "namespace" not in doc.get("metadata", {}):
+                if "metadata" not in doc:
+                    doc["metadata"] = {}
+                doc["metadata"]["namespace"] = namespace
+
+            resource_class = get_resource_class(resource_type=kind)
             if not resource_class:
                 results.append({"kind": kind, "name": name, "error": f"Unknown resource type: {kind}"})
                 continue
 
             try:
-                # Create resource from YAML
-                yaml_str = yaml.dump(doc)
-                kwargs = {"client": client, "yaml_file": io.StringIO(yaml_str)}
+                # Create resource using kind_dict which is more efficient than YAML string
+                kwargs = {"client": client, "kind_dict": doc}
                 resource = resource_class(**kwargs)
                 resource.deploy()
 
@@ -662,13 +772,14 @@ def apply_yaml(
         return {"error": f"Failed to apply YAML: {str(e)}", "type": type(e).__name__}
 
 
-@mcp.tool()
-def get_resource_types() -> dict[str, list[str]]:
+@mcp.tool
+def get_resource_types(random_string: str) -> dict[str, Any]:
     """
     Get a list of all available resource types that can be managed.
     """
     return {
-        "resource_types": sorted(list(RESOURCE_TYPES.keys())),
+        "resource_types": sorted(RESOURCE_TYPES),  # RESOURCE_TYPES is already a list
+        "total_count": len(RESOURCE_TYPES),
         "categories": {
             "workloads": ["pod", "deployment", "replicaset", "daemonset", "job", "cronjob"],
             "services": ["service", "route", "networkpolicy"],
@@ -682,7 +793,9 @@ def get_resource_types() -> dict[str, list[str]]:
     }
 
 
-# Add main entry point
-if __name__ == "__main__":
-    # Run the MCP server
+def main() -> None:
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()

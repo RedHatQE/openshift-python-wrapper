@@ -17,7 +17,13 @@ addopts = [
 ]
 
 [tool.coverage.run]
-omit = ["tests/*", "class_generator/tests/*", "class_generator/scripts/tests/*"]
+omit = [
+  "tests/*",
+  "class_generator/tests/*",
+  "class_generator/scripts/tests/*",
+  "mcp_server/tests/*",
+  "fake_kubernetes_client/tests/*",
+]
 
 [tool.coverage.report]
 fail_under = 60
@@ -49,7 +55,12 @@ warn_unused_configs = true
 warn_redundant_casts = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["ocp_resources", "class_generator", "fake_kubernetes_client"]
+packages = [
+  "ocp_resources",
+  "class_generator",
+  "fake_kubernetes_client",
+  "mcp_server",
+]
 
 [tool.uv]
 dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
@@ -81,6 +92,8 @@ dependencies = [
   "ruff>=0.6.9",
   "timeout-sampler>=0.0.46",
   "xmltodict>=0.13.0",
+  "fastmcp>=2.10.4",
+
 ]
 
 [[project.authors]]
@@ -107,11 +120,11 @@ Download = "https://pypi.org/project/openshift-python-wrapper/"
 
 [project.scripts]
 class-generator = "class_generator.class_generator:main"
+openshift-mcp-server = "mcp_server.server:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-mcp = ["fastmcp>=2.10.4"]
 tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]
