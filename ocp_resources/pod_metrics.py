@@ -1,10 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
-from ocp_resources.resource import NamespacedResource
 
 from typing import Any
-from ocp_resources.resource import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
 class PodMetrics(NamespacedResource):
@@ -21,7 +19,7 @@ class PodMetrics(NamespacedResource):
         window: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             containers (list[Any]): Metrics for all containers are collected within the same time window.
 

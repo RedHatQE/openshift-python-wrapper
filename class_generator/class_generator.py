@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import ast
 import filecmp
 import json
@@ -143,7 +141,7 @@ def read_resources_mapping_file() -> dict[Any, Any]:
         return {}
 
 
-def get_server_version(client: str):
+def get_server_version(client: str) -> str:
     rc, out, _ = run_command(command=shlex.split(f"{client} version -o json"), check=False)
     if not rc:
         LOGGER.error("Failed to get server version")
@@ -415,7 +413,7 @@ def generate_resource_file_from_dict(
         template_name="class_generator_template.j2",
     )
 
-    output = "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md\n\nfrom __future__ import annotations\n"
+    output = "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md\n\n"
     formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
     _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
@@ -450,7 +448,7 @@ def generate_resource_file_from_dict(
             LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
             _output_file = temp_output_file
 
-    if _user_code or _user_imports:
+    if _user_code.strip() and _user_imports.strip():
         output += f"{_user_imports}{rendered}{_user_code}"
     else:
         output += rendered

@@ -1,9 +1,11 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.resource import Resource
+from typing import Any
+
 from timeout_sampler import TimeoutSampler
+
+from ocp_resources.resource import Resource
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 
 
 class CDIConfig(Resource):
@@ -15,41 +17,42 @@ class CDIConfig(Resource):
 
     def __init__(
         self,
-        data_volume_ttl_seconds: Optional[int] = None,
-        feature_gates: Optional[List[Any]] = None,
-        filesystem_overhead: Optional[Dict[str, Any]] = None,
-        image_pull_secrets: Optional[List[Any]] = None,
-        import_proxy: Optional[Dict[str, Any]] = None,
-        insecure_registries: Optional[List[Any]] = None,
-        log_verbosity: Optional[int] = None,
-        pod_resource_requirements: Optional[Dict[str, Any]] = None,
-        preallocation: Optional[bool] = None,
-        scratch_space_storage_class: Optional[str] = "",
-        tls_security_profile: Optional[Dict[str, Any]] = None,
-        upload_proxy_url_override: Optional[str] = "",
+        data_volume_ttl_seconds: int | None = None,
+        feature_gates: list[Any] | None = None,
+        filesystem_overhead: dict[str, Any] | None = None,
+        image_pull_secrets: list[Any] | None = None,
+        import_proxy: dict[str, Any] | None = None,
+        insecure_registries: list[Any] | None = None,
+        log_verbosity: int | None = None,
+        pod_resource_requirements: dict[str, Any] | None = None,
+        preallocation: bool | None = None,
+        scratch_space_storage_class: str | None = None,
+        tls_security_profile: dict[str, Any] | None = None,
+        upload_proxy_url_override: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             data_volume_ttl_seconds (int): DataVolumeTTLSeconds is the time in seconds after DataVolume
               completion it can be garbage collected. Disabled by default.
+              Deprecated: Removed in v1.62.
 
-            feature_gates (List[Any]): FeatureGates are a list of specific enabled feature gates
+            feature_gates (list[Any]): FeatureGates are a list of specific enabled feature gates
 
-            filesystem_overhead (Dict[str, Any]): FilesystemOverhead describes the space reserved for overhead when
+            filesystem_overhead (dict[str, Any]): FilesystemOverhead describes the space reserved for overhead when
               using Filesystem volumes. A value is between 0 and 1, if not
               defined it is 0.055 (5.5% overhead)
 
-            image_pull_secrets (List[Any]): The imagePullSecrets used to pull the container images
+            image_pull_secrets (list[Any]): The imagePullSecrets used to pull the container images
 
-            import_proxy (Dict[str, Any]): ImportProxy contains importer pod proxy configuration.
+            import_proxy (dict[str, Any]): ImportProxy contains importer pod proxy configuration.
 
-            insecure_registries (List[Any]): InsecureRegistries is a list of TLS disabled registries
+            insecure_registries (list[Any]): InsecureRegistries is a list of TLS disabled registries
 
             log_verbosity (int): LogVerbosity overrides the default verbosity level used to initialize
               loggers
 
-            pod_resource_requirements (Dict[str, Any]): ResourceRequirements describes the compute resource requirements.
+            pod_resource_requirements (dict[str, Any]): ResourceRequirements describes the compute resource requirements.
 
             preallocation (bool): Preallocation controls whether storage for DataVolumes should be
               allocated in advance.
@@ -61,7 +64,7 @@ class CDIConfig(Resource):
               default storage class, use the storage class of the DataVolume, if
               no storage class specified, use no storage class for scratch space
 
-            tls_security_profile (Dict[str, Any]): TLSSecurityProfile is used by operators to apply cluster-wide TLS
+            tls_security_profile (dict[str, Any]): TLSSecurityProfile is used by operators to apply cluster-wide TLS
               security settings to operands.
 
             upload_proxy_url_override (str): Override the URL used when uploading to a DataVolume
@@ -89,40 +92,40 @@ class CDIConfig(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.data_volume_ttl_seconds:
+            if self.data_volume_ttl_seconds is not None:
                 _spec["dataVolumeTTLSeconds"] = self.data_volume_ttl_seconds
 
-            if self.feature_gates:
+            if self.feature_gates is not None:
                 _spec["featureGates"] = self.feature_gates
 
-            if self.filesystem_overhead:
+            if self.filesystem_overhead is not None:
                 _spec["filesystemOverhead"] = self.filesystem_overhead
 
-            if self.image_pull_secrets:
+            if self.image_pull_secrets is not None:
                 _spec["imagePullSecrets"] = self.image_pull_secrets
 
-            if self.import_proxy:
+            if self.import_proxy is not None:
                 _spec["importProxy"] = self.import_proxy
 
-            if self.insecure_registries:
+            if self.insecure_registries is not None:
                 _spec["insecureRegistries"] = self.insecure_registries
 
-            if self.log_verbosity:
+            if self.log_verbosity is not None:
                 _spec["logVerbosity"] = self.log_verbosity
 
-            if self.pod_resource_requirements:
+            if self.pod_resource_requirements is not None:
                 _spec["podResourceRequirements"] = self.pod_resource_requirements
 
             if self.preallocation is not None:
                 _spec["preallocation"] = self.preallocation
 
-            if self.scratch_space_storage_class:
+            if self.scratch_space_storage_class is not None:
                 _spec["scratchSpaceStorageClass"] = self.scratch_space_storage_class
 
-            if self.tls_security_profile:
+            if self.tls_security_profile is not None:
                 _spec["tlsSecurityProfile"] = self.tls_security_profile
 
-            if self.upload_proxy_url_override:
+            if self.upload_proxy_url_override is not None:
                 _spec["uploadProxyURLOverride"] = self.upload_proxy_url_override
 
     # End of generated code

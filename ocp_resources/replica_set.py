@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -13,13 +14,13 @@ class ReplicaSet(NamespacedResource):
 
     def __init__(
         self,
-        min_ready_seconds: Optional[int] = None,
-        replicas: Optional[int] = None,
-        selector: Optional[Dict[str, Any]] = None,
-        template: Optional[Dict[str, Any]] = None,
+        min_ready_seconds: int | None = None,
+        replicas: int | None = None,
+        selector: dict[str, Any] | None = None,
+        template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             min_ready_seconds (int): Minimum number of seconds for which a newly created pod should be
               ready without any of its container crashing, for it to be
@@ -31,12 +32,12 @@ class ReplicaSet(NamespacedResource):
               More info: https://kubernetes.io/docs/concepts/workloads/controlle
               rs/replicationcontroller/#what-is-a-replicationcontroller
 
-            selector (Dict[str, Any]): A label selector is a label query over a set of resources. The result
+            selector (dict[str, Any]): A label selector is a label query over a set of resources. The result
               of matchLabels and matchExpressions are ANDed. An empty label
               selector matches all objects. A null label selector matches no
               objects.
 
-            template (Dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
+            template (dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
               a template
 
         """
@@ -51,7 +52,7 @@ class ReplicaSet(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if not self.selector:
+            if self.selector is None:
                 raise MissingRequiredArgumentError(argument="self.selector")
 
             self.res["spec"] = {}
@@ -59,13 +60,13 @@ class ReplicaSet(NamespacedResource):
 
             _spec["selector"] = self.selector
 
-            if self.min_ready_seconds:
+            if self.min_ready_seconds is not None:
                 _spec["minReadySeconds"] = self.min_ready_seconds
 
-            if self.replicas:
+            if self.replicas is not None:
                 _spec["replicas"] = self.replicas
 
-            if self.template:
+            if self.template is not None:
                 _spec["template"] = self.template
 
     # End of generated code

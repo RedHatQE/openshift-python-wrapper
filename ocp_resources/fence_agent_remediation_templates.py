@@ -1,6 +1,6 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class FenceAgentsRemediationTemplate(NamespacedResource):
@@ -14,12 +14,12 @@ class FenceAgentsRemediationTemplate(NamespacedResource):
     def __init__(
         self,
         agent: str,
-        remediation_strategy: Optional[str] = None,
-        retry_count: Optional[int] = None,
-        retry_interval: Optional[str] = None,
-        remediation_timeout: Optional[str] = None,
-        shared_parameters: Optional[Dict[str, str]] = None,
-        node_parameters: Optional[Dict[str, Any]] = None,
+        remediation_strategy: str | None = None,
+        retry_count: int | None = None,
+        retry_interval: str | None = None,
+        remediation_timeout: str | None = None,
+        shared_parameters: dict[str, str] | None = None,
+        node_parameters: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """

@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -29,7 +28,7 @@ class Console(Resource):
         unsupported_config_overrides: Any | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             customization (dict[str, Any]): customization is used to optionally provide a small set of
               customization options to the web console.

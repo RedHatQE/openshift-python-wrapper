@@ -1,8 +1,8 @@
 import ast
 import os
-from typing import List, Set
-from deepdiff.diff import difflib
+
 import pytest
+from deepdiff.diff import difflib
 
 
 def test_api_group_order():
@@ -14,14 +14,14 @@ def test_api_group_order():
         pytest.fail(f"Failed to read {file_path}: {str(exp)}")
 
     tree = ast.parse(source=content)
-    api_group_class: List[ast.ClassDef] = [
+    api_group_class: list[ast.ClassDef] = [
         node for node in ast.walk(tree) if isinstance(node, ast.ClassDef) and node.name == "ApiGroup"
     ]
     if not api_group_class:
         pytest.fail("ApiGroup class not found in resource.py")
 
     api_groups = api_group_class[0]
-    api_group_names: List[str] = []
+    api_group_names: list[str] = []
 
     for _api in api_groups.body:
         try:
@@ -32,7 +32,7 @@ def test_api_group_order():
             api_group_names.append(_api.targets[0].id)
 
     sorted_api_group_names = sorted(api_group_names, key=lambda x: x.replace("_", " "))
-    errors: Set[str] = set()
+    errors: set[str] = set()
     for _diff in difflib.Differ().compare(api_group_names, sorted_api_group_names):
         if _diff.startswith("-") or _diff.startswith("+") or _diff.startswith("?"):
             _err_diff = _diff.split(" ")[-1]
