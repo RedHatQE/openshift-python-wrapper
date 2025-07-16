@@ -607,6 +607,137 @@ def exec_in_pod(
         return _format_exception_error("Failed to execute command in", f"pod '{name}'", e)
 
 
+def _build_event_field_selector(
+    resource_class: Any,
+    name: str,
+    namespace: str | None,
+    resource_type: str,
+) -> str | None:
+    """
+    Build field selector for events with correct format.
+
+    Args:
+        resource_class: The resource class object
+        name: Name of the resource
+        namespace: Namespace of the resource
+        resource_type: Type of the resource
+
+    Returns:
+        Field selector string or None
+    """
+    field_selectors = []
+    if name:
+        field_selectors.append(f"involvedObject.name=={name}")
+    if namespace:
+        field_selectors.append(f"involvedObject.namespace=={namespace}")
+    if resource_type:
+        # Get the correct Kind value from the resource class
+        kind = resource_class.kind if resource_class else resource_type
+        field_selectors.append(f"involvedObject.kind=={kind}")
+
+    field_selector = ",".join(field_selectors) if field_selectors else None
+    LOGGER.debug(f"Using field selector: {field_selector}")
+    return field_selector
+
+
+def _extract_event_info(watch_event: dict[str, Any]) -> dict[str, Any]:
+    """
+    Extract event information from a watch event.
+
+    Args:
+        watch_event: The watch event dictionary
+
+    Returns:
+        Dictionary containing extracted event information
+    """
+    # Debug logging to understand the structure
+    LOGGER.debug(f"watch_event type: {type(watch_event)}")
+
+    # Extract the event object from the watch event
+    # The watch event is a dict with keys: ['type', 'object', 'raw_object']
+    if isinstance(watch_event, dict) and "object" in watch_event:
+        event_obj = watch_event["object"]
+        event_type = watch_event.get("type", "UNKNOWN")  # ADDED, MODIFIED, DELETED
+        LOGGER.debug(f"Watch event type: {event_type}, object type: {type(event_obj)}")
+    else:
+        # Fallback for unexpected structure
+        event_obj = watch_event
+        event_type = "UNKNOWN"
+
+    # The event_obj is a kubernetes.dynamic.resource.ResourceInstance
+    # We can access its attributes directly
+    try:
+        event_info = {
+            "type": event_obj.type,
+            "reason": event_obj.reason,
+            "message": event_obj.message,
+            "count": getattr(event_obj, "count", 1),
+            "firstTimestamp": str(getattr(event_obj, "firstTimestamp", "")),
+            "lastTimestamp": str(getattr(event_obj, "lastTimestamp", "")),
+            "source": {
+                "component": event_obj.source.get("component") if hasattr(event_obj, "source") else None,
+                "host": event_obj.source.get("host") if hasattr(event_obj, "source") else None,
+            },
+            "involvedObject": {
+                "kind": event_obj.involvedObject.get("kind") if hasattr(event_obj, "involvedObject") else None,
+                "name": event_obj.involvedObject.get("name") if hasattr(event_obj, "involvedObject") else None,
+                "namespace": event_obj.involvedObject.get("namespace")
+                if hasattr(event_obj, "involvedObject")
+                else None,
+            },
+        }
+        LOGGER.debug(f"Successfully extracted event: {event_info['reason']} - {event_info['message'][:50]}...")
+        return event_info
+    except Exception as e:
+        LOGGER.error(f"Failed to extract event data: {e}")
+        # Try to get whatever we can
+        return {
+            "type": "Unknown",
+            "reason": "ExtractionError",
+            "message": str(e),
+            "count": 0,
+            "firstTimestamp": "",
+            "lastTimestamp": "",
+            "source": {"component": None, "host": None},
+            "involvedObject": {"kind": None, "name": None, "namespace": None},
+        }
+
+
+def _process_watch_events(
+    client: Any,
+    namespace: str | None,
+    field_selector: str | None,
+    limit: int,
+) -> list[dict[str, Any]]:
+    """
+    Process watch events and collect event information.
+
+    Args:
+        client: Dynamic client instance
+        namespace: Namespace of the resource
+        field_selector: Field selector string
+        limit: Maximum number of events to return
+
+    Returns:
+        List of event information dictionaries
+    """
+    events = []
+    # Event.get() returns a generator of watch events
+    for watch_event in Event.get(
+        client,  # Pass as positional argument, not keyword
+        namespace=namespace,
+        field_selector=field_selector,
+        timeout=5,  # Add timeout to avoid hanging
+    ):
+        event_info = _extract_event_info(watch_event=watch_event)
+        events.append(event_info)
+
+        if len(events) >= limit:
+            break
+
+    return events
+
+
 @mcp.tool
 def get_resource_events(
     resource_type: str,
@@ -635,83 +766,13 @@ def get_resource_events(
         if error_response:
             return error_response
 
-        # Build field selector for events with correct format
-        field_selectors = []
-        if name:
-            field_selectors.append(f"involvedObject.name=={name}")
-        if namespace:
-            field_selectors.append(f"involvedObject.namespace=={namespace}")
-        if resource_type:
-            # Get the correct Kind value from the resource class
-            kind = resource_class.kind if resource_class else resource_type
-            field_selectors.append(f"involvedObject.kind=={kind}")
+        # Build field selector for events
+        field_selector = _build_event_field_selector(
+            resource_class=resource_class, name=name, namespace=namespace, resource_type=resource_type
+        )
 
-        field_selector = ",".join(field_selectors) if field_selectors else None
-        LOGGER.debug(f"Using field selector: {field_selector}")
-
-        events = []
-        # Event.get() returns a generator of watch events
-        for watch_event in Event.get(
-            client,  # Pass as positional argument, not keyword
-            namespace=namespace,
-            field_selector=field_selector,
-            timeout=5,  # Add timeout to avoid hanging
-        ):
-            # Debug logging to understand the structure
-            LOGGER.debug(f"watch_event type: {type(watch_event)}")
-
-            # Extract the event object from the watch event
-            # The watch event is a dict with keys: ['type', 'object', 'raw_object']
-            if isinstance(watch_event, dict) and "object" in watch_event:
-                event_obj = watch_event["object"]
-                event_type = watch_event.get("type", "UNKNOWN")  # ADDED, MODIFIED, DELETED
-                LOGGER.debug(f"Watch event type: {event_type}, object type: {type(event_obj)}")
-            else:
-                # Fallback for unexpected structure
-                event_obj = watch_event
-                event_type = "UNKNOWN"
-
-            # The event_obj is a kubernetes.dynamic.resource.ResourceInstance
-            # We can access its attributes directly
-            try:
-                event_info = {
-                    "type": event_obj.type,
-                    "reason": event_obj.reason,
-                    "message": event_obj.message,
-                    "count": getattr(event_obj, "count", 1),
-                    "firstTimestamp": str(getattr(event_obj, "firstTimestamp", "")),
-                    "lastTimestamp": str(getattr(event_obj, "lastTimestamp", "")),
-                    "source": {
-                        "component": event_obj.source.get("component") if hasattr(event_obj, "source") else None,
-                        "host": event_obj.source.get("host") if hasattr(event_obj, "source") else None,
-                    },
-                    "involvedObject": {
-                        "kind": event_obj.involvedObject.get("kind") if hasattr(event_obj, "involvedObject") else None,
-                        "name": event_obj.involvedObject.get("name") if hasattr(event_obj, "involvedObject") else None,
-                        "namespace": event_obj.involvedObject.get("namespace")
-                        if hasattr(event_obj, "involvedObject")
-                        else None,
-                    },
-                }
-                events.append(event_info)
-                LOGGER.debug(f"Successfully extracted event: {event_info['reason']} - {event_info['message'][:50]}...")
-            except Exception as e:
-                LOGGER.error(f"Failed to extract event data: {e}")
-                # Try to get whatever we can
-                event_info = {
-                    "type": "Unknown",
-                    "reason": "ExtractionError",
-                    "message": str(e),
-                    "count": 0,
-                    "firstTimestamp": "",
-                    "lastTimestamp": "",
-                    "source": {"component": None, "host": None},
-                    "involvedObject": {"kind": None, "name": None, "namespace": None},
-                }
-                events.append(event_info)
-
-            if len(events) >= limit:
-                break
+        # Process watch events and collect event information
+        events = _process_watch_events(client=client, namespace=namespace, field_selector=field_selector, limit=limit)
 
         return {
             "resource_type": resource_type,
