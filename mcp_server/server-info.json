@@ -1,0 +1,503 @@
+{
+  "name": "openshift-python-wrapper",
+  "instructions": null,
+  "fastmcp_version": "2.10.4",
+  "mcp_version": "1.10.1",
+  "server_version": "2.10.4",
+  "tools": [
+    {
+      "key": "list_resources",
+      "name": "list_resources",
+      "description": "List Kubernetes/OpenShift resources of a specific type.\n\nReturns a list of resources with their basic information.",
+      "input_schema": {
+        "properties": {
+          "resource_type": {
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          },
+          "label_selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Label Selector"
+          },
+          "field_selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Field Selector"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Limit"
+          }
+        },
+        "required": ["resource_type"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "get_resource",
+      "name": "get_resource",
+      "description": "Get a specific Kubernetes/OpenShift resource by name.\n\nReturns detailed information about the resource.",
+      "input_schema": {
+        "properties": {
+          "resource_type": {
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          },
+          "output_format": {
+            "default": "info",
+            "title": "Output Format",
+            "type": "string"
+          }
+        },
+        "required": ["resource_type", "name"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "create_resource",
+      "name": "create_resource",
+      "description": "Create a new Kubernetes/OpenShift resource.\n\nYou can provide either yaml_content or spec to define the resource.",
+      "input_schema": {
+        "properties": {
+          "resource_type": {
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          },
+          "yaml_content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Yaml Content"
+          },
+          "spec": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Spec"
+          },
+          "labels": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Labels"
+          },
+          "annotations": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Annotations"
+          },
+          "wait": {
+            "default": false,
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "required": ["resource_type", "name"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "update_resource",
+      "name": "update_resource",
+      "description": "Update an existing Kubernetes/OpenShift resource using a patch.\n\nThe patch should be a dictionary containing the fields to update.",
+      "input_schema": {
+        "properties": {
+          "resource_type": {
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "patch": {
+            "additionalProperties": true,
+            "title": "Patch",
+            "type": "object"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          },
+          "patch_type": {
+            "default": "merge",
+            "title": "Patch Type",
+            "type": "string"
+          }
+        },
+        "required": ["resource_type", "name", "patch"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "delete_resource",
+      "name": "delete_resource",
+      "description": "Delete a Kubernetes/OpenShift resource.",
+      "input_schema": {
+        "properties": {
+          "resource_type": {
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          },
+          "wait": {
+            "default": true,
+            "title": "Wait",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": 60,
+            "title": "Timeout",
+            "type": "integer"
+          }
+        },
+        "required": ["resource_type", "name"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "get_pod_logs",
+      "name": "get_pod_logs",
+      "description": "Get logs from a pod container.",
+      "input_schema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "container": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Container"
+          },
+          "previous": {
+            "default": false,
+            "title": "Previous",
+            "type": "boolean"
+          },
+          "tail_lines": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tail Lines"
+          },
+          "since_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Since Seconds"
+          }
+        },
+        "required": ["name", "namespace"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "exec_in_pod",
+      "name": "exec_in_pod",
+      "description": "Execute a command in a pod container.",
+      "input_schema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "command": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Command",
+            "type": "array"
+          },
+          "container": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Container"
+          }
+        },
+        "required": ["name", "namespace", "command"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "get_resource_events",
+      "name": "get_resource_events",
+      "description": "Get events related to a specific resource.",
+      "input_schema": {
+        "properties": {
+          "resource_type": {
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          },
+          "limit": {
+            "default": 10,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": ["resource_type", "name"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "apply_yaml",
+      "name": "apply_yaml",
+      "description": "Apply YAML content containing one or more Kubernetes/OpenShift resources.",
+      "input_schema": {
+        "properties": {
+          "yaml_content": {
+            "title": "Yaml Content",
+            "type": "string"
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Namespace"
+          }
+        },
+        "required": ["yaml_content"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "get_resource_types",
+      "name": "get_resource_types",
+      "description": "Get a list of all available resource types that can be managed.",
+      "input_schema": {
+        "properties": {
+          "random_string": {
+            "title": "Random String",
+            "type": "string"
+          }
+        },
+        "required": ["random_string"],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    }
+  ],
+  "prompts": [],
+  "resources": [],
+  "templates": [],
+  "capabilities": {
+    "tools": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": {}
+  }
+}

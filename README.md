@@ -45,6 +45,10 @@ pip install openshift-python-wrapper --user
 
 The project includes a comprehensive fake Kubernetes client for testing without a real cluster. See [Fake Kubernetes Client documentation](fake_kubernetes_client/README.md) for details.
 
+## MCP Server
+
+The project includes an MCP (Model Context Protocol) server that exposes OpenShift/Kubernetes functionality through a standardized interface. See [MCP Server documentation](mcp_server/README.md) for details.
+
 ## Release new version
 
 ### requirements

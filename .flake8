@@ -68,6 +68,7 @@ fcn_exclude_functions =
     get_args,
     get_type_hints,
     shutil,
+    asyncio,
 
 enable-extensions =
     FCN,
