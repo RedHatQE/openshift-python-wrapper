@@ -350,6 +350,8 @@ class TestGetResourceTypes:
 
     def test_get_resource_types_success(self):
         """Test getting available resource types"""
+        # The random_string parameter is passed to comply with MCP protocol requirements,
+        # even though it is not used in the function implementation
         result = get_resource_types_func(random_string="test")
 
         assert "resource_types" in result

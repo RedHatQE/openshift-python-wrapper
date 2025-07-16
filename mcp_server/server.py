@@ -794,6 +794,13 @@ def apply_yaml(
 def get_resource_types(random_string: str) -> dict[str, Any]:
     """
     Get a list of all available resource types that can be managed.
+
+    Args:
+        random_string: This parameter is required by the MCP protocol but is not used
+                     in this implementation and may be ignored.
+
+    Returns:
+        Dictionary containing available resource types and their categories
     """
     return {
         "resource_types": sorted(RESOURCE_TYPES),  # RESOURCE_TYPES is already a list
