@@ -6,9 +6,11 @@ This MCP server provides tools to interact with OpenShift/Kubernetes resources
 using the ocp_resources library through the Model Context Protocol.
 """
 
+import importlib
 import inspect
 import os
 import tempfile
+from pathlib import Path
 from typing import Any, Type
 
 import yaml
@@ -46,9 +48,6 @@ def get_dynamic_client(config_file: str | None = None, context: str | None = Non
 
 def _get_available_resource_types():
     """Dynamically get all available resource types from ocp_resources module."""
-    import importlib
-    from pathlib import Path
-
     resource_types = []
     LOGGER.debug("Starting to scan ocp_resources module for resource types")
 
