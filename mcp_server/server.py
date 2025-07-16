@@ -48,61 +48,10 @@ def get_dynamic_client(config_file: str | None = None, context: str | None = Non
     return _client
 
 
-def _get_available_resource_types():
-    """Dynamically get all available resource types from ocp_resources module."""
-    resource_types = []
+def _scan_resource_classes():
+    """Scan ocp_resources modules and return a dict mapping resource types to their classes."""
+    resource_map = {}
     LOGGER.debug("Starting to scan ocp_resources module for resource types")
-
-    # Get the ocp_resources directory path
-    ocp_resources_path = Path(ocp_resources.__file__).parent
-
-    # Scan all .py files in the ocp_resources directory
-    for file_path in ocp_resources_path.glob("*.py"):
-        if file_path.name.startswith("_") or file_path.name == "utils.py":
-            continue
-
-        module_name = file_path.stem
-        try:
-            # Import the module dynamically
-            module = importlib.import_module(f"ocp_resources.{module_name}")
-
-            # Look for classes in the module
-            for name in dir(module):
-                if name.startswith("_"):
-                    continue
-
-                obj = getattr(module, name)
-                if inspect.isclass(obj) and hasattr(obj, "kind") and hasattr(obj, "api_group"):
-                    try:
-                        if obj.kind:  # Some base classes might not have a kind
-                            resource_types.append(obj.kind.lower())
-                            LOGGER.debug(f"Added resource type from {module_name}: {obj.kind.lower()}")
-                    except Exception as e:
-                        LOGGER.debug(f"Error processing {name} in {module_name}: {e}")
-                        continue
-        except Exception as e:
-            LOGGER.debug(f"Error importing module {module_name}: {e}")
-            continue
-
-    LOGGER.debug(f"Found {len(resource_types)} resource types total")
-    return sorted(set(resource_types))
-
-
-# Use it in the server initialization
-RESOURCE_TYPES = _get_available_resource_types()
-LOGGER.info(f"Available resource types: {RESOURCE_TYPES}")
-LOGGER.info(f"Total resource types found: {len(RESOURCE_TYPES)}")
-
-
-def get_resource_class(resource_type: str) -> Type[Resource] | None:
-    """Get the resource class for a given resource type"""
-    # Convert resource_type to lowercase for comparison
-    resource_type_lower = resource_type.lower()
-
-    # Check if the resource type exists in our list
-    if resource_type_lower not in RESOURCE_TYPES:
-        LOGGER.warning(f"Resource type '{resource_type}' not found in RESOURCE_TYPES")
-        return None
 
     # Get the ocp_resources directory path
     ocp_resources_path = Path(ocp_resources.__file__).parent
@@ -125,18 +74,98 @@ def get_resource_class(resource_type: str) -> Type[Resource] | None:
                 obj = getattr(module, name)
                 if inspect.isclass(obj) and hasattr(obj, "kind"):
                     try:
-                        if obj.kind and obj.kind.lower() == resource_type_lower:
-                            LOGGER.debug(
-                                f"Found resource class {name} in module {module_name} for type {resource_type}"
-                            )
-                            return obj
-                    except Exception:
+                        if obj.kind:  # Some base classes might not have a kind
+                            resource_type = obj.kind.lower()
+                            # Store the class in the map (later occurrences override earlier ones)
+                            resource_map[resource_type] = obj
+                            LOGGER.debug(f"Added resource type from {module_name}: {resource_type}")
+                    except Exception as e:
+                        LOGGER.debug(f"Error processing {name} in {module_name}: {e}")
                         continue
-        except Exception:
+        except Exception as e:
+            LOGGER.debug(f"Error importing module {module_name}: {e}")
             continue
 
-    LOGGER.warning(f"Could not find class for resource type '{resource_type}'")
+    LOGGER.debug(f"Found {len(resource_map)} resource types total")
+    return resource_map
+
+
+def _get_available_resource_types():
+    """Get all available resource types from the resource map."""
+    return sorted(RESOURCE_CLASS_MAP.keys())
+
+
+# Use it in the server initialization
+# Initialize resource class map and available resource types
+RESOURCE_CLASS_MAP = _scan_resource_classes()
+RESOURCE_TYPES = _get_available_resource_types()
+LOGGER.info(f"Available resource types: {RESOURCE_TYPES}")
+LOGGER.info(f"Total resource types found: {len(RESOURCE_TYPES)}")
+
+
+def get_resource_class(resource_type: str) -> Type[Resource] | None:
+    """Get the resource class for a given resource type"""
+    # Convert resource_type to lowercase for comparison
+    resource_type_lower = resource_type.lower()
+
+    # Look up the resource class in the pre-scanned map
+    resource_class = RESOURCE_CLASS_MAP.get(resource_type_lower)
+
+    if resource_class:
+        LOGGER.debug(f"Found resource class for type {resource_type}")
+        return resource_class
+
+    LOGGER.warning(f"Resource type '{resource_type}' not found in RESOURCE_CLASS_MAP")
     return None
+
+
+def _validate_resource_type(resource_type: str) -> tuple[Type[Resource] | None, dict[str, Any] | None]:
+    """Validate resource type and return (resource_class, error_dict) tuple."""
+    resource_class = get_resource_class(resource_type=resource_type)
+    if not resource_class:
+        return None, {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
+    return resource_class, None
+
+
+def _create_resource_instance(
+    resource_class: Type[Resource],
+    name: str,
+    namespace: str | None = None,
+    client: Any | None = None,
+) -> tuple[Any, dict[str, Any] | None]:
+    """Create a resource instance with proper namespace handling.
+    Returns (resource, error_dict) tuple."""
+    if client is None:
+        client = get_dynamic_client()
+
+    # Check if resource is namespaced
+    is_namespaced = issubclass(resource_class, NamespacedResource)
+    if is_namespaced and not namespace:
+        return None, {"error": f"Namespace is required for {resource_class.kind} resources"}
+
+    # Create resource instance
+    kwargs = {"name": name, "client": client}
+    if is_namespaced:
+        kwargs["namespace"] = namespace
+
+    resource = resource_class(**kwargs)
+    return resource, None
+
+
+def _format_not_found_error(resource_type: str, name: str, namespace: str | None = None) -> dict[str, Any]:
+    """Format a consistent not found error message."""
+    return {"error": f"{resource_type} '{name}' not found" + (f" in namespace '{namespace}'" if namespace else "")}
+
+
+def _format_exception_error(action: str, resource_info: str, exception: Exception) -> dict[str, Any]:
+    """Format a consistent exception error message.
+
+    Args:
+        action: The action that failed (e.g., "Failed to create", "Failed to get")
+        resource_info: Resource description (e.g., "Pod 'my-pod'", "configmap")
+        exception: The exception that occurred
+    """
+    return {"error": f"{action} {resource_info}: {str(exception)}", "type": type(exception).__name__}
 
 
 def format_resource_info(resource: Any) -> dict[str, Any]:
@@ -184,12 +213,13 @@ def list_resources(
     """
     try:
         LOGGER.info(f"Listing resources: type={resource_type}, namespace={namespace}")
-        resource_class = get_resource_class(resource_type=resource_type)
-        if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
+        # Validate resource type
+        resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+        if error_response:
+            return error_response
 
         client = get_dynamic_client()
-
+        assert resource_class is not None  # Type checker hint - we already checked this above
         # Build kwargs for the get method
         kwargs: dict[str, Any] = {}
         if namespace:
@@ -202,7 +232,6 @@ def list_resources(
             kwargs["limit"] = limit
 
         resources = []
-        assert resource_class is not None  # Type checker hint - we already checked this above
         for resource in resource_class.get(dyn_client=client, **kwargs):
             resources.append(format_resource_info(resource))
 
@@ -213,7 +242,7 @@ def list_resources(
             "resources": resources,
         }
     except Exception as e:
-        return {"error": f"Failed to list {resource_type} resources: {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to list", f"{resource_type} resources", e)
 
 
 @mcp.tool
@@ -229,60 +258,53 @@ def get_resource(
     Returns detailed information about the resource.
     """
     try:
-        resource_class = get_resource_class(resource_type=resource_type)
-        if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
+        # Validate resource type
+        resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+        if error_response:
+            return error_response
 
         client = get_dynamic_client()
+        assert resource_class is not None  # Type checker hint - we already validated this
+        resource_instance, error = _create_resource_instance(
+            resource_class=resource_class, name=name, namespace=namespace, client=client
+        )
+        if error:
+            return error
 
-        # Check if resource is namespaced
-        is_namespaced = issubclass(resource_class, NamespacedResource)
-        if is_namespaced and not namespace:
-            return {"error": f"Namespace is required for {resource_type} resources"}
-
-        # Create resource instance
-        kwargs = {"name": name, "client": client}
-        if is_namespaced:
-            kwargs["namespace"] = namespace
-
-        resource = resource_class(**kwargs)
-
-        if not resource.exists:
-            return {
-                "error": f"{resource_type} '{name}' not found" + (f" in namespace '{namespace}'" if namespace else "")
-            }
+        if not resource_instance.exists:
+            return _format_not_found_error(resource_type=resource_type, name=name, namespace=namespace)
 
         if output_format == "yaml":
             return {
                 "resource_type": resource_type,
                 "name": name,
                 "namespace": namespace,
-                "yaml": yaml.dump(resource.instance.to_dict(), default_flow_style=False),
+                "yaml": yaml.dump(resource_instance.instance.to_dict(), default_flow_style=False),
             }
         elif output_format == "json":
             return {
                 "resource_type": resource_type,
                 "name": name,
                 "namespace": namespace,
-                "json": resource.instance.to_dict(),
+                "json": resource_instance.instance.to_dict(),
             }
         else:  # info format
-            info = format_resource_info(resource)
+            info = format_resource_info(resource_instance)
             info["resource_type"] = resource_type
 
             # Add resource-specific information
             if resource_type.lower() == "pod":
-                info["node"] = getattr(resource.instance.spec, "nodeName", None)
+                info["node"] = getattr(resource_instance.instance.spec, "nodeName", None)
                 info["containers"] = (
-                    [c.name for c in resource.instance.spec.containers]
-                    if hasattr(resource.instance.spec, "containers")
+                    [c.name for c in resource_instance.instance.spec.containers]
+                    if hasattr(resource_instance.instance.spec, "containers")
                     else []
                 )
 
                 # Get container statuses
-                if hasattr(resource.instance.status, "containerStatuses"):
+                if hasattr(resource_instance.instance.status, "containerStatuses"):
                     info["container_statuses"] = []
-                    for cs in resource.instance.status.containerStatuses:
+                    for cs in resource_instance.instance.status.containerStatuses:
                         status_info = {
                             "name": cs.name,
                             "ready": cs.ready,
@@ -299,27 +321,27 @@ def get_resource(
                         info["container_statuses"].append(status_info)
 
             elif resource_type.lower() == "deployment":
-                if hasattr(resource.instance.status, "replicas"):
-                    info["replicas"] = resource.instance.status.replicas
-                    info["readyReplicas"] = getattr(resource.instance.status, "readyReplicas", 0)
-                    info["availableReplicas"] = getattr(resource.instance.status, "availableReplicas", 0)
+                if hasattr(resource_instance.instance.status, "replicas"):
+                    info["replicas"] = resource_instance.instance.status.replicas
+                    info["readyReplicas"] = getattr(resource_instance.instance.status, "readyReplicas", 0)
+                    info["availableReplicas"] = getattr(resource_instance.instance.status, "availableReplicas", 0)
 
             elif resource_type.lower() == "service":
-                if hasattr(resource.instance.spec, "type"):
-                    info["type"] = resource.instance.spec.type
-                    info["clusterIP"] = resource.instance.spec.clusterIP
+                if hasattr(resource_instance.instance.spec, "type"):
+                    info["type"] = resource_instance.instance.spec.type
+                    info["clusterIP"] = resource_instance.instance.spec.clusterIP
                     info["ports"] = (
                         [
                             {"port": p.port, "targetPort": str(p.targetPort), "protocol": p.protocol}
-                            for p in resource.instance.spec.ports
+                            for p in resource_instance.instance.spec.ports
                         ]
-                        if hasattr(resource.instance.spec, "ports")
+                        if hasattr(resource_instance.instance.spec, "ports")
                         else []
                     )
 
             return info
     except Exception as e:
-        return {"error": f"Failed to get {resource_type} '{name}': {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to get", f"{resource_type} '{name}'", e)
 
 
 @mcp.tool
@@ -356,26 +378,22 @@ def create_resource(
             name = yaml_data.get("metadata", {}).get("name", name)
             namespace = yaml_data.get("metadata", {}).get("namespace", namespace)
 
-            resource_class = get_resource_class(resource_type=resource_type)
-            if not resource_class:
-                return {
-                    "error": f"Unknown resource type: {resource_type}",
-                    "available_types": RESOURCE_TYPES,
-                }
+            resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+            if error_response:
+                return error_response
 
             # Create resource from parsed YAML using kind_dict
+            assert resource_class is not None  # Type checker hint
             kwargs = {"client": client, "kind_dict": yaml_data}
-            resource = resource_class(**kwargs)
+            resource_instance = resource_class(**kwargs)
         else:
             # Create resource from spec
-            resource_class = get_resource_class(resource_type=resource_type)
-            if not resource_class:
-                return {
-                    "error": f"Unknown resource type: {resource_type}",
-                    "available_types": RESOURCE_TYPES,
-                }
+            resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+            if error_response:
+                return error_response
 
             # Check if resource is namespaced
+            assert resource_class is not None  # Type checker hint
             is_namespaced = issubclass(resource_class, NamespacedResource)
             if is_namespaced and not namespace:
                 return {"error": f"Namespace is required for {resource_type} resources"}
@@ -394,20 +412,20 @@ def create_resource(
             if spec:
                 kwargs.update(spec)
 
-            resource = resource_class(**kwargs)
+            resource_instance = resource_class(**kwargs)
 
         # Deploy the resource
-        resource.deploy(wait=wait)
+        resource_instance.deploy(wait=wait)
 
         return {
             "success": True,
             "resource_type": resource_type,
-            "name": resource.name,
-            "namespace": getattr(resource, "namespace", None),
-            "message": f"{resource_type} '{resource.name}' created successfully",
+            "name": resource_instance.name,
+            "namespace": getattr(resource_instance, "namespace", None),
+            "message": f"{resource_type} '{resource_instance.name}' created successfully",
         }
     except Exception as e:
-        return {"error": f"Failed to create {resource_type}: {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to create", resource_type, e)
 
 
 @mcp.tool
@@ -424,34 +442,27 @@ def update_resource(
     The patch should be a dictionary containing the fields to update.
     """
     try:
-        resource_class = get_resource_class(resource_type=resource_type)
-        if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
+        # Validate resource type
+        resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+        if error_response:
+            return error_response
 
         client = get_dynamic_client()
+        assert resource_class is not None  # Type checker hint - we already validated this
+        resource_instance, error = _create_resource_instance(
+            resource_class=resource_class, name=name, namespace=namespace, client=client
+        )
+        if error:
+            return error
 
-        # Check if resource is namespaced
-        is_namespaced = issubclass(resource_class, NamespacedResource)
-        if is_namespaced and not namespace:
-            return {"error": f"Namespace is required for {resource_type} resources"}
-
-        # Create resource instance
-        kwargs = {"name": name, "client": client}
-        if is_namespaced:
-            kwargs["namespace"] = namespace
-
-        resource = resource_class(**kwargs)
-
-        if not resource.exists:
-            return {
-                "error": f"{resource_type} '{name}' not found" + (f" in namespace '{namespace}'" if namespace else "")
-            }
+        if not resource_instance.exists:
+            return _format_not_found_error(resource_type=resource_type, name=name, namespace=namespace)
 
         # Apply the patch
         content_type = (
             "application/merge-patch+json" if patch_type == "merge" else "application/strategic-merge-patch+json"
         )
-        resource.api.patch(body=patch, namespace=namespace, content_type=content_type)
+        resource_instance.api.patch(body=patch, namespace=namespace, content_type=content_type)
 
         return {
             "success": True,
@@ -461,7 +472,7 @@ def update_resource(
             "message": f"{resource_type} '{name}' updated successfully",
         }
     except Exception as e:
-        return {"error": f"Failed to update {resource_type} '{name}': {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to update", f"{resource_type} '{name}'", e)
 
 
 @mcp.tool
@@ -476,25 +487,20 @@ def delete_resource(
     Delete a Kubernetes/OpenShift resource.
     """
     try:
-        resource_class = get_resource_class(resource_type=resource_type)
-        if not resource_class:
-            return {"error": f"Unknown resource type: {resource_type}", "available_types": RESOURCE_TYPES}
+        # Validate resource type
+        resource_class, error_response = _validate_resource_type(resource_type=resource_type)
+        if error_response:
+            return error_response
 
         client = get_dynamic_client()
+        assert resource_class is not None  # Type checker hint - we already validated this
+        resource_instance, error = _create_resource_instance(
+            resource_class=resource_class, name=name, namespace=namespace, client=client
+        )
+        if error:
+            return error
 
-        # Check if resource is namespaced
-        is_namespaced = issubclass(resource_class, NamespacedResource)
-        if is_namespaced and not namespace:
-            return {"error": f"Namespace is required for {resource_type} resources"}
-
-        # Create resource instance
-        kwargs = {"name": name, "client": client}
-        if is_namespaced:
-            kwargs["namespace"] = namespace
-
-        resource = resource_class(**kwargs)
-
-        if not resource.exists:
+        if not resource_instance.exists:
             return {
                 "warning": f"{resource_type} '{name}' not found"
                 + (f" in namespace '{namespace}'" if namespace else ""),
@@ -502,7 +508,7 @@ def delete_resource(
             }
 
         # Delete the resource
-        success = resource.delete(wait=wait, timeout=timeout)
+        success = resource_instance.delete(wait=wait, timeout=timeout)
 
         return {
             "success": success,
@@ -514,7 +520,7 @@ def delete_resource(
             else f"Failed to delete {resource_type} '{name}'",
         }
     except Exception as e:
-        return {"error": f"Failed to delete {resource_type} '{name}': {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to delete", f"{resource_type} '{name}'", e)
 
 
 @mcp.tool
@@ -523,18 +529,18 @@ def get_pod_logs(
     namespace: str,
     container: str | None = None,
     previous: bool = False,
-    tail_lines: int | None = None,
     since_seconds: int | None = None,
+    tail_lines: int | None = None,
 ) -> dict[str, Any]:
     """
     Get logs from a pod container.
     """
     try:
         client = get_dynamic_client()
-        pod = Pod(name=name, namespace=namespace, client=client)
+        pod = Pod(client=client, name=name, namespace=namespace)
 
         if not pod.exists:
-            return {"error": f"Pod '{name}' not found in namespace '{namespace}'"}
+            return _format_not_found_error(resource_type="Pod", name=name, namespace=namespace)
 
         # Build kwargs for log method
         kwargs: dict[str, Any] = {}
@@ -551,7 +557,7 @@ def get_pod_logs(
 
         return {"pod": name, "namespace": namespace, "container": container, "logs": logs}
     except Exception as e:
-        return {"error": f"Failed to get logs for pod '{name}': {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to get logs for", f"pod '{name}'", e)
 
 
 @mcp.tool
@@ -566,10 +572,10 @@ def exec_in_pod(
     """
     try:
         client = get_dynamic_client()
-        pod = Pod(name=name, namespace=namespace, client=client)
+        pod = Pod(client=client, name=name, namespace=namespace)
 
         if not pod.exists:
-            return {"error": f"Pod '{name}' not found in namespace '{namespace}'"}
+            return _format_not_found_error(resource_type="Pod", name=name, namespace=namespace)
 
         # Execute command
         try:
@@ -598,7 +604,7 @@ def exec_in_pod(
                 "returncode": e.rc,
             }
     except Exception as e:
-        return {"error": f"Failed to execute command in pod '{name}': {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to execute command in", f"pod '{name}'", e)
 
 
 @mcp.tool
@@ -701,11 +707,9 @@ def get_resource_events(
             "events": events,
         }
     except Exception as e:
-        return {
-            "error": f"Failed to get events: {str(e)}",
-            "type": type(e).__name__,
-            "traceback": traceback.format_exc(),
-        }
+        error_dict = _format_exception_error("Failed to get", "events", e)
+        error_dict["traceback"] = traceback.format_exc()
+        return error_dict
 
 
 @mcp.tool
@@ -719,52 +723,57 @@ def apply_yaml(
     try:
         client = get_dynamic_client()
         results = []
+        successful = 0
+        failed = 0
 
-        # Parse YAML content (may contain multiple documents)
-        yaml_docs = yaml.safe_load_all(io.StringIO(yaml_content))
+        # Parse YAML content (could contain multiple documents)
+        documents = yaml.safe_load_all(yaml_content)
 
-        for doc in yaml_docs:
+        for doc in documents:
             if not doc:
                 continue
 
-            # Extract resource info
             kind = doc.get("kind", "").lower()
-            name = doc.get("metadata", {}).get("name", "unknown")
+            if not kind:
+                results.append({"error": "Missing 'kind' field in YAML document", "success": False})
+                failed += 1
+                continue
 
-            # If namespace is provided as parameter and not in the doc, add it
-            if namespace and "namespace" not in doc.get("metadata", {}):
-                if "metadata" not in doc:
-                    doc["metadata"] = {}
-                doc["metadata"]["namespace"] = namespace
-
-            resource_class = get_resource_class(resource_type=kind)
-            if not resource_class:
-                results.append({"kind": kind, "name": name, "error": f"Unknown resource type: {kind}"})
+            # Validate resource type
+            resource_class, error_response = _validate_resource_type(resource_type=kind)
+            if error_response:
+                results.append({
+                    "kind": kind,
+                    "name": doc.get("metadata", {}).get("name", "unknown"),
+                    "error": error_response.get("error", f"Unknown resource type: {kind}"),
+                    "success": False,
+                })
+                failed += 1
                 continue
 
             try:
                 # Create resource using kind_dict which is more efficient than YAML string
+                assert resource_class is not None  # Type checker hint
                 kwargs = {"client": client, "kind_dict": doc}
-                resource = resource_class(**kwargs)
-                resource.deploy()
+                resource_instance = resource_class(**kwargs)
+                resource_instance.deploy()
 
                 results.append({
                     "kind": kind,
-                    "name": resource.name,
-                    "namespace": getattr(resource, "namespace", None),
+                    "name": resource_instance.name,
+                    "namespace": getattr(resource_instance, "namespace", None),
                     "success": True,
-                    "message": f"Created {kind} '{resource.name}'",
+                    "message": f"Created {kind} '{resource_instance.name}'",
                 })
+                successful += 1
             except Exception as e:
-                results.append({"kind": kind, "name": name, "error": str(e)})
+                results.append({"kind": kind, "name": doc.get("metadata", {}).get("name", "unknown"), "error": str(e)})
+                failed += 1
 
         # Summary
-        success_count = sum(1 for r in results if r.get("success"))
-        error_count = len(results) - success_count
-
-        return {"total_resources": len(results), "successful": success_count, "failed": error_count, "results": results}
+        return {"total_resources": len(results), "successful": successful, "failed": failed, "results": results}
     except Exception as e:
-        return {"error": f"Failed to apply YAML: {str(e)}", "type": type(e).__name__}
+        return _format_exception_error("Failed to apply", "YAML", e)
 
 
 @mcp.tool
