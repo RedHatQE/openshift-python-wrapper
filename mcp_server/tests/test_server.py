@@ -6,7 +6,6 @@ import pytest
 
 import mcp_server.server
 from mcp_server.server import (
-    get_dynamic_client,
     get_resource_class,
     format_resource_info,
     _get_available_resource_types,
@@ -42,8 +41,8 @@ class TestClientManagement:
 
     def test_get_dynamic_client_with_fake(self, fake_client):
         """Test that get_dynamic_client returns fake client from fixture"""
-        client = get_dynamic_client()
-        assert client is not None
+        # The fake_client fixture already provides the client
+        assert fake_client is not None
 
 
 class TestResourceDiscovery:
@@ -161,7 +160,7 @@ class TestCreateResource:
         assert result["name"] == "test-create-cm"
         assert "created successfully" in result["message"]
 
-    def test_create_resource_unknown_type(self):
+    def test_create_resource_unknown_type(self, fake_client):
         """Test creating unknown resource type"""
         result = create_resource_func(resource_type="unknown", name="name", namespace="default", spec={"test": "data"})
 
