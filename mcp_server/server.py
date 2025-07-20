@@ -530,7 +530,6 @@ def get_pod_logs(
     container: str | None = None,
     previous: bool = False,
     since_seconds: int | None = None,
-    tail_lines: int | None = None,
 ) -> dict[str, Any]:
     """
     Get logs from a pod container.
@@ -548,8 +547,6 @@ def get_pod_logs(
             kwargs["container"] = container
         if previous:
             kwargs["previous"] = previous
-        if tail_lines:
-            kwargs["tail_lines"] = tail_lines
         if since_seconds:
             kwargs["since_seconds"] = since_seconds
 
