@@ -39,12 +39,12 @@ mcp = FastMCP(name="openshift-python-wrapper")
 _client = None
 
 
-def get_dynamic_client(config_file: str | None = None, context: str | None = None) -> Any:
+def get_dynamic_client() -> Any:
     """Get or create a dynamic client for Kubernetes/OpenShift"""
     global _client
     if _client is None:
         LOGGER.debug("Creating new dynamic client")
-        _client = get_client(config_file=config_file, context=context)
+        _client = get_client()
     return _client
 
 
