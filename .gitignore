@@ -127,3 +127,9 @@ package-lock.json
 
 # Dev
 .local_dev/
+
+# AI
+.cursor/
+CLAUDE.md
+.agent-os/
+.cursorrules
