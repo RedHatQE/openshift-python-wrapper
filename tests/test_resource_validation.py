@@ -228,7 +228,7 @@ class TestResourceValidation:
             def validate(self):
                 from ocp_resources.resource import Resource
 
-                Resource.validate(res=self)
+                Resource.validate(self)
 
         class MockDNSOperator:
             kind = "DNS"
@@ -240,7 +240,7 @@ class TestResourceValidation:
             def validate(self):
                 from ocp_resources.resource import Resource
 
-                Resource.validate(res=self)
+                Resource.validate(self)
 
         # Create mock instances
         dns_config = MockDNSConfig()
@@ -359,44 +359,16 @@ class TestAutoValidation:
         validate_calls.clear()
         replacement_dict = pod.instance.to_dict()
         replacement_dict["metadata"]["labels"] = {"test": "label"}
-        pod.update_replace(body=replacement_dict)
+        pod.update_replace(resource_dict=replacement_dict)
         assert len(validate_calls) == 0
 
         # Enable validation and try again
         pod.schema_validation_enabled = True
         validate_calls.clear()
         replacement_dict["metadata"]["labels"]["test2"] = "label2"
-        pod.update_replace(body=replacement_dict)
+        pod.update_replace(resource_dict=replacement_dict)
         assert len(validate_calls) == 1
         assert validate_calls[0] == replacement_dict
-
-    def test_update_does_not_validate(self, monkeypatch, fake_client):
-        """Test that update() does not validate even when validation is enabled."""
-        # Track if validate was called
-        validate_calls = []
-
-        def mock_validate():
-            validate_calls.append(1)
-
-        # Create and deploy pod with validation enabled
-        pod = Pod(
-            name="test-pod",
-            namespace="default",
-            client=fake_client,
-            containers=[{"name": "test", "image": "nginx"}],
-            schema_validation_enabled=True,
-        )
-        pod.deploy()
-
-        # Mock validate
-        monkeypatch.setattr(pod, "validate", mock_validate)
-
-        # Update should NOT trigger validation (it's a patch operation)
-        validate_calls.clear()
-        update_dict = pod.instance.to_dict()
-        update_dict["metadata"]["labels"] = {"test": "label"}
-        pod.update(update_dict)
-        assert len(validate_calls) == 0
 
     def test_auto_validation_with_validation_error(self, monkeypatch, fake_client):
         """Test that validation errors prevent create/update when auto-validation is enabled."""

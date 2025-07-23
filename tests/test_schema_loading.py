@@ -125,7 +125,7 @@ class TestSchemaLoading:
 
         SchemaValidator._definitions_data = definitions
         resolver = MagicMock()
-        resolved = SchemaValidator._resolve_refs(schema=schema_with_ref, resolver=resolver)
+        resolved = SchemaValidator._resolve_refs(obj=schema_with_ref, resolver=resolver)
 
         # Check that $ref was resolved
         assert resolved["properties"]["spec"]["type"] == "object"
@@ -147,7 +147,7 @@ class TestSchemaLoading:
 
         SchemaValidator._definitions_data = definitions
         resolver = MagicMock()
-        resolved = SchemaValidator._resolve_refs(schema=schema_with_ref, resolver=resolver)
+        resolved = SchemaValidator._resolve_refs(obj=schema_with_ref, resolver=resolver)
 
         # Check that nested refs were resolved
         spec = resolved["properties"]["spec"]
