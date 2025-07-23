@@ -92,7 +92,7 @@ Resources are prioritized as:
 
 ### Example output
 
-```
+```text
 Resource Coverage Report
 
 ╭─────────────────────────── Coverage Statistics ────────────────────────────╮

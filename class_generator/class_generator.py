@@ -1316,12 +1316,26 @@ def main(
     if discover_missing or coverage_report:
         # Set up cache file path
         cache_dir = os.path.expanduser("~/.cache/openshift-python-wrapper")
-        os.makedirs(cache_dir, exist_ok=True)
-        cache_file = os.path.join(cache_dir, "discovery_cache.json")
+        try:
+            os.makedirs(cache_dir, exist_ok=True)
+        except OSError as e:
+            LOGGER.error(f"Failed to create cache directory '{cache_dir}': {e}")
+            # Fall back to temporary directory if cache directory creation fails
+            cache_dir = os.path.join(gettempdir(), "openshift-python-wrapper-cache")
+            try:
+                os.makedirs(cache_dir, exist_ok=True)
+                LOGGER.warning(f"Using fallback cache directory: {cache_dir}")
+            except OSError as fallback_e:
+                LOGGER.error(f"Failed to create fallback cache directory: {fallback_e}")
+                # Disable cache usage if both attempts fail
+                use_cache = False
+                LOGGER.warning("Cache functionality disabled due to directory creation failures")
+
+        cache_file = os.path.join(cache_dir, "discovery_cache.json") if use_cache else None
 
         # Check cache if enabled
         discovered_resources = None
-        if use_cache and os.path.exists(cache_file):
+        if use_cache and cache_file and os.path.exists(cache_file):
             try:
                 # Check cache age (24 hours)
                 cache_age = time.time() - os.path.getmtime(cache_file)
@@ -1340,7 +1354,7 @@ def main(
                 discovered_resources = discover_cluster_resources()
 
                 # Cache the results
-                if use_cache:
+                if use_cache and cache_file:
                     try:
                         with open(cache_file, "w") as f:
                             json.dump(
