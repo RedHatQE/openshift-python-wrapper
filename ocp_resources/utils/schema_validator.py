@@ -5,14 +5,14 @@ the Resource class and the fake Kubernetes client.
 """
 
 import json
-import logging
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
 import jsonschema
+from simple_logger.logger import get_logger
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class SchemaValidator:

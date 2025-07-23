@@ -467,9 +467,6 @@ class Resource(ResourceConstants):
             pod = Pod(name="my-pod", namespace="default", schema_validation_enabled=True)
             pod.create()  # Will validate before API call
 
-        Class method validation:
-            Pod.validate_dict({"kind": "Pod", "metadata": {"name": "test"}})
-
     Attributes:
         api_group (str): API group for the resource (e.g., "apps", "batch")
         api_version (str): API version (e.g., "v1", "v1beta1")

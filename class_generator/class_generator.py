@@ -8,6 +8,7 @@ import sys
 import textwrap
 import time
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from io import StringIO
 from pathlib import Path
 from tempfile import gettempdir
 from typing import Any
@@ -21,7 +22,9 @@ from kubernetes.dynamic import DynamicClient
 from packaging.version import Version
 from pyhelper_utils.shell import run_command
 from rich.console import Console
+from rich.panel import Panel
 from rich.syntax import Syntax
+from rich.table import Table
 from simple_logger.logger import get_logger
 
 from ocp_resources.resource import Resource, get_client
@@ -421,12 +424,6 @@ def generate_report(coverage_analysis: dict[str, Any], output_format: str = "hum
 
     else:
         # Human-readable format with Rich
-        from io import StringIO
-
-        from rich.console import Console
-        from rich.panel import Panel
-        from rich.table import Table
-
         # Create string buffer to capture Rich output
         string_buffer = StringIO()
         console = Console(file=string_buffer, force_terminal=True, width=120)
@@ -715,8 +712,6 @@ def update_kind_schema():
 
     # Clear SchemaValidator cache after updating schemas
     SchemaValidator.clear_cache()
-
-    # No longer need to copy the mappings file - fake client uses SchemaValidator
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
