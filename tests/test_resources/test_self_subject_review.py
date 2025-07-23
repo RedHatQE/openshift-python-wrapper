@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.self_subject_review import SelfSubjectReview
 
 
 @pytest.mark.incremental
 class TestSelfSubjectReview:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def selfsubjectreview(self, client):
+    def selfsubjectreview(self, fake_client):
         return SelfSubjectReview(
-            client=client,
+            client=fake_client,
             name="test-selfsubjectreview",
         )
 

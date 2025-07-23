@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.operator import Operator
 
 
 @pytest.mark.incremental
 class TestOperator:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def operator(self, client):
+    def operator(self, fake_client):
         return Operator(
-            client=client,
+            client=fake_client,
             name="test-operator",
         )
 

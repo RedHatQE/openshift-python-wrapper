@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.scheduler import Scheduler
 
 
 @pytest.mark.incremental
 class TestScheduler:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def scheduler(self, client):
+    def scheduler(self, fake_client):
         return Scheduler(
-            client=client,
+            client=fake_client,
             name="test-scheduler",
         )
 

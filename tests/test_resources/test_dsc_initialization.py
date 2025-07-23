@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.dsc_initialization import DSCInitialization
 
 
 @pytest.mark.incremental
 class TestDSCInitialization:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def dscinitialization(self, client):
+    def dscinitialization(self, fake_client):
         return DSCInitialization(
-            client=client,
+            client=fake_client,
             name="test-dscinitialization",
             applications_namespace="test-applications_namespace",
         )

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.service_mesh_member import ServiceMeshMember
 
 
 @pytest.mark.incremental
 class TestServiceMeshMember:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def servicemeshmember(self, client):
+    def servicemeshmember(self, fake_client):
         return ServiceMeshMember(
-            client=client,
+            client=fake_client,
             name="test-servicemeshmember",
             namespace="default",
             control_plane_ref={"test-control_plane_ref": "test-value"},

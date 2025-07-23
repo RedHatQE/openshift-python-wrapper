@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.data_import_cron import DataImportCron
 
 
 @pytest.mark.incremental
 class TestDataImportCron:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def dataimportcron(self, client):
+    def dataimportcron(self, fake_client):
         return DataImportCron(
-            client=client,
+            client=fake_client,
             name="test-dataimportcron",
             namespace="default",
             managed_data_source="test-managed-data-source",

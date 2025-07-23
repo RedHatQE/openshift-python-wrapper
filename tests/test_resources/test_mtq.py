@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.mtq import MTQ
 
 
 @pytest.mark.incremental
 class TestMTQ:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def mtq(self, client):
+    def mtq(self, fake_client):
         return MTQ(
-            client=client,
+            client=fake_client,
             name="test-mtq",
         )
 

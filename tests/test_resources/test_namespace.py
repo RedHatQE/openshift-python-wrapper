@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.namespace import Namespace
 
 
 @pytest.mark.incremental
 class TestNamespace:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def namespace(self, client):
+    def namespace(self, fake_client):
         return Namespace(
-            client=client,
+            client=fake_client,
             name="test-namespace",
         )
 

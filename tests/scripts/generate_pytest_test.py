@@ -610,19 +610,14 @@ class PytestTestGenerator:
         """Get Jinja2 templates for test generation"""
         return {
             "test_template.j2": '''import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.{{ module_name }} import {{ resource.name }}
 
 @pytest.mark.incremental
 class {{ class_name }}:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def {{ fixture_name }}(self, client):
+    def {{ fixture_name }}(self, fake_client):
         return {{ resource.name }}(
-            client=client,
+            client=fake_client,
 {%- for key, value in test_data.items() %}
 {%- if key == "name" %}
             name="{{ value }}",
@@ -662,7 +657,6 @@ class {{ class_name }}:
         assert not {{ fixture_name }}.exists
 ''',
             "ephemeral_template.j2": '''import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.{{ module_name }} import {{ resource.name }}
 {%- if resource.actual_resource_type == "Project" %}
 from ocp_resources.project_project_openshift_io import Project
@@ -671,13 +665,9 @@ from ocp_resources.project_project_openshift_io import Project
 @pytest.mark.incremental
 class {{ class_name }}:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def {{ fixture_name }}(self, client):
+    def {{ fixture_name }}(self, fake_client):
         return {{ resource.name }}(
-            client=client,
+            client=fake_client,
 {%- for key, value in test_data.items() %}
 {%- if key == "name" %}
             name="{{ value }}",

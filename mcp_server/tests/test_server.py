@@ -1,8 +1,7 @@
-"""
+"""Unit tests for MCP server.
+
 Comprehensive tests for the OpenShift Python Wrapper MCP Server
 """
-
-from unittest.mock import patch
 
 import pytest
 
@@ -13,7 +12,6 @@ from mcp_server.server import (
     get_resource_class,
 )
 from ocp_resources.config_map import ConfigMap
-from ocp_resources.resource import get_client
 
 # Get the actual function implementations from the decorated tools
 list_resources_func = mcp_server.server.list_resources.fn
@@ -28,23 +26,30 @@ apply_yaml_func = mcp_server.server.apply_yaml.fn
 get_resource_types_func = mcp_server.server.get_resource_types.fn
 
 
-# Test fixture
 @pytest.fixture
-def fake_client():
-    """Fixture that patches get_dynamic_client to return fake client"""
-    with patch("mcp_server.server.get_dynamic_client") as mock_get_dynamic_client:
-        fake_client_instance = get_client(fake=True)
-        mock_get_dynamic_client.return_value = fake_client_instance
-        yield fake_client_instance
+def use_fake_client():
+    """Ensure MCP server uses fake client for tests"""
+    # Reset the global client before each test
+    mcp_server.server._client = None
+
+    # Get a fake client
+    fake_client = mcp_server.server.get_dynamic_client(fake=True)
+
+    yield fake_client
+
+    # Reset client after test
+    mcp_server.server._client = None
 
 
 class TestClientManagement:
     """Test client creation and management"""
 
-    def test_get_dynamic_client_with_fake(self, fake_client):
-        """Test that get_dynamic_client returns fake client from fixture"""
-        # The fake_client fixture already provides the client
-        assert fake_client is not None
+    def test_get_dynamic_client_with_fake(self, use_fake_client):
+        """Test that get_dynamic_client returns fake client"""
+        client = mcp_server.server.get_dynamic_client()
+        assert client is not None
+        # The client should be a fake client
+        assert hasattr(client, "resources")
 
 
 class TestResourceDiscovery:
@@ -75,10 +80,10 @@ class TestResourceDiscovery:
 class TestFormatResourceInfo:
     """Test resource info formatting"""
 
-    def test_format_resource_info_basic(self, fake_client):
+    def test_format_resource_info_basic(self, use_fake_client):
         """Test basic resource info formatting"""
         # Create a real ConfigMap resource using the fake client
-        cm = ConfigMap(client=fake_client, name="test-cm", namespace="default", data={"key": "value"})
+        cm = ConfigMap(client=use_fake_client, name="test-cm", namespace="default", data={"key": "value"})
         cm.create()
 
         result = format_resource_info(resource=cm)
@@ -93,13 +98,13 @@ class TestFormatResourceInfo:
 class TestListResources:
     """Test list_resources function"""
 
-    def test_list_resources_success(self, fake_client):
+    def test_list_resources_success(self, use_fake_client):
         """Test successful resource listing"""
         from ocp_resources.config_map import ConfigMap
 
         # Create test resources
         for i in range(3):
-            cm = ConfigMap(name=f"test-cm-{i}", namespace="default", data={"key": f"value-{i}"}, client=fake_client)
+            cm = ConfigMap(name=f"test-cm-{i}", namespace="default", data={"key": f"value-{i}"}, client=use_fake_client)
             cm.deploy()
 
         result = list_resources_func(resource_type="configmap", namespace="default", limit=10)
@@ -120,11 +125,11 @@ class TestListResources:
 class TestGetResource:
     """Test get_resource function"""
 
-    def test_get_resource_success(self, fake_client):
+    def test_get_resource_success(self, use_fake_client):
         """Test successful resource retrieval"""
         from ocp_resources.config_map import ConfigMap
 
-        cm = ConfigMap(name="test-get-cm", namespace="default", data={"key": "value"}, client=fake_client)
+        cm = ConfigMap(name="test-get-cm", namespace="default", data={"key": "value"}, client=use_fake_client)
         cm.deploy()
 
         result = get_resource_func(
@@ -141,7 +146,7 @@ class TestGetResource:
         assert "error" in result
         assert "Unknown resource type" in result["error"]
 
-    def test_get_resource_not_found(self, fake_client):
+    def test_get_resource_not_found(self, use_fake_client):
         """Test getting non-existent resource"""
         result = get_resource_func(resource_type="configmap", name="does-not-exist", namespace="default")
 
@@ -151,7 +156,7 @@ class TestGetResource:
 class TestCreateResource:
     """Test create_resource function"""
 
-    def test_create_resource_success(self, fake_client):
+    def test_create_resource_success(self, use_fake_client):
         """Test successful resource creation"""
         result = create_resource_func(
             resource_type="configmap", name="test-create-cm", namespace="default", spec={"data": {"key": "value"}}
@@ -161,7 +166,7 @@ class TestCreateResource:
         assert result["name"] == "test-create-cm"
         assert "created successfully" in result["message"]
 
-    def test_create_resource_unknown_type(self, fake_client):
+    def test_create_resource_unknown_type(self, use_fake_client):
         """Test creating unknown resource type"""
         result = create_resource_func(resource_type="unknown", name="name", namespace="default", spec={"test": "data"})
 
@@ -172,7 +177,7 @@ class TestCreateResource:
 class TestUpdateResource:
     """Test update_resource function"""
 
-    def test_update_resource_success(self, fake_client):
+    def test_update_resource_success(self, use_fake_client):
         """Test successful resource update"""
         # First create a resource
         create_result = create_resource_func(
@@ -196,7 +201,7 @@ class TestUpdateResource:
         assert result["name"] == "test-update-cm"
         assert result["namespace"] == "default"
 
-    def test_update_resource_not_found(self, fake_client):
+    def test_update_resource_not_found(self, use_fake_client):
         """Test update of non-existent resource"""
         # Try to update a resource that doesn't exist
         result = update_resource_func(
@@ -210,7 +215,7 @@ class TestUpdateResource:
         assert "error" in result
         assert "not found" in result["error"].lower()
 
-    def test_update_resource_unknown_type(self, fake_client):
+    def test_update_resource_unknown_type(self, use_fake_client):
         """Test update with unknown resource type"""
         result = update_resource_func(
             resource_type="unknown_type",
@@ -227,7 +232,7 @@ class TestUpdateResource:
 class TestDeleteResource:
     """Test delete_resource function"""
 
-    def test_delete_resource_success(self, fake_client):
+    def test_delete_resource_success(self, use_fake_client):
         """Test successful resource deletion"""
         # First create a resource
         create_result = create_resource_func(
@@ -245,7 +250,7 @@ class TestDeleteResource:
 class TestGetPodLogs:
     """Test get_pod_logs function"""
 
-    def test_get_pod_logs_not_found(self, fake_client):
+    def test_get_pod_logs_not_found(self, use_fake_client):
         """Test pod logs retrieval for non-existent pod"""
         result = get_pod_logs_func(name="non-existent-pod", namespace="default")
 
@@ -255,7 +260,7 @@ class TestGetPodLogs:
 class TestExecInPod:
     """Test exec_in_pod function"""
 
-    def test_exec_in_pod_not_found(self, fake_client):
+    def test_exec_in_pod_not_found(self, use_fake_client):
         """Test command execution in non-existent pod"""
         result = exec_in_pod_func(name="non-existent-pod", namespace="default", command=["echo", "hello"])
 
@@ -265,7 +270,7 @@ class TestExecInPod:
 class TestGetResourceEvents:
     """Test get_resource_events function"""
 
-    def test_get_resource_events_empty(self, fake_client):
+    def test_get_resource_events_empty(self, use_fake_client):
         """Test resource events retrieval when no events exist"""
         # No resources created, so no events should exist
         result = get_resource_events_func(resource_type="pod", name="test-pod", namespace="default")
@@ -276,10 +281,10 @@ class TestGetResourceEvents:
         assert result["event_count"] == 0
         assert result["events"] == []
 
-    def test_get_resource_events_with_created_resource(self, fake_client):
+    def test_get_resource_events_with_created_resource(self, use_fake_client):
         """Test that events are automatically generated when resources are created"""
         # Create a ConfigMap - this will automatically generate a creation event
-        cm = ConfigMap(client=fake_client, name="test-cm-events", namespace="default", data={"key": "value"})
+        cm = ConfigMap(client=use_fake_client, name="test-cm-events", namespace="default", data={"key": "value"})
         cm.create()
 
         # Get events for the created ConfigMap
@@ -300,12 +305,12 @@ class TestGetResourceEvents:
         assert event["involvedObject"]["name"] == "test-cm-events"
         assert event["involvedObject"]["namespace"] == "default"
 
-    def test_get_resource_events_correct_kind_values(self, fake_client):
+    def test_get_resource_events_correct_kind_values(self, use_fake_client):
         """Test that different resource types get the correct Kind value in field selector"""
         # Just test with resources we know work well with the fake client
 
         # Test with ConfigMap
-        cm = ConfigMap(client=fake_client, name="test-cm-kind", namespace="default")
+        cm = ConfigMap(client=use_fake_client, name="test-cm-kind", namespace="default")
         cm.data = {"key": "value"}  # Set data after construction
         cm.create()
 
@@ -326,7 +331,7 @@ class TestGetResourceEvents:
 class TestApplyYaml:
     """Test apply_yaml function"""
 
-    def test_apply_yaml_success(self, fake_client):
+    def test_apply_yaml_success(self, use_fake_client):
         """Test successful YAML application"""
         yaml_content = """
 apiVersion: v1

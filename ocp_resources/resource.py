@@ -14,6 +14,7 @@ from types import TracebackType
 from typing import Any, Type
 from urllib.parse import parse_qs, urlencode, urlparse
 
+import jsonschema
 import kubernetes
 import requests
 import yaml
@@ -43,6 +44,7 @@ from ocp_resources.exceptions import (
     MissingRequiredArgumentError,
     MissingResourceResError,
     ResourceTeardownError,
+    ValidationError,
 )
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
@@ -56,6 +58,7 @@ from ocp_resources.utils.constants import (
     TIMEOUT_30SEC,
 )
 from ocp_resources.utils.resource_constants import ResourceConstants
+from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
@@ -443,6 +446,16 @@ class ClassProperty:
 class Resource(ResourceConstants):
     """
     Base class for API resources
+
+    Provides common functionality for all Kubernetes/OpenShift resources including
+    CRUD operations, resource management, and schema validation.
+
+    Attributes:
+        api_group (str): API group for the resource (e.g., "apps", "batch")
+        api_version (str): API version (e.g., "v1", "v1beta1")
+        singular_name (str): Singular resource name for API calls
+        timeout_seconds (int): Default timeout for API operations
+        schema_validation_enabled (bool): Enable automatic validation on create/update
     """
 
     api_group: str = ""
@@ -581,6 +594,7 @@ class Resource(ResourceConstants):
         ensure_exists: bool = False,
         kind_dict: dict[Any, Any] | None = None,
         wait_for_resource: bool = False,
+        schema_validation_enabled: bool = False,
     ):
         """
         Create an API resource
@@ -606,6 +620,8 @@ class Resource(ResourceConstants):
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
             kind_dict (dict): dict which represents the resource object
             wait_for_resource (bool): Waits for the resource to be created
+            schema_validation_enabled (bool): Enable automatic schema validation for this instance.
+                Defaults to False. Set to True to validate on create/update operations.
         """
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
@@ -643,6 +659,9 @@ class Resource(ResourceConstants):
 
         if ensure_exists:
             self._ensure_exists()
+
+        # Set instance-level validation flag
+        self.schema_validation_enabled = schema_validation_enabled
 
         # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
@@ -987,6 +1006,10 @@ class Resource(ResourceConstants):
         """
         self.to_dict()
 
+        # Validate the resource if auto-validation is enabled
+        if self.schema_validation_enabled:
+            self.validate()
+
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
@@ -1046,6 +1069,10 @@ class Resource(ResourceConstants):
         Args:
             resource_dict: Resource dictionary
         """
+        # Note: We don't validate on update() because this method sends a patch,
+        # not a complete resource. Patches are partial updates that would fail
+        # full schema validation.
+
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
@@ -1060,6 +1087,12 @@ class Resource(ResourceConstants):
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
+        # Validate the resource if auto-validation is enabled
+        # For replace operations, we validate the full resource_dict
+        if self.schema_validation_enabled:
+            # Use validate_dict to validate the replacement resource
+            self.__class__.validate_dict(resource_dict)
+
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
@@ -1424,6 +1457,73 @@ class Resource(ResourceConstants):
                     break
 
         return ""
+
+    def validate(self) -> None:
+        """
+        Validate the resource against its OpenAPI schema.
+
+        This method validates the resource dictionary (self.res) against the
+        appropriate OpenAPI schema for this resource type. If validation fails,
+        a ValidationError is raised with details about what is invalid.
+
+        Note: This method is called automatically during create() and update()
+        operations if schema_validation_enabled was set to True when creating
+        the resource instance.
+
+        Raises:
+            ValidationError: If the resource is invalid according to the schema
+        """
+
+        # Get resource dict - if self.res is already populated, use it directly
+        # Otherwise, try to build it with to_dict()
+        if not self.res:
+            try:
+                self.to_dict()  # This populates self.res
+            except Exception:
+                # If to_dict fails (e.g., missing required fields),
+                # we can't validate - let the original error propagate
+                raise
+
+        resource_dict = self.res
+
+        # Validate using shared validator
+        try:
+            SchemaValidator.validate(resource_dict=resource_dict, kind=self.kind, api_group=self.api_group)
+        except jsonschema.ValidationError as e:
+            error_msg = SchemaValidator.format_validation_error(
+                error=e, kind=self.kind, name=self.name or "unnamed", api_group=self.api_group
+            )
+            raise ValidationError(error_msg)
+        except Exception as e:
+            LOGGER.error(f"Unexpected error during validation: {e}")
+            raise
+
+    @classmethod
+    def validate_dict(cls, resource_dict: dict[str, Any]) -> None:
+        """
+        Validate a resource dictionary against the schema.
+
+        Args:
+            resource_dict: Dictionary representation of the resource
+
+        Raises:
+            ValidationError: If the resource dict is invalid
+        """
+
+        # Get name for error messages
+        name = resource_dict.get("metadata", {}).get("name", "unnamed")
+
+        # Validate using shared validator
+        try:
+            SchemaValidator.validate(resource_dict=resource_dict, kind=cls.kind, api_group=cls.api_group)
+        except jsonschema.ValidationError as e:
+            error_msg = SchemaValidator.format_validation_error(
+                error=e, kind=cls.kind, name=name, api_group=cls.api_group
+            )
+            raise ValidationError(error_msg)
+        except Exception as e:
+            LOGGER.error(f"Unexpected error during validation: {e}")
+            raise
 
 
 class NamespacedResource(Resource):

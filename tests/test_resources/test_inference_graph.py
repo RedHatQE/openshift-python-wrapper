@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.inference_graph import InferenceGraph
 
 
 @pytest.mark.incremental
 class TestInferenceGraph:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def inferencegraph(self, client):
+    def inferencegraph(self, fake_client):
         return InferenceGraph(
-            client=client,
+            client=fake_client,
             name="test-inferencegraph",
             namespace="default",
             nodes={"test-nodes": "test-value"},

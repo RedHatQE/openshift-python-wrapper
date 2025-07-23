@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.dns_config_openshift_io import DNS
 
 
 @pytest.mark.incremental
 class TestDNS:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def dns(self, client):
+    def dns(self, fake_client):
         return DNS(
-            client=client,
+            client=fake_client,
             name="test-dns",
         )
 

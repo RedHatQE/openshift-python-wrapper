@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.serving_runtime import ServingRuntime
 
 
 @pytest.mark.incremental
 class TestServingRuntime:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def servingruntime(self, client):
+    def servingruntime(self, fake_client):
         return ServingRuntime(
-            client=client,
+            client=fake_client,
             name="test-servingruntime",
             namespace="default",
             containers=["test-containers"],

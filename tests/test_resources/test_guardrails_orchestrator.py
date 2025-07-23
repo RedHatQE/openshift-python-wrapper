@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.guardrails_orchestrator import GuardrailsOrchestrator
 
 
 @pytest.mark.incremental
 class TestGuardrailsOrchestrator:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def guardrailsorchestrator(self, client):
+    def guardrailsorchestrator(self, fake_client):
         return GuardrailsOrchestrator(
-            client=client,
+            client=fake_client,
             name="test-guardrailsorchestrator",
             namespace="default",
             orchestrator_config="test-orchestrator_config",

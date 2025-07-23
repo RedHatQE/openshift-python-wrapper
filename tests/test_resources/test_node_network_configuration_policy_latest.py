@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.node_network_configuration_policy_latest import NodeNetworkConfigurationPolicy
 
 
 @pytest.mark.incremental
 class TestNodeNetworkConfigurationPolicy:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def nodenetworkconfigurationpolicy(self, client):
+    def nodenetworkconfigurationpolicy(self, fake_client):
         return NodeNetworkConfigurationPolicy(
-            client=client,
+            client=fake_client,
             name="test-nodenetworkconfigurationpolicy",
         )
 

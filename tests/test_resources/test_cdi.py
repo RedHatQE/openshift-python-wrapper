@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.cdi import CDI
 
 
 @pytest.mark.incremental
 class TestCDI:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def cdi(self, client):
+    def cdi(self, fake_client):
         return CDI(
-            client=client,
+            client=fake_client,
             name="test-cdi",
         )
 
