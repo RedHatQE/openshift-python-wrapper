@@ -58,8 +58,8 @@ from ocp_resources.utils.constants import (
     TIMEOUT_30SEC,
 )
 from ocp_resources.utils.resource_constants import ResourceConstants
-from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 from ocp_resources.utils.schema_validator import SchemaValidator
+from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -449,23 +449,6 @@ class Resource(ResourceConstants):
 
     Provides common functionality for all Kubernetes/OpenShift resources including
     CRUD operations, resource management, and schema validation.
-
-    Schema Validation:
-        Resources can validate their structure against OpenAPI schemas to catch
-        configuration errors before API submission. Validation can be performed
-        manually or automatically during create/update operations.
-
-        Manual validation:
-            pod = Pod(name="my-pod", namespace="default")
-            try:
-                pod.validate()
-            except ValidationError as e:
-                print(f"Validation failed: {e}")
-
-        Auto-validation (disabled by default):
-            # Enable for a specific instance
-            pod = Pod(name="my-pod", namespace="default", schema_validation_enabled=True)
-            pod.create()  # Will validate before API call
 
     Attributes:
         api_group (str): API group for the resource (e.g., "apps", "batch")
