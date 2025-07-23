@@ -67,21 +67,10 @@ class TestSchemaLoading:
 
     def test_load_mappings_data_success(self):
         """Test successful loading of mappings data."""
-        # Clear any existing data
-        SchemaValidator.clear_cache()
-
         mock_mappings_content = '{"pod": [{"type": "object"}]}'
         mock_definitions_content = '{"definitions": {"SomeDefinition": {"type": "string"}}}'
 
         # Mock the file system operations
-        from unittest.mock import mock_open
-
-        def side_effect(filename, *args, **kwargs):
-            if "mappings" in str(filename):
-                return mock_open(read_data=mock_mappings_content)()
-            elif "definitions" in str(filename):
-                return mock_open(read_data=mock_definitions_content)()
-            raise FileNotFoundError(f"File not found: {filename}")
 
         # Patch importlib.resources to prevent actual file loading
         with patch("ocp_resources.utils.schema_validator.files") as mock_files:
@@ -107,8 +96,10 @@ class TestSchemaLoading:
             mappings_data = SchemaValidator.get_mappings_data()
             assert mappings_data is not None
             assert "pod" in mappings_data
-            # Note: We don't have a public getter for definitions_data, so we'll skip that assertion
-            # or we could add a getter if needed
+
+            definitions_data = SchemaValidator.get_definitions_data()
+            assert definitions_data is not None
+            assert "SomeDefinition" in definitions_data
 
         # No cleanup needed - test is using real loading mechanism
 
@@ -127,41 +118,51 @@ class TestSchemaLoading:
             mock_open.assert_not_called()
 
     def test_resolve_refs_with_definitions(self, monkeypatch):
-        """Test resolving $ref references."""
+        """Test resolving $ref references through load_schema."""
         # Set up test data with references
         schema_with_ref = {"type": "object", "properties": {"spec": {"$ref": "#/definitions/PodSpec"}}}
 
         definitions = {"PodSpec": {"type": "object", "properties": {"containers": {"type": "array"}}}}
 
+        # Set up mock mappings with the schema containing references
+        mock_mappings = {"testresource": [schema_with_ref]}
+
         # Set up test data using monkeypatch
-        monkeypatch.setattr(SchemaValidator, "_mappings_data", {})
+        monkeypatch.setattr(SchemaValidator, "_mappings_data", mock_mappings)
         monkeypatch.setattr(SchemaValidator, "_definitions_data", definitions)
 
-        resolver = MagicMock()
-        resolved = SchemaValidator._resolve_refs(obj=schema_with_ref, resolver=resolver)
+        # Use the public load_schema method which will resolve refs internally
+        with patch.object(SchemaValidator, "load_mappings_data", return_value=True):
+            resolved = SchemaValidator.load_schema(kind="TestResource")
 
         # Check that $ref was resolved
+        assert resolved is not None
         assert resolved["properties"]["spec"]["type"] == "object"
         assert "containers" in resolved["properties"]["spec"]["properties"]
 
     def test_resolve_refs_with_nested_refs(self, monkeypatch):
-        """Test resolving nested $ref references."""
+        """Test resolving nested $ref references through load_schema."""
         # Set up test data with nested references
-        schema_with_ref = {"properties": {"spec": {"$ref": "#/definitions/PodSpec"}}}
+        schema_with_ref = {"type": "object", "properties": {"spec": {"$ref": "#/definitions/PodSpec"}}}
 
         definitions = {
             "PodSpec": {"properties": {"container": {"$ref": "#/definitions/Container"}}},
             "Container": {"type": "object", "properties": {"image": {"type": "string"}}},
         }
 
+        # Set up mock mappings with the schema containing nested references
+        mock_mappings = {"nestedresource": [schema_with_ref]}
+
         # Set up test data using monkeypatch
-        monkeypatch.setattr(SchemaValidator, "_mappings_data", {})
+        monkeypatch.setattr(SchemaValidator, "_mappings_data", mock_mappings)
         monkeypatch.setattr(SchemaValidator, "_definitions_data", definitions)
 
-        resolver = MagicMock()
-        resolved = SchemaValidator._resolve_refs(obj=schema_with_ref, resolver=resolver)
+        # Use the public load_schema method which will resolve refs internally
+        with patch.object(SchemaValidator, "load_mappings_data", return_value=True):
+            resolved = SchemaValidator.load_schema(kind="NestedResource")
 
         # Check that nested $refs were resolved
+        assert resolved is not None
         assert "image" in resolved["properties"]["spec"]["properties"]["container"]["properties"]
         assert resolved["properties"]["spec"]["properties"]["container"]["type"] == "object"
 
@@ -271,13 +272,31 @@ class TestSchemaLoadingWithApiGroup:
         # But we shouldn't rely on order, just verify we got a schema
         assert "description" in schema
 
-    def test_load_schema_with_wrong_api_group_fallback(self):
+    def test_load_schema_with_wrong_api_group_fallback(self, caplog):
         """Test that wrong API group falls back to first schema with warning."""
-        # Try to load DNS with a non-existent API group
-        schema = SchemaValidator.load_schema(kind="DNS", api_group="nonexistent.io")
+        import logging
+
+        # Set log level to capture warnings
+        with caplog.at_level(logging.WARNING):
+            # Try to load DNS with a non-existent API group
+            schema = SchemaValidator.load_schema(kind="DNS", api_group="nonexistent.io")
 
         # Should still get a schema (fallback to first)
         assert schema is not None
+
+        # Verify that a warning was logged about the wrong API group
+        assert len(caplog.records) > 0
+        warning_logged = False
+        for record in caplog.records:
+            if (
+                "Could not find schema for DNS with API group nonexistent.io" in record.message
+                and "Available groups:" in record.message
+            ):
+                warning_logged = True
+                break
+        assert warning_logged, (
+            f"Expected warning about wrong API group not found. Logs: {[r.message for r in caplog.records]}"
+        )
 
     def test_cache_key_includes_api_group(self):
         """Test that schemas are cached separately by API group."""

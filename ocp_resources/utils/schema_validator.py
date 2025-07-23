@@ -89,6 +89,22 @@ class SchemaValidator:
         return cls._mappings_data
 
     @classmethod
+    def get_definitions_data(cls) -> dict[str, Any] | None:
+        """
+        Get the resource definitions data.
+
+        This method provides public access to the definitions data while maintaining
+        encapsulation. It ensures the data is loaded before returning.
+
+        Returns:
+            dict[str, Any] | None: The definitions data or None if not loaded
+        """
+        # Ensure data is loaded
+        if cls._definitions_data is None:
+            cls.load_mappings_data()
+        return cls._definitions_data
+
+    @classmethod
     def load_schema(cls, kind: str, api_group: str | None = None) -> dict[str, Any] | None:
         """
         Load OpenAPI schema for a resource kind from the mappings file.
@@ -279,5 +295,10 @@ class SchemaValidator:
 
     @classmethod
     def clear_cache(cls) -> None:
-        """Clear all cached data (useful for testing)."""
+        """Clear the schema cache (useful for testing).
+
+        This only clears the _schema_cache which contains resolved schemas.
+        It does not clear _mappings_data or _definitions_data which are
+        loaded from files.
+        """
         cls._schema_cache.clear()

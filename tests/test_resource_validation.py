@@ -186,7 +186,7 @@ class TestResourceValidation:
             # Should mention at least one of the issues
             assert any(term in error_str for term in ["kind", "metadata", "spec", "required", "type"])
 
-    def test_validate_performance_with_cache(self, fake_client, enable_validation_by_default):
+    def test_validate_performance_with_cache(self, fake_client, enable_validation_by_default, monkeypatch):
         """Test that schema caching improves performance."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -200,9 +200,9 @@ class TestResourceValidation:
         mock_mappings = {"pod": [POD_SCHEMA]}
         mock_definitions = {}  # Empty definitions for this test
 
-        # Set up the class attributes
-        SchemaValidator._mappings_data = mock_mappings
-        SchemaValidator._definitions_data = mock_definitions
+        # Set up the class attributes using monkeypatch
+        monkeypatch.setattr(SchemaValidator, "_mappings_data", mock_mappings)
+        monkeypatch.setattr(SchemaValidator, "_definitions_data", mock_definitions)
 
         try:
             # Mock load_mappings_data to return True (already loaded)
