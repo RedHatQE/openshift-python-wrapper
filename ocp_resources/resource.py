@@ -9,6 +9,7 @@ import threading
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Generator
 from io import StringIO
+from pathlib import Path
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Any, Type
@@ -560,6 +561,10 @@ class Resource(ResourceConstants):
         V1BETA1: str = "v1beta1"
         V1ALPHA1: str = "v1alpha1"
         V1ALPHA3: str = "v1alpha3"
+
+    # Class-level schema cache shared across all resources
+    _schema_cache: dict[str, dict[str, Any]] = {}
+    _schema_validation_enabled: bool = False
 
     def __init__(
         self,
@@ -1424,6 +1429,64 @@ class Resource(ResourceConstants):
                     break
 
         return ""
+
+    def _find_schema_file(self) -> Path | None:
+        """
+        Find the schema file for this resource kind.
+
+        Returns:
+            Path to the schema file or None if not found
+        """
+        from pathlib import Path
+        from class_generator.class_generator import convert_camel_case_to_snake_case
+
+        # Get the schema directory
+        schema_dir = Path(__file__).parent.parent / "class_generator" / "schema"
+
+        # Convert kind to lowercase filename
+        schema_filename = f"{convert_camel_case_to_snake_case(name=self.kind)}.json"
+        schema_path = schema_dir / schema_filename
+
+        if schema_path.exists():
+            return schema_path
+
+        # Try just lowercase as fallback
+        schema_filename_lower = f"{self.kind.lower()}.json"
+        schema_path_lower = schema_dir / schema_filename_lower
+
+        if schema_path_lower.exists():
+            return schema_path_lower
+
+        return None
+
+    def _load_schema(self) -> dict[str, Any] | None:
+        """
+        Load OpenAPI schema for this resource kind.
+
+        Returns:
+            Schema dict or None if not found
+        """
+        # Check cache first
+        if self.kind in self._schema_cache:
+            return self._schema_cache[self.kind]
+
+        # Find and load schema file
+        schema_file = self._find_schema_file()
+        if not schema_file:
+            return None
+
+        try:
+            with open(schema_file, "r") as f:
+                schema = json.load(f)
+                # Cache the schema
+                self._schema_cache[self.kind] = schema
+                return schema
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Failed to parse schema file {schema_file}: {e}")
+            return None
+        except IOError as e:
+            self.logger.error(f"Failed to read schema file {schema_file}: {e}")
+            return None
 
 
 class NamespacedResource(Resource):
