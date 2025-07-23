@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.deployment import Deployment
 
 
 @pytest.mark.incremental
 class TestDeployment:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def deployment(self, client):
+    def deployment(self, fake_client):
         return Deployment(
-            client=client,
+            client=fake_client,
             name="test-deployment",
             namespace="default",
             selector={"matchLabels": {"app": "test"}},

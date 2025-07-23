@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.console_config_openshift_io import Console
 
 
 @pytest.mark.incremental
 class TestConsole:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def console(self, client):
+    def console(self, fake_client):
         return Console(
-            client=client,
+            client=fake_client,
             name="test-console",
         )
 

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.llama_stack_distribution import LlamaStackDistribution
 
 
 @pytest.mark.incremental
 class TestLlamaStackDistribution:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def llamastackdistribution(self, client):
+    def llamastackdistribution(self, fake_client):
         return LlamaStackDistribution(
-            client=client,
+            client=fake_client,
             name="test-llamastackdistribution",
             namespace="default",
             server={"test-server": "test-value"},

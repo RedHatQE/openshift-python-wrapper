@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 
 
 @pytest.mark.incremental
 class TestImageContentSourcePolicy:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def imagecontentsourcepolicy(self, client):
+    def imagecontentsourcepolicy(self, fake_client):
         return ImageContentSourcePolicy(
-            client=client,
+            client=fake_client,
             name="test-imagecontentsourcepolicy",
         )
 

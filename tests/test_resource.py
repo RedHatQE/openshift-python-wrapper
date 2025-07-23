@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import pytest
 
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
@@ -24,25 +23,20 @@ class SecretTestExit(Secret):
 
 
 @pytest.fixture(scope="class")
-def client():
-    yield FakeDynamicClient()
+def namespace(fake_client):
+    return Namespace(client=fake_client, name=BASE_NAMESPACE_NAME)
 
 
 @pytest.fixture(scope="class")
-def namespace(client):
-    return Namespace(client=client, name=BASE_NAMESPACE_NAME)
+def namespaces(fake_client):
+    return ResourceList(client=fake_client, resource_class=Namespace, num_resources=3, name=BASE_NAMESPACE_NAME)
 
 
 @pytest.fixture(scope="class")
-def namespaces(client):
-    return ResourceList(client=client, resource_class=Namespace, num_resources=3, name=BASE_NAMESPACE_NAME)
-
-
-@pytest.fixture(scope="class")
-def pod(client):
+def pod(fake_client):
     # Create a test pod for testing purposes
     test_pod = Pod(
-        client=client,
+        client=fake_client,
         name=BASE_POD_NAME,
         namespace="default",
         containers=POD_CONTAINERS,
@@ -55,9 +49,9 @@ def pod(client):
 
 
 @pytest.fixture(scope="class")
-def pods(client, namespaces):
+def pods(fake_client, namespaces):
     return NamespacedResourceList(
-        client=client,
+        client=fake_client,
         resource_class=Pod,
         namespaces=namespaces,
         name=BASE_POD_NAME,
@@ -67,8 +61,8 @@ def pods(client, namespaces):
 
 @pytest.mark.incremental
 class TestResource:
-    def test_get(self, client):
-        for ns in Namespace.get(dyn_client=client):
+    def test_get(self, fake_client):
+        for ns in Namespace.get(dyn_client=fake_client):
             assert ns.name
 
     def test_create(self, namespace):
@@ -94,8 +88,8 @@ class TestResource:
         events = list(pod.events(timeout=1))
         assert events
 
-    def test_get_all_cluster_resources(self, client):
-        for _resources in Resource.get_all_cluster_resources(client=client):
+    def test_get_all_cluster_resources(self, fake_client):
+        for _resources in Resource.get_all_cluster_resources(client=fake_client):
             if _resources:
                 break
 
@@ -125,15 +119,15 @@ class TestResource:
     def test_cleanup(self, namespace):
         namespace.clean_up(wait=False)
 
-    def test_resource_context_manager(self, client):
-        with Secret(name="test-context-manager", namespace="default", client=client) as sec:
+    def test_resource_context_manager(self, fake_client):
+        with Secret(name="test-context-manager", namespace="default", client=fake_client) as sec:
             pass
 
         assert not sec.exists
 
-    def test_resource_context_manager_exit(self, client):
+    def test_resource_context_manager_exit(self, fake_client):
         with pytest.raises(ResourceTeardownError):
-            with SecretTestExit(name="test-context-manager-exit", namespace="default", client=client):
+            with SecretTestExit(name="test-context-manager-exit", namespace="default", client=fake_client):
                 pass
 
 
@@ -153,16 +147,16 @@ class TestResourceList:
     def test_resource_list_teardown(self, namespaces):
         namespaces.clean_up(wait=False)
 
-    def test_resource_list_context_manager(self, client):
+    def test_resource_list_context_manager(self, fake_client):
         with ResourceList(
-            client=client, resource_class=Namespace, name=BASE_NAMESPACE_NAME, num_resources=3
+            client=fake_client, resource_class=Namespace, name=BASE_NAMESPACE_NAME, num_resources=3
         ) as namespaces:
             assert namespaces
 
 
 @pytest.mark.incremental
 class TestNamespacedResourceList:
-    def test_namespaced_resource_list_deploy(self, client, pods):
+    def test_namespaced_resource_list_deploy(self, fake_client, pods):
         pods.deploy()
         assert pods
 
@@ -180,9 +174,9 @@ class TestNamespacedResourceList:
     def test_resource_list_teardown(self, pods):
         pods.clean_up(wait=False)
 
-    def test_namespaced_resource_list_context_manager(self, client, namespaces):
+    def test_namespaced_resource_list_context_manager(self, fake_client, namespaces):
         with NamespacedResourceList(
-            client=client,
+            client=fake_client,
             resource_class=Pod,
             namespaces=namespaces,
             name=BASE_POD_NAME,
@@ -194,15 +188,15 @@ class TestNamespacedResourceList:
 @pytest.mark.xfail(reason="Need debug")
 class TestClientProxy:
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
-    def test_client_with_proxy(self, client):
+    def test_client_with_proxy(self, fake_client):
         http_proxy = "http://env-http-proxy.com"
 
-        assert client.configuration.proxy == http_proxy
+        assert fake_client.configuration.proxy == http_proxy
 
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-http-proxy.com"})
     @patch.dict(os.environ, {"HTTPS_PROXY": "http://env-https-proxy.com"})
-    def test_proxy_precedence(self, client):
+    def test_proxy_precedence(self, fake_client):
         https_proxy = "https://env-https-proxy.com"
 
         # Verify HTTPS_PROXY takes precedence over HTTP_PROXY
-        assert client.configuration.proxy == https_proxy
+        assert fake_client.configuration.proxy == https_proxy

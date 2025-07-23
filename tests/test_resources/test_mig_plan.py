@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.mig_plan import MigPlan
 
 
 @pytest.mark.incremental
 class TestMigPlan:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def migplan(self, client):
+    def migplan(self, fake_client):
         return MigPlan(
-            client=client,
+            client=fake_client,
             name="test-migplan",
             namespace="default",
         )

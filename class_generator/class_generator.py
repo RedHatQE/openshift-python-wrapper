@@ -2,13 +2,13 @@ import ast
 import filecmp
 import json
 import os
-import re
 import shlex
 import shutil
 import sys
 import textwrap
 import time
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from io import StringIO
 from pathlib import Path
 from tempfile import gettempdir
 from typing import Any
@@ -18,18 +18,23 @@ import pytest
 import requests
 from cloup.constraints import If, IsSet, accept_none, require_one
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
+from kubernetes.dynamic import DynamicClient
 from packaging.version import Version
 from pyhelper_utils.shell import run_command
 from rich.console import Console
+from rich.panel import Panel
 from rich.syntax import Syntax
+from rich.table import Table
 from simple_logger.logger import get_logger
 
 from ocp_resources.resource import Resource, get_client
-from kubernetes.dynamic import DynamicClient
+from ocp_resources.utils.schema_validator import SchemaValidator
+from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
+# Set global logging
+LOGGER = get_logger(name="class_generator")
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
-LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
@@ -419,11 +424,6 @@ def generate_report(coverage_analysis: dict[str, Any], output_format: str = "hum
 
     else:
         # Human-readable format with Rich
-        from rich.console import Console
-        from rich.table import Table
-        from rich.panel import Panel
-        from io import StringIO
-
         # Create string buffer to capture Rich output
         string_buffer = StringIO()
         console = Console(file=string_buffer, force_terminal=True, width=120)
@@ -594,8 +594,17 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_defi
     with open(not_kind_file, "w") as fd:
         fd.writelines("\n".join(not_kind_list))
 
+    # Clear SchemaValidator cache so it reloads the updated files
+    SchemaValidator.clear_cache()
+
 
 def read_resources_mapping_file() -> dict[Any, Any]:
+    """Read resources mapping using SchemaValidator for consistency"""
+    # Try to use SchemaValidator first
+    if SchemaValidator.load_mappings_data():
+        return SchemaValidator._mappings_data or {}
+
+    # Fallback for cases where schema files don't exist yet (e.g., initial generation)
     try:
         with open(RESOURCES_MAPPING_FILE) as fd:
             return json.load(fd)
@@ -701,112 +710,8 @@ def update_kind_schema():
         client=client, newer_cluster_version=same_or_newer_version, schema_definition_file=ocp_openapi_json_file
     )
 
-    # Copy the resources mapping file to fake_kubernetes_client for the fake client to use
-    fake_client_mappings = Path("fake_kubernetes_client/__resources-mappings.json")
-    try:
-        shutil.copy2(RESOURCES_MAPPING_FILE, fake_client_mappings)
-    except (OSError, IOError):
-        # Don't fail the entire process if copy fails
-        pass
-
-
-def convert_camel_case_to_snake_case(name: str) -> str:
-    """
-    Converts a camel case string to snake case.
-
-    Args:
-        name (str): The camel case string to convert.
-
-    Returns:
-        str: The snake case representation of the input string.
-
-    Examples:
-        >>> convert_camel_case_to_snake_case(string_="allocateLoadBalancerNodePorts")
-        'allocate_load_balancer_node_ports'
-        >>> convert_camel_case_to_snake_case(string_="clusterIPs")
-        'cluster_ips'
-        >>> convert_camel_case_to_snake_case(string_="additionalCORSAllowedOS")
-        'additional_cors_allowed_os'
-
-    Notes:
-        - This function assumes that the input string adheres to camel case conventions.
-        - If the input string contains acronyms (e.g., "XMLHttpRequest"), they will be treated as separate words
-          (e.g., "xml_http_request").
-        - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
-          (e.g., "myCamelCaseString").
-    """
-    do_not_process_list = ["oauth", "kubevirt"]
-
-    # If the input string is in the do_not_proccess_list, return it as it is.
-    if name.lower() in do_not_process_list:
-        return name.lower()
-
-    formatted_str: str = ""
-
-    if name.islower():
-        return name
-
-    # For single words, e.g "Service" or "SERVICE"
-    if name.istitle() or name.isupper():
-        return name.lower()
-
-    # To decide if underscore is needed before a char, keep the last char format.
-    # If previous char is uppercase, underscode should not be added. Also applied for the first char in the string.
-    last_capital_char: bool | None = None
-
-    # To decide if there are additional words ahead; if found, there is at least one more word ahead, else this is the
-    # last word. Underscore should be added before it and all chars from here should be lowercase.
-    following_capital_chars: re.Match | None = None
-
-    str_len_for_idx_check = len(name) - 1
-
-    for idx, char in enumerate(name):
-        # If lower case, append to formatted string
-        if char.islower():
-            formatted_str += char
-            last_capital_char = False
-
-        # If first char is uppercase
-        elif idx == 0:
-            formatted_str += char.lower()
-            last_capital_char = True
-
-        else:
-            if idx < str_len_for_idx_check:
-                following_capital_chars = re.search(r"[A-Z]", "".join(name[idx + 1 :]))
-            if last_capital_char:
-                if idx < str_len_for_idx_check and name[idx + 1].islower():
-                    if following_capital_chars:
-                        formatted_str += f"_{char.lower()}"
-                        last_capital_char = True
-                        continue
-
-                    remaining_str = "".join(name[idx:])
-                    # The 2 letters in the string; uppercase char followed by lowercase char.
-                    # Example: `clusterIPs`, handle `Ps` at this point
-                    if idx + 1 == str_len_for_idx_check:
-                        formatted_str += remaining_str.lower()
-                        break
-
-                    # The last word in the string; uppercase followed by multiple lowercase chars
-                    # Example: `dataVolumeTTLSeconds`, handle `Seconds` at this point
-                    elif remaining_str.istitle():
-                        formatted_str += f"_{remaining_str.lower()}"
-                        break
-
-                    else:
-                        formatted_str += char.lower()
-                        last_capital_char = True
-
-                else:
-                    formatted_str += char.lower()
-                    last_capital_char = True
-
-            else:
-                formatted_str += f"_{char.lower()}"
-                last_capital_char = True
-
-    return formatted_str
+    # Clear SchemaValidator cache after updating schemas
+    SchemaValidator.clear_cache()
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:

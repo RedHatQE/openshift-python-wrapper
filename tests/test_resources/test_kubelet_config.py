@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.kubelet_config import KubeletConfig
 
 
 @pytest.mark.incremental
 class TestKubeletConfig:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def kubeletconfig(self, client):
+    def kubeletconfig(self, fake_client):
         return KubeletConfig(
-            client=client,
+            client=fake_client,
             name="test-kubeletconfig",
         )
 

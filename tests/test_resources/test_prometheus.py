@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.prometheus import Prometheus
 
 
 @pytest.mark.incremental
 class TestPrometheus:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def prometheus(self, client):
+    def prometheus(self, fake_client):
         return Prometheus(
-            client=client,
+            client=fake_client,
             name="test-prometheus",
             namespace="default",
         )

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.volume_snapshot_class import VolumeSnapshotClass
 
 
 @pytest.mark.incremental
 class TestVolumeSnapshotClass:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def volumesnapshotclass(self, client):
+    def volumesnapshotclass(self, fake_client):
         return VolumeSnapshotClass(
-            client=client,
+            client=fake_client,
             name="test-volumesnapshotclass",
             deletion_policy="Delete",
             driver="example.com/csi-driver",

@@ -1,5 +1,13 @@
 import pytest
 
+from ocp_resources.resource import get_client
+
+
+@pytest.fixture(scope="class")
+def fake_client():
+    """Fixture that provides a fake client for testing"""
+    return get_client(fake=True)
+
 
 def pytest_runtest_makereport(item, call):
     """

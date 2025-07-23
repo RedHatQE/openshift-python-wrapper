@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.image_caching_internal_knative_dev import Image
 
 
 @pytest.mark.incremental
 class TestImage:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def image(self, client):
+    def image(self, fake_client):
         return Image(
-            client=client,
+            client=fake_client,
             name="test-image",
             namespace="default",
             image="test-image",

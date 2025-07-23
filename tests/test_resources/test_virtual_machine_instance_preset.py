@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.virtual_machine_instance_preset import VirtualMachineInstancePreset
 
 
 @pytest.mark.incremental
 class TestVirtualMachineInstancePreset:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def virtualmachineinstancepreset(self, client):
+    def virtualmachineinstancepreset(self, fake_client):
         return VirtualMachineInstancePreset(
-            client=client,
+            client=fake_client,
             name="test-virtualmachineinstancepreset",
             namespace="default",
             selector={"matchLabels": {"app": "test"}},

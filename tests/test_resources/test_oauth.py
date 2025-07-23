@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.oauth import OAuth
 
 
 @pytest.mark.incremental
 class TestOAuth:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def oauth(self, client):
+    def oauth(self, fake_client):
         return OAuth(
-            client=client,
+            client=fake_client,
             name="test-oauth",
         )
 

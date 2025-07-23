@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.direct_volume_migration import DirectVolumeMigration
 
 
 @pytest.mark.incremental
 class TestDirectVolumeMigration:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def directvolumemigration(self, client):
+    def directvolumemigration(self, fake_client):
         return DirectVolumeMigration(
-            client=client,
+            client=fake_client,
             name="test-directvolumemigration",
             namespace="default",
         )

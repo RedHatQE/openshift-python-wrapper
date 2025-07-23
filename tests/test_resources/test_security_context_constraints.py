@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.security_context_constraints import SecurityContextConstraints
 
 
 @pytest.mark.incremental
 class TestSecurityContextConstraints:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def securitycontextconstraints(self, client):
+    def securitycontextconstraints(self, fake_client):
         return SecurityContextConstraints(
-            client=client,
+            client=fake_client,
             name="test-securitycontextconstraints",
             allow_host_dir_volume_plugin=True,
             allow_host_ipc=True,

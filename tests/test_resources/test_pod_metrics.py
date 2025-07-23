@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.pod_metrics import PodMetrics
 
 
 @pytest.mark.incremental
 class TestPodMetrics:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def podmetrics(self, client):
+    def podmetrics(self, fake_client):
         return PodMetrics(
-            client=client,
+            client=fake_client,
             name="test-podmetrics",
             namespace="default",
             containers=["test-containers"],

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.machine import Machine
 
 
 @pytest.mark.incremental
 class TestMachine:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def machine(self, client):
+    def machine(self, fake_client):
         return Machine(
-            client=client,
+            client=fake_client,
             name="test-machine",
             namespace="default",
         )

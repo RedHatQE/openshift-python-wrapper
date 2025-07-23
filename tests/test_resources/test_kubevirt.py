@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.kubevirt import KubeVirt
 
 
 @pytest.mark.incremental
 class TestKubeVirt:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def kubevirt(self, client):
+    def kubevirt(self, fake_client):
         return KubeVirt(
-            client=client,
+            client=fake_client,
             name="test-kubevirt",
             namespace="default",
         )

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.model_registry_components_platform_opendatahub_io import ModelRegistry
 
 
 @pytest.mark.incremental
 class TestModelRegistry:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def modelregistry(self, client):
+    def modelregistry(self, fake_client):
         return ModelRegistry(
-            client=client,
+            client=fake_client,
             name="test-modelregistry",
         )
 

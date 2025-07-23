@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.cluster_resource_quota import ClusterResourceQuota
 
 
 @pytest.mark.incremental
 class TestClusterResourceQuota:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def clusterresourcequota(self, client):
+    def clusterresourcequota(self, fake_client):
         return ClusterResourceQuota(
-            client=client,
+            client=fake_client,
             name="test-clusterresourcequota",
             quota={"test-quota": "test-value"},
             selector={"matchLabels": {"app": "test"}},

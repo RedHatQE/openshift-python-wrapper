@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.service_serving_knative_dev import Service
 
 
 @pytest.mark.incremental
 class TestService:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def service(self, client):
+    def service(self, fake_client):
         return Service(
-            client=client,
+            client=fake_client,
             name="test-service",
             namespace="default",
             template={"spec": {"containers": [{"image": "nginx:latest", "name": "nginx"}]}},

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.storage_cluster import StorageCluster
 
 
 @pytest.mark.incremental
 class TestStorageCluster:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def storagecluster(self, client):
+    def storagecluster(self, fake_client):
         return StorageCluster(
-            client=client,
+            client=fake_client,
             name="test-storagecluster",
             namespace="default",
         )

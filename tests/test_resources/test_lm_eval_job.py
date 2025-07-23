@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.lm_eval_job import LMEvalJob
 
 
 @pytest.mark.incremental
 class TestLMEvalJob:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def lmevaljob(self, client):
+    def lmevaljob(self, fake_client):
         return LMEvalJob(
-            client=client,
+            client=fake_client,
             name="test-lmevaljob",
             namespace="default",
             model="test-model",

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.snapshot import Snapshot
 
 
 @pytest.mark.incremental
 class TestSnapshot:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def snapshot(self, client):
+    def snapshot(self, fake_client):
         return Snapshot(
-            client=client,
+            client=fake_client,
             name="test-snapshot",
             namespace="default",
             application="test-application",

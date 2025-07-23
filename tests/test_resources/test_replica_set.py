@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.replica_set import ReplicaSet
 
 
 @pytest.mark.incremental
 class TestReplicaSet:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def replicaset(self, client):
+    def replicaset(self, fake_client):
         return ReplicaSet(
-            client=client,
+            client=fake_client,
             name="test-replicaset",
             namespace="default",
             selector={"matchLabels": {"app": "test"}},

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.maria_db import MariaDB
 
 
 @pytest.mark.incremental
 class TestMariaDB:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def mariadb(self, client):
+    def mariadb(self, fake_client):
         return MariaDB(
-            client=client,
+            client=fake_client,
             name="test-mariadb",
             namespace="default",
         )

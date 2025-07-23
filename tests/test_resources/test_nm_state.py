@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.nm_state import NMState
 
 
 @pytest.mark.incremental
 class TestNMState:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def nmstate(self, client):
+    def nmstate(self, fake_client):
         return NMState(
-            client=client,
+            client=fake_client,
             name="test-nmstate",
         )
 

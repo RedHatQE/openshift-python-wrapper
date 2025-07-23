@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.aaq import AAQ
 
 
 @pytest.mark.incremental
 class TestAAQ:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def aaq(self, client):
+    def aaq(self, fake_client):
         return AAQ(
-            client=client,
+            client=fake_client,
             name="test-aaq",
         )
 
