@@ -70,6 +70,7 @@ fcn_exclude_functions =
     shutil,
     asyncio,
     __class__,
+    cls,
 
 enable-extensions =
     FCN,
