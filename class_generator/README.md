@@ -37,17 +37,84 @@ if type class-generator > /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=zsh_
 class-generator --help
 ```
 
+### Generating classes for specific resources
+
 - Running in normal mode with `--kind` flags:
   - `--kind` can process multiple kinds at the same command, pass `--kind <kind1>,<kind2>,<kind3>`
 
 ```bash
 class-generator --kind <kind>
-
 ```
 
 - Review the resource file; make sure that the filename and attribute names are named correctly. For example:
   - `OATH` -> `oath`
   - `CDIConfig` -> `cdi_config`
+
+### Discovering missing resources
+
+The class-generator can automatically discover resources in your cluster that don't have wrapper classes yet. Resource discovery runs in parallel for improved performance.
+
+- Discover missing resources:
+
+```bash
+class-generator --discover-missing
+```
+
+- Generate a coverage report:
+
+```bash
+class-generator --coverage-report
+```
+
+- Generate JSON output for CI/CD:
+
+```bash
+class-generator --coverage-report --json
+```
+
+- Automatically generate classes for all missing resources:
+
+```bash
+class-generator --discover-missing --generate-missing
+```
+
+### Example output
+
+```
+Resource Coverage Report
+
+╭─────────────────────────── Coverage Statistics ────────────────────────────╮
+│ Total Discovered Resources: 150                                             │
+│ Implemented Resources: 120                                                  │
+│ Covered Resources: 120                                                      │
+│ Missing Resources: 30                                                       │
+│ Coverage Percentage: 80.0%                                                  │
+╰─────────────────────────────────────────────────────────────────────────────╯
+
+Missing Resources (sorted by priority)
+
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Priority   ┃ Kind            ┃ API Version             ┃ Namespaced ┃ Command                                 ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ CORE       │ Secret          │ v1                      │ Yes        │ class-generator -k Secret               │
+│ CORE       │ Node            │ v1                      │ No         │ class-generator -k Node                 │
+│ HIGH       │ StatefulSet     │ apps/v1                 │ Yes        │ class-generator -k StatefulSet          │
+│ HIGH       │ NetworkPolicy   │ networking.k8s.io/v1    │ Yes        │ class-generator -k NetworkPolicy        │
+│ MEDIUM     │ Route           │ route.openshift.io/v1   │ Yes        │ class-generator -k Route                │
+└────────────┴─────────────────┴─────────────────────────┴────────────┴─────────────────────────────────────────┘
+
+Tip: You can generate multiple resources at once:
+
+  class-generator -k Secret,Node
+```
+
+### Caching
+
+Discovery results are cached for 24 hours to improve performance. You can disable caching:
+
+```bash
+class-generator --discover-missing --no-cache
+```
 
 ## Adding tests
 
