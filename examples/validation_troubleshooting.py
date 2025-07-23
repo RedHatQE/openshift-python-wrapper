@@ -258,8 +258,12 @@ def case_6_validation_performance():
                     "kind": resource_cls.kind,
                     "metadata": {"name": "dummy"}
                 })
-            except:
-                pass  # Ignore errors, just loading schemas
+            except ValidationError:
+                # Schema validation errors are expected during warmup
+                pass  # Ignore validation errors, just loading schemas
+            except (ValueError, TypeError, AttributeError) as e:
+                # Handle potential errors from missing/malformed data
+                print(f"Warning: Failed to warmup cache for {resource_cls.kind}: {e}")
     """)
 
 

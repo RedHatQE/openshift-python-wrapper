@@ -39,7 +39,7 @@ class FakeResourceRegistry:
         if self._resource_mappings_cache is None:
             # Use SchemaValidator to load the mappings - single source of truth
             if SchemaValidator.load_mappings_data():
-                self._resource_mappings_cache = SchemaValidator._mappings_data or {}
+                self._resource_mappings_cache = SchemaValidator.get_mappings_data() or {}
                 logger.debug(f"Loaded {len(self._resource_mappings_cache)} resource mappings from SchemaValidator")
             else:
                 logger.error("Failed to load resource mappings from SchemaValidator")

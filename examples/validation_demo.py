@@ -207,7 +207,7 @@ def demo_error_details():
     # Create pod with multiple errors
     print("Creating a pod with multiple validation errors...")
     pod = Pod(
-        name="123-invalid-name",  # Names can't start with numbers
+        name="invalid-name-",  # Names must start and end with alphanumeric, can only contain lowercase alphanumeric or hyphens
         namespace="default",
         containers=[
             {

@@ -15,18 +15,43 @@ from tests.fixtures.validation_schemas import (
 )
 
 
+@pytest.fixture(autouse=True)
+def reset_schema_validator():
+    """Reset SchemaValidator state before each test to prevent test pollution."""
+    # Clear any existing state before test
+    SchemaValidator._mappings_data = None
+    SchemaValidator._definitions_data = None
+    SchemaValidator._schema_cache.clear()
+
+    yield
+
+    # Clear state after test as well
+    SchemaValidator._mappings_data = None
+    SchemaValidator._definitions_data = None
+    SchemaValidator._schema_cache.clear()
+
+
+@pytest.fixture
+def enable_validation_by_default(monkeypatch):
+    """Fixture to enable schema validation by default for all Resource instances during tests."""
+    original_init = Resource.__init__
+
+    def patched_init(self, *args, **kwargs):
+        # If schema_validation_enabled is not explicitly set, default to True
+        if "schema_validation_enabled" not in kwargs:
+            kwargs["schema_validation_enabled"] = True
+        # Call original_init with self as keyword argument to satisfy FCN001
+        return original_init(self=self, *args, **kwargs)
+
+    monkeypatch.setattr(Resource, "__init__", patched_init)
+    yield
+    # Cleanup happens automatically when fixture goes out of scope
+
+
 class TestResourceValidation:
     """Test resource validation functionality."""
 
-    def setup_method(self):
-        """Enable validation for tests."""
-        Resource._schema_validation_enabled = True
-
-    def teardown_method(self):
-        """Disable validation after tests."""
-        Resource._schema_validation_enabled = False
-
-    def test_validate_with_valid_resource(self, fake_client):
+    def test_validate_with_valid_resource(self, fake_client, enable_validation_by_default):
         """Test validation passes with valid resource."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -42,7 +67,7 @@ class TestResourceValidation:
             with patch.object(SchemaValidator, "load_schema", return_value=POD_SCHEMA):
                 Pod.validate_dict(resource_dict=POD_VALID)
 
-    def test_validate_with_invalid_resource_missing_required(self, fake_client):
+    def test_validate_with_invalid_resource_missing_required(self, fake_client, enable_validation_by_default):
         """Test validation fails when required fields are missing."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -60,7 +85,7 @@ class TestResourceValidation:
 
             assert "'metadata' is a required property" in str(exc_info.value)
 
-    def test_validate_with_invalid_resource_wrong_type(self, fake_client):
+    def test_validate_with_invalid_resource_wrong_type(self, fake_client, enable_validation_by_default):
         """Test validation fails when field has wrong type."""
         pod = Pod(name="test-pod", namespace="default", client=fake_client)
 
@@ -78,7 +103,7 @@ class TestResourceValidation:
             assert "spec" in str(exc_info.value)
             assert "must be of type" in str(exc_info.value) or "is not of type" in str(exc_info.value)
 
-    def test_validate_with_no_schema_available(self, fake_client):
+    def test_validate_with_no_schema_available(self, fake_client, enable_validation_by_default):
         """Test validation is skipped when no schema is available."""
         pod = Pod(name="test-pod", namespace="default", client=fake_client)
         pod.res = POD_VALID
@@ -118,7 +143,7 @@ class TestResourceValidation:
         assert "Field: metadata" in formatted
         assert "'name' is a required property" in formatted
 
-    def test_validate_with_nested_error(self, fake_client):
+    def test_validate_with_nested_error(self, fake_client, enable_validation_by_default):
         """Test validation with deeply nested error."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -138,7 +163,7 @@ class TestResourceValidation:
             error_str = str(exc_info.value)
             assert "spec.containers[0].image" in error_str or "spec.containers.0.image" in error_str
 
-    def test_validate_with_multiple_errors(self, fake_client):
+    def test_validate_with_multiple_errors(self, fake_client, enable_validation_by_default):
         """Test validation reports multiple errors."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -161,7 +186,7 @@ class TestResourceValidation:
             # Should mention at least one of the issues
             assert any(term in error_str for term in ["kind", "metadata", "spec", "required", "type"])
 
-    def test_validate_performance_with_cache(self, fake_client):
+    def test_validate_performance_with_cache(self, fake_client, enable_validation_by_default):
         """Test that schema caching improves performance."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -197,7 +222,7 @@ class TestResourceValidation:
             # Clean up
             SchemaValidator.clear_cache()
 
-    def test_validate_with_additional_properties(self, fake_client):
+    def test_validate_with_additional_properties(self, fake_client, enable_validation_by_default):
         """Test validation passes even with additional properties not in schema."""
         pod = Pod(
             name="test-pod", namespace="default", containers=[{"name": "test", "image": "test"}], client=fake_client
@@ -214,16 +239,16 @@ class TestResourceValidation:
             # Should not raise any exception - additional properties are allowed
             pod.validate()
 
-    def test_validate_with_api_group_disambiguation(self, fake_client):
+    def test_validate_with_api_group_disambiguation(self, fake_client, enable_validation_by_default):
         """Test that resources with same kind but different API groups use correct schema."""
 
         # Mock DNS classes to avoid initialization issues
         class MockDNSConfig:
             kind = "DNS"
             api_group = "config.openshift.io"
-            _schema_validation_enabled = True
             name = "cluster"
             res = {"apiVersion": "config.openshift.io/v1", "kind": "DNS", "metadata": {"name": "cluster"}, "spec": {}}
+            schema_validation_enabled = True
 
             def validate(self):
                 from ocp_resources.resource import Resource
@@ -233,9 +258,9 @@ class TestResourceValidation:
         class MockDNSOperator:
             kind = "DNS"
             api_group = "operator.openshift.io"
-            _schema_validation_enabled = True
             name = "default"
             res = {"apiVersion": "operator.openshift.io/v1", "kind": "DNS", "metadata": {"name": "default"}, "spec": {}}
+            schema_validation_enabled = True
 
             def validate(self):
                 from ocp_resources.resource import Resource
@@ -295,7 +320,7 @@ class TestAutoValidation:
         pod2 = Pod(name="test-pod2", namespace="default", client=fake_client, schema_validation_enabled=True)
         assert pod2.schema_validation_enabled is True
 
-    def test_auto_validation_on_create(self, monkeypatch, fake_client):
+    def test_auto_validation_on_create(self, monkeypatch, fake_client, enable_validation_by_default):
         """Test that validation runs automatically on create when enabled."""
         # Track if validate was called
         validate_calls = []
@@ -337,7 +362,7 @@ class TestAutoValidation:
         assert deployed2
         assert len(validate_calls) == 1
 
-    def test_auto_validation_on_update_replace(self, monkeypatch, fake_client):
+    def test_auto_validation_on_update_replace(self, monkeypatch, fake_client, enable_validation_by_default):
         """Test that validation runs automatically on update_replace when enabled."""
         # Track if validate_dict was called
         validate_calls = []
@@ -370,7 +395,7 @@ class TestAutoValidation:
         assert len(validate_calls) == 1
         assert validate_calls[0] == replacement_dict
 
-    def test_auto_validation_with_validation_error(self, monkeypatch, fake_client):
+    def test_auto_validation_with_validation_error(self, monkeypatch, fake_client, enable_validation_by_default):
         """Test that validation errors prevent create/update when auto-validation is enabled."""
         # Create pod with validation enabled
         pod = Pod(
