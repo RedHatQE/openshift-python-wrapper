@@ -1,8 +1,6 @@
 import pytest
 
-from class_generator.class_generator import (
-    convert_camel_case_to_snake_case,
-)
+from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 
 @pytest.mark.parametrize(

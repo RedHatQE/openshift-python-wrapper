@@ -190,8 +190,8 @@ class TestSchemaLoading:
 
     def test_camelcase_to_snake_case(self):
         """Test CamelCase to snake_case conversion."""
-        # Use the existing function from class_generator
-        from class_generator.class_generator import convert_camel_case_to_snake_case
+        # Use the function from utils
+        from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
         test_cases = [
             ("Pod", "pod"),

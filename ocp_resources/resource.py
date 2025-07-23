@@ -1438,7 +1438,7 @@ class Resource(ResourceConstants):
             Path to the schema file or None if not found
         """
         from pathlib import Path
-        from class_generator.class_generator import convert_camel_case_to_snake_case
+        from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
         # Get the schema directory
         schema_dir = Path(__file__).parent.parent / "class_generator" / "schema"

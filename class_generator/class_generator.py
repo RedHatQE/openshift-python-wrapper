@@ -2,7 +2,6 @@ import ast
 import filecmp
 import json
 import os
-import re
 import shlex
 import shutil
 import sys
@@ -24,10 +23,12 @@ from rich.syntax import Syntax
 from simple_logger.logger import get_logger
 
 from ocp_resources.resource import Resource
+from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
+# Set global logging
+LOGGER = get_logger(name="class_generator")
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
-LOGGER = get_logger(name="class_generator")
 TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
@@ -246,105 +247,6 @@ def update_kind_schema():
     except (OSError, IOError):
         # Don't fail the entire process if copy fails
         pass
-
-
-def convert_camel_case_to_snake_case(name: str) -> str:
-    """
-    Converts a camel case string to snake case.
-
-    Args:
-        name (str): The camel case string to convert.
-
-    Returns:
-        str: The snake case representation of the input string.
-
-    Examples:
-        >>> convert_camel_case_to_snake_case(string_="allocateLoadBalancerNodePorts")
-        'allocate_load_balancer_node_ports'
-        >>> convert_camel_case_to_snake_case(string_="clusterIPs")
-        'cluster_ips'
-        >>> convert_camel_case_to_snake_case(string_="additionalCORSAllowedOS")
-        'additional_cors_allowed_os'
-
-    Notes:
-        - This function assumes that the input string adheres to camel case conventions.
-        - If the input string contains acronyms (e.g., "XMLHttpRequest"), they will be treated as separate words
-          (e.g., "xml_http_request").
-        - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
-          (e.g., "myCamelCaseString").
-    """
-    do_not_process_list = ["oauth", "kubevirt"]
-
-    # If the input string is in the do_not_proccess_list, return it as it is.
-    if name.lower() in do_not_process_list:
-        return name.lower()
-
-    formatted_str: str = ""
-
-    if name.islower():
-        return name
-
-    # For single words, e.g "Service" or "SERVICE"
-    if name.istitle() or name.isupper():
-        return name.lower()
-
-    # To decide if underscore is needed before a char, keep the last char format.
-    # If previous char is uppercase, underscode should not be added. Also applied for the first char in the string.
-    last_capital_char: bool | None = None
-
-    # To decide if there are additional words ahead; if found, there is at least one more word ahead, else this is the
-    # last word. Underscore should be added before it and all chars from here should be lowercase.
-    following_capital_chars: re.Match | None = None
-
-    str_len_for_idx_check = len(name) - 1
-
-    for idx, char in enumerate(name):
-        # If lower case, append to formatted string
-        if char.islower():
-            formatted_str += char
-            last_capital_char = False
-
-        # If first char is uppercase
-        elif idx == 0:
-            formatted_str += char.lower()
-            last_capital_char = True
-
-        else:
-            if idx < str_len_for_idx_check:
-                following_capital_chars = re.search(r"[A-Z]", "".join(name[idx + 1 :]))
-            if last_capital_char:
-                if idx < str_len_for_idx_check and name[idx + 1].islower():
-                    if following_capital_chars:
-                        formatted_str += f"_{char.lower()}"
-                        last_capital_char = True
-                        continue
-
-                    remaining_str = "".join(name[idx:])
-                    # The 2 letters in the string; uppercase char followed by lowercase char.
-                    # Example: `clusterIPs`, handle `Ps` at this point
-                    if idx + 1 == str_len_for_idx_check:
-                        formatted_str += remaining_str.lower()
-                        break
-
-                    # The last word in the string; uppercase followed by multiple lowercase chars
-                    # Example: `dataVolumeTTLSeconds`, handle `Seconds` at this point
-                    elif remaining_str.istitle():
-                        formatted_str += f"_{remaining_str.lower()}"
-                        break
-
-                    else:
-                        formatted_str += char.lower()
-                        last_capital_char = True
-
-                else:
-                    formatted_str += char.lower()
-                    last_capital_char = True
-
-            else:
-                formatted_str += f"_{char.lower()}"
-                last_capital_char = True
-
-    return formatted_str
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
