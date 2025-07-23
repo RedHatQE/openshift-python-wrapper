@@ -6,6 +6,7 @@ import shlex
 import shutil
 import sys
 import textwrap
+import time
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tempfile import gettempdir
@@ -16,13 +17,14 @@ import pytest
 import requests
 from cloup.constraints import If, IsSet, accept_none, require_one
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
+from kubernetes.dynamic import DynamicClient
 from packaging.version import Version
 from pyhelper_utils.shell import run_command
 from rich.console import Console
 from rich.syntax import Syntax
 from simple_logger.logger import get_logger
 
-from ocp_resources.resource import Resource
+from ocp_resources.resource import Resource, get_client
 from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
@@ -34,6 +36,467 @@ TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 MISSING_DESCRIPTION_STR: str = "No field description from API"
+
+
+def discover_cluster_resources(
+    client: DynamicClient | None = None, api_group_filter: str | None = None
+) -> dict[str, list[dict[str, Any]]]:
+    """
+    Discover all resources available in the cluster.
+
+    Args:
+        client: Kubernetes dynamic client. If None, will create one.
+        api_group_filter: Filter resources by API group (e.g., "apps", "route.openshift.io")
+
+    Returns:
+        Dictionary mapping API version to list of resources
+    """
+    if not client:
+        client = get_client()
+
+    discovered_resources: dict[str, list[dict[str, Any]]] = {}
+
+    try:
+        # Use the underlying kubernetes client to get API resources
+        k8s_client = client.client
+
+        # Create a thread pool for parallel discovery
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            futures: list[Future] = []
+
+            # Function to process core API resources
+            def process_core_api() -> tuple[str, list[dict[str, Any]]]:
+                try:
+                    response = k8s_client.call_api(
+                        resource_path="/api/v1",
+                        method="GET",
+                        auth_settings=["BearerToken"],
+                        response_type="object",
+                        _return_http_data_only=True,
+                    )
+
+                    if response and "resources" in response:
+                        resources = []
+                        for r in response["resources"]:
+                            if "/" not in r.get("name", ""):  # Filter out subresources
+                                resources.append({
+                                    "name": r.get("name"),
+                                    "kind": r.get("kind"),
+                                    "namespaced": r.get("namespaced", True),
+                                })
+                        return "v1", resources
+                except Exception as e:
+                    LOGGER.debug(f"Failed to get core API resources: {e}")
+                return "v1", []
+
+            # Submit core API discovery
+            futures.append(executor.submit(process_core_api))
+
+            # Function to process a specific API group version
+            def process_api_group_version(group_version: str) -> tuple[str, list[dict[str, Any]]]:
+                try:
+                    api_path = f"/apis/{group_version}"
+                    resources_response = k8s_client.call_api(
+                        resource_path=api_path,
+                        method="GET",
+                        auth_settings=["BearerToken"],
+                        response_type="object",
+                        _return_http_data_only=True,
+                    )
+
+                    if resources_response and "resources" in resources_response:
+                        resources = []
+                        for r in resources_response["resources"]:
+                            if "/" not in r.get("name", ""):  # Filter out subresources
+                                resources.append({
+                                    "name": r.get("name"),
+                                    "kind": r.get("kind"),
+                                    "namespaced": r.get("namespaced", True),
+                                })
+                        return group_version, resources
+                except Exception as e:
+                    LOGGER.debug(f"Failed to get resources for {group_version}: {e}")
+                return group_version, []
+
+            # Get all API groups
+            try:
+                groups_response = k8s_client.call_api(
+                    resource_path="/apis",
+                    method="GET",
+                    auth_settings=["BearerToken"],
+                    response_type="object",
+                    _return_http_data_only=True,
+                )
+
+                if groups_response and "groups" in groups_response:
+                    for group in groups_response["groups"]:
+                        group_name = group.get("name", "")
+
+                        # Apply filter if specified
+                        if api_group_filter and group_name != api_group_filter:
+                            if api_group_filter not in group_name:
+                                continue
+
+                        # Process each version in the group
+                        for version in group.get("versions", []):
+                            group_version = version.get("groupVersion", "")
+                            if group_version:
+                                # Submit API group version discovery to thread pool
+                                futures.append(executor.submit(process_api_group_version, group_version))
+
+            except Exception as e:
+                LOGGER.debug(f"Failed to get API groups: {e}")
+
+            # Function to process CRDs
+            def process_crds() -> list[tuple[str, list[dict[str, Any]]]]:
+                results = []
+                try:
+                    crd_resources = client.resources.get(
+                        api_version="apiextensions.k8s.io/v1", kind="CustomResourceDefinition"
+                    )
+                    crds = crd_resources.get()
+
+                    # Check if items is iterable
+                    crd_items = crds.items if hasattr(crds, "items") else []
+                    if callable(crd_items):
+                        crd_items = crd_items()
+
+                    for crd in crd_items:
+                        crd_group = crd.spec.group
+
+                        # Apply filter if specified
+                        if api_group_filter and crd_group != api_group_filter:
+                            if api_group_filter not in crd_group:
+                                continue
+
+                        for version in crd.spec.versions:
+                            if version.served:
+                                group_version = f"{crd_group}/{version.name}"
+                                resource_info = {
+                                    "name": crd.spec.names.plural,
+                                    "kind": crd.spec.names.kind,
+                                    "namespaced": crd.spec.scope == "Namespaced",
+                                }
+                                results.append((group_version, [resource_info]))
+
+                except Exception as e:
+                    LOGGER.debug(f"Failed to discover CRDs: {e}")
+                return results
+
+            # Submit CRD discovery
+            crd_future = executor.submit(process_crds)
+
+            # Collect results from all futures
+            for future in as_completed(futures):
+                try:
+                    api_version, resources = future.result()
+                    if resources:
+                        if api_version in discovered_resources:
+                            # Merge resources, avoiding duplicates
+                            existing_kinds = {r["kind"] for r in discovered_resources[api_version]}
+                            for resource in resources:
+                                if resource["kind"] not in existing_kinds:
+                                    discovered_resources[api_version].append(resource)
+                        else:
+                            discovered_resources[api_version] = resources
+                except Exception as e:
+                    LOGGER.debug(f"Failed to process discovery result: {e}")
+
+            # Process CRD results
+            try:
+                crd_results = crd_future.result()
+                for group_version, resources in crd_results:
+                    if group_version in discovered_resources:
+                        # Merge, avoiding duplicates
+                        existing_kinds = {r["kind"] for r in discovered_resources[group_version]}
+                        for resource in resources:
+                            if resource["kind"] not in existing_kinds:
+                                discovered_resources[group_version].append(resource)
+                    else:
+                        discovered_resources[group_version] = resources
+            except Exception as e:
+                LOGGER.debug(f"Failed to process CRD results: {e}")
+
+    except Exception as e:
+        LOGGER.error(f"Failed to discover cluster resources: {e}")
+        raise
+
+    return discovered_resources
+
+
+def analyze_coverage(
+    discovered_resources: dict[str, list[dict[str, Any]]], resources_dir: str = "ocp_resources"
+) -> dict[str, Any]:
+    """
+    Analyze coverage of implemented resources vs discovered resources.
+
+    Args:
+        discovered_resources: Resources discovered from cluster
+        resources_dir: Directory containing resource implementation files
+
+    Returns:
+        Dictionary containing:
+        - implemented_resources: List of resource kinds that have implementations
+        - missing_resources: List of resources that need implementation
+        - coverage_stats: Statistics about coverage
+    """
+    implemented_resources: list[str] = []
+
+    # Scan the resources directory
+    try:
+        if not os.path.exists(resources_dir):
+            LOGGER.warning(f"Resources directory '{resources_dir}' not found")
+            files = []
+        else:
+            files = os.listdir(resources_dir)
+    except Exception as e:
+        LOGGER.error(f"Failed to scan resources directory: {e}")
+        files = []
+
+    # Parse each Python file to find implemented resources
+    for filename in files:
+        # Skip non-Python files and special files
+        if not filename.endswith(".py") or filename == "__init__.py":
+            continue
+
+        # Skip utility/helper files
+        if filename in ["utils.py", "constants.py", "exceptions.py", "resource.py"]:
+            continue
+
+        filepath = os.path.join(resources_dir, filename)
+        if not os.path.isfile(filepath):
+            continue
+
+        try:
+            with open(filepath, "r") as f:
+                content = f.read()
+
+            # Parse the file to find class definitions
+            tree = ast.parse(content)
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    # Check if this is a resource class (not a helper/base class)
+                    # Look for classes that inherit from Resource, NamespacedResource, etc.
+                    for base in node.bases:
+                        base_name = ""
+                        if isinstance(base, ast.Name):
+                            base_name = base.id
+                        elif isinstance(base, ast.Attribute):
+                            base_name = base.attr
+
+                        if "Resource" in base_name:
+                            # This is a resource class
+                            resource_kind = node.name
+                            # Avoid duplicates (e.g., DNS implemented in multiple files)
+                            if resource_kind not in implemented_resources:
+                                implemented_resources.append(resource_kind)
+                            break
+
+        except Exception as e:
+            LOGGER.debug(f"Failed to parse {filename}: {e}")
+            continue
+
+    # Calculate missing resources and coverage
+    missing_resources: list[dict[str, Any]] = []
+    total_discovered = 0
+    covered_resources = 0
+
+    for api_version, resources in discovered_resources.items():
+        for resource in resources:
+            total_discovered += 1
+            resource_kind = resource.get("kind", "")
+
+            if resource_kind not in implemented_resources:
+                missing_resources.append({
+                    "kind": resource_kind,
+                    "api_version": api_version,
+                    "name": resource.get("name", ""),
+                    "namespaced": resource.get("namespaced", True),
+                })
+            else:
+                covered_resources += 1
+
+    # Calculate coverage statistics
+    total_missing = len(missing_resources)
+
+    if total_discovered > 0:
+        coverage_percentage = (covered_resources / total_discovered) * 100
+    else:
+        coverage_percentage = 0.0
+
+    return {
+        "implemented_resources": implemented_resources,
+        "missing_resources": missing_resources,
+        "coverage_stats": {
+            "total_discovered": total_discovered,
+            "total_implemented": len(implemented_resources),
+            "covered_resources": covered_resources,
+            "total_missing": total_missing,
+            "coverage_percentage": round(coverage_percentage, 2),
+        },
+    }
+
+
+def generate_report(coverage_analysis: dict[str, Any], output_format: str = "human") -> str:
+    """
+    Generate a report from coverage analysis results.
+
+    Args:
+        coverage_analysis: Results from analyze_coverage()
+        output_format: Either "human" for Rich-formatted text or "json"
+
+    Returns:
+        Formatted report string
+    """
+
+    def calculate_priority(resource: dict[str, Any]) -> int:
+        """Calculate priority score for a resource (higher = more important)."""
+        api_version = resource.get("api_version", "")
+
+        # Core resources (v1) have highest priority
+        if api_version == "v1":
+            return 100
+
+        # Standard Kubernetes APIs
+        if any(api in api_version for api in ["apps/", "batch/", "networking.k8s.io/", "storage.k8s.io/"]):
+            return 80
+
+        # OpenShift core APIs
+        if any(api in api_version for api in ["route.openshift.io/", "image.openshift.io/", "config.openshift.io/"]):
+            return 70
+
+        # Operator resources
+        if any(api in api_version for api in ["operators.coreos.com/", ".operator.openshift.io/"]):
+            return 50
+
+        # Other CRDs
+        return 30
+
+    def generate_class_generator_command(resource: dict[str, Any]) -> str:
+        """Generate class-generator command for a resource."""
+        kind = resource.get("kind", "")
+        # For now, class-generator only accepts the kind parameter
+        # API version/group selection is handled automatically by the tool
+        cmd = f"class-generator -k {kind}"
+        return cmd
+
+    missing_resources = coverage_analysis.get("missing_resources", [])
+
+    # Add priority scores
+    for resource in missing_resources:
+        resource["priority"] = calculate_priority(resource=resource)
+
+    # Sort by priority
+    missing_resources.sort(key=lambda x: x["priority"], reverse=True)
+
+    if output_format == "json":
+        # JSON format for CI/CD
+        generation_commands = [generate_class_generator_command(r) for r in missing_resources]
+
+        # Group by API version for batch commands
+        batch_commands = []
+        api_groups: dict[str, list[str]] = {}
+        for resource in missing_resources:
+            api_version = resource.get("api_version", "")
+            kind = resource.get("kind", "")
+            if api_version not in api_groups:
+                api_groups[api_version] = []
+            api_groups[api_version].append(kind)
+
+        for api_version, kinds in api_groups.items():
+            if len(kinds) > 1:
+                cmd = f"class-generator -k {','.join(kinds)}"
+                batch_commands.append(cmd)
+
+        report_data = {
+            "coverage_stats": coverage_analysis.get("coverage_stats", {}),
+            "implemented_resources": coverage_analysis.get("implemented_resources", []),
+            "missing_resources": missing_resources,
+            "generation_commands": generation_commands,
+            "batch_generation_commands": batch_commands,
+        }
+
+        return json.dumps(report_data, indent=2)
+
+    else:
+        # Human-readable format with Rich
+        from io import StringIO
+
+        from rich.console import Console
+        from rich.panel import Panel
+        from rich.table import Table
+
+        # Create string buffer to capture Rich output
+        string_buffer = StringIO()
+        console = Console(file=string_buffer, force_terminal=True, width=120)
+
+        # Title
+        console.print("\n[bold cyan]Resource Coverage Report[/bold cyan]\n")
+
+        # Coverage Statistics Panel
+        stats = coverage_analysis.get("coverage_stats", {})
+        stats_text = f"""
+Total Discovered Resources: [bold]{stats.get("total_discovered", 0)}[/bold]
+Implemented Resources: [bold green]{stats.get("total_implemented", 0)}[/bold green]
+Covered Resources: [bold green]{stats.get("covered_resources", 0)}[/bold green]
+Missing Resources: [bold red]{stats.get("total_missing", 0)}[/bold red]
+Coverage Percentage: [bold yellow]{stats.get("coverage_percentage", 0)}%[/bold yellow]
+"""
+        console.print(Panel(stats_text.strip(), title="Coverage Statistics", border_style="cyan"))
+
+        # Missing Resources Table
+        if missing_resources:
+            console.print("\n[bold]Missing Resources[/bold] (sorted by priority)\n")
+
+            table = Table(show_header=True, header_style="bold magenta")
+            table.add_column("Priority", style="cyan", width=10)
+            table.add_column("Kind", style="yellow")
+            table.add_column("API Version", style="green")
+            table.add_column("Namespaced", style="blue")
+            table.add_column("Command", style="white")
+
+            for resource in missing_resources:
+                priority = resource.get("priority", 0)
+                priority_label = "HIGH" if priority >= 80 else "MEDIUM" if priority >= 50 else "LOW"
+                if resource.get("api_version") == "v1":
+                    priority_label = "[bold red]CORE[/bold red]"
+
+                table.add_row(
+                    priority_label,
+                    resource.get("kind", ""),
+                    resource.get("api_version", ""),
+                    "Yes" if resource.get("namespaced", True) else "No",
+                    generate_class_generator_command(resource),
+                )
+
+            console.print(table)
+
+            # Batch generation tip
+            if len(missing_resources) > 3:
+                console.print("\n[bold]Tip:[/bold] You can generate multiple resources at once:")
+                # Show first batch command as example
+                example_groups: dict[str, list[str]] = {}
+                for resource in missing_resources[:5]:  # Just first 5 as example
+                    api_version = resource.get("api_version", "")
+                    kind = resource.get("kind", "")
+                    if api_version not in example_groups:
+                        example_groups[api_version] = []
+                    example_groups[api_version].append(kind)
+
+                for api_version, kinds in example_groups.items():
+                    if len(kinds) > 1:
+                        cmd = f"class-generator -k {','.join(kinds)}"
+                        console.print(f"\n  [green]{cmd}[/green]")
+                        break
+        else:
+            console.print("\n[bold green]All resources are implemented! 🎉[/bold green]\n")
+
+        # Get the string output
+        output = string_buffer.getvalue()
+        string_buffer.close()
+
+        return output
 
 
 def _is_kind_and_namespaced(
@@ -690,9 +1153,50 @@ def generate_class_generator_tests() -> None:
     is_flag=True,
     show_default=True,
 )
+@cloup.option(
+    "--discover-missing",
+    help="Discover resources in the cluster that don't have wrapper classes",
+    is_flag=True,
+    show_default=True,
+)
+@cloup.option(
+    "--coverage-report",
+    help="Generate a coverage report of implemented vs discovered resources",
+    is_flag=True,
+    show_default=True,
+)
+@cloup.option(
+    "--json",
+    "json_output",
+    help="Output reports in JSON format",
+    is_flag=True,
+    default=False,
+    show_default=True,
+)
+@cloup.option(
+    "--generate-missing",
+    help="Generate classes for all missing resources after discovery",
+    is_flag=True,
+    show_default=True,
+)
+@cloup.option(
+    "--use-cache/--no-cache",
+    help="Use cached discovery results if available",
+    default=True,
+    show_default=True,
+)
 @cloup.constraint(
     If("update_schema", then=accept_none),
-    ["add_tests", "dry_run", "kind", "output_file", "overwrite"],
+    [
+        "add_tests",
+        "dry_run",
+        "kind",
+        "output_file",
+        "overwrite",
+        "discover_missing",
+        "coverage_report",
+        "generate_missing",
+    ],
 )
 @cloup.constraint(
     If(
@@ -701,7 +1205,7 @@ def generate_class_generator_tests() -> None:
     ),
     ["output_file", "dry_run", "update_schema", "overwrite"],
 )
-@cloup.constraint(require_one, ["kind", "update_schema"])
+@cloup.constraint(require_one, ["kind", "update_schema", "discover_missing", "coverage_report"])
 def main(
     kind: str,
     overwrite: bool,
@@ -709,9 +1213,129 @@ def main(
     output_file: str,
     add_tests: bool,
     update_schema: bool,
+    discover_missing: bool,
+    coverage_report: bool,
+    json_output: bool,
+    generate_missing: bool,
+    use_cache: bool,
 ) -> None:
     if update_schema:
         return update_kind_schema()
+
+    # Handle discovery and coverage report options
+    if discover_missing or coverage_report:
+        # Set up cache file path
+        cache_dir = os.path.expanduser("~/.cache/openshift-python-wrapper")
+        try:
+            os.makedirs(cache_dir, exist_ok=True)
+        except OSError as e:
+            LOGGER.error(f"Failed to create cache directory '{cache_dir}': {e}")
+            # Fall back to temporary directory if cache directory creation fails
+            cache_dir = os.path.join(gettempdir(), "openshift-python-wrapper-cache")
+            try:
+                os.makedirs(cache_dir, exist_ok=True)
+                LOGGER.warning(f"Using fallback cache directory: {cache_dir}")
+            except OSError as fallback_e:
+                LOGGER.error(f"Failed to create fallback cache directory: {fallback_e}")
+                # Disable cache usage if both attempts fail
+                use_cache = False
+                LOGGER.warning("Cache functionality disabled due to directory creation failures")
+
+        cache_file = os.path.join(cache_dir, "discovery_cache.json") if use_cache else None
+
+        # Check cache if enabled
+        discovered_resources = None
+        if use_cache and cache_file and os.path.exists(cache_file):
+            try:
+                # Check cache age (24 hours)
+                cache_age = time.time() - os.path.getmtime(cache_file)
+                if cache_age < 86400:  # 24 hours
+                    with open(cache_file, "r") as f:
+                        cached_data = json.load(f)
+                    discovered_resources = cached_data.get("discovered_resources")
+                    LOGGER.info("Using cached discovery results")
+            except Exception as e:
+                LOGGER.warning(f"Failed to load cache: {e}")
+
+        # Discover resources if not cached
+        if discovered_resources is None:
+            try:
+                LOGGER.info("Discovering cluster resources...")
+                discovered_resources = discover_cluster_resources()
+
+                # Cache the results
+                if use_cache and cache_file:
+                    try:
+                        with open(cache_file, "w") as f:
+                            json.dump(
+                                {"discovered_resources": discovered_resources, "timestamp": time.time()}, f, indent=2
+                            )
+                    except Exception as e:
+                        LOGGER.warning(f"Failed to cache results: {e}")
+            except Exception as e:
+                LOGGER.error(f"Failed to discover resources: {e}")
+                sys.exit(1)
+
+        # Analyze coverage
+        coverage_analysis = analyze_coverage(discovered_resources=discovered_resources)
+
+        # Generate report if requested
+        if coverage_report or discover_missing:
+            output_format = "json" if json_output else "human"
+            report = generate_report(coverage_analysis=coverage_analysis, output_format=output_format)
+            print(report)
+
+        # Generate missing resources if requested
+        if generate_missing and coverage_analysis["missing_resources"]:
+            LOGGER.info(f"Generating {len(coverage_analysis['missing_resources'])} missing resources...")
+
+            # Group by API version for batch generation
+            api_groups: dict[str, list[str]] = {}
+            for resource in coverage_analysis["missing_resources"]:
+                api_version = resource.get("api_version", "")
+                kind_name = resource.get("kind", "")
+                if api_version not in api_groups:
+                    api_groups[api_version] = []
+                api_groups[api_version].append(kind_name)
+
+            # Generate classes
+            for api_version, kinds in api_groups.items():
+                if kinds:
+                    LOGGER.info(f"Generating resources for {api_version}: {', '.join(kinds)}")
+                    # Call class_generator for batch of kinds
+                    _gen_kwargs = {
+                        "kind": ",".join(kinds),
+                        "overwrite": overwrite,
+                        "dry_run": dry_run,
+                        "output_file": "",
+                        "add_tests": add_tests,
+                        "called_from_cli": False,
+                    }
+                    # Reuse the existing generation logic
+                    with ThreadPoolExecutor(max_workers=10) as executor:
+                        gen_futures = []
+                        for _kind in kinds:
+                            gen_futures.append(
+                                executor.submit(
+                                    class_generator,
+                                    kind=_kind,
+                                    overwrite=overwrite,
+                                    dry_run=dry_run,
+                                    output_file="",
+                                    add_tests=add_tests,
+                                    called_from_cli=False,
+                                )
+                            )
+
+                        for future in as_completed(gen_futures):
+                            try:
+                                future.result()
+                            except Exception as e:
+                                LOGGER.error(f"Failed to generate resource: {e}")
+
+        # Exit if we only did discovery/report
+        if not kind:
+            return
 
     _kwargs: dict[str, Any] = {
         "overwrite": overwrite,
@@ -720,20 +1344,26 @@ def main(
         "add_tests": add_tests,
     }
 
-    kinds: list[str] = kind.split(",")
+    kind_list: list[str] = kind.split(",")
     futures: list[Future] = []
 
-    with ThreadPoolExecutor() as executor:
-        for _kind in kinds:
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        for _kind in kind_list:
             _kwargs["kind"] = _kind
 
-            if len(kinds) == 1:
+            if len(kind_list) == 1:
                 class_generator(**_kwargs)
 
             else:
-                executor.submit(
-                    class_generator,
-                    **_kwargs,
+                futures.append(
+                    executor.submit(
+                        class_generator,
+                        kind=_kwargs["kind"],
+                        overwrite=overwrite,
+                        dry_run=dry_run,
+                        output_file=output_file,
+                        add_tests=add_tests,
+                    )
                 )
 
         for _ in as_completed(futures):
