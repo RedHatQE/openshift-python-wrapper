@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.virtual_machine_instancetype import VirtualMachineInstancetype
 
 
 @pytest.mark.incremental
 class TestVirtualMachineInstancetype:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def virtualmachineinstancetype(self, client):
+    def virtualmachineinstancetype(self, fake_client):
         return VirtualMachineInstancetype(
-            client=client,
+            client=fake_client,
             name="test-virtualmachineinstancetype",
             namespace="default",
             cpu={"test-cpu": "test-value"},

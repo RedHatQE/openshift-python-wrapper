@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.authorino import Authorino
 
 
 @pytest.mark.incremental
 class TestAuthorino:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def authorino(self, client):
+    def authorino(self, fake_client):
         return Authorino(
-            client=client,
+            client=fake_client,
             name="test-authorino",
             namespace="default",
             listener={"test-listener": "test-value"},

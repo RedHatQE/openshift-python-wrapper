@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.network_operator_openshift_io import Network
 
 
 @pytest.mark.incremental
 class TestNetwork:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def network(self, client):
+    def network(self, fake_client):
         return Network(
-            client=client,
+            client=fake_client,
             name="test-network",
         )
 

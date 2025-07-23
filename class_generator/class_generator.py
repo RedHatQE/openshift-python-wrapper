@@ -23,6 +23,7 @@ from rich.syntax import Syntax
 from simple_logger.logger import get_logger
 
 from ocp_resources.resource import Resource
+from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 # Set global logging
@@ -133,8 +134,17 @@ def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_defi
     with open(not_kind_file, "w") as fd:
         fd.writelines("\n".join(not_kind_list))
 
+    # Clear SchemaValidator cache so it reloads the updated files
+    SchemaValidator.clear_cache()
+
 
 def read_resources_mapping_file() -> dict[Any, Any]:
+    """Read resources mapping using SchemaValidator for consistency"""
+    # Try to use SchemaValidator first
+    if SchemaValidator.load_mappings_data():
+        return SchemaValidator._mappings_data or {}
+
+    # Fallback for cases where schema files don't exist yet (e.g., initial generation)
     try:
         with open(RESOURCES_MAPPING_FILE) as fd:
             return json.load(fd)
@@ -240,13 +250,10 @@ def update_kind_schema():
         client=client, newer_cluster_version=same_or_newer_version, schema_definition_file=ocp_openapi_json_file
     )
 
-    # Copy the resources mapping file to fake_kubernetes_client for the fake client to use
-    fake_client_mappings = Path("fake_kubernetes_client/__resources-mappings.json")
-    try:
-        shutil.copy2(RESOURCES_MAPPING_FILE, fake_client_mappings)
-    except (OSError, IOError):
-        # Don't fail the entire process if copy fails
-        pass
+    # Clear SchemaValidator cache after updating schemas
+    SchemaValidator.clear_cache()
+
+    # No longer need to copy the mappings file - fake client uses SchemaValidator
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:

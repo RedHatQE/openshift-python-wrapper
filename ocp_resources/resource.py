@@ -9,7 +9,6 @@ import threading
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Generator
 from io import StringIO
-from pathlib import Path
 from signal import SIGINT, signal
 from types import TracebackType
 from typing import Any, Type
@@ -59,7 +58,8 @@ from ocp_resources.utils.constants import (
     TIMEOUT_30SEC,
 )
 from ocp_resources.utils.resource_constants import ResourceConstants
-from ocp_resources.utils.utils import convert_camel_case_to_snake_case, skip_existing_resource_creation_teardown
+from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
+from ocp_resources.utils.schema_validator import SchemaValidator
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -564,10 +564,6 @@ class Resource(ResourceConstants):
         V1ALPHA1: str = "v1alpha1"
         V1ALPHA3: str = "v1alpha3"
 
-    # Class-level schema cache shared across all resources
-    _schema_cache: dict[str, dict[str, Any]] = {}
-    _schema_validation_enabled: bool = False
-
     def __init__(
         self,
         name: str | None = None,
@@ -588,6 +584,7 @@ class Resource(ResourceConstants):
         ensure_exists: bool = False,
         kind_dict: dict[Any, Any] | None = None,
         wait_for_resource: bool = False,
+        schema_validation_enabled: bool = False,
     ):
         """
         Create an API resource
@@ -613,6 +610,8 @@ class Resource(ResourceConstants):
             ensure_exists (bool): Whether to check if the resource exists before when initializing the resource, raise if not.
             kind_dict (dict): dict which represents the resource object
             wait_for_resource (bool): Waits for the resource to be created
+            schema_validation_enabled (bool): Enable automatic schema validation for this instance.
+                Defaults to False. Set to True to validate on create/update operations.
         """
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
@@ -650,6 +649,9 @@ class Resource(ResourceConstants):
 
         if ensure_exists:
             self._ensure_exists()
+
+        # Set instance-level validation flag
+        self.schema_validation_enabled = schema_validation_enabled
 
         # self._set_client_and_api_version() must be last init line
         self._set_client_and_api_version()
@@ -994,6 +996,10 @@ class Resource(ResourceConstants):
         """
         self.to_dict()
 
+        # Validate the resource if auto-validation is enabled
+        if self.schema_validation_enabled:
+            self.validate()
+
         hashed_res = self.hash_resource_dict(resource_dict=self.res)
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
@@ -1053,6 +1059,10 @@ class Resource(ResourceConstants):
         Args:
             resource_dict: Resource dictionary
         """
+        # Note: We don't validate on update() because this method sends a patch,
+        # not a complete resource. Patches are partial updates that would fail
+        # full schema validation.
+
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Update {self.kind} {self.name}:\n{hashed_resource_dict}")
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
@@ -1067,6 +1077,12 @@ class Resource(ResourceConstants):
         Replace resource metadata.
         Use this to remove existing field. (update() will only update existing fields)
         """
+        # Validate the resource if auto-validation is enabled
+        # For replace operations, we validate the full resource_dict
+        if self.schema_validation_enabled:
+            # Use validate_dict to validate the replacement resource
+            self.__class__.validate_dict(resource_dict)
+
         hashed_resource_dict = self.hash_resource_dict(resource_dict=resource_dict)
         self.logger.info(f"Replace {self.kind} {self.name}: \n{hashed_resource_dict}")
         self.logger.debug(f"\n{yaml.dump(hashed_resource_dict)}")
@@ -1432,150 +1448,21 @@ class Resource(ResourceConstants):
 
         return ""
 
-    def _find_schema_file(self) -> Path | None:
-        """
-        Find the schema file for this resource kind.
-
-        Returns:
-            Path to schema file or None if not found
-        """
-        # Use importlib.resources for package-safe resource access
-        try:
-            if sys.version_info >= (3, 9):
-                from importlib.resources import files
-
-                schema_dir = files("class_generator") / "schema"
-            else:
-                # Fallback for older Python versions
-                import importlib.resources
-
-                with importlib.resources.path("class_generator", "schema") as schema_path:
-                    schema_dir = Path(schema_path)
-        except (ImportError, ModuleNotFoundError):
-            # Fallback to file system path for development
-            schema_dir = Path(__file__).parent.parent / "class_generator" / "schema"
-            if not schema_dir.exists():
-                LOGGER.warning(f"Schema directory not found: {schema_dir}")
-                return None
-
-        # Convert kind to lowercase filename
-        schema_filename = f"{convert_camel_case_to_snake_case(name=self.kind)}.json"
-
-        # For importlib.resources, we need to check if file exists differently
-        if sys.version_info >= (3, 9) and hasattr(schema_dir, "joinpath"):
-            schema_path = schema_dir / schema_filename
-            try:
-                # Try to read to check if exists
-                schema_path.read_text()
-                return Path(str(schema_path))
-            except (FileNotFoundError, AttributeError):
-                pass
-        else:
-            # Traditional file system check
-            schema_path = schema_dir / schema_filename
-            if isinstance(schema_path, Path) and schema_path.exists():
-                return schema_path
-
-        # Try alternate names for special cases
-        alternate_names = [
-            f"{self.kind}_{self.api_group.replace('.', '_')}.json",
-            f"{self.kind}_{self.api_version}.json",
-        ]
-
-        for alt_name in alternate_names:
-            if sys.version_info >= (3, 9) and hasattr(schema_dir, "joinpath"):
-                alt_path = schema_dir / alt_name
-                try:
-                    alt_path.read_text()
-                    return Path(str(alt_path))
-                except (FileNotFoundError, AttributeError):
-                    pass
-            else:
-                alt_path = schema_dir / alt_name
-                if isinstance(alt_path, Path) and alt_path.exists():
-                    return alt_path
-
-        return None
-
-    def _load_schema(self) -> dict[str, Any] | None:
-        """
-        Load OpenAPI schema for this resource kind.
-
-        Returns:
-            Schema dict or None if not found
-        """
-        # Check cache first
-        if self.kind in self._schema_cache:
-            return self._schema_cache[self.kind]
-
-        # Find and load schema file
-        schema_file = self._find_schema_file()
-        if not schema_file:
-            return None
-
-        try:
-            # Handle both Path objects and importlib.resources paths
-            if hasattr(schema_file, "read_text"):
-                # importlib.resources path
-                schema_data = schema_file.read_text()
-            else:
-                # Regular Path object
-                with open(schema_file, "r") as f:
-                    schema_data = f.read()
-
-            schema = json.loads(schema_data)
-            # Cache the schema
-            self._schema_cache[self.kind] = schema
-            return schema
-        except Exception as e:
-            LOGGER.warning(f"Failed to load schema for {self.kind}: {e}")
-            return None
-
-    def _format_validation_error(self, error: Any) -> str:
-        """
-        Format a jsonschema validation error into a user-friendly message.
-
-        Args:
-            error: jsonschema.ValidationError instance
-
-        Returns:
-            str: Formatted error message
-        """
-        # Build path string
-        path_parts = []
-        for part in error.path:
-            if isinstance(part, int):
-                path_parts.append(f"[{part}]")
-            else:
-                if path_parts:
-                    path_parts.append(f".{part}")
-                else:
-                    path_parts.append(str(part))
-
-        path_str = "".join(path_parts) if path_parts else "root"
-
-        # Build error message
-        error_msg = f"Validation error at '{path_str}': {error.message}"
-
-        # Add schema path for debugging
-        schema_path_parts = [str(p) for p in error.schema_path]
-        if schema_path_parts:
-            error_msg += f"\nSchema path: {'/'.join(schema_path_parts)}"
-
-        return error_msg
-
     def validate(self) -> None:
         """
         Validate the resource against its OpenAPI schema.
 
+        This method validates the resource dictionary (self.res) against the
+        appropriate OpenAPI schema for this resource type. If validation fails,
+        a ValidationError is raised with details about what is invalid.
+
+        Note: This method is called automatically during create() and update()
+        operations if schema_validation_enabled was set to True when creating
+        the resource instance.
+
         Raises:
             ValidationError: If the resource is invalid according to the schema
         """
-        # Load schema
-        schema = self._load_schema()
-        if not schema:
-            LOGGER.warning(f"No schema found for {self.kind}, skipping validation")
-            return
 
         # Get resource dict - if self.res is already populated, use it directly
         # Otherwise, try to build it with to_dict()
@@ -1589,13 +1476,14 @@ class Resource(ResourceConstants):
 
         resource_dict = self.res
 
-        # Validate
+        # Validate using shared validator
         try:
-            jsonschema.validate(instance=resource_dict, schema=schema)
+            SchemaValidator.validate(resource_dict=resource_dict, kind=self.kind, api_group=self.api_group)
         except jsonschema.ValidationError as e:
-            raise ValidationError(
-                f"Resource validation failed for {self.kind}/{self.name}:\n{self._format_validation_error(e)}"
+            error_msg = SchemaValidator.format_validation_error(
+                error=e, kind=self.kind, name=self.name or "unnamed", api_group=self.api_group
             )
+            raise ValidationError(error_msg)
         except Exception as e:
             LOGGER.error(f"Unexpected error during validation: {e}")
             raise
@@ -1611,32 +1499,18 @@ class Resource(ResourceConstants):
         Raises:
             ValidationError: If the resource dict is invalid
         """
+
         # Get name for error messages
         name = resource_dict.get("metadata", {}).get("name", "unnamed")
 
-        # Create a minimal temporary instance just to use _load_schema
-        # We'll override the necessary attributes to avoid validation in __init__
-        temp_instance = object.__new__(cls)
-        temp_instance.kind = cls.kind
-        temp_instance.name = name
-
-        # Initialize the schema cache if not present
-        if not hasattr(cls, "_schema_cache"):
-            cls._schema_cache = {}
-
-        # Load schema using instance method
-        schema = temp_instance._load_schema()
-        if not schema:
-            LOGGER.warning(f"No schema found for {cls.kind}, skipping validation")
-            return
-
-        # Validate
+        # Validate using shared validator
         try:
-            jsonschema.validate(instance=resource_dict, schema=schema)
+            SchemaValidator.validate(resource_dict=resource_dict, kind=cls.kind, api_group=cls.api_group)
         except jsonschema.ValidationError as e:
-            raise ValidationError(
-                f"Resource validation failed for {cls.kind}/{name}:\n{temp_instance._format_validation_error(e)}"
+            error_msg = SchemaValidator.format_validation_error(
+                error=e, kind=cls.kind, name=name, api_group=cls.api_group
             )
+            raise ValidationError(error_msg)
         except Exception as e:
             LOGGER.error(f"Unexpected error during validation: {e}")
             raise

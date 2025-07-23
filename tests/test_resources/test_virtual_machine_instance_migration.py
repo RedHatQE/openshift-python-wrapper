@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.virtual_machine_instance_migration import VirtualMachineInstanceMigration
 
 
 @pytest.mark.incremental
 class TestVirtualMachineInstanceMigration:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def virtualmachineinstancemigration(self, client):
+    def virtualmachineinstancemigration(self, fake_client):
         return VirtualMachineInstanceMigration(
-            client=client,
+            client=fake_client,
             name="test-virtualmachineinstancemigration",
             namespace="default",
         )

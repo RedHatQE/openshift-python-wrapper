@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.ssp import SSP
 
 
 @pytest.mark.incremental
 class TestSSP:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def ssp(self, client):
+    def ssp(self, fake_client):
         return SSP(
-            client=client,
+            client=fake_client,
             name="test-ssp",
             namespace="default",
             common_templates={"test-common_templates": "test-value"},

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.virtual_machine_export import VirtualMachineExport
 
 
 @pytest.mark.incremental
 class TestVirtualMachineExport:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def virtualmachineexport(self, client):
+    def virtualmachineexport(self, fake_client):
         return VirtualMachineExport(
-            client=client,
+            client=fake_client,
             name="test-virtualmachineexport",
             namespace="default",
             source={"test-source": "test-value"},

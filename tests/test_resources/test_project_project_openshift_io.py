@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.project_project_openshift_io import Project
 
 
 @pytest.mark.incremental
 class TestProject:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def project(self, client):
+    def project(self, fake_client):
         return Project(
-            client=client,
+            client=fake_client,
             name="test-project",
         )
 

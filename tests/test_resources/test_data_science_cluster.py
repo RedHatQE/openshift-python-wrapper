@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.data_science_cluster import DataScienceCluster
 
 
 @pytest.mark.incremental
 class TestDataScienceCluster:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def datasciencecluster(self, client):
+    def datasciencecluster(self, fake_client):
         return DataScienceCluster(
-            client=client,
+            client=fake_client,
             name="test-datasciencecluster",
         )
 

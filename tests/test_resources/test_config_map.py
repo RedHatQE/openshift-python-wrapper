@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.config_map import ConfigMap
 
 
 @pytest.mark.incremental
 class TestConfigMap:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def configmap(self, client):
+    def configmap(self, fake_client):
         return ConfigMap(
-            client=client,
+            client=fake_client,
             name="test-configmap",
             namespace="default",
             data={"key1": "value1"},

@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.pod import Pod
 
 
 @pytest.mark.incremental
 class TestPod:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def pod(self, client):
+    def pod(self, fake_client):
         return Pod(
-            client=client,
+            client=fake_client,
             name="test-pod",
             namespace="default",
             containers=[{"name": "test-container", "image": "nginx:latest"}],

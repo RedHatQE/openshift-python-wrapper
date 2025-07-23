@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.virtual_machine_cluster_preference import VirtualMachineClusterPreference
 
 
 @pytest.mark.incremental
 class TestVirtualMachineClusterPreference:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def virtualmachineclusterpreference(self, client):
+    def virtualmachineclusterpreference(self, fake_client):
         return VirtualMachineClusterPreference(
-            client=client,
+            client=fake_client,
             name="test-virtualmachineclusterpreference",
         )
 

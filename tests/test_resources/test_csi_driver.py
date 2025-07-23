@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.csi_driver import CSIDriver
 
 
 @pytest.mark.incremental
 class TestCSIDriver:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def csidriver(self, client):
+    def csidriver(self, fake_client):
         return CSIDriver(
-            client=client,
+            client=fake_client,
             name="test-csidriver",
         )
 

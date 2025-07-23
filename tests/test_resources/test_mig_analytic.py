@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.mig_analytic import MigAnalytic
 
 
 @pytest.mark.incremental
 class TestMigAnalytic:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def miganalytic(self, client):
+    def miganalytic(self, fake_client):
         return MigAnalytic(
-            client=client,
+            client=fake_client,
             name="test-miganalytic",
             namespace="default",
             analyze_image_count=True,

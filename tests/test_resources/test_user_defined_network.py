@@ -1,18 +1,13 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.user_defined_network import UserDefinedNetwork
 
 
 @pytest.mark.incremental
 class TestUserDefinedNetwork:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def userdefinednetwork(self, client):
+    def userdefinednetwork(self, fake_client):
         return UserDefinedNetwork(
-            client=client,
+            client=fake_client,
             name="test-userdefinednetwork",
             namespace="default",
             topology="Layer2",

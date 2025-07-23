@@ -1,5 +1,4 @@
 import pytest
-from fake_kubernetes_client import FakeDynamicClient
 from ocp_resources.project_request import ProjectRequest
 from ocp_resources.project_project_openshift_io import Project
 
@@ -7,13 +6,9 @@ from ocp_resources.project_project_openshift_io import Project
 @pytest.mark.incremental
 class TestProjectRequest:
     @pytest.fixture(scope="class")
-    def client(self):
-        return FakeDynamicClient()
-
-    @pytest.fixture(scope="class")
-    def projectrequest(self, client):
+    def projectrequest(self, fake_client):
         return ProjectRequest(
-            client=client,
+            client=fake_client,
             name="test-projectrequest",
         )
 
