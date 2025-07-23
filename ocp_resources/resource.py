@@ -446,6 +446,36 @@ class ClassProperty:
 class Resource(ResourceConstants):
     """
     Base class for API resources
+
+    Provides common functionality for all Kubernetes/OpenShift resources including
+    CRUD operations, resource management, and schema validation.
+
+    Schema Validation:
+        Resources can validate their structure against OpenAPI schemas to catch
+        configuration errors before API submission. Validation can be performed
+        manually or automatically during create/update operations.
+
+        Manual validation:
+            pod = Pod(name="my-pod", namespace="default")
+            try:
+                pod.validate()
+            except ValidationError as e:
+                print(f"Validation failed: {e}")
+
+        Auto-validation (disabled by default):
+            # Enable for a specific instance
+            pod = Pod(name="my-pod", namespace="default", schema_validation_enabled=True)
+            pod.create()  # Will validate before API call
+
+        Class method validation:
+            Pod.validate_dict({"kind": "Pod", "metadata": {"name": "test"}})
+
+    Attributes:
+        api_group (str): API group for the resource (e.g., "apps", "batch")
+        api_version (str): API version (e.g., "v1", "v1beta1")
+        singular_name (str): Singular resource name for API calls
+        timeout_seconds (int): Default timeout for API operations
+        schema_validation_enabled (bool): Enable automatic validation on create/update
     """
 
     api_group: str = ""
