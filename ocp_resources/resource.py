@@ -1481,12 +1481,127 @@ class Resource(ResourceConstants):
                 # Cache the schema
                 self._schema_cache[self.kind] = schema
                 return schema
-        except json.JSONDecodeError as e:
-            self.logger.error(f"Failed to parse schema file {schema_file}: {e}")
+        except Exception as e:
+            LOGGER.warning(f"Failed to load schema for {self.kind}: {e}")
             return None
-        except IOError as e:
-            self.logger.error(f"Failed to read schema file {schema_file}: {e}")
-            return None
+
+    def _format_validation_error(self, error: Any) -> str:
+        """
+        Format a jsonschema validation error into a user-friendly message.
+
+        Args:
+            error: jsonschema.ValidationError instance
+
+        Returns:
+            str: Formatted error message
+        """
+        # Build path string
+        path_parts = []
+        for part in error.path:
+            if isinstance(part, int):
+                path_parts.append(f"[{part}]")
+            else:
+                if path_parts:
+                    path_parts.append(f".{part}")
+                else:
+                    path_parts.append(str(part))
+
+        path_str = "".join(path_parts) if path_parts else "root"
+
+        # Build error message
+        error_msg = f"Validation error at '{path_str}': {error.message}"
+
+        # Add schema path for debugging
+        schema_path_parts = [str(p) for p in error.schema_path]
+        if schema_path_parts:
+            error_msg += f"\nSchema path: {'/'.join(schema_path_parts)}"
+
+        return error_msg
+
+    def validate(self) -> None:
+        """
+        Validate the resource against its OpenAPI schema.
+
+        Raises:
+            ValidationError: If the resource is invalid according to the schema
+        """
+        # Load schema
+        schema = self._load_schema()
+        if not schema:
+            LOGGER.warning(f"No schema found for {self.kind}, skipping validation")
+            return
+
+        # Get resource dict - if self.res is already populated, use it directly
+        # Otherwise, try to build it with to_dict()
+        if not self.res:
+            try:
+                self.to_dict()  # This populates self.res
+            except Exception:
+                # If to_dict fails (e.g., missing required fields),
+                # we can't validate - let the original error propagate
+                raise
+
+        resource_dict = self.res
+
+        # Validate
+        try:
+            import jsonschema
+
+            jsonschema.validate(instance=resource_dict, schema=schema)
+        except jsonschema.ValidationError as e:
+            from ocp_resources.exceptions import ValidationError
+
+            raise ValidationError(
+                f"Resource validation failed for {self.kind}/{self.name}:\n{self._format_validation_error(e)}"
+            )
+        except Exception as e:
+            LOGGER.error(f"Unexpected error during validation: {e}")
+            raise
+
+    @classmethod
+    def validate_dict(cls, resource_dict: dict[str, Any]) -> None:
+        """
+        Validate a resource dictionary against the schema.
+
+        Args:
+            resource_dict: Dictionary representation of the resource
+
+        Raises:
+            ValidationError: If the resource dict is invalid
+        """
+        # Get name for error messages
+        name = resource_dict.get("metadata", {}).get("name", "unnamed")
+
+        # Create a minimal temporary instance just to use _load_schema
+        # We'll override the necessary attributes to avoid validation in __init__
+        temp_instance = object.__new__(cls)
+        temp_instance.kind = cls.kind
+        temp_instance.name = name
+
+        # Initialize the schema cache if not present
+        if not hasattr(cls, "_schema_cache"):
+            cls._schema_cache = {}
+
+        # Load schema using instance method
+        schema = temp_instance._load_schema()
+        if not schema:
+            LOGGER.warning(f"No schema found for {cls.kind}, skipping validation")
+            return
+
+        # Validate
+        try:
+            import jsonschema
+
+            jsonschema.validate(instance=resource_dict, schema=schema)
+        except jsonschema.ValidationError as e:
+            from ocp_resources.exceptions import ValidationError
+
+            raise ValidationError(
+                f"Resource validation failed for {cls.kind}/{name}:\n{temp_instance._format_validation_error(e)}"
+            )
+        except Exception as e:
+            LOGGER.error(f"Unexpected error during validation: {e}")
+            raise
 
 
 class NamespacedResource(Resource):
