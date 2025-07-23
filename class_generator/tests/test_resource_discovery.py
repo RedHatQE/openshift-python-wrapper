@@ -65,54 +65,56 @@ class TestResourceDiscovery:
     def test_discover_cluster_resources_success(
         self, fake_client: FakeDynamicClient, sample_api_resources: dict[str, list[dict[str, Any]]]
     ) -> None:
-        """Test successful resource discovery using common groups approach."""
-        # Mock resources.get to handle different resource types
-        with patch.object(fake_client.resources, "get") as mock_get:
+        """Test successful resource discovery using direct API calls."""
+        # Mock the client's call_api method directly
+        with patch.object(fake_client.client, "call_api") as mock_call_api:
 
-            def mock_get_side_effect(api_version=None, kind=None, **kwargs):
-                mock_resource = MagicMock()
+            def mock_call_api_impl(resource_path=None, method=None, **kwargs):
+                # Mock core API resources response
+                if resource_path == "/api/v1" and method == "GET":
+                    return {
+                        "resources": [
+                            {"name": r["name"], "kind": r["kind"], "namespaced": r["namespaced"]}
+                            for r in sample_api_resources["v1"]
+                        ]
+                    }
 
-                # Handle APIGroup request (will fail, triggering common groups approach)
-                if kind == "APIGroup":
-                    raise Exception("APIGroup not found")
+                # Mock API groups response
+                elif resource_path == "/apis" and method == "GET":
+                    return {
+                        "groups": [
+                            {"name": "apps", "versions": [{"groupVersion": "apps/v1"}]},
+                            {"name": "route.openshift.io", "versions": [{"groupVersion": "route.openshift.io/v1"}]},
+                        ]
+                    }
 
-                # Handle testing for common groups
-                if kind is None and api_version in ["apps/v1", "route.openshift.io/v1"]:
-                    return mock_resource  # Group exists
-                elif kind is None:
-                    raise Exception("Group not found")
+                # Mock specific API group resources
+                elif resource_path == "/apis/apps/v1" and method == "GET":
+                    return {
+                        "resources": [
+                            {"name": r["name"], "kind": r["kind"], "namespaced": r["namespaced"]}
+                            for r in sample_api_resources.get("apps/v1", [])
+                        ]
+                    }
 
-                # Handle APIResourceList requests
-                if kind == "APIResourceList":
-                    if api_version == "v1":
-                        resources_list = sample_api_resources["v1"]
-                    elif api_version in sample_api_resources:
-                        resources_list = sample_api_resources[api_version]
-                    else:
-                        resources_list = []
+                elif resource_path == "/apis/route.openshift.io/v1" and method == "GET":
+                    return {
+                        "resources": [
+                            {"name": r["name"], "kind": r["kind"], "namespaced": r["namespaced"]}
+                            for r in sample_api_resources.get("route.openshift.io/v1", [])
+                        ]
+                    }
 
-                    # Create mock resource objects
-                    mock_resources = []
-                    for r in resources_list:
-                        mock_r = MagicMock()
-                        mock_r.name = r["name"]
-                        mock_r.kind = r["kind"]
-                        mock_r.namespaced = r["namespaced"]
-                        mock_resources.append(mock_r)
+                return {"resources": []}
 
-                    mock_response = MagicMock()
-                    mock_response.resources = mock_resources
-                    mock_resource.get.return_value = mock_response
+            mock_call_api.side_effect = mock_call_api_impl
 
-                # Handle CRD requests
-                if kind == "CustomResourceDefinition":
-                    raise Exception("No CRDs")
+            # Mock resources.get for CRD discovery
+            with patch.object(fake_client.resources, "get") as mock_get:
+                # CRD discovery should raise exception (no CRDs)
+                mock_get.side_effect = Exception("No CRDs")
 
-                return mock_resource
-
-            mock_get.side_effect = mock_get_side_effect
-
-            discovered = discover_cluster_resources(client=fake_client)
+                discovered = discover_cluster_resources(client=fake_client)
 
             # Verify structure
             assert isinstance(discovered, dict)
@@ -680,7 +682,11 @@ class TestCLIIntegration:
         runner = CliRunner()
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            cache_dir = os.path.join(tmpdir, ".cache", "openshift-python-wrapper")
+            # Mock expanduser to return a path inside tmpdir
+            home_dir = os.path.join(tmpdir, "home")
+            os.makedirs(home_dir)
+
+            cache_dir = os.path.join(home_dir, ".cache", "openshift-python-wrapper")
             cache_file = os.path.join(cache_dir, "discovery_cache.json")
 
             # Ensure cache directory exists
@@ -693,8 +699,13 @@ class TestCLIIntegration:
                 )
 
             with patch("os.path.expanduser") as mock_expanduser:
-                # Make expanduser return our temp directory
-                mock_expanduser.return_value = tmpdir
+                # Make expanduser return our test home directory
+                def expanduser_side_effect(path):
+                    if path.startswith("~"):
+                        return path.replace("~", home_dir, 1)
+                    return path
+
+                mock_expanduser.side_effect = expanduser_side_effect
 
                 with patch("class_generator.class_generator.discover_cluster_resources") as mock_discover:
                     with patch("class_generator.class_generator.analyze_coverage") as mock_analyze:
@@ -705,7 +716,22 @@ class TestCLIIntegration:
 
                             # Run with cache - should not call discover
                             result = runner.invoke(cli=main, args=["--discover-missing"])
+
+                            # Debug output
+                            if result.exit_code != 0:
+                                print(f"Exit code: {result.exit_code}")
+                                print(f"Output: {result.output}")
+                                print(f"Exception: {result.exception}")
+
                             assert result.exit_code == 0
+
+                            # Check if cache was used
+                            if "Using cached discovery results" not in result.output:
+                                print(f"Output: {result.output}")
+                                print(f"Cache file exists: {os.path.exists(cache_file)}")
+                                print(f"Cache dir: {cache_dir}")
+                                print(f"Expanduser called with: {mock_expanduser.call_args}")
+
                             # Should use cache, not call discover
                             assert mock_discover.call_count == 0
                             assert mock_analyze.called
