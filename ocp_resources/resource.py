@@ -15,6 +15,7 @@ from types import TracebackType
 from typing import Any, Type
 from urllib.parse import parse_qs, urlencode, urlparse
 
+import jsonschema
 import kubernetes
 import requests
 import yaml
@@ -44,6 +45,7 @@ from ocp_resources.exceptions import (
     MissingRequiredArgumentError,
     MissingResourceResError,
     ResourceTeardownError,
+    ValidationError,
 )
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
@@ -57,7 +59,7 @@ from ocp_resources.utils.constants import (
     TIMEOUT_30SEC,
 )
 from ocp_resources.utils.resource_constants import ResourceConstants
-from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
+from ocp_resources.utils.utils import convert_camel_case_to_snake_case, skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
@@ -1435,27 +1437,63 @@ class Resource(ResourceConstants):
         Find the schema file for this resource kind.
 
         Returns:
-            Path to the schema file or None if not found
+            Path to schema file or None if not found
         """
-        from pathlib import Path
-        from ocp_resources.utils.utils import convert_camel_case_to_snake_case
+        # Use importlib.resources for package-safe resource access
+        try:
+            if sys.version_info >= (3, 9):
+                from importlib.resources import files
 
-        # Get the schema directory
-        schema_dir = Path(__file__).parent.parent / "class_generator" / "schema"
+                schema_dir = files("class_generator") / "schema"
+            else:
+                # Fallback for older Python versions
+                import importlib.resources
+
+                with importlib.resources.path("class_generator", "schema") as schema_path:
+                    schema_dir = Path(schema_path)
+        except (ImportError, ModuleNotFoundError):
+            # Fallback to file system path for development
+            schema_dir = Path(__file__).parent.parent / "class_generator" / "schema"
+            if not schema_dir.exists():
+                LOGGER.warning(f"Schema directory not found: {schema_dir}")
+                return None
 
         # Convert kind to lowercase filename
         schema_filename = f"{convert_camel_case_to_snake_case(name=self.kind)}.json"
-        schema_path = schema_dir / schema_filename
 
-        if schema_path.exists():
-            return schema_path
+        # For importlib.resources, we need to check if file exists differently
+        if sys.version_info >= (3, 9) and hasattr(schema_dir, "joinpath"):
+            schema_path = schema_dir / schema_filename
+            try:
+                # Try to read to check if exists
+                schema_path.read_text()
+                return Path(str(schema_path))
+            except (FileNotFoundError, AttributeError):
+                pass
+        else:
+            # Traditional file system check
+            schema_path = schema_dir / schema_filename
+            if isinstance(schema_path, Path) and schema_path.exists():
+                return schema_path
 
-        # Try just lowercase as fallback
-        schema_filename_lower = f"{self.kind.lower()}.json"
-        schema_path_lower = schema_dir / schema_filename_lower
+        # Try alternate names for special cases
+        alternate_names = [
+            f"{self.kind}_{self.api_group.replace('.', '_')}.json",
+            f"{self.kind}_{self.api_version}.json",
+        ]
 
-        if schema_path_lower.exists():
-            return schema_path_lower
+        for alt_name in alternate_names:
+            if sys.version_info >= (3, 9) and hasattr(schema_dir, "joinpath"):
+                alt_path = schema_dir / alt_name
+                try:
+                    alt_path.read_text()
+                    return Path(str(alt_path))
+                except (FileNotFoundError, AttributeError):
+                    pass
+            else:
+                alt_path = schema_dir / alt_name
+                if isinstance(alt_path, Path) and alt_path.exists():
+                    return alt_path
 
         return None
 
@@ -1476,11 +1514,19 @@ class Resource(ResourceConstants):
             return None
 
         try:
-            with open(schema_file, "r") as f:
-                schema = json.load(f)
-                # Cache the schema
-                self._schema_cache[self.kind] = schema
-                return schema
+            # Handle both Path objects and importlib.resources paths
+            if hasattr(schema_file, "read_text"):
+                # importlib.resources path
+                schema_data = schema_file.read_text()
+            else:
+                # Regular Path object
+                with open(schema_file, "r") as f:
+                    schema_data = f.read()
+
+            schema = json.loads(schema_data)
+            # Cache the schema
+            self._schema_cache[self.kind] = schema
+            return schema
         except Exception as e:
             LOGGER.warning(f"Failed to load schema for {self.kind}: {e}")
             return None
@@ -1545,12 +1591,8 @@ class Resource(ResourceConstants):
 
         # Validate
         try:
-            import jsonschema
-
             jsonschema.validate(instance=resource_dict, schema=schema)
         except jsonschema.ValidationError as e:
-            from ocp_resources.exceptions import ValidationError
-
             raise ValidationError(
                 f"Resource validation failed for {self.kind}/{self.name}:\n{self._format_validation_error(e)}"
             )
@@ -1590,12 +1632,8 @@ class Resource(ResourceConstants):
 
         # Validate
         try:
-            import jsonschema
-
             jsonschema.validate(instance=resource_dict, schema=schema)
         except jsonschema.ValidationError as e:
-            from ocp_resources.exceptions import ValidationError
-
             raise ValidationError(
                 f"Resource validation failed for {cls.kind}/{name}:\n{temp_instance._format_validation_error(e)}"
             )

@@ -2,7 +2,6 @@
 
 import copy
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -160,21 +159,20 @@ class TestResourceValidation:
         if hasattr(Resource, "_schema_cache"):
             Resource._schema_cache.clear()
 
-        # Mock file operations instead of _load_schema to test caching
-        mock_schema_path = Path("/fake/path/pod.json")
-        with patch.object(pod, "_find_schema_file", return_value=mock_schema_path) as mock_find:
-            with patch("builtins.open", mock=MagicMock()) as mock_open:
-                mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(POD_SCHEMA)
+        # Create a mock Path object that has read_text method
+        mock_path = MagicMock()
+        mock_path.read_text.return_value = json.dumps(POD_SCHEMA)
 
-                # First call should load schema from file
-                pod.validate()
-                assert mock_find.call_count == 1
-                assert mock_open.call_count == 1
+        with patch.object(pod, "_find_schema_file", return_value=mock_path) as mock_find:
+            # First call should find and load schema
+            pod.validate()
+            assert mock_find.call_count == 1
+            assert mock_path.read_text.call_count == 1
 
-                # Second call should use cache (no file operations)
-                pod.validate()
-                assert mock_find.call_count == 1  # Should not increase
-                assert mock_open.call_count == 1  # Should not increase
+            # Second call should use cache (no file operations)
+            pod.validate()
+            assert mock_find.call_count == 1  # Should not increase
+            assert mock_path.read_text.call_count == 1  # Should not increase
 
     def test_validate_with_additional_properties(self):
         """Test validate() with additional properties not in schema."""

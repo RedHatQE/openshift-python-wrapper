@@ -61,6 +61,9 @@ packages = [
   "fake_kubernetes_client",
   "mcp_server",
 ]
+include = [
+  "class_generator/schema/*.json",
+]
 
 [tool.uv]
 dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
