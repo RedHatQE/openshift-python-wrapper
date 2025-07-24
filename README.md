@@ -32,13 +32,19 @@ From source:
 ```bash
 git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
-python setup.py install --user
+uv sync
 ```
 
-From pypi:
+To use the wrapper in another project:
 
 ```bash
-pip install openshift-python-wrapper --user
+uv pip install /path/to/openshift-python-wrapper
+```
+
+From Pypi:
+
+```bash
+uv pip install openshift-python-wrapper
 ```
 
 ## Fake Kubernetes Client
