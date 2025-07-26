@@ -636,7 +636,7 @@ def get_client_binary() -> str:
         sys.exit(1)
 
 
-def update_kind_schema():
+def update_kind_schema() -> None:
     openapi2jsonschema_str: str = "openapi2jsonschema"
     client = get_client_binary()
 

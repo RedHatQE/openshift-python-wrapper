@@ -11,7 +11,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Type
+from typing import Any, Self, Type
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import jsonschema
@@ -752,7 +752,7 @@ class Resource(ResourceConstants):
         self.__exit__()
         sys.exit(signal_received)
 
-    def deploy(self, wait: bool = False) -> "Resource | NamespacedResource":
+    def deploy(self, wait: bool = False) -> Self:
         """
         For debug, export REUSE_IF_RESOURCE_EXISTS to skip resource create.
         Spaces are important in the export dict
@@ -1734,7 +1734,7 @@ class ResourceEditor:
     def restore(self) -> None:
         self._apply_patches_sampler(patches=self._backups, action_text="Restoring", action=self.action)
 
-    def __enter__(self) -> "ResourceEditor":
+    def __enter__(self) -> Self:
         self.update(backup_resources=True)
         return self
 
@@ -1863,11 +1863,11 @@ class BaseResourceList(ABC):
     iteration, indexing, deployment, and cleanup operations.
     """
 
-    def __init__(self, client: DynamicClient):
+    def __init__(self, client: DynamicClient) -> None:
         self.resources: list[Resource] = []
         self.client = client
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Enters the runtime context and deploys all resources."""
         self.deploy()
         return self

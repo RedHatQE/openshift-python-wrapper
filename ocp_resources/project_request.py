@@ -45,7 +45,7 @@ class ProjectRequest(Resource):
 
     # End of generated code
 
-    def deploy(self, wait: bool = False) -> Project:
+    def deploy(self, wait: bool = False) -> Project:  # type: ignore[override]
         super().deploy(wait=wait)
 
         project = Project(
