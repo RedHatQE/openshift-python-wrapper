@@ -2,16 +2,16 @@
 
 
 from typing import Any
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class Machine(Resource):
+class Machine(NamespacedResource):
     """
         Machine is the Schema for the machines API
     Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
     """
 
-    api_group: str = Resource.ApiGroup.MACHINE_OPENSHIFT_IO
+    api_group: str = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
 
     def __init__(
         self,

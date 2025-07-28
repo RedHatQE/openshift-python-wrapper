@@ -2,15 +2,15 @@
 
 
 from typing import Any
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class ConfigMap(Resource):
+class ConfigMap(NamespacedResource):
     """
     ConfigMap holds configuration data for pods to consume.
     """
 
-    api_version: str = Resource.ApiVersion.V1
+    api_version: str = NamespacedResource.ApiVersion.V1
 
     def __init__(
         self,

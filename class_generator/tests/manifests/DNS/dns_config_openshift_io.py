@@ -2,17 +2,17 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class DNS(NamespacedResource):
+class DNS(Resource):
     """
         DNS holds cluster-wide information about DNS. The canonical name is `cluster`
 
     Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
     """
 
-    api_group: str = NamespacedResource.ApiGroup.CONFIG_OPENSHIFT_IO
+    api_group: str = Resource.ApiGroup.CONFIG_OPENSHIFT_IO
 
     def __init__(
         self,
