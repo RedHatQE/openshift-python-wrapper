@@ -868,15 +868,16 @@ def extract_crd_schemas(client: str) -> None:
 
                     # Check if this version already exists
                     version_exists = False
-                    for mapping in resources_mapping[kind_lower]:
+                    for i, mapping in enumerate(resources_mapping[kind_lower]):
                         # Check if this mapping matches the group/version
                         mapping_group_version_kinds = mapping.get("x-kubernetes-group-version-kind", [])
                         for gvk in mapping_group_version_kinds:
                             if gvk.get("group") == group and gvk.get("version") == version:
-                                # Update existing mapping with full schema
-                                mapping.clear()  # Clear the old minimal mapping
-                                mapping.update(full_schema)
-                                mapping["namespaced"] = namespaced
+                                # Create new mapping with full schema to ensure atomic update
+                                new_mapping = full_schema.copy()
+                                new_mapping["namespaced"] = namespaced
+                                # Replace the old mapping atomically
+                                resources_mapping[kind_lower][i] = new_mapping
                                 version_exists = True
                                 break
                         if version_exists:
