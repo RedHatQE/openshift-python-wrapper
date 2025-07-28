@@ -2,10 +2,10 @@
 
 
 from typing import Any
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class DNS(Resource):
+class DNS(NamespacedResource):
     """
        DNS manages the CoreDNS component to provide a name resolution service for pods and services in the cluster.
     This supports the DNS-based service discovery specification: https://github.com/kubernetes/dns/blob/master/docs/specification.md
@@ -13,7 +13,7 @@ class DNS(Resource):
     Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
     """
 
-    api_group: str = Resource.ApiGroup.OPERATOR_OPENSHIFT_IO
+    api_group: str = NamespacedResource.ApiGroup.OPERATOR_OPENSHIFT_IO
 
     def __init__(
         self,

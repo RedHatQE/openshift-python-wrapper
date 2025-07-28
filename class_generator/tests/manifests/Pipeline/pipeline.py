@@ -9,8 +9,6 @@ class Pipeline(NamespacedResource):
     """
         Pipeline describes a list of Tasks to execute. It expresses how outputs
     of tasks feed into inputs of subsequent tasks.
-
-    Deprecated: Please use v1.Pipeline instead.
     """
 
     api_group: str = NamespacedResource.ApiGroup.TEKTON_DEV
@@ -21,7 +19,6 @@ class Pipeline(NamespacedResource):
         display_name: str | None = None,
         finally_: list[Any] | None = None,
         params: list[Any] | None = None,
-        resources: list[Any] | None = None,
         results: list[Any] | None = None,
         tasks: list[Any] | None = None,
         workspaces: list[Any] | None = None,
@@ -44,8 +41,6 @@ class Pipeline(NamespacedResource):
             params (list[Any]): Params declares a list of input parameters that must be supplied when
               this Pipeline is run.
 
-            resources (list[Any]): Deprecated: Unused, preserved only for backwards compatibility
-
             results (list[Any]): Results are values that this pipeline can output once run
 
             tasks (list[Any]): Tasks declares the graph of Tasks that execute when this Pipeline is
@@ -61,7 +56,6 @@ class Pipeline(NamespacedResource):
         self.display_name = display_name
         self.finally_ = finally_
         self.params = params
-        self.resources = resources
         self.results = results
         self.tasks = tasks
         self.workspaces = workspaces
@@ -84,9 +78,6 @@ class Pipeline(NamespacedResource):
 
             if self.params is not None:
                 _spec["params"] = self.params
-
-            if self.resources is not None:
-                _spec["resources"] = self.resources
 
             if self.results is not None:
                 _spec["results"] = self.results

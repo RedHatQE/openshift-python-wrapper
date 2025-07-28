@@ -138,21 +138,7 @@ class-generator --kind Pod --add-tests
 - Dependencies
   - Kubernetes/Openshift cluster
   - [oc](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/) or [kubectl](https://kubernetes.io/docs/tasks/tools/) (latest version)
-  - [openapi2jsonschema](https://github.com/instrumenta/openapi2jsonschema)
   - [uv](https://github.com/astral-sh/uv)
-
-```bash
-uv tool install --python python3.9 openapi2jsonschema
-```
-
-If install fail ([Issue 1455](https://github.com/astral-sh/uv/issues/1455)) try to install manually:
-
-```bash
-git clone https://github.com/instrumenta/openapi2jsonschema
-cd openapi2jsonschema
-sed -i .bk s/'pyyaml = "^5.1"'/'pyyaml = ">=6.0"'/g  pyproject.toml
-uv tool install --python python3.9 .
-```
 
 - Clone this repository
 
@@ -172,3 +158,26 @@ oc login <clster api URL> -u <username> -p <password>
 ```bash
 class-generator --update-schema
 ```
+
+The schema update process:
+- Fetches schemas directly from the OpenAPI v3 endpoint
+- Runs in parallel for improved performance
+- Stores schemas in `class_generator/schema/__resources-mappings.json` and `class_generator/schema/_definitions.json`
+
+## Version Selection
+
+When multiple API versions exist for the same resource within an API group, the class generator automatically selects the latest stable version according to this precedence:
+
+`v2` > `v1` > `v1beta2` > `v1beta1` > `v1alpha2` > `v1alpha1`
+
+For example:
+- If both `v1` and `v1beta1` exist, `v1` will be used
+- Resources from different API groups are treated as separate resources
+
+## Python Keyword Handling
+
+Fields that conflict with Python reserved keywords are automatically renamed by appending an underscore. The original field name is preserved in the API calls.
+
+Example:
+- CRD field `finally` → Python parameter `finally_`
+- The generated `to_dict()` method correctly maps back to `finally` for API operations

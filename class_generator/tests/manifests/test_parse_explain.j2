@@ -10,7 +10,8 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
 
 @pytest.mark.parametrize(
     "kind",
-    ({% for test_info in template %}
+    (
+    {% for test_info in template %}
         "{{ test_info["kind"] }}",
     {% endfor %}),
 )

@@ -2,10 +2,10 @@
 
 
 from typing import Any
-from ocp_resources.resource import Resource
+from ocp_resources.resource import NamespacedResource
 
 
-class ImageContentSourcePolicy(Resource):
+class ImageContentSourcePolicy(NamespacedResource):
     """
         ImageContentSourcePolicy holds cluster-wide information about how to handle registry mirror rules.
     When multiple policies are defined, the outcome of the behavior is defined on each field.
@@ -13,7 +13,7 @@ class ImageContentSourcePolicy(Resource):
     Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.
     """
 
-    api_group: str = Resource.ApiGroup.OPERATOR_OPENSHIFT_IO
+    api_group: str = NamespacedResource.ApiGroup.OPERATOR_OPENSHIFT_IO
 
     def __init__(
         self,

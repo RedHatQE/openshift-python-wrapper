@@ -50,18 +50,36 @@ PYTHON_KEYWORD_MAPPINGS = {
 
 
 def sanitize_python_name(name: str) -> tuple[str, str]:
-    """
-    Sanitize a name to be a valid Python identifier.
-
-    Args:
-        name: The original field name
-
-    Returns:
-        tuple: (python_safe_name, original_name)
-    """
+    """Sanitize Python reserved keywords by appending underscore."""
     if name in PYTHON_KEYWORD_MAPPINGS:
         return PYTHON_KEYWORD_MAPPINGS[name], name
     return name, name
+
+
+def get_latest_version(versions: list[str]) -> str:
+    """
+    Get the latest version from a list of Kubernetes API versions.
+
+    Version precedence (from newest to oldest):
+    - v2 > v1 > v1beta2 > v1beta1 > v1alpha2 > v1alpha1
+    """
+    if not versions:
+        return ""
+
+    # Define version priority (higher number = newer version)
+    version_priority = {
+        "v2": 6,
+        "v1": 5,
+        "v1beta2": 4,
+        "v1beta1": 3,
+        "v1alpha2": 2,
+        "v1alpha1": 1,
+    }
+
+    # Sort versions by priority
+    sorted_versions = sorted(versions, key=lambda v: version_priority.get(v.split("/")[-1], 0), reverse=True)
+
+    return sorted_versions[0] if sorted_versions else versions[0]
 
 
 def discover_cluster_resources(
@@ -521,108 +539,6 @@ Coverage Percentage: [bold yellow]{stats.get("coverage_percentage", 0)}%[/bold y
         return output
 
 
-def _is_kind_and_namespaced(
-    client: str, _key: str, _data: dict[str, Any], kind: str, group: str, version: str
-) -> dict[str, Any]:
-    _group_and_version = f"{group}/{version}" if group else version
-    not_resource_dict = {"is_kind": False, "kind": _key}
-
-    # if explain command failed, this is not a resource
-    if not run_command(command=shlex.split(f"{client} explain {kind}"), check=False, log_errors=False)[0]:
-        return not_resource_dict
-
-    api_resources_base_cmd = f"bash -c '{client} api-resources"
-
-    # check if this as a valid version for the resource.
-    if run_command(
-        command=shlex.split(f"{api_resources_base_cmd} | grep -w {kind} | grep {_group_and_version}'"),
-        check=False,
-        log_errors=False,
-    )[0]:
-        # Check if the resource if namespaced.
-        _data["namespaced"] = (
-            run_command(
-                command=shlex.split(
-                    f"{api_resources_base_cmd} --namespaced | grep -w {kind} | grep {_group_and_version} | wc -l'"
-                ),
-                check=False,
-                log_errors=False,
-            )[1].strip()
-            == "1"
-        )
-        return {"is_kind": True, "kind": _key, "data": _data}
-
-    return not_resource_dict
-
-
-def map_kind_to_namespaced(client: str, newer_cluster_version: bool, schema_definition_file: Path) -> None:
-    not_kind_file: str = os.path.join(SCHEMA_DIR, "__not-kind.txt")
-
-    resources_mapping = read_resources_mapping_file()
-
-    if os.path.isfile(not_kind_file):
-        with open(not_kind_file) as fd:
-            not_kind_list = fd.read().split("\n")
-    else:
-        not_kind_list = []
-
-    with open(schema_definition_file) as fd:
-        _definitions_json_data = json.load(fd)
-
-    _kind_data_futures: list[Future] = []
-    with ThreadPoolExecutor() as executor:
-        for _key, _data in _definitions_json_data["definitions"].items():
-            if not _data.get("x-kubernetes-group-version-kind"):
-                continue
-
-            if _key in not_kind_list:
-                continue
-
-            x_kubernetes_group_version_kind = extract_group_kind_version(_kind_schema=_data)
-            _kind = x_kubernetes_group_version_kind["kind"]
-            _group = x_kubernetes_group_version_kind.get("group", "")
-            _version = x_kubernetes_group_version_kind.get("version", "")
-
-            # Do not add the resource if it is already in the mapping and the cluster version is not newer than the last
-            if resources_mapping.get(_kind.lower()) and not newer_cluster_version:
-                continue
-
-            _kind_data_futures.append(
-                executor.submit(
-                    _is_kind_and_namespaced,
-                    client=client,
-                    _key=_key,
-                    _data=_data,
-                    kind=_kind,
-                    group=_group,
-                    version=_version,
-                )
-            )
-
-    _temp_resources_mappings: dict[Any, Any] = {}
-    for res in as_completed(_kind_data_futures):
-        _res = res.result()
-        # _res["kind"] is group.version.kind, set only kind as key in the final dict
-        kind_key = _res["kind"].rsplit(".", 1)[-1].lower()
-
-        if _res["is_kind"]:
-            _temp_resources_mappings.setdefault(kind_key, []).append(_res["data"])
-        else:
-            not_kind_list.append(_res["kind"])
-
-    # Update the resources mapping dict with the one that we filled to avoid duplication in the lists
-    resources_mapping.update(_temp_resources_mappings)
-
-    with open(RESOURCES_MAPPING_FILE, "w") as fd:
-        json.dump(resources_mapping, fd, indent=4)
-
-    with open(not_kind_file, "w") as fd:
-        fd.writelines("\n".join(not_kind_list))
-
-    # Clear SchemaValidator cache so it reloads the updated files
-    SchemaValidator.clear_cache()
-
-
 def read_resources_mapping_file() -> dict[Any, Any]:
     """Read resources mapping using SchemaValidator for consistency"""
     # Try to use SchemaValidator first
@@ -662,17 +578,21 @@ def get_client_binary() -> str:
 
 
 def update_kind_schema() -> None:
-    openapi2jsonschema_str: str = "openapi2jsonschema"
+    """Update schema files using OpenAPI v3 endpoints"""
     client = get_client_binary()
 
-    if not run_command(command=shlex.split("which openapi2jsonschema"), check=False, log_errors=False)[0]:
-        LOGGER.error(
-            f"{openapi2jsonschema_str} not found. Install it using `pipx install --python python3.9 openapi2jsonschema`"
-        )
+    # Get v3 API index
+    LOGGER.info("Fetching OpenAPI v3 index...")
+    success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
+    if not success:
+        LOGGER.error("Failed to fetch OpenAPI v3 index")
         sys.exit(1)
 
-    data = run_command(command=shlex.split(f"{client} get --raw /openapi/v2"))[1]
+    v3_index = json.loads(v3_data)
+    paths = v3_index.get("paths", {})
+    LOGGER.info(f"Found {len(paths)} API groups to process")
 
+    # Check and update cluster version
     cluster_version_file = Path("class_generator/__cluster_version__.txt")
     last_cluster_version_generated: str = ""
     try:
@@ -684,7 +604,6 @@ def update_kind_schema() -> None:
 
     cluster_version = get_server_version(client=client)
     cluster_version = cluster_version.split("+")[0]
-    ocp_openapi_json_file = Path(gettempdir()) / f"__k8s-openapi-{cluster_version}__.json"
 
     same_or_newer_version: bool = Version(cluster_version) >= Version(last_cluster_version_generated)
 
@@ -692,41 +611,189 @@ def update_kind_schema() -> None:
         with open(cluster_version_file, "w") as fd:
             fd.write(cluster_version)
 
-    with open(ocp_openapi_json_file, "w") as fd:
-        fd.write(data)
+    # Ensure schema directory exists
+    Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
 
-    tmp_schema_dir = Path(gettempdir()) / f"{SCHEMA_DIR}-{cluster_version}"
+    # Load existing resources mapping
+    resources_mapping = read_resources_mapping_file()
+    definitions = {}
 
-    if not run_command(command=shlex.split(f"{openapi2jsonschema_str} {ocp_openapi_json_file} -o {tmp_schema_dir}"))[0]:
-        LOGGER.error("Failed to generate schema.")
-        sys.exit(1)
+    # Track processed schemas to avoid duplicates
+    processed_schemas = set()
+    total_schemas = 0
 
-    if same_or_newer_version:
-        # copy all files from tmp_schema_dir to schema dir
-        shutil.copytree(src=tmp_schema_dir, dst=SCHEMA_DIR, dirs_exist_ok=True)
+    # Function to fetch and process a single API group
+    def fetch_api_group(api_path: str, api_info: dict[str, Any]) -> tuple[str, dict[str, Any] | None]:
+        api_url = api_info.get("serverRelativeURL", "")
+        if not api_url:
+            return api_path, None
 
-    else:
-        # Copy only new files from tmp_schema_dir to schema dir
-        for root, _, files in os.walk(tmp_schema_dir):
-            for file_ in files:
-                dst_file = Path(SCHEMA_DIR) / file_
-                try:
-                    if not os.path.isfile(dst_file):
-                        shutil.copy(src=Path(root) / file_, dst=dst_file)
-                except (OSError, IOError) as exp:
-                    LOGGER.error(f"Failed to copy file {file_}: {exp}")
-                    sys.exit(1)
+        # Fetch the API group's schemas
+        success, api_data, _ = run_command(
+            command=shlex.split(f"{client} get --raw '{api_url}'"), check=False, log_errors=False
+        )
 
-    map_kind_to_namespaced(
-        client=client, newer_cluster_version=same_or_newer_version, schema_definition_file=ocp_openapi_json_file
-    )
+        if not success:
+            LOGGER.debug(f"Failed to fetch schemas for {api_path}")
+            return api_path, None
 
-    # Extract schemas from CRDs with OpenAPIV3Schema
-    # This supplements the openapi2jsonschema extraction for CRDs that don't fully expose their schemas
-    extract_crd_schemas(client=client)
+        try:
+            api_schemas = json.loads(api_data)
+            return api_path, api_schemas
+        except json.JSONDecodeError:
+            LOGGER.debug(f"Failed to parse JSON for {api_path}")
+            return api_path, None
+
+    # Fetch all API groups in parallel
+    LOGGER.info("Fetching API groups in parallel...")
+    api_groups_data = {}
+
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        # Submit all API group fetches
+        future_to_api = {
+            executor.submit(fetch_api_group, api_path, api_info): api_path for api_path, api_info in paths.items()
+        }
+
+        # Process completed fetches
+        completed = 0
+        for future in as_completed(future_to_api):
+            api_path = future_to_api[future]
+            completed += 1
+            if completed % 20 == 0:
+                LOGGER.info(f"Fetched {completed}/{len(paths)} API groups...")
+
+            try:
+                api_path, api_schemas = future.result()
+                if api_schemas:
+                    api_groups_data[api_path] = api_schemas
+            except Exception as e:
+                LOGGER.debug(f"Exception fetching {api_path}: {e}")
+
+    LOGGER.info(f"Successfully fetched {len(api_groups_data)} API groups")
+
+    # Now process all the fetched data
+    for api_path, api_schemas in api_groups_data.items():
+        # Extract schemas from this API group
+        components = api_schemas.get("components", {})
+        schemas = components.get("schemas", {})
+
+        for schema_name, schema_data in schemas.items():
+            # Skip if already processed (same schema might appear in multiple API groups)
+            if schema_name in processed_schemas:
+                continue
+
+            processed_schemas.add(schema_name)
+
+            # Extract the kind from schema name or GVK
+            gvk_list = schema_data.get("x-kubernetes-group-version-kind", [])
+
+            if gvk_list:
+                # This is a top-level resource (has GVK)
+                for gvk in gvk_list:
+                    kind = gvk.get("kind", "")
+                    if not kind:
+                        continue
+
+                    kind_lower = kind.lower()
+                    schema_filename = f"{kind_lower}.json"
+                    schema_filepath = Path(SCHEMA_DIR) / schema_filename
+
+                    # Only update if same_or_newer_version or file doesn't exist
+                    if same_or_newer_version or not schema_filepath.exists():
+                        # Individual schema files are no longer needed with v3
+                        # We save everything to __resources-mappings.json and _definitions.json
+                        # Keeping this commented in case we need to revert
+                        # with open(schema_filepath, "w") as fd:
+                        #     json.dump(schema_data, fd, indent=2, sort_keys=True)
+
+                        total_schemas += 1
+
+                    # Update resources mapping
+                    group = gvk.get("group", "")
+                    version = gvk.get("version", "")
+
+                    # Determine if namespaced using v3 paths
+                    namespaced = _is_resource_namespaced_from_paths(api_data=api_schemas, kind=kind)
+
+                    # Update the mapping entry
+                    if kind_lower not in resources_mapping:
+                        resources_mapping[kind_lower] = []
+
+                    # Check if this version already exists
+                    mapping_updated = False
+                    for i, mapping in enumerate(resources_mapping[kind_lower]):
+                        # Check if this mapping matches the group/version
+                        mapping_group_version_kinds = mapping.get("x-kubernetes-group-version-kind", [])
+                        for gvk_item in mapping_group_version_kinds:
+                            if gvk_item.get("group") == group and gvk_item.get("version") == version:
+                                # Create new mapping with full schema to ensure atomic update
+                                new_mapping = schema_data.copy()
+                                new_mapping["namespaced"] = namespaced
+                                # Replace the old mapping atomically
+                                resources_mapping[kind_lower][i] = new_mapping
+                                mapping_updated = True
+                                break
+                        if mapping_updated:
+                            break
+
+                    if not mapping_updated:
+                        # Add new mapping with full schema
+                        new_mapping = schema_data.copy()
+                        new_mapping["namespaced"] = namespaced
+                        resources_mapping[kind_lower].append(new_mapping)
+            else:
+                # This is a sub-schema (like status types, spec types, etc.)
+                # Store in definitions for reference resolution
+                definitions[schema_name] = schema_data
+
+    LOGGER.info(f"Processed {total_schemas} resource schemas")
+
+    # Save definitions file
+    definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
+    with open(definitions_file, "w") as fd:
+        json.dump({"definitions": definitions}, fd, indent=2, sort_keys=True)
+
+    # Save updated resources mapping
+    with open(RESOURCES_MAPPING_FILE, "w") as fd:
+        json.dump(resources_mapping, fd, indent=2, sort_keys=True)
 
     # Clear SchemaValidator cache after updating schemas
     SchemaValidator.clear_cache()
+
+    LOGGER.info("Schema update completed successfully")
+
+
+def _is_resource_namespaced_from_paths(api_data: dict[str, Any], kind: str) -> bool:
+    """Determine if a resource is namespaced by checking its v3 API paths"""
+    paths = api_data.get("paths", {})
+    kind_lower = kind.lower()
+    kind_plural = f"{kind_lower}s"  # Simple pluralization
+
+    # Special plural cases
+    plural_map = {
+        "policy": "policies",
+        "ingress": "ingresses",
+        "customresourcedefinition": "customresourcedefinitions",
+    }
+    if kind_lower in plural_map:
+        kind_plural = plural_map[kind_lower]
+
+    # Look for paths containing this resource
+    for path in paths:
+        path_lower = path.lower()
+        # Check if this path is for our resource type
+        if f"/{kind_plural}" in path_lower or f"/{kind_lower}" in path_lower:
+            # If path contains /namespaces/{namespace}/, it's namespaced
+            if "/namespaces/{namespace}/" in path:
+                return True
+            # If we found the resource path without namespace, it's cluster-scoped
+            # Make sure it's actually the resource endpoint, not a subresource
+            if path.endswith(f"/{kind_plural}") or path.endswith(f"/{kind_lower}"):
+                return False
+
+    # Default to namespaced if we couldn't determine from paths
+    # This is a safe default as most resources are namespaced
+    return True
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
@@ -774,193 +841,6 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
         sys.exit(1)
 
     return rendered
-
-
-def _should_update_schema(schema_filepath: Path, existing_schema: dict[str, Any], crd_schema: dict[str, Any]) -> bool:
-    """
-    Determine if a schema file should be updated based on its current state.
-
-    Args:
-        schema_filepath: Path to the schema file
-        existing_schema: The current schema content
-        crd_schema: The schema from the CRD
-
-    Returns:
-        bool: True if the schema should be updated
-    """
-    if not schema_filepath.exists():
-        return True
-
-    # If the existing schema has no properties defined, we should update it
-    if not existing_schema.get("properties"):
-        return True
-
-    # Also check if existing schema has properties but is different from CRD schema
-    crd_props = crd_schema.get("properties", {})
-    existing_props = existing_schema.get("properties", {})
-    if existing_props != crd_props and len(crd_props) > len(existing_props):
-        return True
-
-    return False
-
-
-def _format_crd_schema(schema: dict[str, Any], group: str, kind: str, version: str) -> dict[str, Any]:
-    """
-    Format a CRD schema in the format expected by the class generator.
-
-    Args:
-        schema: The OpenAPIV3Schema from the CRD
-        group: API group
-        kind: Resource kind
-        version: API version
-
-    Returns:
-        dict: Formatted schema
-    """
-    formatted_schema = {
-        "type": "object",
-        "x-kubernetes-group-version-kind": [{"group": group, "kind": kind, "version": version}],
-        "$schema": "http://json-schema.org/schema#",
-    }
-
-    # Merge the OpenAPIV3Schema content
-    formatted_schema.update(schema)
-
-    return formatted_schema
-
-
-def _update_resource_mapping(
-    resources_mapping: dict[str, Any],
-    kind_lower: str,
-    full_schema: dict[str, Any],
-    namespaced: bool,
-    group: str,
-    version: str,
-) -> bool:
-    """
-    Update or add a resource in the resources mapping.
-
-    Args:
-        resources_mapping: The resources mapping dictionary
-        kind_lower: Lowercase kind name
-        full_schema: The complete schema
-        namespaced: Whether the resource is namespaced
-        group: API group
-        version: API version
-
-    Returns:
-        bool: True if an existing mapping was updated, False if a new one was added
-    """
-    # Initialize or update the resource mapping
-    if kind_lower not in resources_mapping:
-        resources_mapping[kind_lower] = []
-
-    # Check if this version already exists
-    for i, mapping in enumerate(resources_mapping[kind_lower]):
-        # Check if this mapping matches the group/version
-        mapping_group_version_kinds = mapping.get("x-kubernetes-group-version-kind", [])
-        for gvk in mapping_group_version_kinds:
-            if gvk.get("group") == group and gvk.get("version") == version:
-                # Create new mapping with full schema to ensure atomic update
-                new_mapping = full_schema.copy()
-                new_mapping["namespaced"] = namespaced
-                # Replace the old mapping atomically
-                resources_mapping[kind_lower][i] = new_mapping
-                return True
-
-    # Add new mapping with full schema
-    new_mapping = full_schema.copy()
-    new_mapping["namespaced"] = namespaced
-    resources_mapping[kind_lower].append(new_mapping)
-    return False
-
-
-def extract_crd_schemas(client: str) -> None:
-    """
-    Extract schemas from CRDs that have OpenAPIV3Schema defined.
-    This supplements the openapi2jsonschema extraction for CRDs that don't expose their full schema via /openapi/v2.
-    """
-    LOGGER.info("Extracting schemas from CRDs with OpenAPIV3Schema")
-
-    # Get all CRDs
-    success, output, _ = run_command(command=shlex.split(f"{client} get crd -o json"), check=False, log_errors=False)
-    if not success:
-        LOGGER.warning("Failed to get CRDs, skipping CRD schema extraction")
-        return
-
-    resources_mapping = read_resources_mapping_file()
-    schemas_updated = False
-
-    try:
-        crds_data = json.loads(output)
-        crds = crds_data.get("items", [])
-
-        for crd in crds:
-            crd_name = crd.get("metadata", {}).get("name", "")
-            spec = crd.get("spec", {})
-            group = spec.get("group", "")
-
-            # Process each version of the CRD
-            versions = spec.get("versions", [])
-            for version_spec in versions:
-                version = version_spec.get("name", "")
-                schema = version_spec.get("schema", {}).get("openAPIV3Schema", {})
-
-                if not schema or not version:
-                    continue
-
-                # Extract the kind from CRD spec
-                kind = spec.get("names", {}).get("kind", "")
-                kind_lower = kind.lower()
-                if not kind:
-                    continue
-
-                # Create the schema file name (same format as openapi2jsonschema)
-                schema_filename = f"{kind_lower}.json"
-                schema_filepath = Path(SCHEMA_DIR) / schema_filename
-
-                # Check if the schema file should be updated
-                existing_schema = {}
-                if schema_filepath.exists():
-                    with open(schema_filepath, "r") as f:
-                        existing_schema = json.load(f)
-
-                if _should_update_schema(schema_filepath, existing_schema, schema):
-                    # Format the schema
-                    formatted_schema = _format_crd_schema(schema=schema, group=group, kind=kind, version=version)
-
-                    # Write the schema file
-                    with open(schema_filepath, "w") as f:
-                        json.dump(formatted_schema, f, indent=2)
-
-                    LOGGER.info(f"Updated schema for {kind} from CRD {crd_name}")
-                    schemas_updated = True
-
-                    # Read the schema file back to get the full schema
-                    with open(schema_filepath, "r") as f:
-                        full_schema = json.load(f)
-
-                    # Update resources mapping
-                    namespaced = spec.get("scope", "") == "Namespaced"
-                    _update_resource_mapping(
-                        resources_mapping=resources_mapping,
-                        kind_lower=kind_lower,
-                        full_schema=full_schema,
-                        namespaced=namespaced,
-                        group=group,
-                        version=version,
-                    )
-
-    except json.JSONDecodeError as e:
-        LOGGER.warning(f"Failed to parse CRD JSON output: {e}")
-    except Exception as e:
-        LOGGER.warning(f"Error extracting CRD schemas: {e}")
-
-    # Update the resources mapping file if any schemas were updated
-    if schemas_updated:
-        with open(RESOURCES_MAPPING_FILE, "w") as fd:
-            json.dump(resources_mapping, fd, indent=2)
-        LOGGER.info("Updated resources mapping file with CRD schemas")
 
 
 def generate_resource_file_from_dict(
@@ -1063,8 +943,20 @@ def types_generator(key_dict: dict[str, Any]) -> dict[str, str]:
 
 def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
     if _ref := property_.get("$ref"):
-        with open(f"{SCHEMA_DIR}/{_ref.rsplit('.')[-1].lower()}.json") as fd:
-            return json.load(fd)
+        # Extract the definition name from the $ref
+        # e.g., "#/definitions/io.k8s.api.core.v1.PodSpec" -> "io.k8s.api.core.v1.PodSpec"
+        ref_name = _ref.split("/")[-1]
+
+        # Load from _definitions.json instead of individual files
+        definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
+        if definitions_file.exists():
+            with open(definitions_file) as fd:
+                definitions = json.load(fd).get("definitions", {})
+                if ref_name in definitions:
+                    return definitions[ref_name]
+
+        # Fallback to the property itself if ref not found
+        LOGGER.warning(f"Could not resolve $ref: {_ref}")
     return property_
 
 
@@ -1121,7 +1013,43 @@ def parse_explain(
     _resources: list[dict[str, Any]] = []
 
     _kinds_schema = _schema_definition[kind.lower()]
-    for _kind_schema in _kinds_schema:
+
+    # Group schemas by API group
+    schemas_by_group: dict[str, list[dict[str, Any]]] = {}
+    for schema in _kinds_schema:
+        gvk_list = schema.get("x-kubernetes-group-version-kind", [])
+        if gvk_list:
+            group = gvk_list[0].get("group", "")
+            if group not in schemas_by_group:
+                schemas_by_group[group] = []
+            schemas_by_group[group].append(schema)
+
+    # For each API group, select the latest version
+    filtered_schemas = []
+    for group, group_schemas in schemas_by_group.items():
+        if len(group_schemas) > 1:
+            # Multiple versions in same group - pick latest
+            versions = []
+            for schema in group_schemas:
+                gvk_list = schema.get("x-kubernetes-group-version-kind", [])
+                if gvk_list:
+                    version = gvk_list[0].get("version", "")
+                    versions.append(version)
+
+            latest_version = get_latest_version(versions=versions)
+
+            # Add only the schema with the latest version
+            for schema in group_schemas:
+                gvk_list = schema.get("x-kubernetes-group-version-kind", [])
+                if gvk_list and gvk_list[0].get("version") == latest_version:
+                    filtered_schemas.append(schema)
+                    break
+        else:
+            # Single version in this group
+            filtered_schemas.extend(group_schemas)
+
+    # Use filtered schemas instead of all schemas
+    for _kind_schema in filtered_schemas:
         namespaced = _kind_schema["namespaced"]
         resource_dict: dict[str, Any] = {
             "base_class": "NamespacedResource" if namespaced else "Resource",
@@ -1131,18 +1059,6 @@ def parse_explain(
         }
 
         schema_properties: dict[str, Any] = _kind_schema.get("properties", {})
-
-        # If the mapping doesn't have properties, try to read from the schema file
-        if not schema_properties:
-            schema_file = Path(SCHEMA_DIR) / f"{kind.lower()}.json"
-            if schema_file.exists():
-                with open(schema_file, "r") as f:
-                    full_schema = json.load(f)
-                    schema_properties = full_schema.get("properties", {})
-                    # Update the description if available
-                    if full_schema.get("description"):
-                        resource_dict["description"] = full_schema["description"]
-
         fields_required = _kind_schema.get("required", [])
 
         resource_dict.update(extract_group_kind_version(_kind_schema=_kind_schema))
@@ -1165,11 +1081,15 @@ def parse_explain(
         )
 
         api_group_real_name = resource_dict.get("group")
+        # Store the original group name before converting
+        resource_dict["original_group"] = api_group_real_name
+
         # If API Group is not present in resource, try to get it from VERSION
         if not api_group_real_name:
             version_splited = resource_dict["version"].split("/")
             if len(version_splited) == 2:
                 api_group_real_name = version_splited[0]
+                resource_dict["original_group"] = api_group_real_name
 
         if api_group_real_name:
             api_group_for_resource_api_group = api_group_real_name.upper().replace(".", "_").replace("-", "_")
@@ -1260,10 +1180,20 @@ def class_generator(
 
     resources = parse_explain(kind=kind)
 
-    use_output_file_suffix: bool = len(resources) > 1
+    # Check if we have resources from different API groups
+    unique_groups = set()
+    for resource in resources:
+        # Use the original group name that we stored
+        if "original_group" in resource and resource["original_group"]:
+            unique_groups.add(resource["original_group"])
+
+    use_output_file_suffix: bool = len(unique_groups) > 1
     generated_files: list[str] = []
     for resource_dict in resources:
-        output_file_suffix = resource_dict["group"].lower() if use_output_file_suffix else ""
+        # Use the lowercase version of the original group name for suffix
+        output_file_suffix = ""
+        if use_output_file_suffix and "original_group" in resource_dict and resource_dict["original_group"]:
+            output_file_suffix = resource_dict["original_group"].lower().replace(".", "_").replace("-", "_")
 
         orig_filename, generated_py_file = generate_resource_file_from_dict(
             resource_dict=resource_dict,
@@ -1327,10 +1257,12 @@ def generate_class_generator_tests() -> None:
         template_name="test_parse_explain.j2",
     )
 
-    write_and_format_rendered(
-        filepath=os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py"),
-        output=rendered,
-    )
+    test_file_path = os.path.join(Path(TESTS_MANIFESTS_DIR).parent, "test_class_generator.py")
+    with open(test_file_path, "w") as fd:
+        fd.write(rendered)
+    LOGGER.info(f"Generated test file: {test_file_path}")
+    console = Console()
+    console.print(Panel.fit(f"[green]Generated test file:[/green] [cyan]{test_file_path}[/cyan]"))
 
 
 @cloup.command("Resource class generator", show_constraints=True)

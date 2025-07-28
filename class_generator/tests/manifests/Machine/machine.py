@@ -2,16 +2,16 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource
+from ocp_resources.resource import Resource
 
 
-class Machine(NamespacedResource):
+class Machine(Resource):
     """
         Machine is the Schema for the machines API
     Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
     """
 
-    api_group: str = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
+    api_group: str = Resource.ApiGroup.MACHINE_OPENSHIFT_IO
 
     def __init__(
         self,
@@ -24,14 +24,14 @@ class Machine(NamespacedResource):
     ) -> None:
         r"""
         Args:
-            lifecycle_hooks (dict[str, Any]): lifecycleHooks allow users to pause operations on the machine at
+            lifecycle_hooks (dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
               certain predefined points within the machine lifecycle.
 
             metadata (dict[str, Any]): ObjectMeta will autopopulate the Node created. Use this to indicate
               what labels, annotations, name prefix, etc., should be used when
               creating the Node.
 
-            provider_id (str): providerID is the identification ID of the machine provided by the
+            provider_id (str): ProviderID is the identification ID of the machine provided by the
               provider. This field must match the provider ID as seen on the
               node object corresponding to this machine. This field is required
               by higher level consumers of cluster-api. Example use case is
@@ -47,7 +47,7 @@ class Machine(NamespacedResource):
               autoscaler that will be interfacing with cluster-api as generic
               provider.
 
-            provider_spec (dict[str, Any]): providerSpec details Provider-specific configuration to use during
+            provider_spec (dict[str, Any]): ProviderSpec details Provider-specific configuration to use during
               node creation.
 
             taints (list[Any]): The list of the taints to be applied to the corresponding Node in

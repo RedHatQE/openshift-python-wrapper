@@ -21,7 +21,7 @@ class Image(Resource):
         docker_image_manifest: str | None = None,
         docker_image_manifest_media_type: str | None = None,
         docker_image_manifests: list[Any] | None = None,
-        docker_image_metadata: dict[str, Any] | None = None,
+        docker_image_metadata: Any | None = None,
         docker_image_metadata_version: str | None = None,
         docker_image_reference: str | None = None,
         docker_image_signatures: list[Any] | None = None,
@@ -47,31 +47,7 @@ class Image(Resource):
               image represents a manifest list. When this field is present, no
               DockerImageLayers should be specified.
 
-            docker_image_metadata (dict[str, Any]): RawExtension is used to hold extensions in external versions.  To use
-              this, make a field which has RawExtension as its type in your
-              external, versioned struct, and Object in your internal struct.
-              You also need to register your various plugin types.  // Internal
-              package:          type MyAPIObject struct {
-              runtime.TypeMeta `json:",inline"`                 MyPlugin
-              runtime.Object `json:"myPlugin"`         }          type PluginA
-              struct {                 AOption string `json:"aOption"`         }
-              // External package:          type MyAPIObject struct {
-              runtime.TypeMeta `json:",inline"`                 MyPlugin
-              runtime.RawExtension `json:"myPlugin"`         }          type
-              PluginA struct {                 AOption string `json:"aOption"`
-              }  // On the wire, the JSON will look something like this:
-              {                 "kind":"MyAPIObject",
-              "apiVersion":"v1",                 "myPlugin": {
-              "kind":"PluginA",                         "aOption":"foo",
-              },         }  So what happens? Decode first uses json or yaml to
-              unmarshal the serialized data into your external MyAPIObject. That
-              causes the raw JSON to be stored, but not unpacked. The next step
-              is to copy (using pkg/conversion) into the internal struct. The
-              runtime package's DefaultScheme has conversion functions installed
-              which will unpack the JSON stored in RawExtension, turning it into
-              the correct object type, and storing it in the Object. (TODO: In
-              the case where the object is of an unknown type, a runtime.Unknown
-              object will be created and stored.)
+            docker_image_metadata (Any): DockerImageMetadata contains metadata about this image
 
             docker_image_metadata_version (str): DockerImageMetadataVersion conveys the version of the object, which if
               empty defaults to "1.0"
