@@ -7,6 +7,7 @@
       "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
-  "$schema": "http://json-schema.org/schema#"
+  "$schema": "http://json-schema.org/schema#",
+  "description": "Schema for the tektonconfigs API",
+  "x-kubernetes-preserve-unknown-fields": true
 }

@@ -4,9 +4,9 @@
     {
       "group": "triggers.tekton.dev",
       "kind": "Trigger",
-      "version": "v1beta1"
+      "version": "v1alpha1"
     }
   ],
-  "x-kubernetes-selectable-fields": [],
-  "$schema": "http://json-schema.org/schema#"
+  "$schema": "http://json-schema.org/schema#",
+  "x-kubernetes-preserve-unknown-fields": true
 }

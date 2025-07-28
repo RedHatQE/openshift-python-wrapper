@@ -1085,3 +1085,7 @@ io.k8s.networking.gateway.v1.GRPCRouteList
 io.openshift.ocs.v1.StorageAutoScalerList
 io.openshift.machineconfiguration.v1.MachineOSConfigList
 io.openshift.machineconfiguration.v1.MachineOSBuildList
+io.jaegertracing.v1.JaegerList
+io.kiali.v1alpha1.OSSMConsoleList
+dev.tekton.operator.v1alpha1.TektonDashboardList
+io.kiali.v1alpha1.KialiList

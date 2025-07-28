@@ -15,7 +15,6 @@ from typing import Any
 
 import cloup
 import pytest
-import requests
 from cloup.constraints import If, IsSet, accept_none, require_one
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from kubernetes.dynamic import DynamicClient
@@ -56,6 +55,8 @@ def discover_cluster_resources(
     """
     if not client:
         client = get_client()
+        if not isinstance(client, DynamicClient):
+            raise ValueError("client must be an instance of DynamicClient")
 
     discovered_resources: dict[str, list[dict[str, Any]]] = {}
 
@@ -646,21 +647,7 @@ def update_kind_schema() -> None:
         )
         sys.exit(1)
 
-    rc, token, _ = run_command(command=shlex.split(f"{client} whoami -t"), check=False, log_errors=False)
-    if not rc:
-        LOGGER.error(
-            f"Failed to get token.\nMake sure you are logged in to the cluster using user and password using `{client} login`"
-        )
-        sys.exit(1)
-
-    api_url = run_command(command=shlex.split(f"{client} whoami --show-server"), check=False, log_errors=False)[
-        1
-    ].strip()
-    data = requests.get(f"{api_url}/openapi/v2", headers={"Authorization": f"Bearer {token.strip()}"}, verify=False)
-
-    if not data.ok:
-        LOGGER.error("Failed to get openapi schema.")
-        sys.exit(1)
+    data = run_command(command=shlex.split(f"{client} get --raw /openapi/v2"))[1]
 
     cluster_version_file = Path("class_generator/__cluster_version__.txt")
     last_cluster_version_generated: str = ""
@@ -682,7 +669,7 @@ def update_kind_schema() -> None:
             fd.write(cluster_version)
 
     with open(ocp_openapi_json_file, "w") as fd:
-        fd.write(data.text)
+        fd.write(data)
 
     tmp_schema_dir = Path(gettempdir()) / f"{SCHEMA_DIR}-{cluster_version}"
 
@@ -709,6 +696,10 @@ def update_kind_schema() -> None:
     map_kind_to_namespaced(
         client=client, newer_cluster_version=same_or_newer_version, schema_definition_file=ocp_openapi_json_file
     )
+
+    # Extract schemas from CRDs with OpenAPIV3Schema
+    # This supplements the openapi2jsonschema extraction for CRDs that don't fully expose their schemas
+    extract_crd_schemas(client=client)
 
     # Clear SchemaValidator cache after updating schemas
     SchemaValidator.clear_cache()
@@ -759,6 +750,131 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
         sys.exit(1)
 
     return rendered
+
+
+def extract_crd_schemas(client: str) -> None:
+    """
+    Extract schemas from CRDs that have OpenAPIV3Schema defined.
+    This supplements the openapi2jsonschema extraction for CRDs that don't expose their full schema via /openapi/v2.
+    """
+    LOGGER.info("Extracting schemas from CRDs with OpenAPIV3Schema")
+
+    # Get all CRDs
+    success, output, _ = run_command(command=shlex.split(f"{client} get crd -o json"), check=False, log_errors=False)
+    if not success:
+        LOGGER.warning("Failed to get CRDs, skipping CRD schema extraction")
+        return
+
+    resources_mapping = read_resources_mapping_file()
+    schemas_updated = False
+
+    try:
+        crds_data = json.loads(output)
+        crds = crds_data.get("items", [])
+
+        for crd in crds:
+            crd_name = crd.get("metadata", {}).get("name", "")
+            spec = crd.get("spec", {})
+            group = spec.get("group", "")
+
+            # Process each version of the CRD
+            versions = spec.get("versions", [])
+            for version_spec in versions:
+                version = version_spec.get("name", "")
+                schema = version_spec.get("schema", {}).get("openAPIV3Schema", {})
+
+                if not schema or not version:
+                    continue
+
+                # Extract the kind from CRD spec
+                kind = spec.get("names", {}).get("kind", "")
+                kind_lower = kind.lower()
+                if not kind:
+                    continue
+
+                # Create the schema file name (same format as openapi2jsonschema)
+                schema_filename = f"{kind_lower}.json"
+                schema_filepath = Path(SCHEMA_DIR) / schema_filename
+
+                # Check if the schema file exists and is minimal (like the pipeline.json issue)
+                update_schema = False
+                if schema_filepath.exists():
+                    with open(schema_filepath, "r") as f:
+                        existing_schema = json.load(f)
+                        # If the existing schema has no properties defined, we should update it
+                        if not existing_schema.get("properties"):
+                            update_schema = True
+                        # Also check if existing schema has properties but is different from CRD schema
+                        elif existing_schema.get("properties", {}) != schema.get("properties", {}):
+                            # Check if CRD schema has more properties
+                            crd_props = schema.get("properties", {})
+                            existing_props = existing_schema.get("properties", {})
+                            if len(crd_props) > len(existing_props):
+                                update_schema = True
+                else:
+                    update_schema = True
+
+                if update_schema:
+                    # Create the schema in the format expected by the class generator
+                    formatted_schema = {
+                        "type": "object",
+                        "x-kubernetes-group-version-kind": [{"group": group, "kind": kind, "version": version}],
+                        "$schema": "http://json-schema.org/schema#",
+                    }
+
+                    # Merge the OpenAPIV3Schema content
+                    formatted_schema.update(schema)
+
+                    # Write the schema file
+                    with open(schema_filepath, "w") as f:
+                        json.dump(formatted_schema, f, indent=2)
+
+                    LOGGER.info(f"Updated schema for {kind} from CRD {crd_name}")
+                    schemas_updated = True
+
+                    # Read the schema file back to get the full schema
+                    with open(schema_filepath, "r") as f:
+                        full_schema = json.load(f)
+
+                    # Update resources mapping
+                    namespaced = spec.get("scope", "") == "Namespaced"
+
+                    # Initialize or update the resource mapping
+                    if kind_lower not in resources_mapping:
+                        resources_mapping[kind_lower] = []
+
+                    # Check if this version already exists
+                    version_exists = False
+                    for mapping in resources_mapping[kind_lower]:
+                        # Check if this mapping matches the group/version
+                        mapping_group_version_kinds = mapping.get("x-kubernetes-group-version-kind", [])
+                        for gvk in mapping_group_version_kinds:
+                            if gvk.get("group") == group and gvk.get("version") == version:
+                                # Update existing mapping with full schema
+                                mapping.clear()  # Clear the old minimal mapping
+                                mapping.update(full_schema)
+                                mapping["namespaced"] = namespaced
+                                version_exists = True
+                                break
+                        if version_exists:
+                            break
+
+                    if not version_exists:
+                        # Add new mapping with full schema
+                        new_mapping = full_schema.copy()
+                        new_mapping["namespaced"] = namespaced
+                        resources_mapping[kind_lower].append(new_mapping)
+
+    except json.JSONDecodeError as e:
+        LOGGER.warning(f"Failed to parse CRD JSON output: {e}")
+    except Exception as e:
+        LOGGER.warning(f"Error extracting CRD schemas: {e}")
+
+    # Update the resources mapping file if any schemas were updated
+    if schemas_updated:
+        with open(RESOURCES_MAPPING_FILE, "w") as fd:
+            json.dump(resources_mapping, fd, indent=2)
+        LOGGER.info("Updated resources mapping file with CRD schemas")
 
 
 def generate_resource_file_from_dict(
@@ -922,6 +1038,18 @@ def parse_explain(
         }
 
         schema_properties: dict[str, Any] = _kind_schema.get("properties", {})
+
+        # If the mapping doesn't have properties, try to read from the schema file
+        if not schema_properties:
+            schema_file = Path(SCHEMA_DIR) / f"{kind.lower()}.json"
+            if schema_file.exists():
+                with open(schema_file, "r") as f:
+                    full_schema = json.load(f)
+                    schema_properties = full_schema.get("properties", {})
+                    # Update the description if available
+                    if full_schema.get("description"):
+                        resource_dict["description"] = full_schema["description"]
+
         fields_required = _kind_schema.get("required", [])
 
         resource_dict.update(extract_group_kind_version(_kind_schema=_kind_schema))
@@ -1298,14 +1426,6 @@ def main(
                 if kinds:
                     LOGGER.info(f"Generating resources for {api_version}: {', '.join(kinds)}")
                     # Call class_generator for batch of kinds
-                    _gen_kwargs = {
-                        "kind": ",".join(kinds),
-                        "overwrite": overwrite,
-                        "dry_run": dry_run,
-                        "output_file": "",
-                        "add_tests": add_tests,
-                        "called_from_cli": False,
-                    }
                     # Reuse the existing generation logic
                     with ThreadPoolExecutor(max_workers=10) as executor:
                         gen_futures = []
