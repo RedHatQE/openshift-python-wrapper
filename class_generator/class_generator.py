@@ -1,6 +1,7 @@
 import ast
 import filecmp
 import json
+import keyword
 import os
 import shlex
 import shutil
@@ -38,6 +39,28 @@ TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
 SCHEMA_DIR: str = "class_generator/schema"
 RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
 MISSING_DESCRIPTION_STR: str = "No field description from API"
+
+# Python keyword mappings for safe variable names
+PYTHON_KEYWORD_MAPPINGS = {
+    # Map Python keywords to safe alternatives by appending underscore
+    kw: f"{kw}_"
+    for kw in keyword.kwlist
+}
+
+
+def sanitize_python_name(name: str) -> tuple[str, str]:
+    """
+    Sanitize a name to be a valid Python identifier.
+
+    Args:
+        name: The original field name
+
+    Returns:
+        tuple: (python_safe_name, original_name)
+    """
+    if name in PYTHON_KEYWORD_MAPPINGS:
+        return PYTHON_KEYWORD_MAPPINGS[name], name
+    return name, name
 
 
 def discover_cluster_resources(
@@ -1009,13 +1032,20 @@ def prepare_property_dict(
         val_schema = get_property_schema(property_=val)
         type_dict = types_generator(key_dict=val_schema)
         python_name = convert_camel_case_to_snake_case(name=f"{dict_key}_{key}" if key in keys_to_rename else key)
+
+        # Sanitize Python reserved keywords
+        safe_python_name, original_name = sanitize_python_name(name=python_name)
+        is_keyword_renamed = safe_python_name != original_name
+
         resource_dict[dict_key].append({
-            "name-for-class-arg": python_name,
+            "name-for-class-arg": safe_python_name,
             "property-name": key,
+            "original-python-name": python_name,  # Store original for reference
+            "is-keyword-renamed": is_keyword_renamed,  # Flag for template
             "required": key in required,
             "description": format_description(description=val_schema.get("description", MISSING_DESCRIPTION_STR)),
             "type-for-docstring": type_dict["type-for-doc"],
-            "type-for-class-arg": f"{python_name}: {type_dict['type-for-init']}",
+            "type-for-class-arg": f"{safe_python_name}: {type_dict['type-for-init']}",
         })
 
     return resource_dict
