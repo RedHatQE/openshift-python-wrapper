@@ -27,6 +27,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 from simple_logger.logger import get_logger
 
+from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.resource import Resource, get_client
 from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
@@ -64,7 +65,7 @@ def sanitize_python_name(name: str) -> tuple[str, str]:
 
 
 def discover_cluster_resources(
-    client: DynamicClient | None = None, api_group_filter: str | None = None
+    client: DynamicClient | FakeDynamicClient | None = None, api_group_filter: str | None = None
 ) -> dict[str, list[dict[str, Any]]]:
     """
     Discover all resources available in the cluster.
@@ -79,7 +80,7 @@ def discover_cluster_resources(
     if not client:
         client = get_client()
         if not isinstance(client, DynamicClient):
-            raise ValueError("client must be an instance of DynamicClient")
+            raise ValueError(f"Expected DynamicClient instance, got {type(client).__name__}")
 
     discovered_resources: dict[str, list[dict[str, Any]]] = {}
 
@@ -775,6 +776,105 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
     return rendered
 
 
+def _should_update_schema(schema_filepath: Path, existing_schema: dict[str, Any], crd_schema: dict[str, Any]) -> bool:
+    """
+    Determine if a schema file should be updated based on its current state.
+
+    Args:
+        schema_filepath: Path to the schema file
+        existing_schema: The current schema content
+        crd_schema: The schema from the CRD
+
+    Returns:
+        bool: True if the schema should be updated
+    """
+    if not schema_filepath.exists():
+        return True
+
+    # If the existing schema has no properties defined, we should update it
+    if not existing_schema.get("properties"):
+        return True
+
+    # Also check if existing schema has properties but is different from CRD schema
+    crd_props = crd_schema.get("properties", {})
+    existing_props = existing_schema.get("properties", {})
+    if existing_props != crd_props and len(crd_props) > len(existing_props):
+        return True
+
+    return False
+
+
+def _format_crd_schema(schema: dict[str, Any], group: str, kind: str, version: str) -> dict[str, Any]:
+    """
+    Format a CRD schema in the format expected by the class generator.
+
+    Args:
+        schema: The OpenAPIV3Schema from the CRD
+        group: API group
+        kind: Resource kind
+        version: API version
+
+    Returns:
+        dict: Formatted schema
+    """
+    formatted_schema = {
+        "type": "object",
+        "x-kubernetes-group-version-kind": [{"group": group, "kind": kind, "version": version}],
+        "$schema": "http://json-schema.org/schema#",
+    }
+
+    # Merge the OpenAPIV3Schema content
+    formatted_schema.update(schema)
+
+    return formatted_schema
+
+
+def _update_resource_mapping(
+    resources_mapping: dict[str, Any],
+    kind_lower: str,
+    full_schema: dict[str, Any],
+    namespaced: bool,
+    group: str,
+    version: str,
+) -> bool:
+    """
+    Update or add a resource in the resources mapping.
+
+    Args:
+        resources_mapping: The resources mapping dictionary
+        kind_lower: Lowercase kind name
+        full_schema: The complete schema
+        namespaced: Whether the resource is namespaced
+        group: API group
+        version: API version
+
+    Returns:
+        bool: True if an existing mapping was updated, False if a new one was added
+    """
+    # Initialize or update the resource mapping
+    if kind_lower not in resources_mapping:
+        resources_mapping[kind_lower] = []
+
+    # Check if this version already exists
+    for i, mapping in enumerate(resources_mapping[kind_lower]):
+        # Check if this mapping matches the group/version
+        mapping_group_version_kinds = mapping.get("x-kubernetes-group-version-kind", [])
+        for gvk in mapping_group_version_kinds:
+            if gvk.get("group") == group and gvk.get("version") == version:
+                # Create new mapping with full schema to ensure atomic update
+                new_mapping = full_schema.copy()
+                new_mapping["namespaced"] = namespaced
+                # Replace the old mapping atomically
+                resources_mapping[kind_lower][i] = new_mapping
+                return True
+
+    # Add new mapping with full schema
+    new_mapping = full_schema.copy()
+    new_mapping["namespaced"] = namespaced
+    resources_mapping[kind_lower].append(new_mapping)
+    return False
+
+
 def extract_crd_schemas(client: str) -> None:
     """
     Extract schemas from CRDs that have OpenAPIV3Schema defined.
@@ -819,34 +919,15 @@ def extract_crd_schemas(client: str) -> None:
                 schema_filename = f"{kind_lower}.json"
                 schema_filepath = Path(SCHEMA_DIR) / schema_filename
 
-                # Check if the schema file exists and is minimal (like the pipeline.json issue)
-                update_schema = False
+                # Check if the schema file should be updated
+                existing_schema = {}
                 if schema_filepath.exists():
                     with open(schema_filepath, "r") as f:
                         existing_schema = json.load(f)
-                        # If the existing schema has no properties defined, we should update it
-                        if not existing_schema.get("properties"):
-                            update_schema = True
-                        # Also check if existing schema has properties but is different from CRD schema
-                        elif existing_schema.get("properties", {}) != schema.get("properties", {}):
-                            # Check if CRD schema has more properties
-                            crd_props = schema.get("properties", {})
-                            existing_props = existing_schema.get("properties", {})
-                            if len(crd_props) > len(existing_props):
-                                update_schema = True
-                else:
-                    update_schema = True
 
-                if update_schema:
-                    # Create the schema in the format expected by the class generator
-                    formatted_schema = {
-                        "type": "object",
-                        "x-kubernetes-group-version-kind": [{"group": group, "kind": kind, "version": version}],
-                        "$schema": "http://json-schema.org/schema#",
-                    }
-
-                    # Merge the OpenAPIV3Schema content
-                    formatted_schema.update(schema)
+                if _should_update_schema(schema_filepath, existing_schema, schema):
+                    # Format the schema
+                    formatted_schema = _format_crd_schema(schema=schema, group=group, kind=kind, version=version)
 
                     # Write the schema file
                     with open(schema_filepath, "w") as f:
@@ -861,33 +942,14 @@ def extract_crd_schemas(client: str) -> None:
 
                     # Update resources mapping
                     namespaced = spec.get("scope", "") == "Namespaced"
-
-                    # Initialize or update the resource mapping
-                    if kind_lower not in resources_mapping:
-                        resources_mapping[kind_lower] = []
-
-                    # Check if this version already exists
-                    version_exists = False
-                    for i, mapping in enumerate(resources_mapping[kind_lower]):
-                        # Check if this mapping matches the group/version
-                        mapping_group_version_kinds = mapping.get("x-kubernetes-group-version-kind", [])
-                        for gvk in mapping_group_version_kinds:
-                            if gvk.get("group") == group and gvk.get("version") == version:
-                                # Create new mapping with full schema to ensure atomic update
-                                new_mapping = full_schema.copy()
-                                new_mapping["namespaced"] = namespaced
-                                # Replace the old mapping atomically
-                                resources_mapping[kind_lower][i] = new_mapping
-                                version_exists = True
-                                break
-                        if version_exists:
-                            break
-
-                    if not version_exists:
-                        # Add new mapping with full schema
-                        new_mapping = full_schema.copy()
-                        new_mapping["namespaced"] = namespaced
-                        resources_mapping[kind_lower].append(new_mapping)
+                    _update_resource_mapping(
+                        resources_mapping=resources_mapping,
+                        kind_lower=kind_lower,
+                        full_schema=full_schema,
+                        namespaced=namespaced,
+                        group=group,
+                        version=version,
+                    )
 
     except json.JSONDecodeError as e:
         LOGGER.warning(f"Failed to parse CRD JSON output: {e}")
