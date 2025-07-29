@@ -107,13 +107,13 @@ class Pod(NamespacedResource):
 '''
 
         resource_file = temp_ocp_resources_dir / "pod.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
         # Create __init__.py (should be excluded)
         init_file = temp_ocp_resources_dir / "__init__.py"
-        init_file.write_text("")
+        init_file.write_text(data="")
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 1
@@ -136,9 +136,9 @@ class CustomResource(Resource):
 '''
 
         resource_file = temp_ocp_resources_dir / "custom.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 0
@@ -162,9 +162,9 @@ class ClusterResource(Resource):
 '''
 
         resource_file = temp_ocp_resources_dir / "cluster_resource.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 1
@@ -189,9 +189,9 @@ class ProjectRequest(Resource):
 '''
 
         resource_file = temp_ocp_resources_dir / "project_request.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 1
@@ -216,9 +216,9 @@ class Deployment(NamespacedResource):
 '''
 
         resource_file = temp_ocp_resources_dir / "deployment.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 1
@@ -252,9 +252,9 @@ class Service(NamespacedResource):
 '''
 
         resource_file = temp_ocp_resources_dir / "service.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 1
@@ -280,9 +280,9 @@ class Ingress(NamespacedResource):
 '''
 
         resource_file = temp_ocp_resources_dir / "ingress.py"
-        resource_file.write_text(resource_content)
+        resource_file.write_text(data=resource_content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 1
@@ -291,7 +291,7 @@ class Ingress(NamespacedResource):
 
     def test_scan_empty_directory(self, temp_ocp_resources_dir):
         """Test scanning an empty directory."""
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 0
@@ -309,9 +309,9 @@ class {name.capitalize()}(Resource):
     pass
 """
             resource_file = temp_ocp_resources_dir / f"{name}.py"
-            resource_file.write_text(content)
+            resource_file.write_text(data=content)
 
-        scanner = ResourceScanner(str(temp_ocp_resources_dir))
+        scanner = ResourceScanner(ocp_resources_path=str(temp_ocp_resources_dir))
         resources = scanner.scan_resources()
 
         assert len(resources) == 3

@@ -151,8 +151,8 @@ def generate_report(coverage_data: dict[str, Any], output_format: str | None = N
 
     # Create summary table
     summary_table = Table(title="Resource Coverage Summary", show_header=False)
-    summary_table.add_column("Metric", style="bold")
-    summary_table.add_column("Value", justify="right")
+    summary_table.add_column(style="bold", header="Metric")
+    summary_table.add_column(justify="right", header="Value")
 
     summary_table.add_row("Total Resources in Schema", str(stats["total_in_mapping"]))
     summary_table.add_row("Auto-Generated Resources", str(stats["total_generated"]))
@@ -166,7 +166,7 @@ def generate_report(coverage_data: dict[str, Any], output_format: str | None = N
     # Show missing resources if any
     if coverage_data["missing_resources"]:
         missing_table = Table(title="Resources Not Yet Generated")
-        missing_table.add_column("Resource Kind", style="red")
+        missing_table.add_column(header="Resource Kind", style="red")
 
         for resource in coverage_data["missing_resources"][:20]:  # Show first 20
             # Handle both string and dict formats

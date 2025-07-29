@@ -37,7 +37,7 @@ class TestCLIFunctionality:
                     # Console format returns None
                     mock_report.return_value = None
 
-                    result = runner.invoke(main, ["--coverage-report"])
+                    result = runner.invoke(cli=main, args=["--coverage-report"])
 
                     assert result.exit_code == 0
                     # Verify correct parameter names are used
@@ -67,7 +67,7 @@ class TestCLIFunctionality:
                     # JSON format returns string
                     mock_report.return_value = json.dumps(coverage_data, indent=2)
 
-                    result = runner.invoke(main, ["--coverage-report", "--json"])
+                    result = runner.invoke(cli=main, args=["--coverage-report", "--json"])
 
                     assert result.exit_code == 0
                     mock_report.assert_called_with(coverage_data=mock_analyze.return_value, output_format="json")
@@ -89,7 +89,7 @@ class TestCLIFunctionality:
                     }
                     mock_report.return_value = None
 
-                    result = runner.invoke(main, ["--discover-missing"])
+                    result = runner.invoke(cli=main, args=["--discover-missing"])
 
                     assert result.exit_code == 0
                     # Discover should not be called anymore since we use schema
@@ -104,7 +104,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.update_kind_schema") as mock_update:
             mock_update.return_value = True
 
-            result = runner.invoke(main, ["--update-schema"])
+            result = runner.invoke(cli=main, args=["--update-schema"])
 
             assert result.exit_code == 0
             assert mock_update.called
@@ -116,7 +116,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.class_generator") as mock_generator:
             mock_generator.return_value = None
 
-            result = runner.invoke(main, ["-k", "Pod"])
+            result = runner.invoke(cli=main, args=["-k", "Pod"])
 
             assert result.exit_code == 0
             mock_generator.assert_called_once()
@@ -131,7 +131,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.class_generator") as mock_generator:
             mock_generator.return_value = None
 
-            result = runner.invoke(main, ["-k", "Pod", "-o", "pod.py"])
+            result = runner.invoke(cli=main, args=["-k", "Pod", "-o", "pod.py"])
 
             assert result.exit_code == 0
             mock_generator.assert_called_once()
@@ -146,7 +146,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.class_generator") as mock_generator:
             mock_generator.return_value = None
 
-            result = runner.invoke(main, ["-k", "Pod", "--dry-run"])
+            result = runner.invoke(cli=main, args=["-k", "Pod", "--dry-run"])
 
             assert result.exit_code == 0
             mock_generator.assert_called_once()
@@ -161,7 +161,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.generate_class_generator_tests") as mock_test_gen:
             mock_test_gen.return_value = None
 
-            result = runner.invoke(main, ["-k", "Pod", "--add-tests"])
+            result = runner.invoke(cli=main, args=["-k", "Pod", "--add-tests"])
 
             assert result.exit_code == 0
             mock_test_gen.assert_called_once()
@@ -170,7 +170,7 @@ class TestCLIFunctionality:
         """Test that --add-tests cannot be used alone."""
         runner = CliRunner()
 
-        result = runner.invoke(main, ["--add-tests"], catch_exceptions=False)
+        result = runner.invoke(cli=main, args=["--add-tests"], catch_exceptions=False)
 
         # Should fail because it doesn't satisfy our validation
         assert result.exit_code != 0
@@ -183,7 +183,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.class_generator") as mock_generator:
             mock_generator.return_value = None
 
-            result = runner.invoke(main, ["-k", "Pod", "--overwrite"])
+            result = runner.invoke(cli=main, args=["-k", "Pod", "--overwrite"])
 
             assert result.exit_code == 0
             mock_generator.assert_called_once()
@@ -210,7 +210,7 @@ class TestCLIFunctionality:
                 }
                 mock_generator.return_value = None
 
-                result = runner.invoke(main, ["--generate-missing"], catch_exceptions=False)
+                result = runner.invoke(cli=main, args=["--generate-missing"], catch_exceptions=False)
 
                 assert result.exit_code == 0
                 assert mock_analyze.called
@@ -224,7 +224,7 @@ class TestCLIFunctionality:
         runner = CliRunner()
 
         # Cannot use --add-tests without -k
-        result = runner.invoke(main, ["--add-tests"])
+        result = runner.invoke(cli=main, args=["--add-tests"])
         assert result.exit_code != 0
 
     def test_required_options(self):
@@ -232,6 +232,6 @@ class TestCLIFunctionality:
         runner = CliRunner()
 
         # No options should fail
-        result = runner.invoke(main, [], catch_exceptions=False)
+        result = runner.invoke(cli=main, args=[], catch_exceptions=False)
         assert result.exit_code != 0
         # Error is printed to stderr, not stdout

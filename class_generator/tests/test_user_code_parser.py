@@ -43,7 +43,7 @@ class MyResource(NamespacedResource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(f.name)
+            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -78,7 +78,7 @@ class MyResource(Resource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(f.name)
+            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -116,7 +116,7 @@ class MyResource(Resource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(f.name)
+            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -152,7 +152,7 @@ class MyResource(NamespacedResource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(f.name)
+            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -170,7 +170,7 @@ class MyResource(NamespacedResource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(f.name)
+            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -195,7 +195,7 @@ class MyResource(Resource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(f.name)
+            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -227,6 +227,6 @@ class MyResource(Resource):
 
             # Should raise SyntaxError when parsing
             with pytest.raises(SyntaxError):
-                parse_user_code_from_file(f.name)
+                parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()

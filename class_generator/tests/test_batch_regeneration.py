@@ -158,9 +158,9 @@ class BrokenSyntax(
     def test_discover_skips_special_files(self, temp_resources_dir, monkeypatch):
         """Test discovery skips __init__.py, resource.py, and exceptions.py."""
         # Create files that should be skipped
-        (temp_resources_dir / "__init__.py").write_text("# Init file")
-        (temp_resources_dir / "resource.py").write_text("# Base resource")
-        (temp_resources_dir / "exceptions.py").write_text("# Exceptions")
+        (temp_resources_dir / "__init__.py").write_text(data="# Init file")
+        (temp_resources_dir / "resource.py").write_text(data="# Base resource")
+        (temp_resources_dir / "exceptions.py").write_text(data="# Exceptions")
         self.create_generated_file(temp_resources_dir / "pod.py", "Pod")
 
         # Mock ResourceScanner - it should skip special files
@@ -200,7 +200,7 @@ class AnotherResource(Resource):
     pass
 '''
         test_file = temp_resources_dir / "multi_class.py"
-        test_file.write_text(content)
+        test_file.write_text(data=content)
 
         # Mock ResourceScanner - it finds the first resource class
         mock_scanner = MagicMock()
