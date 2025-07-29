@@ -17,6 +17,12 @@ from ocp_resources.utils.schema_validator import SchemaValidator
 LOGGER = get_logger(name=__name__)
 
 
+class ClusterVersionError(Exception):
+    """Raised when there are issues with cluster version operations."""
+
+    pass
+
+
 def get_client_binary() -> str:
     """Determine whether to use 'oc' or 'kubectl' binary."""
     # Check if 'oc' binary exists
@@ -34,18 +40,14 @@ def get_client_binary() -> str:
 
 def read_resources_mapping_file() -> dict[Any, Any]:
     """Read resources mapping using SchemaValidator for consistency"""
-    # Try to use SchemaValidator first
+    # Use SchemaValidator to load and get mappings data
     if SchemaValidator.load_mappings_data():
         mappings = SchemaValidator.get_mappings_data()
         if mappings is not None:
             return mappings
 
-    # Fallback for cases where schema files don't exist yet (e.g., initial generation)
-    try:
-        with open(RESOURCES_MAPPING_FILE) as fd:
-            return json.load(fd)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+    # If we couldn't load the file, return empty dict
+    return {}
 
 
 def extract_group_kind_version(kind_schema: dict[str, Any]) -> dict[str, str]:
@@ -123,6 +125,9 @@ def check_and_update_cluster_version(client: str) -> bool:
 
     Returns:
         bool: True if version is same or newer, False otherwise
+
+    Raises:
+        ClusterVersionError: If cluster version file cannot be read
     """
     cluster_version_file = Path("class_generator/schema/__cluster_version__.txt")
     last_cluster_version_generated: str = ""
@@ -131,8 +136,9 @@ def check_and_update_cluster_version(client: str) -> bool:
         with open(cluster_version_file, "r") as fd:
             last_cluster_version_generated = fd.read().strip()
     except (FileNotFoundError, IOError) as exp:
-        LOGGER.error(f"Failed to read cluster version file: {exp}")
-        sys.exit(1)
+        error_msg = f"Failed to read cluster version file: {exp}"
+        LOGGER.error(error_msg)
+        raise ClusterVersionError(error_msg) from exp
 
     cluster_version = get_server_version(client=client)
     cluster_version = cluster_version.split("+")[0]
@@ -283,20 +289,38 @@ def write_schema_files(resources_mapping: dict[str, Any], definitions: dict[str,
     Args:
         resources_mapping: Resources mapping dictionary
         definitions: Schema definitions dictionary
+
+    Raises:
+        IOError: If files cannot be written
     """
     # Ensure schema directory exists
-    Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
+    try:
+        Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
+    except (OSError, IOError) as e:
+        error_msg = f"Failed to create schema directory {SCHEMA_DIR}: {e}"
+        LOGGER.error(error_msg)
+        raise IOError(error_msg) from e
 
     # Write updated definitions
     definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
-    with open(definitions_file, "w") as fd:
-        json.dump(definitions, fd, indent=2, sort_keys=True)
-    LOGGER.info(f"Written definitions to {definitions_file}")
+    try:
+        with open(definitions_file, "w") as fd:
+            json.dump(definitions, fd, indent=2, sort_keys=True)
+        LOGGER.info(f"Written definitions to {definitions_file}")
+    except (OSError, IOError, TypeError) as e:
+        error_msg = f"Failed to write definitions file {definitions_file}: {e}"
+        LOGGER.error(error_msg)
+        raise IOError(error_msg) from e
 
     # Write updated resources mapping
-    with open(RESOURCES_MAPPING_FILE, "w") as fd:
-        json.dump(resources_mapping, fd, indent=2, sort_keys=True)
-    LOGGER.info(f"Written resources mapping to {RESOURCES_MAPPING_FILE}")
+    try:
+        with open(RESOURCES_MAPPING_FILE, "w") as fd:
+            json.dump(resources_mapping, fd, indent=2, sort_keys=True)
+        LOGGER.info(f"Written resources mapping to {RESOURCES_MAPPING_FILE}")
+    except (OSError, IOError, TypeError) as e:
+        error_msg = f"Failed to write resources mapping file {RESOURCES_MAPPING_FILE}: {e}"
+        LOGGER.error(error_msg)
+        raise IOError(error_msg) from e
 
 
 def update_kind_schema() -> None:
@@ -318,7 +342,11 @@ def update_kind_schema() -> None:
     LOGGER.info(f"Found {len(paths)} API groups to process")
 
     # Check and update cluster version
-    check_and_update_cluster_version(client=client)
+    try:
+        check_and_update_cluster_version(client=client)
+    except ClusterVersionError as e:
+        LOGGER.error(f"Cannot proceed without cluster version information: {e}")
+        sys.exit(1)
 
     # Load existing resources mapping
     resources_mapping = read_resources_mapping_file()
@@ -332,7 +360,11 @@ def update_kind_schema() -> None:
     )
 
     # Write schema files
-    write_schema_files(resources_mapping=resources_mapping, definitions=definitions)
+    try:
+        write_schema_files(resources_mapping=resources_mapping, definitions=definitions)
+    except IOError as e:
+        LOGGER.error(f"Failed to write schema files: {e}")
+        sys.exit(1)
 
     # Clear cached mapping data in SchemaValidator to force reload
     SchemaValidator.clear_cache()
