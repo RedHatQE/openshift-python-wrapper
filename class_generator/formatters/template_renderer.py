@@ -42,7 +42,7 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
         with open(template_path, "r", encoding="utf-8") as f:
             template_source = f.read()
 
-    ast = env.parse(template_source)
+    ast = env.parse(source=template_source)
     undeclared_variables = meta.find_undeclared_variables(ast)
 
     # Filter out variables that are present in template_dict

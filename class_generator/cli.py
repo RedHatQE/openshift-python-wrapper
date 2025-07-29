@@ -362,7 +362,7 @@ def main(
                 target_file = Path("ocp_resources") / f"{formatted_kind}.py"
 
             # Create backup if file exists
-            create_backup_if_needed(target_file, backup_dir)
+            create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
 
         class_generator(
             kind=kind,
@@ -386,7 +386,7 @@ def main(
                 target_file = Path("ocp_resources") / f"{formatted_kind}.py"
 
                 # Create backup if file exists
-                create_backup_if_needed(target_file, backup_dir)
+                create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
 
             return class_generator(
                 kind=kind_to_generate,

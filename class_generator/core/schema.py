@@ -318,19 +318,21 @@ def update_kind_schema() -> None:
     LOGGER.info(f"Found {len(paths)} API groups to process")
 
     # Check and update cluster version
-    check_and_update_cluster_version(client)
+    check_and_update_cluster_version(client=client)
 
     # Load existing resources mapping
     resources_mapping = read_resources_mapping_file()
 
     # Fetch all API schemas in parallel
-    schemas = fetch_all_api_schemas(client, paths)
+    schemas = fetch_all_api_schemas(client=client, paths=paths)
 
     # Process schema definitions
-    resources_mapping, definitions = process_schema_definitions(schemas, namespacing_dict, resources_mapping)
+    resources_mapping, definitions = process_schema_definitions(
+        schemas=schemas, namespacing_dict=namespacing_dict, existing_resources_mapping=resources_mapping
+    )
 
     # Write schema files
-    write_schema_files(resources_mapping, definitions)
+    write_schema_files(resources_mapping=resources_mapping, definitions=definitions)
 
     # Clear cached mapping data in SchemaValidator to force reload
     SchemaValidator.clear_cache()
