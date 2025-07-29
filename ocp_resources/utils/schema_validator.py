@@ -192,9 +192,20 @@ class SchemaValidator:
         if isinstance(obj, dict):
             if "$ref" in obj:
                 ref = obj["$ref"]
-                # Handle internal references
-                if ref.startswith("#/definitions/"):
-                    definition_name = ref[14:]  # Remove "#/definitions/"
+                # Handle internal references - both old and new formats
+                if (
+                    ref.startswith("#/definitions/")
+                    or ref.startswith("#/components/schemas/")
+                    or ref.startswith("/components/schemas/")
+                ):
+                    # Extract the definition name
+                    if ref.startswith("#/definitions/"):
+                        definition_name = ref[14:]  # Remove "#/definitions/"
+                    elif ref.startswith("#/components/schemas/"):
+                        definition_name = ref[21:]  # Remove "#/components/schemas/"
+                    else:
+                        definition_name = ref[20:]  # Remove "/components/schemas/"
+
                     # Type guard for mypy
                     if cls._definitions_data is not None and definition_name in cls._definitions_data:
                         # Return the resolved definition (and resolve any refs within it)
