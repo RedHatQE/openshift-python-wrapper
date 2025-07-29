@@ -47,7 +47,7 @@ def generate_class_generator_tests() -> None:
             if _file.endswith(".py") and not _file.startswith("__"):
                 test_data["res_files"].append(_file)
 
-        # Only append test_data if at least one "_res.py" file was found
+        # Only append test_data if at least one valid Python file (ending with ".py" and not starting with "__") was found
         if test_data["res_files"]:
             tests_info["template"].append(test_data)
 

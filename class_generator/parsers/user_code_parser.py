@@ -1,7 +1,10 @@
 """Parser for extracting user-added code from generated files."""
 
 import ast
-import logging
+
+from simple_logger.logger import get_logger
+
+LOGGER = get_logger(name=__name__)
 
 
 def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
@@ -90,7 +93,7 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
                 if import_str and import_str not in template_imports:
                     user_imports_list.append(import_str)
         except SyntaxError as e:
-            logging.error(f"SyntaxError in file {file_path}: {e}")
+            LOGGER.error(f"SyntaxError in file {file_path}: {e}")
             raise  # Re-raise the error so it can be caught by tests
 
     # Join all collected imports at once
