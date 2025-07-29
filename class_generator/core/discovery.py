@@ -220,8 +220,18 @@ def discover_generated_resources() -> list[dict[str, Any]]:
     resources = []
     for info in resource_infos:
         # Read file to check for user code
-        with open(info.file_path, "r") as f:
-            content = f.read()
+        try:
+            with open(info.file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except FileNotFoundError:
+            LOGGER.warning(f"File not found: {info.file_path}, skipping...")
+            continue
+        except UnicodeDecodeError as e:
+            LOGGER.error(f"Failed to decode file {info.file_path}: {e}, skipping...")
+            continue
+        except Exception as e:
+            LOGGER.error(f"Unexpected error reading file {info.file_path}: {e}, skipping...")
+            continue
 
         has_user_code = END_OF_GENERATED_CODE in content and len(content.split(END_OF_GENERATED_CODE)[1].strip()) > 0
 

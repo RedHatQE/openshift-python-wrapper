@@ -36,7 +36,9 @@ def read_resources_mapping_file() -> dict[Any, Any]:
     """Read resources mapping using SchemaValidator for consistency"""
     # Try to use SchemaValidator first
     if SchemaValidator.load_mappings_data():
-        return SchemaValidator._mappings_data or {}
+        mappings = SchemaValidator.get_mappings_data()
+        if mappings is not None:
+            return mappings
 
     # Fallback for cases where schema files don't exist yet (e.g., initial generation)
     try:
@@ -46,9 +48,30 @@ def read_resources_mapping_file() -> dict[Any, Any]:
         return {}
 
 
-def extract_group_kind_version(_kind_schema: dict[str, Any]) -> dict[str, str]:
-    """Extract group, kind, and version from schema."""
-    group_kind_versions: list[dict[str, str]] = _kind_schema["x-kubernetes-group-version-kind"]
+def extract_group_kind_version(kind_schema: dict[str, Any]) -> dict[str, str]:
+    """Extract group, kind, and version from schema.
+
+    Args:
+        kind_schema: Schema dictionary containing Kubernetes metadata
+
+    Returns:
+        dict: Dictionary with group, kind, and version information
+
+    Raises:
+        KeyError: If required x-kubernetes-group-version-kind key is missing
+        ValueError: If x-kubernetes-group-version-kind list is empty
+    """
+    if "x-kubernetes-group-version-kind" not in kind_schema:
+        raise KeyError(
+            "Required key 'x-kubernetes-group-version-kind' not found in schema. "
+            f"Available keys: {list(kind_schema.keys())}"
+        )
+
+    group_kind_versions: list[dict[str, str]] = kind_schema["x-kubernetes-group-version-kind"]
+
+    if not group_kind_versions:
+        raise ValueError("x-kubernetes-group-version-kind list is empty")
+
     group_kind_version = group_kind_versions[0]
 
     for group_kind_version in group_kind_versions:
@@ -91,27 +114,19 @@ def build_namespacing_dict(client: str) -> dict[str, bool]:
     return namespacing_dict
 
 
-def update_kind_schema() -> None:
-    """Update schema files using OpenAPI v3 endpoints"""
-    client = get_client_binary()
+def check_and_update_cluster_version(client: str) -> bool:
+    """
+    Check and update the cluster version file.
 
-    # Build namespacing dictionary once
-    namespacing_dict = build_namespacing_dict(client=client)
+    Args:
+        client: Path to kubectl/oc client binary
 
-    # Get v3 API index
-    LOGGER.info("Fetching OpenAPI v3 index...")
-    success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
-    if not success:
-        LOGGER.error("Failed to fetch OpenAPI v3 index")
-        sys.exit(1)
-
-    v3_index = json.loads(v3_data)
-    paths = v3_index.get("paths", {})
-    LOGGER.info(f"Found {len(paths)} API groups to process")
-
-    # Check and update cluster version
+    Returns:
+        bool: True if version is same or newer, False otherwise
+    """
     cluster_version_file = Path("class_generator/schema/__cluster_version__.txt")
     last_cluster_version_generated: str = ""
+
     try:
         with open(cluster_version_file, "r") as fd:
             last_cluster_version_generated = fd.read().strip()
@@ -128,16 +143,21 @@ def update_kind_schema() -> None:
         with open(cluster_version_file, "w") as fd:
             fd.write(cluster_version)
 
-    # Ensure schema directory exists
-    Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
+    return same_or_newer_version
 
-    # Load existing resources mapping
-    resources_mapping = read_resources_mapping_file()
-    definitions = {}
 
-    # Track processed schemas to avoid duplicates
-    processed_schemas = set()
-    total_schemas = 0
+def fetch_all_api_schemas(client: str, paths: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """
+    Fetch all API schemas from the cluster in parallel.
+
+    Args:
+        client: Path to kubectl/oc client binary
+        paths: Dictionary of API paths from v3 index
+
+    Returns:
+        dict: Mapping of API path to schema data
+    """
+    schemas: dict[str, dict[str, Any]] = {}
 
     # Function to fetch and process a single API group
     def fetch_api_group(api_path: str, api_info: dict[str, Any]) -> tuple[str, dict[str, Any] | None]:
@@ -169,65 +189,103 @@ def update_kind_schema() -> None:
         # Process results as they complete
         for future in as_completed(future_to_path):
             api_path, schema = future.result()
+            if schema:
+                schemas[api_path] = schema
 
-            if not schema:
+    return schemas
+
+
+def process_schema_definitions(
+    schemas: dict[str, dict[str, Any]], namespacing_dict: dict[str, bool], existing_resources_mapping: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """
+    Process schema definitions to extract resource information.
+
+    Args:
+        schemas: Dictionary of API schemas
+        namespacing_dict: Dictionary of resource namespacing info
+        existing_resources_mapping: Existing resources mapping
+
+    Returns:
+        tuple: (resources_mapping, definitions)
+    """
+    resources_mapping = existing_resources_mapping.copy()
+    definitions = {}
+    processed_schemas = set()
+    total_schemas = 0
+
+    for api_path, schema in schemas.items():
+        # Process schema definitions
+        for def_name, def_data in schema.get("definitions", {}).items():
+            if def_name in processed_schemas:
                 continue
 
-            # Process schema definitions
-            for def_name, def_data in schema.get("definitions", {}).items():
-                if def_name in processed_schemas:
-                    continue
+            processed_schemas.add(def_name)
 
-                processed_schemas.add(def_name)
+            # Extract schema info
+            gvk_list = def_data.get("x-kubernetes-group-version-kind", [])
+            if not gvk_list:
+                continue
 
-                # Extract schema info
-                gvk_list = def_data.get("x-kubernetes-group-version-kind", [])
-                if not gvk_list:
-                    continue
+            # Get the proper GVK
+            group_kind_version = gvk_list[0]
+            for gvk in gvk_list:
+                if gvk.get("group"):
+                    group_kind_version = gvk
+                    break
 
-                # Get the proper GVK
-                group_kind_version = gvk_list[0]
-                for gvk in gvk_list:
-                    if gvk.get("group"):
-                        group_kind_version = gvk
-                        break
+            kind = group_kind_version.get("kind", "")
+            group = group_kind_version.get("group", "")
+            version = group_kind_version.get("version", "")
 
-                kind = group_kind_version.get("kind", "")
-                group = group_kind_version.get("group", "")
-                version = group_kind_version.get("version", "")
+            if not kind:
+                continue
 
-                if not kind:
-                    continue
+            # Determine if resource is namespaced
+            is_namespaced = namespacing_dict.get(kind, True)
 
-                # Determine if resource is namespaced
-                is_namespaced = namespacing_dict.get(kind, True)
+            # Build schema name
+            if group:
+                schema_name = f"{group}/{version}/{kind}"
+            else:
+                schema_name = f"{version}/{kind}"
 
-                # Build schema name
-                if group:
-                    schema_name = f"{group}/{version}/{kind}"
-                else:
-                    schema_name = f"{version}/{kind}"
+            # Create schema data in the format expected by SchemaValidator
+            schema_data = {
+                "description": def_data.get("description", ""),
+                "properties": def_data.get("properties", {}),
+                "required": def_data.get("required", []),
+                "type": def_data.get("type", "object"),
+                "x-kubernetes-group-version-kind": [group_kind_version],
+                "namespaced": is_namespaced,
+            }
 
-                # Update resources mapping
-                resources_mapping[kind] = {
-                    "api_version": f"{group}/{version}" if group else version,
-                    "api_group": group,
-                    "namespaced": is_namespaced,
-                }
+            # Store in resources_mapping as an array (multiple schemas per kind)
+            kind_lower = kind.lower()
+            if kind_lower not in resources_mapping:
+                resources_mapping[kind_lower] = []
 
-                # Store schema data
-                schema_data = {
-                    "description": def_data.get("description", ""),
-                    "properties": def_data.get("properties", {}),
-                    "required": def_data.get("required", []),
-                    "type": def_data.get("type", "object"),
-                    "x-kubernetes-group-version-kind": [group_kind_version],
-                }
+            # Add this schema to the kind's array
+            resources_mapping[kind_lower].append(schema_data)
 
-                definitions[schema_name] = schema_data
-                total_schemas += 1
+            # Also store in definitions for separate definitions file
+            definitions[schema_name] = schema_data
+            total_schemas += 1
 
     LOGGER.info(f"Processed {total_schemas} unique schemas")
+    return resources_mapping, definitions
+
+
+def write_schema_files(resources_mapping: dict[str, Any], definitions: dict[str, Any]) -> None:
+    """
+    Write schema files to disk.
+
+    Args:
+        resources_mapping: Resources mapping dictionary
+        definitions: Schema definitions dictionary
+    """
+    # Ensure schema directory exists
+    Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
 
     # Write updated definitions
     definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
@@ -240,6 +298,40 @@ def update_kind_schema() -> None:
         json.dump(resources_mapping, fd, indent=2, sort_keys=True)
     LOGGER.info(f"Written resources mapping to {RESOURCES_MAPPING_FILE}")
 
+
+def update_kind_schema() -> None:
+    """Update schema files using OpenAPI v3 endpoints"""
+    client = get_client_binary()
+
+    # Build namespacing dictionary once
+    namespacing_dict = build_namespacing_dict(client=client)
+
+    # Get v3 API index
+    LOGGER.info("Fetching OpenAPI v3 index...")
+    success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
+    if not success:
+        LOGGER.error("Failed to fetch OpenAPI v3 index")
+        sys.exit(1)
+
+    v3_index = json.loads(v3_data)
+    paths = v3_index.get("paths", {})
+    LOGGER.info(f"Found {len(paths)} API groups to process")
+
+    # Check and update cluster version
+    check_and_update_cluster_version(client)
+
+    # Load existing resources mapping
+    resources_mapping = read_resources_mapping_file()
+
+    # Fetch all API schemas in parallel
+    schemas = fetch_all_api_schemas(client, paths)
+
+    # Process schema definitions
+    resources_mapping, definitions = process_schema_definitions(schemas, namespacing_dict, resources_mapping)
+
+    # Write schema files
+    write_schema_files(resources_mapping, definitions)
+
     # Clear cached mapping data in SchemaValidator to force reload
-    SchemaValidator._mappings_data = None
+    SchemaValidator.clear_cache()
     SchemaValidator.load_mappings_data()

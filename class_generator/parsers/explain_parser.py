@@ -13,6 +13,14 @@ from ocp_resources.resource import Resource
 LOGGER = get_logger(name=__name__)
 
 
+class ResourceNotFoundError(Exception):
+    """Raised when a resource kind is not found in the schema definition."""
+
+    def __init__(self, kind: str) -> None:
+        self.kind = kind
+        super().__init__(f"Resource kind '{kind}' not found in schema definition")
+
+
 def parse_explain(kind: str) -> list[dict[str, Any]]:
     """
     Parse OpenAPI explain data for a given resource kind.
@@ -26,7 +34,12 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
     _schema_definition = read_resources_mapping_file()
     _resources: list[dict[str, Any]] = []
 
-    _kinds_schema = _schema_definition[kind.lower()]
+    # Check if the kind exists in the schema definition
+    kind_lower = kind.lower()
+    if kind_lower not in _schema_definition:
+        raise ResourceNotFoundError(kind)
+
+    _kinds_schema = _schema_definition[kind_lower]
 
     # Group schemas by API group
     schemas_by_group: dict[str, list[dict[str, Any]]] = {}
@@ -64,7 +77,16 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
 
     # Use filtered schemas instead of all schemas
     for _kind_schema in filtered_schemas:
-        namespaced = _kind_schema["namespaced"]
+        # Validate 'namespaced' key exists
+        if "namespaced" not in _kind_schema:
+            LOGGER.warning(
+                f"Schema for kind '{kind}' is missing 'namespaced' key. "
+                f"Defaulting to namespaced=True. Schema: {_kind_schema.get('x-kubernetes-group-version-kind', [])}"
+            )
+            namespaced = True  # Default to namespaced resource
+        else:
+            namespaced = _kind_schema["namespaced"]
+
         resource_dict: dict[str, Any] = {
             "base_class": "NamespacedResource" if namespaced else "Resource",
             "description": _kind_schema.get("description", MISSING_DESCRIPTION_STR),
@@ -75,7 +97,7 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
         schema_properties: dict[str, Any] = _kind_schema.get("properties", {})
         fields_required = _kind_schema.get("required", [])
 
-        resource_dict.update(extract_group_kind_version(_kind_schema=_kind_schema))
+        resource_dict.update(extract_group_kind_version(kind_schema=_kind_schema))
 
         if spec_schema := schema_properties.get("spec", {}):
             spec_schema = get_property_schema(property_=spec_schema)
@@ -127,7 +149,7 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
                 LOGGER.warning(
                     f"Missing API Version in Resource\n"
                     f"Please add `Resource.ApiVersion.{api_version_for_resource_api_version} = {resource_dict['version']}` "
-                    "manually into ocp_resources/resource.py under Resource class > ApiGroup class."
+                    "manually into ocp_resources/resource.py under Resource class > ApiVersion class."
                 )
 
         _resources.append(resource_dict)

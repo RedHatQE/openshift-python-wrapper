@@ -56,7 +56,7 @@ class ResourceScanner:
 
     def __init__(self, ocp_resources_path: str = "ocp_resources"):
         self.ocp_resources_path = Path(ocp_resources_path)
-        self.exclude_files = {"__init__.py", "resource.py", "exceptions.py", "utils"}
+        self.exclude_files = {"__init__.py", "resource.py", "exceptions.py", "utils.py"}
 
     def scan_resources(self) -> list[ResourceInfo]:
         """Scan ocp_resources directory and extract all resource classes"""

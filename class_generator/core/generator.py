@@ -48,8 +48,7 @@ def generate_resource_file_from_dict(
         Tuple of (original_filename, generated_filename)
     """
     base_dir = output_dir or "ocp_resources"
-    if not os.path.exists(base_dir):
-        os.makedirs(base_dir)
+    os.makedirs(base_dir, exist_ok=True)
 
     rendered = render_jinja_template(
         template_dict=resource_dict,
@@ -63,9 +62,8 @@ def generate_resource_file_from_dict(
 
     if add_tests:
         overwrite = True
-        tests_path = os.path.join(TESTS_MANIFESTS_DIR, resource_dict["kind"])
-        if not os.path.exists(tests_path):
-            os.makedirs(tests_path)
+        tests_path = Path(TESTS_MANIFESTS_DIR) / resource_dict["kind"]
+        os.makedirs(tests_path, exist_ok=True)
 
         _output_file = os.path.join(tests_path, f"{formatted_kind_str}{_file_suffix}.py")
 
@@ -142,25 +140,49 @@ def class_generator(
                 LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed.")
                 sys.exit(1)
 
-            run_update_schema = input(
-                f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]"
-            )
-            if run_update_schema.lower() == "n":
-                sys.exit(1)
+            # Use a loop to handle retries instead of recursion
+            max_retries = 3
+            retry_count = 0
 
-            elif run_update_schema.lower() == "y":
+            while retry_count < max_retries:
+                # Validate user input with a loop
+                while True:
+                    run_update_schema = (
+                        input(
+                            f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]: "
+                        )
+                        .strip()
+                        .lower()
+                    )
+
+                    if run_update_schema in ["y", "n"]:
+                        break
+                    else:
+                        print("Invalid input. Please enter 'Y' or 'N'.")
+
+                if run_update_schema == "n":
+                    sys.exit(1)
+
+                # User chose 'y' - update schema and retry
+                LOGGER.info(f"Updating schema (attempt {retry_count + 1}/{max_retries})...")
                 update_kind_schema()
 
-                return class_generator(
-                    overwrite=overwrite,
-                    dry_run=dry_run,
-                    kind=kind,
-                    output_file=output_file,
-                    output_dir=output_dir,
-                    add_tests=add_tests,
-                    called_from_cli=True,
-                    update_schema_executed=True,
-                )
+                # Re-read the mapping file to check if kind is now available
+                kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
+                if kind_and_namespaced_mappings:
+                    # Kind found, break out of retry loop to continue processing
+                    break
+                else:
+                    retry_count += 1
+                    if retry_count < max_retries:
+                        LOGGER.warning(
+                            f"{kind} still not found after schema update. Retry {retry_count}/{max_retries}."
+                        )
+                    else:
+                        LOGGER.error(
+                            f"{kind} not found in {RESOURCES_MAPPING_FILE} after {max_retries} update-schema attempts."
+                        )
+                        sys.exit(1)
 
         else:
             LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema.")
@@ -194,11 +216,27 @@ def class_generator(
         )
 
         if not dry_run:
-            run_command(
-                command=shlex.split(f"uvx pre-commit run --files {generated_py_file}"),
-                verify_stderr=False,
-                check=False,
-            )
+            try:
+                rc, stdout, stderr = run_command(
+                    command=shlex.split(f"uvx pre-commit run --files {generated_py_file}"),
+                    verify_stderr=False,
+                    check=False,
+                )
+                # Check if the command failed
+                if not rc:
+                    LOGGER.warning(
+                        f"Pre-commit hooks failed for {generated_py_file}. "
+                        f"This is non-fatal and generation will continue."
+                    )
+                    if stderr:
+                        LOGGER.debug(f"Pre-commit stderr: {stderr}")
+                    if stdout:
+                        LOGGER.debug(f"Pre-commit stdout: {stdout}")
+            except Exception as e:
+                LOGGER.error(
+                    f"Failed to run pre-commit hooks for {generated_py_file}: {e}. "
+                    f"This is non-fatal and generation will continue."
+                )
 
             if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
                 LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")

@@ -1,16 +1,16 @@
 """Constants used throughout the class generator."""
 
 import keyword
-import os
+from pathlib import Path
 
 # String constants
 SPEC_STR: str = "SPEC"
 FIELDS_STR: str = "FIELDS"
 
 # Directory constants
-TESTS_MANIFESTS_DIR: str = "class_generator/tests/manifests"
-SCHEMA_DIR: str = "class_generator/schema"
-RESOURCES_MAPPING_FILE: str = os.path.join(SCHEMA_DIR, "__resources-mappings.json")
+TESTS_MANIFESTS_DIR: Path = Path("class_generator") / "tests" / "manifests"
+SCHEMA_DIR: Path = Path("class_generator") / "schema"
+RESOURCES_MAPPING_FILE: Path = SCHEMA_DIR / "__resources-mappings.json"
 
 # Description constants
 MISSING_DESCRIPTION_STR: str = "No field description from API"

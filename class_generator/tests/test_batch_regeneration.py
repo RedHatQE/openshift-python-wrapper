@@ -561,24 +561,25 @@ class TestBackupWithKindOption:
         backup_dirs = list(Path.cwd().glob(".backups/backup-*"))
         assert len(backup_dirs) == 0
 
-    def test_backup_with_custom_output_file(self, monkeypatch):
+    def test_backup_with_custom_output_file(self, monkeypatch, temp_ocp_resources_dir):
         """Test backup with custom output file path."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            custom_file = Path(tmpdir) / "custom_pod.py"
-            custom_file.write_text(data="# Custom Pod file")
+        custom_file = temp_ocp_resources_dir / "custom_pod.py"
+        custom_file.write_text(data="# Custom Pod file")
 
-            # Mock class_generator
-            def mock_class_generator(**kwargs):
-                return [str(custom_file)]
+        # Mock class_generator
+        def mock_class_generator(**kwargs):
+            return [str(custom_file)]
 
-            monkeypatch.setattr("class_generator.cli.class_generator", mock_class_generator)
+        monkeypatch.setattr("class_generator.cli.class_generator", mock_class_generator)
 
-            runner = CliRunner()
-            result = runner.invoke(cli=main, args=["-k", "Pod", "--overwrite", "--backup", "-o", str(custom_file)])
+        runner = CliRunner()
+        result = runner.invoke(cli=main, args=["-k", "Pod", "--overwrite", "--backup", "-o", str(custom_file)])
 
-            assert result.exit_code == 0
+        assert result.exit_code == 0
 
-            # Check backup was created
-            backup_dirs = list(Path.cwd().glob(".backups/backup-*"))
-            assert len(backup_dirs) == 1
-            assert (backup_dirs[0] / "custom_pod.py").exists()
+        # Check backup was created
+        backup_dirs = list(Path.cwd().glob(".backups/backup-*"))
+        assert len(backup_dirs) == 1
+        # The backup should preserve the directory structure
+        relative_path = custom_file.relative_to(Path.cwd())
+        assert (backup_dirs[0] / relative_path).exists()

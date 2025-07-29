@@ -22,6 +22,31 @@ from class_generator.tests.test_generation import generate_class_generator_tests
 LOGGER = get_logger(name=__name__)
 
 
+def create_backup_if_needed(target_file: Path, backup_dir: Path | None) -> None:
+    """
+    Create a backup of the target file if backup_dir is set and file exists.
+
+    Args:
+        target_file: The file to backup
+        backup_dir: The directory where backups should be stored
+    """
+    if backup_dir and target_file.exists():
+        # Preserve directory structure in backup
+        if target_file.is_absolute():
+            try:
+                relative_path = target_file.relative_to(Path.cwd())
+            except ValueError:
+                # File is outside current directory, use just the filename
+                relative_path = Path(target_file.name)
+        else:
+            # Path is already relative, use as-is
+            relative_path = target_file
+        backup_path = backup_dir / relative_path
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(target_file, backup_path)
+        LOGGER.info(f"Backed up {target_file}")
+
+
 @cloup.command("Resource class generator", show_constraints=True)
 @cloup.option(
     "-k",
@@ -30,7 +55,7 @@ LOGGER = get_logger(name=__name__)
     help="""
     \b
     The Kind to generate the class for, Needs working cluster with admin privileges.
-    multiple kinds can be sent separated by comma (without psaces)
+    multiple kinds can be sent separated by comma (without spaces)
     Example: -k Deployment,Pod,ConfigMap
 """,
 )
@@ -309,11 +334,6 @@ def main(
         LOGGER.error("No kind specified for generation")
         return
 
-    # Handle add_tests option with kind
-    if add_tests:
-        generate_class_generator_tests()
-        return
-
     # Generate class files for specified kinds
     kind_list: list[str] = kind.split(",")
 
@@ -342,21 +362,7 @@ def main(
                 target_file = Path("ocp_resources") / f"{formatted_kind}.py"
 
             # Create backup if file exists
-            if target_file.exists():
-                # Preserve directory structure in backup
-                if target_file.is_absolute():
-                    try:
-                        relative_path = target_file.relative_to(Path.cwd())
-                    except ValueError:
-                        # File is outside current directory, use just the filename
-                        relative_path = Path(target_file.name)
-                else:
-                    # Path is already relative, use as-is
-                    relative_path = target_file
-                backup_path = backup_dir / relative_path
-                backup_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(target_file, backup_path)
-                LOGGER.info(f"Backed up {target_file}")
+            create_backup_if_needed(target_file, backup_dir)
 
         class_generator(
             kind=kind,
@@ -380,21 +386,7 @@ def main(
                 target_file = Path("ocp_resources") / f"{formatted_kind}.py"
 
                 # Create backup if file exists
-                if target_file.exists():
-                    # Preserve directory structure in backup
-                    if target_file.is_absolute():
-                        try:
-                            relative_path = target_file.relative_to(Path.cwd())
-                        except ValueError:
-                            # File is outside current directory, use just the filename
-                            relative_path = Path(target_file.name)
-                    else:
-                        # Path is already relative, use as-is
-                        relative_path = target_file
-                    backup_path = backup_dir / relative_path
-                    backup_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(target_file, backup_path)
-                    LOGGER.info(f"Backed up {target_file}")
+                create_backup_if_needed(target_file, backup_dir)
 
             return class_generator(
                 kind=kind_to_generate,
@@ -415,6 +407,21 @@ def main(
 
         if backup_dir and not dry_run:
             LOGGER.info(f"Backup files stored in: {backup_dir}")
+
+    # Regenerate test file if --add-tests was specified
+    if add_tests:
+        generate_class_generator_tests()
+
+        # Run the generated test file
+        LOGGER.info("Running generated tests...")
+        import os
+
+        test_file = "class_generator/tests/test_class_generator.py"
+        exit_code = os.system(f"uv run pytest {test_file}")
+
+        # os.system returns the exit status shifted left by 8 bits
+        if exit_code != 0:
+            LOGGER.error(f"Tests failed with exit code {exit_code >> 8}")
 
 
 if __name__ == "__main__":

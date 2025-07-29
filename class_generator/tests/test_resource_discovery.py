@@ -480,7 +480,8 @@ class TestReportGeneration:
     def sample_coverage_analysis(self) -> dict[str, Any]:
         """Sample coverage analysis for testing."""
         return {
-            "implemented_resources": ["Pod", "Service", "Deployment", "ConfigMap", "Route"],
+            "generated_resources": ["Pod", "Service", "Deployment"],
+            "manual_resources": ["ConfigMap", "Route"],
             "missing_resources": [
                 {"name": "secrets", "kind": "Secret", "api_version": "v1", "namespaced": True},
                 {"name": "nodes", "kind": "Node", "api_version": "v1", "namespaced": False},
@@ -502,6 +503,8 @@ class TestReportGeneration:
             "coverage_stats": {
                 "total_discovered": 10,
                 "total_implemented": 5,
+                "total_generated": 3,
+                "total_manual": 2,
                 "covered_resources": 5,
                 "total_missing": 5,
                 "coverage_percentage": 50.0,

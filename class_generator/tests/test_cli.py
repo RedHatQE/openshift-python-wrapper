@@ -227,6 +227,19 @@ class TestCLIFunctionality:
         result = runner.invoke(cli=main, args=["--add-tests"])
         assert result.exit_code != 0
 
+        # Cannot use --backup without --regenerate-all or --overwrite
+        result = runner.invoke(cli=main, args=["--backup", "backup_dir"])
+        assert result.exit_code != 0
+
+        # Cannot use --filter without --regenerate-all
+        result = runner.invoke(cli=main, args=["--filter", "Pod*"])
+        assert result.exit_code != 0
+
+        # When --update-schema is used alone (without --generate-missing),
+        # cannot combine with other options like -k, --dry-run, etc.
+        result = runner.invoke(cli=main, args=["--update-schema", "-k", "Pod"])
+        assert result.exit_code != 0
+
     def test_required_options(self):
         """Test that at least one main option is required."""
         runner = CliRunner()

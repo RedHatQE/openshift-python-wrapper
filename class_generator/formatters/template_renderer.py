@@ -2,6 +2,7 @@
 
 import sys
 from typing import Any
+from pathlib import Path
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
@@ -29,11 +30,34 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
     )
 
     template = env.get_template(name=template_name)
-    rendered = template.render(template_dict)
-    undefined_variables = meta.find_undeclared_variables(env.parse(rendered))
+
+    # Parse the template source to find undeclared variables
+    # Get template source in a way that's compatible with different Jinja2 versions
+    try:
+        # Try to get source directly (newer Jinja2 versions)
+        template_source = template.source
+    except AttributeError:
+        # Fallback: read the template file directly
+        template_path = Path(template_dir) / template_name
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_source = f.read()
+
+    ast = env.parse(template_source)
+    undeclared_variables = meta.find_undeclared_variables(ast)
+
+    # Filter out variables that are present in template_dict
+    # We need to check all levels of the template_dict for nested access
+    provided_variables = set(template_dict.keys())
+
+    # Find truly undefined variables
+    undefined_variables = undeclared_variables - provided_variables
 
     if undefined_variables:
-        LOGGER.error(f"The following variables are undefined: {undefined_variables}")
+        LOGGER.error(f"The following variables are undefined in template '{template_name}': {undefined_variables}")
+        LOGGER.error(f"Available variables: {provided_variables}")
         sys.exit(1)
+
+    # Now render the template
+    rendered = template.render(template_dict)
 
     return rendered
