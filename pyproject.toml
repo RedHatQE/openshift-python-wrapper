@@ -124,7 +124,7 @@ Download = "https://pypi.org/project/openshift-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
 
 [project.scripts]
-class-generator = "class_generator.class_generator:main"
+class-generator = "class_generator.cli:main"
 openshift-mcp-server = "mcp_server.server:main"
 
 [build-system]

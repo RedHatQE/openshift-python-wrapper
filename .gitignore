@@ -1,14 +1,6 @@
 # Temporary files
 _out
 
-# Generated OpenAPI files
-class_generator/__k8s-openapi-*.json
-
-# Generated schema files (except the two needed for distribution)
-class_generator/schema/*.json
-!class_generator/schema/__resources-mappings.json
-!class_generator/schema/_definitions.json
-class_generator/schema/__not-kind.txt
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template

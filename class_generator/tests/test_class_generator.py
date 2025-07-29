@@ -5,7 +5,8 @@ import filecmp
 from pathlib import Path
 import pytest
 
-from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
+from class_generator.constants import TESTS_MANIFESTS_DIR
+from class_generator.core.generator import class_generator
 
 
 @pytest.mark.parametrize(
