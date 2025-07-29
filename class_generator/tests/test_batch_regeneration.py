@@ -483,7 +483,7 @@ class TestBackupWithKindOption:
     def test_backup_requires_overwrite(self):
         """Test that --backup requires --overwrite when used with -k."""
         runner = CliRunner()
-        result = runner.invoke(main, ["-k", "Pod", "--backup"])
+        result = runner.invoke(cli=main, args=["-k", "Pod", "--backup"])
         assert result.exit_code != 0
         assert "when --backup is set, exactly 1 of the following parameters must be set" in result.output
 
@@ -491,7 +491,7 @@ class TestBackupWithKindOption:
         """Test backup creation with single kind and overwrite."""
         # Create existing file
         existing_file = temp_ocp_resources_dir / "pod.py"
-        existing_file.write_text("# Existing Pod file\nclass Pod: pass")
+        existing_file.write_text(data="# Existing Pod file\nclass Pod: pass")
 
         # Mock class_generator to avoid actual generation
         def mock_class_generator(**kwargs):
@@ -501,7 +501,7 @@ class TestBackupWithKindOption:
         monkeypatch.setattr("class_generator.cli.class_generator", mock_class_generator)
 
         runner = CliRunner()
-        result = runner.invoke(main, ["-k", "Pod", "--overwrite", "--backup"])
+        result = runner.invoke(cli=main, args=["-k", "Pod", "--overwrite", "--backup"])
 
         assert result.exit_code == 0
 
@@ -518,10 +518,10 @@ class TestBackupWithKindOption:
         """Test backup creation with multiple kinds and overwrite."""
         # Create existing files
         pod_file = temp_ocp_resources_dir / "pod.py"
-        pod_file.write_text("# Existing Pod file")
+        pod_file.write_text(data="# Existing Pod file")
 
         service_file = temp_ocp_resources_dir / "service.py"
-        service_file.write_text("# Existing Service file")
+        service_file.write_text(data="# Existing Service file")
 
         # Mock class_generator
         def mock_class_generator(**kwargs):
@@ -535,7 +535,7 @@ class TestBackupWithKindOption:
         monkeypatch.setattr("class_generator.cli.class_generator", mock_class_generator)
 
         runner = CliRunner()
-        result = runner.invoke(main, ["-k", "Pod,Service", "--overwrite", "--backup"])
+        result = runner.invoke(cli=main, args=["-k", "Pod,Service", "--overwrite", "--backup"])
 
         assert result.exit_code == 0
 
@@ -553,7 +553,7 @@ class TestBackupWithKindOption:
         monkeypatch.setattr("class_generator.cli.class_generator", lambda **kwargs: [])
 
         runner = CliRunner()
-        result = runner.invoke(main, ["-k", "Pod", "--overwrite", "--backup", "--dry-run"])
+        result = runner.invoke(cli=main, args=["-k", "Pod", "--overwrite", "--backup", "--dry-run"])
 
         assert result.exit_code == 0
 
@@ -565,7 +565,7 @@ class TestBackupWithKindOption:
         """Test backup with custom output file path."""
         with tempfile.TemporaryDirectory() as tmpdir:
             custom_file = Path(tmpdir) / "custom_pod.py"
-            custom_file.write_text("# Custom Pod file")
+            custom_file.write_text(data="# Custom Pod file")
 
             # Mock class_generator
             def mock_class_generator(**kwargs):
@@ -574,7 +574,7 @@ class TestBackupWithKindOption:
             monkeypatch.setattr("class_generator.cli.class_generator", mock_class_generator)
 
             runner = CliRunner()
-            result = runner.invoke(main, ["-k", "Pod", "--overwrite", "--backup", "-o", str(custom_file)])
+            result = runner.invoke(cli=main, args=["-k", "Pod", "--overwrite", "--backup", "-o", str(custom_file)])
 
             assert result.exit_code == 0
 

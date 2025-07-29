@@ -72,6 +72,7 @@ fcn_exclude_functions =
     __class__,
     cls,
     validate,
+    relative_to,
 
 enable-extensions =
     FCN,
