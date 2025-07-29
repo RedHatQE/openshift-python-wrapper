@@ -637,7 +637,7 @@ class TestCLIIntegration:
             with patch("os.path.expanduser") as mock_expanduser:
                 mock_expanduser.return_value = tmpdir
 
-                with patch("class_generator.cli.discover_cluster_resources") as mock_discover:
+                with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
                     with patch("class_generator.cli.analyze_coverage") as mock_analyze:
                         with patch("class_generator.cli.generate_report") as mock_report:
                             mock_discover.return_value = {"v1": []}
@@ -685,7 +685,7 @@ class TestCLIIntegration:
 
                 mock_expanduser.side_effect = expanduser_side_effect
 
-                with patch("class_generator.cli.discover_cluster_resources") as mock_discover:
+                with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
                     with patch("class_generator.cli.analyze_coverage") as mock_analyze:
                         with patch("class_generator.cli.generate_report") as mock_report:
                             mock_discover.return_value = {"v1": [{"name": "pods", "kind": "Pod"}]}
@@ -719,7 +719,7 @@ class TestCLIIntegration:
         """Test that --discover-missing can be combined with kind generation."""
         runner = CliRunner()
 
-        with patch("class_generator.cli.discover_cluster_resources") as mock_discover:
+        with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
             with patch("class_generator.cli.analyze_coverage") as mock_analyze:
                 with patch("class_generator.cli.generate_report") as mock_report:
                     with patch("class_generator.cli.class_generator") as mock_generator:

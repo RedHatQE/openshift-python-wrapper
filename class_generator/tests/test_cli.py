@@ -15,7 +15,7 @@ class TestCLIFunctionality:
         """Test --coverage-report with console output format."""
         runner = CliRunner()
 
-        with patch("class_generator.cli.discover_cluster_resources") as mock_discover:
+        with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
             with patch("class_generator.cli.analyze_coverage") as mock_analyze:
                 with patch("class_generator.cli.generate_report") as mock_report:
                     # Mock discovery results
@@ -50,7 +50,7 @@ class TestCLIFunctionality:
         """Test --coverage-report with JSON output format."""
         runner = CliRunner()
 
-        with patch("class_generator.cli.discover_cluster_resources") as mock_discover:
+        with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
             with patch("class_generator.cli.analyze_coverage") as mock_analyze:
                 with patch("class_generator.cli.generate_report") as mock_report:
                     # Mock discovery results
@@ -78,7 +78,7 @@ class TestCLIFunctionality:
         """Test --discover-missing functionality."""
         runner = CliRunner()
 
-        with patch("class_generator.cli.discover_cluster_resources") as mock_discover:
+        with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
             with patch("class_generator.cli.analyze_coverage") as mock_analyze:
                 with patch("class_generator.cli.generate_report") as mock_report:
                     mock_discover.return_value = {"v1": ["Pod", "Service", "ConfigMap"]}
