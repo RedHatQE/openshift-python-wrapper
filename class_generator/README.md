@@ -50,6 +50,26 @@ class-generator --kind <kind>
   - `OATH` -> `oath`
   - `CDIConfig` -> `cdi_config`
 
+### Overwriting existing files
+
+When regenerating or updating existing resource files, you can use the `--overwrite` flag along with `--backup` to create a backup of existing files before overwriting them:
+
+```bash
+class-generator --kind <kind> --overwrite --backup
+```
+
+This creates a timestamped backup in `.backups/backup-YYYYMMDD-HHMMSS/` preserving the original directory structure of your files.
+
+### Batch regeneration with backup
+
+When regenerating all resources, backups are also stored in the unified `.backups/` directory:
+
+```bash
+class-generator --regenerate-all --backup
+```
+
+All backups preserve the original directory structure, making it easy to restore specific files or entire directories if needed.
+
 ### Discovering missing resources
 
 The class-generator can automatically discover resources in your cluster that don't have wrapper classes yet. Resource discovery runs in parallel for improved performance, typically reducing discovery time by 3-5x compared to sequential discovery.
@@ -149,35 +169,4 @@ cd openshift-python-wrapper
 
 - Login to the cluster use admin user and password.
 
-```bash
-oc login <clster api URL> -u <username> -p <password>
 ```
-
-- Execute the command:
-
-```bash
-class-generator --update-schema
-```
-
-The schema update process:
-- Fetches schemas directly from the OpenAPI v3 endpoint
-- Runs in parallel for improved performance
-- Stores schemas in `class_generator/schema/__resources-mappings.json` and `class_generator/schema/_definitions.json`
-
-## Version Selection
-
-When multiple API versions exist for the same resource within an API group, the class generator automatically selects the latest stable version according to this precedence:
-
-`v2` > `v1` > `v1beta2` > `v1beta1` > `v1alpha2` > `v1alpha1`
-
-For example:
-- If both `v1` and `v1beta1` exist, `v1` will be used
-- Resources from different API groups are treated as separate resources
-
-## Python Keyword Handling
-
-Fields that conflict with Python reserved keywords are automatically renamed by appending an underscore. The original field name is preserved in the API calls.
-
-Example:
-- CRD field `finally` → Python parameter `finally_`
-- The generated `to_dict()` method correctly maps back to `finally` for API operations
