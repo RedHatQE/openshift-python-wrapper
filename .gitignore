@@ -134,6 +134,7 @@ package-lock.json
 CLAUDE.md
 .agent-os/
 .cursorrules
+.claude/
 
 # VS Code settings
 .vscode/

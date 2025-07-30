@@ -120,6 +120,9 @@ def analyze_coverage(
 
     not_generated.sort()
 
+    # Normalize missing_resources entries to dicts with "kind" key
+    missing_resources = [{"kind": resource} if isinstance(resource, str) else resource for resource in not_generated]
+
     # Calculate coverage statistics
     total_in_mapping = len(all_mapped_resources)
     total_generated = len(matched_generated)
@@ -128,13 +131,13 @@ def analyze_coverage(
     return {
         "generated_resources": sorted(generated_set),
         "manual_resources": sorted(manual_set),
-        "missing_resources": not_generated,  # Resources in mapping but not generated
+        "missing_resources": missing_resources,  # Resources in mapping but not generated
         "coverage_stats": {
             "total_in_mapping": total_in_mapping,
             "total_generated": total_generated,
             "total_manual": len(manual_set),
             "coverage_percentage": coverage_percentage,
-            "missing_count": len(not_generated),
+            "missing_count": len(missing_resources),
         },
     }
 

@@ -18,6 +18,7 @@ from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
 from class_generator.core.schema import update_kind_schema
 from class_generator.tests.test_generation import generate_class_generator_tests
+from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
 
@@ -197,10 +198,8 @@ def main(
     if generate_missing and coverage_analysis["missing_resources"]:
         LOGGER.info(f"Generating {len(coverage_analysis['missing_resources'])} missing resources...")
         for resource_kind in coverage_analysis["missing_resources"]:
-            if isinstance(resource_kind, dict):
-                kind_to_generate = resource_kind.get("kind", resource_kind)
-            else:
-                kind_to_generate = resource_kind
+            # Extract kind from dict (missing_resources entries are now always dicts)
+            kind_to_generate = resource_kind["kind"]
 
             try:
                 class_generator(
@@ -261,22 +260,7 @@ def main(
                 LOGGER.info(f"Regenerating {resource_kind}...")
 
                 # Create backup of original file if requested
-                if backup_dir:
-                    # Preserve directory structure in backup
-                    resource_path = Path(resource_file)
-                    if resource_path.is_absolute():
-                        try:
-                            relative_path = resource_path.relative_to(Path.cwd())
-                        except ValueError:
-                            # File is outside current directory, use just the filename
-                            relative_path = Path(resource_path.name)
-                    else:
-                        # Path is already relative, use as-is
-                        relative_path = resource_path
-                    backup_path = backup_dir / relative_path
-                    backup_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(resource_file, backup_path)
-                    LOGGER.info(f"Backed up {resource_file}")
+                create_backup_if_needed(target_file=Path(resource_file), backup_dir=backup_dir)
 
                 # Regenerate the resource
                 result = class_generator(
@@ -356,8 +340,6 @@ def main(
                 target_file = Path(output_file)
             else:
                 # Default output path based on kind
-                from ocp_resources.utils.utils import convert_camel_case_to_snake_case
-
                 formatted_kind = convert_camel_case_to_snake_case(name=kind)
                 target_file = Path("ocp_resources") / f"{formatted_kind}.py"
 
@@ -380,8 +362,6 @@ def main(
             """Generate a single kind with optional backup."""
             if overwrite and backup_dir:
                 # Determine the output file path for this kind
-                from ocp_resources.utils.utils import convert_camel_case_to_snake_case
-
                 formatted_kind = convert_camel_case_to_snake_case(name=kind_to_generate)
                 target_file = Path("ocp_resources") / f"{formatted_kind}.py"
 

@@ -197,7 +197,7 @@ class TestCLIFunctionality:
         with patch("class_generator.cli.analyze_coverage") as mock_analyze:
             with patch("class_generator.cli.class_generator") as mock_generator:
                 mock_analyze.return_value = {
-                    "missing_resources": ["ConfigMap"],
+                    "missing_resources": [{"kind": "ConfigMap"}],
                     "generated_resources": [],
                     "manual_resources": [],
                     "coverage_stats": {
