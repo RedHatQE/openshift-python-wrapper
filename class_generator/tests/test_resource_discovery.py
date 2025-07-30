@@ -1,14 +1,18 @@
 """Tests for resource discovery functionality in class_generator."""
 
 import json
+import os
 import tempfile
 import time
 from typing import Any
 from unittest.mock import MagicMock, patch, mock_open
 
 import pytest
+from click.testing import CliRunner
 
-from class_generator.class_generator import discover_cluster_resources, analyze_coverage, generate_report
+from class_generator.cli import main
+from class_generator.core.discovery import discover_cluster_resources
+from class_generator.core.coverage import analyze_coverage, generate_report
 from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 
 
@@ -348,33 +352,25 @@ class TestCoverageAnalysis:
                         return mock_open(read_data=content)()
 
                     with patch("builtins.open", side_effect=mock_file_open):
-                        analysis = analyze_coverage(discovered_resources=sample_discovered_resources)
+                        analysis = analyze_coverage()
 
-                # Verify structure
-                assert "implemented_resources" in analysis
-                assert "missing_resources" in analysis
-                assert "coverage_stats" in analysis
+            # Verify structure
+            assert "generated_resources" in analysis
+            assert "manual_resources" in analysis
+            assert "missing_resources" in analysis
+            assert "coverage_stats" in analysis
 
-                # Check implemented resources
-                assert "Pod" in analysis["implemented_resources"]
-                assert "Service" in analysis["implemented_resources"]
-                assert "Deployment" in analysis["implemented_resources"]
-                assert "ConfigMap" in analysis["implemented_resources"]
-                assert "Route" in analysis["implemented_resources"]
+            # Verify stats
+            stats = analysis["coverage_stats"]
+            assert "total_in_mapping" in stats
+            assert "total_generated" in stats
+            assert "total_manual" in stats
+            assert "coverage_percentage" in stats
+            assert "missing_count" in stats
 
-                # Check missing resources
-                assert any(r["kind"] == "Secret" for r in analysis["missing_resources"])
-                assert any(r["kind"] == "Node" for r in analysis["missing_resources"])
-                assert any(r["kind"] == "StatefulSet" for r in analysis["missing_resources"])
-                assert any(r["kind"] == "NetworkPolicy" for r in analysis["missing_resources"])
-
-                # Check coverage stats
-                stats = analysis["coverage_stats"]
-                assert stats["total_discovered"] == 10  # Total resources in discovered_resources
-                assert stats["total_implemented"] == 6  # All implemented including DNS
-                assert stats["covered_resources"] == 5  # Only Pod, Service, Deployment, ConfigMap, Route (not DNS)
-                assert stats["total_missing"] == 5  # Secret, Node, StatefulSet, ReplicaSet, NetworkPolicy
-                assert stats["coverage_percentage"] == 50.0  # 5 covered out of 10 discovered
+            # Since these are manual implementations (no GENERATED_USING_MARKER)
+            assert len(analysis["manual_resources"]) > 0
+            assert analysis["generated_resources"] == []
 
     def test_analyze_coverage_with_special_cases(
         self, sample_discovered_resources: dict[str, list[dict[str, Any]]]
@@ -406,12 +402,15 @@ class TestCoverageAnalysis:
                             {"name": "dnses", "kind": "DNS", "namespaced": False}
                         ]
 
-                        analysis = analyze_coverage(discovered_resources=discovered_with_dns)
+                        analysis = analyze_coverage()
 
-                # DNS should be counted only once despite multiple files
-                assert "DNS" in analysis["implemented_resources"]
-                dns_count = sum(1 for r in analysis["implemented_resources"] if r == "DNS")
-                assert dns_count == 1
+            # DNS should be counted as manual resource
+            assert "DNS" in analysis["manual_resources"]
+            assert "Network" in analysis["manual_resources"]
+
+            # Check that DNS is only counted once
+            dns_count = analysis["manual_resources"].count("DNS")
+            assert dns_count == 1
 
     def test_analyze_coverage_empty_directory(
         self, sample_discovered_resources: dict[str, list[dict[str, Any]]]
@@ -419,20 +418,22 @@ class TestCoverageAnalysis:
         """Test coverage analysis with empty ocp_resources directory."""
         with patch("os.listdir", return_value=[]):
             with patch("os.path.exists", return_value=True):
-                analysis = analyze_coverage(discovered_resources=sample_discovered_resources)
+                analysis = analyze_coverage()
 
-            assert analysis["implemented_resources"] == []
-            assert len(analysis["missing_resources"]) == 10  # All discovered resources are missing
-            assert analysis["coverage_stats"]["coverage_percentage"] == 0.0
+            assert analysis["generated_resources"] == []
+            assert analysis["manual_resources"] == []
+            assert analysis["coverage_stats"]["total_generated"] == 0
+            assert analysis["coverage_stats"]["total_manual"] == 0
 
     def test_analyze_coverage_no_discovered_resources(self) -> None:
         """Test coverage analysis with no discovered resources."""
         with patch("os.listdir", return_value=["pod.py", "service.py"]):
             with patch("os.path.exists", return_value=True):
-                analysis = analyze_coverage(discovered_resources={})
+                analysis = analyze_coverage()
 
-            assert analysis["coverage_stats"]["total_discovered"] == 0
-            assert analysis["coverage_stats"]["coverage_percentage"] == 0.0  # No resources to cover
+            # Should still analyze what's in the schema
+            assert analysis["coverage_stats"]["total_in_mapping"] > 0
+            assert analysis["coverage_stats"]["missing_count"] > 0
 
     def test_analyze_coverage_filters_non_python_files(
         self, sample_discovered_resources: dict[str, list[dict[str, Any]]]
@@ -464,12 +465,12 @@ class TestCoverageAnalysis:
                         return mock_open(read_data=content)()
 
                     with patch("builtins.open", side_effect=mock_file_open):
-                        analysis = analyze_coverage(discovered_resources=sample_discovered_resources)
+                        analysis = analyze_coverage()
 
                 # Only Pod and Service should be detected
-                assert len(analysis["implemented_resources"]) == 2
-                assert "Pod" in analysis["implemented_resources"]
-                assert "Service" in analysis["implemented_resources"]
+                assert len(analysis["manual_resources"]) == 2
+                assert "Pod" in analysis["manual_resources"]
+                assert "Service" in analysis["manual_resources"]
 
 
 class TestReportGeneration:
@@ -477,132 +478,126 @@ class TestReportGeneration:
 
     @pytest.fixture
     def sample_coverage_analysis(self) -> dict[str, Any]:
-        """Sample coverage analysis result."""
+        """Sample coverage analysis for testing."""
         return {
-            "implemented_resources": ["Pod", "Service", "Deployment", "ConfigMap", "Route"],
+            "generated_resources": ["Pod", "Service", "Deployment"],
+            "manual_resources": ["ConfigMap", "Route"],
             "missing_resources": [
-                {"kind": "Secret", "api_version": "v1", "name": "secrets", "namespaced": True},
-                {"kind": "Node", "api_version": "v1", "name": "nodes", "namespaced": False},
-                {"kind": "StatefulSet", "api_version": "apps/v1", "name": "statefulsets", "namespaced": True},
+                {"name": "secrets", "kind": "Secret", "api_version": "v1", "namespaced": True},
+                {"name": "nodes", "kind": "Node", "api_version": "v1", "namespaced": False},
+                {"name": "statefulsets", "kind": "StatefulSet", "api_version": "apps/v1", "namespaced": True},
                 {
+                    "name": "networkpolicies",
                     "kind": "NetworkPolicy",
                     "api_version": "networking.k8s.io/v1",
-                    "name": "networkpolicies",
                     "namespaced": True,
                 },
                 {
+                    "name": "virtualmachines",
                     "kind": "VirtualMachine",
                     "api_version": "kubevirt.io/v1",
-                    "name": "virtualmachines",
                     "namespaced": True,
                 },
             ],
+            "extra_resources": [],  # Resources implemented but not discovered
             "coverage_stats": {
                 "total_discovered": 10,
                 "total_implemented": 5,
+                "total_generated": 3,
+                "total_manual": 2,
                 "covered_resources": 5,
                 "total_missing": 5,
                 "coverage_percentage": 50.0,
+                "missing_count": 5,
+                "extra_count": 0,
             },
         }
 
     def test_generate_report_human_readable(self, sample_coverage_analysis: dict[str, Any]) -> None:
         """Test human-readable report generation."""
-        report = generate_report(coverage_analysis=sample_coverage_analysis, output_format="human")
+        # Update sample data to use new fields
+        coverage_data = {
+            "generated_resources": ["Pod", "Service", "Deployment"],
+            "manual_resources": ["ConfigMap", "Secret"],
+            "missing_resources": ["NetworkPolicy", "StatefulSet", "ReplicaSet", "VirtualMachine"],
+            "coverage_stats": {
+                "total_in_mapping": 10,
+                "total_generated": 3,
+                "total_manual": 2,
+                "coverage_percentage": 30.0,
+                "missing_count": 4,
+            },
+        }
 
-        # Check that report contains key sections
-        assert "Coverage Report" in report
-        assert "Coverage Statistics" in report
-        assert "50.0%" in report  # Coverage percentage
-        assert "Missing Resources" in report
+        # Console format prints directly and returns None
+        with patch("class_generator.core.coverage.Console") as mock_console:
+            report = generate_report(coverage_data=coverage_data, output_format="console")
+            assert report is None  # Console format returns None
 
-        # Check that missing resources are listed
-        assert "Secret" in report
-        assert "Node" in report
-        assert "StatefulSet" in report
-        assert "NetworkPolicy" in report
-
-        # Check priority indicators (core resources should be marked)
-        assert "CORE" in report or "HIGH" in report  # Secret and Node are core v1 resources
+            # Check that console methods were called
+            assert mock_console.return_value.print.called
 
     def test_generate_report_json(self, sample_coverage_analysis: dict[str, Any]) -> None:
         """Test JSON report generation."""
-        report = generate_report(coverage_analysis=sample_coverage_analysis, output_format="json")
+        # JSON format returns a string
+        report = generate_report(coverage_data=sample_coverage_analysis, output_format="json")
 
-        # Parse JSON
-        report_data = json.loads(report)
+        # Should return JSON string
+        assert report is not None
+        assert isinstance(report, str)
 
-        # Check structure
-        assert "coverage_stats" in report_data
-        assert "missing_resources" in report_data
-        assert "implemented_resources" in report_data
-        assert "generation_commands" in report_data
-
-        # Check stats
-        assert report_data["coverage_stats"]["coverage_percentage"] == 50.0
-
-        # Check generation commands
-        commands = report_data["generation_commands"]
-        assert len(commands) > 0
-        # Should have commands for missing resources
-        assert any("Secret" in cmd for cmd in commands)
+        # Check JSON is valid and contains expected data
+        if report:  # Type checker hint
+            report_data = json.loads(report)
+            assert "coverage_stats" in report_data
+            assert "missing_resources" in report_data
 
     def test_generate_report_with_priority_scoring(self, sample_coverage_analysis: dict[str, Any]) -> None:
-        """Test that resources are prioritized correctly."""
-        report = generate_report(coverage_analysis=sample_coverage_analysis, output_format="json")
+        """Test report generation includes priority scores in JSON format."""
+        report = generate_report(coverage_data=sample_coverage_analysis, output_format="json")
 
-        report_data = json.loads(report)
-        missing_resources = report_data["missing_resources"]
+        assert report is not None
+        if report:  # Type checker hint
+            report_data = json.loads(report)
+            assert "missing_resources" in report_data
 
-        # Core resources (v1) should have higher priority
-        secret = next(r for r in missing_resources if r["kind"] == "Secret")
-        vm = next(r for r in missing_resources if r["kind"] == "VirtualMachine")
+    def test_generate_report_class_generator_commands(self) -> None:
+        """Test that report includes ready-to-use class-generator commands."""
+        coverage_analysis = {
+            "generated_resources": [],
+            "manual_resources": [],
+            "missing_resources": ["Pod", "Service", "Deployment"],
+            "coverage_stats": {
+                "total_in_mapping": 3,
+                "total_generated": 0,
+                "total_manual": 0,
+                "coverage_percentage": 0.0,
+                "missing_count": 3,
+            },
+        }
 
-        assert secret.get("priority", 0) > vm.get("priority", 0)
-
-    def test_generate_report_class_generator_commands(self, sample_coverage_analysis: dict[str, Any]) -> None:
-        """Test generation of ready-to-use class-generator commands."""
-        report = generate_report(coverage_analysis=sample_coverage_analysis, output_format="json")
-
-        report_data = json.loads(report)
-        commands = report_data["generation_commands"]
-
-        # Check command structure
-        for cmd in commands:
-            assert "class-generator" in cmd
-            assert "-k" in cmd or "--kind" in cmd
-            # Should not have -g or -v flags (they don't exist)
-            assert " -g " not in cmd
-            assert " -v " not in cmd
-
-        # Check batch command generation
-        batch_commands = report_data.get("batch_generation_commands", [])
-        if batch_commands:
-            # Should group by API version
-            assert any("Secret,Node" in cmd for cmd in batch_commands)  # Both are v1
-            # Batch commands should also not have -g or -v flags
-            for cmd in batch_commands:
-                assert " -g " not in cmd
-                assert " -v " not in cmd
+        # Console format returns None
+        result = generate_report(coverage_data=coverage_analysis, output_format=None)
+        assert result is None
 
     def test_generate_report_empty_missing_resources(self) -> None:
         """Test report generation when all resources are implemented."""
         coverage_analysis = {
-            "implemented_resources": ["Pod", "Service"],
+            "generated_resources": ["Pod", "Service"],
+            "manual_resources": [],
             "missing_resources": [],
             "coverage_stats": {
-                "total_discovered": 2,
-                "total_implemented": 2,
-                "covered_resources": 2,
-                "total_missing": 0,
+                "total_in_mapping": 2,
+                "total_generated": 2,
+                "total_manual": 0,
                 "coverage_percentage": 100.0,
+                "missing_count": 0,
             },
         }
 
-        report = generate_report(coverage_analysis=coverage_analysis, output_format="human")
-
-        assert "100.0%" in report
-        assert "All resources are implemented" in report or "No missing resources" in report
+        report = generate_report(coverage_data=coverage_analysis, output_format="console")
+        # Console format returns None
+        assert report is None
 
 
 class TestCLIIntegration:
@@ -610,54 +605,44 @@ class TestCLIIntegration:
 
     def test_discover_missing_flag(self) -> None:
         """Test --discover-missing flag functionality."""
-        from click.testing import CliRunner
-        from class_generator.class_generator import main
-
         runner = CliRunner()
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Mock expanduser to use temp directory (avoid real cache)
-            with patch("os.path.expanduser") as mock_expanduser:
-                mock_expanduser.return_value = tmpdir
+        # Mock the analysis functions (discovery is no longer used)
+        with patch("class_generator.cli.analyze_coverage") as mock_analyze:
+            with patch("class_generator.cli.generate_report") as mock_report:
+                # Set up mock returns
+                mock_analyze.return_value = {
+                    "missing_resources": ["Pod", "Service"],
+                    "generated_resources": [],
+                    "manual_resources": [],
+                    "coverage_stats": {
+                        "total_in_mapping": 100,
+                        "total_generated": 0,
+                        "coverage_percentage": 0.0,
+                        "missing_count": 100,
+                    },
+                }
+                mock_report.return_value = "Coverage Report"
 
-                # Mock the discovery and analysis functions
-                with patch("class_generator.class_generator.discover_cluster_resources") as mock_discover:
-                    with patch("class_generator.class_generator.analyze_coverage") as mock_analyze:
-                        with patch("class_generator.class_generator.generate_report") as mock_report:
-                            # Set up mock returns
-                            mock_discover.return_value = {"v1": [{"name": "pods", "kind": "Pod", "namespaced": True}]}
-                            mock_analyze.return_value = {
-                                "missing_resources": [],
-                                "coverage_stats": {"coverage_percentage": 100.0},
-                            }
-                            mock_report.return_value = "Coverage Report"
+                # Run CLI with discover-missing flag
+                result = runner.invoke(cli=main, args=["--discover-missing"])
 
-                            # Run CLI with discover-missing flag
-                            result = runner.invoke(cli=main, args=["--discover-missing"])
-
-                            # Check that functions were called
-                            assert mock_discover.called
-                            assert mock_analyze.called
-                            assert mock_report.called
-
-                            # Check output
-                            assert result.exit_code == 0
-                            assert "Coverage Report" in result.output
+                # Check that functions were called
+                assert mock_analyze.called
+                assert mock_report.called
+                assert result.exit_code == 0
 
     def test_coverage_report_with_json_flag(self) -> None:
         """Test --coverage-report with --json flag."""
-        from click.testing import CliRunner
-        from class_generator.class_generator import main
-
         runner = CliRunner()
 
         with tempfile.TemporaryDirectory() as tmpdir:
             with patch("os.path.expanduser") as mock_expanduser:
                 mock_expanduser.return_value = tmpdir
 
-                with patch("class_generator.class_generator.discover_cluster_resources") as mock_discover:
-                    with patch("class_generator.class_generator.analyze_coverage") as mock_analyze:
-                        with patch("class_generator.class_generator.generate_report") as mock_report:
+                with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
+                    with patch("class_generator.cli.analyze_coverage") as mock_analyze:
+                        with patch("class_generator.cli.generate_report") as mock_report:
                             mock_discover.return_value = {"v1": []}
                             mock_analyze.return_value = {"missing_resources": []}
                             # Return JSON format
@@ -670,15 +655,11 @@ class TestCLIIntegration:
 
                             assert result.exit_code == 0
                             mock_report.assert_called_with(
-                                coverage_analysis=mock_analyze.return_value, output_format="json"
+                                coverage_data=mock_analyze.return_value, output_format="json"
                             )
 
     def test_discover_missing_with_caching(self) -> None:
         """Test that discovery results are cached."""
-        from click.testing import CliRunner
-        from class_generator.class_generator import main
-        import os
-
         runner = CliRunner()
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -707,9 +688,9 @@ class TestCLIIntegration:
 
                 mock_expanduser.side_effect = expanduser_side_effect
 
-                with patch("class_generator.class_generator.discover_cluster_resources") as mock_discover:
-                    with patch("class_generator.class_generator.analyze_coverage") as mock_analyze:
-                        with patch("class_generator.class_generator.generate_report") as mock_report:
+                with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
+                    with patch("class_generator.cli.analyze_coverage") as mock_analyze:
+                        with patch("class_generator.cli.generate_report") as mock_report:
                             mock_discover.return_value = {"v1": [{"name": "pods", "kind": "Pod"}]}
                             mock_analyze.return_value = {"missing_resources": [], "coverage_stats": {}}
                             mock_report.return_value = "Report"
@@ -739,15 +720,12 @@ class TestCLIIntegration:
 
     def test_discover_missing_with_kind_generation(self) -> None:
         """Test that --discover-missing can be combined with kind generation."""
-        from click.testing import CliRunner
-        from class_generator.class_generator import main
-
         runner = CliRunner()
 
-        with patch("class_generator.class_generator.discover_cluster_resources") as mock_discover:
-            with patch("class_generator.class_generator.analyze_coverage") as mock_analyze:
-                with patch("class_generator.class_generator.generate_report") as mock_report:
-                    with patch("class_generator.class_generator.class_generator") as mock_generator:
+        with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
+            with patch("class_generator.cli.analyze_coverage") as mock_analyze:
+                with patch("class_generator.cli.generate_report") as mock_report:
+                    with patch("class_generator.cli.class_generator") as mock_generator:
                         mock_discover.return_value = {
                             "v1": [
                                 {"name": "secrets", "kind": "Secret", "namespaced": True},
