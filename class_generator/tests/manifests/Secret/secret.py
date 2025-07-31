@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -21,7 +20,7 @@ class Secret(NamespacedResource):
         type: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             data (dict[str, Any]): Data contains the secret data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. The serialized form of the secret
@@ -56,16 +55,16 @@ class Secret(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.data:
+            if self.data is not None:
                 self.res["data"] = self.data
 
             if self.immutable is not None:
                 self.res["immutable"] = self.immutable
 
-            if self.string_data:
+            if self.string_data is not None:
                 self.res["stringData"] = self.string_data
 
-            if self.type:
+            if self.type is not None:
                 self.res["type"] = self.type
 
     # End of generated code

@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -24,7 +23,7 @@ class OAuth(Resource):
         token_config: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             identity_providers (list[Any]): identityProviders is an ordered list of ways for a user to identify
               themselves. When this list is empty, no identities are provisioned
@@ -48,13 +47,13 @@ class OAuth(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.identity_providers:
+            if self.identity_providers is not None:
                 _spec["identityProviders"] = self.identity_providers
 
-            if self.templates:
+            if self.templates is not None:
                 _spec["templates"] = self.templates
 
-            if self.token_config:
+            if self.token_config is not None:
                 _spec["tokenConfig"] = self.token_config
 
     # End of generated code

@@ -1,11 +1,12 @@
-from __future__ import annotations
 import ast
 import json
 import os
-from typing import Any, Dict, Generator, List, Tuple
-
+from typing import Any, Generator
 
 from ocp_resources.resource import Resource  # noqa
+
+# Cache for resources definitions to avoid reloading the large JSON file
+_RESOURCES_DEFINITIONS_CACHE: dict[str, Any] = {}
 
 
 def _get_api_value_by_type(api_value: str, api_type: str) -> str:
@@ -23,9 +24,8 @@ def _get_api_value_by_type(api_value: str, api_type: str) -> str:
     return api_value
 
 
-def _get_api_group_and_version(bodies: List[Any]) -> Tuple[str, str]:
+def _get_api_group_and_version(bodies: list[Any]) -> tuple[str, str]:
     for targets in bodies:
-        targets: ast.AnnAssign | ast.Attribute
         if isinstance(targets, ast.AnnAssign):
             api_type = targets.target.id
         else:
@@ -39,11 +39,11 @@ def _get_api_group_and_version(bodies: List[Any]) -> Tuple[str, str]:
 
 def validate_resource(
     cls: ast.ClassDef,
-    resource_list: List[Dict[str, Any]],
+    resource_list: list[dict[str, Any]],
     api_value: str,
     api_type: str,
-) -> List[str]:
-    errors: List[str] = []
+) -> list[str]:
+    errors: list[str] = []
     resource_str: str = "Resource"
     namespaced_resource_str: str = "NamespacedResource"
     _base_class_error: str = f"Resource {cls.name} must have {resource_str} or {namespaced_resource_str} base class"
@@ -66,7 +66,7 @@ def validate_resource(
 
     namespaced_based: bool = base_class_from[0].id == namespaced_resource_str
     api_value_name = _get_api_value_by_type(api_value=api_value, api_type=api_type)
-    matched_resource: Dict[str, Any] = {}
+    matched_resource: dict[str, Any] = {}
 
     for resource_dict in resource_list:
         _x_kind = resource_dict["x-kubernetes-group-version-kind"]
@@ -113,8 +113,8 @@ def resource_file() -> Generator[str, None, None]:
             yield os.path.join(root, _file)
 
 
-def parse_resource_file_for_errors(data) -> List[str]:
-    errors: List[str] = []
+def parse_resource_file_for_errors(data) -> list[str]:
+    errors: list[str] = []
     _resources_definitions = resources_definitions()
 
     if data.startswith(
@@ -147,6 +147,9 @@ def parse_resource_file_for_errors(data) -> List[str]:
     return errors
 
 
-def resources_definitions() -> Dict[str, Any]:
-    with open("class_generator/schema/__resources-mappings.json") as fd:
-        return json.load(fd)
+def resources_definitions() -> dict[str, Any]:
+    global _RESOURCES_DEFINITIONS_CACHE
+    if not _RESOURCES_DEFINITIONS_CACHE:
+        with open("class_generator/schema/__resources-mappings.json") as fd:
+            _RESOURCES_DEFINITIONS_CACHE = json.load(fd)
+    return _RESOURCES_DEFINITIONS_CACHE

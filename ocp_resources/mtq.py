@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+from typing import Any
+
 from ocp_resources.resource import Resource
 
 
@@ -13,11 +14,11 @@ class MTQ(Resource):
 
     def __init__(
         self,
-        cert_config: Optional[Dict[str, Any]] = None,
-        image_pull_policy: Optional[str] = "",
-        infra: Optional[Dict[str, Any]] = None,
-        priority_class: Optional[str] = "",
-        workload: Optional[Dict[str, Any]] = None,
+        cert_config: dict[str, Any] | None = None,
+        image_pull_policy: str | None = None,
+        infra: dict[str, Any] | None = None,
+        priority_class: str | None = None,
+        workload: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """

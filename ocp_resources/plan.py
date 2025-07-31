@@ -1,10 +1,9 @@
-from __future__ import annotations
 from typing import Any
-from ocp_resources.mtv import MTV
+
 from ocp_resources.resource import NamespacedResource
 
 
-class Plan(NamespacedResource, MTV):
+class Plan(NamespacedResource):
     """
     Migration Tool for Virtualization (MTV) Plan Resource.
 
@@ -42,7 +41,7 @@ class Plan(NamespacedResource, MTV):
         pre_hook_namespace: str | None = None,
         after_hook_name: str | None = None,
         after_hook_namespace: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         self.source_provider_name = source_provider_name
@@ -60,8 +59,6 @@ class Plan(NamespacedResource, MTV):
         self.after_hook_name = after_hook_name
         self.after_hook_namespace = after_hook_namespace
         self.target_namespace = target_namespace or self.namespace
-        self.condition_message_ready = self.ConditionMessage.PLAN_READY
-        self.condition_message_succeeded = self.ConditionMessage.PLAN_SUCCEEDED
         self.hooks_array = []
 
         if self.pre_hook_name and self.pre_hook_namespace:

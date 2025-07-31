@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -24,24 +23,25 @@ class NMState(Resource):
         tolerations: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
               handler DaemonSet manifest.
 
-            infra_affinity (dict[str, Any]): Affinity is an optional affinity selector that will be added to
-              webhook & certmanager Deployment manifests.
+            infra_affinity (dict[str, Any]): InfraAffinity is an optional affinity selector that will be added to
+              webhook, metrics & console-plugin Deployment manifests.
 
             infra_node_selector (dict[str, Any]): InfraNodeSelector is an optional selector that will be added to
-              webhook & certmanager Deployment manifests If InfraNodeSelector is
-              specified, the webhook and certmanager will run only on nodes that
-              have each of the indicated key-value pairs as labels applied to
-              the node.
+              webhook, metrics & console-plugin Deployment manifests If
+              InfraNodeSelector is specified, the webhook, metrics and the
+              console plugin will run only on nodes that have each of the
+              indicated key-value pairs as labels applied to the node.
 
             infra_tolerations (list[Any]): InfraTolerations is an optional list of tolerations to be added to
-              webhook & certmanager Deployment manifests If InfraTolerations is
-              specified, the webhook and certmanager will be able to be
-              scheduled on nodes with corresponding taints
+              webhook, metrics & console-plugin Deployment manifests If
+              InfraTolerations is specified, the webhook, metrics and the
+              console plugin will be able to be scheduled on nodes with
+              corresponding taints
 
             node_selector (dict[str, Any]): NodeSelector is an optional selector that will be added to handler
               DaemonSet manifest for both workers and control-plane
@@ -75,25 +75,25 @@ class NMState(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.affinity:
+            if self.affinity is not None:
                 _spec["affinity"] = self.affinity
 
-            if self.infra_affinity:
+            if self.infra_affinity is not None:
                 _spec["infraAffinity"] = self.infra_affinity
 
-            if self.infra_node_selector:
+            if self.infra_node_selector is not None:
                 _spec["infraNodeSelector"] = self.infra_node_selector
 
-            if self.infra_tolerations:
+            if self.infra_tolerations is not None:
                 _spec["infraTolerations"] = self.infra_tolerations
 
-            if self.node_selector:
+            if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
 
-            if self.self_sign_configuration:
+            if self.self_sign_configuration is not None:
                 _spec["selfSignConfiguration"] = self.self_sign_configuration
 
-            if self.tolerations:
+            if self.tolerations is not None:
                 _spec["tolerations"] = self.tolerations
 
     # End of generated code

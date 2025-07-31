@@ -1,9 +1,8 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import NamespacedResource
 
 
-class Host(NamespacedResource, MTV):
+class Host(NamespacedResource):
     """
     Migration Toolkit For Virtualization (MTV) Host resource.
     """
@@ -41,7 +40,6 @@ class Host(NamespacedResource, MTV):
         self.provider_namespace = provider_namespace
         self.secret_name = secret_name or f"{self.name}-secret"
         self.secret_namespace = secret_namespace or self.namespace
-        self.condition_message_ready = self.ConditionMessage.HOST_READY
 
     def to_dict(self) -> None:
         super().to_dict()

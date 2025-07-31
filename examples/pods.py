@@ -1,9 +1,7 @@
-import kubernetes
-from kubernetes.dynamic import DynamicClient
-
 from ocp_resources.pod import Pod
+from ocp_resources.resource import get_client
 
-client = DynamicClient(client=kubernetes.config.new_client_from_config())
+client = get_client()
 
 # Query to get Pods (resource) in the connected cluster with label of ``label_example=example``.
 # Returns a ``generator`` of the resource - ``pod``

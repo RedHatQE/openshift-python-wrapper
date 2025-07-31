@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -29,7 +28,7 @@ class Image(Resource):
         signatures: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             docker_image_config (str): DockerImageConfig is a JSON blob that the runtime uses to set up the
               container. This is a part of manifest schema v2. Will not be set
@@ -103,34 +102,34 @@ class Image(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.docker_image_config:
+            if self.docker_image_config is not None:
                 self.res["dockerImageConfig"] = self.docker_image_config
 
-            if self.docker_image_layers:
+            if self.docker_image_layers is not None:
                 self.res["dockerImageLayers"] = self.docker_image_layers
 
-            if self.docker_image_manifest:
+            if self.docker_image_manifest is not None:
                 self.res["dockerImageManifest"] = self.docker_image_manifest
 
-            if self.docker_image_manifest_media_type:
+            if self.docker_image_manifest_media_type is not None:
                 self.res["dockerImageManifestMediaType"] = self.docker_image_manifest_media_type
 
-            if self.docker_image_manifests:
+            if self.docker_image_manifests is not None:
                 self.res["dockerImageManifests"] = self.docker_image_manifests
 
-            if self.docker_image_metadata:
+            if self.docker_image_metadata is not None:
                 self.res["dockerImageMetadata"] = self.docker_image_metadata
 
-            if self.docker_image_metadata_version:
+            if self.docker_image_metadata_version is not None:
                 self.res["dockerImageMetadataVersion"] = self.docker_image_metadata_version
 
-            if self.docker_image_reference:
+            if self.docker_image_reference is not None:
                 self.res["dockerImageReference"] = self.docker_image_reference
 
-            if self.docker_image_signatures:
+            if self.docker_image_signatures is not None:
                 self.res["dockerImageSignatures"] = self.docker_image_signatures
 
-            if self.signatures:
+            if self.signatures is not None:
                 self.res["signatures"] = self.signatures
 
     # End of generated code

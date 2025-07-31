@@ -1,9 +1,9 @@
-from ocp_resources.constants import TIMEOUT_4MINUTES
-from ocp_resources.mtv import MTV
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
-class Provider(NamespacedResource, MTV):
+class Provider(NamespacedResource):
     """
     Migration Toolkit For Virtualization (MTV) Provider object.
     """
@@ -12,33 +12,18 @@ class Provider(NamespacedResource, MTV):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        provider_type=None,
-        url=None,
-        secret_name=None,
-        secret_namespace=None,
-        vddk_init_image=None,
-        client=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
+        provider_type: str | None = None,
+        url: str | None = None,
+        secret_name: str | None = None,
+        secret_namespace: str | None = None,
+        vddk_init_image: str | None = None,
+        **kwargs: Any,
     ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            teardown=teardown,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        super().__init__(**kwargs)
         self.provider_type = provider_type
         self.url = url
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
-        self.condition_message_ready = self.ConditionMessage.PROVIDER_READY
         self.vddk_init_image = vddk_init_image
 
     def to_dict(self) -> None:

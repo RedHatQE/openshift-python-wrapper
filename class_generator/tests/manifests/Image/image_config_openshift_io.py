@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -28,7 +27,7 @@ class Image(Resource):
         registry_sources: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             additional_trusted_ca (dict[str, Any]): additionalTrustedCA is a reference to a ConfigMap containing
               additional CAs that should be trusted during imagestream import,
@@ -70,16 +69,16 @@ class Image(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.additional_trusted_ca:
+            if self.additional_trusted_ca is not None:
                 _spec["additionalTrustedCA"] = self.additional_trusted_ca
 
-            if self.allowed_registries_for_import:
+            if self.allowed_registries_for_import is not None:
                 _spec["allowedRegistriesForImport"] = self.allowed_registries_for_import
 
-            if self.external_registry_hostnames:
+            if self.external_registry_hostnames is not None:
                 _spec["externalRegistryHostnames"] = self.external_registry_hostnames
 
-            if self.registry_sources:
+            if self.registry_sources is not None:
                 _spec["registrySources"] = self.registry_sources
 
     # End of generated code

@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
+
+from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
@@ -13,41 +14,41 @@ class VirtualMachinePreference(NamespacedResource):
 
     def __init__(
         self,
-        spec_annotations: Optional[Dict[str, Any]] = None,
-        clock: Optional[Dict[str, Any]] = None,
-        cpu: Optional[Dict[str, Any]] = None,
-        devices: Optional[Dict[str, Any]] = None,
-        features: Optional[Dict[str, Any]] = None,
-        firmware: Optional[Dict[str, Any]] = None,
-        machine: Optional[Dict[str, Any]] = None,
-        prefer_spread_socket_to_core_ratio: Optional[int] = None,
-        preferred_subdomain: Optional[str] = "",
-        preferred_termination_grace_period_seconds: Optional[int] = None,
-        requirements: Optional[Dict[str, Any]] = None,
-        volumes: Optional[Dict[str, Any]] = None,
+        spec_annotations: dict[str, Any] | None = None,
+        clock: dict[str, Any] | None = None,
+        cpu: dict[str, Any] | None = None,
+        devices: dict[str, Any] | None = None,
+        features: dict[str, Any] | None = None,
+        firmware: dict[str, Any] | None = None,
+        machine: dict[str, Any] | None = None,
+        prefer_spread_socket_to_core_ratio: int | None = None,
+        preferred_subdomain: str | None = None,
+        preferred_termination_grace_period_seconds: int | None = None,
+        requirements: dict[str, Any] | None = None,
+        volumes: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            spec_annotations (Dict[str, Any]): Optionally defines preferred Annotations to be applied to the
+            spec_annotations (dict[str, Any]): Optionally defines preferred Annotations to be applied to the
               VirtualMachineInstance
 
-            clock (Dict[str, Any]): Clock optionally defines preferences associated with the Clock
+            clock (dict[str, Any]): Clock optionally defines preferences associated with the Clock
               attribute of a VirtualMachineInstance DomainSpec
 
-            cpu (Dict[str, Any]): CPU optionally defines preferences associated with the CPU attribute
+            cpu (dict[str, Any]): CPU optionally defines preferences associated with the CPU attribute
               of a VirtualMachineInstance DomainSpec
 
-            devices (Dict[str, Any]): Devices optionally defines preferences associated with the Devices
+            devices (dict[str, Any]): Devices optionally defines preferences associated with the Devices
               attribute of a VirtualMachineInstance DomainSpec
 
-            features (Dict[str, Any]): Features optionally defines preferences associated with the Features
+            features (dict[str, Any]): Features optionally defines preferences associated with the Features
               attribute of a VirtualMachineInstance DomainSpec
 
-            firmware (Dict[str, Any]): Firmware optionally defines preferences associated with the Firmware
+            firmware (dict[str, Any]): Firmware optionally defines preferences associated with the Firmware
               attribute of a VirtualMachineInstance DomainSpec
 
-            machine (Dict[str, Any]): Machine optionally defines preferences associated with the Machine
+            machine (dict[str, Any]): Machine optionally defines preferences associated with the Machine
               attribute of a VirtualMachineInstance DomainSpec
 
             prefer_spread_socket_to_core_ratio (int): PreferSpreadSocketToCoreRatio defines the ratio to spread vCPUs
@@ -58,10 +59,10 @@ class VirtualMachinePreference(NamespacedResource):
             preferred_termination_grace_period_seconds (int): Grace period observed after signalling a VirtualMachineInstance to
               stop after which the VirtualMachineInstance is force terminated.
 
-            requirements (Dict[str, Any]): Requirements defines the minium amount of instance type defined
+            requirements (dict[str, Any]): Requirements defines the minium amount of instance type defined
               resources required by a set of preferences
 
-            volumes (Dict[str, Any]): Volumes optionally defines preferences associated with the Volumes
+            volumes (dict[str, Any]): Volumes optionally defines preferences associated with the Volumes
               attribute of a VirtualMachineInstace DomainSpec
 
         """
@@ -87,40 +88,40 @@ class VirtualMachinePreference(NamespacedResource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.spec_annotations:
+            if self.spec_annotations is not None:
                 _spec["annotations"] = self.spec_annotations
 
-            if self.clock:
+            if self.clock is not None:
                 _spec["clock"] = self.clock
 
-            if self.cpu:
+            if self.cpu is not None:
                 _spec["cpu"] = self.cpu
 
-            if self.devices:
+            if self.devices is not None:
                 _spec["devices"] = self.devices
 
-            if self.features:
+            if self.features is not None:
                 _spec["features"] = self.features
 
-            if self.firmware:
+            if self.firmware is not None:
                 _spec["firmware"] = self.firmware
 
-            if self.machine:
+            if self.machine is not None:
                 _spec["machine"] = self.machine
 
-            if self.prefer_spread_socket_to_core_ratio:
+            if self.prefer_spread_socket_to_core_ratio is not None:
                 _spec["preferSpreadSocketToCoreRatio"] = self.prefer_spread_socket_to_core_ratio
 
-            if self.preferred_subdomain:
+            if self.preferred_subdomain is not None:
                 _spec["preferredSubdomain"] = self.preferred_subdomain
 
-            if self.preferred_termination_grace_period_seconds:
+            if self.preferred_termination_grace_period_seconds is not None:
                 _spec["preferredTerminationGracePeriodSeconds"] = self.preferred_termination_grace_period_seconds
 
-            if self.requirements:
+            if self.requirements is not None:
                 _spec["requirements"] = self.requirements
 
-            if self.volumes:
+            if self.volumes is not None:
                 _spec["volumes"] = self.volumes
 
     # End of generated code

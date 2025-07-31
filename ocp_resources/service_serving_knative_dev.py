@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -15,8 +16,8 @@ class Service(NamespacedResource):
 
     def __init__(
         self,
-        template: Optional[Dict[str, Any]] = None,
-        traffic: Optional[List[Any]] = None,
+        template: dict[str, Any] | None = None,
+        traffic: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """

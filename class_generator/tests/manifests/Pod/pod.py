@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
@@ -56,7 +55,7 @@ class Pod(NamespacedResource):
         volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             active_deadline_seconds (int): Optional duration in seconds the pod may be active on the node
               relative to StartTime before the system will actively try to mark
@@ -104,7 +103,8 @@ class Pod(NamespacedResource):
               ephemeralcontainers subresource.
 
             host_aliases (list[Any]): HostAliases is an optional list of hosts and IPs that will be injected
-              into the pod's hosts file if specified.
+              into the pod's hosts file if specified. This is only valid for
+              non-hostNetwork pods.
 
             host_ipc (bool): Use the host's ipc namespace. Optional: Default to false.
 
@@ -151,14 +151,9 @@ class Pod(NamespacedResource):
               https://kubernetes.io/docs/concepts/workloads/pods/init-
               containers/
 
-            node_name (str): NodeName indicates in which node this pod is scheduled. If empty, this
-              pod is a candidate for scheduling by the scheduler defined in
-              schedulerName. Once this field is set, the kubelet for this node
-              becomes responsible for the lifecycle of this pod. This field
-              should not be used to express a desire for the pod to be scheduled
-              on a specific node.
-              https://kubernetes.io/docs/concepts/scheduling-eviction/assign-
-              pod-node/#nodename
+            node_name (str): NodeName is a request to schedule this pod onto a specific node. If it
+              is non-empty, the scheduler simply schedules this pod onto that
+              node, assuming that it fits resource requirements.
 
             node_selector (dict[str, Any]): NodeSelector is a selector which must be true for the pod to fit on a
               node. Selector which must match a node's labels for the pod to be
@@ -233,7 +228,8 @@ class Pod(NamespacedResource):
               block scheduling the pod. If schedulingGates is not empty, the pod
               will stay in the SchedulingGated state and the scheduler will not
               attempt to schedule the pod.  SchedulingGates can only be set at
-              pod creation time, and be removed only afterwards.
+              pod creation time, and be removed only afterwards.  This is a beta
+              feature enabled by the PodSchedulingReadiness feature gate.
 
             security_context (dict[str, Any]): PodSecurityContext holds pod-level security attributes and common
               container settings. Some fields are also present in
@@ -241,8 +237,8 @@ class Pod(NamespacedResource):
               container.securityContext take precedence over field values of
               PodSecurityContext.
 
-            service_account (str): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
-              Deprecated: Use serviceAccountName instead.
+            service_account (str): DeprecatedServiceAccount is a depreciated alias for
+              ServiceAccountName. Deprecated: Use serviceAccountName instead.
 
             service_account_name (str): ServiceAccountName is the name of the ServiceAccount to use to run
               this pod. More info: https://kubernetes.io/docs/tasks/configure-
@@ -344,28 +340,28 @@ class Pod(NamespacedResource):
 
             _spec["containers"] = self.containers
 
-            if self.active_deadline_seconds:
+            if self.active_deadline_seconds is not None:
                 _spec["activeDeadlineSeconds"] = self.active_deadline_seconds
 
-            if self.affinity:
+            if self.affinity is not None:
                 _spec["affinity"] = self.affinity
 
             if self.automount_service_account_token is not None:
                 _spec["automountServiceAccountToken"] = self.automount_service_account_token
 
-            if self.dns_config:
+            if self.dns_config is not None:
                 _spec["dnsConfig"] = self.dns_config
 
-            if self.dns_policy:
+            if self.dns_policy is not None:
                 _spec["dnsPolicy"] = self.dns_policy
 
             if self.enable_service_links is not None:
                 _spec["enableServiceLinks"] = self.enable_service_links
 
-            if self.ephemeral_containers:
+            if self.ephemeral_containers is not None:
                 _spec["ephemeralContainers"] = self.ephemeral_containers
 
-            if self.host_aliases:
+            if self.host_aliases is not None:
                 _spec["hostAliases"] = self.host_aliases
 
             if self.host_ipc is not None:
@@ -380,61 +376,61 @@ class Pod(NamespacedResource):
             if self.host_users is not None:
                 _spec["hostUsers"] = self.host_users
 
-            if self.hostname:
+            if self.hostname is not None:
                 _spec["hostname"] = self.hostname
 
-            if self.image_pull_secrets:
+            if self.image_pull_secrets is not None:
                 _spec["imagePullSecrets"] = self.image_pull_secrets
 
-            if self.init_containers:
+            if self.init_containers is not None:
                 _spec["initContainers"] = self.init_containers
 
-            if self.node_name:
+            if self.node_name is not None:
                 _spec["nodeName"] = self.node_name
 
-            if self.node_selector:
+            if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
 
-            if self.os:
+            if self.os is not None:
                 _spec["os"] = self.os
 
-            if self.overhead:
+            if self.overhead is not None:
                 _spec["overhead"] = self.overhead
 
-            if self.preemption_policy:
+            if self.preemption_policy is not None:
                 _spec["preemptionPolicy"] = self.preemption_policy
 
-            if self.priority:
+            if self.priority is not None:
                 _spec["priority"] = self.priority
 
-            if self.priority_class_name:
+            if self.priority_class_name is not None:
                 _spec["priorityClassName"] = self.priority_class_name
 
-            if self.readiness_gates:
+            if self.readiness_gates is not None:
                 _spec["readinessGates"] = self.readiness_gates
 
-            if self.resource_claims:
+            if self.resource_claims is not None:
                 _spec["resourceClaims"] = self.resource_claims
 
-            if self.restart_policy:
+            if self.restart_policy is not None:
                 _spec["restartPolicy"] = self.restart_policy
 
-            if self.runtime_class_name:
+            if self.runtime_class_name is not None:
                 _spec["runtimeClassName"] = self.runtime_class_name
 
-            if self.scheduler_name:
+            if self.scheduler_name is not None:
                 _spec["schedulerName"] = self.scheduler_name
 
-            if self.scheduling_gates:
+            if self.scheduling_gates is not None:
                 _spec["schedulingGates"] = self.scheduling_gates
 
-            if self.security_context:
+            if self.security_context is not None:
                 _spec["securityContext"] = self.security_context
 
-            if self.service_account:
+            if self.service_account is not None:
                 _spec["serviceAccount"] = self.service_account
 
-            if self.service_account_name:
+            if self.service_account_name is not None:
                 _spec["serviceAccountName"] = self.service_account_name
 
             if self.set_hostname_as_fqdn is not None:
@@ -443,19 +439,19 @@ class Pod(NamespacedResource):
             if self.share_process_namespace is not None:
                 _spec["shareProcessNamespace"] = self.share_process_namespace
 
-            if self.subdomain:
+            if self.subdomain is not None:
                 _spec["subdomain"] = self.subdomain
 
-            if self.termination_grace_period_seconds:
+            if self.termination_grace_period_seconds is not None:
                 _spec["terminationGracePeriodSeconds"] = self.termination_grace_period_seconds
 
-            if self.tolerations:
+            if self.tolerations is not None:
                 _spec["tolerations"] = self.tolerations
 
-            if self.topology_spread_constraints:
+            if self.topology_spread_constraints is not None:
                 _spec["topologySpreadConstraints"] = self.topology_spread_constraints
 
-            if self.volumes:
+            if self.volumes is not None:
                 _spec["volumes"] = self.volumes
 
     # End of generated code
