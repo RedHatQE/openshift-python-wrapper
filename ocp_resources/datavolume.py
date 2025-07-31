@@ -1,5 +1,4 @@
 from ocp_resources.constants import (
-    TIMEOUT_1MINUTE,
     TIMEOUT_2MINUTES,
     TIMEOUT_4MINUTES,
     TIMEOUT_10MINUTES,
@@ -325,7 +324,7 @@ class DataVolume(NamespacedResource):
             raise
 
         # For CSI storage, PVC gets Bound after DV succeeded
-        return self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=TIMEOUT_1MINUTE)
+        return self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=TIMEOUT_2MINUTES)
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
