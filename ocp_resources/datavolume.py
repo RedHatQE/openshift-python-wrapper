@@ -1,4 +1,3 @@
-from ocp_resources.constants import (
 from ocp_resources.utils.constants import (
     TIMEOUT_2MINUTES,
     TIMEOUT_4MINUTES,
