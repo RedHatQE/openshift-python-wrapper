@@ -88,15 +88,11 @@ class DataVolume(NamespacedResource):
         hostpath_node: str | None = None,
         source_pvc: str | None = None,
         source_namespace: str | None = None,
-        source_ref_dict: dict[str, Any] | None = None,
-        source_ref_kind: str | None = None,
-        source_ref_name: str | None = None,
-        source_ref_namespace: str | None = None,
+        source_ref: dict[str, Any] | None = None,
         multus_annotation: str | None = None,
         bind_immediate_annotation: bool | None = None,
         preallocation: bool | None = None,
         api_name: str = "pvc",
-        delete_after_completion: str | None = None,
         checkpoints: list[Any] | None = None,
         final_checkpoint: bool | None = None,
         priority_class_name: str | None = None,
@@ -106,28 +102,29 @@ class DataVolume(NamespacedResource):
         DataVolume object
 
         Args:
-            source (str): source of DV - upload/http/pvc/registry.
-            size (str): DataVolume size - format size+size unit, for example: "5Gi".
+            source (str, default: None): source of DV - upload/http/pvc/registry/blank.
+            source_dict (dict[str, Any], default: None): DataVolume.source dictionary.
+            size (str, default: None): DataVolume size - format size+size unit, for example: "5Gi".
             storage_class (str, default: None): storage class name for DataVolume.
             url (str, default: None): url for importing DV, when source is http/registry.
-            content_type (str, default: "kubevirt"): DataVolume content type.
-            access_modes (str, default: None): DataVolume access mode.
+            content_type (str, default: None): DataVolume content type (e.g., "kubevirt", "archive").
+            access_modes (str, default: None): DataVolume access mode (e.g., "ReadWriteOnce", "ReadWriteMany").
+            volume_mode (str, default: None): DataVolume volume mode (e.g., "Filesystem", "Block").
             cert_configmap (str, default: None): name of config map for TLS certificates.
             secret (Secret, default: None): to be set as secretRef.
-            client (DynamicClient): DynamicClient to use.
-            volume_mode (str, default: None): DataVolume volume mode.
             hostpath_node (str, default: None): Node name to provision the DV on.
             source_pvc (str, default: None): PVC name for when cloning the DV.
             source_namespace (str, default: None): PVC namespace for when cloning the DV.
+            source_ref (dict[str, Any], default: None): SourceRef is an indirect reference to the source of data for the
+              requested DataVolume. Currently only "DataSource" is supported. Fields: kind (str), name (str), namespace (str)
             multus_annotation (str, default: None): network nad name.
-            bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in  StorageClass and DV
-            should be bound immediately.
+            bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in StorageClass and DV
+                should be bound immediately.
             preallocation (bool, default: None): preallocate disk space.
-            teardown (bool, default: True): Indicates if this resource would need to be deleted.
-            yaml_file (yaml, default: None): yaml file for the resource.
-            delete_timeout (int, default: 4 minutes): timeout associated with delete action.
-            api_name (str, default: "pvc"): api used for DV, pvc/storage
-            delete_after_completion (str, default: None): annotation for garbage collector - "true"/"false"
+            api_name (str, default: "pvc"): api used for DV (e.g., "storage", "pvc").
+            checkpoints (list[Any], default: None): list of DataVolumeCheckpoints for snapshot operations.
+            final_checkpoint (bool, default: None): indicates whether the current DataVolumeCheckpoint is the final one.
+            priority_class_name (str, default: None): priority class name for the DataVolume pod.
         """
         super().__init__(**kwargs)
         self.source = source
@@ -143,15 +140,11 @@ class DataVolume(NamespacedResource):
         self.source_pvc = source_pvc
         self.source_namespace = source_namespace
         self.source_dict = source_dict
-        self.source_ref_dict = source_ref_dict
-        self.source_ref_kind = source_ref_kind
-        self.source_ref_name = source_ref_name
-        self.source_ref_namespace = source_ref_namespace
+        self.source_ref = source_ref
         self.multus_annotation = multus_annotation
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
         self.api_name = api_name
-        self.delete_after_completion = delete_after_completion
         self.checkpoints = checkpoints
         self.final_checkpoint = final_checkpoint
         self.priority_class_name = priority_class_name
@@ -187,7 +180,7 @@ class DataVolume(NamespacedResource):
                 _spec[self.api_name]["storageClassName"] = self.storage_class
 
             if self.size is not None:
-                _spec[self.api_name]["resources"]["requests"]["storage"] = self.storage_class
+                _spec[self.api_name]["resources"]["requests"]["storage"] = self.size
 
             if self.content_type is not None:
                 _spec["contentType"] = self.content_type
@@ -213,17 +206,8 @@ class DataVolume(NamespacedResource):
             if self.cert_configmap is not None:
                 _spec["source"][self.source]["certConfigMap"] = self.cert_configmap
 
-            if self.source_ref_dict is not None:
-                _spec["sourceRef"] = self.source_ref_dict
-
-            if self.source_ref_kind is not None:
-                _spec["sourceRef"]["kind"] = self.source_ref_kind
-
-            if self.source_ref_name is not None:
-                _spec["sourceRef"]["name"] = self.source_ref_name
-
-            if self.source_ref_namespace is not None:
-                _spec["sourceRef"]["namespace"] = self.source_ref_namespace
+            if self.source_ref is not None:
+                _spec["sourceRef"] = self.source_ref
 
             if self.hostpath_node:
                 self.res["metadata"].setdefault("annotations", {}).update({
@@ -238,11 +222,6 @@ class DataVolume(NamespacedResource):
             if self.bind_immediate_annotation:
                 self.res["metadata"].setdefault("annotations", {}).update({
                     f"{self.api_group}/storage.bind.immediate.requested": "true"
-                })
-
-            if self.delete_after_completion:
-                self.res["metadata"].setdefault("annotations", {}).update({
-                    f"{self.api_group}/storage.deleteAfterCompletion": (self.delete_after_completion)
                 })
 
     def wait_deleted(self, timeout=TIMEOUT_4MINUTES):
