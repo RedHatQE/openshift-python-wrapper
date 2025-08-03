@@ -1,4 +1,3 @@
-exclude: "class_generator/schema/"
 minimum_pre_commit_version: 3.3.0
 default_install_hook_types: [pre-commit, commit-msg]
 
@@ -24,7 +23,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/PyCQA/flake8
-    rev: "7.2.0"
+    rev: "7.3.0"
     hooks:
       - id: flake8
         args: [--config=.flake8]
@@ -42,21 +41,22 @@ repos:
           [
             "--exclude-files=class_generator/schema/*",
             "--exclude-files=class_generator/__k8s-openapi-.*.json",
+            "--exclude-files=fake_kubernetes_client/__resources-mappings.json",
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.13
+    rev: v0.12.5
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.2
+    rev: v8.28.0
     hooks:
       - id: gitleaks
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+    rev: v1.17.0
     hooks:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)

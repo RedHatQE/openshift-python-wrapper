@@ -1,6 +1,6 @@
-from typing import Optional, Dict, Any
+from typing import Any
 
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class InferenceService(NamespacedResource):
@@ -12,10 +12,10 @@ class InferenceService(NamespacedResource):
 
     def __init__(
         self,
-        predictor: Optional[Dict[str, Any]] = None,
-        explainer: Optional[Dict[str, Any]] = None,
-        transformer: Optional[Dict[str, Any]] = None,
-        **kwargs,
+        predictor: dict[str, Any] | None = None,
+        explainer: dict[str, Any] | None = None,
+        transformer: dict[str, Any] | None = None,
+        **kwargs: Any,
     ):
         """
         InferenceService object

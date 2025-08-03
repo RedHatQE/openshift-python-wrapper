@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -20,7 +19,6 @@ class NMState(Resource):
         infra_node_selector: dict[str, Any] | None = None,
         infra_tolerations: list[Any] | None = None,
         node_selector: dict[str, Any] | None = None,
-        probe_configuration: dict[str, Any] | None = None,
         self_sign_configuration: dict[str, Any] | None = None,
         tolerations: list[Any] | None = None,
         **kwargs: Any,
@@ -52,11 +50,6 @@ class NMState(Resource):
               is specified, the handler will run only on nodes that have each of
               the indicated key-value pairs as labels applied to the node.
 
-            probe_configuration (dict[str, Any]): ProbeConfiguration is an optional configuration of NMstate probes
-              testing various functionalities. If ProbeConfiguration is
-              specified, the handler will use the config defined here instead of
-              its default values.
-
             self_sign_configuration (dict[str, Any]): SelfSignConfiguration defines self signed certificate configuration
 
             tolerations (list[Any]): Tolerations is an optional list of tolerations to be added to handler
@@ -72,7 +65,6 @@ class NMState(Resource):
         self.infra_node_selector = infra_node_selector
         self.infra_tolerations = infra_tolerations
         self.node_selector = node_selector
-        self.probe_configuration = probe_configuration
         self.self_sign_configuration = self_sign_configuration
         self.tolerations = tolerations
 
@@ -97,9 +89,6 @@ class NMState(Resource):
 
             if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector
-
-            if self.probe_configuration is not None:
-                _spec["probeConfiguration"] = self.probe_configuration
 
             if self.self_sign_configuration is not None:
                 _spec["selfSignConfiguration"] = self.self_sign_configuration

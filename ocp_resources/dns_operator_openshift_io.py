@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -16,18 +17,18 @@ class DNS(Resource):
 
     def __init__(
         self,
-        cache: Optional[Dict[str, Any]] = None,
-        log_level: Optional[str] = "",
-        management_state: Optional[str] = "",
-        node_placement: Optional[Dict[str, Any]] = None,
-        operator_log_level: Optional[str] = "",
-        servers: Optional[List[Any]] = None,
-        upstream_resolvers: Optional[Dict[str, Any]] = None,
+        cache: dict[str, Any] | None = None,
+        log_level: str | None = None,
+        management_state: str | None = None,
+        node_placement: dict[str, Any] | None = None,
+        operator_log_level: str | None = None,
+        servers: list[Any] | None = None,
+        upstream_resolvers: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            cache (Dict[str, Any]): cache describes the caching configuration that applies to all server
+            cache (dict[str, Any]): cache describes the caching configuration that applies to all server
               blocks listed in the Corefile. This field allows a cluster admin
               to optionally configure: * positiveTTL which is a duration for
               which positive responses should be cached. * negativeTTL which is
@@ -48,7 +49,7 @@ class DNS(Resource):
             management_state (str): managementState indicates whether the DNS operator should manage
               cluster DNS
 
-            node_placement (Dict[str, Any]): nodePlacement provides explicit control over the scheduling of DNS
+            node_placement (dict[str, Any]): nodePlacement provides explicit control over the scheduling of DNS
               pods.   Generally, it is useful to run a DNS pod on every node so
               that DNS queries are always handled by a local DNS pod instead of
               going over the network to a DNS pod on another node.  However,
@@ -66,7 +67,7 @@ class DNS(Resource):
               setting operatorLogLevel: Trace will produce extremely verbose
               logs.
 
-            servers (List[Any]): servers is a list of DNS resolvers that provide name query delegation
+            servers (list[Any]): servers is a list of DNS resolvers that provide name query delegation
               for one or more subdomains outside the scope of the cluster
               domain. If servers consists of more than one Server, longest
               suffix match will be used to determine the Server.   For example,
@@ -75,7 +76,7 @@ class DNS(Resource):
               routed to the Server with Zone "a.foo.com".   If this field is
               nil, no servers are created.
 
-            upstream_resolvers (Dict[str, Any]): upstreamResolvers defines a schema for configuring CoreDNS to proxy
+            upstream_resolvers (dict[str, Any]): upstreamResolvers defines a schema for configuring CoreDNS to proxy
               DNS messages to upstream resolvers for the case of the default
               (".") server   If this field is not specified, the upstream used
               will default to /etc/resolv.conf, with policy "sequential"
@@ -98,25 +99,25 @@ class DNS(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.cache:
+            if self.cache is not None:
                 _spec["cache"] = self.cache
 
-            if self.log_level:
+            if self.log_level is not None:
                 _spec["logLevel"] = self.log_level
 
-            if self.management_state:
+            if self.management_state is not None:
                 _spec["managementState"] = self.management_state
 
-            if self.node_placement:
+            if self.node_placement is not None:
                 _spec["nodePlacement"] = self.node_placement
 
-            if self.operator_log_level:
+            if self.operator_log_level is not None:
                 _spec["operatorLogLevel"] = self.operator_log_level
 
-            if self.servers:
+            if self.servers is not None:
                 _spec["servers"] = self.servers
 
-            if self.upstream_resolvers:
+            if self.upstream_resolvers is not None:
                 _spec["upstreamResolvers"] = self.upstream_resolvers
 
     # End of generated code

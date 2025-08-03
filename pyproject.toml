@@ -14,13 +14,20 @@ addopts = [
   "--cov=ocp_resources.utils.utils",
   "--cov=ocp_resources.exceptions",
   "--cov=class_generator",
+  "--cov=fake_kubernetes_client",
 ]
 
 [tool.coverage.run]
-omit = ["tests/*", "class_generator/tests/*", "class_generator/scripts/tests/*"]
+omit = [
+  "tests/*",
+  "class_generator/tests/*",
+  "class_generator/scripts/tests/*",
+  "mcp_server/tests/*",
+  "fake_kubernetes_client/tests/*",
+]
 
 [tool.coverage.report]
-fail_under = 45
+fail_under = 65
 skip_empty = true
 
 [tool.coverage.html]
@@ -36,20 +43,37 @@ output-format = "grouped"
 exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.mypy]
+check_untyped_defs = false
+disallow_any_generics = false
+disallow_incomplete_defs = true
+disallow_untyped_defs = false
 no_implicit_optional = true
 show_error_codes = true
 warn_unused_ignores = true
+strict_equality = true
+extra_checks = true
+warn_unused_configs = true
+warn_redundant_casts = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["ocp_resources", "class_generator"]
+packages = [
+  "ocp_resources",
+  "class_generator",
+  "fake_kubernetes_client",
+  "mcp_server",
+]
+include = [
+  "class_generator/schema/__resources-mappings.json",
+  "class_generator/schema/_definitions.json",
+]
 
 [tool.uv]
 dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
 
 [project]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 name = "openshift-python-wrapper"
-version = "11.0.58"
+version = "11.0.83"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
@@ -63,6 +87,7 @@ dependencies = [
   "colorlog>=6.8.2",
   "deepdiff>=8.0.1",
   "jinja2>=3.1.4",
+  "jsonschema>=4.20.0",
   "kubernetes>=31.0.0",
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
@@ -73,6 +98,7 @@ dependencies = [
   "ruff>=0.6.9",
   "timeout-sampler>=0.0.46",
   "xmltodict>=0.13.0",
+  "fastmcp>=2.10.4",
 ]
 
 [[project.authors]]
@@ -98,11 +124,12 @@ Download = "https://pypi.org/project/openshift-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
 
 [project.scripts]
-class-generator = "class_generator.class_generator:main"
+class-generator = "class_generator.cli:main"
+openshift-mcp-server = "mcp_server.server:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1", "testcontainers>=4.10.0"]
+tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]

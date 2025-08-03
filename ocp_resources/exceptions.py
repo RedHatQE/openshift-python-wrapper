@@ -61,3 +61,30 @@ class ResourceTeardownError(Exception):
 
     def __str__(self):
         return f"Failed to execute teardown for resource {self.resource}"
+
+
+class ClientWithBasicAuthError(Exception):
+    pass
+
+
+class ValidationError(Exception):
+    """Raised when resource validation against OpenAPI schema fails."""
+
+    def __init__(self, message: str, path: str = "", schema_error: Any = None) -> None:
+        """
+        Initialize ValidationError.
+
+        Args:
+            message: Human-readable error message
+            path: JSONPath to the invalid field (e.g., "spec.containers[0].image")
+            schema_error: Original jsonschema validation error for debugging
+        """
+        self.message = message
+        self.path = path
+        self.schema_error = schema_error
+        super().__init__(message)
+
+    def __str__(self) -> str:
+        if self.path:
+            return f"Validation error at '{self.path}': {self.message}"
+        return f"Validation error: {self.message}"

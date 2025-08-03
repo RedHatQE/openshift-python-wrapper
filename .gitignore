@@ -1,6 +1,7 @@
 # Temporary files
 _out
 
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -127,3 +128,16 @@ package-lock.json
 
 # Dev
 .local_dev/
+
+# AI
+.cursor/
+CLAUDE.md
+.agent-os/
+.cursorrules
+.claude/
+
+# VS Code settings
+.vscode/
+
+# Backup directories
+.backups/

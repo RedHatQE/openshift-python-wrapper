@@ -1,11 +1,10 @@
-from typing import List
 import pytest
 
 from tests.scripts.validate_resources import parse_resource_file_for_errors, resource_file
 
 
 @pytest.fixture()
-def resources_definitions_errors() -> List[str]:
+def resources_definitions_errors() -> list[str]:
     errors = []
     for _file in resource_file():
         with open(_file) as fd:
