@@ -92,7 +92,7 @@ class DataVolume(NamespacedResource):
         multus_annotation: str | None = None,
         bind_immediate_annotation: bool | None = None,
         preallocation: bool | None = None,
-        api_name: str = "pvc",
+        api_name: str | None = "pvc",
         checkpoints: list[Any] | None = None,
         final_checkpoint: bool | None = None,
         priority_class_name: str | None = None,
@@ -170,41 +170,43 @@ class DataVolume(NamespacedResource):
             if self.priority_class_name is not None:
                 _spec["priorityClassName"] = self.priority_class_name
 
-            if self.access_modes is not None:
-                _spec[self.api_name]["accessModes"] = [self.access_modes]
+            # Set api_name spec fields (pvc/storage)
+            if self.api_name is not None:
+                _spec[self.api_name] = {}
 
-            if self.volume_mode is not None:
-                _spec[self.api_name]["volumeMode"] = self.volume_mode
+                if self.access_modes is not None:
+                    _spec[self.api_name]["accessModes"] = [self.access_modes]
 
-            if self.storage_class is not None:
-                _spec[self.api_name]["storageClassName"] = self.storage_class
+                if self.volume_mode is not None:
+                    _spec[self.api_name]["volumeMode"] = self.volume_mode
 
-            if self.size is not None:
-                _spec[self.api_name]["resources"]["requests"]["storage"] = self.size
+                if self.storage_class is not None:
+                    _spec[self.api_name]["storageClassName"] = self.storage_class
 
-            if self.content_type is not None:
-                _spec["contentType"] = self.content_type
+                if self.size is not None:
+                    _spec[self.api_name]["resources"] = {"requests": {"storage": self.size}}
 
+            # Handle source configuration
             if self.source_dict is not None:
                 _spec["source"] = self.source_dict
+            elif self.source is not None:
+                _spec["source"] = {}
+                source_spec = _spec["source"]
 
-            if self.source == "http" or "registry":
-                _spec["source"][self.source]["url"] = self.url
+                if self.source in ["http", "registry"]:
+                    source_spec[self.source] = {"url": self.url}
+                elif self.source in ["upload", "blank"]:
+                    source_spec[self.source] = {}
+                elif self.source == "pvc":
+                    source_spec[self.source] = {
+                        "name": self.source_pvc,
+                        "namespace": self.source_namespace,
+                    }
 
-            if self.source == "upload" or self.source == "blank":
-                _spec["source"][self.source] = {}
-
-            if self.source == "pvc":
-                _spec["source"][self.source] = {
-                    "name": self.source_pvc,
-                    "namespace": self.source_namespace,
-                }
-
-            if self.secret is not None:
-                _spec["source"][self.source]["secretRef"] = self.secret.name
-
-            if self.cert_configmap is not None:
-                _spec["source"][self.source]["certConfigMap"] = self.cert_configmap
+                if self.secret is not None:
+                    source_spec[self.source]["secretRef"] = self.secret.name
+                if self.cert_configmap is not None:
+                    source_spec[self.source]["certConfigMap"] = self.cert_configmap
 
             if self.source_ref is not None:
                 _spec["sourceRef"] = self.source_ref
