@@ -70,3 +70,17 @@ class ResourceConstants:
         RHV: str = "ovirt"
         OVA: str = "ova"
         OPENSTACK: str = "openstack"
+
+    class Backup:
+        class Status:
+            NEW: str = "New"
+            FAILEDVALIDATION: str = "FailedValidation"
+            INPROGRESS: str = "InProgress"
+            WAITINGFORPLUGINOPERATIONS: str = "WaitingForPluginOperations"
+            WAITINGFORPLUGINOPERATIONSPARTIALLYFAILED: str = "WaitingForPluginOperationsPartiallyFailed"
+            FINALIZING: str = "Finalizing"
+            FINALIZINGPARTIALLYFAILED: str = "FinalizingPartiallyFailed"
+            COMPLETED: str = "Completed"
+            PARTIALLYFAILED: str = "PartiallyFailed"
+            FAILED: str = "Failed"
+            DELETING: str = "Deleting"
