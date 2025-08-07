@@ -1,5 +1,5 @@
 import json
-from typing import List, Any, Dict
+from typing import Any
 
 from ocp_resources.resource import NamespacedResource
 
@@ -10,13 +10,13 @@ class ClusterServiceVersion(NamespacedResource):
     class Status(NamespacedResource.Status):
         INSTALLING = "Installing"
 
-    def get_alm_examples(self) -> List[Dict[str, Any]]:
+    def get_alm_examples(self) -> list[dict[str, Any]]:
         """
         Parse the alm-examples annotation from the CSV instance and return a list of dictionaries.
         Returns an empty list if no annotation is found or if the JSON is invalid.
 
         Returns:
-            Union[List[Dict[str, Any]], List[]]: A list of dictionaries from alm-examples, or an empty list if parsing fails.
+            Union[List[dict[str, Any]], List[]]: A list of dictionaries from alm-examples, or an empty list if parsing fails.
         """
         alm_examples = self.instance.metadata.annotations.get("alm-examples")
 

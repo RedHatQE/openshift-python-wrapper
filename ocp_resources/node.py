@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from ocp_resources.resource import Resource
 
 
@@ -13,18 +14,18 @@ class Node(Resource):
 
     def __init__(
         self,
-        config_source: Optional[Dict[str, Any]] = None,
-        external_id: Optional[str] = "",
-        pod_cidr: Optional[str] = "",
-        pod_cidrs: Optional[List[Any]] = None,
-        provider_id: Optional[str] = "",
-        taints: Optional[List[Any]] = None,
-        unschedulable: Optional[bool] = None,
+        config_source: dict[str, Any] | None = None,
+        external_id: str | None = None,
+        pod_cidr: str | None = None,
+        pod_cidrs: list[Any] | None = None,
+        provider_id: str | None = None,
+        taints: list[Any] | None = None,
+        unschedulable: bool | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
-            config_source (Dict[str, Any]): NodeConfigSource specifies a source of node configuration. Exactly one
+            config_source (dict[str, Any]): NodeConfigSource specifies a source of node configuration. Exactly one
               subfield (excluding metadata) must be non-nil. This API is
               deprecated since 1.22
 
@@ -33,7 +34,7 @@ class Node(Resource):
 
             pod_cidr (str): PodCIDR represents the pod IP range assigned to the node.
 
-            pod_cidrs (List[Any]): podCIDRs represents the IP ranges assigned to the node for usage by
+            pod_cidrs (list[Any]): podCIDRs represents the IP ranges assigned to the node for usage by
               Pods on that node. If this field is specified, the 0th entry must
               match the podCIDR field. It may contain at most 1 value for each
               of IPv4 and IPv6.
@@ -41,7 +42,7 @@ class Node(Resource):
             provider_id (str): ID of the node assigned by the cloud provider in the format:
               <ProviderName>://<ProviderSpecificNodeID>
 
-            taints (List[Any]): If specified, the node's taints.
+            taints (list[Any]): If specified, the node's taints.
 
             unschedulable (bool): Unschedulable controls node schedulability of new pods. By default,
               node is schedulable. More info:
@@ -66,22 +67,22 @@ class Node(Resource):
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-            if self.config_source:
+            if self.config_source is not None:
                 _spec["configSource"] = self.config_source
 
-            if self.external_id:
+            if self.external_id is not None:
                 _spec["externalID"] = self.external_id
 
-            if self.pod_cidr:
+            if self.pod_cidr is not None:
                 _spec["podCIDR"] = self.pod_cidr
 
-            if self.pod_cidrs:
+            if self.pod_cidrs is not None:
                 _spec["podCIDRs"] = self.pod_cidrs
 
-            if self.provider_id:
+            if self.provider_id is not None:
                 _spec["providerID"] = self.provider_id
 
-            if self.taints:
+            if self.taints is not None:
                 _spec["taints"] = self.taints
 
             if self.unschedulable is not None:

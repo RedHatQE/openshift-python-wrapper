@@ -1,7 +1,17 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from typing import Any
+from warnings import warn
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+
+warn(
+    "model_registry.py module will be removed in the next release, "
+    "please import `ModelRegistry` from model_registry_modelregistry_opendatahub_io.py "
+    "or model_registry_components_platform_opendatahub_io.py instead",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class ModelRegistry(NamespacedResource):
@@ -13,13 +23,13 @@ class ModelRegistry(NamespacedResource):
 
     def __init__(
         self,
-        downgrade_db_schema_version: Optional[int] = None,
-        enable_database_upgrade: Optional[bool] = None,
-        grpc: Optional[Dict[str, Any]] = None,
-        istio: Optional[Dict[str, Any]] = None,
-        mysql: Optional[Dict[str, Any]] = None,
-        postgres: Optional[Dict[str, Any]] = None,
-        rest: Optional[Dict[str, Any]] = None,
+        downgrade_db_schema_version: int | None = None,
+        enable_database_upgrade: bool | None = None,
+        grpc: dict[str, Any] | None = None,
+        istio: dict[str, Any] | None = None,
+        mysql: dict[str, Any] | None = None,
+        postgres: dict[str, Any] | None = None,
+        rest: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -31,15 +41,15 @@ class ModelRegistry(NamespacedResource):
             enable_database_upgrade (bool): Flag specifying database upgrade option. If set to true, it enables
               database migration during initialization (Optional parameter)
 
-            grpc (Dict[str, Any]): Configuration for gRPC endpoint
+            grpc (dict[str, Any]): Configuration for gRPC endpoint
 
-            istio (Dict[str, Any]): Istio servicemesh configuration options
+            istio (dict[str, Any]): Istio servicemesh configuration options
 
-            mysql (Dict[str, Any]): MySQL configuration options
+            mysql (dict[str, Any]): MySQL configuration options
 
-            postgres (Dict[str, Any]): PostgreSQL configuration options
+            postgres (dict[str, Any]): PostgreSQL configuration options
 
-            rest (Dict[str, Any]): Configuration for REST endpoint
+            rest (dict[str, Any]): Configuration for REST endpoint
 
         """
         super().__init__(**kwargs)

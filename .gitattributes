@@ -1,0 +1,2 @@
+class_generator/schema/*.json binary
+class_generator/schema/*.json -diff
