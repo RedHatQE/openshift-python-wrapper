@@ -200,7 +200,7 @@ class DataVolume(NamespacedResource):
                 elif self.source == "pvc":
                     source_spec[self.source] = {
                         "name": self.source_pvc,
-                        "namespace": self.source_namespace,
+                        "namespace": self.source_namespace or self.namespace,
                     }
 
                 if self.secret is not None:
