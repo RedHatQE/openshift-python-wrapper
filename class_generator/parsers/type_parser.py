@@ -2,12 +2,11 @@
 
 import json
 import textwrap
-from pathlib import Path
 from typing import Any
 
 from simple_logger.logger import get_logger
 
-from class_generator.constants import MISSING_DESCRIPTION_STR, SCHEMA_DIR, SPEC_STR
+from class_generator.constants import MISSING_DESCRIPTION_STR, SPEC_STR, DEFINITIONS_FILE
 from class_generator.utils import sanitize_python_name
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
@@ -70,7 +69,7 @@ def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
         ref_name = _ref.split("/")[-1]
 
         # Load from _definitions.json instead of individual files
-        definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
+        definitions_file = DEFINITIONS_FILE
         if definitions_file.exists():
             with open(definitions_file) as fd:
                 data = json.load(fd)

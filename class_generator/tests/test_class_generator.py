@@ -98,10 +98,10 @@ def test_parse_explain(tmpdir_factory: pytest.TempPathFactory) -> None:
         "Machine",
         "NMState",
         "OAuth",
-        "Pipeline",
         "Pod",
         "Secret",
         "ServiceMeshMember",
+        "Pipeline",
         "ServingRuntime",
     ]
 
