@@ -72,6 +72,8 @@ def generate_class_generator_tests() -> None:
     try:
         with open(test_file_path, "w", encoding="utf-8") as fd:
             fd.write(rendered)
+            if not rendered.endswith("\n"):
+                fd.write("\n")
     except OSError as e:
         LOGGER.error(f"Failed to write test file to {test_file_path}: {e}")
         return

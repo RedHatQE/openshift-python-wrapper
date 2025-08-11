@@ -86,9 +86,10 @@ def generate_resource_file_from_dict(
             LOGGER.warning(f"Overwriting {_output_file}")
 
         else:
-            temp_output_file = _output_file.replace(".py", "_TEMP.py")
-            LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
-            _output_file = temp_output_file
+            if not dry_run:
+                temp_output_file = _output_file.replace(".py", "_TEMP.py")
+                LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
+                _output_file = temp_output_file
 
     if _user_code.strip() or _user_imports.strip():
         output += f"{_user_imports}{rendered}{_user_code}"
@@ -140,49 +141,37 @@ def class_generator(
                 LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed.")
                 sys.exit(1)
 
-            # Use a loop to handle retries instead of recursion
-            max_retries = 3
-            retry_count = 0
+            run_update_schema = (
+                input(
+                    f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]: "
+                )
+                .strip()
+                .lower()
+            )
 
-            while retry_count < max_retries:
-                # Validate user input with a loop
-                while True:
-                    run_update_schema = (
-                        input(
-                            f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]: "
-                        )
-                        .strip()
-                        .lower()
-                    )
+            if run_update_schema != "y":
+                sys.exit(1)
 
-                    if run_update_schema in ["y", "n"]:
-                        break
-                    else:
-                        print("Invalid input. Please enter 'Y' or 'N'.")
+            # User chose 'y' - update schema and retry
+            LOGGER.info("Updating schema")
+            update_kind_schema()
 
-                if run_update_schema == "n":
-                    sys.exit(1)
-
-                # User chose 'y' - update schema and retry
-                LOGGER.info(f"Updating schema (attempt {retry_count + 1}/{max_retries})...")
-                update_kind_schema()
-
-                # Re-read the mapping file to check if kind is now available
-                kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
-                if kind_and_namespaced_mappings:
-                    # Kind found, break out of retry loop to continue processing
-                    break
-                else:
-                    retry_count += 1
-                    if retry_count < max_retries:
-                        LOGGER.warning(
-                            f"{kind} still not found after schema update. Retry {retry_count}/{max_retries}."
-                        )
-                    else:
-                        LOGGER.error(
-                            f"{kind} not found in {RESOURCES_MAPPING_FILE} after {max_retries} update-schema attempts."
-                        )
-                        sys.exit(1)
+            # Re-read the mapping file to check if kind is now available
+            kind_and_namespaced_mappings = read_resources_mapping_file(skip_cache=True).get(kind)
+            if kind_and_namespaced_mappings:
+                class_generator(
+                    kind=kind,
+                    overwrite=overwrite,
+                    dry_run=dry_run,
+                    output_file=output_file,
+                    output_dir=output_dir,
+                    add_tests=add_tests,
+                    called_from_cli=called_from_cli,
+                    update_schema_executed=True,
+                )
+            else:
+                LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema attempt.")
+                sys.exit(1)
 
         else:
             LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema.")
