@@ -75,11 +75,23 @@ def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
             with open(definitions_file) as fd:
                 data = json.load(fd)
                 definitions = data.get("definitions", {})
-                if ref_name in definitions:
-                    return definitions[ref_name]
 
-        # Fallback to the property itself if ref not found
-        LOGGER.warning(f"Could not resolve $ref: {_ref}")
+                # Try multiple key formats to handle schema key format mismatch
+                possible_keys = [
+                    ref_name,  # io.k8s.api.core.v1.PodSpec
+                    ref_name.split(".")[-1],  # PodSpec
+                    # Extract version/Kind format from the namespaced reference
+                    "/".join(ref_name.split(".")[-2:]) if "." in ref_name else ref_name,  # v1/PodSpec
+                ]
+
+                for key in possible_keys:
+                    if key in definitions:
+                        return definitions[key]
+
+        # If not found in definitions, log warning and use property as-is
+        LOGGER.warning(
+            f"Could not resolve $ref: {_ref} in definitions. Consider running --update-schema to populate missing definitions."
+        )
 
     # Handle allOf containing $ref
     elif all_of := property_.get("allOf"):

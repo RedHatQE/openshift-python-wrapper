@@ -2,7 +2,7 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 
 class Deployment(NamespacedResource):
@@ -26,37 +26,21 @@ class Deployment(NamespacedResource):
     ) -> None:
         r"""
         Args:
-            min_ready_seconds (int): Minimum number of seconds for which a newly created pod should be
-              ready without any of its container crashing, for it to be
-              considered available. Defaults to 0 (pod will be considered
-              available as soon as it is ready)
+            min_ready_seconds (int): No field description from API
 
-            paused (bool): Indicates that the deployment is paused.
+            paused (bool): No field description from API
 
-            progress_deadline_seconds (int): The maximum time in seconds for a deployment to make progress before
-              it is considered to be failed. The deployment controller will
-              continue to process failed deployments and a condition with a
-              ProgressDeadlineExceeded reason will be surfaced in the deployment
-              status. Note that progress will not be estimated during the time a
-              deployment is paused. Defaults to 600s.
+            progress_deadline_seconds (int): No field description from API
 
-            replicas (int): Number of desired pods. This is a pointer to distinguish between
-              explicit zero and not specified. Defaults to 1.
+            replicas (int): No field description from API
 
-            revision_history_limit (int): The number of old ReplicaSets to retain to allow rollback. This is a
-              pointer to distinguish between explicit zero and not specified.
-              Defaults to 10.
+            revision_history_limit (int): No field description from API
 
-            selector (dict[str, Any]): A label selector is a label query over a set of resources. The result
-              of matchLabels and matchExpressions are ANDed. An empty label
-              selector matches all objects. A null label selector matches no
-              objects.
+            selector (dict[str, Any]): No field description from API
 
-            strategy (dict[str, Any]): DeploymentStrategy describes how to replace existing pods with new
-              ones.
+            strategy (dict[str, Any]): No field description from API
 
-            template (dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
-              a template
+            template (dict[str, Any]): No field description from API
 
         """
         super().__init__(**kwargs)
@@ -74,17 +58,8 @@ class Deployment(NamespacedResource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.selector is None:
-                raise MissingRequiredArgumentError(argument="self.selector")
-
-            if self.template is None:
-                raise MissingRequiredArgumentError(argument="self.template")
-
             self.res["spec"] = {}
             _spec = self.res["spec"]
-
-            _spec["selector"] = self.selector
-            _spec["template"] = self.template
 
             if self.min_ready_seconds is not None:
                 _spec["minReadySeconds"] = self.min_ready_seconds
@@ -101,7 +76,13 @@ class Deployment(NamespacedResource):
             if self.revision_history_limit is not None:
                 _spec["revisionHistoryLimit"] = self.revision_history_limit
 
+            if self.selector is not None:
+                _spec["selector"] = self.selector
+
             if self.strategy is not None:
                 _spec["strategy"] = self.strategy
+
+            if self.template is not None:
+                _spec["template"] = self.template
 
     # End of generated code

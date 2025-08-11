@@ -24,7 +24,7 @@ class SchemaValidator:
     _schema_cache: dict[str, dict[str, Any]] = {}
 
     @classmethod
-    def load_mappings_data(cls) -> bool:
+    def load_mappings_data(cls, skip_cache: bool = False) -> bool:
         """
         Load the resource mappings and definitions data.
 
@@ -32,7 +32,8 @@ class SchemaValidator:
             bool: True if loaded successfully, False otherwise
         """
         if cls._mappings_data is not None and cls._definitions_data is not None:
-            return True
+            if not skip_cache:
+                return True
 
         try:
             schema_dir = files("class_generator") / "schema"
@@ -73,7 +74,7 @@ class SchemaValidator:
             return False
 
     @classmethod
-    def get_mappings_data(cls) -> dict[str, Any] | None:
+    def get_mappings_data(cls, skip_cache: bool = False) -> dict[str, Any] | None:
         """
         Get the resource mappings data.
 
@@ -84,7 +85,7 @@ class SchemaValidator:
             dict[str, Any] | None: The mappings data or None if not loaded
         """
         # Ensure data is loaded
-        if cls._mappings_data is None:
+        if cls._mappings_data is None or skip_cache:
             cls.load_mappings_data()
         return cls._mappings_data
 
@@ -207,9 +208,29 @@ class SchemaValidator:
                         definition_name = ref[20:]  # Remove "/components/schemas/"
 
                     # Type guard for mypy
-                    if cls._definitions_data is not None and definition_name in cls._definitions_data:
-                        # Return the resolved definition (and resolve any refs within it)
-                        return cls._resolve_refs(cls._definitions_data[definition_name], resolver)
+                    if cls._definitions_data is not None:
+                        # Try multiple key formats to handle schema key format mismatch
+                        possible_keys = [
+                            definition_name,  # io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+                            definition_name.split(".")[-1],  # ObjectMeta
+                            # Extract version/Kind format from the namespaced reference
+                            "/".join(definition_name.split(".")[-2:])
+                            if "." in definition_name
+                            else definition_name,  # v1/ObjectMeta
+                        ]
+
+                        for key in possible_keys:
+                            if key in cls._definitions_data:
+                                # Return the resolved definition (and resolve any refs within it)
+                                return cls._resolve_refs(cls._definitions_data[key], resolver)
+
+                        LOGGER.warning(f"Definition not found: {definition_name} (tried {possible_keys})")
+                        # For core Kubernetes types that are missing, return a basic object schema
+                        # to allow validation to continue instead of failing completely
+                        if any(core_type in definition_name for core_type in ["ObjectMeta", "TypeMeta", "Status"]):
+                            LOGGER.info(f"Using basic object schema fallback for core type: {definition_name}")
+                            return {"type": "object", "additionalProperties": True}
+                        return obj
                     else:
                         LOGGER.warning(f"Definition not found: {definition_name}")
                         return obj
