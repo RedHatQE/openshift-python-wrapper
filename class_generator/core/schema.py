@@ -4,7 +4,6 @@ import json
 import re
 import shlex
 import subprocess
-import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
@@ -13,7 +12,8 @@ from packaging.version import Version
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
-from class_generator.constants import RESOURCES_MAPPING_FILE, SCHEMA_DIR
+from class_generator.constants import RESOURCES_MAPPING_FILE, SCHEMA_DIR, DEFINITIONS_FILE
+from ocp_resources.utils.archive_utils import save_json_archive
 from ocp_resources.utils.schema_validator import SchemaValidator
 
 LOGGER = get_logger(name=__name__)
@@ -87,8 +87,9 @@ def get_server_version(client: str) -> str:
     """Get the server version from the cluster."""
     rc, out, _ = run_command(command=shlex.split(f"{client} version -o json"), check=False)
     if not rc:
-        LOGGER.error("Failed to get server version")
-        sys.exit(1)
+        error_msg = "Failed to get server version"
+        LOGGER.error(error_msg)
+        raise RuntimeError(error_msg)
 
     jout = json.loads(out)
     server_version = jout["serverVersion"]["gitVersion"]
@@ -202,7 +203,10 @@ def fetch_all_api_schemas(client: str, paths: dict[str, Any]) -> dict[str, dict[
 
 
 def process_schema_definitions(
-    schemas: dict[str, dict[str, Any]], namespacing_dict: dict[str, bool], existing_resources_mapping: dict[str, Any]
+    schemas: dict[str, dict[str, Any]],
+    namespacing_dict: dict[str, bool],
+    existing_resources_mapping: dict[str, Any],
+    allow_updates: bool = True,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """
     Process schema definitions to extract resource information.
@@ -211,14 +215,21 @@ def process_schema_definitions(
         schemas: Dictionary of API schemas
         namespacing_dict: Dictionary of resource namespacing info
         existing_resources_mapping: Existing resources mapping
+        allow_updates: Whether to update existing resources or only add new ones
 
     Returns:
         tuple: (resources_mapping, definitions)
     """
+    # Start with ALL existing resources (NEVER DELETE)
     resources_mapping = existing_resources_mapping.copy()
+    existing_count = len(resources_mapping)
+    LOGGER.info(f"Starting with {existing_count} existing resource types - preserving all")
+
     definitions = {}
     processed_schemas = set()
     total_schemas = 0
+    new_resources = 0
+    updated_resources = 0
 
     for api_path, schema in schemas.items():
         # Process schema definitions
@@ -269,16 +280,57 @@ def process_schema_definitions(
             # Store in resources_mapping as an array (multiple schemas per kind)
             kind_lower = kind.lower()
             if kind_lower not in resources_mapping:
-                resources_mapping[kind_lower] = []
+                # NEW resource - always add
+                resources_mapping[kind_lower] = [schema_data]
+                new_resources += 1
+                LOGGER.debug(f"Added new resource: {kind_lower}")
+            elif allow_updates:
+                # UPDATE existing resource - replace schema with same group/version or add new one
+                existing_schemas = resources_mapping[kind_lower]
+                updated = False
 
-            # Add this schema to the kind's array
-            resources_mapping[kind_lower].append(schema_data)
+                for i, existing_schema in enumerate(existing_schemas):
+                    existing_gvk = existing_schema.get("x-kubernetes-group-version-kind", [{}])[0]
+                    new_gvk = group_kind_version
+
+                    # Check if this is the same group/version combination
+                    if existing_gvk.get("group") == new_gvk.get("group") and existing_gvk.get("version") == new_gvk.get(
+                        "version"
+                    ):
+                        # UPDATE: Replace existing schema with newer version
+                        existing_schemas[i] = schema_data
+                        updated = True
+                        updated_resources += 1
+                        LOGGER.debug(
+                            f"Updated existing resource schema: {kind_lower} ({new_gvk.get('group', 'core')}/{new_gvk.get('version')})"
+                        )
+                        break
+
+                if not updated:
+                    # ADD: New group/version for existing resource kind
+                    existing_schemas.append(schema_data)
+                    updated_resources += 1
+                    LOGGER.debug(
+                        f"Added new schema version for existing resource: {kind_lower} ({group_kind_version.get('group', 'core')}/{group_kind_version.get('version')})"
+                    )
+            else:
+                # Don't update existing resources when cluster version is older
+                LOGGER.debug(f"Skipping update for existing resource: {kind_lower}")
+                continue
 
             # Also store in definitions for separate definitions file
             definitions[schema_name] = schema_data
             total_schemas += 1
 
-    LOGGER.info(f"Processed {total_schemas} unique schemas")
+    final_count = len(resources_mapping)
+    LOGGER.info("Schema processing complete:")
+    LOGGER.info(f"  - Started with: {existing_count} resource types")
+    LOGGER.info(f"  - Added new: {new_resources} resource types")
+    LOGGER.info(f"  - Updated: {updated_resources} resource schemas")
+    LOGGER.info(f"  - Final total: {final_count} resource types")
+    LOGGER.info(f"  - Processed: {total_schemas} unique schemas")
+    LOGGER.info("  - NEVER DELETED any existing resources")
+
     return resources_mapping, definitions
 
 
@@ -564,7 +616,7 @@ def write_schema_files(
             LOGGER.info(f"Added {len(missing_definitions)} missing core definitions to schema")
 
     # Write updated definitions
-    definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
+    definitions_file = DEFINITIONS_FILE
     try:
         # Wrap definitions in a "definitions" object for jsonschema compatibility
         definitions_data = {"definitions": definitions}
@@ -576,13 +628,11 @@ def write_schema_files(
         LOGGER.error(error_msg)
         raise IOError(error_msg) from e
 
-    # Write updated resources mapping
+    # Write and archive resources mapping
     try:
-        with open(RESOURCES_MAPPING_FILE, "w") as fd:
-            json.dump(resources_mapping, fd, indent=2, sort_keys=True)
-        LOGGER.info(f"Written resources mapping to {RESOURCES_MAPPING_FILE}")
+        save_json_archive(resources_mapping, RESOURCES_MAPPING_FILE)
     except (OSError, IOError, TypeError) as e:
-        error_msg = f"Failed to write resources mapping file {RESOURCES_MAPPING_FILE}: {e}"
+        error_msg = f"Failed to save and archive resources mapping file {RESOURCES_MAPPING_FILE}: {e}"
         LOGGER.error(error_msg)
         raise IOError(error_msg) from e
 
@@ -598,8 +648,9 @@ def update_kind_schema() -> None:
     LOGGER.info("Fetching OpenAPI v3 index...")
     success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
     if not success:
-        LOGGER.error("Failed to fetch OpenAPI v3 index")
-        sys.exit(1)
+        error_msg = "Failed to fetch OpenAPI v3 index"
+        LOGGER.error(error_msg)
+        raise RuntimeError(error_msg)
 
     v3_index = json.loads(v3_data)
     paths = v3_index.get("paths", {})
@@ -607,10 +658,10 @@ def update_kind_schema() -> None:
 
     # Check and update cluster version
     try:
-        check_and_update_cluster_version(client=client)
+        should_update = check_and_update_cluster_version(client=client)
     except ClusterVersionError as e:
         LOGGER.error(f"Cannot proceed without cluster version information: {e}")
-        sys.exit(1)
+        raise
 
     # Load existing resources mapping
     resources_mapping = read_resources_mapping_file()
@@ -619,8 +670,14 @@ def update_kind_schema() -> None:
     schemas = fetch_all_api_schemas(client=client, paths=paths)
 
     # Process schema definitions
+    LOGGER.info(
+        f"Cluster version is {'same or newer' if should_update else 'older'}. {'Allowing updates to existing resources' if should_update else 'Only adding new resources, keeping existing ones unchanged'}."
+    )
     resources_mapping, definitions = process_schema_definitions(
-        schemas=schemas, namespacing_dict=namespacing_dict, existing_resources_mapping=resources_mapping
+        schemas=schemas,
+        namespacing_dict=namespacing_dict,
+        existing_resources_mapping=resources_mapping,
+        allow_updates=should_update,
     )
 
     # Write schema files
@@ -628,7 +685,7 @@ def update_kind_schema() -> None:
         write_schema_files(resources_mapping=resources_mapping, definitions=definitions, client=client, schemas=schemas)
     except IOError as e:
         LOGGER.error(f"Failed to write schema files: {e}")
-        sys.exit(1)
+        raise
 
     # Clear cached mapping data in SchemaValidator to force reload
     SchemaValidator.clear_cache()

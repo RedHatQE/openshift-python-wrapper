@@ -3,7 +3,6 @@
 import filecmp
 import os
 import shlex
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -138,8 +137,9 @@ def class_generator(
     if not kind_and_namespaced_mappings:
         if called_from_cli:
             if update_schema_executed:
-                LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed.")
-                sys.exit(1)
+                error_msg = f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed."
+                LOGGER.error(error_msg)
+                raise RuntimeError(error_msg)
 
             run_update_schema = (
                 input(
@@ -150,11 +150,16 @@ def class_generator(
             )
 
             if run_update_schema != "y":
-                sys.exit(1)
+                raise RuntimeError(f"User declined to update schema for {kind}")
 
             # User chose 'y' - update schema and retry
             LOGGER.info("Updating schema")
-            update_kind_schema()
+            try:
+                update_kind_schema()
+            except (RuntimeError, IOError) as e:
+                error_msg = f"Failed to update schema: {e}"
+                LOGGER.error(error_msg)
+                raise RuntimeError(error_msg) from e
 
             # Re-read the mapping file to check if kind is now available
             kind_and_namespaced_mappings = read_resources_mapping_file(skip_cache=True).get(kind)
@@ -170,8 +175,9 @@ def class_generator(
                     update_schema_executed=True,
                 )
             else:
-                LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema attempt.")
-                sys.exit(1)
+                error_msg = f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema attempt."
+                LOGGER.error(error_msg)
+                raise RuntimeError(error_msg)
 
         else:
             LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema.")

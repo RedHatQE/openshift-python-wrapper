@@ -16,7 +16,7 @@ from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
-from class_generator.core.schema import update_kind_schema
+from class_generator.core.schema import update_kind_schema, ClusterVersionError
 from class_generator.tests.test_generation import generate_class_generator_tests
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
@@ -53,7 +53,11 @@ def handle_schema_update(update_schema: bool, generate_missing: bool) -> bool:
     """
     if update_schema:
         LOGGER.info("Updating resource schema...")
-        update_kind_schema()
+        try:
+            update_kind_schema()
+        except (RuntimeError, IOError, ClusterVersionError) as e:
+            LOGGER.error(f"Failed to update schema: {e}")
+            sys.exit(1)
 
         # If only updating schema (not generating), exit
         if not generate_missing:
@@ -317,13 +321,17 @@ def handle_normal_kind_generation(
             # Create backup if file exists
             create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
 
-        class_generator(
-            kind=kind,
-            overwrite=overwrite,
-            dry_run=dry_run,
-            output_file=output_file,
-            add_tests=add_tests,
-        )
+        try:
+            class_generator(
+                kind=kind,
+                overwrite=overwrite,
+                dry_run=dry_run,
+                output_file=output_file,
+                add_tests=add_tests,
+            )
+        except Exception as e:
+            LOGGER.error(f"Failed to generate {kind}: {e}")
+            sys.exit(1)
 
         if backup_dir and not dry_run:
             LOGGER.info(f"Backup files stored in: {backup_dir}")
@@ -339,13 +347,17 @@ def handle_normal_kind_generation(
                 # Create backup if file exists
                 create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
 
-            return class_generator(
-                kind=kind_to_generate,
-                overwrite=overwrite,
-                dry_run=dry_run,
-                output_file=output_file,
-                add_tests=add_tests,
-            )
+            try:
+                return class_generator(
+                    kind=kind_to_generate,
+                    overwrite=overwrite,
+                    dry_run=dry_run,
+                    output_file=output_file,
+                    add_tests=add_tests,
+                )
+            except Exception as e:
+                LOGGER.error(f"Failed to generate {kind_to_generate}: {e}")
+                return []
 
         futures: list[Future] = []
         with ThreadPoolExecutor(max_workers=10) as executor:

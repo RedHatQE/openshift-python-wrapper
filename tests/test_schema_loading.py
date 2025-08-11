@@ -1,7 +1,8 @@
 """Tests for schema loading functionality."""
 
+from unittest.mock import mock_open, patch
+
 import pytest
-from unittest.mock import MagicMock, patch
 
 from ocp_resources.utils.schema_validator import SchemaValidator
 from tests.fixtures.validation_schemas import POD_SCHEMA
@@ -67,41 +68,27 @@ class TestSchemaLoading:
 
     def test_load_mappings_data_success(self):
         """Test successful loading of mappings data."""
-        mock_mappings_content = '{"pod": [{"type": "object"}]}'
-        mock_definitions_content = '{"definitions": {"SomeDefinition": {"type": "string"}}}'
+        mock_mappings_data = {"pod": [{"type": "object"}]}
 
-        # Mock the file system operations
+        # Mock the archive loading function and file operations
+        with patch("ocp_resources.utils.schema_validator.load_json_archive") as mock_load_archive:
+            mock_load_archive.return_value = mock_mappings_data
 
-        # Patch importlib.resources to prevent actual file loading
-        with patch("ocp_resources.utils.schema_validator.files") as mock_files:
-            # Mock the files() function
-            mock_schema_dir = mock_files.return_value.__truediv__.return_value
-            mock_mappings_path = mock_schema_dir.__truediv__.return_value
-            mock_mappings_path.read_text.return_value = mock_mappings_content
+            with patch("builtins.open", mock_open(read_data='{"definitions": {"SomeDefinition": {"type": "string"}}}')):
+                # Mock Path.exists() method
+                with patch("pathlib.Path.exists") as mock_exists:
+                    mock_exists.return_value = True
 
-            # Set up the second call for definitions
-            def side_effect_for_truediv(path):
-                mock_path = MagicMock()
-                if "__resources-mappings.json" in str(path):
-                    mock_path.read_text.return_value = mock_mappings_content
-                elif "_definitions.json" in str(path):
-                    mock_path.read_text.return_value = mock_definitions_content
-                return mock_path
+                    result = SchemaValidator.load_mappings_data()
 
-            mock_schema_dir.__truediv__.side_effect = side_effect_for_truediv
+                    assert result is True
+                    mappings_data = SchemaValidator.get_mappings_data()
+                    assert mappings_data is not None
+                    assert "pod" in mappings_data
 
-            result = SchemaValidator.load_mappings_data()
-
-            assert result is True
-            mappings_data = SchemaValidator.get_mappings_data()
-            assert mappings_data is not None
-            assert "pod" in mappings_data
-
-            definitions_data = SchemaValidator.get_definitions_data()
-            assert definitions_data is not None
-            assert "SomeDefinition" in definitions_data
-
-        # No cleanup needed - test is using real loading mechanism
+                    definitions_data = SchemaValidator.get_definitions_data()
+                    assert definitions_data is not None
+                    assert "SomeDefinition" in definitions_data
 
     def test_load_mappings_data_already_loaded(self, monkeypatch):
         """Test that mappings data is not reloaded if already present."""

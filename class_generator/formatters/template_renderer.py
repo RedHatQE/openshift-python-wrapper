@@ -1,6 +1,5 @@
 """Jinja template rendering for resource generation."""
 
-import sys
 from typing import Any
 from pathlib import Path
 
@@ -53,9 +52,9 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
     undefined_variables = undeclared_variables - provided_variables
 
     if undefined_variables:
-        LOGGER.error(f"The following variables are undefined in template '{template_name}': {undefined_variables}")
-        LOGGER.error(f"Available variables: {provided_variables}")
-        sys.exit(1)
+        error_msg = f"The following variables are undefined in template '{template_name}': {undefined_variables}. Available variables: {provided_variables}"
+        LOGGER.error(error_msg)
+        raise ValueError(error_msg)
 
     # Now render the template
     rendered = template.render(template_dict)
