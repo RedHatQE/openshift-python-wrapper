@@ -1,7 +1,5 @@
 """File writing utilities for generated code."""
 
-import shlex
-
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
@@ -15,7 +13,6 @@ def write_and_format_rendered(filepath: str, output: str) -> None:
     Args:
         filepath: Path to write the file to
         output: Content to write
-        skip_formatting: If True, skip pre-commit formatting (for tests)
     """
     with open(filepath, "w", encoding="utf-8") as fd:
         fd.write(output)
@@ -23,7 +20,7 @@ def write_and_format_rendered(filepath: str, output: str) -> None:
     # Run pre-commit on the file
     try:
         rc, stdout, stderr = run_command(
-            command=shlex.split(f"uvx pre-commit run --files {filepath}"),
+            command=["uvx", "pre-commit", "run", "--files", filepath],
             verify_stderr=False,
             check=False,
             log_errors=False,
