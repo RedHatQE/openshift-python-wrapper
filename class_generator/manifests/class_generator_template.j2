@@ -1,9 +1,15 @@
 {% set all_types_for_class_args = [] %}
 {% set all_names_types_for_docstring = [] %}
 {% set all_required_args = [] %}
+{% set has_keyword_renamed = False %}
 {% for arg in fields + spec %}
   {% set _ = all_types_for_class_args.append(arg["type-for-class-arg"]|safe) %}
-  {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + " (" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe ) %}
+  {% if arg.get("is-keyword-renamed", False) %}
+    {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + " (" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe + "\n                Note: Parameter renamed from '" + arg["original-python-name"] + "' to avoid Python keyword conflict." ) %}
+    {% set has_keyword_renamed = True %}
+  {% else %}
+    {% set _ = all_names_types_for_docstring.append(arg["name-for-class-arg"] + " (" + arg["type-for-docstring"] + "): " +  arg["description"]|indent(10)|safe ) %}
+  {% endif %}
   {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 
@@ -30,7 +36,7 @@ class {{ kind }}({{ base_class }}):
         **kwargs: Any,
     ) -> None:
         {% if all_types_for_class_args %}
-        """
+        r"""
         Args:
             {% for value in all_names_types_for_docstring %}
             {{ value }}

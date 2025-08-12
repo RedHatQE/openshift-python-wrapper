@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -27,7 +26,7 @@ class DNS(Resource):
         upstream_resolvers: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             cache (dict[str, Any]): cache describes the caching configuration that applies to all server
               blocks listed in the Corefile. This field allows a cluster admin

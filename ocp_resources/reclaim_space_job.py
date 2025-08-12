@@ -1,6 +1,6 @@
-from __future__ import annotations
-from typing import Any, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from typing import Any
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class ReclaimSpaceJob(NamespacedResource):
@@ -12,9 +12,9 @@ class ReclaimSpaceJob(NamespacedResource):
 
     def __init__(
         self,
-        backoff_limit: Optional[int] = None,
-        target: Optional[dict[str, Any]] = None,
-        retry_deadline_seconds: Optional[int] = None,
+        backoff_limit: int | None = None,
+        target: dict[str, Any] | None = None,
+        retry_deadline_seconds: int | None = None,
         timeout_seconds_reclaim_job: int | None = None,
         **kwargs: Any,
     ) -> None:

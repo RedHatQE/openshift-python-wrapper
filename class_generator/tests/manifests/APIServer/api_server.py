@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -27,7 +26,7 @@ class APIServer(Resource):
         tls_security_profile: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             additional_cors_allowed_origins (list[Any]): additionalCORSAllowedOrigins lists additional, user-defined regular
               expressions describing hosts for which the API server allows

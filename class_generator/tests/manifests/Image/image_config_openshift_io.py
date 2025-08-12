@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -28,7 +27,7 @@ class Image(Resource):
         registry_sources: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             additional_trusted_ca (dict[str, Any]): additionalTrustedCA is a reference to a ConfigMap containing
               additional CAs that should be trusted during imagestream import,

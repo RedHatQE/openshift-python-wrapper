@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -8,7 +7,8 @@ from ocp_resources.resource import NamespacedResource
 
 class Machine(NamespacedResource):
     """
-    Machine is the Schema for the machines API Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
+        Machine is the Schema for the machines API
+    Compatibility level 2: Stable within a major release for a minimum of 9 months or 3 minor releases (whichever is longer).
     """
 
     api_group: str = NamespacedResource.ApiGroup.MACHINE_OPENSHIFT_IO
@@ -22,7 +22,7 @@ class Machine(NamespacedResource):
         taints: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             lifecycle_hooks (dict[str, Any]): LifecycleHooks allow users to pause operations on the machine at
               certain predefined points within the machine lifecycle.

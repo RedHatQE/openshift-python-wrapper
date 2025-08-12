@@ -3,17 +3,18 @@
   "extends": [
     ":dependencyDashboard",
     ":maintainLockFilesWeekly",
-    ":prHourlyLimitNone"
+    ":prHourlyLimitNone",
+    ":semanticCommitTypeAll(ci: )"
   ],
   "prConcurrentLimit": 0,
   "lockFileMaintenance": {
     "enabled": true
   },
-  "baseBranches": ["main", "v4.17", "v4.16", "v4.15"],
+  "baseBranches": ["main", "v4.18", "v4.17", "v4.16"],
   "ignoreDeps": ["kubernetes"],
   "packageRules": [
     {
-      "baseBranchList": ["v4.17", "v4.16", "v4.15"],
+      "baseBranchList": ["v4.18", "v4.17", "v4.16"],
       "enabled": false
     },
     {

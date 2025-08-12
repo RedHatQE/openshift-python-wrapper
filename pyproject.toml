@@ -1,20 +1,33 @@
 [tool.pytest.ini_options]
 markers = [
   "incremental: Mark tests as incremental",
-  "kubevirt: Mark tests as kubevirt tests"
+  "kubevirt: Mark tests as kubevirt tests",
 ]
 addopts = [
   "--pdbcls=IPython.terminal.debugger:TerminalPdb",
   "--cov-config=pyproject.toml",
   "--cov-report=html",
   "--cov-report=term",
-  "--cov=ocp_resources"
+  "--cov=ocp_resources.resource",
+  "--cov=ocp_resources.utils.resource_constants",
+  "--cov=ocp_resources.utils.constants",
+  "--cov=ocp_resources.utils.utils",
+  "--cov=ocp_resources.exceptions",
+  "--cov=class_generator",
+  "--cov=fake_kubernetes_client",
 ]
 
 [tool.coverage.run]
-omit = [ "tests/*" ]
+omit = [
+  "tests/*",
+  "class_generator/tests/*",
+  "class_generator/scripts/tests/*",
+  "mcp_server/tests/*",
+  "fake_kubernetes_client/tests/*",
+]
 
 [tool.coverage.report]
+fail_under = 65
 skip_empty = true
 
 [tool.coverage.html]
@@ -26,78 +39,97 @@ line-length = 120
 fix = true
 output-format = "grouped"
 
-  [tool.ruff.format]
-  exclude = [ ".git", ".venv", ".mypy_cache", ".tox", "__pycache__" ]
+[tool.ruff.format]
+exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.mypy]
+check_untyped_defs = false
+disallow_any_generics = false
+disallow_incomplete_defs = true
+disallow_untyped_defs = false
 no_implicit_optional = true
 show_error_codes = true
 warn_unused_ignores = true
+strict_equality = true
+extra_checks = true
+warn_unused_configs = true
+warn_redundant_casts = true
 
 [tool.hatch.build.targets.wheel]
-packages = [ "ocp_resources", "class_generator" ]
+packages = [
+  "ocp_resources",
+  "class_generator",
+  "fake_kubernetes_client",
+  "mcp_server",
+]
+include = [
+  "class_generator/schema/__resources-mappings.json",
+  "class_generator/schema/_definitions.json",
+]
 
 [tool.uv]
-dev-dependencies = [ "ipdb>=0.13.13", "ipython>=8.12.3" ]
+dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
 
 [project]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 name = "openshift-python-wrapper"
-version = "11.0.18"
+version = "11.0.85"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
-keywords = [ "Openshift", "Kubevirt", "Openshift Virtualization" ]
+keywords = ["Openshift", "Kubevirt", "Openshift Virtualization"]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Operating System :: OS Independent"
+  "Operating System :: OS Independent",
 ]
 dependencies = [
-  "click>=8.1.7",
   "cloup>=3.0.5",
   "colorlog>=6.8.2",
   "deepdiff>=8.0.1",
   "jinja2>=3.1.4",
+  "jsonschema>=4.20.0",
   "kubernetes>=31.0.0",
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
-  "pytest-cov>=6.0.0",
-  "pytest>=8.3.3",
   "python-benedict>=0.33.2",
   "python-simple-logger>=1.0.40",
-  "requests>=2.32.3",
+  "requests>=2.32.2",
   "rich>=13.9.2",
   "ruff>=0.6.9",
-  "testcontainers>=4.9.0",
   "timeout-sampler>=0.0.46",
-  "xmltodict>=0.13.0"
+  "xmltodict>=0.13.0",
+  "fastmcp>=2.10.4",
 ]
 
-  [[project.authors]]
-  name = "Meni Yakove"
-  email = "myakove@gmail.com"
+[[project.authors]]
+name = "Meni Yakove"
+email = "myakove@gmail.com"
 
-  [[project.authors]]
-  name = "Ruth Netser"
-  email = "rnetser@gmail.com"
+[[project.authors]]
+name = "Ruth Netser"
+email = "rnetser@gmail.com"
 
-  [[project.maintainers]]
-  name = "Meni Yakove"
-  email = "myakove@gmail.com"
+[[project.maintainers]]
+name = "Meni Yakove"
+email = "myakove@gmail.com"
 
-  [[project.maintainers]]
-  name = "Ruth Netser"
-  email = "rnetser@gmail.com"
+[[project.maintainers]]
+name = "Ruth Netser"
+email = "rnetser@gmail.com"
 
-  [project.urls]
-  homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
-  documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
-  Download = "https://pypi.org/project/openshift-python-wrapper/"
-  "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
+[project.urls]
+homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
+documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
+Download = "https://pypi.org/project/openshift-python-wrapper/"
+"Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
 
-  [project.scripts]
-  class-generator = "class_generator.class_generator:main"
+[project.scripts]
+class-generator = "class_generator.cli:main"
+openshift-mcp-server = "mcp_server.server:main"
 
 [build-system]
-requires = [ "hatchling" ]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]

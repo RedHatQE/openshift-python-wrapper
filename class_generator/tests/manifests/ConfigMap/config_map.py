@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -20,7 +19,7 @@ class ConfigMap(NamespacedResource):
         immutable: bool | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             binary_data (dict[str, Any]): BinaryData contains the binary data. Each key must consist of
               alphanumeric characters, '-', '_' or '.'. BinaryData can contain

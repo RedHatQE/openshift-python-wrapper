@@ -1,6 +1,5 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from __future__ import annotations
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -21,7 +20,7 @@ class Secret(NamespacedResource):
         type: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             data (dict[str, Any]): Data contains the secret data. Each key must consist of alphanumeric
               characters, '-', '_' or '.'. The serialized form of the secret

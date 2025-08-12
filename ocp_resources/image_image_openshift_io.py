@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
-from typing import Any, Dict, List, Optional
+
+from typing import Any
 from ocp_resources.resource import Resource
 
 
@@ -15,25 +16,25 @@ class Image(Resource):
 
     def __init__(
         self,
-        docker_image_config: Optional[str] = "",
-        docker_image_layers: Optional[List[Any]] = None,
-        docker_image_manifest: Optional[str] = "",
-        docker_image_manifest_media_type: Optional[str] = "",
-        docker_image_manifests: Optional[List[Any]] = None,
-        docker_image_metadata: Optional[Dict[str, Any]] = None,
-        docker_image_metadata_version: Optional[str] = "",
-        docker_image_reference: Optional[str] = "",
-        docker_image_signatures: Optional[List[Any]] = None,
-        signatures: Optional[List[Any]] = None,
+        docker_image_config: str | None = None,
+        docker_image_layers: list[Any] | None = None,
+        docker_image_manifest: str | None = None,
+        docker_image_manifest_media_type: str | None = None,
+        docker_image_manifests: list[Any] | None = None,
+        docker_image_metadata: dict[str, Any] | None = None,
+        docker_image_metadata_version: str | None = None,
+        docker_image_reference: str | None = None,
+        docker_image_signatures: list[Any] | None = None,
+        signatures: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             docker_image_config (str): DockerImageConfig is a JSON blob that the runtime uses to set up the
               container. This is a part of manifest schema v2. Will not be set
               when the image represents a manifest list.
 
-            docker_image_layers (List[Any]): DockerImageLayers represents the layers in the image. May not be set
+            docker_image_layers (list[Any]): DockerImageLayers represents the layers in the image. May not be set
               if the image does not define that data or if the image represents
               a manifest list.
 
@@ -42,11 +43,11 @@ class Image(Resource):
             docker_image_manifest_media_type (str): DockerImageManifestMediaType specifies the mediaType of manifest. This
               is a part of manifest schema v2.
 
-            docker_image_manifests (List[Any]): DockerImageManifests holds information about sub-manifests when the
+            docker_image_manifests (list[Any]): DockerImageManifests holds information about sub-manifests when the
               image represents a manifest list. When this field is present, no
               DockerImageLayers should be specified.
 
-            docker_image_metadata (Dict[str, Any]): RawExtension is used to hold extensions in external versions.  To use
+            docker_image_metadata (dict[str, Any]): RawExtension is used to hold extensions in external versions.  To use
               this, make a field which has RawExtension as its type in your
               external, versioned struct, and Object in your internal struct.
               You also need to register your various plugin types.  // Internal
@@ -78,10 +79,10 @@ class Image(Resource):
             docker_image_reference (str): DockerImageReference is the string that can be used to pull this
               image.
 
-            docker_image_signatures (List[Any]): DockerImageSignatures provides the signatures as opaque blobs. This is
+            docker_image_signatures (list[Any]): DockerImageSignatures provides the signatures as opaque blobs. This is
               a part of manifest schema v1.
 
-            signatures (List[Any]): Signatures holds all signatures of the image.
+            signatures (list[Any]): Signatures holds all signatures of the image.
 
         """
         super().__init__(**kwargs)
@@ -101,34 +102,34 @@ class Image(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
-            if self.docker_image_config:
+            if self.docker_image_config is not None:
                 self.res["dockerImageConfig"] = self.docker_image_config
 
-            if self.docker_image_layers:
+            if self.docker_image_layers is not None:
                 self.res["dockerImageLayers"] = self.docker_image_layers
 
-            if self.docker_image_manifest:
+            if self.docker_image_manifest is not None:
                 self.res["dockerImageManifest"] = self.docker_image_manifest
 
-            if self.docker_image_manifest_media_type:
+            if self.docker_image_manifest_media_type is not None:
                 self.res["dockerImageManifestMediaType"] = self.docker_image_manifest_media_type
 
-            if self.docker_image_manifests:
+            if self.docker_image_manifests is not None:
                 self.res["dockerImageManifests"] = self.docker_image_manifests
 
-            if self.docker_image_metadata:
+            if self.docker_image_metadata is not None:
                 self.res["dockerImageMetadata"] = self.docker_image_metadata
 
-            if self.docker_image_metadata_version:
+            if self.docker_image_metadata_version is not None:
                 self.res["dockerImageMetadataVersion"] = self.docker_image_metadata_version
 
-            if self.docker_image_reference:
+            if self.docker_image_reference is not None:
                 self.res["dockerImageReference"] = self.docker_image_reference
 
-            if self.docker_image_signatures:
+            if self.docker_image_signatures is not None:
                 self.res["dockerImageSignatures"] = self.docker_image_signatures
 
-            if self.signatures:
+            if self.signatures is not None:
                 self.res["signatures"] = self.signatures
 
     # End of generated code

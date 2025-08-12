@@ -1,76 +1,107 @@
-from typing import Any, Dict, List, Optional
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
+
+from typing import Any
+from ocp_resources.resource import NamespacedResource
 
 
 class Task(NamespacedResource):
     """
-    A collection of Steps for continuous integration flow, executed as a Pod on a Kubernetes cluster.
-    API Reference: https://tekton.dev/docs/pipelines/tasks/#configuring-a-task
+        Task represents a collection of sequential steps that are run as part of a
+    Pipeline using a set of inputs and producing a set of outputs. Tasks execute
+    when TaskRuns are created that provide the input parameters and resources and
+    output resources the Task requires.
     """
 
     api_group: str = NamespacedResource.ApiGroup.TEKTON_DEV
 
     def __init__(
         self,
-        steps: Optional[List[Dict[str, Any]]] = None,
-        description: Optional[str] = None,
-        params: Optional[List[Dict[str, str]]] = None,
-        workspaces: Optional[List[Dict[str, Any]]] = None,
-        results: Optional[List[Dict[str, Any]]] = None,
-        volumes: Optional[List[Dict[str, Dict[str, Any]]]] = None,
-        step_template: Optional[Dict[str, Any]] = None,
-        sidecars: Optional[List[Dict[str, Any]]] = None,
+        description: str | None = None,
+        display_name: str | None = None,
+        params: list[Any] | None = None,
+        results: list[Any] | None = None,
+        sidecars: list[Any] | None = None,
+        step_template: dict[str, Any] | None = None,
+        steps: list[Any] | None = None,
+        volumes: Any | None = None,
+        workspaces: list[Any] | None = None,
         **kwargs: Any,
-    ):
-        """
-        Create and manage Task which specifies a sequence of steps to be executed.
-
+    ) -> None:
+        r"""
         Args:
-            steps (List[Dict[str, Any]]): Specifies one or more container images to run in the Task.
-            description (Optional[str]): An informative description of the Task.
-            params (Optional[List[Dict[str, str]]]): Specifies execution parameters for the Task.
-            workspaces (Optional[List[Dict[str, Any]]]): Specifies paths to volumes required by the Task.
-            results (Optional[List[Dict[str, Any]]]): Specifies the names under which Tasks write execution results.
-            volumes (Optional[List[Dict[str, Dict[str, Any]]]]): Specifies one or more volumes that will be available to the Steps in the Task.
-            step_template (Optional[Dict[str, Any]]): Specifies a Container step definition to use as the basis for all Steps in the Task.
-            sidecars (Optional[List[Dict[str, Any]]]): Specifies Sidecar containers to run alongside the Steps in the Task.
+            description (str): Description is a user-facing description of the task that may be used
+              to populate a UI.
+
+            display_name (str): DisplayName is a user-facing name of the task that may be used to
+              populate a UI.
+
+            params (list[Any]): Params is a list of input parameters required to run the task. Params
+              must be supplied as inputs in TaskRuns unless they declare a
+              default value.
+
+            results (list[Any]): Results are values that this Task can output
+
+            sidecars (list[Any]): Sidecars are run alongside the Task's step containers. They begin
+              before the steps start and end after the steps complete.
+
+            step_template (dict[str, Any]): StepTemplate can be used as the basis for all step containers within
+              the Task, so that the steps inherit settings on the base
+              container.
+
+            steps (list[Any]): Steps are the steps of the build; each step is run sequentially with
+              the source mounted into /workspace.
+
+            volumes (Any): Volumes is a collection of volumes that are available to mount into
+              the steps of the build. See Pod.spec.volumes (API version: v1)
+
+            workspaces (list[Any]): Workspaces are the volumes that this Task requires.
+
         """
         super().__init__(**kwargs)
-        self.steps = steps
+
         self.description = description
+        self.display_name = display_name
         self.params = params
-        self.workspaces = workspaces
         self.results = results
-        self.volumes = volumes
-        self.step_template = step_template
         self.sidecars = sidecars
+        self.step_template = step_template
+        self.steps = steps
+        self.volumes = volumes
+        self.workspaces = workspaces
 
     def to_dict(self) -> None:
         super().to_dict()
+
         if not self.kind_dict and not self.yaml_file:
-            if not self.steps:
-                raise MissingRequiredArgumentError(argument="steps")
             self.res["spec"] = {}
             _spec = self.res["spec"]
-            _spec = {"steps": self.steps}
 
-            if self.description:
+            if self.description is not None:
                 _spec["description"] = self.description
 
-            if self.params:
+            if self.display_name is not None:
+                _spec["displayName"] = self.display_name
+
+            if self.params is not None:
                 _spec["params"] = self.params
 
-            if self.workspaces:
-                _spec["workspaces"] = self.workspaces
-
-            if self.results:
+            if self.results is not None:
                 _spec["results"] = self.results
 
-            if self.volumes:
-                _spec["volumes"] = self.volumes
+            if self.sidecars is not None:
+                _spec["sidecars"] = self.sidecars
 
-            if self.step_template:
+            if self.step_template is not None:
                 _spec["stepTemplate"] = self.step_template
 
-            if self.sidecars:
-                _spec["sidecars"] = self.sidecars
+            if self.steps is not None:
+                _spec["steps"] = self.steps
+
+            if self.volumes is not None:
+                _spec["volumes"] = self.volumes
+
+            if self.workspaces is not None:
+                _spec["workspaces"] = self.workspaces
+
+    # End of generated code
