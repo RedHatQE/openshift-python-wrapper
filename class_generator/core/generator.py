@@ -2,11 +2,9 @@
 
 import filecmp
 import os
-import shlex
 from pathlib import Path
 from typing import Any
 
-from pyhelper_utils.shell import run_command
 from rich.console import Console
 from rich.syntax import Syntax
 from simple_logger.logger import get_logger
@@ -114,6 +112,7 @@ def class_generator(
     add_tests: bool = False,
     called_from_cli: bool = True,
     update_schema_executed: bool = False,
+    called_from_test: bool = False,
 ) -> list[str]:
     """
     Generates a class for a given Kind.
@@ -134,7 +133,7 @@ def class_generator(
     LOGGER.info(f"Generating class for {kind}")
     kind = kind.lower()
     kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
-    if not kind_and_namespaced_mappings:
+    if not called_from_test and not kind_and_namespaced_mappings:
         if called_from_cli:
             if update_schema_executed:
                 error_msg = f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed."
@@ -164,7 +163,7 @@ def class_generator(
             # Re-read the mapping file to check if kind is now available
             kind_and_namespaced_mappings = read_resources_mapping_file(skip_cache=True).get(kind)
             if kind_and_namespaced_mappings:
-                class_generator(
+                return class_generator(
                     kind=kind,
                     overwrite=overwrite,
                     dry_run=dry_run,
@@ -210,29 +209,7 @@ def class_generator(
             output_dir=output_dir,
         )
 
-        if not dry_run:
-            try:
-                rc, stdout, stderr = run_command(
-                    command=shlex.split(f"uvx pre-commit run --files {generated_py_file}"),
-                    verify_stderr=False,
-                    check=False,
-                )
-                # Check if the command failed
-                if not rc:
-                    LOGGER.warning(
-                        f"Pre-commit hooks failed for {generated_py_file}. "
-                        f"This is non-fatal and generation will continue."
-                    )
-                    if stderr:
-                        LOGGER.debug(f"Pre-commit stderr: {stderr}")
-                    if stdout:
-                        LOGGER.debug(f"Pre-commit stdout: {stdout}")
-            except Exception as e:
-                LOGGER.error(
-                    f"Failed to run pre-commit hooks for {generated_py_file}: {e}. "
-                    f"This is non-fatal and generation will continue."
-                )
-
+        if not dry_run and not called_from_test:
             if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
                 LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
                 Path.unlink(Path(generated_py_file))

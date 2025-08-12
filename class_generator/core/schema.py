@@ -12,7 +12,7 @@ from packaging.version import Version
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
-from class_generator.constants import RESOURCES_MAPPING_FILE, SCHEMA_DIR, DEFINITIONS_FILE
+from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_FILE, SCHEMA_DIR
 from ocp_resources.utils.archive_utils import save_json_archive
 from ocp_resources.utils.schema_validator import SchemaValidator
 
@@ -335,9 +335,12 @@ def process_schema_definitions(
 
 
 def _parse_oc_explain_output(output: str) -> dict[str, Any]:
-    """Parse oc explain output to extract field information."""
+    """
+    Parse oc explain output to extract field information, descriptions, and required fields.
+    Clean up descriptions to remove technical artifacts and make them human-readable.
+    """
     lines = output.strip().split("\n")
-    schema = {"type": "object", "properties": {}}
+    schema = {"type": "object", "properties": {}, "required": []}
 
     # Find the FIELDS section
     fields_start = -1
@@ -347,30 +350,154 @@ def _parse_oc_explain_output(output: str) -> dict[str, Any]:
             break
 
     if fields_start == -1:
+        LOGGER.debug("No FIELDS section found in explain output")
         return schema
 
     # Parse fields starting from FIELDS section
     fields_lines = lines[fields_start:]
-    properties = {}
+    properties: dict[str, Any] = {}
+    required_fields: list[str] = []
 
-    for line in fields_lines:
+    current_field: dict[str, Any] | None = None
+    current_description_lines: list[str] = []
+
+    i = 0
+    while i < len(fields_lines):
+        line = fields_lines[i]
+
+        # Skip empty lines
         if not line.strip():
+            i += 1
             continue
 
-        # Only parse top-level fields (those starting with 2 spaces)
+        # Check if this is a field definition line (starts with 2 spaces, not 4 or more)
         if line.startswith("  ") and not line.startswith("    "):
-            # Extract field name and type from format: "  fieldName	<type>"
-            stripped = line.strip()
-            if "\t" in stripped and "<" in stripped and ">" in stripped:
-                field_name = stripped.split("\t")[0].strip()
-                type_part = stripped.split("<")[1].split(">")[0].strip()
+            # Save previous field if we have one
+            if current_field:
+                field_schema = _convert_type_to_schema(current_field["type"])
+                if current_description_lines:
+                    description = _clean_description(current_description_lines)
+                    if description:
+                        field_schema["description"] = description
+                properties[current_field["name"]] = field_schema
 
-                # Convert type to schema format
-                field_schema = _convert_type_to_schema(type_part)
-                properties[field_name] = field_schema
+                if current_field["required"]:
+                    required_fields.append(current_field["name"])
+
+            # Parse new field - handle both tab-separated and space-separated formats
+            stripped = line.strip()
+
+            # Try tab-separated format first
+            if "\t" in stripped:
+                field_name = stripped.split("\t")[0].strip()
+                type_and_flags = stripped.split("\t", 1)[1].strip()
+            # Handle space-separated format as fallback
+            elif " " in stripped and ("<" in stripped and ">" in stripped):
+                parts = stripped.split(None, 1)  # Split on whitespace, max 1 split
+                if len(parts) >= 2:
+                    field_name = parts[0].strip()
+                    type_and_flags = parts[1].strip()
+                else:
+                    # Skip malformed lines
+                    i += 1
+                    continue
+            else:
+                # Skip lines without proper field format
+                i += 1
+                continue
+
+            # Check if field is marked as required (ends with " -required-")
+            is_required = type_and_flags.endswith(" -required-")
+            if is_required:
+                # Remove the " -required-" suffix before extracting type
+                type_and_flags = type_and_flags[:-11].strip()
+            else:
+                # Also check for the format "<type> -required-" within the string
+                if " -required-" in type_and_flags:
+                    is_required = True
+                    type_and_flags = type_and_flags.replace(" -required-", "").strip()
+
+            # Extract type from <type> format
+            if "<" in type_and_flags and ">" in type_and_flags:
+                type_part = type_and_flags.split("<")[1].split(">")[0].strip()
+            else:
+                type_part = type_and_flags.strip()
+
+            current_field = {"name": str(field_name), "type": str(type_part), "required": is_required}
+            current_description_lines = []
+
+        # Check if this is a description line (starts with 4 or more spaces)
+        elif line.startswith("    ") and current_field:
+            # This is a description line for the current field
+            description_text = line.strip()
+            if description_text and not description_text.startswith("Possible enum values:"):
+                current_description_lines.append(description_text)
+
+        i += 1
+
+    # Don't forget the last field
+    if current_field:
+        field_schema = _convert_type_to_schema(current_field["type"])
+        if current_description_lines:
+            description = _clean_description(current_description_lines)
+            if description:
+                field_schema["description"] = description
+        properties[current_field["name"]] = field_schema
+
+        if current_field["required"]:
+            required_fields.append(current_field["name"])
 
     schema["properties"] = properties
+    schema["required"] = required_fields
     return schema
+
+
+def _clean_description(description_lines: list[str]) -> str:
+    """
+    Clean up description lines to extract meaningful text and remove technical artifacts.
+
+    Args:
+        description_lines: List of description lines from explain output
+
+    Returns:
+        Clean, human-readable description string
+    """
+    if not description_lines:
+        return ""
+
+    # Join all lines into a single text block
+    full_text = " ".join(description_lines).strip()
+
+    # Remove "Possible enum values:" sections and everything after (including bullet points)
+    enum_pattern = r"\s*Possible enum values:.*$"
+    full_text = re.sub(enum_pattern, "", full_text, flags=re.DOTALL)
+
+    # Remove bullet point enum descriptions that start with "- `"
+    bullet_pattern = r"\s*-\s*`[^`]*`.*?(?=\s*-\s*`|$)"
+    full_text = re.sub(bullet_pattern, "", full_text, flags=re.DOTALL)
+
+    # Remove common technical patterns and artifacts
+    # Remove patterns like "<string> -required-", "<[]string>", etc.
+    full_text = re.sub(r"<[^>]*>\s*-?(?:required|optional)?-?\s*", "", full_text)
+
+    # Remove technical markers like "-required-", "-optional-"
+    full_text = re.sub(r"\s*-(?:required|optional)-\s*", " ", full_text)
+
+    # Remove multiple consecutive spaces and clean up
+    full_text = re.sub(r"\s+", " ", full_text).strip()
+
+    # Remove leading/trailing punctuation artifacts
+    full_text = full_text.strip(".,;:- ")
+
+    # If the description is too short or just technical info, return empty
+    if len(full_text) < 10 or full_text.lower() in ["no description", "description not available"]:
+        return ""
+
+    # Ensure the description ends with a period for consistency
+    if full_text and not full_text.endswith("."):
+        full_text += "."
+
+    return full_text
 
 
 def _convert_type_to_schema(type_info: str) -> dict[str, Any]:
@@ -527,6 +654,223 @@ def _infer_oc_explain_path(ref_name: str) -> str | None:
     return None
 
 
+def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], client: str) -> dict[str, Any]:
+    """
+    Supplement existing definitions with field descriptions and required field information from explain.
+
+    Args:
+        definitions: Current definitions dictionary
+        client: oc/kubectl client binary path
+
+    Returns:
+        Dictionary with supplemented field descriptions and required field information
+    """
+    # Core resource types that commonly have missing descriptions
+    critical_specs = [
+        ("io.k8s.api.core.v1.PodSpec", "pod.spec"),
+        ("io.k8s.api.core.v1.Container", "pod.spec.containers"),
+        ("io.k8s.api.apps.v1.DeploymentSpec", "deployment.spec"),
+        ("io.k8s.api.apps.v1.ReplicaSetSpec", "replicaset.spec"),
+        ("io.k8s.api.apps.v1.DaemonSetSpec", "daemonset.spec"),
+        ("io.k8s.api.apps.v1.StatefulSetSpec", "statefulset.spec"),
+        ("io.k8s.api.batch.v1.JobSpec", "job.spec"),
+        ("io.k8s.api.core.v1.ServiceSpec", "service.spec"),
+        ("io.k8s.api.core.v1.ConfigMapData", "configmap.data"),
+        ("io.k8s.api.core.v1.SecretData", "secret.data"),
+        ("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta", "pod.metadata"),
+        ("com.github.openshift.api.route.v1.RouteSpec", "route.spec"),
+    ]
+
+    supplemented_definitions = definitions.copy()
+
+    def _run_explain_and_parse(ref_name: str, explain_path: str) -> tuple[dict[str, Any], list[str]] | None:
+        """Helper function to run oc explain and parse the output."""
+        try:
+            cmd = [client, "explain", explain_path]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+            if result.returncode == 0:
+                explain_schema = _parse_oc_explain_output(result.stdout)
+                explain_properties = explain_schema.get("properties", {})
+                explain_required = explain_schema.get("required", [])
+                return explain_properties, explain_required
+            else:
+                LOGGER.warning(f"Failed to get {client} explain for {explain_path}: {result.stderr}")
+                return None
+
+        except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
+            LOGGER.warning(f"Failed to run {client} explain for {explain_path}: {e}")
+            return None
+
+    for ref_name, explain_path in critical_specs:
+        if ref_name in definitions:
+            current_schema = definitions[ref_name]
+
+            LOGGER.info(f"Supplementing schema for {ref_name} using {client} explain {explain_path}")
+            result = _run_explain_and_parse(ref_name, explain_path)
+
+            if result:
+                explain_properties, explain_required = result
+
+                # Start with the current schema
+                updated_schema = current_schema.copy()
+                current_properties = updated_schema.get("properties", {})
+
+                # Update properties with descriptions from explain
+                for field_name, explain_field in explain_properties.items():
+                    if field_name in current_properties:
+                        # Merge the current property with the explain description
+                        updated_property = current_properties[field_name].copy()
+                        if "description" in explain_field and "description" not in updated_property:
+                            updated_property["description"] = explain_field["description"]
+                        current_properties[field_name] = updated_property
+
+                updated_schema["properties"] = current_properties
+
+                # Update required fields if they're missing
+                current_required = updated_schema.get("required")
+                if (not current_required or current_required is None) and explain_required:
+                    updated_schema["required"] = explain_required
+                    LOGGER.info(f"Added {len(explain_required)} required fields to {ref_name}: {explain_required}")
+                elif not current_required:
+                    updated_schema["required"] = []
+
+                supplemented_definitions[ref_name] = updated_schema
+
+                # Count how many descriptions were added
+                desc_count = sum(1 for field in explain_properties.values() if "description" in field)
+                if desc_count > 0:
+                    LOGGER.info(f"Added {desc_count} field descriptions to {ref_name}")
+            else:
+                # Set to empty list if explain fails
+                if current_schema.get("required") is None:
+                    supplemented_definitions[ref_name] = {**current_schema, "required": []}
+        else:
+            # Handle missing definitions - create them from oc explain output
+            LOGGER.info(f"Creating missing schema definition for {ref_name} using {client} explain {explain_path}")
+            result = _run_explain_and_parse(ref_name, explain_path)
+
+            if result:
+                explain_properties, explain_required = result
+
+                # Create new schema from explain output
+                new_schema = {"type": "object", "properties": explain_properties, "required": explain_required}
+
+                supplemented_definitions[ref_name] = new_schema
+                LOGGER.info(
+                    f"Created new schema definition for {ref_name} with {len(explain_properties)} properties and {len(explain_required)} required fields: {explain_required}"
+                )
+
+    # Second, supplement top-level resource schemas with their required fields
+    _supplement_resource_level_required_fields(supplemented_definitions, client)
+
+    return supplemented_definitions
+
+
+def _supplement_resource_level_required_fields(definitions: dict[str, Any], client: str) -> None:
+    """
+    Supplement resource-level schemas with required field information from explain.
+
+    This function focuses on top-level required fields like 'spec', 'metadata', etc.
+    that are marked as required in explain but missing in the schema.
+
+    Args:
+        definitions: Definitions dictionary to update in-place
+        client: oc/kubectl client binary path
+    """
+    # Map resource schemas to their explain paths for top-level required fields
+    resource_explain_mappings = [
+        # Core API resources
+        ("v1/Pod", "pod"),
+        ("v1/Service", "service"),
+        ("v1/ConfigMap", "configmap"),
+        ("v1/Secret", "secret"),
+        ("v1/PersistentVolume", "persistentvolume"),
+        ("v1/PersistentVolumeClaim", "persistentvolumeclaim"),
+        ("v1/ServiceAccount", "serviceaccount"),
+        ("v1/Namespace", "namespace"),
+        # Apps API resources
+        ("apps/v1/Deployment", "deployment"),
+        ("apps/v1/ReplicaSet", "replicaset"),
+        ("apps/v1/DaemonSet", "daemonset"),
+        ("apps/v1/StatefulSet", "statefulset"),
+        # Batch API resources
+        ("batch/v1/Job", "job"),
+        ("batch/v1/CronJob", "cronjob"),
+        # Networking API resources
+        ("networking.k8s.io/v1/NetworkPolicy", "networkpolicy"),
+        ("networking.k8s.io/v1/Ingress", "ingress"),
+        # RBAC API resources
+        ("rbac.authorization.k8s.io/v1/Role", "role"),
+        ("rbac.authorization.k8s.io/v1/RoleBinding", "rolebinding"),
+        ("rbac.authorization.k8s.io/v1/ClusterRole", "clusterrole"),
+        ("rbac.authorization.k8s.io/v1/ClusterRoleBinding", "clusterrolebinding"),
+        # OpenShift-specific resources that commonly have required spec
+        ("route.openshift.io/v1/Route", "route"),
+        ("build.openshift.io/v1/BuildConfig", "buildconfig"),
+        ("apps.openshift.io/v1/DeploymentConfig", "deploymentconfig"),
+        ("image.openshift.io/v1/ImageStream", "imagestream"),
+        ("template.openshift.io/v1/Template", "template"),
+        ("config.openshift.io/v1/ClusterVersion", "clusterversion"),
+        ("config.openshift.io/v1/Infrastructure", "infrastructure"),
+        ("config.openshift.io/v1/DNS", "dns"),
+        ("config.openshift.io/v1/Ingress", "ingress.config.openshift.io"),
+        ("config.openshift.io/v1/Network", "network.config.openshift.io"),
+        ("operator.openshift.io/v1/Console", "console"),
+        ("operator.openshift.io/v1/DNS", "dns.operator.openshift.io"),
+        ("operator.openshift.io/v1/Network", "network.operator.openshift.io"),
+    ]
+
+    for schema_key, explain_path in resource_explain_mappings:
+        if schema_key in definitions:
+            current_schema = definitions[schema_key]
+            current_required = current_schema.get("required")
+
+            # Only supplement if required field is missing or empty
+            if not current_required:
+                try:
+                    LOGGER.info(
+                        f"Supplementing top-level required fields for {schema_key} using {client} explain {explain_path}"
+                    )
+                    cmd = [client, "explain", explain_path]
+
+                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+                    if result.returncode == 0:
+                        explain_schema = _parse_oc_explain_output(result.stdout)
+                        explain_required = explain_schema.get("required", [])
+
+                        if explain_required:
+                            # Update the schema with required fields from explain
+                            updated_schema = current_schema.copy()
+                            updated_schema["required"] = explain_required
+                            definitions[schema_key] = updated_schema
+
+                            LOGGER.info(
+                                f"Added {len(explain_required)} top-level required fields to {schema_key}: {explain_required}"
+                            )
+                        else:
+                            # Set empty list if explain returns no required fields
+                            updated_schema = current_schema.copy()
+                            updated_schema["required"] = []
+                            definitions[schema_key] = updated_schema
+                    else:
+                        LOGGER.debug(
+                            f"{client} explain failed for {explain_path}, skipping required field supplementation"
+                        )
+                        # Set empty list if explain fails
+                        updated_schema = current_schema.copy()
+                        updated_schema["required"] = []
+                        definitions[schema_key] = updated_schema
+
+                except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
+                    LOGGER.warning(f"Failed to run {client} explain for {explain_path}: {e}")
+                    # Set empty list if explain fails
+                    updated_schema = current_schema.copy()
+                    updated_schema["required"] = []
+                    definitions[schema_key] = updated_schema
+
+
 def _get_missing_core_definitions(
     definitions: dict[str, Any], client: str, schemas: dict[str, dict[str, Any]]
 ) -> dict[str, Any]:
@@ -554,7 +898,7 @@ def _get_missing_core_definitions(
         if oc_path:
             try:
                 LOGGER.info(f"Fetching missing definition for {ref_name} using oc explain {oc_path}")
-                cmd = ["oc", "explain", oc_path, "--recursive"]
+                cmd = [client, "explain", oc_path, "--recursive"]
 
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
@@ -614,6 +958,11 @@ def write_schema_files(
         if missing_definitions:
             definitions.update(missing_definitions)
             LOGGER.info(f"Added {len(missing_definitions)} missing core definitions to schema")
+
+    # If client is provided, supplement existing definitions with field descriptions and required field information
+    if client:
+        definitions = _supplement_schema_with_field_descriptions(definitions, client)
+        LOGGER.info("Supplemented definitions with field descriptions and required field information")
 
     # Write updated definitions
     definitions_file = DEFINITIONS_FILE

@@ -2,7 +2,6 @@
 
 import filecmp
 from pathlib import Path
-import pytest
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Tuple, Optional
 
@@ -10,22 +9,25 @@ from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.generator import class_generator
 
 
-def _test_single_resource(kind: str, tmpdir_factory: pytest.TempPathFactory) -> Optional[Tuple[str, str]]:
+def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]]:
     """
     Test a single resource kind and return failure info if test fails.
 
     Args:
         kind: The resource kind to test
-        tmpdir_factory: pytest tmpdir factory
+        tmp_path: pytest temporary path
 
     Returns:
         None if test passes, or (kind, error_message) tuple if test fails
     """
     try:
-        output_dir = tmpdir_factory.mktemp(f"output-dir-{kind}")
+        output_dir = tmp_path / f"output-dir-{kind}"
+        output_dir.mkdir(parents=True, exist_ok=True)
         output_files = class_generator(
             kind=kind,
-            output_dir=output_dir,
+            output_dir=str(output_dir),
+            overwrite=True,
+            called_from_test=True,
         )
 
         if not output_files:
@@ -85,7 +87,7 @@ def _test_single_resource(kind: str, tmpdir_factory: pytest.TempPathFactory) -> 
         return (kind, error_details)
 
 
-def test_parse_explain(tmpdir_factory: pytest.TempPathFactory) -> None:
+def test_parse_explain(tmp_path: Path) -> None:
     """Test all resource kinds in parallel and collect all failures."""
     # List of all resource kinds to test
     resource_kinds = [
@@ -103,6 +105,7 @@ def test_parse_explain(tmpdir_factory: pytest.TempPathFactory) -> None:
         "ServiceMeshMember",
         "Pipeline",
         "ServingRuntime",
+        "RouteAdvertisements",
     ]
 
     failures: List[Tuple[str, str]] = []
@@ -110,7 +113,9 @@ def test_parse_explain(tmpdir_factory: pytest.TempPathFactory) -> None:
     # Run tests in parallel using ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=8) as executor:
         # Submit all test tasks
-        future_to_kind = {executor.submit(_test_single_resource, kind, tmpdir_factory): kind for kind in resource_kinds}
+        future_to_kind = {
+            executor.submit(_test_single_resource, kind, tmp_path / f"test-{kind}"): kind for kind in resource_kinds
+        }
 
         # Collect results as they complete
         for future in as_completed(future_to_kind):

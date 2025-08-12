@@ -54,12 +54,13 @@ def types_generator(key_dict: dict[str, Any]) -> dict[str, str]:
 def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
     """
     Resolve property schema, following $ref if needed.
+    Preserves descriptions from the original property when merging with referenced schemas.
 
     Args:
         property_: Property dictionary that may contain $ref
 
     Returns:
-        Resolved property schema
+        Resolved property schema with preserved descriptions
     """
     # Handle direct $ref
     if _ref := property_.get("$ref"):
@@ -85,7 +86,18 @@ def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
 
                 for key in possible_keys:
                     if key in definitions:
-                        return definitions[key]
+                        resolved_schema = definitions[key]
+                        # Fix null required fields to empty lists
+                        if resolved_schema.get("required") is None:
+                            resolved_schema = resolved_schema.copy()
+                            resolved_schema["required"] = []
+
+                        # Preserve any description from the original property that references this schema
+                        if "description" in property_ and "description" not in resolved_schema:
+                            resolved_schema = resolved_schema.copy()
+                            resolved_schema["description"] = property_["description"]
+
+                        return resolved_schema
 
         # If not found in definitions, log warning and use property as-is
         LOGGER.warning(
@@ -95,9 +107,19 @@ def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
     # Handle allOf containing $ref
     elif all_of := property_.get("allOf"):
         # allOf is typically used with a single $ref in Kubernetes schemas
+        original_description = property_.get("description")
+
         for item in all_of:
             if "$ref" in item:
-                return get_property_schema(item)
+                resolved_schema = get_property_schema(item)
+
+                # If the original property has a description but the resolved schema doesn't,
+                # preserve the original description
+                if original_description and "description" not in resolved_schema:
+                    resolved_schema = resolved_schema.copy()
+                    resolved_schema["description"] = original_description
+
+                return resolved_schema
 
     return property_
 
