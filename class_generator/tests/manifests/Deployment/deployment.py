@@ -2,7 +2,8 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
 
 
 class Deployment(NamespacedResource):
@@ -29,7 +30,7 @@ class Deployment(NamespacedResource):
             min_ready_seconds (int): Minimum number of seconds for which a newly created pod should be
               ready without any of its container crashing, for it to be
               considered available. Defaults to 0 (pod will be considered
-              available as soon as it is ready)
+              available as soon as it is ready).
 
             paused (bool): Indicates that the deployment is paused.
 
@@ -47,16 +48,223 @@ class Deployment(NamespacedResource):
               pointer to distinguish between explicit zero and not specified.
               Defaults to 10.
 
-            selector (dict[str, Any]): A label selector is a label query over a set of resources. The result
-              of matchLabels and matchExpressions are ANDed. An empty label
-              selector matches all objects. A null label selector matches no
-              objects.
+            selector (dict[str, Any]): matchExpressions key operator values matchLabels.
 
-            strategy (dict[str, Any]): DeploymentStrategy describes how to replace existing pods with new
-              ones.
+            strategy (dict[str, Any]): rollingUpdate maxSurge maxUnavailable type enum: Recreate,
+              RollingUpdate.
 
-            template (dict[str, Any]): PodTemplateSpec describes the data a pod should have when created from
-              a template
+            template (dict[str, Any]): metadata annotations creationTimestamp deletionGracePeriodSeconds
+              deletionTimestamp finalizers generateName generation labels
+              managedFields apiVersion fieldsType fieldsV1 manager operation
+              subresource time name namespace ownerReferences apiVersion
+              blockOwnerDeletion controller kind name uid resourceVersion
+              selfLink uid spec activeDeadlineSeconds affinity nodeAffinity
+              preferredDuringSchedulingIgnoredDuringExecution preference
+              matchExpressions key operator enum: DoesNotExist, Exists, Gt, In,
+              .... values matchFields key operator enum: DoesNotExist, Exists,
+              Gt, In, .... values weight
+              requiredDuringSchedulingIgnoredDuringExecution nodeSelectorTerms
+              matchExpressions key operator enum: DoesNotExist, Exists, Gt, In,
+              .... values matchFields key operator enum: DoesNotExist, Exists,
+              Gt, In, .... values podAffinity
+              preferredDuringSchedulingIgnoredDuringExecution podAffinityTerm
+              labelSelector matchExpressions key operator values matchLabels
+              matchLabelKeys mismatchLabelKeys namespaceSelector
+              matchExpressions key operator values matchLabels namespaces
+              topologyKey weight requiredDuringSchedulingIgnoredDuringExecution
+              labelSelector matchExpressions key operator values matchLabels
+              matchLabelKeys mismatchLabelKeys namespaceSelector
+              matchExpressions key operator values matchLabels namespaces
+              topologyKey podAntiAffinity
+              preferredDuringSchedulingIgnoredDuringExecution podAffinityTerm
+              labelSelector matchExpressions key operator values matchLabels
+              matchLabelKeys mismatchLabelKeys namespaceSelector
+              matchExpressions key operator values matchLabels namespaces
+              topologyKey weight requiredDuringSchedulingIgnoredDuringExecution
+              labelSelector matchExpressions key operator values matchLabels
+              matchLabelKeys mismatchLabelKeys namespaceSelector
+              matchExpressions key operator values matchLabels namespaces
+              topologyKey automountServiceAccountToken containers args command
+              env name value valueFrom configMapKeyRef key name fieldRef
+              apiVersion fieldPath resourceFieldRef containerName divisor
+              resource secretKeyRef key name envFrom configMapRef name prefix
+              secretRef name image imagePullPolicy enum: Always, IfNotPresent,
+              Never lifecycle postStart exec command httpGet host httpHeaders
+              name value path port scheme enum: HTTP, HTTPS sleep seconds
+              tcpSocket host port preStop exec command httpGet host httpHeaders
+              name value path port scheme enum: HTTP, HTTPS sleep seconds
+              tcpSocket host port stopSignal enum: SIGABRT, SIGALRM, SIGBUS,
+              SIGCHLD, .... livenessProbe exec command failureThreshold grpc
+              port service httpGet host httpHeaders name value path port scheme
+              enum: HTTP, HTTPS initialDelaySeconds periodSeconds
+              successThreshold tcpSocket host port terminationGracePeriodSeconds
+              timeoutSeconds name ports containerPort hostIP hostPort name
+              protocol enum: SCTP, TCP, UDP readinessProbe exec command
+              failureThreshold grpc port service httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
+              periodSeconds successThreshold tcpSocket host port
+              terminationGracePeriodSeconds timeoutSeconds resizePolicy
+              resourceName restartPolicy resources claims name request limits
+              requests restartPolicy securityContext allowPrivilegeEscalation
+              appArmorProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined capabilities add drop privileged
+              procMount enum: Default, Unmasked readOnlyRootFilesystem
+              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
+              user seccompProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
+              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
+              command failureThreshold grpc port service httpGet host
+              httpHeaders name value path port scheme enum: HTTP, HTTPS
+              initialDelaySeconds periodSeconds successThreshold tcpSocket host
+              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              terminationMessagePath terminationMessagePolicy enum:
+              FallbackToLogsOnError, File tty volumeDevices devicePath name
+              volumeMounts mountPath mountPropagation enum: Bidirectional,
+              HostToContainer, None name readOnly recursiveReadOnly subPath
+              subPathExpr workingDir dnsConfig nameservers options name value
+              searches dnsPolicy enum: ClusterFirst, ClusterFirstWithHostNet,
+              Default, None enableServiceLinks ephemeralContainers args command
+              env name value valueFrom configMapKeyRef key name fieldRef
+              apiVersion fieldPath resourceFieldRef containerName divisor
+              resource secretKeyRef key name envFrom configMapRef name prefix
+              secretRef name image imagePullPolicy enum: Always, IfNotPresent,
+              Never lifecycle postStart exec command httpGet host httpHeaders
+              name value path port scheme enum: HTTP, HTTPS sleep seconds
+              tcpSocket host port preStop exec command httpGet host httpHeaders
+              name value path port scheme enum: HTTP, HTTPS sleep seconds
+              tcpSocket host port stopSignal enum: SIGABRT, SIGALRM, SIGBUS,
+              SIGCHLD, .... livenessProbe exec command failureThreshold grpc
+              port service httpGet host httpHeaders name value path port scheme
+              enum: HTTP, HTTPS initialDelaySeconds periodSeconds
+              successThreshold tcpSocket host port terminationGracePeriodSeconds
+              timeoutSeconds name ports containerPort hostIP hostPort name
+              protocol enum: SCTP, TCP, UDP readinessProbe exec command
+              failureThreshold grpc port service httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
+              periodSeconds successThreshold tcpSocket host port
+              terminationGracePeriodSeconds timeoutSeconds resizePolicy
+              resourceName restartPolicy resources claims name request limits
+              requests restartPolicy securityContext allowPrivilegeEscalation
+              appArmorProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined capabilities add drop privileged
+              procMount enum: Default, Unmasked readOnlyRootFilesystem
+              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
+              user seccompProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
+              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
+              command failureThreshold grpc port service httpGet host
+              httpHeaders name value path port scheme enum: HTTP, HTTPS
+              initialDelaySeconds periodSeconds successThreshold tcpSocket host
+              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              targetContainerName terminationMessagePath
+              terminationMessagePolicy enum: FallbackToLogsOnError, File tty
+              volumeDevices devicePath name volumeMounts mountPath
+              mountPropagation enum: Bidirectional, HostToContainer, None name
+              readOnly recursiveReadOnly subPath subPathExpr workingDir
+              hostAliases hostnames ip hostIPC hostNetwork hostPID hostUsers
+              hostname imagePullSecrets name initContainers args command env
+              name value valueFrom configMapKeyRef key name fieldRef apiVersion
+              fieldPath resourceFieldRef containerName divisor resource
+              secretKeyRef key name envFrom configMapRef name prefix secretRef
+              name image imagePullPolicy enum: Always, IfNotPresent, Never
+              lifecycle postStart exec command httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket
+              host port preStop exec command httpGet host httpHeaders name value
+              path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host
+              port stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy securityContext
+              allowPrivilegeEscalation appArmorProfile localhostProfile type
+              enum: Localhost, RuntimeDefault, Unconfined capabilities add drop
+              privileged procMount enum: Default, Unmasked
+              readOnlyRootFilesystem runAsGroup runAsNonRoot runAsUser
+              seLinuxOptions level role type user seccompProfile
+              localhostProfile type enum: Localhost, RuntimeDefault, Unconfined
+              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
+              hostProcess runAsUserName startupProbe exec command
+              failureThreshold grpc port service httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
+              periodSeconds successThreshold tcpSocket host port
+              terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              terminationMessagePath terminationMessagePolicy enum:
+              FallbackToLogsOnError, File tty volumeDevices devicePath name
+              volumeMounts mountPath mountPropagation enum: Bidirectional,
+              HostToContainer, None name readOnly recursiveReadOnly subPath
+              subPathExpr workingDir nodeName nodeSelector os name overhead
+              preemptionPolicy enum: Never, PreemptLowerPriority priority
+              priorityClassName readinessGates conditionType resourceClaims name
+              resourceClaimName resourceClaimTemplateName resources claims name
+              request limits requests restartPolicy enum: Always, Never,
+              OnFailure runtimeClassName schedulerName schedulingGates name
+              securityContext appArmorProfile localhostProfile type enum:
+              Localhost, RuntimeDefault, Unconfined fsGroup fsGroupChangePolicy
+              enum: Always, OnRootMismatch runAsGroup runAsNonRoot runAsUser
+              seLinuxChangePolicy seLinuxOptions level role type user
+              seccompProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined supplementalGroups
+              supplementalGroupsPolicy enum: Merge, Strict sysctls name value
+              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
+              hostProcess runAsUserName serviceAccount serviceAccountName
+              setHostnameAsFQDN shareProcessNamespace subdomain
+              terminationGracePeriodSeconds tolerations effect enum: NoExecute,
+              NoSchedule, PreferNoSchedule key operator enum: Equal, Exists
+              tolerationSeconds value topologySpreadConstraints labelSelector
+              matchExpressions key operator values matchLabels matchLabelKeys
+              maxSkew minDomains nodeAffinityPolicy enum: Honor, Ignore
+              nodeTaintsPolicy enum: Honor, Ignore topologyKey whenUnsatisfiable
+              enum: DoNotSchedule, ScheduleAnyway volumes awsElasticBlockStore
+              fsType partition readOnly volumeID azureDisk cachingMode enum:
+              None, ReadOnly, ReadWrite diskName diskURI fsType kind enum:
+              Dedicated, Managed, Shared readOnly azureFile readOnly secretName
+              shareName cephfs monitors path readOnly secretFile secretRef name
+              user cinder fsType readOnly secretRef name volumeID configMap
+              defaultMode items key mode path name csi driver fsType
+              nodePublishSecretRef name readOnly volumeAttributes downwardAPI
+              defaultMode items fieldRef apiVersion fieldPath mode path
+              resourceFieldRef containerName divisor resource emptyDir medium
+              sizeLimit ephemeral volumeClaimTemplate metadata annotations
+              creationTimestamp deletionGracePeriodSeconds deletionTimestamp
+              finalizers generateName generation labels managedFields apiVersion
+              fieldsType fieldsV1 manager operation subresource time name
+              namespace ownerReferences apiVersion blockOwnerDeletion controller
+              kind name uid resourceVersion selfLink uid spec accessModes
+              dataSource apiGroup kind name dataSourceRef apiGroup kind name
+              namespace resources limits requests selector matchExpressions key
+              operator values matchLabels storageClassName
+              volumeAttributesClassName volumeMode enum: Block, Filesystem
+              volumeName fc fsType lun readOnly targetWWNs wwids flexVolume
+              driver fsType options readOnly secretRef name flocker datasetName
+              datasetUUID gcePersistentDisk fsType partition pdName readOnly
+              gitRepo directory repository revision glusterfs endpoints path
+              readOnly hostPath path type enum: "", BlockDevice, CharDevice,
+              Directory, .... image pullPolicy enum: Always, IfNotPresent, Never
+              reference iscsi chapAuthDiscovery chapAuthSession fsType
+              initiatorName iqn iscsiInterface lun portals readOnly secretRef
+              name targetPortal name nfs path readOnly server
+              persistentVolumeClaim claimName readOnly photonPersistentDisk
+              fsType pdID portworxVolume fsType readOnly volumeID projected
+              defaultMode sources clusterTrustBundle labelSelector
+              matchExpressions key operator values matchLabels name path
+              signerName configMap items key mode path name downwardAPI items
+              fieldRef apiVersion fieldPath mode path resourceFieldRef
+              containerName divisor resource secret items key mode path name
+              serviceAccountToken audience expirationSeconds path quobyte group
+              readOnly registry tenant user volume rbd fsType image keyring
+              monitors pool readOnly secretRef name user scaleIO fsType gateway
+              protectionDomain readOnly secretRef name sslEnabled storageMode
+              storagePool system volumeName secret defaultMode items key mode
+              path optional secretName storageos fsType readOnly secretRef name
+              volumeName volumeNamespace vsphereVolume fsType storagePolicyID
+              storagePolicyName volumePath.
 
         """
         super().__init__(**kwargs)
