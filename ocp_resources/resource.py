@@ -491,6 +491,7 @@ class Resource(ResourceConstants):
         EXPORT_KUBEVIRT_IO: str = "export.kubevirt.io"
         FENCE_AGENTS_REMEDIATION_MEDIK8S_IO: str = "fence-agents-remediation.medik8s.io"
         FORKLIFT_KONVEYOR_IO: str = "forklift.konveyor.io"
+        FRRK8S_METALLB_IO = "frrk8s.metallb.io"
         HCO_KUBEVIRT_IO: str = "hco.kubevirt.io"
         HELM_MARIADB_MMONTES_IO: str = "helm.mariadb.mmontes.io"
         HIVE_OPENSHIFT_IO: str = "hive.openshift.io"
