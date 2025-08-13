@@ -63,7 +63,7 @@ packages = [
   "mcp_server",
 ]
 include = [
-  "class_generator/schema/__resources-mappings.json",
+  "class_generator/schema/__resources-mappings.json.gz",
   "class_generator/schema/_definitions.json",
 ]
 

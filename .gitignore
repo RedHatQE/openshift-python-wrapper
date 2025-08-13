@@ -141,3 +141,6 @@ CLAUDE.md
 
 # Backup directories
 .backups/
+
+# Large schema files (we keep the compressed versions)
+class_generator/schema/__resources-mappings.json
