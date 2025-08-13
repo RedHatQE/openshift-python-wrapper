@@ -93,9 +93,10 @@ class Deployment(NamespacedResource):
               name value path port scheme enum: HTTP, HTTPS sleep seconds
               tcpSocket host port preStop exec command httpGet host httpHeaders
               name value path port scheme enum: HTTP, HTTPS sleep seconds
-              tcpSocket host port livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
+              tcpSocket host port stopSignal enum: SIGABRT, SIGALRM, SIGBUS,
+              SIGCHLD, .... livenessProbe exec command failureThreshold grpc
+              port service httpGet host httpHeaders name value path port scheme
+              enum: HTTP, HTTPS initialDelaySeconds periodSeconds
               successThreshold tcpSocket host port terminationGracePeriodSeconds
               timeoutSeconds name ports containerPort hostIP hostPort name
               protocol enum: SCTP, TCP, UDP readinessProbe exec command
@@ -131,9 +132,10 @@ class Deployment(NamespacedResource):
               name value path port scheme enum: HTTP, HTTPS sleep seconds
               tcpSocket host port preStop exec command httpGet host httpHeaders
               name value path port scheme enum: HTTP, HTTPS sleep seconds
-              tcpSocket host port livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
+              tcpSocket host port stopSignal enum: SIGABRT, SIGALRM, SIGBUS,
+              SIGCHLD, .... livenessProbe exec command failureThreshold grpc
+              port service httpGet host httpHeaders name value path port scheme
+              enum: HTTP, HTTPS initialDelaySeconds periodSeconds
               successThreshold tcpSocket host port terminationGracePeriodSeconds
               timeoutSeconds name ports containerPort hostIP hostPort name
               protocol enum: SCTP, TCP, UDP readinessProbe exec command
@@ -169,7 +171,8 @@ class Deployment(NamespacedResource):
               value path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket
               host port preStop exec command httpGet host httpHeaders name value
               path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host
-              port livenessProbe exec command failureThreshold grpc port service
+              port stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
               httpGet host httpHeaders name value path port scheme enum: HTTP,
               HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
               host port terminationGracePeriodSeconds timeoutSeconds name ports
