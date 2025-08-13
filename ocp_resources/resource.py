@@ -970,27 +970,23 @@ class Resource(ResourceConstants):
                 **PROTOCOL_ERROR_EXCEPTION_DICT,
                 **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             },
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+            func=lambda: self.instance.status.phase,
         )
         current_status = None
         last_logged_status = None
         try:
             for sample in samples:
-                if sample.items:
-                    sample_status = sample.items[0].status
-                    if sample_status:
-                        current_status = sample_status.phase
-                        if current_status != last_logged_status:
-                            last_logged_status = current_status
-                            self.logger.info(f"Status of {self.kind} {self.name} is {current_status}")
+                if sample:
+                    current_status = sample
+                    if current_status != last_logged_status:
+                        last_logged_status = current_status
+                        self.logger.info(f"Status of {self.kind} {self.name} is {current_status}")
 
-                        if current_status == status:
-                            return
+                    if current_status == status:
+                        return
 
-                        if current_status == stop_status:
-                            raise TimeoutExpiredError(f"Status of {self.kind} {self.name} is {current_status}")
+                    if current_status == stop_status:
+                        raise TimeoutExpiredError(f"Status of {self.kind} {self.name} is {current_status}")
 
         except TimeoutExpiredError:
             if current_status:
