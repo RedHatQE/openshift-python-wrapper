@@ -7,6 +7,7 @@ import pytest
 
 from class_generator.core.schema import (
     ClusterVersionError,
+    build_dynamic_resource_to_api_mapping,
     build_namespacing_dict,
     check_and_update_cluster_version,
     extract_group_kind_version,
@@ -253,8 +254,208 @@ services                      svc          v1                    Service"""
         assert "Pod" in result
 
 
+class TestBuildDynamicResourceToApiMapping:
+    """Test build_dynamic_resource_to_api_mapping function."""
+
+    @patch("class_generator.core.schema.run_command")
+    def test_successful_dynamic_mapping_build(self, mock_run_command):
+        """Test successful building of dynamic resource-to-API mapping."""
+        api_resources_output = """pods                          po           v1                         true         Pod                                  create,delete,deletecollection,get,list,patch,update,watch   all
+services                      svc          v1                         true         Service                              create,delete,deletecollection,get,list,patch,update,watch   all
+deployments                   deploy       apps/v1                    true         Deployment                           create,delete,deletecollection,get,list,patch,update,watch   all
+jobs                                       batch/v1                   true         Job                                  create,delete,deletecollection,get,list,patch,update,watch
+routes                                     route.openshift.io/v1      true         Route                                create,delete,deletecollection,get,list,patch,update,watch   """
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        expected_mapping = {
+            "Pod": ["api/v1"],
+            "Service": ["api/v1"],
+            "Deployment": ["apis/apps/v1"],
+            "Job": ["apis/batch/v1"],
+            "Route": ["apis/route.openshift.io/v1"],
+        }
+        assert result == expected_mapping
+
+    @patch("class_generator.core.schema.run_command")
+    def test_command_failure_returns_empty_mapping(self, mock_run_command):
+        """Test that command failure returns empty mapping."""
+        mock_run_command.return_value = (False, "", "command failed")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+        assert result == {}
+
+    @patch("class_generator.core.schema.run_command")
+    def test_empty_output_returns_empty_mapping(self, mock_run_command):
+        """Test that empty output returns empty mapping."""
+        mock_run_command.return_value = (True, "", "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+        assert result == {}
+
+    @patch("class_generator.core.schema.run_command")
+    def test_malformed_lines_handled_gracefully(self, mock_run_command):
+        """Test that malformed lines are handled gracefully."""
+        api_resources_output = """pods                          po           v1                         true         Pod
+incomplete_line
+services                      svc          v1                         true         Service                              create,delete
+short
+"""
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+        # Should only include valid lines
+        assert "Pod" in result
+        assert "Service" in result
+        assert len(result) == 2
+
+    @patch("class_generator.core.schema.run_command")
+    def test_core_v1_api_mapping(self, mock_run_command):
+        """Test that core v1 API resources are mapped to api/v1."""
+        api_resources_output = """pods                          po           v1                         true         Pod                                  create,delete,deletecollection,get,list,patch,update,watch   all
+configmaps                    cm           v1                         true         ConfigMap                            create,delete,deletecollection,get,list,patch,update,watch
+secrets                                    v1                         true         Secret                               create,delete,deletecollection,get,list,patch,update,watch   """
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # All v1 resources should map to api/v1
+        assert result["Pod"] == ["api/v1"]
+        assert result["ConfigMap"] == ["api/v1"]
+        assert result["Secret"] == ["api/v1"]
+
+    @patch("class_generator.core.schema.run_command")
+    def test_apps_api_group_mapping(self, mock_run_command):
+        """Test that apps API group resources are mapped correctly."""
+        api_resources_output = """deployments                   deploy       apps/v1                    true         Deployment                           create,delete,deletecollection,get,list,patch,update,watch   all
+replicasets                   rs           apps/v1                    true         ReplicaSet                           create,delete,deletecollection,get,list,patch,update,watch   all
+statefulsets                  sts          apps/v1                    true         StatefulSet                          create,delete,deletecollection,get,list,patch,update,watch   all"""
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # All apps/v1 resources should map to apis/apps/v1
+        assert result["Deployment"] == ["apis/apps/v1"]
+        assert result["ReplicaSet"] == ["apis/apps/v1"]
+        assert result["StatefulSet"] == ["apis/apps/v1"]
+
+    @patch("class_generator.core.schema.run_command")
+    def test_openshift_api_groups_mapping(self, mock_run_command):
+        """Test that OpenShift API groups are mapped correctly."""
+        api_resources_output = """routes                                     route.openshift.io/v1      true         Route                                create,delete,deletecollection,get,list,patch,update,watch
+buildconfigs                  bc           build.openshift.io/v1      true         BuildConfig                          create,delete,deletecollection,get,list,patch,update,watch
+clusterversions                            config.openshift.io/v1     false        ClusterVersion                       delete,deletecollection,get,list,patch,create,update,watch   """
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # OpenShift resources should map to their respective APIs
+        assert result["Route"] == ["apis/route.openshift.io/v1"]
+        assert result["BuildConfig"] == ["apis/build.openshift.io/v1"]
+        assert result["ClusterVersion"] == ["apis/config.openshift.io/v1"]
+
+    @patch("class_generator.core.schema.run_command")
+    def test_multiple_versions_same_kind(self, mock_run_command):
+        """Test that multiple API versions for same kind are handled."""
+        api_resources_output = """ingresses                              networking.k8s.io/v1       true         Ingress                              create,delete,deletecollection,get,list,patch,update,watch
+ingresses                              networking.k8s.io/v1beta1  true         Ingress                              create,delete,deletecollection,get,list,patch,update,watch   """
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # Should include both API versions
+        assert len(result["Ingress"]) == 2
+        assert "apis/networking.k8s.io/v1" in result["Ingress"]
+        assert "apis/networking.k8s.io/v1beta1" in result["Ingress"]
+
+    @patch("class_generator.core.schema.run_command")
+    def test_variable_shortnames_column_handled(self, mock_run_command):
+        """Test that variable SHORTNAMES column is handled correctly."""
+        api_resources_output = """bindings                                                       v1                         true         Binding                              create
+componentstatuses             cs                           v1                         false        ComponentStatus                      get,list
+events                        ev                           v1                         true         Event                                create,delete,deletecollection,get,list,patch,update,watch
+limitranges                   limits                       v1                         true         LimitRange                           create,delete,deletecollection,get,list,patch,update,watch   """
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # Should handle lines with and without shortnames correctly
+        assert result["Binding"] == ["api/v1"]
+        assert result["ComponentStatus"] == ["api/v1"]
+        assert result["Event"] == ["api/v1"]
+        assert result["LimitRange"] == ["api/v1"]
+
+    @patch("class_generator.core.schema.run_command")
+    def test_parsing_exception_handling(self, mock_run_command):
+        """Test that parsing exceptions are handled gracefully."""
+        # Create output that will cause parsing issues
+        api_resources_output = """valid_line                    sc           v1                         true         ValidResource                        create,delete
+invalid version format        sc           invalid                    true         InvalidResource                      create
+missing_columns               sc
+"""
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # Should only include resources that parsed successfully
+        assert "ValidResource" in result
+        assert "InvalidResource" not in result
+        assert len(result) == 1
+
+
 class TestFindApiPathsForMissingResources:
-    """Test find_api_paths_for_missing_resources function - the main new function."""
+    """Test find_api_paths_for_missing_resources function - updated to use dynamic discovery."""
+
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_dynamic_mapping_used(self, mock_get_client, mock_build_mapping):
+        """Test that dynamic mapping is used instead of hardcoded mapping."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {
+            "Pod": ["api/v1"],
+            "Deployment": ["apis/apps/v1"],
+            "CustomResource": ["apis/custom.io/v1"],
+        }
+
+        paths = {
+            "api/v1": {"serverRelativeURL": "/api/v1"},
+            "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"},
+            "apis/custom.io/v1": {"serverRelativeURL": "/apis/custom.io/v1"},
+        }
+        missing_resources = {"Pod", "CustomResource"}
+
+        result = find_api_paths_for_missing_resources(paths, missing_resources)
+
+        # Should use dynamic mapping
+        mock_build_mapping.assert_called_once_with("kubectl")
+        expected = {"api/v1", "apis/custom.io/v1"}
+        assert result == expected
+
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_fallback_to_hardcoded_mapping(self, mock_get_client, mock_build_mapping):
+        """Test fallback to hardcoded mapping when dynamic discovery fails."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {}  # Empty mapping (failure)
+
+        paths = {
+            "api/v1": {"serverRelativeURL": "/api/v1"},
+            "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"},
+        }
+        missing_resources = {"Pod", "Deployment"}
+
+        result = find_api_paths_for_missing_resources(paths, missing_resources)
+
+        # Should fall back to hardcoded mapping
+        expected = {"api/v1", "apis/apps/v1"}
+        assert result == expected
 
     def test_known_resources_mapping(self):
         """Test that known resources are mapped to correct API paths."""
@@ -265,12 +466,29 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"Pod", "Deployment", "Job"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
-        expected = {"api/v1", "apis/apps/v1", "apis/batch/v1"}
-        assert result == expected
+        # Mock the dynamic mapping to return expected results
+        with (
+            patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping") as mock_build,
+            patch("class_generator.core.schema.get_client_binary") as mock_get_client,
+        ):
+            mock_get_client.return_value = "kubectl"
+            mock_build.return_value = {
+                "Pod": ["api/v1"],
+                "Deployment": ["apis/apps/v1"],
+                "Job": ["apis/batch/v1"],
+            }
 
-    def test_unknown_resources_get_default_paths(self):
+            result = find_api_paths_for_missing_resources(paths, missing_resources)
+            expected = {"api/v1", "apis/apps/v1", "apis/batch/v1"}
+            assert result == expected
+
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_unknown_resources_get_default_paths(self, mock_get_client, mock_build_mapping):
         """Test that unknown resources get mapped to default OpenShift paths."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {}  # Empty mapping for unknown resources
+
         paths = {
             "api/v1": {"serverRelativeURL": "/api/v1"},
             "apis/apps.openshift.io/v1": {"serverRelativeURL": "/apis/apps.openshift.io/v1"},
@@ -291,8 +509,13 @@ class TestFindApiPathsForMissingResources:
         result = find_api_paths_for_missing_resources(paths, missing_resources)
         assert result == set()
 
-    def test_missing_api_paths_in_cluster(self):
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_missing_api_paths_in_cluster(self, mock_get_client, mock_build_mapping):
         """Test handling when expected API paths are not available in cluster."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {"Deployment": ["apis/apps/v1"]}
+
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}  # Missing apps/v1
         missing_resources = {"Deployment"}  # Deployment usually in apps/v1
 
@@ -300,8 +523,16 @@ class TestFindApiPathsForMissingResources:
         # Should still return empty since apps/v1 not available
         assert result == set()
 
-    def test_openshift_specific_resources(self):
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_openshift_specific_resources(self, mock_get_client, mock_build_mapping):
         """Test OpenShift-specific resources are mapped correctly."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {
+            "Route": ["apis/route.openshift.io/v1"],
+            "BuildConfig": ["apis/build.openshift.io/v1"],
+        }
+
         paths = {
             "apis/route.openshift.io/v1": {"serverRelativeURL": "/apis/route.openshift.io/v1"},
             "apis/build.openshift.io/v1": {"serverRelativeURL": "/apis/build.openshift.io/v1"},
@@ -312,8 +543,13 @@ class TestFindApiPathsForMissingResources:
         expected = {"apis/route.openshift.io/v1", "apis/build.openshift.io/v1"}
         assert result == expected
 
-    def test_mixed_known_and_unknown_resources(self):
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_mixed_known_and_unknown_resources(self, mock_get_client, mock_build_mapping):
         """Test mix of known and unknown resources."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {"Pod": ["api/v1"]}  # Only Pod known
+
         paths = {
             "api/v1": {"serverRelativeURL": "/api/v1"},
             "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"},
@@ -326,8 +562,13 @@ class TestFindApiPathsForMissingResources:
         assert "api/v1" in result
         assert "apis/apps.openshift.io/v1" in result  # Default OpenShift path
 
-    def test_uploadtokenrequest_special_case(self):
-        """Test UploadTokenRequest which could be in either api."""
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_uploadtokenrequest_special_case(self, mock_get_client, mock_build_mapping):
+        """Test UploadTokenRequest which could be in either api (using fallback)."""
+        mock_get_client.return_value = "kubectl"
+        mock_build_mapping.return_value = {}  # Empty - force fallback to hardcoded
+
         paths = {
             "api/v1": {"serverRelativeURL": "/api/v1"},
             "apis/image.openshift.io/v1": {"serverRelativeURL": "/apis/image.openshift.io/v1"},
@@ -335,7 +576,7 @@ class TestFindApiPathsForMissingResources:
         missing_resources = {"UploadTokenRequest"}
 
         result = find_api_paths_for_missing_resources(paths, missing_resources)
-        # Should check both API paths
+        # Should check both API paths using fallback hardcoded mapping
         assert "api/v1" in result
         assert "apis/image.openshift.io/v1" in result
 
@@ -387,6 +628,92 @@ class TestFetchAllApiSchemas:
         result = fetch_all_api_schemas("kubectl", paths, filter_paths)
         # Should only process filtered paths
         assert isinstance(result, dict)
+
+    def test_filter_paths_validation_valid_set(self):
+        """Test that valid filter_paths set passes validation."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}, "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"}}
+        filter_paths = {"api/v1", "apis/apps/v1"}
+
+        # Should not raise any exception during validation
+        with patch("class_generator.core.schema.run_command") as mock_run_command:
+            mock_run_command.return_value = (True, '{"swagger": "2.0"}', "")
+            result = fetch_all_api_schemas("kubectl", paths, filter_paths)
+            assert isinstance(result, dict)
+
+    def test_filter_paths_validation_converts_iterable_to_set(self):
+        """Test that filter_paths list is converted to set."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}, "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"}}
+        filter_paths = ["api/v1", "apis/apps/v1"]  # List instead of set
+
+        # Should not raise any exception during validation
+        with patch("class_generator.core.schema.run_command") as mock_run_command:
+            mock_run_command.return_value = (True, '{"swagger": "2.0"}', "")
+            result = fetch_all_api_schemas("kubectl", paths, filter_paths)
+            assert isinstance(result, dict)
+
+    def test_filter_paths_validation_string_with_invalid_chars_raises_valueerror(self):
+        """Test that string filter_paths with invalid characters raises ValueError."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
+        filter_paths = "not_iterable"  # String is iterable but each char isn't a valid path
+
+        with pytest.raises(ValueError, match="The following filter_paths are not present in paths"):
+            fetch_all_api_schemas("kubectl", paths, filter_paths)
+
+    def test_filter_paths_validation_non_iterable_type_raises_typeerror(self):
+        """Test that non-iterable filter_paths type raises TypeError."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
+        filter_paths = 123  # Not iterable
+
+        with pytest.raises(TypeError, match="filter_paths must be a set or iterable of strings, got int"):
+            fetch_all_api_schemas("kubectl", paths, filter_paths)
+
+    def test_filter_paths_validation_non_string_items_raises_typeerror(self):
+        """Test that non-string items in filter_paths raise TypeError."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
+        filter_paths = {"api/v1", 123, None}  # Mixed types
+
+        with pytest.raises(TypeError, match="All items in filter_paths must be non-empty strings, found invalid items"):
+            fetch_all_api_schemas("kubectl", paths, filter_paths)
+
+    def test_filter_paths_validation_empty_string_raises_typeerror(self):
+        """Test that empty string in filter_paths raises TypeError."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
+        filter_paths = {"api/v1", ""}  # Empty string
+
+        with pytest.raises(TypeError, match="All items in filter_paths must be non-empty strings, found invalid items"):
+            fetch_all_api_schemas("kubectl", paths, filter_paths)
+
+    def test_filter_paths_validation_missing_paths_raises_valueerror(self):
+        """Test that filter_paths not present in paths raise ValueError."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
+        filter_paths = {"api/v1", "apis/missing/v1", "api/v2"}  # Some paths not in paths dict
+
+        with pytest.raises(ValueError, match="The following filter_paths are not present in paths"):
+            fetch_all_api_schemas("kubectl", paths, filter_paths)
+
+    def test_filter_paths_validation_missing_paths_includes_available_paths(self):
+        """Test that ValueError includes available paths for debugging."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}, "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"}}
+        filter_paths = {"missing/path"}
+
+        with pytest.raises(ValueError) as exc_info:
+            fetch_all_api_schemas("kubectl", paths, filter_paths)
+
+        error_message = str(exc_info.value)
+        assert "missing/path" in error_message
+        assert "Available paths:" in error_message
+        assert "api/v1" in error_message
+        assert "apis/apps/v1" in error_message
+
+    def test_filter_paths_none_allows_all_paths(self):
+        """Test that filter_paths=None processes all paths (existing behavior)."""
+        paths = {"api/v1": {"serverRelativeURL": "/api/v1"}, "apis/apps/v1": {"serverRelativeURL": "/apis/apps/v1"}}
+        filter_paths = None
+
+        with patch("class_generator.core.schema.run_command") as mock_run_command:
+            mock_run_command.return_value = (True, '{"swagger": "2.0"}', "")
+            result = fetch_all_api_schemas("kubectl", paths, filter_paths)
+            assert isinstance(result, dict)
 
 
 class TestProcessSchemaDefinitions:
@@ -610,6 +937,51 @@ class TestDetectMissingRefsFromSchemas:
 
         result = _detect_missing_refs_from_schemas(schemas, definitions)
         assert "io.k8s.api.core.v1.Container" in result
+
+    def test_circular_reference_detection(self):
+        """Test that circular references don't cause infinite recursion."""
+        # Create a circular reference structure
+        obj_a = {"name": "ObjectA"}
+        obj_b = {"name": "ObjectB"}
+        obj_c = {"name": "ObjectC"}
+
+        # Create circular references: A -> B -> C -> A
+        obj_a["ref_to_b"] = obj_b
+        obj_b["ref_to_c"] = obj_c
+        obj_c["ref_to_a"] = obj_a
+
+        # Add some $ref references to test the actual functionality
+        obj_a["$ref"] = "#/definitions/MissingRef1"
+        obj_b["$ref"] = "#/definitions/MissingRef2"
+
+        schemas = {"api/v1": {"components": {"schemas": {"CircularTest": obj_a}}}}
+
+        definitions = {}
+
+        # This should not cause infinite recursion
+        result = _detect_missing_refs_from_schemas(schemas, definitions)
+
+        # Should detect the missing references
+        assert "MissingRef1" in result
+        assert "MissingRef2" in result
+        assert len(result) == 2
+
+    def test_self_referencing_object(self):
+        """Test that an object referencing itself doesn't cause infinite recursion."""
+        # Create a self-referencing object
+        self_ref_obj = {"name": "SelfRef", "$ref": "#/definitions/MissingSelfRef"}
+        self_ref_obj["self"] = self_ref_obj  # Self-reference
+
+        schemas = {"api/v1": {"components": {"schemas": {"SelfRefTest": self_ref_obj}}}}
+
+        definitions = {}
+
+        # This should not cause infinite recursion
+        result = _detect_missing_refs_from_schemas(schemas, definitions)
+
+        # Should detect the missing reference
+        assert "MissingSelfRef" in result
+        assert len(result) == 1
 
 
 class TestInferOcExplainPath:

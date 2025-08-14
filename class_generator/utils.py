@@ -1,15 +1,161 @@
 """Utilities for class generator."""
 
 import ast
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 
 from simple_logger.logger import get_logger
 
 from class_generator.constants import PYTHON_KEYWORD_MAPPINGS, VERSION_PRIORITY
 
 LOGGER = get_logger(name=__name__)
+
+# Type variables for generic parallel execution
+T = TypeVar("T")  # Input task type
+R = TypeVar("R")  # Result type
+
+
+def execute_parallel_tasks(
+    tasks: Iterable[T],
+    task_func: Callable[[T], R],
+    max_workers: Optional[int] = None,
+    task_name: str = "task",
+    result_processor: Optional[Callable[[T, R], Any]] = None,
+    error_handler: Optional[Callable[[T, Exception], Any]] = None,
+) -> List[Tuple[T, Union[R, Exception]]]:
+    """
+    Execute tasks in parallel using ThreadPoolExecutor.
+
+    This generic helper eliminates code duplication for parallel execution patterns
+    throughout the class generator codebase.
+
+    Args:
+        tasks: Iterable of tasks to execute
+        task_func: Function to execute for each task
+        max_workers: Maximum number of worker threads (defaults to min(10, len(tasks)))
+        task_name: Name for logging purposes
+        result_processor: Optional function to process successful results
+        error_handler: Optional function to handle exceptions
+
+    Returns:
+        List of tuples containing (task, result_or_exception) for each task
+
+    Example:
+        # Simple usage
+        results = execute_parallel_tasks(
+            tasks=resources,
+            task_func=regenerate_single_resource,
+            task_name="regeneration"
+        )
+
+        # With custom processing
+        def process_result(resource, result):
+            kind, success, error = result
+            if success:
+                LOGGER.info(f"Success: {kind}")
+            else:
+                LOGGER.error(f"Failed: {kind} - {error}")
+
+        results = execute_parallel_tasks(
+            tasks=resources,
+            task_func=regenerate_single_resource,
+            result_processor=process_result,
+            task_name="regeneration"
+        )
+    """
+    task_list = list(tasks)
+    if not task_list:
+        return []
+
+    # Default max_workers to min(10, len(tasks))
+    if max_workers is None:
+        max_workers = min(10, len(task_list))
+
+    results: List[Tuple[T, Union[R, Exception]]] = []
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all tasks and create mapping from future to task
+        future_to_task: Dict[Any, T] = {executor.submit(task_func, task): task for task in task_list}
+
+        # Process results as they complete
+        for future in as_completed(future_to_task):
+            task = future_to_task[future]
+            try:
+                result = future.result()
+                results.append((task, result))
+
+                # Optional result processing
+                if result_processor:
+                    result_processor(task, result)
+
+            except Exception as exc:
+                results.append((task, exc))
+
+                # Optional error handling
+                if error_handler:
+                    error_handler(task, exc)
+                else:
+                    LOGGER.error(f"Failed to execute {task_name} for {task}: {exc}")
+
+    return results
+
+
+def execute_parallel_with_mapping(
+    task_mapping: Dict[T, Any],
+    task_func: Callable[[T], R],
+    max_workers: Optional[int] = None,
+    task_name: str = "task",
+) -> Dict[T, Union[R, Exception]]:
+    """
+    Execute tasks in parallel where each task has associated metadata.
+
+    This is useful when you need to maintain a mapping between tasks and their
+    associated data (like API paths to schema info).
+
+    Args:
+        task_mapping: Dictionary mapping tasks to their associated data
+        task_func: Function to execute for each task (receives only the task)
+        max_workers: Maximum number of worker threads
+        task_name: Name for logging purposes
+
+    Returns:
+        Dictionary mapping tasks to their results or exceptions
+
+    Example:
+        # API fetching pattern
+        path_to_info = {"/api/v1": {...}, "/apis/apps/v1": {...}}
+        results = execute_parallel_with_mapping(
+            task_mapping=path_to_info,
+            task_func=lambda path: fetch_api_group(path, path_to_info[path]),
+            task_name="API fetching"
+        )
+    """
+    if not task_mapping:
+        return {}
+
+    # Default max_workers to min(10, len(task_mapping))
+    if max_workers is None:
+        max_workers = min(10, len(task_mapping))
+
+    results: Dict[T, Union[R, Exception]] = {}
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all tasks
+        future_to_task: Dict[Any, T] = {executor.submit(task_func, task): task for task in task_mapping.keys()}
+
+        # Process results as they complete
+        for future in as_completed(future_to_task):
+            task = future_to_task[future]
+            try:
+                result = future.result()
+                results[task] = result
+            except Exception as exc:
+                results[task] = exc
+                LOGGER.error(f"Failed to execute {task_name} for {task}: {exc}")
+
+    return results
 
 
 def sanitize_python_name(name: str) -> tuple[str, str]:

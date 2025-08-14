@@ -3,7 +3,6 @@
 import fnmatch
 import shutil
 import sys
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -20,6 +19,7 @@ from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
 from class_generator.core.schema import update_kind_schema, ClusterVersionError
 from class_generator.tests.test_generation import generate_class_generator_tests
+from class_generator.utils import execute_parallel_tasks
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
@@ -250,20 +250,23 @@ def handle_regenerate_all(
             LOGGER.error(f"Failed to regenerate {resource_kind}: {e}")
             return resource_kind, False, str(e)
 
-    # Process resources in parallel
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        # Submit all tasks
-        regeneration_futures = {
-            executor.submit(regenerate_single_resource, resource): resource for resource in discovered
-        }
+    # Process results from parallel execution
+    def process_regeneration_result(resource: dict[str, Any], result: tuple[str, bool, str | None]) -> None:
+        nonlocal success_count, error_count
+        resource_kind, success, error = result
+        if success:
+            success_count += 1
+        else:
+            error_count += 1
 
-        # Process results as they complete
-        for future in as_completed(regeneration_futures):
-            resource_kind, success, error = future.result()
-            if success:
-                success_count += 1
-            else:
-                error_count += 1
+    # Process resources in parallel
+    execute_parallel_tasks(
+        tasks=discovered,
+        task_func=regenerate_single_resource,
+        max_workers=10,
+        task_name="regeneration",
+        result_processor=process_regeneration_result,
+    )
 
     # Print summary
     if not dry_run:
@@ -361,14 +364,13 @@ def handle_normal_kind_generation(
                 LOGGER.error(f"Failed to generate {kind_to_generate}: {e}")
                 return []
 
-        futures: list[Future] = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            for _kind in kind_list:
-                futures.append(executor.submit(generate_with_backup, _kind))
-
-            # Wait for all tasks to complete
-            for _ in as_completed(futures):
-                pass
+        # Generate all kinds in parallel
+        execute_parallel_tasks(
+            tasks=kind_list,
+            task_func=generate_with_backup,
+            max_workers=10,
+            task_name="generation",
+        )
 
         if backup_dir and not dry_run:
             LOGGER.info(f"Backup files stored in: {backup_dir}")
