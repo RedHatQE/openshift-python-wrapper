@@ -158,13 +158,18 @@ class TestCLIFunctionality:
         runner = CliRunner()
 
         # --add-tests requires -k option
-        with patch("class_generator.cli.generate_class_generator_tests") as mock_test_gen:
+        with (
+            patch("class_generator.cli.generate_class_generator_tests") as mock_test_gen,
+            patch("os.system") as mock_os_system,
+        ):
             mock_test_gen.return_value = None
+            mock_os_system.return_value = 0  # Simulate successful test run
 
             result = runner.invoke(cli=main, args=["-k", "Pod", "--add-tests"])
 
             assert result.exit_code == 0
             mock_test_gen.assert_called_once()
+            mock_os_system.assert_called_once_with("uv run pytest class_generator/tests/test_class_generator.py")
 
     def test_add_tests_requires_kind(self):
         """Test that --add-tests cannot be used alone."""

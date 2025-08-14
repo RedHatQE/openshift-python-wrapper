@@ -2,7 +2,8 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
 
 
 class ServiceMeshMember(NamespacedResource):

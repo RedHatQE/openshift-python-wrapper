@@ -46,7 +46,9 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
     for schema in _kinds_schema:
         gvk_list = schema.get("x-kubernetes-group-version-kind", [])
         if gvk_list:
-            group = gvk_list[0].get("group", "")
+            # Prefer non-empty groups over empty groups to avoid duplicates
+            preferred_gvk = next((gvk for gvk in gvk_list if gvk.get("group")), gvk_list[0])
+            group = preferred_gvk.get("group", "")
             if group not in schemas_by_group:
                 schemas_by_group[group] = []
             schemas_by_group[group].append(schema)
@@ -60,7 +62,9 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
             for schema in group_schemas:
                 gvk_list = schema.get("x-kubernetes-group-version-kind", [])
                 if gvk_list:
-                    version = gvk_list[0].get("version", "")
+                    # Use same preference logic as grouping
+                    preferred_gvk = next((gvk for gvk in gvk_list if gvk.get("group")), gvk_list[0])
+                    version = preferred_gvk.get("version", "")
                     versions.append(version)
 
             latest_version = get_latest_version(versions=versions)
@@ -68,9 +72,12 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
             # Add only the schema with the latest version
             for schema in group_schemas:
                 gvk_list = schema.get("x-kubernetes-group-version-kind", [])
-                if gvk_list and gvk_list[0].get("version") == latest_version:
-                    filtered_schemas.append(schema)
-                    break
+                if gvk_list:
+                    # Use same preference logic as grouping
+                    preferred_gvk = next((gvk for gvk in gvk_list if gvk.get("group")), gvk_list[0])
+                    if preferred_gvk.get("version") == latest_version:
+                        filtered_schemas.append(schema)
+                        break
         else:
             # Single version in this group
             filtered_schemas.extend(group_schemas)

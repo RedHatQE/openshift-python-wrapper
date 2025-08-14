@@ -1,9 +1,10 @@
 import ast
-import json
 import os
 from typing import Any, Generator
 
 from ocp_resources.resource import Resource  # noqa
+from ocp_resources.utils.archive_utils import load_json_archive
+from class_generator.constants import RESOURCES_MAPPING_FILE
 
 # Cache for resources definitions to avoid reloading the large JSON file
 _RESOURCES_DEFINITIONS_CACHE: dict[str, Any] = {}
@@ -150,6 +151,5 @@ def parse_resource_file_for_errors(data) -> list[str]:
 def resources_definitions() -> dict[str, Any]:
     global _RESOURCES_DEFINITIONS_CACHE
     if not _RESOURCES_DEFINITIONS_CACHE:
-        with open("class_generator/schema/__resources-mappings.json") as fd:
-            _RESOURCES_DEFINITIONS_CACHE = json.load(fd)
+        _RESOURCES_DEFINITIONS_CACHE = load_json_archive(RESOURCES_MAPPING_FILE)
     return _RESOURCES_DEFINITIONS_CACHE

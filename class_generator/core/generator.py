@@ -2,12 +2,9 @@
 
 import filecmp
 import os
-import shlex
-import sys
 from pathlib import Path
 from typing import Any
 
-from pyhelper_utils.shell import run_command
 from rich.console import Console
 from rich.syntax import Syntax
 from simple_logger.logger import get_logger
@@ -86,9 +83,10 @@ def generate_resource_file_from_dict(
             LOGGER.warning(f"Overwriting {_output_file}")
 
         else:
-            temp_output_file = _output_file.replace(".py", "_TEMP.py")
-            LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
-            _output_file = temp_output_file
+            if not dry_run:
+                temp_output_file = _output_file.replace(".py", "_TEMP.py")
+                LOGGER.warning(f"{_output_file} already exists, using {temp_output_file}")
+                _output_file = temp_output_file
 
     if _user_code.strip() or _user_imports.strip():
         output += f"{_user_imports}{rendered}{_user_code}"
@@ -114,6 +112,7 @@ def class_generator(
     add_tests: bool = False,
     called_from_cli: bool = True,
     update_schema_executed: bool = False,
+    called_from_test: bool = False,
 ) -> list[str]:
     """
     Generates a class for a given Kind.
@@ -134,55 +133,50 @@ def class_generator(
     LOGGER.info(f"Generating class for {kind}")
     kind = kind.lower()
     kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
-    if not kind_and_namespaced_mappings:
+    if not called_from_test and not kind_and_namespaced_mappings:
         if called_from_cli:
             if update_schema_executed:
-                LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed.")
-                sys.exit(1)
+                error_msg = f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema executed."
+                LOGGER.error(error_msg)
+                raise RuntimeError(error_msg)
 
-            # Use a loop to handle retries instead of recursion
-            max_retries = 3
-            retry_count = 0
+            run_update_schema = (
+                input(
+                    f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]: "
+                )
+                .strip()
+                .lower()
+            )
 
-            while retry_count < max_retries:
-                # Validate user input with a loop
-                while True:
-                    run_update_schema = (
-                        input(
-                            f"{kind} not found in {RESOURCES_MAPPING_FILE}, Do you want to run --update-schema and retry? [Y/N]: "
-                        )
-                        .strip()
-                        .lower()
-                    )
+            if run_update_schema != "y":
+                raise RuntimeError(f"User declined to update schema for {kind}")
 
-                    if run_update_schema in ["y", "n"]:
-                        break
-                    else:
-                        print("Invalid input. Please enter 'Y' or 'N'.")
-
-                if run_update_schema == "n":
-                    sys.exit(1)
-
-                # User chose 'y' - update schema and retry
-                LOGGER.info(f"Updating schema (attempt {retry_count + 1}/{max_retries})...")
+            # User chose 'y' - update schema and retry
+            LOGGER.info("Updating schema")
+            try:
                 update_kind_schema()
+            except (RuntimeError, IOError) as e:
+                error_msg = f"Failed to update schema: {e}"
+                LOGGER.error(error_msg)
+                raise RuntimeError(error_msg) from e
 
-                # Re-read the mapping file to check if kind is now available
-                kind_and_namespaced_mappings = read_resources_mapping_file().get(kind)
-                if kind_and_namespaced_mappings:
-                    # Kind found, break out of retry loop to continue processing
-                    break
-                else:
-                    retry_count += 1
-                    if retry_count < max_retries:
-                        LOGGER.warning(
-                            f"{kind} still not found after schema update. Retry {retry_count}/{max_retries}."
-                        )
-                    else:
-                        LOGGER.error(
-                            f"{kind} not found in {RESOURCES_MAPPING_FILE} after {max_retries} update-schema attempts."
-                        )
-                        sys.exit(1)
+            # Re-read the mapping file to check if kind is now available
+            kind_and_namespaced_mappings = read_resources_mapping_file(skip_cache=True).get(kind)
+            if kind_and_namespaced_mappings:
+                return class_generator(
+                    kind=kind,
+                    overwrite=overwrite,
+                    dry_run=dry_run,
+                    output_file=output_file,
+                    output_dir=output_dir,
+                    add_tests=add_tests,
+                    called_from_cli=called_from_cli,
+                    update_schema_executed=True,
+                )
+            else:
+                error_msg = f"{kind} not found in {RESOURCES_MAPPING_FILE} after update-schema attempt."
+                LOGGER.error(error_msg)
+                raise RuntimeError(error_msg)
 
         else:
             LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema.")
@@ -215,29 +209,7 @@ def class_generator(
             output_dir=output_dir,
         )
 
-        if not dry_run:
-            try:
-                rc, stdout, stderr = run_command(
-                    command=shlex.split(f"uvx pre-commit run --files {generated_py_file}"),
-                    verify_stderr=False,
-                    check=False,
-                )
-                # Check if the command failed
-                if not rc:
-                    LOGGER.warning(
-                        f"Pre-commit hooks failed for {generated_py_file}. "
-                        f"This is non-fatal and generation will continue."
-                    )
-                    if stderr:
-                        LOGGER.debug(f"Pre-commit stderr: {stderr}")
-                    if stdout:
-                        LOGGER.debug(f"Pre-commit stdout: {stdout}")
-            except Exception as e:
-                LOGGER.error(
-                    f"Failed to run pre-commit hooks for {generated_py_file}: {e}. "
-                    f"This is non-fatal and generation will continue."
-                )
-
+        if not dry_run and not called_from_test:
             if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
                 LOGGER.warning(f"File {orig_filename} was not updated, deleting {generated_py_file}")
                 Path.unlink(Path(generated_py_file))

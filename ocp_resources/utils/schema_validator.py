@@ -5,12 +5,14 @@ the Resource class and the fake Kubernetes client.
 """
 
 import json
-from importlib.resources import files
-from pathlib import Path
 from typing import Any
 
 import jsonschema
 from simple_logger.logger import get_logger
+
+from class_generator.constants import RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE, DEFINITIONS_FILE
+
+from .archive_utils import load_json_archive
 
 LOGGER = get_logger(name=__name__)
 
@@ -24,7 +26,7 @@ class SchemaValidator:
     _schema_cache: dict[str, dict[str, Any]] = {}
 
     @classmethod
-    def load_mappings_data(cls) -> bool:
+    def load_mappings_data(cls, skip_cache: bool = False) -> bool:
         """
         Load the resource mappings and definitions data.
 
@@ -32,48 +34,38 @@ class SchemaValidator:
             bool: True if loaded successfully, False otherwise
         """
         if cls._mappings_data is not None and cls._definitions_data is not None:
-            return True
+            if not skip_cache:
+                return True
 
-        try:
-            schema_dir = files("class_generator") / "schema"
-            mappings_path = schema_dir / "__resources-mappings.json"
-            definitions_path = schema_dir / "_definitions.json"
-
-            # Read the files
-            mappings_data = mappings_path.read_text()
-            definitions_data = definitions_path.read_text()
-        except (ImportError, ModuleNotFoundError):
-            # Fallback to file system path for development
-            schema_dir = Path(__file__).parent.parent.parent / "class_generator" / "schema"
-            mappings_file = schema_dir / "__resources-mappings.json"
-            definitions_file = schema_dir / "_definitions.json"
-
-            if not mappings_file.exists() or not definitions_file.exists():
-                LOGGER.warning(f"Schema files not found in {schema_dir}")
-                return False
-
+        # Load mappings from archive
+        if RESOURCES_MAPPING_ARCHIVE.exists():
             try:
-                with open(mappings_file, "r") as f:
-                    mappings_data = f.read()
-                with open(definitions_file, "r") as f:
-                    definitions_data = f.read()
-            except Exception as e:
-                LOGGER.error(f"Failed to read schema files: {e}")
+                cls._mappings_data = load_json_archive(RESOURCES_MAPPING_FILE)
+            except (json.JSONDecodeError, IOError) as e:
+                LOGGER.error(f"Failed to load mappings from archive {RESOURCES_MAPPING_ARCHIVE}: {e}")
                 return False
-
-        # Parse the JSON data
-        try:
-            cls._mappings_data = json.loads(mappings_data)
-            definitions_json = json.loads(definitions_data)
-            # Extract the definitions from the top-level "definitions" key
-            cls._definitions_data = definitions_json.get("definitions", {})
-            return True
-        except json.JSONDecodeError as e:
-            LOGGER.error(f"Failed to parse schema JSON: {e}")
+        else:
+            LOGGER.warning(f"Mappings archive not found: {RESOURCES_MAPPING_ARCHIVE}")
             return False
 
+        # Load definitions file (not archived)
+        if not DEFINITIONS_FILE.exists():
+            LOGGER.warning(f"Definitions file not found: {DEFINITIONS_FILE}")
+            return False
+
+        try:
+            with open(DEFINITIONS_FILE, "r") as f:
+                definitions_data = f.read()
+            definitions_json = json.loads(definitions_data)
+            cls._definitions_data = definitions_json.get("definitions", {})
+        except Exception as e:
+            LOGGER.error(f"Failed to read definitions file {DEFINITIONS_FILE}: {e}")
+            return False
+
+        return True
+
     @classmethod
-    def get_mappings_data(cls) -> dict[str, Any] | None:
+    def get_mappings_data(cls, skip_cache: bool = False) -> dict[str, Any] | None:
         """
         Get the resource mappings data.
 
@@ -84,7 +76,7 @@ class SchemaValidator:
             dict[str, Any] | None: The mappings data or None if not loaded
         """
         # Ensure data is loaded
-        if cls._mappings_data is None:
+        if cls._mappings_data is None or skip_cache:
             cls.load_mappings_data()
         return cls._mappings_data
 
@@ -207,9 +199,29 @@ class SchemaValidator:
                         definition_name = ref[20:]  # Remove "/components/schemas/"
 
                     # Type guard for mypy
-                    if cls._definitions_data is not None and definition_name in cls._definitions_data:
-                        # Return the resolved definition (and resolve any refs within it)
-                        return cls._resolve_refs(cls._definitions_data[definition_name], resolver)
+                    if cls._definitions_data is not None:
+                        # Try multiple key formats to handle schema key format mismatch
+                        possible_keys = [
+                            definition_name,  # io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+                            definition_name.split(".")[-1],  # ObjectMeta
+                            # Extract version/Kind format from the namespaced reference
+                            "/".join(definition_name.split(".")[-2:])
+                            if "." in definition_name
+                            else definition_name,  # v1/ObjectMeta
+                        ]
+
+                        for key in possible_keys:
+                            if key in cls._definitions_data:
+                                # Return the resolved definition (and resolve any refs within it)
+                                return cls._resolve_refs(cls._definitions_data[key], resolver)
+
+                        LOGGER.warning(f"Definition not found: {definition_name} (tried {possible_keys})")
+                        # For core Kubernetes types that are missing, return a basic object schema
+                        # to allow validation to continue instead of failing completely
+                        if any(core_type in definition_name for core_type in ["ObjectMeta", "TypeMeta", "Status"]):
+                            LOGGER.info(f"Using basic object schema fallback for core type: {definition_name}")
+                            return {"type": "object", "additionalProperties": True}
+                        return obj
                     else:
                         LOGGER.warning(f"Definition not found: {definition_name}")
                         return obj
