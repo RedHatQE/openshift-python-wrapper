@@ -192,6 +192,12 @@ class DataVolume(NamespacedResource):
             if self.source_dict is not None:
                 _spec["source"] = self.source_dict
             elif self.source is not None:
+                warn(
+                    "source is deprecated and will be removed in the next version. Use source_dict instead.",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+
                 _spec["source"] = {}
                 source_spec = _spec["source"]
 
