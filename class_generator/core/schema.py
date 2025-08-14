@@ -153,13 +153,166 @@ def check_and_update_cluster_version(client: str) -> bool:
     return same_or_newer_version
 
 
-def fetch_all_api_schemas(client: str, paths: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def identify_missing_resources(client: str, existing_resources_mapping: dict[Any, Any]) -> set[str]:
     """
-    Fetch all API schemas from the cluster in parallel.
+    Identify resources that exist in the cluster but are missing from our mapping.
+
+    Args:
+        client: Path to kubectl/oc client binary
+        existing_resources_mapping: Current resources mapping
+
+    Returns:
+        set: Set of missing resource kinds
+    """
+    missing_resources: set[str] = set()
+
+    # Get all available resources from cluster
+    cmd = f"{client} api-resources --no-headers"
+    success, output, _ = run_command(command=shlex.split(cmd), check=False, log_errors=False)
+
+    if not success or not output:
+        LOGGER.debug("Failed to get api-resources from cluster")
+        return missing_resources
+
+    # Extract kinds from cluster resources
+    cluster_resources = set()
+    lines = output.strip().split("\n")
+
+    for line in lines:
+        parts = [p for p in line.split() if p]
+        if parts:
+            kind = parts[-1]  # KIND is the last column
+            cluster_resources.add(kind)
+
+    # Find missing resources by comparing with existing mapping
+    existing_kinds = set()
+    for _, resource_schemas in existing_resources_mapping.items():
+        if isinstance(resource_schemas, list) and resource_schemas:
+            # Extract kind from the first schema's x-kubernetes-group-version-kind
+            first_schema = resource_schemas[0]
+            if isinstance(first_schema, dict):
+                gvk_list = first_schema.get("x-kubernetes-group-version-kind", [])
+                if gvk_list and isinstance(gvk_list, list):
+                    kind = gvk_list[0].get("kind", "")
+                    if kind:
+                        existing_kinds.add(kind)
+
+    missing_resources = cluster_resources - existing_kinds
+    LOGGER.info(f"Found {len(missing_resources)} missing resources: {sorted(list(missing_resources)[:10])}")
+
+    return missing_resources
+
+
+def find_api_paths_for_missing_resources(paths: dict[str, Any], missing_resources: set[str]) -> set[str]:
+    """
+    Find API paths that contain schemas for missing resources.
 
     Args:
         client: Path to kubectl/oc client binary
         paths: Dictionary of API paths from v3 index
+        missing_resources: Set of missing resource kinds
+
+    Returns:
+        set: Set of API paths to fetch for missing resources
+    """
+    if not missing_resources:
+        return set()
+
+    relevant_paths = set()
+
+    # Define a mapping of common resource kinds to their expected API groups
+    resource_to_api_mapping = {
+        # Core API resources (in api/v1)
+        "Pod": ["api/v1"],
+        "Service": ["api/v1"],
+        "ConfigMap": ["api/v1"],
+        "Secret": ["api/v1"],
+        "PersistentVolume": ["api/v1"],
+        "PersistentVolumeClaim": ["api/v1"],
+        "ServiceAccount": ["api/v1"],
+        "Namespace": ["api/v1"],
+        "Node": ["api/v1"],
+        "Event": ["api/v1"],
+        "Endpoints": ["api/v1"],
+        "LimitRange": ["api/v1"],
+        "ResourceQuota": ["api/v1"],
+        # Apps API group resources
+        "Deployment": ["apis/apps/v1"],
+        "ReplicaSet": ["apis/apps/v1"],
+        "DaemonSet": ["apis/apps/v1"],
+        "StatefulSet": ["apis/apps/v1"],
+        # Batch API group resources
+        "Job": ["apis/batch/v1"],
+        "CronJob": ["apis/batch/v1"],
+        # Networking API group resources
+        "NetworkPolicy": ["apis/networking.k8s.io/v1"],
+        "Ingress": ["apis/networking.k8s.io/v1"],
+        # RBAC API group resources
+        "Role": ["apis/rbac.authorization.k8s.io/v1"],
+        "RoleBinding": ["apis/rbac.authorization.k8s.io/v1"],
+        "ClusterRole": ["apis/rbac.authorization.k8s.io/v1"],
+        "ClusterRoleBinding": ["apis/rbac.authorization.k8s.io/v1"],
+        # OpenShift-specific resources
+        "Route": ["apis/route.openshift.io/v1"],
+        "Template": ["apis/template.openshift.io/v1"],
+        "BuildConfig": ["apis/build.openshift.io/v1"],
+        "DeploymentConfig": ["apis/apps.openshift.io/v1"],
+        "ImageStream": ["apis/image.openshift.io/v1"],
+        "User": ["apis/user.openshift.io/v1"],
+        "Group": ["apis/user.openshift.io/v1"],
+        "Project": ["apis/project.openshift.io/v1"],
+        "ClusterVersion": ["apis/config.openshift.io/v1"],
+        "UploadTokenRequest": ["api/v1", "apis/image.openshift.io/v1"],  # Could be in either
+    }
+
+    # For each missing resource, add its known API paths
+    for missing_resource in missing_resources:
+        LOGGER.info(f"Processing missing resource: {missing_resource}")
+        if missing_resource in resource_to_api_mapping:
+            for api_path in resource_to_api_mapping[missing_resource]:
+                if api_path in paths:
+                    relevant_paths.add(api_path)
+                    LOGGER.debug(f"Added API path {api_path} for missing resource {missing_resource}")
+                else:
+                    LOGGER.debug(f"API path {api_path} not found in cluster paths for resource {missing_resource}")
+        else:
+            # For unknown resources, do a more targeted search
+            # Check if the resource name appears in any API path documentation
+            LOGGER.debug(f"Unknown resource {missing_resource}, scanning API paths for potential matches")
+
+            # Check core API first for unknown resources
+            if "api/v1" in paths:
+                relevant_paths.add("api/v1")
+
+            # Check common OpenShift API groups for unknown OpenShift resources
+            openshift_groups = [
+                "apis/apps.openshift.io/v1",
+                "apis/config.openshift.io/v1",
+                "apis/operator.openshift.io/v1",
+                "apis/image.openshift.io/v1",
+                "apis/route.openshift.io/v1",
+                "apis/template.openshift.io/v1",
+            ]
+            for group_path in openshift_groups:
+                if group_path in paths:
+                    relevant_paths.add(group_path)
+
+    LOGGER.info(
+        f"Identified {len(relevant_paths)} specific API paths for {len(missing_resources)} missing resources: {sorted(relevant_paths)}"
+    )
+    return relevant_paths
+
+
+def fetch_all_api_schemas(
+    client: str, paths: dict[str, Any], filter_paths: set[str] | None = None
+) -> dict[str, dict[str, Any]]:
+    """
+    Fetch all or filtered API schemas from the cluster in parallel.
+
+    Args:
+        client: Path to kubectl/oc client binary
+        paths: Dictionary of API paths from v3 index
+        filter_paths: Optional set of specific API paths to fetch. If None, fetch all.
 
     Returns:
         dict: Mapping of API path to schema data
@@ -178,21 +331,28 @@ def fetch_all_api_schemas(client: str, paths: dict[str, Any]) -> dict[str, dict[
         )
 
         if not success:
-            LOGGER.warning(f"Failed to fetch schema for {api_path}")
+            LOGGER.debug(f"Failed to fetch schema for {api_path}")
             return api_path, None
 
         try:
             schema = json.loads(schema_data)
             return api_path, schema
         except json.JSONDecodeError as e:
-            LOGGER.warning(f"Failed to parse schema for {api_path}: {e}")
+            LOGGER.debug(f"Failed to parse schema for {api_path}: {e}")
             return api_path, None
+
+    # Filter paths if needed
+    paths_to_fetch = paths
+    if filter_paths is not None:
+        paths_to_fetch = {path: info for path, info in paths.items() if path in filter_paths}
+        LOGGER.info(f"Filtering to {len(paths_to_fetch)} specific API paths out of {len(paths)} total")
 
     # Use ThreadPoolExecutor to parallelize API fetching
     with ThreadPoolExecutor(max_workers=10) as executor:
         # Submit all fetch tasks
         future_to_path = {
-            executor.submit(fetch_api_group, api_path, api_info): api_path for api_path, api_info in paths.items()
+            executor.submit(fetch_api_group, api_path, api_info): api_path
+            for api_path, api_info in paths_to_fetch.items()
         }
 
         # Process results as they complete
@@ -236,7 +396,7 @@ def process_schema_definitions(
                 definitions = existing_definitions_data.get("definitions", {})
                 LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve")
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            LOGGER.warning(f"Could not load existing definitions: {e}")
+            LOGGER.debug(f"Could not load existing definitions: {e}")
             definitions = {}
 
     processed_schemas = set()
@@ -244,7 +404,7 @@ def process_schema_definitions(
     new_resources = 0
     updated_resources = 0
 
-    for api_path, schema in schemas.items():
+    for _, schema in schemas.items():
         # Process schema definitions
         for def_name, def_data in schema.get("components", {}).get("schemas", {}).items():
             if def_name in processed_schemas:
@@ -552,7 +712,7 @@ def _detect_missing_refs_from_schemas(schemas: dict[str, dict[str, Any]], defini
     """
     missing_refs = set()
 
-    def find_refs_in_schema(schema_data: dict[str, Any]) -> None:
+    def find_refs_in_schema(schema_data: dict[str, Any] | list[Any]) -> None:
         """Recursively find all $ref references in a schema."""
         if isinstance(schema_data, dict):
             if "$ref" in schema_data:
@@ -582,10 +742,11 @@ def _detect_missing_refs_from_schemas(schemas: dict[str, dict[str, Any]], defini
                 find_refs_in_schema(item)
 
     # Analyze all schemas to find missing refs
-    for api_path, schema in schemas.items():
+    for _, schema in schemas.items():
         find_refs_in_schema(schema)
 
-    LOGGER.info(f"Detected {len(missing_refs)} missing $ref definitions: {sorted(missing_refs)}")
+    LOGGER.info(f"Detected {len(missing_refs)} missing $ref definitions")
+    LOGGER.debug(f"Missing $refs {sorted(missing_refs)}")
     return missing_refs
 
 
@@ -679,11 +840,29 @@ def _run_explain_and_parse(client: str, explain_path: str) -> tuple[dict[str, An
             explain_required = explain_schema.get("required", [])
             return explain_properties, explain_required
         else:
-            LOGGER.warning(f"Failed to get {client} explain for {explain_path}: {result.stderr}")
+            LOGGER.debug(f"Failed to get {client} explain for {explain_path}: {result.stderr}")
             return None
 
     except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
-        LOGGER.warning(f"Failed to run {client} explain for {explain_path}: {e}")
+        LOGGER.debug(f"Failed to run {client} explain for {explain_path}: {e}")
+        return None
+
+
+def _run_explain_recursive(client: str, ref_name: str, oc_path: str) -> tuple[str, dict[str, Any]] | None:
+    """Helper function to run oc explain --recursive for missing definitions."""
+    try:
+        cmd = [client, "explain", oc_path, "--recursive"]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+        if result.returncode == 0:
+            schema = _parse_oc_explain_output(result.stdout)
+            return ref_name, schema
+        else:
+            LOGGER.debug(f"Failed to get oc explain for {oc_path}: {result.stderr}")
+            return None
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
+        LOGGER.debug(f"Failed to run oc explain for {oc_path}: {e}")
         return None
 
 
@@ -742,9 +921,9 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
                 if result:
                     LOGGER.info(f"Successfully obtained explain data for {ref_name} from {explain_path}")
                 else:
-                    LOGGER.warning(f"Failed to obtain explain data for {ref_name} from {explain_path}")
+                    LOGGER.debug(f"Failed to obtain explain data for {ref_name} from {explain_path}")
             except Exception as e:
-                LOGGER.warning(f"Exception occurred while explaining {ref_name} from {explain_path}: {e}")
+                LOGGER.debug(f"Exception occurred while explaining {ref_name} from {explain_path}: {e}")
                 explain_results[ref_name] = None
 
     # Process existing schemas that need supplementation
@@ -924,7 +1103,7 @@ def _supplement_resource_level_required_fields(definitions: dict[str, Any], clie
                         definitions[schema_key] = updated_schema
 
                 except Exception as e:
-                    LOGGER.warning(f"Failed to process required fields for {schema_key}: {e}")
+                    LOGGER.debug(f"Failed to process required fields for {schema_key}: {e}")
                     # Set empty list if explain fails
                     current_schema = definitions[schema_key]
                     updated_schema = current_schema.copy()
@@ -952,34 +1131,41 @@ def _get_missing_core_definitions(
 
     missing_definitions = {}
 
+    # Separate refs that can be fetched vs those that need basic schemas
+    refs_to_fetch = []
     for ref_name in missing_refs:
-        # Try to infer the oc explain path
         oc_path = _infer_oc_explain_path(ref_name)
-
         if oc_path:
-            try:
-                LOGGER.info(f"Fetching missing definition for {ref_name} using oc explain {oc_path}")
-                cmd = [client, "explain", oc_path, "--recursive"]
-
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-
-                if result.returncode == 0:
-                    schema = _parse_oc_explain_output(result.stdout)
-                    # Store with the full reference name
-                    missing_definitions[ref_name] = schema
-                    LOGGER.info(f"Successfully fetched definition for {ref_name}")
-                else:
-                    LOGGER.warning(f"Failed to get oc explain for {oc_path}: {result.stderr}")
-
-            except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
-                LOGGER.warning(f"Failed to run oc explain for {oc_path}: {e}")
+            refs_to_fetch.append((ref_name, oc_path))
         else:
             # For types we can't infer paths for, provide basic object schema
             if any(core_type in ref_name for core_type in ["ObjectMeta", "TypeMeta", "Status", "LabelSelector"]):
                 LOGGER.info(f"Using basic object schema for core type: {ref_name}")
                 missing_definitions[ref_name] = {"type": "object", "additionalProperties": True}
             else:
-                LOGGER.warning(f"Cannot infer oc explain path for {ref_name}, skipping")
+                LOGGER.debug(f"Cannot infer oc explain path for {ref_name}, skipping")
+
+    # Fetch missing definitions in parallel
+    if refs_to_fetch:
+        with ThreadPoolExecutor(max_workers=min(10, len(refs_to_fetch))) as executor:
+            # Submit all explain --recursive operations
+            future_to_ref = {}
+            for ref_name, oc_path in refs_to_fetch:
+                LOGGER.info(f"Fetching missing definition for {ref_name} using oc explain {oc_path}")
+                future = executor.submit(_run_explain_recursive, client, ref_name, oc_path)
+                future_to_ref[future] = ref_name
+
+            # Process results as they complete
+            for future in as_completed(future_to_ref):
+                ref_name = future_to_ref[future]
+                try:
+                    result = future.result()
+                    if result:
+                        fetched_ref_name, schema = result
+                        missing_definitions[fetched_ref_name] = schema
+                        LOGGER.info(f"Successfully fetched definition for {fetched_ref_name}")
+                except Exception as e:
+                    LOGGER.debug(f"Failed to fetch definition for {ref_name}: {e}")
 
     if missing_definitions:
         LOGGER.info(f"Retrieved {len(missing_definitions)} missing core definitions using oc explain")
@@ -1055,22 +1241,7 @@ def update_kind_schema() -> None:
     """Update schema files using OpenAPI v3 endpoints"""
     client = get_client_binary()
 
-    # Build namespacing dictionary once
-    namespacing_dict = build_namespacing_dict(client=client)
-
-    # Get v3 API index
-    LOGGER.info("Fetching OpenAPI v3 index...")
-    success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
-    if not success:
-        error_msg = "Failed to fetch OpenAPI v3 index"
-        LOGGER.error(error_msg)
-        raise RuntimeError(error_msg)
-
-    v3_index = json.loads(v3_data)
-    paths = v3_index.get("paths", {})
-    LOGGER.info(f"Found {len(paths)} API groups to process")
-
-    # Check and update cluster version
+    # Check and update cluster version FIRST (before any expensive operations)
     try:
         should_update = check_and_update_cluster_version(client=client)
     except ClusterVersionError as e:
@@ -1080,36 +1251,94 @@ def update_kind_schema() -> None:
     # Load existing resources mapping
     resources_mapping = read_resources_mapping_file()
 
-    # Always fetch schemas from cluster to allow new resource discovery
-    schemas = fetch_all_api_schemas(client=client, paths=paths)
+    # Determine what we need to do based on cluster version
+    if should_update:
+        need_v3_index = True
+        missing_resources: set[str] = set()
+        LOGGER.info(
+            "Cluster version is same or newer. Fetching all schemas and allowing updates to existing resources."
+        )
+    else:
+        LOGGER.info(
+            "Cluster version is older. Identifying missing resources only - preserving existing resource schemas."
+        )
+        missing_resources = identify_missing_resources(client=client, existing_resources_mapping=resources_mapping)
+        need_v3_index = bool(missing_resources)
+
+    # Fetch v3 API index if needed
+    if need_v3_index:
+        LOGGER.info("Fetching OpenAPI v3 index...")
+        success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
+        if not success:
+            error_msg = "Failed to fetch OpenAPI v3 index"
+            LOGGER.error(error_msg)
+            raise RuntimeError(error_msg)
+
+        v3_index = json.loads(v3_data)
+        paths = v3_index.get("paths", {})
+        LOGGER.info(f"Found {len(paths)} API groups to process")
+    else:
+        paths = {}
+
+    # Fetch schemas based on what we determined
+    if should_update:
+        # Fetch all schemas for full update
+        schemas = fetch_all_api_schemas(client=client, paths=paths)
+    elif missing_resources:
+        # Find API paths that might contain missing resources
+        relevant_paths = find_api_paths_for_missing_resources(paths=paths, missing_resources=missing_resources)
+        # Fetch only relevant schemas
+        schemas = fetch_all_api_schemas(client=client, paths=paths, filter_paths=relevant_paths)
+        LOGGER.info(f"Fetched {len(schemas)} schemas for missing resources instead of all {len(paths)} schemas")
+    else:
+        LOGGER.info("No missing resources found. Skipping all schema fetching.")
+        schemas = {}
+
+    # Build namespacing dictionary (only if we have schemas to process)
+    if schemas:
+        namespacing_dict = build_namespacing_dict(client=client)
+    else:
+        namespacing_dict = {}
 
     # Process schema definitions with appropriate update policy
-    if should_update:
-        LOGGER.info("Cluster version is same or newer. Allowing updates to existing resources.")
-    else:
-        LOGGER.info("Cluster version is older. Adding new resources but preserving existing resource schemas.")
-
-    resources_mapping, definitions = process_schema_definitions(
-        schemas=schemas,
-        namespacing_dict=namespacing_dict,
-        existing_resources_mapping=resources_mapping,
-        allow_updates=should_update,
-    )
-
-    # Write schema files
-    try:
-        write_schema_files(
-            resources_mapping=resources_mapping,
-            definitions=definitions,
-            client=client,
-            allow_supplementation=should_update,
+    if schemas or should_update:
+        # Process schemas normally when we have new schemas or when updates are allowed
+        resources_mapping, definitions = process_schema_definitions(
+            schemas=schemas,
+            namespacing_dict=namespacing_dict,
+            existing_resources_mapping=resources_mapping,
+            allow_updates=should_update,
         )
-    except Exception as e:
-        LOGGER.error(f"Failed to write schema files: {e}")
-        raise
+    else:
+        # No new schemas and no updates allowed - just preserve existing data
+        LOGGER.info("No schemas to process and no updates allowed. Preserving existing data.")
+        # Load existing definitions if available
+        try:
+            with open(DEFINITIONS_FILE, "r") as fd:
+                existing_definitions_data = json.load(fd)
+                definitions = existing_definitions_data.get("definitions", {})
+        except (FileNotFoundError, IOError, json.JSONDecodeError):
+            LOGGER.debug("Could not load existing definitions file. Using empty definitions.")
+            definitions = {}
 
-    # Clear cached mapping data in SchemaValidator to force reload
-    SchemaValidator.clear_cache()
-    SchemaValidator.load_mappings_data()
+    # Write schema files only if we processed schemas or updates are allowed
+    if schemas or should_update:
+        try:
+            write_schema_files(
+                resources_mapping=resources_mapping,
+                definitions=definitions,
+                client=client,
+                schemas=schemas if schemas else None,
+                allow_supplementation=should_update,
+            )
+        except Exception as e:
+            LOGGER.error(f"Failed to write schema files: {e}")
+            raise
 
-    LOGGER.info("Schema processing completed successfully")
+        # Clear cached mapping data in SchemaValidator to force reload
+        SchemaValidator.clear_cache()
+        SchemaValidator.load_mappings_data()
+
+        LOGGER.info("Schema processing completed successfully")
+    else:
+        LOGGER.info("No schema processing required - cluster version older and no missing resources found")

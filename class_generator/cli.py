@@ -8,6 +8,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import logging
+
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
 from simple_logger.logger import get_logger
@@ -474,6 +476,13 @@ def handle_test_generation(add_tests: bool) -> None:
     type=cloup.STRING,
     default=None,
 )
+@cloup.option(
+    "-v",
+    "--verbose",
+    help="Enable verbose output with debug logs",
+    is_flag=True,
+    show_default=True,
+)
 @cloup.constraint(
     If(IsSet("update_schema") & ~IsSet("generate_missing"), then=accept_none),
     [
@@ -509,8 +518,19 @@ def main(
     filter: str | None,
     json_output: bool,
     update_schema: bool,
+    verbose: bool,
 ) -> None:
     """Generate Python module for K8S resource."""
+    # Configure logging based on verbose flag
+    if verbose:
+        # Set debug level for all class_generator modules
+        logging.getLogger("class_generator.core.schema").setLevel(logging.DEBUG)
+        logging.getLogger("class_generator.core.generator").setLevel(logging.DEBUG)
+        logging.getLogger("class_generator.core.coverage").setLevel(logging.DEBUG)
+        logging.getLogger("class_generator.core.discovery").setLevel(logging.DEBUG)
+        logging.getLogger("class_generator.cli").setLevel(logging.DEBUG)
+        logging.getLogger("ocp_resources").setLevel(logging.DEBUG)
+
     # Validate input parameters
     validate_actions(
         kind=kind,
