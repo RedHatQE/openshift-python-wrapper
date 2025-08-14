@@ -9,11 +9,13 @@ from ocp_resources.utils.constants import (
 )
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 from ocp_resources.resource import NamespacedResource, Resource
-from ocp_resources.secret import Secret
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 from warnings import warn
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ocp_resources.secret import Secret
 
 
 class DataVolume(NamespacedResource):
