@@ -971,14 +971,16 @@ class Resource(ResourceConstants):
                 **PROTOCOL_ERROR_EXCEPTION_DICT,
                 **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             },
-            func=lambda: self.instance.status.phase,
+            func=lambda: self.exists,
         )
         current_status = None
         last_logged_status = None
         try:
             for sample in samples:
                 if sample:
-                    current_status = sample
+                    instance_dict = sample.to_dict()
+                    current_status = instance_dict.get("status", {}).get("phase")
+
                     if current_status != last_logged_status:
                         last_logged_status = current_status
                         self.logger.info(f"Status of {self.kind} {self.name} is {current_status}")
