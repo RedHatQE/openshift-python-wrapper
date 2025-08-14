@@ -40,7 +40,6 @@ class Pod(NamespacedResource):
         priority_class_name: str | None = None,
         readiness_gates: list[Any] | None = None,
         resource_claims: list[Any] | None = None,
-        resources: dict[str, Any] | None = None,
         restart_policy: str | None = None,
         runtime_class_name: str | None = None,
         scheduler_name: str | None = None,
@@ -102,30 +101,30 @@ class Pod(NamespacedResource):
               httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
               seconds tcpSocket host port preStop exec command httpGet host
               httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
+              seconds tcpSocket host port livenessProbe exec command
               failureThreshold grpc port service httpGet host httpHeaders name
               value path port scheme enum: HTTP, HTTPS initialDelaySeconds
               periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
-              appArmorProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined capabilities add drop privileged
-              procMount enum: Default, Unmasked readOnlyRootFilesystem
-              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
-              user seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
-              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
-              command failureThreshold grpc port service httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS
-              initialDelaySeconds periodSeconds successThreshold tcpSocket host
-              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy securityContext
+              allowPrivilegeEscalation appArmorProfile localhostProfile type
+              enum: Localhost, RuntimeDefault, Unconfined capabilities add drop
+              privileged procMount enum: Default, Unmasked
+              readOnlyRootFilesystem runAsGroup runAsNonRoot runAsUser
+              seLinuxOptions level role type user seccompProfile
+              localhostProfile type enum: Localhost, RuntimeDefault, Unconfined
+              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
+              hostProcess runAsUserName startupProbe exec command
+              failureThreshold grpc port service httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
+              periodSeconds successThreshold tcpSocket host port
+              terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
               terminationMessagePath terminationMessagePolicy enum:
               FallbackToLogsOnError, File tty volumeDevices devicePath name
               volumeMounts mountPath mountPropagation enum: Bidirectional,
@@ -153,30 +152,30 @@ class Pod(NamespacedResource):
               httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
               seconds tcpSocket host port preStop exec command httpGet host
               httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
+              seconds tcpSocket host port livenessProbe exec command
               failureThreshold grpc port service httpGet host httpHeaders name
               value path port scheme enum: HTTP, HTTPS initialDelaySeconds
               periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
-              appArmorProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined capabilities add drop privileged
-              procMount enum: Default, Unmasked readOnlyRootFilesystem
-              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
-              user seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
-              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
-              command failureThreshold grpc port service httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS
-              initialDelaySeconds periodSeconds successThreshold tcpSocket host
-              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy securityContext
+              allowPrivilegeEscalation appArmorProfile localhostProfile type
+              enum: Localhost, RuntimeDefault, Unconfined capabilities add drop
+              privileged procMount enum: Default, Unmasked
+              readOnlyRootFilesystem runAsGroup runAsNonRoot runAsUser
+              seLinuxOptions level role type user seccompProfile
+              localhostProfile type enum: Localhost, RuntimeDefault, Unconfined
+              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
+              hostProcess runAsUserName startupProbe exec command
+              failureThreshold grpc port service httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
+              periodSeconds successThreshold tcpSocket host port
+              terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
               targetContainerName terminationMessagePath
               terminationMessagePolicy enum: FallbackToLogsOnError, File tty
               volumeDevices devicePath name volumeMounts mountPath
@@ -222,30 +221,30 @@ class Pod(NamespacedResource):
               httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
               seconds tcpSocket host port preStop exec command httpGet host
               httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
+              seconds tcpSocket host port livenessProbe exec command
               failureThreshold grpc port service httpGet host httpHeaders name
               value path port scheme enum: HTTP, HTTPS initialDelaySeconds
               periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
-              appArmorProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined capabilities add drop privileged
-              procMount enum: Default, Unmasked readOnlyRootFilesystem
-              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
-              user seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
-              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
-              command failureThreshold grpc port service httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS
-              initialDelaySeconds periodSeconds successThreshold tcpSocket host
-              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy securityContext
+              allowPrivilegeEscalation appArmorProfile localhostProfile type
+              enum: Localhost, RuntimeDefault, Unconfined capabilities add drop
+              privileged procMount enum: Default, Unmasked
+              readOnlyRootFilesystem runAsGroup runAsNonRoot runAsUser
+              seLinuxOptions level role type user seccompProfile
+              localhostProfile type enum: Localhost, RuntimeDefault, Unconfined
+              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
+              hostProcess runAsUserName startupProbe exec command
+              failureThreshold grpc port service httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
+              periodSeconds successThreshold tcpSocket host port
+              terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
               terminationMessagePath terminationMessagePolicy enum:
               FallbackToLogsOnError, File tty volumeDevices devicePath name
               volumeMounts mountPath mountPropagation enum: Bidirectional,
@@ -324,8 +323,6 @@ class Pod(NamespacedResource):
 
             resource_claims (list[Any]): name resourceClaimName resourceClaimTemplateName.
 
-            resources (dict[str, Any]): claims name request limits requests.
-
             restart_policy (str): Restart policy for all containers within the pod. One of Always,
               OnFailure, Never. In some contexts, only a subset of those values
               may be permitted. Default to Always. More info:
@@ -351,10 +348,9 @@ class Pod(NamespacedResource):
 
             security_context (dict[str, Any]): appArmorProfile localhostProfile type enum: Localhost, RuntimeDefault,
               Unconfined fsGroup fsGroupChangePolicy enum: Always,
-              OnRootMismatch runAsGroup runAsNonRoot runAsUser
-              seLinuxChangePolicy seLinuxOptions level role type user
-              seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined supplementalGroups
+              OnRootMismatch runAsGroup runAsNonRoot runAsUser seLinuxOptions
+              level role type user seccompProfile localhostProfile type enum:
+              Localhost, RuntimeDefault, Unconfined supplementalGroups
               supplementalGroupsPolicy enum: Merge, Strict sysctls name value
               windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
               hostProcess runAsUserName.
@@ -371,8 +367,8 @@ class Pod(NamespacedResource):
               means setting the FQDN in the hostname field of the kernel (the
               nodename field of struct utsname). In Windows containers, this
               means setting the registry value of hostname for the registry key
-              HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Pa
-              rameters to FQDN. If a pod does not have FQDN, this has no effect.
+              HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Paramet
+              ers to FQDN. If a pod does not have FQDN, this has no effect.
               Default to false.
 
             share_process_namespace (bool): Share a single process namespace between all of the containers in a
@@ -475,7 +471,6 @@ class Pod(NamespacedResource):
         self.priority_class_name = priority_class_name
         self.readiness_gates = readiness_gates
         self.resource_claims = resource_claims
-        self.resources = resources
         self.restart_policy = restart_policy
         self.runtime_class_name = runtime_class_name
         self.scheduler_name = scheduler_name
@@ -574,9 +569,6 @@ class Pod(NamespacedResource):
 
             if self.resource_claims is not None:
                 _spec["resourceClaims"] = self.resource_claims
-
-            if self.resources is not None:
-                _spec["resources"] = self.resources
 
             if self.restart_policy is not None:
                 _spec["restartPolicy"] = self.restart_policy
