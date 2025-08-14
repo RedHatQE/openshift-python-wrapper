@@ -524,12 +524,25 @@ def main(
     # Configure logging based on verbose flag
     if verbose:
         # Set debug level for all class_generator modules
-        logging.getLogger("class_generator.core.schema").setLevel(logging.DEBUG)
-        logging.getLogger("class_generator.core.generator").setLevel(logging.DEBUG)
-        logging.getLogger("class_generator.core.coverage").setLevel(logging.DEBUG)
-        logging.getLogger("class_generator.core.discovery").setLevel(logging.DEBUG)
-        logging.getLogger("class_generator.cli").setLevel(logging.DEBUG)
-        logging.getLogger("ocp_resources").setLevel(logging.DEBUG)
+        for logger_name in [
+            "class_generator.core.schema",
+            "class_generator.core.generator",
+            "class_generator.core.coverage",
+            "class_generator.core.discovery",
+            "class_generator.cli",
+            "ocp_resources",
+        ]:
+            logger = logging.getLogger(logger_name)
+            logger.setLevel(logging.DEBUG)
+            # Also set all handlers to DEBUG to ensure debug logs surface
+            for handler in logger.handlers:
+                handler.setLevel(logging.DEBUG)
+
+        # Set root logger to DEBUG to cover all configured handlers
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG)
+        for handler in root_logger.handlers:
+            handler.setLevel(logging.DEBUG)
 
     # Validate input parameters
     validate_actions(

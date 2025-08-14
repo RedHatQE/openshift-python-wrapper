@@ -208,7 +208,6 @@ def find_api_paths_for_missing_resources(paths: dict[str, Any], missing_resource
     Find API paths that contain schemas for missing resources.
 
     Args:
-        client: Path to kubectl/oc client binary
         paths: Dictionary of API paths from v3 index
         missing_resources: Set of missing resource kinds
 
@@ -221,6 +220,8 @@ def find_api_paths_for_missing_resources(paths: dict[str, Any], missing_resource
     relevant_paths = set()
 
     # Define a mapping of common resource kinds to their expected API groups
+    # TODO: Consider future-proofing by deriving API groups from `api-resources -o wide` to avoid manual mapping drift
+    # TODO: Consider case normalization for resource names if upstream ever deviates
     resource_to_api_mapping = {
         # Core API resources (in api/v1)
         "Pod": ["api/v1"],
@@ -348,7 +349,9 @@ def fetch_all_api_schemas(
         LOGGER.info(f"Filtering to {len(paths_to_fetch)} specific API paths out of {len(paths)} total")
 
     # Use ThreadPoolExecutor to parallelize API fetching
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    # Right-size worker pool to avoid over-provisioning threads for small path sets
+    max_workers = min(10, len(paths_to_fetch))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all fetch tasks
         future_to_path = {
             executor.submit(fetch_api_group, api_path, api_info): api_path
@@ -858,11 +861,11 @@ def _run_explain_recursive(client: str, ref_name: str, oc_path: str) -> tuple[st
             schema = _parse_oc_explain_output(result.stdout)
             return ref_name, schema
         else:
-            LOGGER.debug(f"Failed to get oc explain for {oc_path}: {result.stderr}")
+            LOGGER.debug(f"Failed to get {client} explain for {oc_path}: {result.stderr}")
             return None
 
     except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
-        LOGGER.debug(f"Failed to run oc explain for {oc_path}: {e}")
+        LOGGER.debug(f"Failed to run {client} explain for {oc_path}: {e}")
         return None
 
 
@@ -919,7 +922,7 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
                 result = future.result()
                 explain_results[ref_name] = result
                 if result:
-                    LOGGER.info(f"Successfully obtained explain data for {ref_name} from {explain_path}")
+                    LOGGER.debug(f"Successfully obtained explain data for {ref_name} from {explain_path}")
                 else:
                     LOGGER.debug(f"Failed to obtain explain data for {ref_name} from {explain_path}")
             except Exception as e:
@@ -1140,7 +1143,7 @@ def _get_missing_core_definitions(
         else:
             # For types we can't infer paths for, provide basic object schema
             if any(core_type in ref_name for core_type in ["ObjectMeta", "TypeMeta", "Status", "LabelSelector"]):
-                LOGGER.info(f"Using basic object schema for core type: {ref_name}")
+                LOGGER.debug(f"Using basic object schema for core type: {ref_name}")
                 missing_definitions[ref_name] = {"type": "object", "additionalProperties": True}
             else:
                 LOGGER.debug(f"Cannot infer oc explain path for {ref_name}, skipping")
@@ -1151,7 +1154,7 @@ def _get_missing_core_definitions(
             # Submit all explain --recursive operations
             future_to_ref = {}
             for ref_name, oc_path in refs_to_fetch:
-                LOGGER.info(f"Fetching missing definition for {ref_name} using oc explain {oc_path}")
+                LOGGER.debug(f"Fetching missing definition for {ref_name} using {client} explain {oc_path}")
                 future = executor.submit(_run_explain_recursive, client, ref_name, oc_path)
                 future_to_ref[future] = ref_name
 
@@ -1163,7 +1166,7 @@ def _get_missing_core_definitions(
                     if result:
                         fetched_ref_name, schema = result
                         missing_definitions[fetched_ref_name] = schema
-                        LOGGER.info(f"Successfully fetched definition for {fetched_ref_name}")
+                        LOGGER.debug(f"Successfully fetched definition for {fetched_ref_name}")
                 except Exception as e:
                     LOGGER.debug(f"Failed to fetch definition for {ref_name}: {e}")
 
@@ -1217,16 +1220,23 @@ def write_schema_files(
 
     # Write updated definitions
     definitions_file = DEFINITIONS_FILE
-    try:
-        # Wrap definitions in a "definitions" object for jsonschema compatibility
-        definitions_data = {"definitions": definitions}
-        with open(definitions_file, "w") as fd:
-            json.dump(definitions_data, fd, indent=2, sort_keys=True)
-        LOGGER.info(f"Written {len(definitions)} definitions to {definitions_file}")
-    except (OSError, IOError, TypeError) as e:
-        error_msg = f"Failed to write definitions file {definitions_file}: {e}"
-        LOGGER.error(error_msg)
-        raise IOError(error_msg) from e
+
+    # Guard against overwriting existing definitions with empty definitions
+    if not definitions and Path(definitions_file).exists():
+        LOGGER.warning(
+            "No definitions generated; preserving existing definitions file to avoid overwriting with empty definitions."
+        )
+    else:
+        try:
+            # Wrap definitions in a "definitions" object for jsonschema compatibility
+            definitions_data = {"definitions": definitions}
+            with open(definitions_file, "w") as fd:
+                json.dump(definitions_data, fd, indent=2, sort_keys=True)
+            LOGGER.info(f"Written {len(definitions)} definitions to {definitions_file}")
+        except (OSError, IOError, TypeError) as e:
+            error_msg = f"Failed to write definitions file {definitions_file}: {e}"
+            LOGGER.error(error_msg)
+            raise IOError(error_msg) from e
 
     # Write and archive resources mapping
     try:
@@ -1301,8 +1311,8 @@ def update_kind_schema() -> None:
         namespacing_dict = {}
 
     # Process schema definitions with appropriate update policy
-    if schemas or should_update:
-        # Process schemas normally when we have new schemas or when updates are allowed
+    if schemas:
+        # Process schemas normally when we have new schemas
         resources_mapping, definitions = process_schema_definitions(
             schemas=schemas,
             namespacing_dict=namespacing_dict,
@@ -1310,19 +1320,20 @@ def update_kind_schema() -> None:
             allow_updates=should_update,
         )
     else:
-        # No new schemas and no updates allowed - just preserve existing data
-        LOGGER.info("No schemas to process and no updates allowed. Preserving existing data.")
+        # No new schemas - preserve existing data
+        LOGGER.info("No schemas fetched. Preserving existing data to avoid overwriting with empty definitions.")
         # Load existing definitions if available
         try:
             with open(DEFINITIONS_FILE, "r") as fd:
                 existing_definitions_data = json.load(fd)
                 definitions = existing_definitions_data.get("definitions", {})
+                LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve")
         except (FileNotFoundError, IOError, json.JSONDecodeError):
             LOGGER.debug("Could not load existing definitions file. Using empty definitions.")
             definitions = {}
 
-    # Write schema files only if we processed schemas or updates are allowed
-    if schemas or should_update:
+    # Write schema files only if we processed schemas (never write when no schemas were fetched)
+    if schemas:
         try:
             write_schema_files(
                 resources_mapping=resources_mapping,
@@ -1341,4 +1352,6 @@ def update_kind_schema() -> None:
 
         LOGGER.info("Schema processing completed successfully")
     else:
-        LOGGER.info("No schema processing required - cluster version older and no missing resources found")
+        LOGGER.info(
+            "No schema files updated - no schemas were fetched (either due to older cluster version with no missing resources, or transient fetch failures)"
+        )

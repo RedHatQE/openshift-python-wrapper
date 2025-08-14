@@ -538,10 +538,14 @@ class TestWriteSchemaFiles:
     def test_file_writing_failure(self, mock_open, mock_path):
         """Test handling of file writing failure."""
         mock_path.return_value.mkdir = Mock()
+        mock_path.return_value.exists.return_value = False  # No existing file to preserve
         mock_open.side_effect = OSError("Write failed")
 
+        # Use non-empty definitions to bypass the empty definitions guard
+        non_empty_definitions = {"v1/Pod": {"type": "object"}}
+
         with pytest.raises(IOError, match="Failed to write definitions file"):
-            write_schema_files({}, {}, "kubectl")
+            write_schema_files({}, non_empty_definitions, "kubectl")
 
 
 class TestDetectMissingRefsFromSchemas:

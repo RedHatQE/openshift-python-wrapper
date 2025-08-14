@@ -8,11 +8,6 @@ addopts = [
   "--cov-config=pyproject.toml",
   "--cov-report=html",
   "--cov-report=term",
-  "--cov=ocp_resources.resource",
-  "--cov=ocp_resources.utils.resource_constants",
-  "--cov=ocp_resources.utils.constants",
-  "--cov=ocp_resources.utils.utils",
-  "--cov=ocp_resources.exceptions",
   "--cov=class_generator",
   "--cov=fake_kubernetes_client",
 ]
