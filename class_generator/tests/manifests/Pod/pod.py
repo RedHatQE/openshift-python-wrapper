@@ -64,75 +64,17 @@ class Pod(NamespacedResource):
               it failed and kill associated containers. Value must be a positive
               integer.
 
-            affinity (dict[str, Any]): nodeAffinity preferredDuringSchedulingIgnoredDuringExecution
-              preference matchExpressions key operator enum: DoesNotExist,
-              Exists, Gt, In, .... values matchFields key operator enum:
-              DoesNotExist, Exists, Gt, In, .... values weight
-              requiredDuringSchedulingIgnoredDuringExecution nodeSelectorTerms
-              matchExpressions key operator enum: DoesNotExist, Exists, Gt, In,
-              .... values matchFields key operator enum: DoesNotExist, Exists,
-              Gt, In, .... values podAffinity
-              preferredDuringSchedulingIgnoredDuringExecution podAffinityTerm
-              labelSelector matchExpressions key operator values matchLabels
-              matchLabelKeys mismatchLabelKeys namespaceSelector
-              matchExpressions key operator values matchLabels namespaces
-              topologyKey weight requiredDuringSchedulingIgnoredDuringExecution
-              labelSelector matchExpressions key operator values matchLabels
-              matchLabelKeys mismatchLabelKeys namespaceSelector
-              matchExpressions key operator values matchLabels namespaces
-              topologyKey podAntiAffinity
-              preferredDuringSchedulingIgnoredDuringExecution podAffinityTerm
-              labelSelector matchExpressions key operator values matchLabels
-              matchLabelKeys mismatchLabelKeys namespaceSelector
-              matchExpressions key operator values matchLabels namespaces
-              topologyKey weight requiredDuringSchedulingIgnoredDuringExecution
-              labelSelector matchExpressions key operator values matchLabels
-              matchLabelKeys mismatchLabelKeys namespaceSelector
-              matchExpressions key operator values matchLabels namespaces
-              topologyKey.
+            affinity (dict[str, Any]): If specified, the pod's scheduling constraints.
 
             automount_service_account_token (bool): AutomountServiceAccountToken indicates whether a service account token
               should be automatically mounted.
 
-            containers (list[Any]): args command env name value valueFrom configMapKeyRef key name
-              fieldRef apiVersion fieldPath resourceFieldRef containerName
-              divisor resource secretKeyRef key name envFrom configMapRef name
-              prefix secretRef name image imagePullPolicy enum: Always,
-              IfNotPresent, Never lifecycle postStart exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port preStop exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
-              appArmorProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined capabilities add drop privileged
-              procMount enum: Default, Unmasked readOnlyRootFilesystem
-              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
-              user seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
-              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
-              command failureThreshold grpc port service httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS
-              initialDelaySeconds periodSeconds successThreshold tcpSocket host
-              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
-              terminationMessagePath terminationMessagePolicy enum:
-              FallbackToLogsOnError, File tty volumeDevices devicePath name
-              volumeMounts mountPath mountPropagation enum: Bidirectional,
-              HostToContainer, None name readOnly recursiveReadOnly subPath
-              subPathExpr workingDir.
+            containers (list[Any]): List of containers belonging to the pod. Containers cannot currently
+              be added or removed. There must be at least one container in a
+              Pod. Cannot be updated.
 
-            dns_config (dict[str, Any]): nameservers options name value searches.
+            dns_config (dict[str, Any]): Specifies the DNS parameters of a pod. Parameters specified here will
+              be merged to the generated DNS configuration based on DNSPolicy.
 
             dns_policy (str): Set DNS policy for the pod. Defaults to "ClusterFirst". Valid values
               are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or
@@ -145,45 +87,15 @@ class Pod(NamespacedResource):
               be injected into pod's environment variables, matching the syntax
               of Docker links. Optional: Defaults to true.
 
-            ephemeral_containers (list[Any]): args command env name value valueFrom configMapKeyRef key name
-              fieldRef apiVersion fieldPath resourceFieldRef containerName
-              divisor resource secretKeyRef key name envFrom configMapRef name
-              prefix secretRef name image imagePullPolicy enum: Always,
-              IfNotPresent, Never lifecycle postStart exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port preStop exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
-              appArmorProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined capabilities add drop privileged
-              procMount enum: Default, Unmasked readOnlyRootFilesystem
-              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
-              user seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
-              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
-              command failureThreshold grpc port service httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS
-              initialDelaySeconds periodSeconds successThreshold tcpSocket host
-              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
-              targetContainerName terminationMessagePath
-              terminationMessagePolicy enum: FallbackToLogsOnError, File tty
-              volumeDevices devicePath name volumeMounts mountPath
-              mountPropagation enum: Bidirectional, HostToContainer, None name
-              readOnly recursiveReadOnly subPath subPathExpr workingDir.
+            ephemeral_containers (list[Any]): List of ephemeral containers run in this pod. Ephemeral containers may
+              be run in an existing pod to perform user-initiated actions such
+              as debugging. This list cannot be specified when creating a pod,
+              and it cannot be modified by updating the pod spec. In order to
+              add an ephemeral container to an existing pod, use the pod's
+              ephemeralcontainers subresource.
 
-            host_aliases (list[Any]): hostnames ip.
+            host_aliases (list[Any]): HostAliases is an optional list of hosts and IPs that will be injected
+              into the pod's hosts file if specified.
 
             host_ipc (bool): Use the host's ipc namespace. Optional: Default to false.
 
@@ -214,43 +126,21 @@ class Pod(NamespacedResource):
               https://kubernetes.io/docs/concepts/containers/images#specifying-
               imagepullsecrets-on-a-pod.
 
-            init_containers (list[Any]): args command env name value valueFrom configMapKeyRef key name
-              fieldRef apiVersion fieldPath resourceFieldRef containerName
-              divisor resource secretKeyRef key name envFrom configMapRef name
-              prefix secretRef name image imagePullPolicy enum: Always,
-              IfNotPresent, Never lifecycle postStart exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port preStop exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
-              appArmorProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined capabilities add drop privileged
-              procMount enum: Default, Unmasked readOnlyRootFilesystem
-              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
-              user seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
-              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
-              command failureThreshold grpc port service httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS
-              initialDelaySeconds periodSeconds successThreshold tcpSocket host
-              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
-              terminationMessagePath terminationMessagePolicy enum:
-              FallbackToLogsOnError, File tty volumeDevices devicePath name
-              volumeMounts mountPath mountPropagation enum: Bidirectional,
-              HostToContainer, None name readOnly recursiveReadOnly subPath
-              subPathExpr workingDir.
+            init_containers (list[Any]): List of initialization containers belonging to the pod. Init
+              containers are executed in order prior to containers being
+              started. If any init container fails, the pod is considered to
+              have failed and is handled according to its restartPolicy. The
+              name for an init container or normal container must be unique
+              among all containers. Init containers may not have Lifecycle
+              actions, Readiness probes, Liveness probes, or Startup probes. The
+              resourceRequirements of an init container are taken into account
+              during scheduling by finding the highest request/limit for each
+              resource type, and then using the max of that value or the sum of
+              the normal containers. Limits are applied to init containers in a
+              similar fashion. Init containers cannot currently be added or
+              removed. Cannot be updated. More info:
+              https://kubernetes.io/docs/concepts/workloads/pods/init-
+              containers/.
 
             node_name (str): NodeName indicates in which node this pod is scheduled. If empty, this
               pod is a candidate for scheduling by the scheduler defined in
@@ -320,11 +210,25 @@ class Pod(NamespacedResource):
               with that name. If not specified, the pod priority will be default
               or zero if there is no default.
 
-            readiness_gates (list[Any]): conditionType.
+            readiness_gates (list[Any]): If specified, all readiness gates will be evaluated for pod readiness.
+              A pod is ready when all its containers are ready AND all
+              conditions specified in the readiness gates have status equal to
+              "True" More info: https://git.k8s.io/enhancements/keps/sig-
+              network/580-pod-readiness-gates.
 
-            resource_claims (list[Any]): name resourceClaimName resourceClaimTemplateName.
+            resource_claims (list[Any]): ResourceClaims defines which ResourceClaims must be allocated and
+              reserved before the Pod is allowed to start. The resources will be
+              made available to those containers which consume them by name.
+              This is an alpha field and requires enabling the
+              DynamicResourceAllocation feature gate. This field is immutable.
 
-            resources (dict[str, Any]): claims name request limits requests.
+            resources (dict[str, Any]): Resources is the total amount of CPU and Memory resources required by
+              all containers in the pod. It supports specifying Requests and
+              Limits for "cpu" and "memory" resource names only. ResourceClaims
+              are not supported. This field enables fine-grained control over
+              resource allocation for the entire pod, allowing resource sharing
+              among containers in a pod. This is an alpha field and requires
+              enabling the PodLevelResources feature gate.
 
             restart_policy (str): Restart policy for all containers within the pod. One of Always,
               OnFailure, Never. In some contexts, only a subset of those values
@@ -349,15 +253,9 @@ class Pod(NamespacedResource):
               attempt to schedule the pod. SchedulingGates can only be set at
               pod creation time, and be removed only afterwards.
 
-            security_context (dict[str, Any]): appArmorProfile localhostProfile type enum: Localhost, RuntimeDefault,
-              Unconfined fsGroup fsGroupChangePolicy enum: Always,
-              OnRootMismatch runAsGroup runAsNonRoot runAsUser
-              seLinuxChangePolicy seLinuxOptions level role type user
-              seccompProfile localhostProfile type enum: Localhost,
-              RuntimeDefault, Unconfined supplementalGroups
-              supplementalGroupsPolicy enum: Merge, Strict sysctls name value
-              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
-              hostProcess runAsUserName.
+            security_context (dict[str, Any]): SecurityContext holds pod-level security attributes and common
+              container settings. Optional: Defaults to empty. See type
+              description for default values of each field.
 
             service_account (str): DeprecatedServiceAccount is a deprecated alias for ServiceAccountName.
               Deprecated: Use serviceAccountName instead.
@@ -395,57 +293,16 @@ class Pod(NamespacedResource):
               forcibly halted with a kill signal. Set this value longer than the
               expected cleanup time for your process. Defaults to 30 seconds.
 
-            tolerations (list[Any]): effect enum: NoExecute, NoSchedule, PreferNoSchedule key operator
-              enum: Equal, Exists tolerationSeconds value.
+            tolerations (list[Any]): If specified, the pod's tolerations.
 
-            topology_spread_constraints (list[Any]): labelSelector matchExpressions key operator values matchLabels
-              matchLabelKeys maxSkew minDomains nodeAffinityPolicy enum: Honor,
-              Ignore nodeTaintsPolicy enum: Honor, Ignore topologyKey
-              whenUnsatisfiable enum: DoNotSchedule, ScheduleAnyway.
+            topology_spread_constraints (list[Any]): TopologySpreadConstraints describes how a group of pods ought to
+              spread across topology domains. Scheduler will schedule pods in a
+              way which abides by the constraints. All topologySpreadConstraints
+              are ANDed.
 
-            volumes (list[Any]): awsElasticBlockStore fsType partition readOnly volumeID azureDisk
-              cachingMode enum: None, ReadOnly, ReadWrite diskName diskURI
-              fsType kind enum: Dedicated, Managed, Shared readOnly azureFile
-              readOnly secretName shareName cephfs monitors path readOnly
-              secretFile secretRef name user cinder fsType readOnly secretRef
-              name volumeID configMap defaultMode items key mode path name csi
-              driver fsType nodePublishSecretRef name readOnly volumeAttributes
-              downwardAPI defaultMode items fieldRef apiVersion fieldPath mode
-              path resourceFieldRef containerName divisor resource emptyDir
-              medium sizeLimit ephemeral volumeClaimTemplate metadata
-              annotations creationTimestamp deletionGracePeriodSeconds
-              deletionTimestamp finalizers generateName generation labels
-              managedFields apiVersion fieldsType fieldsV1 manager operation
-              subresource time name namespace ownerReferences apiVersion
-              blockOwnerDeletion controller kind name uid resourceVersion
-              selfLink uid spec accessModes dataSource apiGroup kind name
-              dataSourceRef apiGroup kind name namespace resources limits
-              requests selector matchExpressions key operator values matchLabels
-              storageClassName volumeAttributesClassName volumeMode enum: Block,
-              Filesystem volumeName fc fsType lun readOnly targetWWNs wwids
-              flexVolume driver fsType options readOnly secretRef name flocker
-              datasetName datasetUUID gcePersistentDisk fsType partition pdName
-              readOnly gitRepo directory repository revision glusterfs endpoints
-              path readOnly hostPath path type enum: "", BlockDevice,
-              CharDevice, Directory, .... image pullPolicy enum: Always,
-              IfNotPresent, Never reference iscsi chapAuthDiscovery
-              chapAuthSession fsType initiatorName iqn iscsiInterface lun
-              portals readOnly secretRef name targetPortal name nfs path
-              readOnly server persistentVolumeClaim claimName readOnly
-              photonPersistentDisk fsType pdID portworxVolume fsType readOnly
-              volumeID projected defaultMode sources clusterTrustBundle
-              labelSelector matchExpressions key operator values matchLabels
-              name path signerName configMap items key mode path name
-              downwardAPI items fieldRef apiVersion fieldPath mode path
-              resourceFieldRef containerName divisor resource secret items key
-              mode path name serviceAccountToken audience expirationSeconds path
-              quobyte group readOnly registry tenant user volume rbd fsType
-              image keyring monitors pool readOnly secretRef name user scaleIO
-              fsType gateway protectionDomain readOnly secretRef name sslEnabled
-              storageMode storagePool system volumeName secret defaultMode items
-              key mode path optional secretName storageos fsType readOnly
-              secretRef name volumeName volumeNamespace vsphereVolume fsType
-              storagePolicyID storagePolicyName volumePath.
+            volumes (list[Any]): List of volumes that can be mounted by containers belonging to the
+              pod. More info:
+              https://kubernetes.io/docs/concepts/storage/volumes.
 
         """
         super().__init__(**kwargs)

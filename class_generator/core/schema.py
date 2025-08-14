@@ -173,7 +173,9 @@ def fetch_all_api_schemas(client: str, paths: dict[str, Any]) -> dict[str, dict[
             return api_path, None
 
         LOGGER.info(f"Processing {api_path}...")
-        success, schema_data, _ = run_command(command=shlex.split(f"{client} get --raw {api_url}"), check=False)
+        success, schema_data, _ = run_command(
+            command=shlex.split(f"{client} get --raw {api_url}"), check=False, log_errors=False
+        )
 
         if not success:
             LOGGER.warning(f"Failed to fetch schema for {api_path}")
@@ -665,6 +667,26 @@ def _infer_oc_explain_path(ref_name: str) -> str | None:
     return None
 
 
+def _run_explain_and_parse(client: str, explain_path: str) -> tuple[dict[str, Any], list[str]] | None:
+    """Helper function to run oc explain and parse the output."""
+    try:
+        cmd = [client, "explain", explain_path]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+        if result.returncode == 0:
+            explain_schema = _parse_oc_explain_output(result.stdout)
+            explain_properties = explain_schema.get("properties", {})
+            explain_required = explain_schema.get("required", [])
+            return explain_properties, explain_required
+        else:
+            LOGGER.warning(f"Failed to get {client} explain for {explain_path}: {result.stderr}")
+            return None
+
+    except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
+        LOGGER.warning(f"Failed to run {client} explain for {explain_path}: {e}")
+        return None
+
+
 def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], client: str) -> dict[str, Any]:
     """
     Supplement existing definitions with field descriptions and required field information from explain.
@@ -694,83 +716,97 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
 
     supplemented_definitions = definitions.copy()
 
-    def _run_explain_and_parse(explain_path: str) -> tuple[dict[str, Any], list[str]] | None:
-        """Helper function to run oc explain and parse the output."""
-        try:
-            cmd = [client, "explain", explain_path]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    # Group critical specs by whether they exist in definitions or not
+    existing_specs = [(ref_name, explain_path) for ref_name, explain_path in critical_specs if ref_name in definitions]
+    missing_specs = [
+        (ref_name, explain_path) for ref_name, explain_path in critical_specs if ref_name not in definitions
+    ]
 
-            if result.returncode == 0:
-                explain_schema = _parse_oc_explain_output(result.stdout)
-                explain_properties = explain_schema.get("properties", {})
-                explain_required = explain_schema.get("required", [])
-                return explain_properties, explain_required
-            else:
-                LOGGER.warning(f"Failed to get {client} explain for {explain_path}: {result.stderr}")
-                return None
+    # Run all oc explain operations in parallel
+    all_specs = critical_specs
+    explain_results = {}
 
-        except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
-            LOGGER.warning(f"Failed to run {client} explain for {explain_path}: {e}")
-            return None
+    with ThreadPoolExecutor(max_workers=min(len(all_specs), 10)) as executor:
+        # Submit all explain operations
+        future_to_spec = {
+            executor.submit(_run_explain_and_parse, client, explain_path): (ref_name, explain_path)
+            for ref_name, explain_path in all_specs
+        }
 
-    for ref_name, explain_path in critical_specs:
-        if ref_name in definitions:
-            current_schema = definitions[ref_name]
+        # Collect results as they complete
+        for future in as_completed(future_to_spec):
+            ref_name, explain_path = future_to_spec[future]
+            try:
+                result = future.result()
+                explain_results[ref_name] = result
+                if result:
+                    LOGGER.info(f"Successfully obtained explain data for {ref_name} from {explain_path}")
+                else:
+                    LOGGER.warning(f"Failed to obtain explain data for {ref_name} from {explain_path}")
+            except Exception as e:
+                LOGGER.warning(f"Exception occurred while explaining {ref_name} from {explain_path}: {e}")
+                explain_results[ref_name] = None
 
-            LOGGER.info(f"Supplementing schema for {ref_name} using {client} explain {explain_path}")
-            result = _run_explain_and_parse(explain_path)
+    # Process existing schemas that need supplementation
+    for ref_name, explain_path in existing_specs:
+        current_schema = definitions[ref_name]
+        result = explain_results.get(ref_name)
 
-            if result:
-                explain_properties, explain_required = result
+        LOGGER.info(f"Supplementing schema for {ref_name} using {client} explain {explain_path}")
 
-                # Start with the current schema
-                updated_schema = current_schema.copy()
-                current_properties = updated_schema.get("properties", {})
+        if result:
+            explain_properties, explain_required = result
 
-                # Update properties with descriptions from explain
-                for field_name, explain_field in explain_properties.items():
-                    if field_name in current_properties:
-                        # Merge the current property with the explain description
-                        updated_property = current_properties[field_name].copy()
-                        if "description" in explain_field and "description" not in updated_property:
-                            updated_property["description"] = explain_field["description"]
-                        current_properties[field_name] = updated_property
+            # Start with the current schema
+            updated_schema = current_schema.copy()
+            current_properties = updated_schema.get("properties", {})
 
-                updated_schema["properties"] = current_properties
+            # Update properties with descriptions from explain
+            for field_name, explain_field in explain_properties.items():
+                if field_name in current_properties:
+                    # Merge the current property with the explain description
+                    updated_property = current_properties[field_name].copy()
+                    if "description" in explain_field and "description" not in updated_property:
+                        updated_property["description"] = explain_field["description"]
+                    current_properties[field_name] = updated_property
 
-                # Update required fields if they're missing
-                current_required = updated_schema.get("required")
-                if (not current_required or current_required is None) and explain_required:
-                    updated_schema["required"] = explain_required
-                    LOGGER.info(f"Added {len(explain_required)} required fields to {ref_name}: {explain_required}")
-                elif not current_required:
-                    updated_schema["required"] = []
+            updated_schema["properties"] = current_properties
 
-                supplemented_definitions[ref_name] = updated_schema
+            # Update required fields if they're missing
+            current_required = updated_schema.get("required")
+            if (not current_required or current_required is None) and explain_required:
+                updated_schema["required"] = explain_required
+                LOGGER.info(f"Added {len(explain_required)} required fields to {ref_name}: {explain_required}")
+            elif not current_required:
+                updated_schema["required"] = []
 
-                # Count how many descriptions were added
-                desc_count = sum(1 for field in explain_properties.values() if "description" in field)
-                if desc_count > 0:
-                    LOGGER.info(f"Added {desc_count} field descriptions to {ref_name}")
-            else:
-                # Set to empty list if explain fails
-                if current_schema.get("required") is None:
-                    supplemented_definitions[ref_name] = {**current_schema, "required": []}
+            supplemented_definitions[ref_name] = updated_schema
+
+            # Count how many descriptions were added
+            desc_count = sum(1 for field in explain_properties.values() if "description" in field)
+            if desc_count > 0:
+                LOGGER.info(f"Added {desc_count} field descriptions to {ref_name}")
         else:
-            # Handle missing definitions - create them from oc explain output
-            LOGGER.info(f"Creating missing schema definition for {ref_name} using {client} explain {explain_path}")
-            result = _run_explain_and_parse(explain_path)
+            # Set to empty list if explain fails
+            if current_schema.get("required") is None:
+                supplemented_definitions[ref_name] = {**current_schema, "required": []}
 
-            if result:
-                explain_properties, explain_required = result
+    # Process missing definitions - create them from oc explain output
+    for ref_name, explain_path in missing_specs:
+        result = explain_results.get(ref_name)
 
-                # Create new schema from explain output
-                new_schema = {"type": "object", "properties": explain_properties, "required": explain_required}
+        LOGGER.info(f"Creating missing schema definition for {ref_name} using {client} explain {explain_path}")
 
-                supplemented_definitions[ref_name] = new_schema
-                LOGGER.info(
-                    f"Created new schema definition for {ref_name} with {len(explain_properties)} properties and {len(explain_required)} required fields: {explain_required}"
-                )
+        if result:
+            explain_properties, explain_required = result
+
+            # Create new schema from explain output
+            new_schema = {"type": "object", "properties": explain_properties, "required": explain_required}
+
+            supplemented_definitions[ref_name] = new_schema
+            LOGGER.info(
+                f"Created new schema definition for {ref_name} with {len(explain_properties)} properties and {len(explain_required)} required fields: {explain_required}"
+            )
 
     # Second, supplement top-level resource schemas with their required fields
     _supplement_resource_level_required_fields(supplemented_definitions, client)
@@ -832,6 +868,8 @@ def _supplement_resource_level_required_fields(definitions: dict[str, Any], clie
         ("operator.openshift.io/v1/Network", "network.operator.openshift.io"),
     ]
 
+    # Collect resource schemas that need required field supplementation
+    required_field_tasks = []
     for schema_key, explain_path in resource_explain_mappings:
         if schema_key in definitions:
             current_schema = definitions[schema_key]
@@ -839,18 +877,29 @@ def _supplement_resource_level_required_fields(definitions: dict[str, Any], clie
 
             # Only supplement if required field is missing or empty
             if not current_required:
+                required_field_tasks.append((schema_key, explain_path))
+
+    # Process required field supplementation in parallel
+    if required_field_tasks:
+        with ThreadPoolExecutor(max_workers=min(10, len(required_field_tasks))) as executor:
+            # Submit all required field explain operations
+            future_to_schema = {}
+            for schema_key, explain_path in required_field_tasks:
+                LOGGER.info(
+                    f"Supplementing top-level required fields for {schema_key} using {client} explain {explain_path}"
+                )
+                future = executor.submit(_run_explain_and_parse, client, explain_path)
+                future_to_schema[future] = (schema_key, explain_path)
+
+            # Process results as they complete
+            for future in as_completed(future_to_schema):
+                schema_key, explain_path = future_to_schema[future]
                 try:
-                    LOGGER.info(
-                        f"Supplementing top-level required fields for {schema_key} using {client} explain {explain_path}"
-                    )
-                    cmd = [client, "explain", explain_path]
+                    result = future.result()
+                    current_schema = definitions[schema_key]
 
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-
-                    if result.returncode == 0:
-                        explain_schema = _parse_oc_explain_output(result.stdout)
-                        explain_required = explain_schema.get("required", [])
-
+                    if result:
+                        _, explain_required = result
                         if explain_required:
                             # Update the schema with required fields from explain
                             updated_schema = current_schema.copy()
@@ -874,9 +923,10 @@ def _supplement_resource_level_required_fields(definitions: dict[str, Any], clie
                         updated_schema["required"] = []
                         definitions[schema_key] = updated_schema
 
-                except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
-                    LOGGER.warning(f"Failed to run {client} explain for {explain_path}: {e}")
+                except Exception as e:
+                    LOGGER.warning(f"Failed to process required fields for {schema_key}: {e}")
                     # Set empty list if explain fails
+                    current_schema = definitions[schema_key]
                     updated_schema = current_schema.copy()
                     updated_schema["required"] = []
                     definitions[schema_key] = updated_schema
