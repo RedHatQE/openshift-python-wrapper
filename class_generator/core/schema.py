@@ -225,7 +225,18 @@ def process_schema_definitions(
     existing_count = len(resources_mapping)
     LOGGER.info(f"Starting with {existing_count} existing resource types - preserving all")
 
+    # Load existing definitions when not allowing updates to preserve them
     definitions = {}
+    if not allow_updates:
+        try:
+            with open(DEFINITIONS_FILE, "r") as f:
+                existing_definitions_data = json.load(f)
+                definitions = existing_definitions_data.get("definitions", {})
+                LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve")
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            LOGGER.warning(f"Could not load existing definitions: {e}")
+            definitions = {}
+
     processed_schemas = set()
     total_schemas = 0
     new_resources = 0
@@ -683,7 +694,7 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
 
     supplemented_definitions = definitions.copy()
 
-    def _run_explain_and_parse(ref_name: str, explain_path: str) -> tuple[dict[str, Any], list[str]] | None:
+    def _run_explain_and_parse(explain_path: str) -> tuple[dict[str, Any], list[str]] | None:
         """Helper function to run oc explain and parse the output."""
         try:
             cmd = [client, "explain", explain_path]
@@ -707,7 +718,7 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
             current_schema = definitions[ref_name]
 
             LOGGER.info(f"Supplementing schema for {ref_name} using {client} explain {explain_path}")
-            result = _run_explain_and_parse(ref_name, explain_path)
+            result = _run_explain_and_parse(explain_path)
 
             if result:
                 explain_properties, explain_required = result
@@ -748,7 +759,7 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
         else:
             # Handle missing definitions - create them from oc explain output
             LOGGER.info(f"Creating missing schema definition for {ref_name} using {client} explain {explain_path}")
-            result = _run_explain_and_parse(ref_name, explain_path)
+            result = _run_explain_and_parse(explain_path)
 
             if result:
                 explain_properties, explain_required = result
@@ -929,8 +940,9 @@ def _get_missing_core_definitions(
 def write_schema_files(
     resources_mapping: dict[str, Any],
     definitions: dict[str, Any],
-    client: str | None = None,
+    client: str,
     schemas: dict[str, dict[str, Any]] | None = None,
+    allow_supplementation: bool = True,
 ) -> None:
     """
     Write schema files to disk.
@@ -938,8 +950,9 @@ def write_schema_files(
     Args:
         resources_mapping: Resources mapping dictionary
         definitions: Schema definitions dictionary
-        client: Optional oc/kubectl client binary path for fetching missing definitions
+        client: oc/kubectl client binary path for fetching missing definitions
         schemas: Optional all fetched API schemas for analyzing missing refs
+        allow_supplementation: Whether to supplement existing schemas with explain data
 
     Raises:
         IOError: If files cannot be written
@@ -952,17 +965,19 @@ def write_schema_files(
         LOGGER.error(error_msg)
         raise IOError(error_msg) from e
 
-    # If client is provided (during schema update), fetch missing core definitions
-    if client and schemas:
+    # Fetch missing core definitions if schemas are available
+    if schemas:
         missing_definitions = _get_missing_core_definitions(definitions, client, schemas)
         if missing_definitions:
             definitions.update(missing_definitions)
             LOGGER.info(f"Added {len(missing_definitions)} missing core definitions to schema")
 
-    # If client is provided, supplement existing definitions with field descriptions and required field information
-    if client:
+    # Supplement existing definitions with field descriptions and required field information
+    if allow_supplementation:
         definitions = _supplement_schema_with_field_descriptions(definitions, client)
         LOGGER.info("Supplemented definitions with field descriptions and required field information")
+    else:
+        LOGGER.info("Skipping schema supplementation due to older cluster version - preserving existing schema data")
 
     # Write updated definitions
     definitions_file = DEFINITIONS_FILE
@@ -1015,13 +1030,15 @@ def update_kind_schema() -> None:
     # Load existing resources mapping
     resources_mapping = read_resources_mapping_file()
 
-    # Fetch all API schemas in parallel
+    # Always fetch schemas from cluster to allow new resource discovery
     schemas = fetch_all_api_schemas(client=client, paths=paths)
 
-    # Process schema definitions
-    LOGGER.info(
-        f"Cluster version is {'same or newer' if should_update else 'older'}. {'Allowing updates to existing resources' if should_update else 'Only adding new resources, keeping existing ones unchanged'}."
-    )
+    # Process schema definitions with appropriate update policy
+    if should_update:
+        LOGGER.info("Cluster version is same or newer. Allowing updates to existing resources.")
+    else:
+        LOGGER.info("Cluster version is older. Adding new resources but preserving existing resource schemas.")
+
     resources_mapping, definitions = process_schema_definitions(
         schemas=schemas,
         namespacing_dict=namespacing_dict,
@@ -1031,11 +1048,18 @@ def update_kind_schema() -> None:
 
     # Write schema files
     try:
-        write_schema_files(resources_mapping=resources_mapping, definitions=definitions, client=client, schemas=schemas)
-    except IOError as e:
+        write_schema_files(
+            resources_mapping=resources_mapping,
+            definitions=definitions,
+            client=client,
+            allow_supplementation=should_update,
+        )
+    except Exception as e:
         LOGGER.error(f"Failed to write schema files: {e}")
         raise
 
     # Clear cached mapping data in SchemaValidator to force reload
     SchemaValidator.clear_cache()
     SchemaValidator.load_mappings_data()
+
+    LOGGER.info("Schema processing completed successfully")
