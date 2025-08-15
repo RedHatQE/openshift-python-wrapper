@@ -87,10 +87,33 @@ class TestExtractGroupKindVersion:
         assert result == {"group": "apps", "version": "v1", "kind": "Deployment"}
 
     def test_extraction_without_group_uses_first(self):
-        """Test extraction uses first entry when no group is present."""
+        """Test extraction uses first entry when all entries have empty/no group."""
         kind_schema = {"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}
         result = extract_group_kind_version(kind_schema)
         assert result == {"group": "", "version": "v1", "kind": "Pod"}
+
+    def test_extraction_prefers_entry_with_group(self):
+        """Test extraction prefers first entry with non-empty group when multiple entries exist."""
+        kind_schema = {
+            "x-kubernetes-group-version-kind": [
+                {"group": "", "version": "v1", "kind": "Pod"},  # First but empty group
+                {"group": "apps", "version": "v1", "kind": "Deployment"},  # Should be selected
+                {"group": "batch", "version": "v1", "kind": "Job"},  # Later entry, should be ignored
+            ]
+        }
+        result = extract_group_kind_version(kind_schema)
+        assert result == {"group": "apps", "version": "v1", "kind": "Deployment"}
+
+    def test_extraction_multiple_entries_no_group_uses_last(self):
+        """Test extraction uses last entry when multiple entries but none have groups."""
+        kind_schema = {
+            "x-kubernetes-group-version-kind": [
+                {"group": "", "version": "v1", "kind": "Pod"},  # Should be ignored
+                {"group": "", "version": "v2", "kind": "Pod"},  # Should be selected (last)
+            ]
+        }
+        result = extract_group_kind_version(kind_schema)
+        assert result == {"group": "", "version": "v2", "kind": "Pod"}
 
     def test_missing_key_raises_keyerror(self):
         """Test that KeyError is raised when required key is missing."""
@@ -181,6 +204,15 @@ class TestCheckAndUpdateClusterVersion:
         write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
         assert len(write_calls) == 1, "File should be opened for writing exactly once"
 
+        # Verify that the correct cluster version file path is used
+        from pathlib import Path
+
+        expected_path = Path("class_generator/schema/__cluster_version__.txt")
+        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        assert len(read_calls) == 1, "File should be opened for reading exactly once"
+        # Check that the file path used matches expected cluster version file
+        assert str(expected_path) in str(read_calls[0][0][0]) or expected_path.name in str(read_calls[0][0][0])
+
         # Verify that write() was called on the file handle with the new version
         mock_file.write.assert_called_once_with("v1.28.0")
 
@@ -220,6 +252,15 @@ class TestCheckAndUpdateClusterVersion:
         assert mock_open.call_count == 2  # Once for reading, once for writing
         write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
         assert len(write_calls) == 1, "File should be opened for writing exactly once"
+
+        # Verify that the correct cluster version file path is used
+        from pathlib import Path
+
+        expected_path = Path("class_generator/schema/__cluster_version__.txt")
+        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        assert len(read_calls) == 1, "File should be opened for reading exactly once"
+        # Check that the file path used matches expected cluster version file
+        assert str(expected_path) in str(read_calls[0][0][0]) or expected_path.name in str(read_calls[0][0][0])
 
         # Verify that write() was called with the cleaned version (without build suffix)
         mock_file.write.assert_called_once_with("v1.28.0")
@@ -448,6 +489,34 @@ missing_columns               sc
         assert "InvalidResource" not in result
         assert len(result) == 1
 
+    @patch("class_generator.core.schema.run_command")
+    def test_subresource_paths_included(self, mock_run_command):
+        """Test that CRD with APIVERSION containing subresource path-like strings are included as separate kinds."""
+        api_resources_output = """widgets                       widget       widgets.example.io/v1      true         Widget                               create,delete,deletecollection,get,list,patch,update,watch
+widgets                       widget       widgets.example.io/v1      true         Widget/status                        create,delete
+widgets                       widget       widgets.example.io/v1      true         Widget/spec                          create,update
+customresources               cr           custom.io/v1               true         CustomResource                       create,delete,deletecollection,get,list,patch,update,watch
+customresources/finalizers    cr           custom.io/v1               true         CustomResource/finalizers            update,patch"""
+
+        mock_run_command.return_value = (True, api_resources_output, "")
+
+        result = build_dynamic_resource_to_api_mapping("kubectl")
+
+        # Should include both main resource kinds and subresource paths as separate kinds
+        expected_mapping = {
+            "Widget": ["apis/widgets.example.io/v1"],
+            "Widget/status": ["apis/widgets.example.io/v1"],
+            "Widget/spec": ["apis/widgets.example.io/v1"],
+            "CustomResource": ["apis/custom.io/v1"],
+            "CustomResource/finalizers": ["apis/custom.io/v1"],
+        }
+        assert result == expected_mapping
+
+        # Verify subresource entries are included as separate keys (current behavior)
+        assert "Widget/status" in result
+        assert "Widget/spec" in result
+        assert "CustomResource/finalizers" in result
+
 
 class TestFindApiPathsForMissingResources:
     """Test find_api_paths_for_missing_resources function - updated to use dynamic discovery."""
@@ -647,8 +716,9 @@ class TestFetchAllApiSchemas:
         filter_paths = {"api/v1"}
 
         result = fetch_all_api_schemas("kubectl", paths, filter_paths)
-        # Should only process filtered paths
+        # Should only process filtered paths - assert exactly the filter set to guard against over-fetching
         assert isinstance(result, dict)
+        assert set(result.keys()) == filter_paths, f"Expected exactly {filter_paths}, got {set(result.keys())}"
 
     def test_filter_paths_validation_valid_set(self):
         """Test that valid filter_paths set passes validation."""
@@ -660,6 +730,8 @@ class TestFetchAllApiSchemas:
             mock_run_command.return_value = (True, '{"swagger": "2.0"}', "")
             result = fetch_all_api_schemas("kubectl", paths, filter_paths)
             assert isinstance(result, dict)
+            # Assert that resulting keys are exactly the filter set to guard against over-fetching
+            assert set(result.keys()) == filter_paths, f"Expected exactly {filter_paths}, got {set(result.keys())}"
 
     def test_filter_paths_validation_converts_iterable_to_set(self):
         """Test that filter_paths list is converted to set."""
@@ -671,6 +743,9 @@ class TestFetchAllApiSchemas:
             mock_run_command.return_value = (True, '{"swagger": "2.0"}', "")
             result = fetch_all_api_schemas("kubectl", paths, filter_paths)
             assert isinstance(result, dict)
+            # Assert that resulting keys are exactly the filter set to guard against over-fetching
+            expected_keys = set(filter_paths)
+            assert set(result.keys()) == expected_keys, f"Expected exactly {expected_keys}, got {set(result.keys())}"
 
     def test_filter_paths_validation_string_with_invalid_chars_raises_valueerror(self):
         """Test that string filter_paths with invalid characters raises ValueError."""
@@ -942,8 +1017,8 @@ class TestWriteSchemaFiles:
 
         # Verify that missing definitions function is not called when no schemas provided
         mock_get_missing.assert_not_called()
-        # Verify that supplementation is called
-        mock_supplement.assert_called_once()
+        # Verify that supplementation is NOT called when no schemas and empty definitions
+        mock_supplement.assert_not_called()
 
         # Verify that the definitions file is NOT opened for writing (guard protection)
         write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
@@ -980,8 +1055,8 @@ class TestWriteSchemaFiles:
 
         # Verify that missing definitions function is not called when no schemas provided
         mock_get_missing.assert_not_called()
-        # Verify that supplementation is called
-        mock_supplement.assert_called_once()
+        # Verify that supplementation is NOT called when no schemas and empty definitions
+        mock_supplement.assert_not_called()
 
         # Verify that the definitions file IS opened for writing when no existing file
         write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
@@ -1242,98 +1317,64 @@ class TestDetectMissingRefsFromSchemas:
 class TestInferOcExplainPath:
     """Test _infer_oc_explain_path function."""
 
-    def test_infer_pod_spec_path(self):
-        """Test inferring path for PodSpec."""
-        result = _infer_oc_explain_path("io.k8s.api.core.v1.PodSpec")
-        assert result == "pod.spec"
+    @pytest.mark.parametrize(
+        "ref,expected_path",
+        [
+            ("io.k8s.api.core.v1.PodSpec", "pod.spec"),
+            ("io.k8s.api.apps.v1.DeploymentStatus", "deployment.status"),
+            ("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta", "pod.metadata"),
+            ("io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector", "deployment.spec.selector"),
+            ("io.k8s.api.core.v1.Container", "pod.spec.containers"),
+            ("io.k8s.api.core.v1.Volume", "pod.spec.volumes"),
+            ("io.k8s.api.core.v1.ContainerPort", "pod.spec.containers.ports"),
+        ],
+    )
+    def test_infer_known_paths(self, ref, expected_path):
+        """Test inferring paths for known Kubernetes types."""
+        result = _infer_oc_explain_path(ref)
+        assert result == expected_path
 
-    def test_infer_deployment_status_path(self):
-        """Test inferring path for DeploymentStatus."""
-        result = _infer_oc_explain_path("io.k8s.api.apps.v1.DeploymentStatus")
-        assert result == "deployment.status"
-
-    def test_infer_object_meta_path(self):
-        """Test inferring path for ObjectMeta."""
-        result = _infer_oc_explain_path("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta")
-        assert result == "pod.metadata"
-
-    def test_infer_label_selector_path(self):
-        """Test inferring path for LabelSelector."""
-        result = _infer_oc_explain_path("io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector")
-        assert result == "deployment.spec.selector"
-
-    def test_infer_container_path(self):
-        """Test inferring path for Container."""
-        result = _infer_oc_explain_path("io.k8s.api.core.v1.Container")
-        assert result == "pod.spec.containers"
-
-    def test_infer_volume_path(self):
-        """Test inferring path for Volume."""
-        result = _infer_oc_explain_path("io.k8s.api.core.v1.Volume")
-        assert result == "pod.spec.volumes"
-
-    def test_infer_container_port_path(self):
-        """Test inferring path for ContainerPort."""
-        result = _infer_oc_explain_path("io.k8s.api.core.v1.ContainerPort")
-        assert result == "pod.spec.containers.ports"
-
-    def test_infer_unknown_ref_returns_none(self):
-        """Test that unknown ref returns None."""
-        result = _infer_oc_explain_path("unknown.reference.Type")
-        assert result is None
-
-    def test_infer_non_kubernetes_ref_returns_none(self):
-        """Test that non-Kubernetes ref returns None."""
-        result = _infer_oc_explain_path("com.example.api.v1.CustomType")
-        assert result is None
-
-    def test_infer_short_ref_returns_none(self):
-        """Test that too-short ref returns None."""
-        result = _infer_oc_explain_path("io.k8s.Type")
+    @pytest.mark.parametrize(
+        "ref",
+        [
+            "unknown.reference.Type",
+            "com.example.api.v1.CustomType",
+            "io.k8s.Type",  # Too short
+        ],
+    )
+    def test_infer_invalid_refs_return_none(self, ref):
+        """Test that invalid or unknown refs return None."""
+        result = _infer_oc_explain_path(ref)
         assert result is None
 
 
 class TestConvertTypeToSchema:
     """Test _convert_type_to_schema function."""
 
-    def test_convert_basic_types(self):
-        """Test conversion of basic types."""
-        assert _convert_type_to_schema("string") == {"type": "string"}
-        assert _convert_type_to_schema("integer") == {"type": "integer"}
-        assert _convert_type_to_schema("boolean") == {"type": "boolean"}
-        assert _convert_type_to_schema("number") == {"type": "number"}
-
-    def test_convert_array_types(self):
-        """Test conversion of array types."""
-        result = _convert_type_to_schema("[]string")
-        assert result == {"type": "array", "items": {"type": "string"}}
-
-        result = _convert_type_to_schema("[]Container")
-        assert result == {"type": "array", "items": {"type": "object"}}
-
-    def test_convert_map_types(self):
-        """Test conversion of map types."""
-        result = _convert_type_to_schema("map[string]string")
-        assert result == {"type": "object"}
-
-        result = _convert_type_to_schema("map[string]int")
-        assert result == {"type": "object"}
-
-    def test_convert_complex_types(self):
-        """Test conversion of complex/unknown types."""
-        result = _convert_type_to_schema("PodSpec")
-        assert result == {"type": "object"}
-
-        result = _convert_type_to_schema("CustomType")
-        assert result == {"type": "object"}
-
-    def test_convert_empty_type(self):
-        """Test conversion of empty type."""
-        result = _convert_type_to_schema("")
-        assert result == {"type": "object"}
-
-    def test_convert_nested_array_types(self):
-        """Test conversion of nested array types."""
-        result = _convert_type_to_schema("[][]string")
-        expected = {"type": "array", "items": {"type": "array", "items": {"type": "string"}}}
-        assert result == expected
+    @pytest.mark.parametrize(
+        "input_type,expected_schema",
+        [
+            # Basic types
+            ("string", {"type": "string"}),
+            ("integer", {"type": "integer"}),
+            ("boolean", {"type": "boolean"}),
+            ("number", {"type": "number"}),
+            # Array types
+            ("[]string", {"type": "array", "items": {"type": "string"}}),
+            ("[]Container", {"type": "array", "items": {"type": "object"}}),
+            # Map types
+            ("map[string]string", {"type": "object"}),
+            ("map[string]int", {"type": "object"}),
+            # Complex/unknown types
+            ("PodSpec", {"type": "object"}),
+            ("CustomType", {"type": "object"}),
+            # Edge cases
+            ("", {"type": "object"}),
+            # Nested array types
+            ("[][]string", {"type": "array", "items": {"type": "array", "items": {"type": "string"}}}),
+        ],
+    )
+    def test_convert_type_to_schema(self, input_type, expected_schema):
+        """Test conversion of various types to schema format."""
+        result = _convert_type_to_schema(input_type)
+        assert result == expected_schema

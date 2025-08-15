@@ -1371,11 +1371,17 @@ def write_schema_files(
             LOGGER.info(f"Added {len(missing_definitions)} missing core definitions to schema")
 
     # Supplement existing definitions with field descriptions and required field information
-    if allow_supplementation:
+    # Only supplement when schemas are provided OR when definitions are not empty
+    if allow_supplementation and (schemas or definitions):
         definitions = _supplement_schema_with_field_descriptions(definitions, client)
         LOGGER.info("Supplemented definitions with field descriptions and required field information")
     else:
-        LOGGER.info("Skipping schema supplementation due to older cluster version - preserving existing schema data")
+        if not allow_supplementation:
+            LOGGER.info(
+                "Skipping schema supplementation due to older cluster version - preserving existing schema data"
+            )
+        else:
+            LOGGER.info("Skipping schema supplementation - no schemas provided and definitions are empty")
 
     # Write updated definitions
     definitions_file = DEFINITIONS_FILE
