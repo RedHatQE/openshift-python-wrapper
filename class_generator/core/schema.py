@@ -128,7 +128,9 @@ def check_and_update_cluster_version(client: str) -> bool:
         bool: True if version is same or newer, False otherwise
 
     Raises:
-        ClusterVersionError: If cluster version cannot be determined from server
+        ClusterVersionError: If the kubectl/oc client command fails to retrieve
+            server version information (e.g., client binary not found, cluster
+            unreachable, or authentication failure)
     """
     cluster_version_file = Path("class_generator/schema/__cluster_version__.txt")
     last_cluster_version_generated: str = ""
@@ -1576,9 +1578,14 @@ def _process_and_write_schemas(
     LOGGER.info("Schema processing completed successfully")
 
 
-def update_kind_schema() -> None:
-    """Update schema files using OpenAPI v3 endpoints"""
-    client = get_client_binary()
+def update_kind_schema(client: str | None = None) -> None:
+    """Update schema files using OpenAPI v3 endpoints
+
+    Args:
+        client: Path to kubectl/oc client binary. If None, will auto-detect.
+    """
+    if client is None:
+        client = get_client_binary()
 
     # Load existing resources mapping
     resources_mapping = read_resources_mapping_file()
