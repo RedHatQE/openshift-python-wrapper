@@ -1,6 +1,7 @@
 """Tests for new schema.py functions focused on coverage improvement."""
 
 import json
+import unittest.mock
 from unittest.mock import Mock, patch
 
 import pytest
@@ -176,6 +177,14 @@ class TestCheckAndUpdateClusterVersion:
         result = check_and_update_cluster_version("oc")
         assert result is True
 
+        # Verify that the file was opened for writing
+        assert mock_open.call_count == 2  # Once for reading, once for writing
+        write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
+        assert len(write_calls) == 1, "File should be opened for writing exactly once"
+
+        # Verify that write() was called on the file handle with the new version
+        mock_file.write.assert_called_once_with("v1.28.0")
+
     @patch("class_generator.core.schema.get_server_version")
     @patch("builtins.open", create=True)
     def test_older_version_no_update(self, mock_open, mock_get_server_version):
@@ -188,10 +197,41 @@ class TestCheckAndUpdateClusterVersion:
         result = check_and_update_cluster_version("oc")
         assert result is False
 
+        # Verify that the file was only opened for reading, not writing
+        assert mock_open.call_count == 1  # Only once for reading
+        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        assert len(read_calls) == 1, "File should be opened for reading exactly once"
+
+        # Verify that write() was never called
+        mock_file.write.assert_not_called()
+
+    @patch("class_generator.core.schema.get_server_version")
+    @patch("builtins.open", create=True)
+    def test_same_version_updates_file(self, mock_open, mock_get_server_version):
+        """Test that same cluster version updates the file and write is called."""
+        mock_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_file
+        mock_file.read.return_value = "v1.28.0"
+        mock_get_server_version.return_value = "v1.28.0+abc123"
+
+        result = check_and_update_cluster_version("oc")
+        assert result is True
+
+        # Verify that the file was opened for both reading and writing
+        assert mock_open.call_count == 2  # Once for reading, once for writing
+        write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
+        assert len(write_calls) == 1, "File should be opened for writing exactly once"
+
+        # Verify that write() was called with the cleaned version (without build suffix)
+        mock_file.write.assert_called_once_with("v1.28.0")
+
+    @patch("class_generator.core.schema.get_server_version")
     @patch("builtins.open", side_effect=FileNotFoundError("File not found"))
-    def test_missing_file_raises_cluster_version_error(self, mock_open):
-        """Test that missing cluster version file raises ClusterVersionError."""
-        with pytest.raises(ClusterVersionError, match="Failed to read cluster version file"):
+    def test_missing_file_raises_cluster_version_error(self, mock_open, mock_get_server_version):
+        """Test that server version failure raises ClusterVersionError."""
+        mock_get_server_version.side_effect = RuntimeError("Failed to get server version")
+
+        with pytest.raises(ClusterVersionError, match="Failed to determine cluster version from server"):
             check_and_update_cluster_version("oc")
 
 
@@ -414,10 +454,8 @@ class TestFindApiPathsForMissingResources:
     """Test find_api_paths_for_missing_resources function - updated to use dynamic discovery."""
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_dynamic_mapping_used(self, mock_get_client, mock_build_mapping):
+    def test_dynamic_mapping_used(self, mock_build_mapping):
         """Test that dynamic mapping is used instead of hardcoded mapping."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {
             "Pod": ["api/v1"],
             "Deployment": ["apis/apps/v1"],
@@ -431,7 +469,7 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"Pod", "CustomResource"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
 
         # Should use dynamic mapping
         mock_build_mapping.assert_called_once_with("kubectl")
@@ -439,10 +477,8 @@ class TestFindApiPathsForMissingResources:
         assert result == expected
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_fallback_to_hardcoded_mapping(self, mock_get_client, mock_build_mapping):
+    def test_fallback_to_hardcoded_mapping(self, mock_build_mapping):
         """Test fallback to hardcoded mapping when dynamic discovery fails."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {}  # Empty mapping (failure)
 
         paths = {
@@ -451,7 +487,7 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"Pod", "Deployment"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
 
         # Should fall back to hardcoded mapping
         expected = {"api/v1", "apis/apps/v1"}
@@ -467,26 +503,20 @@ class TestFindApiPathsForMissingResources:
         missing_resources = {"Pod", "Deployment", "Job"}
 
         # Mock the dynamic mapping to return expected results
-        with (
-            patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping") as mock_build,
-            patch("class_generator.core.schema.get_client_binary") as mock_get_client,
-        ):
-            mock_get_client.return_value = "kubectl"
+        with patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping") as mock_build:
             mock_build.return_value = {
                 "Pod": ["api/v1"],
                 "Deployment": ["apis/apps/v1"],
                 "Job": ["apis/batch/v1"],
             }
 
-            result = find_api_paths_for_missing_resources(paths, missing_resources)
+            result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
             expected = {"api/v1", "apis/apps/v1", "apis/batch/v1"}
             assert result == expected
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_unknown_resources_get_default_paths(self, mock_get_client, mock_build_mapping):
+    def test_unknown_resources_get_default_paths(self, mock_build_mapping):
         """Test that unknown resources get mapped to default OpenShift paths."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {}  # Empty mapping for unknown resources
 
         paths = {
@@ -496,7 +526,7 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"UnknownResource"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
         # Should include core API and OpenShift API groups for unknown resources
         assert "api/v1" in result
         assert "apis/apps.openshift.io/v1" in result
@@ -506,28 +536,24 @@ class TestFindApiPathsForMissingResources:
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
         missing_resources = set()
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
         assert result == set()
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_missing_api_paths_in_cluster(self, mock_get_client, mock_build_mapping):
+    def test_missing_api_paths_in_cluster(self, mock_build_mapping):
         """Test handling when expected API paths are not available in cluster."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {"Deployment": ["apis/apps/v1"]}
 
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}  # Missing apps/v1
         missing_resources = {"Deployment"}  # Deployment usually in apps/v1
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
         # Should still return empty since apps/v1 not available
         assert result == set()
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_openshift_specific_resources(self, mock_get_client, mock_build_mapping):
+    def test_openshift_specific_resources(self, mock_build_mapping):
         """Test OpenShift-specific resources are mapped correctly."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {
             "Route": ["apis/route.openshift.io/v1"],
             "BuildConfig": ["apis/build.openshift.io/v1"],
@@ -539,15 +565,13 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"Route", "BuildConfig"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
         expected = {"apis/route.openshift.io/v1", "apis/build.openshift.io/v1"}
         assert result == expected
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_mixed_known_and_unknown_resources(self, mock_get_client, mock_build_mapping):
+    def test_mixed_known_and_unknown_resources(self, mock_build_mapping):
         """Test mix of known and unknown resources."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {"Pod": ["api/v1"]}  # Only Pod known
 
         paths = {
@@ -557,16 +581,14 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"Pod", "UnknownResource"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
         # Should include api/v1 for Pod and default paths for unknown
         assert "api/v1" in result
         assert "apis/apps.openshift.io/v1" in result  # Default OpenShift path
 
     @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
-    @patch("class_generator.core.schema.get_client_binary")
-    def test_uploadtokenrequest_special_case(self, mock_get_client, mock_build_mapping):
+    def test_uploadtokenrequest_special_case(self, mock_build_mapping):
         """Test UploadTokenRequest which could be in either api (using fallback)."""
-        mock_get_client.return_value = "kubectl"
         mock_build_mapping.return_value = {}  # Empty - force fallback to hardcoded
 
         paths = {
@@ -575,7 +597,7 @@ class TestFindApiPathsForMissingResources:
         }
         missing_resources = {"UploadTokenRequest"}
 
-        result = find_api_paths_for_missing_resources(paths, missing_resources)
+        result = find_api_paths_for_missing_resources("kubectl", paths, missing_resources)
         # Should check both API paths using fallback hardcoded mapping
         assert "api/v1" in result
         assert "apis/image.openshift.io/v1" in result
@@ -656,40 +678,58 @@ class TestFetchAllApiSchemas:
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
         filter_paths = "not_iterable"  # String is iterable but each char isn't a valid path
 
-        with pytest.raises(ValueError, match="The following filter_paths are not present in paths"):
+        with pytest.raises(ValueError) as exc_info:
             fetch_all_api_schemas("kubectl", paths, filter_paths)
+        # Verify it's about missing paths without coupling to exact message
+        assert "filter_paths" in str(exc_info.value)
+        assert "not present" in str(exc_info.value) or "missing" in str(exc_info.value)
 
     def test_filter_paths_validation_non_iterable_type_raises_typeerror(self):
         """Test that non-iterable filter_paths type raises TypeError."""
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
         filter_paths = 123  # Not iterable
 
-        with pytest.raises(TypeError, match="filter_paths must be a set or iterable of strings, got int"):
+        with pytest.raises(TypeError) as exc_info:
             fetch_all_api_schemas("kubectl", paths, filter_paths)
+        # Verify it's about type without coupling to exact message
+        assert "filter_paths" in str(exc_info.value)
+        assert "int" in str(exc_info.value)
 
     def test_filter_paths_validation_non_string_items_raises_typeerror(self):
         """Test that non-string items in filter_paths raise TypeError."""
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
         filter_paths = {"api/v1", 123, None}  # Mixed types
 
-        with pytest.raises(TypeError, match="All items in filter_paths must be non-empty strings, found invalid items"):
+        with pytest.raises(TypeError) as exc_info:
             fetch_all_api_schemas("kubectl", paths, filter_paths)
+        # Verify it's about invalid string items without coupling to exact message
+        assert "filter_paths" in str(exc_info.value)
+        assert "string" in str(exc_info.value)
+        assert "invalid" in str(exc_info.value) or "items" in str(exc_info.value)
 
     def test_filter_paths_validation_empty_string_raises_typeerror(self):
         """Test that empty string in filter_paths raises TypeError."""
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
         filter_paths = {"api/v1", ""}  # Empty string
 
-        with pytest.raises(TypeError, match="All items in filter_paths must be non-empty strings, found invalid items"):
+        with pytest.raises(TypeError) as exc_info:
             fetch_all_api_schemas("kubectl", paths, filter_paths)
+        # Verify it's about empty strings without coupling to exact message
+        assert "filter_paths" in str(exc_info.value)
+        assert "string" in str(exc_info.value)
+        assert "empty" in str(exc_info.value) or "non-empty" in str(exc_info.value)
 
     def test_filter_paths_validation_missing_paths_raises_valueerror(self):
         """Test that filter_paths not present in paths raise ValueError."""
         paths = {"api/v1": {"serverRelativeURL": "/api/v1"}}
         filter_paths = {"api/v1", "apis/missing/v1", "api/v2"}  # Some paths not in paths dict
 
-        with pytest.raises(ValueError, match="The following filter_paths are not present in paths"):
+        with pytest.raises(ValueError) as exc_info:
             fetch_all_api_schemas("kubectl", paths, filter_paths)
+        # Verify it's about missing paths without coupling to exact message
+        assert "filter_paths" in str(exc_info.value)
+        assert "missing/v1" in str(exc_info.value)  # Specific missing path mentioned
+        assert "api/v2" in str(exc_info.value)  # Another specific missing path mentioned
 
     def test_filter_paths_validation_missing_paths_includes_available_paths(self):
         """Test that ValueError includes available paths for debugging."""
@@ -700,10 +740,12 @@ class TestFetchAllApiSchemas:
             fetch_all_api_schemas("kubectl", paths, filter_paths)
 
         error_message = str(exc_info.value)
+        # Verify the essential information is present without exact wording
         assert "missing/path" in error_message
-        assert "Available paths:" in error_message
-        assert "api/v1" in error_message
-        assert "apis/apps/v1" in error_message
+        assert "api/v1" in error_message  # Available path mentioned
+        assert "apis/apps/v1" in error_message  # Another available path mentioned
+        # Check for availability indicator (flexible wording)
+        assert "available" in error_message.lower() or "paths" in error_message.lower()
 
     def test_filter_paths_none_allows_all_paths(self):
         """Test that filter_paths=None processes all paths (existing behavior)."""
@@ -861,18 +903,211 @@ class TestWriteSchemaFiles:
             write_schema_files({}, {}, "kubectl")
 
     @patch("class_generator.core.schema.Path")
+    @patch("class_generator.core.schema._supplement_schema_with_field_descriptions")
     @patch("builtins.open", create=True)
-    def test_file_writing_failure(self, mock_open, mock_path):
+    def test_file_writing_failure(self, mock_open, mock_supplement, mock_path):
         """Test handling of file writing failure."""
         mock_path.return_value.mkdir = Mock()
         mock_path.return_value.exists.return_value = False  # No existing file to preserve
         mock_open.side_effect = OSError("Write failed")
+        mock_supplement.return_value = {"v1/Pod": {"type": "object"}}  # Return the same definitions
 
         # Use non-empty definitions to bypass the empty definitions guard
         non_empty_definitions = {"v1/Pod": {"type": "object"}}
 
         with pytest.raises(IOError, match="Failed to write definitions file"):
             write_schema_files({}, non_empty_definitions, "kubectl")
+
+    @patch("class_generator.core.schema.Path")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("builtins.open", create=True)
+    @patch("class_generator.core.schema._get_missing_core_definitions")
+    @patch("class_generator.core.schema._supplement_schema_with_field_descriptions")
+    def test_empty_definitions_guard_preserves_existing_file(
+        self, mock_supplement, mock_get_missing, mock_open, mock_save_archive, mock_path
+    ):
+        """Test that empty definitions don't overwrite existing definitions file."""
+        # Setup mocks
+        mock_path.return_value.mkdir = Mock()
+        mock_path.return_value.exists.return_value = True  # Existing file exists
+        mock_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_file
+        mock_get_missing.return_value = {}
+        mock_supplement.return_value = {}
+
+        resources_mapping = {"pod": [{"kind": "Pod"}]}
+        empty_definitions = {}  # Empty definitions should trigger guard
+
+        # Call the function
+        write_schema_files(resources_mapping, empty_definitions, "kubectl", allow_supplementation=True)
+
+        # Verify that missing definitions function is not called when no schemas provided
+        mock_get_missing.assert_not_called()
+        # Verify that supplementation is called
+        mock_supplement.assert_called_once()
+
+        # Verify that the definitions file is NOT opened for writing (guard protection)
+        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
+        assert len(write_calls) == 0, "Definitions file should not be opened for writing when definitions are empty"
+
+        # Verify that resources mapping is still saved (not affected by guard)
+        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+
+    @patch("class_generator.core.schema.Path")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("builtins.open", create=True)
+    @patch("class_generator.core.schema._get_missing_core_definitions")
+    @patch("class_generator.core.schema._supplement_schema_with_field_descriptions")
+    def test_empty_definitions_guard_no_existing_file_still_writes(
+        self, mock_supplement, mock_get_missing, mock_open, mock_save_archive, mock_path
+    ):
+        """Test that empty definitions still write when no existing file exists."""
+        # Setup mocks
+        mock_path.return_value.mkdir = Mock()
+        mock_path.return_value.exists.return_value = False  # No existing file
+        mock_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_file
+        mock_get_missing.return_value = {}
+        mock_supplement.return_value = {}
+
+        resources_mapping = {"pod": [{"kind": "Pod"}]}
+        empty_definitions = {}  # Empty definitions
+
+        # Call the function
+        write_schema_files(resources_mapping, empty_definitions, "kubectl", allow_supplementation=True)
+
+        # Verify that missing definitions function is not called when no schemas provided
+        mock_get_missing.assert_not_called()
+        # Verify that supplementation is called
+        mock_supplement.assert_called_once()
+
+        # Verify that the definitions file IS opened for writing when no existing file
+        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
+        assert len(write_calls) == 1, "Definitions file should be opened for writing when no existing file"
+
+        # Verify that resources mapping is saved
+        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+
+    @patch("class_generator.core.schema.Path")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("builtins.open", create=True)
+    @patch("class_generator.core.schema._get_missing_core_definitions")
+    @patch("class_generator.core.schema._supplement_schema_with_field_descriptions")
+    def test_empty_definitions_guard_with_schemas_still_calls_enrichment(
+        self, mock_supplement, mock_get_missing, mock_open, mock_save_archive, mock_path
+    ):
+        """Test that enrichment functions are called even with empty definitions when schemas provided."""
+        # Setup mocks
+        mock_path.return_value.mkdir = Mock()
+        mock_path.return_value.exists.return_value = True  # Existing file exists
+        mock_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_file
+        mock_get_missing.return_value = {"v1/NewDef": {"type": "object"}}  # Missing definitions found
+        mock_supplement.return_value = {"v1/NewDef": {"type": "object"}}  # Supplementation adds content
+
+        resources_mapping = {"pod": [{"kind": "Pod"}]}
+        empty_definitions = {}  # Empty initial definitions
+        schemas = {"api/v1": {"components": {"schemas": {}}}}  # Schemas provided
+
+        # Call the function with schemas
+        write_schema_files(resources_mapping, empty_definitions, "kubectl", schemas=schemas, allow_supplementation=True)
+
+        # Verify that both enrichment functions are called
+        mock_get_missing.assert_called_once_with(empty_definitions, "kubectl", schemas)
+        mock_supplement.assert_called_once()
+
+        # Since enrichment added content, file should be written
+        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
+        assert len(write_calls) == 1, "Definitions file should be written when enrichment adds content"
+
+        # Verify that resources mapping is saved
+        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+
+    @patch("class_generator.core.schema.Path")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("builtins.open", create=True)
+    @patch("class_generator.core.schema._get_missing_core_definitions")
+    @patch("class_generator.core.schema._supplement_schema_with_field_descriptions")
+    def test_empty_definitions_guard_allows_supplementation_false(
+        self, mock_supplement, mock_get_missing, mock_open, mock_save_archive, mock_path
+    ):
+        """Test that empty definitions guard works correctly when supplementation is disabled."""
+        # Setup mocks
+        mock_path.return_value.mkdir = Mock()
+        mock_path.return_value.exists.return_value = True  # Existing file exists
+        mock_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_file
+        mock_get_missing.return_value = {}
+        # mock_supplement should not be called when allow_supplementation=False
+
+        resources_mapping = {"pod": [{"kind": "Pod"}]}
+        empty_definitions = {}  # Empty definitions
+
+        # Call the function with supplementation disabled
+        write_schema_files(resources_mapping, empty_definitions, "kubectl", allow_supplementation=False)
+
+        # Verify that missing definitions function is still called when schemas provided
+        # But since no schemas provided, it shouldn't be called
+        mock_get_missing.assert_not_called()
+
+        # Verify that supplementation is NOT called
+        mock_supplement.assert_not_called()
+
+        # Verify that the definitions file is NOT opened for writing (guard protection)
+        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
+        assert len(write_calls) == 0, "Definitions file should not be opened for writing when definitions are empty"
+
+        # Verify that resources mapping is still saved
+        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+
+    @patch("class_generator.core.schema.Path")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("builtins.open", create=True)
+    @patch("class_generator.core.schema._get_missing_core_definitions")
+    @patch("class_generator.core.schema._supplement_schema_with_field_descriptions")
+    def test_empty_definitions_with_missing_definitions_from_enrichment(
+        self, mock_supplement, mock_get_missing, mock_open, mock_save_archive, mock_path
+    ):
+        """Test that empty definitions get written when enrichment adds missing definitions."""
+        # Setup mocks
+        mock_path.return_value.mkdir = Mock()
+        mock_path.return_value.exists.return_value = True  # Existing file exists
+        mock_file = Mock()
+        mock_open.return_value.__enter__.return_value = mock_file
+
+        # Simulate enrichment functions adding content to empty definitions
+        missing_definitions = {"v1/CoreDef": {"type": "object"}}
+        supplemented_definitions = {"v1/CoreDef": {"type": "object", "description": "Added by supplementation"}}
+
+        mock_get_missing.return_value = missing_definitions
+        mock_supplement.return_value = supplemented_definitions
+
+        resources_mapping = {"pod": [{"kind": "Pod"}]}
+        empty_definitions = {}  # Start with empty definitions
+        schemas = {"api/v1": {"components": {"schemas": {}}}}  # Provide schemas to trigger missing definitions check
+
+        # Call the function
+        write_schema_files(resources_mapping, empty_definitions, "kubectl", schemas=schemas, allow_supplementation=True)
+
+        # Verify enrichment functions called
+        mock_get_missing.assert_called_once_with(empty_definitions, "kubectl", schemas)
+        mock_supplement.assert_called_once_with(missing_definitions, "kubectl")
+
+        # Since enrichment added content, definitions file should be written
+        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
+        assert len(write_calls) == 1, (
+            "Definitions file should be written when enrichment adds content to initially empty definitions"
+        )
+
+        # Verify correct content written
+        mock_file.write.assert_called()
+        # The content is written as JSON with the definitions wrapped in a "definitions" object
+        all_write_calls = [call[0][0] for call in mock_file.write.call_args_list]
+        written_content = "".join(all_write_calls)
+        assert "v1/CoreDef" in written_content
+
+        # Verify that resources mapping is saved
+        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
 
 
 class TestDetectMissingRefsFromSchemas:

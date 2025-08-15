@@ -4,7 +4,6 @@ import dataclasses
 import json
 import re
 import shlex
-import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -129,7 +128,7 @@ def check_and_update_cluster_version(client: str) -> bool:
         bool: True if version is same or newer, False otherwise
 
     Raises:
-        ClusterVersionError: If cluster version file cannot be read
+        ClusterVersionError: If cluster version cannot be determined from server
     """
     cluster_version_file = Path("class_generator/schema/__cluster_version__.txt")
     last_cluster_version_generated: str = ""
@@ -137,12 +136,15 @@ def check_and_update_cluster_version(client: str) -> bool:
     try:
         with open(cluster_version_file, "r") as fd:
             last_cluster_version_generated = fd.read().strip()
-    except (FileNotFoundError, IOError) as exp:
-        error_msg = f"Failed to read cluster version file: {exp}"
-        LOGGER.error(error_msg)
-        raise ClusterVersionError(error_msg) from exp
+    except (FileNotFoundError, IOError):
+        # Treat missing file as first run - use baseline version that allows updates
+        last_cluster_version_generated = "v0.0.0"
+        LOGGER.info("Cluster version file not found - treating as first run with baseline version v0.0.0")
 
-    cluster_version = get_server_version(client=client)
+    try:
+        cluster_version = get_server_version(client=client)
+    except RuntimeError as e:
+        raise ClusterVersionError(f"Failed to determine cluster version from server: {e}") from e
     cluster_version = cluster_version.split("+")[0]
 
     same_or_newer_version: bool = Version(cluster_version) >= Version(last_cluster_version_generated)
@@ -293,11 +295,12 @@ def build_dynamic_resource_to_api_mapping(client: str) -> dict[str, list[str]]:
     return resource_to_api_mapping
 
 
-def find_api_paths_for_missing_resources(paths: dict[str, Any], missing_resources: set[str]) -> set[str]:
+def find_api_paths_for_missing_resources(client: str, paths: dict[str, Any], missing_resources: set[str]) -> set[str]:
     """
     Find API paths that contain schemas for missing resources.
 
     Args:
+        client: Path to kubectl/oc client binary
         paths: Dictionary of API paths from v3 index
         missing_resources: Set of missing resource kinds
 
@@ -310,7 +313,6 @@ def find_api_paths_for_missing_resources(paths: dict[str, Any], missing_resource
     relevant_paths = set()
 
     # Get dynamic resource-to-API mapping from cluster
-    client = get_client_binary()
     resource_to_api_mapping = build_dynamic_resource_to_api_mapping(client)
 
     # Fallback to hardcoded mapping for critical resources if dynamic discovery fails
@@ -978,18 +980,18 @@ def _run_explain_and_parse(client: str, explain_path: str) -> tuple[dict[str, An
     """Helper function to run oc explain and parse the output."""
     try:
         cmd = [client, "explain", explain_path]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        success, stdout, stderr = run_command(command=cmd, timeout=30, check=False, log_errors=False)
 
-        if result.returncode == 0:
-            explain_schema = _parse_oc_explain_output(result.stdout)
+        if success:
+            explain_schema = _parse_oc_explain_output(stdout)
             explain_properties = explain_schema.get("properties", {})
             explain_required = explain_schema.get("required", [])
             return explain_properties, explain_required
         else:
-            LOGGER.debug(f"Failed to get {client} explain for {explain_path}: {result.stderr}")
+            LOGGER.debug(f"Failed to get {client} explain for {explain_path}: {stderr}")
             return None
 
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
+    except Exception as e:
         LOGGER.debug(f"Failed to run {client} explain for {explain_path}: {e}")
         return None
 
@@ -998,16 +1000,16 @@ def _run_explain_recursive(client: str, ref_name: str, oc_path: str) -> tuple[st
     """Helper function to run oc explain --recursive for missing definitions."""
     try:
         cmd = [client, "explain", oc_path, "--recursive"]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        success, stdout, stderr = run_command(command=cmd, timeout=30, check=False, log_errors=False)
 
-        if result.returncode == 0:
-            schema = _parse_oc_explain_output(result.stdout)
+        if success:
+            schema = _parse_oc_explain_output(stdout)
             return ref_name, schema
         else:
-            LOGGER.debug(f"Failed to get {client} explain for {oc_path}: {result.stderr}")
+            LOGGER.debug(f"Failed to get {client} explain for {oc_path}: {stderr}")
             return None
 
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError, OSError) as e:
+    except Exception as e:
         LOGGER.debug(f"Failed to run {client} explain for {oc_path}: {e}")
         return None
 
@@ -1493,7 +1495,9 @@ def _fetch_schemas_based_on_strategy(client: str, strategy: UpdateStrategy, path
         return fetch_all_api_schemas(client=client, paths=paths)
     elif strategy.missing_resources:
         # Find API paths that might contain missing resources
-        relevant_paths = find_api_paths_for_missing_resources(paths=paths, missing_resources=strategy.missing_resources)
+        relevant_paths = find_api_paths_for_missing_resources(
+            client=client, paths=paths, missing_resources=strategy.missing_resources
+        )
         # Fetch only relevant schemas
         schemas = fetch_all_api_schemas(client=client, paths=paths, filter_paths=relevant_paths)
         LOGGER.info(f"Fetched {len(schemas)} schemas for missing resources instead of all {len(paths)} schemas")
@@ -1503,22 +1507,20 @@ def _fetch_schemas_based_on_strategy(client: str, strategy: UpdateStrategy, path
         return {}
 
 
-def _handle_no_schemas_case() -> dict[str, Any]:
+def _handle_no_schemas_case() -> None:
     """Handle the case when no schemas are fetched by preserving existing definitions.
 
-    Returns:
-        Dictionary of existing definitions or empty dict if none found
+    This function logs information about existing definitions but doesn't modify
+    any files, effectively preserving the current state.
     """
     LOGGER.info("No schemas fetched. Preserving existing data to avoid overwriting with empty definitions.")
     try:
         with open(DEFINITIONS_FILE, "r") as fd:
             existing_definitions_data = json.load(fd)
             definitions = existing_definitions_data.get("definitions", {})
-            LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve")
-            return definitions
+            LOGGER.info(f"Found {len(definitions)} existing definitions that will be preserved")
     except (FileNotFoundError, IOError, json.JSONDecodeError):
-        LOGGER.debug("Could not load existing definitions file. Using empty definitions.")
-        return {}
+        LOGGER.debug("Could not load existing definitions file. No existing definitions to preserve.")
 
 
 def _process_and_write_schemas(

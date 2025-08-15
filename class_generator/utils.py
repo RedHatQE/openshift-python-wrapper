@@ -97,7 +97,7 @@ def execute_parallel_tasks(
                 if error_handler:
                     error_handler(task, exc)
                 else:
-                    LOGGER.error(f"Failed to execute {task_name} for {task}: {exc}")
+                    LOGGER.exception(f"Failed to execute {task_name} for {task}: {exc}")
 
     return results
 
@@ -107,6 +107,8 @@ def execute_parallel_with_mapping(
     task_func: Callable[[T], R],
     max_workers: Optional[int] = None,
     task_name: str = "task",
+    result_processor: Optional[Callable[[T, R], Any]] = None,
+    error_handler: Optional[Callable[[T, Exception], Any]] = None,
 ) -> Dict[T, Union[R, Exception]]:
     """
     Execute tasks in parallel where each task has associated metadata.
@@ -119,6 +121,14 @@ def execute_parallel_with_mapping(
         task_func: Function to execute for each task (receives only the task)
         max_workers: Maximum number of worker threads
         task_name: Name for logging purposes
+        result_processor: Optional function to process successful results.
+                         Called with (task, result) on success. Any exceptions
+                         from this function are logged but do not affect the
+                         overall execution.
+        error_handler: Optional function to handle task exceptions.
+                      Called with (task, exception) on failure. Any exceptions
+                      from this function are logged but do not affect the
+                      overall execution.
 
     Returns:
         Dictionary mapping tasks to their results or exceptions
@@ -129,6 +139,21 @@ def execute_parallel_with_mapping(
         results = execute_parallel_with_mapping(
             task_mapping=path_to_info,
             task_func=lambda path: fetch_api_group(path, path_to_info[path]),
+            task_name="API fetching"
+        )
+
+        # With custom callbacks
+        def log_success(task, result):
+            LOGGER.info(f"Successfully processed {task}")
+
+        def handle_error(task, error):
+            LOGGER.warning(f"Task {task} failed: {error}")
+
+        results = execute_parallel_with_mapping(
+            task_mapping=path_to_info,
+            task_func=lambda path: fetch_api_group(path, path_to_info[path]),
+            result_processor=log_success,
+            error_handler=handle_error,
             task_name="API fetching"
         )
     """
@@ -151,9 +176,24 @@ def execute_parallel_with_mapping(
             try:
                 result = future.result()
                 results[task] = result
+
+                # Optional result processing
+                if result_processor:
+                    try:
+                        result_processor(task, result)
+                    except Exception as processor_exc:
+                        LOGGER.exception(f"Result processor failed for {task}: {processor_exc}")
+
             except Exception as exc:
                 results[task] = exc
-                LOGGER.error(f"Failed to execute {task_name} for {task}: {exc}")
+                LOGGER.exception(f"Failed to execute {task_name} for {task}: {exc}")
+
+                # Optional error handling
+                if error_handler:
+                    try:
+                        error_handler(task, exc)
+                    except Exception as handler_exc:
+                        LOGGER.exception(f"Error handler failed for {task}: {handler_exc}")
 
     return results
 
