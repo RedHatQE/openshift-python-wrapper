@@ -1052,7 +1052,7 @@ wheels = [
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "11.0.88"
+version = "11.0.89"
 source = { editable = "." }
 dependencies = [
     { name = "cloup" },
