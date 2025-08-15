@@ -1,7 +1,6 @@
 """Tests for new schema.py functions focused on coverage improvement."""
 
 import json
-import unittest.mock
 from unittest.mock import Mock, patch
 
 import pytest
@@ -951,7 +950,10 @@ class TestWriteSchemaFiles:
         assert len(write_calls) == 0, "Definitions file should not be opened for writing when definitions are empty"
 
         # Verify that resources mapping is still saved (not affected by guard)
-        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+        # Assert the actual file path to ensure the correct mapping file is being saved
+        from class_generator.constants import RESOURCES_MAPPING_FILE
+
+        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
     @patch("class_generator.core.schema.save_json_archive")
@@ -986,7 +988,10 @@ class TestWriteSchemaFiles:
         assert len(write_calls) == 1, "Definitions file should be opened for writing when no existing file"
 
         # Verify that resources mapping is saved
-        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+        # Assert the actual file path to ensure the correct mapping file is being saved
+        from class_generator.constants import RESOURCES_MAPPING_FILE
+
+        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
     @patch("class_generator.core.schema.save_json_archive")
@@ -1021,7 +1026,10 @@ class TestWriteSchemaFiles:
         assert len(write_calls) == 1, "Definitions file should be written when enrichment adds content"
 
         # Verify that resources mapping is saved
-        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+        # Assert the actual file path to ensure the correct mapping file is being saved
+        from class_generator.constants import RESOURCES_MAPPING_FILE
+
+        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
     @patch("class_generator.core.schema.save_json_archive")
@@ -1058,7 +1066,10 @@ class TestWriteSchemaFiles:
         assert len(write_calls) == 0, "Definitions file should not be opened for writing when definitions are empty"
 
         # Verify that resources mapping is still saved
-        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+        # Assert the actual file path to ensure the correct mapping file is being saved
+        from class_generator.constants import RESOURCES_MAPPING_FILE
+
+        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
     @patch("class_generator.core.schema.save_json_archive")
@@ -1104,10 +1115,19 @@ class TestWriteSchemaFiles:
         # The content is written as JSON with the definitions wrapped in a "definitions" object
         all_write_calls = [call[0][0] for call in mock_file.write.call_args_list]
         written_content = "".join(all_write_calls)
-        assert "v1/CoreDef" in written_content
+
+        # Parse the JSON and verify structure properly
+        written_json = json.loads(written_content)
+        assert "definitions" in written_json
+        assert "v1/CoreDef" in written_json["definitions"]
+        assert written_json["definitions"]["v1/CoreDef"]["type"] == "object"
+        assert written_json["definitions"]["v1/CoreDef"]["description"] == "Added by supplementation"
 
         # Verify that resources mapping is saved
-        mock_save_archive.assert_called_once_with(resources_mapping, unittest.mock.ANY)
+        # Assert the actual file path to ensure the correct mapping file is being saved
+        from class_generator.constants import RESOURCES_MAPPING_FILE
+
+        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
 
 class TestDetectMissingRefsFromSchemas:
