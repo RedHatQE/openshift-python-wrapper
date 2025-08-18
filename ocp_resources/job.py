@@ -23,6 +23,7 @@ class Job(NamespacedResource):
                 deleted (for example the pods left behind when you delete a Job). Options are: "Background",
                 "Foreground" and "Orphan". Read more here:
                     https://kubernetes.io/docs/concepts/architecture/garbage-collection/#cascading-deletion
+        volumes (list): List of volumes that can be mounted by containers belonging to the pod
     """
 
     api_group = NamespacedResource.ApiGroup.BATCH
@@ -43,6 +44,7 @@ class Job(NamespacedResource):
         service_account=None,
         containers=None,
         background_propagation_policy=None,
+        volumes=None,
         **kwargs,
     ):
         super().__init__(
@@ -59,6 +61,7 @@ class Job(NamespacedResource):
         self.service_account = service_account
         self.containers = containers
         self.background_propagation_policy = background_propagation_policy
+        self.volumes = volumes
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -77,6 +80,9 @@ class Job(NamespacedResource):
 
                 if self.restart_policy:
                     self.res["spec"]["template"]["spec"]["restartPolicy"] = self.restart_policy
+
+                if self.volumes:
+                    self.res["spec"]["template"]["spec"]["volumes"] = self.volumes
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
