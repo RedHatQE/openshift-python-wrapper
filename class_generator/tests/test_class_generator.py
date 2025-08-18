@@ -2,11 +2,11 @@
 
 import filecmp
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Tuple, Optional
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.generator import class_generator
+from class_generator.utils import execute_parallel_tasks
 
 
 def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]]:
@@ -91,41 +91,46 @@ def test_parse_explain(tmp_path: Path) -> None:
     """Test all resource kinds in parallel and collect all failures."""
     # List of all resource kinds to test
     resource_kinds = [
-        "APIServer",
+        "Pod",
+        "Pipeline",
+        "OAuth",
+        "Ingress",
         "ClusterOperator",
+        "ImageContentSourcePolicy",
+        "ServiceMeshMember",
+        "NMState",
+        "Deployment",
+        "Machine",
+        "APIServer",
+        "Secret",
         "ConfigMap",
         "DNS",
-        "Deployment",
-        "ImageContentSourcePolicy",
-        "Machine",
-        "NMState",
-        "OAuth",
-        "Pod",
-        "Secret",
-        "ServiceMeshMember",
-        "Pipeline",
         "ServingRuntime",
         "RouteAdvertisements",
     ]
 
     failures: List[Tuple[str, str]] = []
 
-    # Run tests in parallel using ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=8) as executor:
-        # Submit all test tasks
-        future_to_kind = {
-            executor.submit(_test_single_resource, kind, tmp_path / f"test-{kind}"): kind for kind in resource_kinds
-        }
+    # Process test results and collect failures
+    def process_test_result(kind: str, result: Optional[Tuple[str, str]]) -> None:
+        if result is not None:
+            failures.append(result)
 
-        # Collect results as they complete
-        for future in as_completed(future_to_kind):
-            kind = future_to_kind[future]
-            try:
-                result = future.result()
-                if result is not None:
-                    failures.append(result)
-            except Exception as exc:
-                failures.append((kind, f"Task execution failed: {str(exc)}"))
+    def handle_test_error(kind: str, exc: Exception) -> None:
+        failures.append((kind, f"Task execution failed: {str(exc)}"))
+
+    def create_test_task(kind: str) -> Optional[Tuple[str, str]]:
+        return _test_single_resource(kind, tmp_path / f"test-{kind}")
+
+    # Run tests in parallel
+    execute_parallel_tasks(
+        tasks=resource_kinds,
+        task_func=create_test_task,
+        max_workers=8,
+        task_name="resource testing",
+        result_processor=process_test_result,
+        error_handler=handle_test_error,
+    )
 
     # Display all failures if any occurred
     if failures:
