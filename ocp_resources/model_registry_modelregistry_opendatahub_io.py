@@ -1,7 +1,9 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
-
-
 from typing import Any
+
+from kubernetes.dynamic import ResourceInstance
+from kubernetes.dynamic.exceptions import InternalServerError
+
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
 
@@ -92,3 +94,23 @@ class ModelRegistry(NamespacedResource):
                 _spec["postgres"] = self.postgres
 
     # End of generated code
+
+    def create(self, wait: bool = False) -> ResourceInstance | None:
+        """
+        Create resource.
+
+        Args:
+            wait (bool) : True to wait for resource status.
+
+        Returns:
+            bool: True if create succeeded, False otherwise.
+        """
+        return self.retry_cluster_exceptions(
+            func=super().create,
+            wait=wait,
+            sleep_time=5,
+            timeout=30,
+            exceptions_dict={
+                InternalServerError: ["connection refused", "no endpoints available for service"],
+            },
+        )
