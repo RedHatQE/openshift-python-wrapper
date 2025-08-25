@@ -303,6 +303,7 @@ class DataVolume(NamespacedResource):
         self,
         timeout=TIMEOUT_10MINUTES,
         failure_timeout=TIMEOUT_2MINUTES,
+        pvc_wait_for_bound_timeout=TIMEOUT_1MINUTE,
         dv_garbage_collection_enabled=None,
         stop_status_func=None,
         *stop_status_func_args,
@@ -314,6 +315,7 @@ class DataVolume(NamespacedResource):
         Args:
             timeout (int):  Time to wait for the DataVolume to succeed.
             failure_timeout (int): Time to wait for the DataVolume to have not Pending/None status
+            pvc_wait_for_bound_timeout (int): Time to wait for the PVC to reach 'Bound' status.
             dv_garbage_collection_enabled (bool, default: None): DV garbage collection is deprecated and removed in
             v4.19
             stop_status_func (function): function that is called inside the TimeoutSampler
@@ -361,7 +363,7 @@ class DataVolume(NamespacedResource):
             raise
 
         # For CSI storage, PVC gets Bound after DV succeeded
-        return self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=TIMEOUT_1MINUTE)
+        return self.pvc.wait_for_status(status=PersistentVolumeClaim.Status.BOUND, timeout=pvc_wait_for_bound_timeout)
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
         """
