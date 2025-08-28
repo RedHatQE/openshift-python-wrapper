@@ -1,8 +1,8 @@
 """Discovery functions for finding cluster resources and generated files."""
 
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
+from concurrent.futures import ThreadPoolExecutor, as_completed, Future
 
 from kubernetes.dynamic import DynamicClient
 from simple_logger.logger import get_logger

@@ -3,10 +3,11 @@
 import fnmatch
 import shutil
 import sys
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+import logging
 
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
@@ -16,8 +17,9 @@ from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
-from class_generator.core.schema import update_kind_schema
+from class_generator.core.schema import update_kind_schema, ClusterVersionError
 from class_generator.tests.test_generation import generate_class_generator_tests
+from class_generator.utils import execute_parallel_tasks
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
@@ -53,7 +55,11 @@ def handle_schema_update(update_schema: bool, generate_missing: bool) -> bool:
     """
     if update_schema:
         LOGGER.info("Updating resource schema...")
-        update_kind_schema()
+        try:
+            update_kind_schema()
+        except (RuntimeError, IOError, ClusterVersionError) as e:
+            LOGGER.exception(f"Failed to update schema: {e}")
+            sys.exit(1)
 
         # If only updating schema (not generating), exit
         if not generate_missing:
@@ -127,7 +133,7 @@ def handle_missing_resources_generation(
                 if not dry_run:
                     LOGGER.info(f"Generated {kind_to_generate}")
             except Exception as e:
-                LOGGER.error(f"Failed to generate {kind_to_generate}: {e}")
+                LOGGER.exception(f"Failed to generate {kind_to_generate}: {e}")
 
 
 def create_backup_if_needed(target_file: Path, backup_dir: Path | None) -> None:
@@ -159,7 +165,7 @@ def handle_regenerate_all(
     regenerate_all: bool,
     backup: bool,
     dry_run: bool,
-    filter: str | None,
+    filter_pattern: str | None,
 ) -> bool:
     """
     Handle regeneration of all generated resources.
@@ -168,7 +174,7 @@ def handle_regenerate_all(
         regenerate_all: Whether to regenerate all resources
         backup: Whether to create backups
         dry_run: Whether this is a dry run
-        filter: Optional filter pattern for resource names
+        filter_pattern: Optional filter pattern for resource names
 
     Returns:
         True if regeneration was performed and main should exit, False to continue
@@ -193,13 +199,13 @@ def handle_regenerate_all(
     LOGGER.info(f"Found {len(discovered)} generated resources")
 
     # Filter resources if pattern provided
-    if filter:
+    if filter_pattern:
         filtered = []
         for resource in discovered:
-            if fnmatch.fnmatch(resource["kind"], filter):
+            if fnmatch.fnmatch(resource["kind"], filter_pattern):
                 filtered.append(resource)
         discovered = filtered
-        LOGGER.info(f"Filtered to {len(discovered)} resources matching '{filter}'")
+        LOGGER.info(f"Filtered to {len(discovered)} resources matching '{filter_pattern}'")
 
     # Regenerate each resource
     success_count = 0
@@ -241,23 +247,34 @@ def handle_regenerate_all(
                 LOGGER.warning(f"Skipped {resource_kind}: Not found in schema mapping")
                 return resource_kind, False, "Not found in schema mapping"
         except Exception as e:
-            LOGGER.error(f"Failed to regenerate {resource_kind}: {e}")
+            LOGGER.exception(f"Failed to regenerate {resource_kind}: {e}")
             return resource_kind, False, str(e)
 
-    # Process resources in parallel
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        # Submit all tasks
-        regeneration_futures = {
-            executor.submit(regenerate_single_resource, resource): resource for resource in discovered
-        }
+    # Process results from parallel execution
+    def process_regeneration_result(resource: dict[str, Any], result: tuple[str, bool, str | None]) -> None:
+        nonlocal success_count, error_count
+        resource_kind, success, error = result
+        if success:
+            success_count += 1
+        else:
+            error_count += 1
 
-        # Process results as they complete
-        for future in as_completed(regeneration_futures):
-            resource_kind, success, error = future.result()
-            if success:
-                success_count += 1
-            else:
-                error_count += 1
+    # Handle executor-level exceptions that bypass result processing
+    def handle_regeneration_error(resource: dict[str, Any], exc: Exception) -> None:
+        nonlocal error_count
+        resource_kind = resource.get("kind", "unknown")
+        LOGGER.exception(f"Executor-level failure for {resource_kind}: {exc}")
+        error_count += 1
+
+    # Process resources in parallel
+    execute_parallel_tasks(
+        tasks=discovered,
+        task_func=regenerate_single_resource,
+        max_workers=10,
+        task_name="regeneration",
+        result_processor=process_regeneration_result,
+        error_handler=handle_regeneration_error,
+    )
 
     # Print summary
     if not dry_run:
@@ -317,20 +334,33 @@ def handle_normal_kind_generation(
             # Create backup if file exists
             create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
 
-        class_generator(
-            kind=kind,
-            overwrite=overwrite,
-            dry_run=dry_run,
-            output_file=output_file,
-            add_tests=add_tests,
-        )
+        try:
+            class_generator(
+                kind=kind,
+                overwrite=overwrite,
+                dry_run=dry_run,
+                output_file=output_file,
+                add_tests=add_tests,
+            )
+        except Exception as e:
+            LOGGER.exception(f"Failed to generate {kind}: {e}")
+            sys.exit(1)
 
         if backup_dir and not dry_run:
             LOGGER.info(f"Backup files stored in: {backup_dir}")
     else:
-        # Multiple kinds - run in parallel
-        def generate_with_backup(kind_to_generate: str) -> list[str]:
-            """Generate a single kind with optional backup."""
+        # Multiple kinds - run in parallel with result tracking
+        success_count = 0
+        error_count = 0
+        failed_kinds = []
+
+        def generate_with_backup(kind_to_generate: str) -> tuple[str, bool, str | None]:
+            """
+            Generate a single kind with optional backup.
+
+            Returns:
+                Tuple of (kind, success, error_message)
+            """
             if overwrite and backup_dir:
                 # Determine the output file path for this kind
                 formatted_kind = convert_camel_case_to_snake_case(name=kind_to_generate)
@@ -339,25 +369,70 @@ def handle_normal_kind_generation(
                 # Create backup if file exists
                 create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
 
-            return class_generator(
-                kind=kind_to_generate,
-                overwrite=overwrite,
-                dry_run=dry_run,
-                output_file=output_file,
-                add_tests=add_tests,
-            )
+            try:
+                result = class_generator(
+                    kind=kind_to_generate,
+                    overwrite=overwrite,
+                    dry_run=dry_run,
+                    output_file=output_file,
+                    add_tests=add_tests,
+                    called_from_cli=False,  # Don't prompt for missing resources during batch generation
+                )
+                # Check if generation was successful (empty list means failure)
+                if result:
+                    if not dry_run:
+                        LOGGER.info(f"Successfully generated {kind_to_generate}")
+                    return kind_to_generate, True, None
+                else:
+                    LOGGER.warning(f"Skipped {kind_to_generate}: Not found in schema mapping")
+                    return kind_to_generate, False, "Not found in schema mapping"
+            except Exception as e:
+                LOGGER.exception(f"Failed to generate {kind_to_generate}: {e}")
+                return kind_to_generate, False, str(e)
 
-        futures: list[Future] = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            for _kind in kind_list:
-                futures.append(executor.submit(generate_with_backup, _kind))
+        # Process results from parallel execution
+        def process_generation_result(kind_to_generate: str, result: tuple[str, bool, str | None]) -> None:
+            nonlocal success_count, error_count, failed_kinds
+            kind_name, success, error = result
+            if success:
+                success_count += 1
+            else:
+                error_count += 1
+                failed_kinds.append({"kind": kind_name, "error": error})
 
-            # Wait for all tasks to complete
-            for _ in as_completed(futures):
-                pass
+        # Handle executor-level exceptions that bypass result processing
+        def handle_generation_error(kind_to_generate: str, exc: Exception) -> None:
+            nonlocal error_count, failed_kinds
+            LOGGER.exception(f"Executor-level failure for {kind_to_generate}: {exc}")
+            error_count += 1
+            failed_kinds.append({"kind": kind_to_generate, "error": str(exc)})
 
-        if backup_dir and not dry_run:
-            LOGGER.info(f"Backup files stored in: {backup_dir}")
+        # Generate all kinds in parallel
+        execute_parallel_tasks(
+            tasks=kind_list,
+            task_func=generate_with_backup,
+            max_workers=10,
+            task_name="generation",
+            result_processor=process_generation_result,
+            error_handler=handle_generation_error,
+        )
+
+        # Print summary and handle failures
+        if not dry_run:
+            LOGGER.info(f"\nGeneration complete: {success_count} succeeded, {error_count} failed")
+            if backup_dir:
+                LOGGER.info(f"Backup files stored in: {backup_dir}")
+        else:
+            LOGGER.info(f"\nDry run complete: would generate {len(kind_list)} kinds")
+
+        # Log detailed failure information
+        if failed_kinds:
+            LOGGER.error(f"\nFailed to generate {len(failed_kinds)} kind(s):")
+            for failure in failed_kinds:
+                LOGGER.error(f"  - {failure['kind']}: {failure['error']}")
+
+            # Exit with non-zero status if any failures occurred
+            sys.exit(1)
 
 
 def handle_test_generation(add_tests: bool) -> None:
@@ -462,6 +537,13 @@ def handle_test_generation(add_tests: bool) -> None:
     type=cloup.STRING,
     default=None,
 )
+@cloup.option(
+    "-v",
+    "--verbose",
+    help="Enable verbose output with debug logs",
+    is_flag=True,
+    show_default=True,
+)
 @cloup.constraint(
     If(IsSet("update_schema") & ~IsSet("generate_missing"), then=accept_none),
     [
@@ -497,8 +579,35 @@ def main(
     filter: str | None,
     json_output: bool,
     update_schema: bool,
+    verbose: bool,
 ) -> None:
     """Generate Python module for K8S resource."""
+    # Configure logging based on verbose flag
+    if verbose:
+        # Set debug level for all class_generator modules
+        for logger_name in [
+            "class_generator.core.schema",
+            "class_generator.core.generator",
+            "class_generator.core.coverage",
+            "class_generator.core.discovery",
+            "class_generator.cli",
+            "class_generator.utils",
+            "ocp_resources",
+        ]:
+            logger = logging.getLogger(logger_name)
+            logger.setLevel(logging.DEBUG)
+            # Prevent propagation to avoid duplicate messages
+            logger.propagate = False
+            # Also set all handlers to DEBUG to ensure debug logs surface
+            for handler in logger.handlers:
+                handler.setLevel(logging.DEBUG)
+
+        # Set root logger to DEBUG to cover all configured handlers
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG)
+        for handler in root_logger.handlers:
+            handler.setLevel(logging.DEBUG)
+
     # Validate input parameters
     validate_actions(
         kind=kind,
@@ -530,7 +639,7 @@ def main(
     )
 
     # Handle regenerate-all operation
-    if handle_regenerate_all(regenerate_all=regenerate_all, backup=backup, dry_run=dry_run, filter=filter):
+    if handle_regenerate_all(regenerate_all=regenerate_all, backup=backup, dry_run=dry_run, filter_pattern=filter):
         return
 
     # Exit if we only did discovery/report/generation

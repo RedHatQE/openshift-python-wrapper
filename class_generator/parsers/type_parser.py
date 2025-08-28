@@ -2,12 +2,11 @@
 
 import json
 import textwrap
-from pathlib import Path
 from typing import Any
 
 from simple_logger.logger import get_logger
 
-from class_generator.constants import MISSING_DESCRIPTION_STR, SCHEMA_DIR, SPEC_STR
+from class_generator.constants import MISSING_DESCRIPTION_STR, SPEC_STR, DEFINITIONS_FILE
 from class_generator.utils import sanitize_python_name
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
@@ -55,12 +54,13 @@ def types_generator(key_dict: dict[str, Any]) -> dict[str, str]:
 def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
     """
     Resolve property schema, following $ref if needed.
+    Preserves descriptions from the original property when merging with referenced schemas.
 
     Args:
         property_: Property dictionary that may contain $ref
 
     Returns:
-        Resolved property schema
+        Resolved property schema with preserved descriptions
     """
     # Handle direct $ref
     if _ref := property_.get("$ref"):
@@ -70,23 +70,56 @@ def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
         ref_name = _ref.split("/")[-1]
 
         # Load from _definitions.json instead of individual files
-        definitions_file = Path(SCHEMA_DIR) / "_definitions.json"
+        definitions_file = DEFINITIONS_FILE
         if definitions_file.exists():
             with open(definitions_file) as fd:
                 data = json.load(fd)
                 definitions = data.get("definitions", {})
-                if ref_name in definitions:
-                    return definitions[ref_name]
 
-        # Fallback to the property itself if ref not found
-        LOGGER.warning(f"Could not resolve $ref: {_ref}")
+                # Try multiple key formats to handle schema key format mismatch
+                possible_keys = [
+                    ref_name,  # io.k8s.api.core.v1.PodSpec
+                    ref_name.split(".")[-1],  # PodSpec
+                    # Extract version/Kind format from the namespaced reference
+                    "/".join(ref_name.split(".")[-2:]) if "." in ref_name else ref_name,  # v1/PodSpec
+                ]
+
+                for key in possible_keys:
+                    if key in definitions:
+                        resolved_schema = definitions[key]
+                        # Fix null required fields to empty lists
+                        if resolved_schema.get("required") is None:
+                            resolved_schema = resolved_schema.copy()
+                            resolved_schema["required"] = []
+
+                        # Preserve any description from the original property that references this schema
+                        if "description" in property_ and "description" not in resolved_schema:
+                            resolved_schema = resolved_schema.copy()
+                            resolved_schema["description"] = property_["description"]
+
+                        return resolved_schema
+
+        # If not found in definitions, log warning and use property as-is
+        LOGGER.warning(
+            f"Could not resolve $ref: {_ref} in definitions. Consider running --update-schema to populate missing definitions."
+        )
 
     # Handle allOf containing $ref
     elif all_of := property_.get("allOf"):
         # allOf is typically used with a single $ref in Kubernetes schemas
+        original_description = property_.get("description")
+
         for item in all_of:
             if "$ref" in item:
-                return get_property_schema(item)
+                resolved_schema = get_property_schema(item)
+
+                # If the original property has a description but the resolved schema doesn't,
+                # preserve the original description
+                if original_description and "description" not in resolved_schema:
+                    resolved_schema = resolved_schema.copy()
+                    resolved_schema["description"] = original_description
+
+                return resolved_schema
 
     return property_
 
