@@ -501,6 +501,7 @@ class Resource(ResourceConstants):
         IMAGEREGISTRY_OPERATOR_OPENSHIFT_IO: str = "imageregistry.operator.openshift.io"
         INSTANCETYPE_KUBEVIRT_IO: str = "instancetype.kubevirt.io"
         INTEGREATLY_ORG: str = "integreatly.org"
+        JAEGERTRACING_IO = "jaegertracing.io"
         K8S_CNI_CNCF_IO: str = "k8s.cni.cncf.io"
         K8S_MARIADB_COM: str = "k8s.mariadb.com"
         K8S_OVN_ORG: str = "k8s.ovn.org"
