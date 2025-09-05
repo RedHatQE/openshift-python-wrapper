@@ -531,6 +531,7 @@ class Resource(ResourceConstants):
         NODEMAINTENANCE_KUBEVIRT_IO: str = "nodemaintenance.kubevirt.io"
         OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO: str = "observability.open-cluster-management.io"
         OCS_OPENSHIFT_IO: str = "ocs.openshift.io"
+        OPENTELEMETRY_IO: str = "opentelemetry.io"
         OPERATOR_AUTHORINO_KUADRANT_IO: str = "operator.authorino.kuadrant.io"
         OPERATOR_OPEN_CLUSTER_MANAGEMENT_IO: str = "operator.open-cluster-management.io"
         OPERATOR_OPENSHIFT_IO: str = "operator.openshift.io"
