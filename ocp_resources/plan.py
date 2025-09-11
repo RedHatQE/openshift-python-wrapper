@@ -20,6 +20,15 @@ class Plan(NamespacedResource):
                                       the Name Or Id of the source Virtual Machines to migrate.
                                       Example: [ { "id": "vm-id-x" }, { "name": "vm-name-x" } ]
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
+        type (str, optional): Migration type. Valid values: "cold", "warm", "live", "conversion".
+        pvc_name_template_use_generate_name (bool, optional): Whether to use generateName for PVC name templates.
+        skip_guest_conversion (bool, optional): Whether to skip guest conversion.
+        target_power_state (str, optional): Specifies the desired power state of the target VM after migration.
+                                          - "on": Target VM will be powered on after migration
+                                          - "off": Target VM will be powered off after migration
+                                          - "auto" or None (default): Target VM will match the source VM's power state
+        use_compatibility_mode (bool, optional): Whether to use compatibility mode.
+        migrate_shared_disks (bool, optional): Whether to migrate shared disks.
     """
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
@@ -41,6 +50,12 @@ class Plan(NamespacedResource):
         pre_hook_namespace: str | None = None,
         after_hook_name: str | None = None,
         after_hook_namespace: str | None = None,
+        type: str | None = None,
+        pvc_name_template_use_generate_name: bool | None = None,
+        skip_guest_conversion: bool | None = None,
+        target_power_state: str | None = None,
+        use_compatibility_mode: bool | None = None,
+        migrate_shared_disks: bool | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -60,6 +75,12 @@ class Plan(NamespacedResource):
         self.after_hook_namespace = after_hook_namespace
         self.target_namespace = target_namespace or self.namespace
         self.hooks_array = []
+        self.type = type
+        self.pvc_name_template_use_generate_name = pvc_name_template_use_generate_name
+        self.skip_guest_conversion = skip_guest_conversion
+        self.target_power_state = target_power_state
+        self.use_compatibility_mode = use_compatibility_mode
+        self.migrate_shared_disks = migrate_shared_disks
 
         if self.pre_hook_name and self.pre_hook_namespace:
             self.hooks_array.append(
@@ -113,6 +134,27 @@ class Plan(NamespacedResource):
                     },
                 }
             })
+
+            # Add optional fields if they are set
+            spec = self.res["spec"]
+
+            if self.type is not None:
+                spec["type"] = self.type
+
+            if self.pvc_name_template_use_generate_name is not None:
+                spec["pvcNameTemplateUseGenerateName"] = self.pvc_name_template_use_generate_name
+
+            if self.skip_guest_conversion is not None:
+                spec["skipGuestConversion"] = self.skip_guest_conversion
+
+            if self.target_power_state is not None:
+                spec["targetPowerState"] = self.target_power_state
+
+            if self.use_compatibility_mode is not None:
+                spec["useCompatibilityMode"] = self.use_compatibility_mode
+
+            if self.migrate_shared_disks is not None:
+                spec["migrateSharedDisks"] = self.migrate_shared_disks
 
     def _generate_hook_spec(self, hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
         return {
