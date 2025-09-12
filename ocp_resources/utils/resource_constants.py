@@ -17,6 +17,7 @@ class ResourceConstants:
         IMAGE_PULL_BACK_OFF: str = "ImagePullBackOff"
         ERR_IMAGE_PULL: str = "ErrImagePull"
         ACTIVE: str = "Active"
+        ESTABLISHED: str = "Established"
 
     class Condition:
         UPGRADEABLE: str = "Upgradeable"
