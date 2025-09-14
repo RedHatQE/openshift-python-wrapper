@@ -123,10 +123,10 @@ export HTTP_PROXY="http://proxy.example.com:8080"
 
 ## Code check
 
-We use pre-commit for code check.
+We use [prek](https://github.com/j178/prek) for code check.
 
 ```bash
-pre-commit install
+prek install
 ```
 
 Some code examples locate at [examples](examples) directory
