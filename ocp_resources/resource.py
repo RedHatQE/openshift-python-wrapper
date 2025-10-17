@@ -35,7 +35,6 @@ from timeout_sampler import (
     TimeoutSampler,
     TimeoutWatch,
 )
-from urllib3.exceptions import MaxRetryError
 
 from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.event import Event
@@ -204,16 +203,24 @@ def get_client(
     token: str | None = None,
     fake: bool = False,
 ) -> DynamicClient | FakeDynamicClient:
-    """
-    Get a kubernetes client.
+    """Get a kubernetes client.
+
+    Valid combinations for arguments include:
+        - config file (kubeconfig path)
+        - config_dict
+        - username, password and host (uses basic auth)
+        - host and token (bearer token)
+        - client_configuration
+
+    If none of the above arguments are provided:
+    - if the `KUBECONFIG` env var is set: it will be used to configure the client.
+    - if `KUBECONFIG` is not set and `~/.kube/config` exists, it will be used to configure the client.
+    - if `KUBECONFIG` is not set and `~/.kube/config` does not exist, in-cluster configuration will
+      be attempted when running inside a Kubernetes cluster.
 
 
-    This function is a replica of `ocp_utilities.infra.get_client` which cannot be imported as ocp_utilities imports
-    from ocp_resources.
+    If no configuration source is found, kubernetes.config.ConfigException will be raised.
 
-    Pass either config_file or config_dict.
-    If none of them are passed, client will be created from default OS kubeconfig
-    (environment variable or .kube folder).
 
     Args:
         config_file (str): path to a kubeconfig file.
@@ -264,14 +271,15 @@ def get_client(
             persist_config=persist_config,
             temp_file_path=temp_file_path,
         )
-    else:
-        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
-        LOGGER.info("Trying to get client via new_client_from_config")
-
+    elif config_file or ("KUBECONFIG" in os.environ) or os.path.exists(os.path.expanduser("~/.kube/config")):
         # kubernetes.config.kube_config.load_kube_config sets KUBE_CONFIG_DEFAULT_LOCATION during module import.
-        # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will be None since
-        # is populated during import which comes before setting the variable in code.
-        config_file = config_file or os.environ.get("KUBECONFIG", "~/.kube/config")
+        # If `KUBECONFIG` environment variable is set via code, the `KUBE_CONFIG_DEFAULT_LOCATION` will not be updated
+        # to reflect the new value since it's set to at import-time.
+
+        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/__init__.py
+        if not config_file:
+            config_file = os.environ.get("KUBECONFIG", "~/.kube/config")
+        LOGGER.info(f"Trying to get client via new_client_from_config {config_file=}")
 
         _client = kubernetes.config.new_client_from_config(
             config_file=config_file,
@@ -279,19 +287,29 @@ def get_client(
             client_configuration=client_configuration,
             persist_config=persist_config,
         )
+    elif all(
+        var in os.environ
+        for var in (
+            kubernetes.config.incluster_config.SERVICE_HOST_ENV_NAME,
+            kubernetes.config.incluster_config.SERVICE_PORT_ENV_NAME,
+        )
+    ):
+        LOGGER.info("Trying to get client via incluster_config")
+
+        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
+        kubernetes.config.load_incluster_config(client_configuration, try_refresh_token=try_refresh_token)
+        _client = kubernetes.client.ApiClient(client_configuration)
+    else:
+        raise kubernetes.config.ConfigException(
+            "No valid configuration found. Provide one of: "
+            "config_file, config_dict, username+password+host, host+token, "
+            "client_configuration, KUBECONFIG environment variable, ~/.kube/config file, "
+            "or run in a Kubernetes cluster (in-cluster configuration)."
+        )
 
     kubernetes.client.Configuration.set_default(default=client_configuration)
 
-    try:
-        return kubernetes.dynamic.DynamicClient(client=_client)
-    except MaxRetryError:
-        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
-        LOGGER.info("Trying to get client via incluster_config")
-        return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.incluster_config.load_incluster_config(
-                client_configuration=client_configuration, try_refresh_token=try_refresh_token
-            ),
-        )
+    return kubernetes.dynamic.DynamicClient(client=_client)
 
 
 def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> str | None:
