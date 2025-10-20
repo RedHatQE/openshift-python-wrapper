@@ -568,6 +568,7 @@ class Resource(ResourceConstants):
         TEKTONTASKS_KUBEVIRT_IO: str = "tektontasks.kubevirt.io"
         TEMPLATE_KUBEVIRT_IO: str = "template.kubevirt.io"
         TEMPLATE_OPENSHIFT_IO: str = "template.openshift.io"
+        TEMPO_GRAFANA_COM: str = "tempo.grafana.com"
         TRUSTYAI_OPENDATAHUB_IO: str = "trustyai.opendatahub.io"
         UPLOAD_CDI_KUBEVIRT_IO: str = "upload.cdi.kubevirt.io"
         USER_OPENSHIFT_IO: str = "user.openshift.io"
