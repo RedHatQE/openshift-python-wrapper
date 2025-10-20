@@ -63,7 +63,6 @@ class TempoStack(NamespacedResource):
             if self.resources is not None:
                 _spec["resources"] = self.resources
 
-
             if self.storage_size is not None:
                 _spec["storageSize"] = self.storage_size
 
