@@ -22,6 +22,7 @@ class Plan(NamespacedResource):
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
         type (str, optional): Migration type. Valid values: "cold", "warm", "live", "conversion".
         pvc_name_template_use_generate_name (bool, optional): Whether to use generateName for PVC name templates.
+        pvc_name_template (str, optional): Template for generating PVC names.
         skip_guest_conversion (bool, optional): Whether to skip guest conversion.
         target_power_state (str, optional): Specifies the desired power state of the target VM after migration.
                                           - "on": Target VM will be powered on after migration
@@ -52,6 +53,7 @@ class Plan(NamespacedResource):
         after_hook_namespace: str | None = None,
         type: str | None = None,
         pvc_name_template_use_generate_name: bool | None = None,
+        pvc_name_template: str | None = None,
         skip_guest_conversion: bool | None = None,
         target_power_state: str | None = None,
         use_compatibility_mode: bool | None = None,
@@ -77,6 +79,7 @@ class Plan(NamespacedResource):
         self.hooks_array = []
         self.type = type
         self.pvc_name_template_use_generate_name = pvc_name_template_use_generate_name
+        self.pvc_name_template = pvc_name_template
         self.skip_guest_conversion = skip_guest_conversion
         self.target_power_state = target_power_state
         self.use_compatibility_mode = use_compatibility_mode
@@ -143,6 +146,9 @@ class Plan(NamespacedResource):
 
             if self.pvc_name_template_use_generate_name is not None:
                 spec["pvcNameTemplateUseGenerateName"] = self.pvc_name_template_use_generate_name
+
+            if self.pvc_name_template is not None:
+                spec["pvcNameTemplate"] = self.pvc_name_template
 
             if self.skip_guest_conversion is not None:
                 spec["skipGuestConversion"] = self.skip_guest_conversion
