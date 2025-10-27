@@ -22,7 +22,7 @@ class Plan(NamespacedResource):
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
         type (str, optional): Migration type. Valid values: "cold", "warm", "live", "conversion".
         pvc_name_template_use_generate_name (bool, optional): Whether to use generateName for PVC name templates.
-        pvc_name_template (str, optional): Template string for PVC names in the target VM.
+        pvc_name_template (str, optional): Template for generating PVC names.
         volume_name_template (str, optional): Template for generating volume interface names in the target VM.
         network_name_template (str, optional): Template for generating network interface names in the target VM.
         skip_guest_conversion (bool, optional): Whether to skip guest conversion.
