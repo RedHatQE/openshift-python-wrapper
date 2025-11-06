@@ -550,6 +550,7 @@ class Resource(ResourceConstants):
         RIPSAW_CLOUDBULLDOZER_IO: str = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO: str = "route.openshift.io"
         SAMPLES_OPERATOR_OPENSHIFT_IO: str = "samples.operator.openshift.io"
+        SERVICES_PLATFORM_OPENDATAHUB_IO: str = "services.platform.opendatahub.io"
         SCHEDULING_K8S_IO: str = "scheduling.k8s.io"
         SECURITY_ISTIO_IO: str = "security.istio.io"
         SECURITY_OPENSHIFT_IO: str = "security.openshift.io"
