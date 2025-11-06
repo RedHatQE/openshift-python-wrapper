@@ -20,10 +20,10 @@ If a related issue doesn't exist, you can open a new issue using a relevant [iss
 To contribute code to the project:
 
 - Fork the project and work on your forked repository
-- Before submitting a new pull request, make sure you have `pre-commit` installed
+- Before submitting a new pull request, make sure you have `prek` installed
 
 ```bash
-pre-commit install
+prek install
 ```
 
 - When submitting a pull request, make sure to fill all the required, relevant fields for your PR.  
