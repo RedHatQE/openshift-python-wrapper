@@ -14,12 +14,15 @@ class Backup(NamespacedResource):
 
     def __init__(
         self,
+        name: str | None = None,
+        namespace: str | None = None,
+        client: Any | None = None,
         included_namespaces: list[str] | None = None,
         excluded_resources: list[str] | None = None,
         snapshot_move_data: bool = False,
         storage_location: str = "",
         **kwargs: Any,
-    ):
+    ) -> None:
         """
         Args:
             included_namespaces (list, optional): Namespaces to include in the backup.
@@ -30,7 +33,7 @@ class Backup(NamespacedResource):
                 controller and a modified CSI Data Mover plugin.
             storage_location (string, optional): Define the location for the DataMover.
         """
-        super().__init__(**kwargs)
+        super().__init__(name=name, namespace=namespace, client=client, **kwargs)
         self.included_namespaces = included_namespaces
         self.excluded_resources = excluded_resources
         self.snapshot_move_data = snapshot_move_data
