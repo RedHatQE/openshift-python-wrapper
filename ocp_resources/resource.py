@@ -156,7 +156,8 @@ def client_configuration_with_basic_auth(
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
-                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
+                # openshift-challenging-client:
+                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",
             },
             verify=_verify_ssl,
         )
@@ -485,6 +486,7 @@ class Resource(ResourceConstants):
         CSIADDONS_OPENSHIFT_IO: str = "csiaddons.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO: str = "dataimportcrontemplate.kubevirt.io"
         DATASCIENCECLUSTER_OPENDATAHUB_IO: str = "datasciencecluster.opendatahub.io"
+        DATASCIENCEPIPELINESAPPLICATIONS_OPENDATAHUB_IO: str = "datasciencepipelinesapplications.opendatahub.io"
         DISCOVERY_K8S_IO: str = "discovery.k8s.io"
         DSCINITIALIZATION_OPENDATAHUB_IO: str = "dscinitialization.opendatahub.io"
         EVENTS_K8S_IO: str = "events.k8s.io"
@@ -1161,7 +1163,13 @@ class Resource(ResourceConstants):
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(
+                # type: ignore[misc]
+                dyn_client=dyn_client,
+                singular_name=singular_name,
+                *args,
+                **kwargs,
+            )
             try:
                 for resource_field in _resources.items:
                     if raw:
@@ -1594,7 +1602,13 @@ class NamespacedResource(Resource):
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(
+                # type: ignore[misc]
+                dyn_client=dyn_client,
+                singular_name=singular_name,
+                *args,
+                **kwargs,
+            )
             try:
                 for resource_field in _resources.items:
                     if raw:
@@ -1846,7 +1860,8 @@ class ResourceEditor:
                 patch["kind"] = resource.kind
                 patch["apiVersion"] = resource.api_version
 
-                resource.update_replace(resource_dict=patch)  # replace the resource metadata
+                # replace the resource metadata
+                resource.update_replace(resource_dict=patch)
 
     def _apply_patches_sampler(self, patches: dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
         exceptions_dict: dict[type[Exception], list[str]] = {ConflictError: []}
