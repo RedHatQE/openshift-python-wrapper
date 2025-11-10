@@ -156,7 +156,8 @@ def client_configuration_with_basic_auth(
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
-                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
+                # openshift-challenging-client:
+                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",
             },
             verify=_verify_ssl,
         )
@@ -485,6 +486,7 @@ class Resource(ResourceConstants):
         CSIADDONS_OPENSHIFT_IO: str = "csiaddons.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO: str = "dataimportcrontemplate.kubevirt.io"
         DATASCIENCECLUSTER_OPENDATAHUB_IO: str = "datasciencecluster.opendatahub.io"
+        DATASCIENCEPIPELINESAPPLICATIONS_OPENDATAHUB_IO: str = "datasciencepipelinesapplications.opendatahub.io"
         DISCOVERY_K8S_IO: str = "discovery.k8s.io"
         DSCINITIALIZATION_OPENDATAHUB_IO: str = "dscinitialization.opendatahub.io"
         EVENTS_K8S_IO: str = "events.k8s.io"
@@ -554,6 +556,7 @@ class Resource(ResourceConstants):
         SECURITY_ISTIO_IO: str = "security.istio.io"
         SECURITY_OPENSHIFT_IO: str = "security.openshift.io"
         SELF_NODE_REMEDIATION_MEDIK8S_IO: str = "self-node-remediation.medik8s.io"
+        SERVICES_PLATFORM_OPENDATAHUB_IO: str = "services.platform.opendatahub.io"
         SERVING_KNATIVE_DEV: str = "serving.knative.dev"
         SERVING_KSERVE_IO: str = "serving.kserve.io"
         SNAPSHOT_KUBEVIRT_IO: str = "snapshot.kubevirt.io"
@@ -1222,13 +1225,23 @@ class Resource(ResourceConstants):
             resource_version=resource_version or self.initial_resource_version,
         )
 
-    def wait_for_condition(self, condition: str, status: str, timeout: int = 300, sleep_time: int = 1) -> None:
+    def wait_for_condition(
+        self,
+        condition: str,
+        status: str,
+        timeout: int = 300,
+        sleep_time: int = 1,
+        reason: str | None = None,
+        message: str = "",
+    ) -> None:
         """
         Wait for Resource condition to be in desire status.
 
         Args:
             condition (str): Condition to query.
             status (str): Expected condition status.
+            reason (None): Expected condition reason.
+            message (str): Expected condition text inclusion.
             timeout (int): Time to wait for the resource.
             sleep_time(int): Interval between each retry when checking the resource's condition.
 
@@ -1238,14 +1251,7 @@ class Resource(ResourceConstants):
         self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
-        for sample in TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=sleep_time,
-            func=lambda: self.exists,
-        ):
-            if sample:
-                break
-
+        self.wait(timeout=timeout, sleep=sleep_time)
         for sample in TimeoutSampler(
             wait_timeout=timeout_watcher.remaining_time(),
             sleep=sleep_time,
@@ -1253,7 +1259,13 @@ class Resource(ResourceConstants):
         ):
             if sample:
                 for cond in sample.get("status", {}).get("conditions", []):
-                    if cond["type"] == condition and cond["status"] == status:
+                    actual_condition = {"type": cond["type"], "status": cond["status"]}
+                    expected_condition = {"type": condition, "status": status}
+                    if reason is not None:
+                        actual_condition["reason"] = cond.get("reason", "")
+                        expected_condition["reason"] = reason
+
+                    if actual_condition == expected_condition and message in cond.get("message", ""):
                         return
 
     def api_request(
@@ -1845,7 +1857,8 @@ class ResourceEditor:
                 patch["kind"] = resource.kind
                 patch["apiVersion"] = resource.api_version
 
-                resource.update_replace(resource_dict=patch)  # replace the resource metadata
+                # replace the resource metadata
+                resource.update_replace(resource_dict=patch)
 
     def _apply_patches_sampler(self, patches: dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
         exceptions_dict: dict[type[Exception], list[str]] = {ConflictError: []}
