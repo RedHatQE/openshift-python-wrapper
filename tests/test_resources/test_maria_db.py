@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.maria_db import MariaDB
 
 

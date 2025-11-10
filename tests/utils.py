@@ -24,7 +24,7 @@ def generate_yaml_from_template(**kwargs):
         generate_yaml_from_template(file_='path/to/file/name', name='vm-name-1')
     """
     file_ = "tests/manifests/vm.yaml"
-    with open(file_, "r") as stream:
+    with open(file_) as stream:
         data = stream.read()
 
     # Find all template variables

@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.cluster_resource_quota import ClusterResourceQuota
 
 

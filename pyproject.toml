@@ -37,6 +37,13 @@ output-format = "grouped"
 [tool.ruff.format]
 exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "PLC0415", "ARG", "RUF059"]
+
+[tool.ruff.lint.per-file-ignores]
+"*" = ["E501"]
+"/*tests/*" = ["ARG"]
+
 [tool.mypy]
 check_untyped_defs = false
 disallow_any_generics = false

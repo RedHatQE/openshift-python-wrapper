@@ -168,7 +168,7 @@ class TestNamespacedResourceList:
             assert pod.name == BASE_POD_NAME
 
     def test_namespaced_resource_list_namespace(self, namespaces, pods):
-        for pod, namespace in zip(pods.resources, namespaces):
+        for pod, namespace in zip(pods.resources, namespaces, strict=False):
             assert pod.namespace == namespace.name
 
     def test_resource_list_teardown(self, pods):

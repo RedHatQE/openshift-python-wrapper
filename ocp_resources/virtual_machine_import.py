@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
-
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
+
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -223,12 +221,12 @@ class VirtualMachineImport(NamespacedResource):
                                 )
                                 self.logger.info(msg)
                                 return
-        except TimeoutExpiredError:
+        except TimeoutExpiredError as err:
             raise TimeoutExpiredError(
                 f"Last condition of {self.kind} {self.name} {last_condition.type} was"
                 f" {last_condition.status} ({last_condition.reason}:"
                 f" {last_condition.message})"
-            )
+            ) from err
 
 
 class ResourceMapping(NamespacedResource):

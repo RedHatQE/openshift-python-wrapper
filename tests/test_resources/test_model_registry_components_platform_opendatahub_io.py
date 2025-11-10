@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.model_registry_components_platform_opendatahub_io import ModelRegistry
 
 

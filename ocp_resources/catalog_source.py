@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from typing import Any
+
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
@@ -46,7 +47,7 @@ class CatalogSource(NamespacedResource):
                 "displayName": self.display_name,
                 "publisher": self.publisher,
             }
-            _spec: Dict[str, Any] = self.res["spec"]
+            _spec: dict[str, Any] = self.res["spec"]
 
             if self.update_strategy_registry_poll_interval:
                 _spec["updateStrategy"] = {"registryPoll": {"interval": self.update_strategy_registry_poll_interval}}

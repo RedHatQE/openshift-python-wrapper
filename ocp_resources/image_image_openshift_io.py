@@ -2,6 +2,7 @@
 
 
 from typing import Any
+
 from ocp_resources.resource import Resource
 
 

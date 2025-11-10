@@ -14,7 +14,7 @@ class FakeKubernetesClient:
 
     def __init__(
         self,
-        configuration: Union[FakeConfiguration, None] = None,
+        configuration: FakeConfiguration | None = None,
         dynamic_client: Union["FakeDynamicClient", None] = None,
     ) -> None:
         self.configuration = configuration or FakeConfiguration()
@@ -24,19 +24,19 @@ class FakeKubernetesClient:
         self,
         resource_path: str,
         method: str,
-        path_params: Union[dict[str, Any], None] = None,
-        query_params: Union[list[tuple[str, Any]], None] = None,
-        header_params: Union[dict[str, Any], None] = None,
-        body: Any = None,
-        post_params: Union[list[tuple[str, Any]], None] = None,
-        files: Union[dict[str, Any], None] = None,
-        response_type: Union[str, None] = None,
-        auth_settings: Union[list[str], None] = None,
-        async_req: Union[bool, None] = None,
-        _return_http_data_only: Union[bool, None] = None,
-        collection_formats: Union[dict[str, Any], None] = None,
-        _preload_content: Union[bool, None] = None,
-        _request_timeout: Union[int, None] = None,
+        _path_params: dict[str, Any] | None = None,
+        _query_params: list[tuple[str, Any]] | None = None,
+        _header_params: dict[str, Any] | None = None,
+        _body: Any = None,
+        _post_params: list[tuple[str, Any]] | None = None,
+        _files: dict[str, Any] | None = None,
+        _response_type: str | None = None,
+        _auth_settings: list[str] | None = None,
+        _async_req: bool | None = None,
+        _return_http_data_only: bool | None = None,
+        _collection_formats: dict[str, Any] | None = None,
+        _preload_content: bool | None = None,
+        _request_timeout: int | None = None,
     ) -> Any:
         """
         Fake implementation of API calls.

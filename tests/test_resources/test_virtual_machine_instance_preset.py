@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.virtual_machine_instance_preset import VirtualMachineInstancePreset
 
 

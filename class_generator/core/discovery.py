@@ -1,8 +1,8 @@
 """Discovery functions for finding cluster resources and generated files."""
 
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
-from concurrent.futures import ThreadPoolExecutor, as_completed, Future
 
 from kubernetes.dynamic import DynamicClient
 from simple_logger.logger import get_logger
@@ -221,7 +221,7 @@ def discover_generated_resources() -> list[dict[str, Any]]:
     for info in resource_infos:
         # Read file to check for user code
         try:
-            with open(info.file_path, "r", encoding="utf-8") as f:
+            with open(info.file_path, encoding="utf-8") as f:
                 content = f.read()
         except FileNotFoundError:
             LOGGER.warning(f"File not found: {info.file_path}, skipping...")

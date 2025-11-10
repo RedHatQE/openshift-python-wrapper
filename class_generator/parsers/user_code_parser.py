@@ -26,10 +26,10 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
     try:
         with open(file_path, encoding="utf-8") as fd:
             data = fd.read()
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {file_path}. Please ensure the file exists.")
-    except PermissionError:
-        raise PermissionError(f"Permission denied when accessing file: {file_path}. Check file permissions.")
+    except FileNotFoundError as err:
+        raise FileNotFoundError(f"File not found: {file_path}. Please ensure the file exists.") from err
+    except PermissionError as err:
+        raise PermissionError(f"Permission denied when accessing file: {file_path}. Check file permissions.") from err
     except UnicodeDecodeError as e:
         raise UnicodeDecodeError(
             e.encoding,
@@ -37,9 +37,9 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
             e.start,
             e.end,
             f"Failed to decode file {file_path} with UTF-8 encoding. The file may contain invalid characters.",
-        )
+        ) from e
     except Exception as e:
-        raise Exception(f"Unexpected error reading file {file_path}: {type(e).__name__}: {str(e)}")
+        raise Exception(f"Unexpected error reading file {file_path}: {type(e).__name__}: {str(e)}") from e
 
     end_of_generated_code_line = "    # End of generated code"
     user_code: str = ""

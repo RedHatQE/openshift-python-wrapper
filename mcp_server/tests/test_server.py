@@ -100,8 +100,6 @@ class TestListResources:
 
     def test_list_resources_success(self, use_fake_client):
         """Test successful resource listing"""
-        from ocp_resources.config_map import ConfigMap
-
         # Create test resources
         for i in range(3):
             cm = ConfigMap(name=f"test-cm-{i}", namespace="default", data={"key": f"value-{i}"}, client=use_fake_client)
@@ -127,8 +125,6 @@ class TestGetResource:
 
     def test_get_resource_success(self, use_fake_client):
         """Test successful resource retrieval"""
-        from ocp_resources.config_map import ConfigMap
-
         cm = ConfigMap(name="test-get-cm", namespace="default", data={"key": "value"}, client=use_fake_client)
         cm.deploy()
 
