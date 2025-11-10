@@ -70,6 +70,9 @@ class VirtualMachineInstance(NamespacedResource):
         if wait:
             return self.wait_for_pause_status(pause=False, timeout=timeout)
 
+    def reset(self) -> dict[str, Any]:
+        return self.api_request(method="PUT", action="reset")
+
     @property
     def interfaces(self):
         return self.instance.status.interfaces
