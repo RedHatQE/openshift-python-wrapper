@@ -556,6 +556,7 @@ class Resource(ResourceConstants):
         SECURITY_ISTIO_IO: str = "security.istio.io"
         SECURITY_OPENSHIFT_IO: str = "security.openshift.io"
         SELF_NODE_REMEDIATION_MEDIK8S_IO: str = "self-node-remediation.medik8s.io"
+        SERVICES_PLATFORM_OPENDATAHUB_IO: str = "services.platform.opendatahub.io"
         SERVING_KNATIVE_DEV: str = "serving.knative.dev"
         SERVING_KSERVE_IO: str = "serving.kserve.io"
         SNAPSHOT_KUBEVIRT_IO: str = "snapshot.kubevirt.io"
