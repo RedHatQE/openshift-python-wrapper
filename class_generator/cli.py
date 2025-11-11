@@ -1,13 +1,13 @@
 """Command-line interface for the class generator."""
 
 import fnmatch
+import logging
+import os
 import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-
-import logging
 
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
@@ -17,7 +17,7 @@ from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
-from class_generator.core.schema import update_kind_schema, ClusterVersionError
+from class_generator.core.schema import ClusterVersionError, update_kind_schema
 from class_generator.tests.test_generation import generate_class_generator_tests
 from class_generator.utils import execute_parallel_tasks
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
@@ -57,7 +57,7 @@ def handle_schema_update(update_schema: bool, generate_missing: bool) -> bool:
         LOGGER.info("Updating resource schema...")
         try:
             update_kind_schema()
-        except (RuntimeError, IOError, ClusterVersionError) as e:
+        except (OSError, RuntimeError, ClusterVersionError) as e:
             LOGGER.exception(f"Failed to update schema: {e}")
             sys.exit(1)
 
@@ -251,9 +251,9 @@ def handle_regenerate_all(
             return resource_kind, False, str(e)
 
     # Process results from parallel execution
-    def process_regeneration_result(resource: dict[str, Any], result: tuple[str, bool, str | None]) -> None:
+    def process_regeneration_result(_resource: dict[str, Any], result: tuple[str, bool, str | None]) -> None:
         nonlocal success_count, error_count
-        resource_kind, success, error = result
+        _resource_kind, success, _error = result
         if success:
             success_count += 1
         else:
@@ -391,7 +391,7 @@ def handle_normal_kind_generation(
                 return kind_to_generate, False, str(e)
 
         # Process results from parallel execution
-        def process_generation_result(kind_to_generate: str, result: tuple[str, bool, str | None]) -> None:
+        def process_generation_result(_kind_to_generate: str, result: tuple[str, bool, str | None]) -> None:
             nonlocal success_count, error_count, failed_kinds
             kind_name, success, error = result
             if success:
@@ -447,8 +447,6 @@ def handle_test_generation(add_tests: bool) -> None:
 
         # Run the generated test file
         LOGGER.info("Running generated tests...")
-        import os
-
         test_file = "class_generator/tests/test_class_generator.py"
         exit_code = os.system(f"uv run pytest {test_file}")
 

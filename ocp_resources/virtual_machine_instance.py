@@ -137,7 +137,7 @@ class VirtualMachineInstance(NamespacedResource):
                 self.logger.debug(virt_pod.log(container="compute"))
             except ResourceNotFoundError as virt_pod_ex:
                 self.logger.error(virt_pod_ex)
-                raise sampler_ex
+                raise sampler_ex from virt_pod_ex
 
             raise
 

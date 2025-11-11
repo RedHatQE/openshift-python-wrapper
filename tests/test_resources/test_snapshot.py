@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.snapshot import Snapshot
 
 

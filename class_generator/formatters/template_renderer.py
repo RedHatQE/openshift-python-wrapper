@@ -1,7 +1,7 @@
 """Jinja template rendering for resource generation."""
 
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 from simple_logger.logger import get_logger
@@ -38,7 +38,7 @@ def render_jinja_template(template_dict: dict[Any, Any], template_dir: str, temp
     except AttributeError:
         # Fallback: read the template file directly
         template_path = Path(template_dir) / template_name
-        with open(template_path, "r", encoding="utf-8") as f:
+        with open(template_path, encoding="utf-8") as f:
             template_source = f.read()
 
     ast = env.parse(source=template_source)

@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.console_operator_openshift_io import Console
 
 

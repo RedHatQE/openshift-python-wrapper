@@ -2,7 +2,8 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class VirtualMachineInstanceReplicaSet(NamespacedResource):

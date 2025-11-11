@@ -4,6 +4,7 @@ import copy
 from unittest.mock import patch
 
 import pytest
+from jsonschema import ValidationError as JsonSchemaError
 
 from ocp_resources.exceptions import ValidationError
 from ocp_resources.pod import Pod
@@ -41,7 +42,7 @@ def enable_validation_by_default(monkeypatch):
         if "schema_validation_enabled" not in kwargs:
             kwargs["schema_validation_enabled"] = True
         # Call original_init with self as keyword argument to satisfy FCN001
-        return original_init(self=self, *args, **kwargs)
+        return original_init(*args, self=self, **kwargs)
 
     monkeypatch.setattr(Resource, "__init__", patched_init)
     yield
@@ -130,8 +131,6 @@ class TestResourceValidation:
     def test_format_validation_error(self, fake_client):
         """Test validation error formatting."""
         # Create a mock validation error
-        from jsonschema import ValidationError as JsonSchemaError
-
         mock_error = JsonSchemaError(
             message="'name' is a required property",
             path=["metadata"],
@@ -251,8 +250,6 @@ class TestResourceValidation:
             schema_validation_enabled = True
 
             def validate(self):
-                from ocp_resources.resource import Resource
-
                 Resource.validate(self)
 
         class MockDNSOperator:
@@ -263,8 +260,6 @@ class TestResourceValidation:
             schema_validation_enabled = True
 
             def validate(self):
-                from ocp_resources.resource import Resource
-
                 Resource.validate(self)
 
         # Create mock instances
