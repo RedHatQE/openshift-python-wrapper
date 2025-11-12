@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.node_network_configuration_policy_latest import NodeNetworkConfigurationPolicy
 
 

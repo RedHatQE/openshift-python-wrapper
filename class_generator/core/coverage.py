@@ -68,7 +68,7 @@ def analyze_coverage(
             continue
 
         try:
-            with open(filepath, "r") as f:
+            with open(filepath) as f:
                 content = f.read()
 
             # Check if file is auto-generated

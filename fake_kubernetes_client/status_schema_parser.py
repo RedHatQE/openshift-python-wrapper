@@ -4,7 +4,7 @@ import json
 import os
 import random
 from datetime import datetime, timezone
-from typing import Any, Union
+from typing import Any
 
 
 class StatusSchemaParser:
@@ -26,11 +26,11 @@ class StatusSchemaParser:
         )
 
         if os.path.exists(definitions_path):
-            with open(definitions_path, "r") as f:
+            with open(definitions_path) as f:
                 data = json.load(f)
                 self._definitions = data.get("definitions", {})
 
-    def get_status_schema_for_resource(self, kind: str, api_version: str) -> Union[dict[str, Any], None]:
+    def get_status_schema_for_resource(self, kind: str, _api_version: str) -> dict[str, Any] | None:
         """Get status schema for a specific resource"""
         kind_lower = kind.lower()
         resource_schemas = self.resource_mappings.get(kind_lower, [])
@@ -56,7 +56,7 @@ class StatusSchemaParser:
 
         return None
 
-    def _resolve_reference(self, ref: str) -> Union[dict[str, Any], None]:
+    def _resolve_reference(self, ref: str) -> dict[str, Any] | None:
         """Resolve a $ref to get the actual schema definition"""
         # Check cache first
         if ref in self._definitions_cache:

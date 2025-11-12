@@ -11,7 +11,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Self, Type
+from typing import Any, Self
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import jsonschema
@@ -156,7 +156,8 @@ def client_configuration_with_basic_auth(
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
-                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",  # openshift-challenging-client:
+                # openshift-challenging-client:
+                "Authorization": "Basic b3BlbnNoaWZ0LWNoYWxsZW5naW5nLWNsaWVudDo=",
             },
             verify=_verify_ssl,
         )
@@ -414,7 +415,7 @@ class KubeAPIVersion(Version):
         return self.vstring
 
     def __repr__(self):
-        return "KubeAPIVersion ('{0}')".format(str(self))
+        return f"KubeAPIVersion ('{str(self)}')"
 
     def _cmp(self, other):
         if isinstance(other, str):
@@ -485,6 +486,7 @@ class Resource(ResourceConstants):
         CSIADDONS_OPENSHIFT_IO: str = "csiaddons.openshift.io"
         DATA_IMPORT_CRON_TEMPLATE_KUBEVIRT_IO: str = "dataimportcrontemplate.kubevirt.io"
         DATASCIENCECLUSTER_OPENDATAHUB_IO: str = "datasciencecluster.opendatahub.io"
+        DATASCIENCEPIPELINESAPPLICATIONS_OPENDATAHUB_IO: str = "datasciencepipelinesapplications.opendatahub.io"
         DISCOVERY_K8S_IO: str = "discovery.k8s.io"
         DSCINITIALIZATION_OPENDATAHUB_IO: str = "dscinitialization.opendatahub.io"
         EVENTS_K8S_IO: str = "events.k8s.io"
@@ -554,6 +556,7 @@ class Resource(ResourceConstants):
         SECURITY_ISTIO_IO: str = "security.istio.io"
         SECURITY_OPENSHIFT_IO: str = "security.openshift.io"
         SELF_NODE_REMEDIATION_MEDIK8S_IO: str = "self-node-remediation.medik8s.io"
+        SERVICES_PLATFORM_OPENDATAHUB_IO: str = "services.platform.opendatahub.io"
         SERVING_KNATIVE_DEV: str = "serving.knative.dev"
         SERVING_KSERVE_IO: str = "serving.kserve.io"
         SNAPSHOT_KUBEVIRT_IO: str = "snapshot.kubevirt.io"
@@ -756,7 +759,7 @@ class Resource(ResourceConstants):
             if not self.clean_up():
                 raise ResourceTeardownError(resource=self)
 
-    def _sigint_handler(self, signal_received: int, frame: Any) -> None:
+    def _sigint_handler(self, signal_received: int, _frame: Any) -> None:
         self.__exit__()
         sys.exit(signal_received)
 
@@ -1126,7 +1129,7 @@ class Resource(ResourceConstants):
 
         except TimeoutExpiredError as exp:
             if exp.last_exp:
-                raise exp.last_exp
+                raise exp.last_exp from exp
 
             raise
 
@@ -1160,7 +1163,7 @@ class Resource(ResourceConstants):
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(*args, dyn_client=dyn_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
                     if raw:
@@ -1222,13 +1225,23 @@ class Resource(ResourceConstants):
             resource_version=resource_version or self.initial_resource_version,
         )
 
-    def wait_for_condition(self, condition: str, status: str, timeout: int = 300, sleep_time: int = 1) -> None:
+    def wait_for_condition(
+        self,
+        condition: str,
+        status: str,
+        timeout: int = 300,
+        sleep_time: int = 1,
+        reason: str | None = None,
+        message: str = "",
+    ) -> None:
         """
         Wait for Resource condition to be in desire status.
 
         Args:
             condition (str): Condition to query.
             status (str): Expected condition status.
+            reason (None): Expected condition reason.
+            message (str): Expected condition text inclusion.
             timeout (int): Time to wait for the resource.
             sleep_time(int): Interval between each retry when checking the resource's condition.
 
@@ -1238,14 +1251,7 @@ class Resource(ResourceConstants):
         self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'")
 
         timeout_watcher = TimeoutWatch(timeout=timeout)
-        for sample in TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=sleep_time,
-            func=lambda: self.exists,
-        ):
-            if sample:
-                break
-
+        self.wait(timeout=timeout, sleep=sleep_time)
         for sample in TimeoutSampler(
             wait_timeout=timeout_watcher.remaining_time(),
             sleep=sleep_time,
@@ -1253,7 +1259,13 @@ class Resource(ResourceConstants):
         ):
             if sample:
                 for cond in sample.get("status", {}).get("conditions", []):
-                    if cond["type"] == condition and cond["status"] == status:
+                    actual_condition = {"type": cond["type"], "status": cond["status"]}
+                    expected_condition = {"type": condition, "status": status}
+                    if reason is not None:
+                        actual_condition["reason"] = cond.get("reason", "")
+                        expected_condition["reason"] = reason
+
+                    if actual_condition == expected_condition and message in cond.get("message", ""):
                         return
 
     def api_request(
@@ -1499,7 +1511,7 @@ class Resource(ResourceConstants):
             error_msg = SchemaValidator.format_validation_error(
                 error=e, kind=self.kind, name=self.name or "unnamed", api_group=self.api_group
             )
-            raise ValidationError(error_msg)
+            raise ValidationError(error_msg) from e
         except Exception as e:
             LOGGER.error(f"Unexpected error during validation: {e}")
             raise
@@ -1526,7 +1538,7 @@ class Resource(ResourceConstants):
             error_msg = SchemaValidator.format_validation_error(
                 error=e, kind=cls.kind, name=name, api_group=cls.api_group
             )
-            raise ValidationError(error_msg)
+            raise ValidationError(error_msg) from e
         except Exception as e:
             LOGGER.error(f"Unexpected error during validation: {e}")
             raise
@@ -1593,7 +1605,7 @@ class NamespacedResource(Resource):
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(dyn_client=dyn_client, singular_name=singular_name, *args, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(*args, dyn_client=dyn_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
                     if raw:
@@ -1641,7 +1653,7 @@ class NamespacedResource(Resource):
             raise MissingRequiredArgumentError(argument="namespace")
 
     def to_dict(self) -> None:
-        super(NamespacedResource, self)._base_body()
+        super()._base_body()
         self._base_body()
 
 
@@ -1845,7 +1857,8 @@ class ResourceEditor:
                 patch["kind"] = resource.kind
                 patch["apiVersion"] = resource.api_version
 
-                resource.update_replace(resource_dict=patch)  # replace the resource metadata
+                # replace the resource metadata
+                resource.update_replace(resource_dict=patch)
 
     def _apply_patches_sampler(self, patches: dict[Any, Any], action_text: str, action: str) -> ResourceInstance:
         exceptions_dict: dict[type[Exception], list[str]] = {ConflictError: []}
@@ -1925,7 +1938,7 @@ class BaseResourceList(ABC):
         return all(resource.clean_up(wait=wait) for resource in reversed(self.resources))
 
     @abstractmethod
-    def _create_resources(self, resource_class: Type, **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: type, **kwargs: Any) -> None:
         """Abstract method to create resources based on specific logic."""
         pass
 
@@ -1940,7 +1953,7 @@ class ResourceList(BaseResourceList):
 
     def __init__(
         self,
-        resource_class: Type[Resource],
+        resource_class: type[Resource],
         num_resources: int,
         client: DynamicClient,
         **kwargs: Any,
@@ -1960,7 +1973,7 @@ class ResourceList(BaseResourceList):
         self.num_resources = num_resources
         self._create_resources(resource_class, **kwargs)
 
-    def _create_resources(self, resource_class: Type[Resource], **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: type[Resource], **kwargs: Any) -> None:
         """Creates N resources with indexed names."""
         base_name = kwargs["name"]
 
@@ -1983,7 +1996,7 @@ class NamespacedResourceList(BaseResourceList):
 
     def __init__(
         self,
-        resource_class: Type[NamespacedResource],
+        resource_class: type[NamespacedResource],
         namespaces: ResourceList,
         client: DynamicClient,
         **kwargs: Any,
@@ -2007,7 +2020,7 @@ class NamespacedResourceList(BaseResourceList):
         self.namespaces = namespaces
         self._create_resources(resource_class, **kwargs)
 
-    def _create_resources(self, resource_class: Type[NamespacedResource], **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: type[NamespacedResource], **kwargs: Any) -> None:
         """Creates one resource per namespace."""
         for ns in self.namespaces:
             instance = resource_class(

@@ -1,10 +1,11 @@
 """Utilities for class generator."""
 
 import ast
+from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
+from typing import Any, TypeVar
 
 from simple_logger.logger import get_logger
 
@@ -20,11 +21,11 @@ R = TypeVar("R")  # Result type
 def execute_parallel_tasks(
     tasks: Iterable[T],
     task_func: Callable[[T], R],
-    max_workers: Optional[int] = None,
+    max_workers: int | None = None,
     task_name: str = "task",
-    result_processor: Optional[Callable[[T, R], Any]] = None,
-    error_handler: Optional[Callable[[T, Exception], Any]] = None,
-) -> List[Tuple[T, Union[R, Exception]]]:
+    result_processor: Callable[[T, R], Any] | None = None,
+    error_handler: Callable[[T, Exception], Any] | None = None,
+) -> list[tuple[T, R | Exception]]:
     """
     Execute tasks in parallel using ThreadPoolExecutor.
 
@@ -73,11 +74,11 @@ def execute_parallel_tasks(
     if max_workers is None:
         max_workers = min(10, len(task_list))
 
-    results: List[Tuple[T, Union[R, Exception]]] = []
+    results: list[tuple[T, R | Exception]] = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks and create mapping from future to task
-        future_to_task: Dict[Any, T] = {executor.submit(task_func, task): task for task in task_list}
+        future_to_task: dict[Any, T] = {executor.submit(task_func, task): task for task in task_list}
 
         # Process results as they complete
         for future in as_completed(future_to_task):
@@ -103,13 +104,13 @@ def execute_parallel_tasks(
 
 
 def execute_parallel_with_mapping(
-    task_mapping: Dict[T, Any],
+    task_mapping: dict[T, Any],
     task_func: Callable[[T], R],
-    max_workers: Optional[int] = None,
+    max_workers: int | None = None,
     task_name: str = "task",
-    result_processor: Optional[Callable[[T, R], Any]] = None,
-    error_handler: Optional[Callable[[T, Exception], Any]] = None,
-) -> Dict[T, Union[R, Exception]]:
+    result_processor: Callable[[T, R], Any] | None = None,
+    error_handler: Callable[[T, Exception], Any] | None = None,
+) -> dict[T, R | Exception]:
     """
     Execute tasks in parallel where each task has associated metadata.
 
@@ -164,11 +165,11 @@ def execute_parallel_with_mapping(
     if max_workers is None:
         max_workers = min(10, len(task_mapping))
 
-    results: Dict[T, Union[R, Exception]] = {}
+    results: dict[T, R | Exception] = {}
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all tasks
-        future_to_task: Dict[Any, T] = {executor.submit(task_func, task): task for task in task_mapping.keys()}
+        future_to_task: dict[Any, T] = {executor.submit(task_func, task): task for task in task_mapping.keys()}
 
         # Process results as they complete
         for future in as_completed(future_to_task):
@@ -228,13 +229,13 @@ class ResourceInfo:
     name: str  # Class name (e.g., "Pod", "Namespace")
     file_path: str  # Path to the resource file
     base_class: str  # "Resource" or "NamespacedResource"
-    api_version: Union[str, None] = None
-    api_group: Union[str, None] = None
+    api_version: str | None = None
+    api_group: str | None = None
     required_params: list[str] = field(default_factory=list)
     optional_params: list[str] = field(default_factory=list)
     has_containers: bool = False
     is_ephemeral: bool = False  # True if resource is ephemeral (e.g. ProjectRequest)
-    actual_resource_type: Union[str, None] = None  # The actual resource type created (e.g. "Project")
+    actual_resource_type: str | None = None  # The actual resource type created (e.g. "Project")
 
 
 class ResourceScanner:
@@ -261,9 +262,9 @@ class ResourceScanner:
 
         return sorted(resources, key=lambda r: r.name)
 
-    def _analyze_resource_file(self, file_path: Path) -> Union[ResourceInfo, None]:
+    def _analyze_resource_file(self, file_path: Path) -> ResourceInfo | None:
         """Analyze a single resource file to extract class information"""
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Only consider resources with the generated marker comment
@@ -394,7 +395,7 @@ class ResourceScanner:
 
         return truly_required
 
-    def _extract_api_info(self, class_node: ast.ClassDef, content: str) -> tuple[Union[str, None], Union[str, None]]:
+    def _extract_api_info(self, class_node: ast.ClassDef, _content: str) -> tuple[str | None, str | None]:
         """Extract API version and group from class attributes"""
         api_version = None
         api_group = None
@@ -415,7 +416,7 @@ class ResourceScanner:
 
         return api_version, api_group
 
-    def _handle_ephemeral_resource(self, name: str) -> tuple[bool, Union[str, None]]:
+    def _handle_ephemeral_resource(self, name: str) -> tuple[bool, str | None]:
         """Check if resource is ephemeral and get actual resource type"""
         # Simple mapping for known ephemeral resources
         ephemeral_resources = {

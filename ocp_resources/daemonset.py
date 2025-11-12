@@ -1,8 +1,8 @@
 import kubernetes
-
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutSampler
+
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 
 
 class DaemonSet(NamespacedResource):
@@ -39,14 +39,14 @@ class DaemonSet(NamespacedResource):
                 if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
                     return
 
-    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, body=None):
+    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, _body=None):
         """
         Delete Daemonset
 
         Args:
             wait (bool): True to wait for Daemonset to be deleted.
             timeout (int): Time to wait for resource deletion
-            body (dict): Content to send for delete()
+            _body (dict): Content to send for delete()
 
         Returns:
             bool: True if delete succeeded, False otherwise.

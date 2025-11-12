@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.serving_runtime import ServingRuntime
 
 

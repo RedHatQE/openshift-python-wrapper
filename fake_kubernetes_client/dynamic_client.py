@@ -1,20 +1,20 @@
 """FakeDynamicClient implementation for fake Kubernetes client"""
 
-from typing import Any, Union
+from typing import Any
 
 from fake_kubernetes_client.exceptions import NotFoundError
 from fake_kubernetes_client.kubernetes_client import FakeKubernetesClient
 from fake_kubernetes_client.resource_field import FakeResourceField
+from fake_kubernetes_client.resource_instance import FakeResourceInstance
 from fake_kubernetes_client.resource_manager import FakeResourceManager
 from fake_kubernetes_client.resource_registry import FakeResourceRegistry
 from fake_kubernetes_client.resource_storage import FakeResourceStorage
-from fake_kubernetes_client.resource_instance import FakeResourceInstance
 
 
 class FakeDynamicClient:
     """Fake implementation of kubernetes.dynamic.DynamicClient"""
 
-    def __init__(self, client: Union[FakeKubernetesClient, None] = None) -> None:
+    def __init__(self, client: FakeKubernetesClient | None = None) -> None:
         # Distinguish between creating a new client vs using an existing one
         if client is None:
             # Create a new client with circular reference
@@ -42,7 +42,7 @@ class FakeDynamicClient:
             "paths": {},
         }
 
-    def request(self, method: str, path: str, body: Any = None, **kwargs: Any) -> FakeResourceField:
+    def request(self, _method: str, _path: str, _body: Any = None, **_kwargs: Any) -> FakeResourceField:
         """Make a raw request (fake implementation)"""
         # Minimal implementation - just return empty response
         return FakeResourceField(data={})
@@ -81,7 +81,7 @@ class FakeDynamicClient:
         """Get the underlying API client"""
         return self.client
 
-    def register_resources(self, resources: Union[dict[str, Any], list[dict[str, Any]]]) -> None:
+    def register_resources(self, resources: dict[str, Any] | list[dict[str, Any]]) -> None:
         """
         Register custom resources dynamically.
 

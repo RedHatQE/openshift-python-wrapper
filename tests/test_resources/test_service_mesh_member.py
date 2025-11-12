@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.service_mesh_member import ServiceMeshMember
 
 

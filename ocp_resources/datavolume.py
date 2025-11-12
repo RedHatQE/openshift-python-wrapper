@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+from warnings import warn
+
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler
+
+from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
+from ocp_resources.resource import NamespacedResource, Resource
 from ocp_resources.utils.constants import (
     TIMEOUT_1MINUTE,
     TIMEOUT_2MINUTES,
@@ -7,12 +14,6 @@ from ocp_resources.utils.constants import (
     TIMEOUT_10MINUTES,
     TIMEOUT_10SEC,
 )
-from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
-from ocp_resources.resource import NamespacedResource, Resource
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler
-from warnings import warn
-
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ocp_resources.secret import Secret
@@ -344,7 +345,9 @@ class DataVolume(NamespacedResource):
                 func=lambda: self.exists,
             ):
                 if dv_garbage_collection_enabled is not None:
-                    warn("garbage collector is deprecated and removed in version v4.19", DeprecationWarning)
+                    warn(
+                        "garbage collector is deprecated and removed in version v4.19", DeprecationWarning, stacklevel=2
+                    )
                 # DV reach success if the status is Succeeded, or if DV garbage collection enabled and the DV does not exist
                 if sample and sample.get("status", {}).get("phase") == self.Status.SUCCEEDED:
                     break

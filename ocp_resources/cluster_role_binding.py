@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from ocp_resources.cluster_role import ClusterRole
 from ocp_resources.resource import MissingRequiredArgumentError, Resource
 

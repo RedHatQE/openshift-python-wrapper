@@ -116,7 +116,7 @@ class MyResource(Resource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
+            _user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
@@ -152,7 +152,7 @@ class MyResource(NamespacedResource):
             f.write(content)
             f.flush()
 
-            user_code, user_imports = parse_user_code_from_file(file_path=f.name)
+            _user_code, user_imports = parse_user_code_from_file(file_path=f.name)
 
         Path(f.name).unlink()
 
