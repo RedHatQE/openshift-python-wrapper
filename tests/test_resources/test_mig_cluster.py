@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.mig_cluster import MigCluster
 
 

@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import Resource
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
 
 class HostPathProvisioner(Resource):

@@ -3,8 +3,9 @@
 import copy
 import time
 import uuid
+from collections.abc import Iterator
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Iterator, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from fake_kubernetes_client.exceptions import ConflictError, MethodNotAllowedError, NotFoundError
 from fake_kubernetes_client.resource_field import FakeResourceField
@@ -30,7 +31,7 @@ class FakeResourceInstance:
         self.storage = storage
         self.client = client
 
-    def _normalize_namespace(self, namespace: Union[str, None]) -> Union[str, None]:
+    def _normalize_namespace(self, namespace: str | None) -> str | None:
         """Normalize namespace parameter (empty string -> None)"""
         return None if namespace == "" else namespace
 
@@ -42,10 +43,10 @@ class FakeResourceInstance:
         """Create proper NotFoundError with Kubernetes-style exception"""
         try:
             api_exception = K8sApiException(status=404, reason=f"{self.resource_def['kind']} '{name}' not found")
-            raise NotFoundError(api_exception)
+            raise NotFoundError(api_exception) from None
         except (NameError, TypeError):
             # K8sApiException not available (ImportError at module level)
-            raise NotFoundError(f"{self.resource_def['kind']} '{name}' not found")
+            raise NotFoundError(f"{self.resource_def['kind']} '{name}' not found") from None
 
     def _create_conflict_error(self, name: str) -> None:
         """Create proper ConflictError with Kubernetes-style exception"""
@@ -53,11 +54,11 @@ class FakeResourceInstance:
             # ConflictError expects an ApiException as argument
             api_exception = K8sApiException(status=409, reason="AlreadyExists")
             api_exception.body = f'{{"kind":"Status","apiVersion":"v1","metadata":{{}},"status":"Failure","message":"{self.resource_def["kind"]} \\"{name}\\" already exists","reason":"AlreadyExists","code":409}}'
-            raise ConflictError(api_exception)
+            raise ConflictError(api_exception) from None
         except (NameError, TypeError):
             # K8sApiException not available (ImportError at module level)
             # Use our fake ConflictError which has status attribute
-            raise ConflictError(f"{self.resource_def['kind']} '{name}' already exists")
+            raise ConflictError(f"{self.resource_def['kind']} '{name}' already exists") from None
 
     def _generate_resource_version(self) -> str:
         """Generate unique resource version"""
@@ -68,7 +69,7 @@ class FakeResourceInstance:
         return datetime.now(timezone.utc).isoformat()
 
     def create(
-        self, body: Union[dict[str, Any], None] = None, namespace: Union[str, None] = None, **kwargs: Any
+        self, body: dict[str, Any] | None = None, namespace: str | None = None, **_kwargs: Any
     ) -> FakeResourceField:
         """Create a resource"""
         if body is None:
@@ -235,11 +236,11 @@ class FakeResourceInstance:
 
     def get(
         self,
-        name: Union[str, None] = None,
-        namespace: Union[str, None] = None,
-        label_selector: Union[str, None] = None,
-        field_selector: Union[str, None] = None,
-        **kwargs: Any,
+        name: str | None = None,
+        namespace: str | None = None,
+        label_selector: str | None = None,
+        field_selector: str | None = None,
+        **_kwargs: Any,
     ) -> FakeResourceField:
         """Get resource(s)"""
         if name:
@@ -279,10 +280,10 @@ class FakeResourceInstance:
 
     def delete(
         self,
-        name: Union[str, None] = None,
-        namespace: Union[str, None] = None,
-        body: Union[dict[str, Any], None] = None,
-        **kwargs: Any,
+        name: str | None = None,
+        namespace: str | None = None,
+        _body: dict[str, Any] | None = None,
+        **_kwargs: Any,
     ) -> FakeResourceField:
         """Delete resource(s)"""
         if name:
@@ -306,10 +307,10 @@ class FakeResourceInstance:
 
     def patch(
         self,
-        name: Union[str, None] = None,
-        body: Union[dict[str, Any], None] = None,
-        namespace: Union[str, None] = None,
-        **kwargs: Any,
+        name: str | None = None,
+        body: dict[str, Any] | None = None,
+        namespace: str | None = None,
+        **_kwargs: Any,
     ) -> FakeResourceField:
         """Patch a resource"""
         if not body:
@@ -357,10 +358,10 @@ class FakeResourceInstance:
 
     def replace(
         self,
-        name: Union[str, None] = None,
-        body: Union[dict[str, Any], None] = None,
-        namespace: Union[str, None] = None,
-        **kwargs: Any,
+        name: str | None = None,
+        body: dict[str, Any] | None = None,
+        namespace: str | None = None,
+        **_kwargs: Any,
     ) -> FakeResourceField:
         """Replace a resource"""
         if not name:
@@ -386,12 +387,12 @@ class FakeResourceInstance:
                 try:
                     api_exception = K8sApiException(status=409, reason="Conflict")
                     api_exception.body = f'{{"kind":"Status","apiVersion":"v1","metadata":{{}},"status":"Failure","message":"Operation cannot be fulfilled on {self.resource_def["kind"].lower()}s.{self.resource_def.get("group", "")} \\"{name}\\": the object has been modified; please apply your changes to the latest version and try again","reason":"Conflict","code":409}}'
-                    raise ConflictError(api_exception)
+                    raise ConflictError(api_exception) from None
                 except (NameError, TypeError):
                     # Use our fake ConflictError which has status attribute
                     raise ConflictError(
                         f"Operation cannot be fulfilled on {self.resource_def['kind']} '{name}': the object has been modified"
-                    )
+                    ) from None
 
         # Ensure metadata is preserved
         if "metadata" not in body:
@@ -429,16 +430,16 @@ class FakeResourceInstance:
 
     def update(
         self,
-        name: Union[str, None] = None,
-        body: Union[dict[str, Any], None] = None,
-        namespace: Union[str, None] = None,
+        name: str | None = None,
+        body: dict[str, Any] | None = None,
+        namespace: str | None = None,
         **kwargs: Any,
     ) -> FakeResourceField:
         """Update a resource (alias for replace)"""
         return self.replace(name=name, body=body, namespace=namespace, **kwargs)
 
     def watch(
-        self, namespace: Union[str, None] = None, timeout: Union[int, None] = None, **kwargs: Any
+        self, namespace: str | None = None, _timeout: int | None = None, **kwargs: Any
     ) -> Iterator[dict[str, Any]]:
         """Watch for resource changes"""
         # Simple implementation - yields existing resources as ADDED events

@@ -1,5 +1,5 @@
-from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
 
 class EndpointSlice(NamespacedResource):

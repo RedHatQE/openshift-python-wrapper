@@ -37,10 +37,10 @@ class NetworkAttachmentDefinition(NamespacedResource):
                 if config is None basic config will be created.
         """
         super().__init__(
+            *args,
             name=name,
             namespace=namespace,
             client=client,
-            *args,
             **kwargs,
         )
         self.cni_type = cni_type

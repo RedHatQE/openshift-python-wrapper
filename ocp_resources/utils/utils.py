@@ -1,3 +1,5 @@
+import re
+
 import yaml
 from simple_logger.logger import get_logger
 
@@ -80,8 +82,6 @@ def convert_camel_case_to_snake_case(name: str) -> str:
         - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
           (e.g., "myCamelCaseString").
     """
-    import re
-
     do_not_process_list = ["oauth", "kubevirt"]
 
     # If the input string is in the do_not_proccess_list, return it as it is.

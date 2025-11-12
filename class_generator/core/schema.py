@@ -12,7 +12,7 @@ from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
 from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_FILE, SCHEMA_DIR
-from class_generator.utils import execute_parallel_with_mapping, execute_parallel_tasks
+from class_generator.utils import execute_parallel_tasks, execute_parallel_with_mapping
 from ocp_resources.utils.archive_utils import save_json_archive
 from ocp_resources.utils.schema_validator import SchemaValidator
 
@@ -136,9 +136,9 @@ def check_and_update_cluster_version(client: str) -> bool:
     last_cluster_version_generated: str = ""
 
     try:
-        with open(cluster_version_file, "r") as fd:
+        with open(cluster_version_file) as fd:
             last_cluster_version_generated = fd.read().strip()
-    except (FileNotFoundError, IOError):
+    except (OSError, FileNotFoundError):
         # Treat missing file as first run - use baseline version that allows updates
         last_cluster_version_generated = "v0.0.0"
         LOGGER.info("Cluster version file not found - treating as first run with baseline version v0.0.0")
@@ -530,7 +530,7 @@ def process_schema_definitions(
     definitions = {}
     if not allow_updates:
         try:
-            with open(DEFINITIONS_FILE, "r") as f:
+            with open(DEFINITIONS_FILE) as f:
                 existing_definitions_data = json.load(f)
                 definitions = existing_definitions_data.get("definitions", {})
                 LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve")
@@ -1064,12 +1064,12 @@ def _supplement_schema_with_field_descriptions(definitions: dict[str, Any], clie
             LOGGER.debug(f"Failed to obtain explain data for {ref_name} from {explain_path}")
 
     def handle_explain_error(spec_tuple: tuple[str, str], exc: Exception) -> None:
-        ref_name, explain_path = spec_tuple
-        LOGGER.debug(f"Exception occurred while explaining {ref_name} from {explain_path}: {exc}")
+        ref_name, _explain_path = spec_tuple
+        LOGGER.debug(f"Exception occurred while explaining {ref_name}: {exc}")
         explain_results[ref_name] = None
 
     def create_explain_task(spec_tuple: tuple[str, str]) -> Any:
-        ref_name, explain_path = spec_tuple
+        _ref_name, explain_path = spec_tuple
         return _run_explain_and_parse(client, explain_path)
 
     execute_parallel_tasks(
@@ -1244,7 +1244,7 @@ def _supplement_resource_level_required_fields(definitions: dict[str, Any], clie
                 definitions[schema_key] = updated_schema
 
         def handle_required_field_error(task_tuple: tuple[str, str], exc: Exception) -> None:
-            schema_key, explain_path = task_tuple
+            schema_key, _explain_path = task_tuple
             LOGGER.debug(f"Failed to process required fields for {schema_key}: {exc}")
             # Set empty list if explain fails
             current_schema = definitions[schema_key]
@@ -1307,14 +1307,14 @@ def _get_missing_core_definitions(
     if refs_to_fetch:
 
         def process_missing_definition_result(task_tuple: tuple[str, str], result: Any) -> None:
-            ref_name, oc_path = task_tuple
+            _ref_name, _oc_path = task_tuple
             if result:
                 fetched_ref_name, schema = result
                 missing_definitions[fetched_ref_name] = schema
                 LOGGER.debug(f"Successfully fetched definition for {fetched_ref_name}")
 
         def handle_missing_definition_error(task_tuple: tuple[str, str], exc: Exception) -> None:
-            ref_name, oc_path = task_tuple
+            ref_name, _oc_path = task_tuple
             LOGGER.debug(f"Failed to fetch definition for {ref_name}: {exc}")
 
         def create_missing_definition_task(task_tuple: tuple[str, str]) -> Any:
@@ -1360,10 +1360,10 @@ def write_schema_files(
     # Ensure schema directory exists
     try:
         Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
-    except (OSError, IOError) as e:
+    except OSError as e:
         error_msg = f"Failed to create schema directory {SCHEMA_DIR}: {e}"
         LOGGER.error(error_msg)
-        raise IOError(error_msg) from e
+        raise OSError(error_msg) from e
 
     # Fetch missing core definitions if schemas are available
     if schemas:
@@ -1400,18 +1400,18 @@ def write_schema_files(
             with open(definitions_file, "w") as fd:
                 json.dump(definitions_data, fd, indent=2, sort_keys=True)
             LOGGER.info(f"Written {len(definitions)} definitions to {definitions_file}")
-        except (OSError, IOError, TypeError) as e:
+        except (OSError, TypeError) as e:
             error_msg = f"Failed to write definitions file {definitions_file}: {e}"
             LOGGER.error(error_msg)
-            raise IOError(error_msg) from e
+            raise OSError(error_msg) from e
 
     # Write and archive resources mapping
     try:
         save_json_archive(resources_mapping, RESOURCES_MAPPING_FILE)
-    except (OSError, IOError, TypeError) as e:
+    except (OSError, TypeError) as e:
         error_msg = f"Failed to save and archive resources mapping file {RESOURCES_MAPPING_FILE}: {e}"
         LOGGER.error(error_msg)
-        raise IOError(error_msg) from e
+        raise OSError(error_msg) from e
 
 
 @dataclasses.dataclass
@@ -1523,11 +1523,11 @@ def _handle_no_schemas_case() -> None:
     """
     LOGGER.info("No schemas fetched. Preserving existing data to avoid overwriting with empty definitions.")
     try:
-        with open(DEFINITIONS_FILE, "r") as fd:
+        with open(DEFINITIONS_FILE) as fd:
             existing_definitions_data = json.load(fd)
             definitions = existing_definitions_data.get("definitions", {})
             LOGGER.info(f"Found {len(definitions)} existing definitions that will be preserved")
-    except (FileNotFoundError, IOError, json.JSONDecodeError):
+    except (OSError, FileNotFoundError, json.JSONDecodeError):
         LOGGER.debug("Could not load existing definitions file. No existing definitions to preserve.")
 
 

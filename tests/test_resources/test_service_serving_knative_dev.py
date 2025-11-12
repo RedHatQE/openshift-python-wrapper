@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.service_serving_knative_dev import Service
 
 

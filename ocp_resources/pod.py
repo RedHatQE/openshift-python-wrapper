@@ -515,7 +515,7 @@ class Pod(NamespacedResource):
                 # Check remaining time, in order to throw exception
                 # if remaining time reached zero
                 if timeout_watch.remaining_time() <= 0:
-                    raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error)
+                    raise ExecOnPodError(command=command, rc=-1, out="", err=stream_closed_error) from None
 
         rcstring = error_channel.get("status")
         if rcstring is None:
