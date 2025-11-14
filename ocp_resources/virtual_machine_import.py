@@ -195,11 +195,12 @@ class VirtualMachineImport(NamespacedResource):
         cond_reason=SucceededConditionReason.VIRTUAL_MACHINE_READY,
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
+        sleep=1,
     ):
         self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
-            sleep=1,
+            sleep=sleep,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
