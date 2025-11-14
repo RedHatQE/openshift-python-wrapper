@@ -59,7 +59,7 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
                     diff_info += f"\nGenerated lines: {len(generated_lines)}, Expected lines: {len(expected_lines)}"
 
                     # Find first differing line
-                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines, strict=False)):
+                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines, strict=True)):
                         if gen_line != exp_line:
                             diff_info += f"\nFirst difference at line {i + 1}:"
                             diff_info += f"\nGenerated: {repr(gen_line[:100])}..."
@@ -89,22 +89,22 @@ def test_parse_explain(tmp_path: Path) -> None:
     """Test all resource kinds in parallel and collect all failures."""
     # List of all resource kinds to test
     resource_kinds = [
-        "Pod",
-        "Pipeline",
-        "OAuth",
-        "Ingress",
-        "ClusterOperator",
-        "ImageContentSourcePolicy",
-        "ServiceMeshMember",
-        "NMState",
-        "Deployment",
-        "Machine",
         "APIServer",
-        "Secret",
+        "ClusterOperator",
         "ConfigMap",
         "DNS",
-        "ServingRuntime",
+        "Deployment",
+        "ImageContentSourcePolicy",
+        "Machine",
+        "NMState",
+        "Pod",
+        "Secret",
+        "ServiceMeshMember",
+        "Ingress",
+        "OAuth",
+        "Pipeline",
         "RouteAdvertisements",
+        "ServingRuntime",
     ]
 
     failures: list[tuple[str, str]] = []
@@ -146,9 +146,7 @@ def test_parse_explain(tmp_path: Path) -> None:
 
         # Create a concise failure message for pytest
         failed_kinds = [kind for kind, _ in failures]
-        failure_summary = f"{len(failures)} resource(s) failed: {', '.join(failed_kinds[:5])}"
-        if len(failed_kinds) > 5:
-            failure_summary += f" and {len(failed_kinds) - 5} more"
+        failure_summary = f"{len(failures)} resource(s) failed: {','.join(failed_kinds)}"
 
         # Fail the test with summary - detailed output is already printed above
         raise AssertionError(failure_summary)
