@@ -55,7 +55,7 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
 
     # For each API group, select the latest version
     filtered_schemas = []
-    for group, group_schemas in schemas_by_group.items():
+    for _group, group_schemas in schemas_by_group.items():
         if len(group_schemas) > 1:
             # Multiple versions in same group - pick latest
             versions = []

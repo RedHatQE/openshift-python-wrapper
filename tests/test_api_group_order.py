@@ -10,7 +10,7 @@ def test_api_group_order():
     try:
         with open(file_path) as fd:
             content = fd.read()
-    except IOError as exp:
+    except OSError as exp:
         pytest.fail(f"Failed to read {file_path}: {str(exp)}")
 
     tree = ast.parse(source=content)

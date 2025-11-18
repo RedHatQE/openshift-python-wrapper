@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
-
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
-from ocp_resources.resource import NamespacedResource
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
+
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 from ocp_resources.virtual_machine import VirtualMachine
 
 
@@ -197,11 +195,12 @@ class VirtualMachineImport(NamespacedResource):
         cond_reason=SucceededConditionReason.VIRTUAL_MACHINE_READY,
         cond_status=Condition.Status.TRUE,
         cond_type=Condition.SUCCEEDED,
+        sleep=1,
     ):
         self.logger.info(f"Wait for {self.kind} {self.name} {cond_reason} condition to be {cond_status}")
         samples = TimeoutSampler(
             wait_timeout=timeout,
-            sleep=1,
+            sleep=sleep,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
             func=self.api.get,
             field_selector=f"metadata.name=={self.name}",
@@ -223,12 +222,12 @@ class VirtualMachineImport(NamespacedResource):
                                 )
                                 self.logger.info(msg)
                                 return
-        except TimeoutExpiredError:
+        except TimeoutExpiredError as err:
             raise TimeoutExpiredError(
                 f"Last condition of {self.kind} {self.name} {last_condition.type} was"
                 f" {last_condition.status} ({last_condition.reason}:"
                 f" {last_condition.message})"
-            )
+            ) from err
 
 
 class ResourceMapping(NamespacedResource):

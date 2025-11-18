@@ -2,7 +2,8 @@
 
 
 from typing import Any
-from ocp_resources.resource import Resource, MissingRequiredArgumentError
+
+from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
 class VirtualMachineClusterInstancetype(Resource):

@@ -10,9 +10,9 @@ import pytest
 from click.testing import CliRunner
 
 import class_generator.cli
-from class_generator.utils import ResourceInfo
-from class_generator.core.discovery import discover_generated_resources
 from class_generator.cli import main
+from class_generator.core.discovery import discover_generated_resources
+from class_generator.utils import ResourceInfo
 
 
 class TestResourceDiscovery:
@@ -326,8 +326,6 @@ class TestRegenerateAll:
             mock_generator = MagicMock(return_value=[str(pod_file)])
 
             # Need to patch where the functions are imported, not where they're defined
-            import class_generator.cli
-
             monkeypatch.setattr(class_generator.cli, "discover_generated_resources", mock_discover)
             monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
 

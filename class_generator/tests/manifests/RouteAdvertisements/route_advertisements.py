@@ -2,8 +2,9 @@
 
 
 from typing import Any
-from ocp_resources.resource import Resource
+
 from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import Resource
 
 
 class RouteAdvertisements(Resource):
@@ -49,6 +50,7 @@ class RouteAdvertisements(Resource):
         self.target_vrf = target_vrf
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

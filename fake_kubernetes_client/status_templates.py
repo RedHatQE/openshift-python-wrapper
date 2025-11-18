@@ -1,7 +1,7 @@
 """Status template methods for fake Kubernetes resources"""
 
 from datetime import datetime, timezone
-from typing import Any, Union
+from typing import Any
 
 from fake_kubernetes_client.status_schema_parser import StatusSchemaParser
 
@@ -42,7 +42,7 @@ def _get_ready_status_config(body: dict[str, Any]) -> tuple[str, str, str]:
     return status, reason, message
 
 
-def add_realistic_status(body: dict[str, Any], resource_mappings: Union[dict[str, Any], None] = None) -> None:
+def add_realistic_status(body: dict[str, Any], resource_mappings: dict[str, Any] | None = None) -> None:
     """Add realistic status to resources that need it"""
     kind = body.get("kind", "")
 
@@ -52,7 +52,7 @@ def add_realistic_status(body: dict[str, Any], resource_mappings: Union[dict[str
     elif kind == "Deployment":
         status = get_deployment_status_template(body=body)
     elif kind == "Service":
-        status = get_service_status_template(body=body)
+        status = get_service_status_template(_body=body)
     elif kind == "Namespace":
         status = get_namespace_status_template(body=body)
     else:
@@ -73,7 +73,7 @@ def generate_dynamic_status(body: dict[str, Any], resource_mappings: dict[str, A
     api_version = body.get("apiVersion", "v1")
 
     parser = StatusSchemaParser(resource_mappings=resource_mappings)
-    status_schema = parser.get_status_schema_for_resource(kind=kind, api_version=api_version)
+    status_schema = parser.get_status_schema_for_resource(kind=kind, _api_version=api_version)
 
     if status_schema:
         return parser.generate_status_from_schema(schema=status_schema, resource_body=body)
@@ -192,7 +192,7 @@ def get_pod_status_template(body: dict[str, Any]) -> dict[str, Any]:
 def get_deployment_status_template(body: dict[str, Any]) -> dict[str, Any]:
     """Get realistic Deployment status"""
     # Get ready status configuration
-    ready_status, ready_reason, ready_message = _get_ready_status_config(body=body)
+    ready_status, _ready_reason, _ready_message = _get_ready_status_config(body=body)
 
     # Adjust deployment-specific values based on ready status
     if ready_status == "True":
@@ -252,7 +252,7 @@ def get_deployment_status_template(body: dict[str, Any]) -> dict[str, Any]:
         }
 
 
-def get_service_status_template(body: dict[str, Any]) -> dict[str, Any]:
+def get_service_status_template(_body: dict[str, Any]) -> dict[str, Any]:
     """Get realistic Service status"""
     # Services don't typically have complex status
     return {"loadBalancer": {}}

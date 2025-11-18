@@ -2,8 +2,9 @@
 
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource
+
 from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 
 class ServiceMeshMember(NamespacedResource):
@@ -28,6 +29,7 @@ class ServiceMeshMember(NamespacedResource):
         self.control_plane_ref = control_plane_ref
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

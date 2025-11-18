@@ -1,27 +1,29 @@
 """Tests for new schema.py functions focused on coverage improvement."""
 
 import json
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 
+from class_generator.constants import RESOURCES_MAPPING_FILE
 from class_generator.core.schema import (
     ClusterVersionError,
+    _convert_type_to_schema,
+    _detect_missing_refs_from_schemas,
+    _infer_oc_explain_path,
     build_dynamic_resource_to_api_mapping,
     build_namespacing_dict,
     check_and_update_cluster_version,
     extract_group_kind_version,
+    fetch_all_api_schemas,
     find_api_paths_for_missing_resources,
     get_client_binary,
     get_server_version,
     identify_missing_resources,
-    read_resources_mapping_file,
-    fetch_all_api_schemas,
     process_schema_definitions,
+    read_resources_mapping_file,
     write_schema_files,
-    _detect_missing_refs_from_schemas,
-    _infer_oc_explain_path,
-    _convert_type_to_schema,
 )
 
 
@@ -201,14 +203,22 @@ class TestCheckAndUpdateClusterVersion:
 
         # Verify that the file was opened for writing
         assert mock_open.call_count == 2  # Once for reading, once for writing
-        write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
+        # Check both positional and keyword arguments for mode
+        write_calls = [
+            call
+            for call in mock_open.call_args_list
+            if (len(call[0]) > 1 and call[0][1] == "w") or call[1].get("mode") == "w"
+        ]
         assert len(write_calls) == 1, "File should be opened for writing exactly once"
 
         # Verify that the correct cluster version file path is used
-        from pathlib import Path
-
         expected_path = Path("class_generator/schema/__cluster_version__.txt")
-        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        # Read calls either have no mode (defaults to 'r') or explicitly 'r'
+        read_calls = [
+            call
+            for call in mock_open.call_args_list
+            if (len(call[0]) == 1) or (len(call[0]) > 1 and call[0][1] == "r") or call[1].get("mode") == "r"
+        ]
         assert len(read_calls) == 1, "File should be opened for reading exactly once"
         # Check that the file path used matches expected cluster version file
         assert str(expected_path) in str(read_calls[0][0][0]) or expected_path.name in str(read_calls[0][0][0])
@@ -230,7 +240,12 @@ class TestCheckAndUpdateClusterVersion:
 
         # Verify that the file was only opened for reading, not writing
         assert mock_open.call_count == 1  # Only once for reading
-        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        # Read calls either have no mode (defaults to 'r') or explicitly 'r'
+        read_calls = [
+            call
+            for call in mock_open.call_args_list
+            if (len(call[0]) == 1) or (len(call[0]) > 1 and call[0][1] == "r") or call[1].get("mode") == "r"
+        ]
         assert len(read_calls) == 1, "File should be opened for reading exactly once"
 
         # Verify that write() was never called
@@ -250,14 +265,22 @@ class TestCheckAndUpdateClusterVersion:
 
         # Verify that the file was opened for both reading and writing
         assert mock_open.call_count == 2  # Once for reading, once for writing
-        write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
+        # Check both positional and keyword arguments for mode
+        write_calls = [
+            call
+            for call in mock_open.call_args_list
+            if (len(call[0]) > 1 and call[0][1] == "w") or call[1].get("mode") == "w"
+        ]
         assert len(write_calls) == 1, "File should be opened for writing exactly once"
 
         # Verify that the correct cluster version file path is used
-        from pathlib import Path
-
         expected_path = Path("class_generator/schema/__cluster_version__.txt")
-        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        # Read calls either have no mode (defaults to 'r') or explicitly 'r'
+        read_calls = [
+            call
+            for call in mock_open.call_args_list
+            if (len(call[0]) == 1) or (len(call[0]) > 1 and call[0][1] == "r") or call[1].get("mode") == "r"
+        ]
         assert len(read_calls) == 1, "File should be opened for reading exactly once"
         # Check that the file path used matches expected cluster version file
         assert str(expected_path) in str(read_calls[0][0][0]) or expected_path.name in str(read_calls[0][0][0])
@@ -887,7 +910,7 @@ class TestProcessSchemaDefinitions:
             mock_open.return_value.__enter__.return_value = mock_file
             mock_file.read.return_value = '{"definitions": {}}'
 
-            resources_mapping, definitions = process_schema_definitions(
+            resources_mapping, _definitions = process_schema_definitions(
                 schemas, namespacing_dict, existing_mapping, allow_updates=False
             )
 
@@ -935,7 +958,7 @@ class TestProcessSchemaDefinitions:
             ]
         }
 
-        resources_mapping, definitions = process_schema_definitions(
+        resources_mapping, _definitions = process_schema_definitions(
             schemas, namespacing_dict, existing_mapping, allow_updates=True
         )
 
@@ -1026,8 +1049,6 @@ class TestWriteSchemaFiles:
 
         # Verify that resources mapping is still saved (not affected by guard)
         # Assert the actual file path to ensure the correct mapping file is being saved
-        from class_generator.constants import RESOURCES_MAPPING_FILE
-
         mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
@@ -1064,8 +1085,6 @@ class TestWriteSchemaFiles:
 
         # Verify that resources mapping is saved
         # Assert the actual file path to ensure the correct mapping file is being saved
-        from class_generator.constants import RESOURCES_MAPPING_FILE
-
         mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
@@ -1102,8 +1121,6 @@ class TestWriteSchemaFiles:
 
         # Verify that resources mapping is saved
         # Assert the actual file path to ensure the correct mapping file is being saved
-        from class_generator.constants import RESOURCES_MAPPING_FILE
-
         mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
@@ -1142,8 +1159,6 @@ class TestWriteSchemaFiles:
 
         # Verify that resources mapping is still saved
         # Assert the actual file path to ensure the correct mapping file is being saved
-        from class_generator.constants import RESOURCES_MAPPING_FILE
-
         mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
     @patch("class_generator.core.schema.Path")
@@ -1200,8 +1215,6 @@ class TestWriteSchemaFiles:
 
         # Verify that resources mapping is saved
         # Assert the actual file path to ensure the correct mapping file is being saved
-        from class_generator.constants import RESOURCES_MAPPING_FILE
-
         mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
 
 

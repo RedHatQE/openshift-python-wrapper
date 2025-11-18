@@ -22,6 +22,9 @@ class Plan(NamespacedResource):
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
         type (str, optional): Migration type. Valid values: "cold", "warm", "live", "conversion".
         pvc_name_template_use_generate_name (bool, optional): Whether to use generateName for PVC name templates.
+        pvc_name_template (str, optional): Template for generating PVC names.
+        volume_name_template (str, optional): Template for generating volume interface names in the target VM.
+        network_name_template (str, optional): Template for generating network interface names in the target VM.
         skip_guest_conversion (bool, optional): Whether to skip guest conversion.
         target_power_state (str, optional): Specifies the desired power state of the target VM after migration.
                                           - "on": Target VM will be powered on after migration
@@ -29,6 +32,13 @@ class Plan(NamespacedResource):
                                           - "auto" or None (default): Target VM will match the source VM's power state
         use_compatibility_mode (bool, optional): Whether to use compatibility mode.
         migrate_shared_disks (bool, optional): Whether to migrate shared disks.
+        preserve_static_ips (bool, optional): Whether to preserve static IPs during migration.
+        target_node_selector (dict, optional): Node selector for the target VM. Specifies which node labels
+                                             should be used for NodeSelector parameter of VMI resource.
+        target_labels (dict, optional): Labels to be applied to the target VM. Specifies which labels
+                                      should be added to the target VM resource.
+        target_affinity (dict, optional): Affinity rules for the target VM. Specifies which affinity
+                                        rules should be applied to the target VM resource.
     """
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
@@ -52,10 +62,17 @@ class Plan(NamespacedResource):
         after_hook_namespace: str | None = None,
         type: str | None = None,
         pvc_name_template_use_generate_name: bool | None = None,
+        pvc_name_template: str | None = None,
+        volume_name_template: str | None = None,
+        network_name_template: str | None = None,
         skip_guest_conversion: bool | None = None,
         target_power_state: str | None = None,
         use_compatibility_mode: bool | None = None,
         migrate_shared_disks: bool | None = None,
+        preserve_static_ips: bool | None = None,
+        target_node_selector: dict[str, str] | None = None,
+        target_labels: dict[str, str] | None = None,
+        target_affinity: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -77,10 +94,17 @@ class Plan(NamespacedResource):
         self.hooks_array = []
         self.type = type
         self.pvc_name_template_use_generate_name = pvc_name_template_use_generate_name
+        self.pvc_name_template = pvc_name_template
+        self.volume_name_template = volume_name_template
+        self.network_name_template = network_name_template
         self.skip_guest_conversion = skip_guest_conversion
         self.target_power_state = target_power_state
         self.use_compatibility_mode = use_compatibility_mode
         self.migrate_shared_disks = migrate_shared_disks
+        self.preserve_static_ips = preserve_static_ips
+        self.target_node_selector = target_node_selector
+        self.target_labels = target_labels
+        self.target_affinity = target_affinity
 
         if self.pre_hook_name and self.pre_hook_namespace:
             self.hooks_array.append(
@@ -144,6 +168,15 @@ class Plan(NamespacedResource):
             if self.pvc_name_template_use_generate_name is not None:
                 spec["pvcNameTemplateUseGenerateName"] = self.pvc_name_template_use_generate_name
 
+            if self.pvc_name_template is not None:
+                spec["pvcNameTemplate"] = self.pvc_name_template
+
+            if self.volume_name_template is not None:
+                spec["volumeNameTemplate"] = self.volume_name_template
+
+            if self.network_name_template is not None:
+                spec["networkNameTemplate"] = self.network_name_template
+
             if self.skip_guest_conversion is not None:
                 spec["skipGuestConversion"] = self.skip_guest_conversion
 
@@ -155,6 +188,18 @@ class Plan(NamespacedResource):
 
             if self.migrate_shared_disks is not None:
                 spec["migrateSharedDisks"] = self.migrate_shared_disks
+
+            if self.preserve_static_ips is not None:
+                spec["preserveStaticIPs"] = self.preserve_static_ips
+
+            if self.target_node_selector is not None:
+                spec["targetNodeSelector"] = self.target_node_selector
+
+            if self.target_labels is not None:
+                spec["targetLabels"] = self.target_labels
+
+            if self.target_affinity is not None:
+                spec["targetAffinity"] = self.target_affinity
 
     def _generate_hook_spec(self, hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
         return {

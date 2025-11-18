@@ -2,6 +2,7 @@
 
 
 from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 
 
@@ -52,6 +53,7 @@ class Secret(NamespacedResource):
         self.type = type
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

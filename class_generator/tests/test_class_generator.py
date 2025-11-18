@@ -1,15 +1,15 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md#adding-tests
 
 import filecmp
+import traceback
 from pathlib import Path
-from typing import List, Tuple, Optional
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.generator import class_generator
 from class_generator.utils import execute_parallel_tasks
 
 
-def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]]:
+def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
     """
     Test a single resource kind and return failure info if test fails.
 
@@ -44,9 +44,9 @@ def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]
             if not filecmp.cmp(output_file, expected_file):
                 try:
                     # Read both files to show diff details
-                    with open(output_file, "r") as f:
+                    with open(output_file) as f:
                         generated_content = f.read()
-                    with open(expected_file, "r") as f:
+                    with open(expected_file) as f:
                         expected_content = f.read()
 
                     # Find first difference for debugging
@@ -59,7 +59,7 @@ def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]
                     diff_info += f"\nGenerated lines: {len(generated_lines)}, Expected lines: {len(expected_lines)}"
 
                     # Find first differing line
-                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines)):
+                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines, strict=True)):
                         if gen_line != exp_line:
                             diff_info += f"\nFirst difference at line {i + 1}:"
                             diff_info += f"\nGenerated: {repr(gen_line[:100])}..."
@@ -80,8 +80,6 @@ def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]
         return None
 
     except Exception as e:
-        import traceback
-
         error_details = f"Exception during generation: {str(e)}\n"
         error_details += f"Traceback:\n{traceback.format_exc()}"
         return (kind, error_details)
@@ -91,35 +89,35 @@ def test_parse_explain(tmp_path: Path) -> None:
     """Test all resource kinds in parallel and collect all failures."""
     # List of all resource kinds to test
     resource_kinds = [
-        "Pod",
-        "Pipeline",
-        "OAuth",
-        "Ingress",
-        "ClusterOperator",
-        "ImageContentSourcePolicy",
-        "ServiceMeshMember",
-        "NMState",
-        "Deployment",
-        "Machine",
         "APIServer",
-        "Secret",
+        "ClusterOperator",
         "ConfigMap",
         "DNS",
-        "ServingRuntime",
+        "Deployment",
+        "ImageContentSourcePolicy",
+        "Machine",
+        "NMState",
+        "Pod",
+        "Secret",
+        "ServiceMeshMember",
+        "Ingress",
+        "OAuth",
+        "Pipeline",
         "RouteAdvertisements",
+        "ServingRuntime",
     ]
 
-    failures: List[Tuple[str, str]] = []
+    failures: list[tuple[str, str]] = []
 
     # Process test results and collect failures
-    def process_test_result(kind: str, result: Optional[Tuple[str, str]]) -> None:
+    def process_test_result(kind: str, result: tuple[str, str] | None) -> None:
         if result is not None:
             failures.append(result)
 
     def handle_test_error(kind: str, exc: Exception) -> None:
         failures.append((kind, f"Task execution failed: {str(exc)}"))
 
-    def create_test_task(kind: str) -> Optional[Tuple[str, str]]:
+    def create_test_task(kind: str) -> tuple[str, str] | None:
         return _test_single_resource(kind, tmp_path / f"test-{kind}")
 
     # Run tests in parallel
@@ -148,12 +146,10 @@ def test_parse_explain(tmp_path: Path) -> None:
 
         # Create a concise failure message for pytest
         failed_kinds = [kind for kind, _ in failures]
-        failure_summary = f"{len(failures)} resource(s) failed: {', '.join(failed_kinds[:5])}"
-        if len(failed_kinds) > 5:
-            failure_summary += f" and {len(failed_kinds) - 5} more"
+        failure_summary = f"{len(failures)} resource(s) failed: {','.join(failed_kinds)}"
 
         # Fail the test with summary - detailed output is already printed above
-        assert False, failure_summary
+        raise AssertionError(failure_summary)
 
     # If we get here, all tests passed
     print(f"\nAll {len(resource_kinds)} resource generation tests passed successfully!")

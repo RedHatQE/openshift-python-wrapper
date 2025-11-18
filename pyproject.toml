@@ -37,6 +37,13 @@ output-format = "grouped"
 [tool.ruff.format]
 exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "PLC0415", "ARG", "RUF059"]
+
+[tool.ruff.lint.per-file-ignores]
+"*" = ["E501"]
+"/*tests/*" = ["ARG"]
+
 [tool.mypy]
 check_untyped_defs = false
 disallow_any_generics = false
@@ -62,13 +69,10 @@ include = [
   "class_generator/schema/_definitions.json",
 ]
 
-[tool.uv]
-dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
-
 [project]
 requires-python = ">=3.10"
 name = "openshift-python-wrapper"
-version = "11.0.94"
+version = "11.0.105"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
@@ -128,3 +132,4 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]
+dev = ["ipdb>=0.13.13", "ipython>=8.12.3"]

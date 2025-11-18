@@ -10,7 +10,7 @@ from typing import Any
 import jsonschema
 from simple_logger.logger import get_logger
 
-from class_generator.constants import RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE, DEFINITIONS_FILE
+from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE
 
 from .archive_utils import load_json_archive
 
@@ -41,7 +41,7 @@ class SchemaValidator:
         if RESOURCES_MAPPING_ARCHIVE.exists():
             try:
                 cls._mappings_data = load_json_archive(RESOURCES_MAPPING_FILE)
-            except (json.JSONDecodeError, IOError) as e:
+            except (OSError, json.JSONDecodeError) as e:
                 LOGGER.error(f"Failed to load mappings from archive {RESOURCES_MAPPING_ARCHIVE}: {e}")
                 return False
         else:
@@ -54,7 +54,7 @@ class SchemaValidator:
             return False
 
         try:
-            with open(DEFINITIONS_FILE, "r") as f:
+            with open(DEFINITIONS_FILE) as f:
                 definitions_data = f.read()
             definitions_json = json.loads(definitions_data)
             cls._definitions_data = definitions_json.get("definitions", {})
@@ -228,7 +228,7 @@ class SchemaValidator:
                 else:
                     # Use the resolver for other types of references
                     try:
-                        url, resolved = resolver.resolve(ref)
+                        _url, resolved = resolver.resolve(ref)
                         return cls._resolve_refs(resolved, resolver)
                     except Exception as e:
                         LOGGER.warning(f"Failed to resolve $ref '{ref}': {e}")

@@ -5,14 +5,14 @@ import os
 import tempfile
 import time
 from typing import Any
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 from click.testing import CliRunner
 
 from class_generator.cli import main
-from class_generator.core.discovery import discover_cluster_resources
 from class_generator.core.coverage import analyze_coverage, generate_report
+from class_generator.core.discovery import discover_cluster_resources
 from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 
 

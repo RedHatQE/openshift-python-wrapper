@@ -155,7 +155,7 @@ def class_generator(
             LOGGER.info("Updating schema")
             try:
                 update_kind_schema()
-            except (RuntimeError, IOError) as e:
+            except (OSError, RuntimeError) as e:
                 error_msg = f"Failed to update schema: {e}"
                 LOGGER.error(error_msg)
                 raise RuntimeError(error_msg) from e
