@@ -1276,7 +1276,7 @@ class Resource(ResourceConstants):
                     if stop_condition:
                         if actual_condition == {"type": stop_condition, "status": stop_status}:
                             raise ConditionError(
-                                f"{self.kind}/{self.name} got unexpected condition '{stop_condition}' in status '{stop_status}'"
+                                f"{self.kind} {self.name} reached stop_condition '{stop_condition}' in status '{stop_status}':\n{cond}"
                             )
 
                     expected_condition = {"type": condition, "status": status}
