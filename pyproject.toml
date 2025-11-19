@@ -49,7 +49,7 @@ dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
 [project]
 requires-python = ">=3.9, <3.14"
 name = "openshift-python-wrapper"
-version = "4.18.6"
+version = "4.18.7"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"

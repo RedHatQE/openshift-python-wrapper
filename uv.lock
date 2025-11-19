@@ -667,7 +667,7 @@ wheels = [
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.18.5"
+version = "4.18.7"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
