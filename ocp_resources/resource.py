@@ -1254,6 +1254,8 @@ class Resource(ResourceConstants):
             timeout (int): Time to wait for the resource.
             sleep_time(int): Interval between each retry when checking the resource's condition.
             stop_condition (str | None): Condition which should stop the wait and fail.
+                Note: Matching for stop_condition only uses condition type and status.
+                The reason and message fields are ignored when checking for stop_condition.
             stop_status (str): Status of the stop condition which should stop the wait and fail.
 
         Raises:
@@ -1273,11 +1275,10 @@ class Resource(ResourceConstants):
                 for cond in sample.get("status", {}).get("conditions", []):
                     actual_condition = {"type": cond["type"], "status": cond["status"]}
 
-                    if stop_condition:
-                        if actual_condition == {"type": stop_condition, "status": stop_status}:
-                            raise ConditionError(
-                                f"{self.kind} {self.name} reached stop_condition '{stop_condition}' in status '{stop_status}':\n{cond}"
-                            )
+                    if stop_condition and actual_condition == {"type": stop_condition, "status": stop_status}:
+                        raise ConditionError(
+                            f"{self.kind} {self.name} reached stop_condition '{stop_condition}' in status '{stop_status}':\n{cond}"
+                        )
 
                     expected_condition = {"type": condition, "status": status}
                     if reason is not None:
