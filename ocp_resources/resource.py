@@ -41,6 +41,7 @@ from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.event import Event
 from ocp_resources.exceptions import (
     ClientWithBasicAuthError,
+    ConditionError,
     MissingRequiredArgumentError,
     MissingResourceResError,
     ResourceTeardownError,
@@ -1239,6 +1240,8 @@ class Resource(ResourceConstants):
         sleep_time: int = 1,
         reason: str | None = None,
         message: str = "",
+        stop_condition: str | None = None,
+        stop_status: str = "True",
     ) -> None:
         """
         Wait for Resource condition to be in desire status.
@@ -1250,9 +1253,14 @@ class Resource(ResourceConstants):
             message (str): Expected condition text inclusion.
             timeout (int): Time to wait for the resource.
             sleep_time(int): Interval between each retry when checking the resource's condition.
+            stop_condition (str | None): Condition which should stop the wait and fail.
+                Note: Matching for stop_condition only uses condition type and status.
+                The reason and message fields are ignored when checking for stop_condition.
+            stop_status (str): Status of the stop condition which should stop the wait and fail.
 
         Raises:
-            TimeoutExpiredError: If Resource condition in not in desire status.
+            TimeoutExpiredError: If Resource condition is not in desired status within timeout.
+            ConditionError: If the desired condition is not met and stop_condition is detected before timeout.
         """
         self.logger.info(f"Wait for {self.kind}/{self.name}'s '{condition}' condition to be '{status}'")
 
@@ -1266,6 +1274,12 @@ class Resource(ResourceConstants):
             if sample:
                 for cond in sample.get("status", {}).get("conditions", []):
                     actual_condition = {"type": cond["type"], "status": cond["status"]}
+
+                    if stop_condition and actual_condition == {"type": stop_condition, "status": stop_status}:
+                        raise ConditionError(
+                            f"{self.kind} {self.name} reached stop_condition '{stop_condition}' in status '{stop_status}':\n{cond}"
+                        )
+
                     expected_condition = {"type": condition, "status": status}
                     if reason is not None:
                         actual_condition["reason"] = cond.get("reason", "")
