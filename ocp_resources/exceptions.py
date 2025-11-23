@@ -88,3 +88,9 @@ class ValidationError(Exception):
         if self.path:
             return f"Validation error at '{self.path}': {self.message}"
         return f"Validation error: {self.message}"
+
+
+class ConditionError(Exception):
+    """Raised when a resource condition reaches an unexpected state."""
+
+    pass
