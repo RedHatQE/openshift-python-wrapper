@@ -957,7 +957,13 @@ class Resource(ResourceConstants):
         return kubernetes.client.CoreV1Api(api_client=self.client.client)
 
     def wait_for_status(
-        self, status: str, timeout: int = TIMEOUT_4MINUTES, stop_status: str | None = None, sleep: int = 1
+        self,
+        status: str,
+        timeout: int = TIMEOUT_4MINUTES,
+        stop_status: str | None = None,
+        sleep: int = 1,
+        exceptions_dict: dict[type[Exception], list[str]] = PROTOCOL_ERROR_EXCEPTION_DICT
+        | DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     ) -> None:
         """
         Wait for resource to be in status
@@ -966,6 +972,7 @@ class Resource(ResourceConstants):
             status (str): Expected status.
             timeout (int): Time to wait for the resource.
             stop_status (str): Status which should stop the wait and failed.
+            exceptions_dict (dict[type[Exception], list[str]]): Dictionary of exceptions to retry on.
 
         Raises:
             TimeoutExpiredError: If resource in not in desire status.
@@ -975,10 +982,7 @@ class Resource(ResourceConstants):
         samples = TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
-            exceptions_dict={
-                **PROTOCOL_ERROR_EXCEPTION_DICT,
-                **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-            },
+            exceptions_dict=exceptions_dict,
             func=lambda: self.exists,
         )
         current_status = None
