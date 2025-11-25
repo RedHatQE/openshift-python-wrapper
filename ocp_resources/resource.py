@@ -1009,7 +1009,10 @@ class Resource(ResourceConstants):
             raise
 
     def create(
-        self, wait: bool = False, exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        self,
+        wait: bool = False,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        | PROTOCOL_ERROR_EXCEPTION_DICT,
     ) -> ResourceInstance | None:
         """
         Create resource.
