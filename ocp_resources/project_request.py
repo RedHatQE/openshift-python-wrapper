@@ -2,8 +2,11 @@
 
 from typing import Any
 
+from kubernetes.dynamic.exceptions import ForbiddenError
+
 from ocp_resources.project_project_openshift_io import Project
 from ocp_resources.resource import Resource
+from ocp_resources.utils.constants import DEFAULT_CLUSTER_RETRY_EXCEPTIONS, PROTOCOL_ERROR_EXCEPTION_DICT
 
 
 class ProjectRequest(Resource):
@@ -54,7 +57,14 @@ class ProjectRequest(Resource):
             teardown=self.teardown,
             delete_timeout=self.delete_timeout,
         )
-        project.wait_for_status(status=project.Status.ACTIVE)
+
+        # When a ProjectRequest is created, the project is created and the user is added to the project.
+        # RBAC binding may not have propagated yet, causing transient 403 Forbidden errors, so we need to retry
+        # on ForbiddenError as well.
+        project.wait_for_status(
+            status=project.Status.ACTIVE,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT | DEFAULT_CLUSTER_RETRY_EXCEPTIONS | {ForbiddenError: []},
+        )
 
         return project
 
