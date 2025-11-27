@@ -154,20 +154,7 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If resource not exists.
         """
         self.logger.info(f"Wait until {self.kind} {self.name} is {'Paused' if pause else 'Unpuased'}")
-        self.wait_for_domstate_pause_status(pause=pause, timeout=timeout)
         self.wait_for_vmi_condition_pause_status(pause=pause, timeout=timeout)
-
-    def wait_for_domstate_pause_status(self, pause, timeout=TIMEOUT_4MINUTES):
-        pause_status = "paused" if pause else "running"
-        samples = TimeoutSampler(
-            wait_timeout=timeout,
-            sleep=1,
-            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.get_domstate,
-        )
-        for sample in samples:
-            if pause_status in sample:
-                return
 
     def wait_for_vmi_condition_pause_status(self, pause, timeout=TIMEOUT_4MINUTES):
         samples = TimeoutSampler(
@@ -261,18 +248,6 @@ class VirtualMachineInstance(NamespacedResource):
             )
             hypervisor_connection_uri = f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
         return hypervisor_connection_uri
-
-    def get_domstate(self):
-        """
-        Get virtual machine instance Status.
-
-        Current workaround, as VM/VMI shows no status/phase == Paused yet.
-        Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1805178
-
-        Returns:
-            String: VMI Status as string
-        """
-        return self.execute_virsh_command(command="domstate")
 
     def get_dommemstat(self):
         """
