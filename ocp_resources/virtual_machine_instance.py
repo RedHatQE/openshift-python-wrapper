@@ -1,5 +1,6 @@
 import shlex
 from typing import Any
+from warnings import warn
 
 import xmltodict
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
@@ -154,10 +155,14 @@ class VirtualMachineInstance(NamespacedResource):
             TimeoutExpiredError: If resource not exists.
         """
         self.logger.info(f"Wait until {self.kind} {self.name} is {'Paused' if pause else 'Unpuased'}")
-        self.wait_for_domstate_pause_status(pause=pause, timeout=timeout)
         self.wait_for_vmi_condition_pause_status(pause=pause, timeout=timeout)
 
     def wait_for_domstate_pause_status(self, pause, timeout=TIMEOUT_4MINUTES):
+        warn(
+            message="wait_for_domstate_pause_status is deprecated and will be removed the next version.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         pause_status = "paused" if pause else "running"
         samples = TimeoutSampler(
             wait_timeout=timeout,
@@ -272,6 +277,11 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: VMI Status as string
         """
+        warn(
+            message="get_domstate is deprecated and will be removed the next version.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         return self.execute_virsh_command(command="domstate")
 
     def get_dommemstat(self):
