@@ -20,6 +20,10 @@ class Plan(NamespacedResource):
                                       the Name Or Id of the source Virtual Machines to migrate.
                                       Example: [ { "id": "vm-id-x" }, { "name": "vm-name-x" } ]
         warm_migration (bool, default: False): Warm (True) or Cold (False) migration.
+        pre_hook_name (str, optional): Name of the PreHook CR to execute before migration.
+        pre_hook_namespace (str, optional): Namespace of the PreHook CR to execute before migration.
+        post_hook_name (str, optional): Name of the PostHook CR to execute after migration.
+        post_hook_namespace (str, optional): Namespace of the PostHook CR to execute after migration.
         type (str, optional): Migration type. Valid values: "cold", "warm", "live", "conversion".
         pvc_name_template_use_generate_name (bool, optional): Whether to use generateName for PVC name templates.
         pvc_name_template (str, optional): Template for generating PVC names.
@@ -58,8 +62,8 @@ class Plan(NamespacedResource):
         warm_migration: bool = False,
         pre_hook_name: str | None = None,
         pre_hook_namespace: str | None = None,
-        after_hook_name: str | None = None,
-        after_hook_namespace: str | None = None,
+        post_hook_name: str | None = None,
+        post_hook_namespace: str | None = None,
         type: str | None = None,
         pvc_name_template_use_generate_name: bool | None = None,
         pvc_name_template: str | None = None,
@@ -88,8 +92,8 @@ class Plan(NamespacedResource):
         self.warm_migration = warm_migration
         self.pre_hook_name = pre_hook_name
         self.pre_hook_namespace = pre_hook_namespace
-        self.after_hook_name = after_hook_name
-        self.after_hook_namespace = after_hook_namespace
+        self.post_hook_name = post_hook_name
+        self.post_hook_namespace = post_hook_namespace
         self.target_namespace = target_namespace or self.namespace
         self.hooks_array = []
         self.type = type
@@ -115,12 +119,12 @@ class Plan(NamespacedResource):
                 )
             )
 
-        if self.after_hook_name and self.after_hook_namespace:
+        if self.post_hook_name and self.post_hook_namespace:
             self.hooks_array.append(
                 self._generate_hook_spec(
-                    hook_name=self.after_hook_name,
-                    hook_namespace=self.after_hook_namespace,
-                    hook_type="AfterHook",
+                    hook_name=self.post_hook_name,
+                    hook_namespace=self.post_hook_namespace,
+                    hook_type="PostHook",
                 )
             )
 
