@@ -120,7 +120,7 @@ class Plan(NamespacedResource):
                 self._generate_hook_spec(
                     hook_name=self.after_hook_name,
                     hook_namespace=self.after_hook_namespace,
-                    hook_type="AfterHook",
+                    hook_type="PostHook",
                 )
             )
 
