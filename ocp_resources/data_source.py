@@ -60,6 +60,7 @@ class DataSource(NamespacedResource):
                 client=self.client,
                 name=instance_source[ds_source].name,
                 namespace=instance_source[ds_source].namespace,
+                ensure_exists=True,
             ).instance.spec.source
             ds_source = next(iter(instance_source))[0]
 
