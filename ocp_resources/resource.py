@@ -840,7 +840,12 @@ class Resource(ResourceConstants):
                 self.logger.error(f"Status of {self.kind} {self.name} is {current_status}")
             raise
 
-    def create(self, wait: bool = False) -> ResourceInstance | None:
+    def create(
+        self,
+        wait: bool = False,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        | PROTOCOL_ERROR_EXCEPTION_DICT,
+    ) -> ResourceInstance | None:
         """
         Create resource.
 
@@ -848,7 +853,7 @@ class Resource(ResourceConstants):
             wait (bool) : True to wait for resource status.
 
         Returns:
-            bool: True if create succeeded, False otherwise.
+            ResourceInstance | None: Created resource instance or None if create failed.
         """
         self.to_dict()
 
@@ -856,10 +861,13 @@ class Resource(ResourceConstants):
         self.logger.info(f"Create {self.kind} {self.name}")
         self.logger.info(f"Posting {hashed_res}")
         self.logger.debug(f"\n{yaml.dump(hashed_res)}")
+        resource_kwargs: dict[str, Any] = {"body": self.res, "namespace": self.namespace}
         resource_kwargs = {"body": self.res, "namespace": self.namespace}
         if self.dry_run:
             resource_kwargs["dry_run"] = "All"
-        resource_ = self.api.create(**resource_kwargs)
+        resource_ = Resource.retry_cluster_exceptions(
+            func=self.api.create, exceptions_dict=exceptions_dict, **resource_kwargs
+        )
         with contextlib.suppress(ForbiddenError, AttributeError, NotFoundError):
             # some resources do not support get() (no instance) or the client do not have permissions
             self.initial_resource_version = self.instance.metadata.resourceVersion
