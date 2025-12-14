@@ -57,6 +57,7 @@ from ocp_resources.utils.constants import (
     TIMEOUT_5SEC,
     TIMEOUT_10SEC,
     TIMEOUT_30SEC,
+    WEBSOCKET_ERROR_EXCEPTION_DICT,
 )
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.schema_validator import SchemaValidator
@@ -914,6 +915,7 @@ class Resource(ResourceConstants):
                 **PROTOCOL_ERROR_EXCEPTION_DICT,
                 **NOT_FOUND_ERROR_EXCEPTION_DICT,
                 **DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+                **WEBSOCKET_ERROR_EXCEPTION_DICT,
             },
             func=lambda: self.exists,
         )
@@ -963,7 +965,8 @@ class Resource(ResourceConstants):
         stop_status: str | None = None,
         sleep: int = 1,
         exceptions_dict: dict[type[Exception], list[str]] = PROTOCOL_ERROR_EXCEPTION_DICT
-        | DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        | DEFAULT_CLUSTER_RETRY_EXCEPTIONS
+        | WEBSOCKET_ERROR_EXCEPTION_DICT,
     ) -> None:
         """
         Wait for resource to be in status
@@ -1012,7 +1015,8 @@ class Resource(ResourceConstants):
         self,
         wait: bool = False,
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS
-        | PROTOCOL_ERROR_EXCEPTION_DICT,
+        | PROTOCOL_ERROR_EXCEPTION_DICT
+        | WEBSOCKET_ERROR_EXCEPTION_DICT,
     ) -> ResourceInstance | None:
         """
         Create resource.
