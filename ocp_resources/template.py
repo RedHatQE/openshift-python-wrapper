@@ -14,6 +14,11 @@ class Template(NamespacedResource):
         WORKLOAD = "workload.template.kubevirt.io"
         ARCHITECTURE = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/architecture"
 
+    class Architecture:
+        AMD64 = "amd64"
+        ARM64 = "arm64"
+        S390X = "s390x"
+
     class Workload:
         DESKTOP = "desktop"
         HIGHPERFORMANCE = "highperformance"
@@ -69,5 +74,5 @@ class Template(NamespacedResource):
             f"{Template.Labels.FLAVOR}/{getattr(Template.Flavor, flavor.upper())}=true",
         ]
         if architecture:
-            labels.append(f"{Template.Labels.ARCHITECTURE}={architecture}")
+            labels.append(f"{Template.Labels.ARCHITECTURE}={getattr(Template.Architecture, architecture.upper())}")
         return labels
