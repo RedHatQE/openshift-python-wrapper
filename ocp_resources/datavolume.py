@@ -249,6 +249,11 @@ class DataVolume(NamespacedResource):
         return self.pvc.wait_deleted(timeout=timeout)
 
     def wait(self, timeout=TIMEOUT_10MINUTES, failure_timeout=TIMEOUT_2MINUTES, wait_for_exists_only=False, sleep=1):
+        warn(
+            message="DataVolume.wait() is deprecated and will be removed the next version.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         if wait_for_exists_only:
             return super().wait(timeout=timeout, sleep=sleep)
         else:
