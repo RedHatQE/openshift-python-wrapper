@@ -511,6 +511,7 @@ class Resource(ResourceConstants):
         K8S_OVN_ORG: str = "k8s.ovn.org"
         K8S_V1_CNI_CNCF_IO: str = "k8s.v1.cni.cncf.io"
         KEDA_SH: str = "keda.sh"
+        KUADRANT_IO = "kuadrant.io"
         KUBEFLOW_ORG: str = "kubeflow.org"
         KUBERNETES_IO: str = "kubernetes.io"
         KUBEVIRT_IO: str = "kubevirt.io"
