@@ -16,7 +16,18 @@ reviews:
   changed_files_summary: true
   labeling_instructions: []
   path_filters: ["!class_generator/schema/**"]
-  path_instructions: []
+  path_instructions:
+    - path: "**/ocp_resources/**"
+      instructions: |
+        SKIP reviewing any code between the markers:
+        - Start: `# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md`
+        - End: `# End of generated code`
+
+        This is auto-generated code from the class-generator tool.
+        Only review code OUTSIDE these markers.
+        If someone modifies generated code directly, flag it as a violation -
+        changes should be made to the class-generator instead.
+
   abort_on_close: true
   auto_review:
     enabled: true
