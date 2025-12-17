@@ -4,7 +4,7 @@
     ":dependencyDashboard",
     ":maintainLockFilesWeekly",
     ":prHourlyLimitNone",
-    ":semanticCommitTypeAll(ci: )"
+    ":semanticCommitTypeAll(ci )"
   ],
   "prConcurrentLimit": 0,
   "lockFileMaintenance": {
