@@ -52,12 +52,22 @@ class DataSource(NamespacedResource):
 
     @property
     def source(self):
-        _instance_source = self.instance.spec.source
-        _source = [*_instance_source][0][0]
-        _source_mapping = {"pvc": PersistentVolumeClaim, "snapshot": VolumeSnapshot}
+        instance_source = self.instance.spec.source
+        ds_source = next(iter(instance_source))[0]
 
-        return _source_mapping[_source](
+        if ds_source == "dataSource":
+            instance_source = DataSource(
+                client=self.client,
+                name=instance_source[ds_source].name,
+                namespace=instance_source[ds_source].namespace,
+                ensure_exists=True,
+            ).instance.spec.source
+            ds_source = next(iter(instance_source))[0]
+
+        source_mapping = {"pvc": PersistentVolumeClaim, "snapshot": VolumeSnapshot}
+
+        return source_mapping[ds_source](
             client=self.client,
-            name=_instance_source[_source].name,
-            namespace=_instance_source[_source].namespace,
+            name=instance_source[ds_source].name,
+            namespace=instance_source[ds_source].namespace,
         )
