@@ -12,6 +12,12 @@ class Template(NamespacedResource):
         FLAVOR = "flavor.template.kubevirt.io"
         OS = "os.template.kubevirt.io"
         WORKLOAD = "workload.template.kubevirt.io"
+        ARCHITECTURE = f"{NamespacedResource.ApiGroup.TEMPLATE_KUBEVIRT_IO}/architecture"
+
+    class Architecture:
+        AMD64 = "amd64"
+        ARM64 = "arm64"
+        S390X = "s390x"
 
     class Workload:
         DESKTOP = "desktop"
@@ -61,9 +67,12 @@ class Template(NamespacedResource):
         return response.to_dict()["objects"]
 
     @staticmethod
-    def generate_template_labels(os, workload, flavor):
-        return [
-            f"{Template.Labels.OS}/{os}",
-            (f"{Template.Labels.WORKLOAD}/{getattr(Template.Workload, workload.upper())}"),
-            f"{Template.Labels.FLAVOR}/{getattr(Template.Flavor, flavor.upper())}",
+    def generate_template_labels(os, workload, flavor, architecture=None):
+        labels = [
+            f"{Template.Labels.OS}/{os}=true",
+            f"{Template.Labels.WORKLOAD}/{getattr(Template.Workload, workload.upper())}=true",
+            f"{Template.Labels.FLAVOR}/{getattr(Template.Flavor, flavor.upper())}=true",
         ]
+        if architecture:
+            labels.append(f"{Template.Labels.ARCHITECTURE}={getattr(Template.Architecture, architecture.upper())}")
+        return labels
