@@ -30,6 +30,7 @@ class ResourceConstants:
         NETWORK_READY: str = "NetworkReady"
         ARCHIVED: str = "Archived"
         CANCELED: str = "Canceled"
+        UP_TO_DATE: str = "UpToDate"
 
         class Status:
             TRUE: str = "True"
