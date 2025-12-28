@@ -30,6 +30,7 @@ class Pod(NamespacedResource):
         host_pid: bool | None = None,
         host_users: bool | None = None,
         hostname: str | None = None,
+        hostname_override: str | None = None,
         image_pull_secrets: list[Any] | None = None,
         init_containers: list[Any] | None = None,
         node_name: str | None = None,
@@ -96,26 +97,27 @@ class Pod(NamespacedResource):
               should be automatically mounted.
 
             containers (list[Any]): args command env name value valueFrom configMapKeyRef key name
-              fieldRef apiVersion fieldPath resourceFieldRef containerName
-              divisor resource secretKeyRef key name envFrom configMapRef name
-              prefix secretRef name image imagePullPolicy enum: Always,
-              IfNotPresent, Never lifecycle postStart exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port preStop exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
+              fieldRef apiVersion fieldPath fileKeyRef key optional path
+              volumeName resourceFieldRef containerName divisor resource
+              secretKeyRef key name envFrom configMapRef name prefix secretRef
+              name image imagePullPolicy enum: Always, IfNotPresent, Never
+              lifecycle postStart exec command httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket
+              host port preStop exec command httpGet host httpHeaders name value
+              path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host
+              port stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy restartPolicyRules action
+              exitCodes operator values securityContext allowPrivilegeEscalation
               appArmorProfile localhostProfile type enum: Localhost,
               RuntimeDefault, Unconfined capabilities add drop privileged
               procMount enum: Default, Unmasked readOnlyRootFilesystem
@@ -147,26 +149,27 @@ class Pod(NamespacedResource):
               of Docker links. Optional: Defaults to true.
 
             ephemeral_containers (list[Any]): args command env name value valueFrom configMapKeyRef key name
-              fieldRef apiVersion fieldPath resourceFieldRef containerName
-              divisor resource secretKeyRef key name envFrom configMapRef name
-              prefix secretRef name image imagePullPolicy enum: Always,
-              IfNotPresent, Never lifecycle postStart exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port preStop exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
+              fieldRef apiVersion fieldPath fileKeyRef key optional path
+              volumeName resourceFieldRef containerName divisor resource
+              secretKeyRef key name envFrom configMapRef name prefix secretRef
+              name image imagePullPolicy enum: Always, IfNotPresent, Never
+              lifecycle postStart exec command httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket
+              host port preStop exec command httpGet host httpHeaders name value
+              path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host
+              port stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy restartPolicyRules action
+              exitCodes operator values securityContext allowPrivilegeEscalation
               appArmorProfile localhostProfile type enum: Localhost,
               RuntimeDefault, Unconfined capabilities add drop privileged
               procMount enum: Default, Unmasked readOnlyRootFilesystem
@@ -189,8 +192,11 @@ class Pod(NamespacedResource):
             host_ipc (bool): Use the host's ipc namespace. Optional: Default to false.
 
             host_network (bool): Host networking requested for this pod. Use the host's network
-              namespace. If this option is set, the ports that will be used must
-              be specified. Default to false.
+              namespace. When using HostNetwork you should specify ports so the
+              scheduler is aware. When `hostNetwork` is true, specified
+              `hostPort` fields in port definitions must match `containerPort`,
+              and unspecified `hostPort` fields in port definitions are
+              defaulted to match `containerPort`. Default to false.
 
             host_pid (bool): Use the host's pid namespace. Optional: Default to false.
 
@@ -208,6 +214,13 @@ class Pod(NamespacedResource):
             hostname (str): Specifies the hostname of the Pod If not specified, the pod's hostname
               will be set to a system-defined value.
 
+            hostname_override (str): HostnameOverride specifies an explicit override for the pod's hostname
+              as perceived by the pod. This field only specifies the pod's
+              hostname and does not affect its DNS records. When this field is
+              set to a non-empty string: - It takes precedence over the values
+              set in `hostname` and `subdomain`. - The Pod's hostname will be
+              set to this value.
+
             image_pull_secrets (list[Any]): ImagePullSecrets is an optional list of references to secrets in the
               same namespace to use for pulling any of the images used by this
               PodSpec. If specified, these secrets will be passed to individual
@@ -216,26 +229,27 @@ class Pod(NamespacedResource):
               imagepullsecrets-on-a-pod.
 
             init_containers (list[Any]): args command env name value valueFrom configMapKeyRef key name
-              fieldRef apiVersion fieldPath resourceFieldRef containerName
-              divisor resource secretKeyRef key name envFrom configMapRef name
-              prefix secretRef name image imagePullPolicy enum: Always,
-              IfNotPresent, Never lifecycle postStart exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port preStop exec command httpGet host
-              httpHeaders name value path port scheme enum: HTTP, HTTPS sleep
-              seconds tcpSocket host port stopSignal enum: SIGABRT, SIGALRM,
-              SIGBUS, SIGCHLD, .... livenessProbe exec command failureThreshold
-              grpc port service httpGet host httpHeaders name value path port
-              scheme enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
+              fieldRef apiVersion fieldPath fileKeyRef key optional path
+              volumeName resourceFieldRef containerName divisor resource
+              secretKeyRef key name envFrom configMapRef name prefix secretRef
+              name image imagePullPolicy enum: Always, IfNotPresent, Never
+              lifecycle postStart exec command httpGet host httpHeaders name
+              value path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket
+              host port preStop exec command httpGet host httpHeaders name value
+              path port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host
+              port stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy restartPolicyRules action
+              exitCodes operator values securityContext allowPrivilegeEscalation
               appArmorProfile localhostProfile type enum: Localhost,
               RuntimeDefault, Unconfined capabilities add drop privileged
               procMount enum: Default, Unmasked readOnlyRootFilesystem
@@ -273,7 +287,8 @@ class Pod(NamespacedResource):
               linux, the following fields must be unset:
               -securityContext.windowsOptions If the OS field is set to windows,
               following fields must be unset: - spec.hostPID - spec.hostIPC -
-              spec.hostUsers - spec.securityContext.appArmorProfile -
+              spec.hostUsers - spec.resources -
+              spec.securityContext.appArmorProfile -
               spec.securityContext.seLinuxOptions -
               spec.securityContext.seccompProfile - spec.securityContext.fsGroup
               - spec.securityContext.fsGroupChangePolicy -
@@ -438,15 +453,17 @@ class Pod(NamespacedResource):
               labelSelector matchExpressions key operator values matchLabels
               name path signerName configMap items key mode path name
               downwardAPI items fieldRef apiVersion fieldPath mode path
-              resourceFieldRef containerName divisor resource secret items key
-              mode path name serviceAccountToken audience expirationSeconds path
-              quobyte group readOnly registry tenant user volume rbd fsType
-              image keyring monitors pool readOnly secretRef name user scaleIO
-              fsType gateway protectionDomain readOnly secretRef name sslEnabled
-              storageMode storagePool system volumeName secret defaultMode items
-              key mode path optional secretName storageos fsType readOnly
-              secretRef name volumeName volumeNamespace vsphereVolume fsType
-              storagePolicyID storagePolicyName volumePath.
+              resourceFieldRef containerName divisor resource podCertificate
+              certificateChainPath credentialBundlePath keyPath keyType
+              maxExpirationSeconds signerName secret items key mode path name
+              serviceAccountToken audience expirationSeconds path quobyte group
+              readOnly registry tenant user volume rbd fsType image keyring
+              monitors pool readOnly secretRef name user scaleIO fsType gateway
+              protectionDomain readOnly secretRef name sslEnabled storageMode
+              storagePool system volumeName secret defaultMode items key mode
+              path optional secretName storageos fsType readOnly secretRef name
+              volumeName volumeNamespace vsphereVolume fsType storagePolicyID
+              storagePolicyName volumePath.
 
         """
         super().__init__(**kwargs)
@@ -465,6 +482,7 @@ class Pod(NamespacedResource):
         self.host_pid = host_pid
         self.host_users = host_users
         self.hostname = hostname
+        self.hostname_override = hostname_override
         self.image_pull_secrets = image_pull_secrets
         self.init_containers = init_containers
         self.node_name = node_name
@@ -543,6 +561,9 @@ class Pod(NamespacedResource):
 
             if self.hostname is not None:
                 _spec["hostname"] = self.hostname
+
+            if self.hostname_override is not None:
+                _spec["hostnameOverride"] = self.hostname_override
 
             if self.image_pull_secrets is not None:
                 _spec["imagePullSecrets"] = self.image_pull_secrets
