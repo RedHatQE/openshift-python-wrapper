@@ -56,10 +56,10 @@ class APIServer(Resource):
               secure traffic.
 
             tls_security_profile (dict[str, Any]): tlsSecurityProfile specifies settings for TLS connections for
-              externally exposed servers.  If unset, a default (which may change
-              between releases) is chosen. Note that only Old, Intermediate and
-              Custom profiles are currently supported, and the maximum available
-              minTLSVersion is VersionTLS12.
+              externally exposed servers.  When omitted, this means no opinion
+              and the platform is left to choose a reasonable default, which is
+              subject to change over time. The current default is the
+              Intermediate profile.
 
         """
         super().__init__(**kwargs)
