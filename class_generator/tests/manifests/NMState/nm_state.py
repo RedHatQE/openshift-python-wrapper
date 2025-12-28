@@ -19,6 +19,8 @@ class NMState(Resource):
         infra_affinity: dict[str, Any] | None = None,
         infra_node_selector: dict[str, Any] | None = None,
         infra_tolerations: list[Any] | None = None,
+        log_level: str | None = None,
+        metrics_configuration: dict[str, Any] | None = None,
         node_selector: dict[str, Any] | None = None,
         probe_configuration: dict[str, Any] | None = None,
         self_sign_configuration: dict[str, Any] | None = None,
@@ -44,6 +46,14 @@ class NMState(Resource):
               InfraTolerations is specified, the webhook, metrics and the
               console plugin will be able to be scheduled on nodes with
               corresponding taints
+
+            log_level (str): LogLevel defines the log level for nmstate operations. Valid values
+              are "info" (default, minimal output) and "debug" (verbose output
+              for debugging).
+
+            metrics_configuration (dict[str, Any]): MetricsConfiguration is an optional configuration for metrics server.
+              If MetricsConfiguration is specified, the handler will use the
+              config defined here instead of its default values.
 
             node_selector (dict[str, Any]): NodeSelector is an optional selector that will be added to handler
               DaemonSet manifest for both workers and control-plane
@@ -71,6 +81,8 @@ class NMState(Resource):
         self.infra_affinity = infra_affinity
         self.infra_node_selector = infra_node_selector
         self.infra_tolerations = infra_tolerations
+        self.log_level = log_level
+        self.metrics_configuration = metrics_configuration
         self.node_selector = node_selector
         self.probe_configuration = probe_configuration
         self.self_sign_configuration = self_sign_configuration
@@ -95,6 +107,12 @@ class NMState(Resource):
 
             if self.infra_tolerations is not None:
                 _spec["infraTolerations"] = self.infra_tolerations
+
+            if self.log_level is not None:
+                _spec["logLevel"] = self.log_level
+
+            if self.metrics_configuration is not None:
+                _spec["metricsConfiguration"] = self.metrics_configuration
 
             if self.node_selector is not None:
                 _spec["nodeSelector"] = self.node_selector

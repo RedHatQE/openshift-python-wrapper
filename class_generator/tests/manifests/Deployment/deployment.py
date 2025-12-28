@@ -87,26 +87,27 @@ class Deployment(NamespacedResource):
               matchExpressions key operator values matchLabels namespaces
               topologyKey automountServiceAccountToken containers args command
               env name value valueFrom configMapKeyRef key name fieldRef
-              apiVersion fieldPath resourceFieldRef containerName divisor
-              resource secretKeyRef key name envFrom configMapRef name prefix
-              secretRef name image imagePullPolicy enum: Always, IfNotPresent,
-              Never lifecycle postStart exec command httpGet host httpHeaders
-              name value path port scheme enum: HTTP, HTTPS sleep seconds
-              tcpSocket host port preStop exec command httpGet host httpHeaders
-              name value path port scheme enum: HTTP, HTTPS sleep seconds
-              tcpSocket host port stopSignal enum: SIGABRT, SIGALRM, SIGBUS,
-              SIGCHLD, .... livenessProbe exec command failureThreshold grpc
-              port service httpGet host httpHeaders name value path port scheme
-              enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
+              apiVersion fieldPath fileKeyRef key optional path volumeName
+              resourceFieldRef containerName divisor resource secretKeyRef key
+              name envFrom configMapRef name prefix secretRef name image
+              imagePullPolicy enum: Always, IfNotPresent, Never lifecycle
+              postStart exec command httpGet host httpHeaders name value path
+              port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host port
+              preStop exec command httpGet host httpHeaders name value path port
+              scheme enum: HTTP, HTTPS sleep seconds tcpSocket host port
+              stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy restartPolicyRules action
+              exitCodes operator values securityContext allowPrivilegeEscalation
               appArmorProfile localhostProfile type enum: Localhost,
               RuntimeDefault, Unconfined capabilities add drop privileged
               procMount enum: Default, Unmasked readOnlyRootFilesystem
@@ -126,26 +127,27 @@ class Deployment(NamespacedResource):
               searches dnsPolicy enum: ClusterFirst, ClusterFirstWithHostNet,
               Default, None enableServiceLinks ephemeralContainers args command
               env name value valueFrom configMapKeyRef key name fieldRef
-              apiVersion fieldPath resourceFieldRef containerName divisor
-              resource secretKeyRef key name envFrom configMapRef name prefix
-              secretRef name image imagePullPolicy enum: Always, IfNotPresent,
-              Never lifecycle postStart exec command httpGet host httpHeaders
-              name value path port scheme enum: HTTP, HTTPS sleep seconds
-              tcpSocket host port preStop exec command httpGet host httpHeaders
-              name value path port scheme enum: HTTP, HTTPS sleep seconds
-              tcpSocket host port stopSignal enum: SIGABRT, SIGALRM, SIGBUS,
-              SIGCHLD, .... livenessProbe exec command failureThreshold grpc
-              port service httpGet host httpHeaders name value path port scheme
-              enum: HTTP, HTTPS initialDelaySeconds periodSeconds
-              successThreshold tcpSocket host port terminationGracePeriodSeconds
-              timeoutSeconds name ports containerPort hostIP hostPort name
-              protocol enum: SCTP, TCP, UDP readinessProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds resizePolicy
-              resourceName restartPolicy resources claims name request limits
-              requests restartPolicy securityContext allowPrivilegeEscalation
+              apiVersion fieldPath fileKeyRef key optional path volumeName
+              resourceFieldRef containerName divisor resource secretKeyRef key
+              name envFrom configMapRef name prefix secretRef name image
+              imagePullPolicy enum: Always, IfNotPresent, Never lifecycle
+              postStart exec command httpGet host httpHeaders name value path
+              port scheme enum: HTTP, HTTPS sleep seconds tcpSocket host port
+              preStop exec command httpGet host httpHeaders name value path port
+              scheme enum: HTTP, HTTPS sleep seconds tcpSocket host port
+              stopSignal enum: SIGABRT, SIGALRM, SIGBUS, SIGCHLD, ....
+              livenessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds name ports
+              containerPort hostIP hostPort name protocol enum: SCTP, TCP, UDP
+              readinessProbe exec command failureThreshold grpc port service
+              httpGet host httpHeaders name value path port scheme enum: HTTP,
+              HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
+              host port terminationGracePeriodSeconds timeoutSeconds
+              resizePolicy resourceName restartPolicy resources claims name
+              request limits requests restartPolicy restartPolicyRules action
+              exitCodes operator values securityContext allowPrivilegeEscalation
               appArmorProfile localhostProfile type enum: Localhost,
               RuntimeDefault, Unconfined capabilities add drop privileged
               procMount enum: Default, Unmasked readOnlyRootFilesystem
@@ -163,9 +165,10 @@ class Deployment(NamespacedResource):
               mountPropagation enum: Bidirectional, HostToContainer, None name
               readOnly recursiveReadOnly subPath subPathExpr workingDir
               hostAliases hostnames ip hostIPC hostNetwork hostPID hostUsers
-              hostname imagePullSecrets name initContainers args command env
-              name value valueFrom configMapKeyRef key name fieldRef apiVersion
-              fieldPath resourceFieldRef containerName divisor resource
+              hostname hostnameOverride imagePullSecrets name initContainers
+              args command env name value valueFrom configMapKeyRef key name
+              fieldRef apiVersion fieldPath fileKeyRef key optional path
+              volumeName resourceFieldRef containerName divisor resource
               secretKeyRef key name envFrom configMapRef name prefix secretRef
               name image imagePullPolicy enum: Always, IfNotPresent, Never
               lifecycle postStart exec command httpGet host httpHeaders name
@@ -183,19 +186,19 @@ class Deployment(NamespacedResource):
               HTTPS initialDelaySeconds periodSeconds successThreshold tcpSocket
               host port terminationGracePeriodSeconds timeoutSeconds
               resizePolicy resourceName restartPolicy resources claims name
-              request limits requests restartPolicy securityContext
-              allowPrivilegeEscalation appArmorProfile localhostProfile type
-              enum: Localhost, RuntimeDefault, Unconfined capabilities add drop
-              privileged procMount enum: Default, Unmasked
-              readOnlyRootFilesystem runAsGroup runAsNonRoot runAsUser
-              seLinuxOptions level role type user seccompProfile
-              localhostProfile type enum: Localhost, RuntimeDefault, Unconfined
-              windowsOptions gmsaCredentialSpec gmsaCredentialSpecName
-              hostProcess runAsUserName startupProbe exec command
-              failureThreshold grpc port service httpGet host httpHeaders name
-              value path port scheme enum: HTTP, HTTPS initialDelaySeconds
-              periodSeconds successThreshold tcpSocket host port
-              terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
+              request limits requests restartPolicy restartPolicyRules action
+              exitCodes operator values securityContext allowPrivilegeEscalation
+              appArmorProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined capabilities add drop privileged
+              procMount enum: Default, Unmasked readOnlyRootFilesystem
+              runAsGroup runAsNonRoot runAsUser seLinuxOptions level role type
+              user seccompProfile localhostProfile type enum: Localhost,
+              RuntimeDefault, Unconfined windowsOptions gmsaCredentialSpec
+              gmsaCredentialSpecName hostProcess runAsUserName startupProbe exec
+              command failureThreshold grpc port service httpGet host
+              httpHeaders name value path port scheme enum: HTTP, HTTPS
+              initialDelaySeconds periodSeconds successThreshold tcpSocket host
+              port terminationGracePeriodSeconds timeoutSeconds stdin stdinOnce
               terminationMessagePath terminationMessagePolicy enum:
               FallbackToLogsOnError, File tty volumeDevices devicePath name
               volumeMounts mountPath mountPropagation enum: Bidirectional,
@@ -257,14 +260,16 @@ class Deployment(NamespacedResource):
               matchExpressions key operator values matchLabels name path
               signerName configMap items key mode path name downwardAPI items
               fieldRef apiVersion fieldPath mode path resourceFieldRef
-              containerName divisor resource secret items key mode path name
-              serviceAccountToken audience expirationSeconds path quobyte group
-              readOnly registry tenant user volume rbd fsType image keyring
-              monitors pool readOnly secretRef name user scaleIO fsType gateway
-              protectionDomain readOnly secretRef name sslEnabled storageMode
-              storagePool system volumeName secret defaultMode items key mode
-              path optional secretName storageos fsType readOnly secretRef name
-              volumeName volumeNamespace vsphereVolume fsType storagePolicyID
+              containerName divisor resource podCertificate certificateChainPath
+              credentialBundlePath keyPath keyType maxExpirationSeconds
+              signerName secret items key mode path name serviceAccountToken
+              audience expirationSeconds path quobyte group readOnly registry
+              tenant user volume rbd fsType image keyring monitors pool readOnly
+              secretRef name user scaleIO fsType gateway protectionDomain
+              readOnly secretRef name sslEnabled storageMode storagePool system
+              volumeName secret defaultMode items key mode path optional
+              secretName storageos fsType readOnly secretRef name volumeName
+              volumeNamespace vsphereVolume fsType storagePolicyID
               storagePolicyName volumePath.
 
         """
