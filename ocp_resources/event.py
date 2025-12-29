@@ -107,13 +107,9 @@ class Event:
             resource_version (str): filter events by their resource's version
             timeout (int): timeout in seconds
 
-        Returns
-            list: event objects
-
-        example: deleting all the event with a reason of "AnEventReason", from "my-namespace" namespace
-
-        def delete_events_before_test(default_client):
-          Event.delete_events(default_client, namespace=my-namespace, field_selector="reason=AnEventReason")
+        example: deleting all the events with a reason of "AnEventReason", from "my-namespace" namespace
+            def delete_events_before_test(client):
+                Event.delete_events(client=client, namespace="my-namespace", field_selector="reason=AnEventReason")
         """
         _client = client or dyn_client
 
