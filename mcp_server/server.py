@@ -232,7 +232,7 @@ def list_resources(
             kwargs["limit"] = limit
 
         resources = []
-        for resource in resource_class.get(dyn_client=client, **kwargs):
+        for resource in resource_class.get(client=client, **kwargs):
             resources.append(format_resource_info(resource))
 
         return {

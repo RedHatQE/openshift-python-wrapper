@@ -67,8 +67,8 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> ResourceField | None:
-    results = dyn_client.resources.search(group=api_group, kind=kind)
+def _find_supported_resource(client: DynamicClient, api_group: str, kind: str) -> ResourceField | None:
+    results = client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
     for result in sorted_results:
         if KubeAPIVersion(result.api_version) <= KubeAPIVersion(MAX_SUPPORTED_API_VERSION):
@@ -76,9 +76,9 @@ def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: st
     return None
 
 
-def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> str:
+def _get_api_version(client: DynamicClient, api_group: str, kind: str) -> str:
     # Returns api_group/api_version
-    res = _find_supported_resource(dyn_client=dyn_client, api_group=api_group, kind=kind)
+    res = _find_supported_resource(client=client, api_group=api_group, kind=kind)
     log = f"Couldn't find {kind} in {api_group} api group"
 
     if not res:
@@ -849,13 +849,13 @@ class Resource(ResourceConstants):
 
     @classmethod
     def _prepare_resources(
-        cls, dyn_client: DynamicClient, singular_name: str, *args: Any, **kwargs: Any
+        cls, client: DynamicClient, singular_name: str, *args: Any, **kwargs: Any
     ) -> ResourceInstance:
         if not cls.api_version:
-            cls.api_version = _get_api_version(dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind)
+            cls.api_version = _get_api_version(client=client, api_group=cls.api_group, kind=cls.kind)
 
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
-        return dyn_client.resources.get(
+        return client.resources.get(
             kind=cls.kind,
             api_version=cls.api_version,
             **get_kwargs,
@@ -870,7 +870,7 @@ class Resource(ResourceConstants):
 
     def _set_api_version(self) -> None:
         if not self.api_version:
-            self.api_version = _get_api_version(dyn_client=self.client, api_group=self.api_group, kind=self.kind)
+            self.api_version = _get_api_version(client=self.client, api_group=self.api_group, kind=self.kind)
 
     def full_api(self, **kwargs: Any) -> ResourceInstance:
         """
@@ -1157,12 +1157,12 @@ class Resource(ResourceConstants):
     def get(
         cls,
         client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
+        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
         config_file: str = "",
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         context: str | None = None,
-        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
         *args: Any,
         **kwargs: Any,
     ) -> Generator[Any, None, None]:
@@ -1193,7 +1193,7 @@ class Resource(ResourceConstants):
             _client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(*args, dyn_client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(*args, client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
                     if raw:
@@ -1405,7 +1405,7 @@ class Resource(ResourceConstants):
         if field_selector:
             field_selector = f"{_field_selector},{field_selector}"
         yield from Event.get(
-            dyn_client=self.client,
+            client=self.client,
             namespace=self.namespace,
             name=name,
             label_selector=label_selector,
@@ -1628,12 +1628,12 @@ class NamespacedResource(Resource):
     def get(
         cls,
         client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
+        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
         config_file: str = "",
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         context: str | None = None,
-        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
         *args: Any,
         **kwargs: Any,
     ) -> Generator[Any, None, None]:
@@ -1664,7 +1664,7 @@ class NamespacedResource(Resource):
             _client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(*args, dyn_client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(*args, client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
                     if raw:
@@ -1780,7 +1780,7 @@ class ResourceEditor:
                         # happens in 'ServiceMonitor' resource.
                         original_resource_dict = list(
                             resource.get(
-                                dyn_client=resource.client,
+                                client=resource.client,
                                 field_selector=f"metadata.name={resource.name}",
                             )
                         )[0].to_dict()

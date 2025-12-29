@@ -111,13 +111,13 @@ class NodeNetworkConfigurationPolicy(Resource):
     def _nodes(self):
         if self.node_selector:
             return list(
-                Node.get(dyn_client=self.client, name=self.node_selector[f"{self.ApiGroup.KUBERNETES_IO}/hostname"])
+                Node.get(client=self.client, name=self.node_selector[f"{self.ApiGroup.KUBERNETES_IO}/hostname"])
             )
         if self.node_selector_labels:
             node_labels = ",".join([
                 f"{label_key}={label_value}" for label_key, label_value in self.node_selector_labels.items()
             ])
-            return list(Node.get(dyn_client=self.client, label_selector=node_labels))
+            return list(Node.get(client=self.client, label_selector=node_labels))
 
     def set_interface(self, interface):
         if not self.res:
@@ -441,7 +441,7 @@ class NodeNetworkConfigurationPolicy(Resource):
     @property
     def nnces(self):
         nnces = []
-        for nnce in NodeNetworkConfigurationEnactment.get(dyn_client=self.client):
+        for nnce in NodeNetworkConfigurationEnactment.get(client=self.client):
             if nnce.name.endswith(f".{self.name}"):
                 nnces.append(nnce)
         return nnces
