@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import threading
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Generator
 from io import StringIO
@@ -652,6 +653,13 @@ class Resource(ResourceConstants):
         self.context = context
         self.label = label
         self.annotations = annotations
+        if not client:
+            warnings.warn(
+                "'client' arg will be mandatory in the next major release. "
+                "`config_file` and `context` args will be removed.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
         self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
@@ -861,6 +869,7 @@ class Resource(ResourceConstants):
         return kwargs
 
     def _set_client_and_api_version(self) -> None:
+        # TODO: remove this condition once `client` becomes mandatory
         if not self.client:
             self.client = get_client(config_file=self.config_file, context=self.context)
 
@@ -1175,6 +1184,12 @@ class Resource(ResourceConstants):
             generator: Generator of Resources of cls.kind.
         """
         if not dyn_client:
+            warnings.warn(
+                "'dyn_client' arg will be mandatory in the next major release. "
+                "`config_file` and `context` will be removed.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
@@ -1427,6 +1442,12 @@ class Resource(ResourceConstants):
                 print(f"Resource: {resource}")
         """
         if not client:
+            warnings.warn(
+                "'client' arg will be mandatory in the next major release. "
+                "`config_file`, `config_dict` and `context` will be removed.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             client = get_client(config_file=config_file, config_dict=config_dict, context=context)
 
         for _resource in client.resources.search():
@@ -1630,6 +1651,12 @@ class NamespacedResource(Resource):
             generator: Generator of Resources of cls.kind
         """
         if not dyn_client:
+            warnings.warn(
+                "'dyn_client' arg will be mandatory in the next major release. "
+                "`config_file` and `context` will be removed.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             dyn_client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
