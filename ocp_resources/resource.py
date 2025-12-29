@@ -657,7 +657,7 @@ class Resource(ResourceConstants):
             warnings.warn(
                 "'client' arg will be mandatory in the next major release. "
                 "`config_file` and `context` args will be removed.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=2,
             )
         self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
@@ -1187,7 +1187,7 @@ class Resource(ResourceConstants):
             warnings.warn(
                 "'dyn_client' arg will be mandatory in the next major release. "
                 "`config_file` and `context` will be removed.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=2,
             )
             dyn_client = get_client(config_file=config_file, context=context)
@@ -1445,7 +1445,7 @@ class Resource(ResourceConstants):
             warnings.warn(
                 "'client' arg will be mandatory in the next major release. "
                 "`config_file`, `config_dict` and `context` will be removed.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=2,
             )
             client = get_client(config_file=config_file, config_dict=config_dict, context=context)
@@ -1654,7 +1654,7 @@ class NamespacedResource(Resource):
             warnings.warn(
                 "'dyn_client' arg will be mandatory in the next major release. "
                 "`config_file` and `context` will be removed.",
-                DeprecationWarning,
+                FutureWarning,
                 stacklevel=2,
             )
             dyn_client = get_client(config_file=config_file, context=context)
