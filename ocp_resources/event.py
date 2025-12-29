@@ -15,6 +15,24 @@ class Event:
 
     api_version = "v1"
 
+    # TODO: remove once `client` is mandatory
+    @staticmethod
+    def _resolve_client(
+        client: DynamicClient | None,
+        dyn_client: DynamicClient | None,
+    ) -> DynamicClient:
+        """Resolve client from new or deprecated parameter with deprecation warning."""
+        if client is None and dyn_client is not None:
+            warnings.warn(
+                "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release.",
+                FutureWarning,
+                stacklevel=3,  # Adjusted for helper function call
+            )
+
+        resolved = client or dyn_client
+        assert resolved is not None, "Either 'client' or 'dyn_client' must be provided"
+        return resolved
+
     @classmethod
     def get(
         cls,
@@ -53,15 +71,7 @@ class Event:
               ):
                 print(event.object)
         """
-        _client = client or dyn_client
-
-        warnings.warn(
-            "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release. ",
-            FutureWarning,
-            stacklevel=2,
-        )
-
-        assert _client is not None, "Either 'client' or 'dyn_client' must be provided"
+        _client = cls._resolve_client(client, dyn_client)
 
         LOGGER.info("Reading events")
         LOGGER.debug(
@@ -111,15 +121,7 @@ class Event:
             def delete_events_before_test(client):
                 Event.delete_events(client=client, namespace="my-namespace", field_selector="reason=AnEventReason")
         """
-        _client = client or dyn_client
-
-        warnings.warn(
-            "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release. ",
-            FutureWarning,
-            stacklevel=2,
-        )
-
-        assert _client is not None, "Either 'client' or 'dyn_client' must be provided"
+        _client = cls._resolve_client(client, dyn_client)
 
         LOGGER.info("Deleting events")
         LOGGER.debug(
