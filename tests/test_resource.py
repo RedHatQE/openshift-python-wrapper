@@ -62,7 +62,7 @@ def pods(fake_client, namespaces):
 @pytest.mark.incremental
 class TestResource:
     def test_get(self, fake_client):
-        for ns in Namespace.get(dyn_client=fake_client):
+        for ns in Namespace.get(client=fake_client):
             assert ns.name
 
     def test_create(self, namespace):

@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import threading
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Generator
 from io import StringIO
@@ -66,8 +67,8 @@ LOGGER = get_logger(name=__name__)
 MAX_SUPPORTED_API_VERSION = "v2"
 
 
-def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: str) -> ResourceField | None:
-    results = dyn_client.resources.search(group=api_group, kind=kind)
+def _find_supported_resource(client: DynamicClient, api_group: str, kind: str) -> ResourceField | None:
+    results = client.resources.search(group=api_group, kind=kind)
     sorted_results = sorted(results, key=lambda result: KubeAPIVersion(result.api_version), reverse=True)
     for result in sorted_results:
         if KubeAPIVersion(result.api_version) <= KubeAPIVersion(MAX_SUPPORTED_API_VERSION):
@@ -75,9 +76,9 @@ def _find_supported_resource(dyn_client: DynamicClient, api_group: str, kind: st
     return None
 
 
-def _get_api_version(dyn_client: DynamicClient, api_group: str, kind: str) -> str:
+def _get_api_version(client: DynamicClient, api_group: str, kind: str) -> str:
     # Returns api_group/api_version
-    res = _find_supported_resource(dyn_client=dyn_client, api_group=api_group, kind=kind)
+    res = _find_supported_resource(client=client, api_group=api_group, kind=kind)
     log = f"Couldn't find {kind} in {api_group} api group"
 
     if not res:
@@ -589,8 +590,8 @@ class Resource(ResourceConstants):
 
     def __init__(
         self,
+        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
         name: str | None = None,
-        client: DynamicClient | None = None,
         teardown: bool = True,
         yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
@@ -652,6 +653,13 @@ class Resource(ResourceConstants):
         self.context = context
         self.label = label
         self.annotations = annotations
+        if not client:
+            warnings.warn(
+                "'client' arg will be mandatory in the next major release. "
+                "`config_file` and `context` args will be removed.",
+                FutureWarning,
+                stacklevel=2,
+            )
         self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
@@ -676,8 +684,8 @@ class Resource(ResourceConstants):
         # Set instance-level validation flag
         self.schema_validation_enabled = schema_validation_enabled
 
-        # self._set_client_and_api_version() must be last init line
-        self._set_client_and_api_version()
+        # self._set_api_version() must be last init line
+        self._set_api_version()
 
     def _ensure_exists(self) -> None:
         if not self.exists:
@@ -841,13 +849,13 @@ class Resource(ResourceConstants):
 
     @classmethod
     def _prepare_resources(
-        cls, dyn_client: DynamicClient, singular_name: str, *args: Any, **kwargs: Any
+        cls, client: DynamicClient, singular_name: str, *args: Any, **kwargs: Any
     ) -> ResourceInstance:
         if not cls.api_version:
-            cls.api_version = _get_api_version(dyn_client=dyn_client, api_group=cls.api_group, kind=cls.kind)
+            cls.api_version = _get_api_version(client=client, api_group=cls.api_group, kind=cls.kind)
 
         get_kwargs = {"singular_name": singular_name} if singular_name else {}
-        return dyn_client.resources.get(
+        return client.resources.get(
             kind=cls.kind,
             api_version=cls.api_version,
             **get_kwargs,
@@ -860,12 +868,9 @@ class Resource(ResourceConstants):
 
         return kwargs
 
-    def _set_client_and_api_version(self) -> None:
-        if not self.client:
-            self.client = get_client(config_file=self.config_file, context=self.context)
-
+    def _set_api_version(self) -> None:
         if not self.api_version:
-            self.api_version = _get_api_version(dyn_client=self.client, api_group=self.api_group, kind=self.kind)
+            self.api_version = _get_api_version(client=self.client, api_group=self.api_group, kind=self.kind)
 
     def full_api(self, **kwargs: Any) -> ResourceInstance:
         """
@@ -886,7 +891,7 @@ class Resource(ResourceConstants):
         Returns:
             Resource: Resource object.
         """
-        self._set_client_and_api_version()
+        self._set_api_version()
 
         kwargs = self._prepare_singular_name_kwargs(**kwargs)
 
@@ -1151,12 +1156,13 @@ class Resource(ResourceConstants):
     @classmethod
     def get(
         cls,
+        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
+        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
         config_file: str = "",
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         context: str | None = None,
-        dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> Generator[Any, None, None]:
@@ -1164,6 +1170,7 @@ class Resource(ResourceConstants):
         Get resources
 
         Args:
+            client (DynamicClient): k8s client
             dyn_client (DynamicClient): Open connection to remote cluster.
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
@@ -1174,23 +1181,31 @@ class Resource(ResourceConstants):
         Returns:
             generator: Generator of Resources of cls.kind.
         """
-        if not dyn_client:
-            dyn_client = get_client(config_file=config_file, context=context)
+        _client = client or dyn_client
+
+        if not _client:
+            warnings.warn(
+                "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release. "
+                "`config_file` and `context` will be removed.",
+                FutureWarning,
+                stacklevel=2,
+            )
+            _client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(*args, dyn_client=dyn_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(*args, client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
                     if raw:
                         yield _resources
                     else:
-                        yield cls(client=dyn_client, name=resource_field.metadata.name)
+                        yield cls(client=_client, name=resource_field.metadata.name)
 
             except TypeError:
                 if raw:
                     yield _resources
                 else:
-                    yield cls(client=dyn_client, name=_resources.metadata.name)
+                    yield cls(client=_client, name=_resources.metadata.name)
 
         return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
@@ -1390,7 +1405,7 @@ class Resource(ResourceConstants):
         if field_selector:
             field_selector = f"{_field_selector},{field_selector}"
         yield from Event.get(
-            dyn_client=self.client,
+            client=self.client,
             namespace=self.namespace,
             name=name,
             label_selector=label_selector,
@@ -1401,7 +1416,7 @@ class Resource(ResourceConstants):
 
     @staticmethod
     def get_all_cluster_resources(
-        client: DynamicClient | None = None,
+        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
         config_file: str = "",
         context: str | None = None,
         config_dict: dict[str, Any] | None = None,
@@ -1427,6 +1442,12 @@ class Resource(ResourceConstants):
                 print(f"Resource: {resource}")
         """
         if not client:
+            warnings.warn(
+                "'client' arg will be mandatory in the next major release. "
+                "`config_file`, `config_dict` and `context` will be removed.",
+                FutureWarning,
+                stacklevel=2,
+            )
             client = get_client(config_file=config_file, config_dict=config_dict, context=context)
 
         for _resource in client.resources.search():
@@ -1606,12 +1627,13 @@ class NamespacedResource(Resource):
     @classmethod
     def get(
         cls,
+        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
+        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
         config_file: str = "",
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
         context: str | None = None,
-        dyn_client: DynamicClient | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> Generator[Any, None, None]:
@@ -1619,6 +1641,7 @@ class NamespacedResource(Resource):
         Get resources
 
         Args:
+            client (DynamicClient): k8s client
             dyn_client (DynamicClient): Open connection to remote cluster
             config_file (str): Path to config file for connecting to remote cluster.
             context (str): Context name for connecting to remote cluster.
@@ -1629,18 +1652,26 @@ class NamespacedResource(Resource):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        if not dyn_client:
-            dyn_client = get_client(config_file=config_file, context=context)
+        _client = client or dyn_client
+
+        if not _client:
+            warnings.warn(
+                "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release. "
+                "`config_file` and `context` will be removed.",
+                FutureWarning,
+                stacklevel=2,
+            )
+            _client = get_client(config_file=config_file, context=context)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(*args, dyn_client=dyn_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(*args, client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
             try:
                 for resource_field in _resources.items:
                     if raw:
                         yield resource_field
                     else:
                         yield cls(
-                            client=dyn_client,
+                            client=_client,
                             name=resource_field.metadata.name,
                             namespace=resource_field.metadata.namespace,
                         )
@@ -1649,7 +1680,7 @@ class NamespacedResource(Resource):
                     yield _resources
                 else:
                     yield cls(
-                        client=dyn_client,
+                        client=_client,
                         name=_resources.metadata.name,
                         namespace=_resources.metadata.namespace,
                     )
@@ -1749,7 +1780,7 @@ class ResourceEditor:
                         # happens in 'ServiceMonitor' resource.
                         original_resource_dict = list(
                             resource.get(
-                                dyn_client=resource.client,
+                                client=resource.client,
                                 field_selector=f"metadata.name={resource.name}",
                             )
                         )[0].to_dict()
