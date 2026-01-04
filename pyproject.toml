@@ -60,12 +60,12 @@ requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9, <3.14"
 xmltodict = "^0.13.0"
 colorlog = "^6.7.0"
 kubernetes = "30.*.*"
 python-benedict = "^0.33.0"
-packaging = "^23.1"
+packaging = ">=24.0"
 python-simple-logger = ">=1.0.6"
 jinja2 = "^3.1.2"
 timeout-sampler = ">=0.0.17"

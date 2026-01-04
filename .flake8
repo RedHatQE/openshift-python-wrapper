@@ -55,6 +55,7 @@ fcn_exclude_functions =
     Path,
     writelines,
     submit,
+    datetime,
 
 enable-extensions =
     FCN,
