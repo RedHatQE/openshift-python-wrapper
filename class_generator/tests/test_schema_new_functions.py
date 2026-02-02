@@ -58,19 +58,19 @@ class TestReadResourcesMappingFile:
     """Test read_resources_mapping_file function."""
 
     @patch("class_generator.core.schema.SchemaValidator")
-    def test_successful_mapping_load(self, mock_schema_validator):
+    def test_successful_mapping_load(self, _mock_schema_validator):
         """Test successful loading of resources mapping."""
         expected_mapping = {"pod": [{"kind": "Pod"}], "service": [{"kind": "Service"}]}
-        mock_schema_validator.load_mappings_data.return_value = True
-        mock_schema_validator.get_mappings_data.return_value = expected_mapping
+        _mock_schema_validator.load_mappings_data.return_value = True
+        _mock_schema_validator.get_mappings_data.return_value = expected_mapping
 
         result = read_resources_mapping_file()
         assert result == expected_mapping
 
     @patch("class_generator.core.schema.SchemaValidator")
-    def test_mapping_load_failure_returns_empty_dict(self, mock_schema_validator):
+    def test_mapping_load_failure_returns_empty_dict(self, _mock_schema_validator):
         """Test that empty dict is returned when mapping load fails."""
-        mock_schema_validator.load_mappings_data.return_value = False
+        _mock_schema_validator.load_mappings_data.return_value = False
 
         result = read_resources_mapping_file()
         assert result == {}
@@ -1415,7 +1415,7 @@ class TestUpdateSingleResourceSchema:
         mock_fetch_schemas,
         mock_read_mapping,
         mock_save_archive,
-        mock_schema_validator,
+        _mock_schema_validator,
     ):
         """Test adding a new resource that doesn't exist in mapping."""
         mock_get_client.return_value = "oc"
@@ -1483,7 +1483,7 @@ class TestUpdateSingleResourceSchema:
         mock_fetch_schemas,
         mock_read_mapping,
         mock_save_archive,
-        mock_schema_validator,
+        _mock_schema_validator,
     ):
         """Test updating an existing resource schema."""
         mock_get_client.return_value = "oc"

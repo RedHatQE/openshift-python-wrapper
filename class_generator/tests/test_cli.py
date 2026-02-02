@@ -291,7 +291,7 @@ class TestCLIFunctionality:
         runner = CliRunner()
 
         with patch("class_generator.cli.update_single_resource_schema") as mock_update:
-            mock_update.side_effect = ResourceNotFoundError("Resource 'FakeResource' not found on the cluster")
+            mock_update.side_effect = ResourceNotFoundError(kind="FakeResource")
 
             result = runner.invoke(cli=main, args=["--update-schema-for", "FakeResource"], catch_exceptions=False)
 
