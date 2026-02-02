@@ -9,6 +9,7 @@ import pytest
 from class_generator.constants import RESOURCES_MAPPING_FILE
 from class_generator.core.schema import (
     ClusterVersionError,
+    ResourceNotFoundError,
     _convert_type_to_schema,
     _detect_missing_refs_from_schemas,
     _infer_oc_explain_path,
@@ -23,6 +24,7 @@ from class_generator.core.schema import (
     identify_missing_resources,
     process_schema_definitions,
     read_resources_mapping_file,
+    update_single_resource_schema,
     write_schema_files,
 )
 
@@ -1391,3 +1393,190 @@ class TestConvertTypeToSchema:
         """Test conversion of various types to schema format."""
         result = _convert_type_to_schema(input_type)
         assert result == expected_schema
+
+
+class TestUpdateSingleResourceSchema:
+    """Test update_single_resource_schema function."""
+
+    @patch("class_generator.core.schema.SchemaValidator")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("class_generator.core.schema.read_resources_mapping_file")
+    @patch("class_generator.core.schema.fetch_all_api_schemas")
+    @patch("class_generator.core.schema.build_namespacing_dict")
+    @patch("class_generator.core.schema.run_command")
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_update_single_resource_schema_new_resource(
+        self,
+        mock_get_client,
+        mock_build_mapping,
+        mock_run_command,
+        mock_build_namespacing,
+        mock_fetch_schemas,
+        mock_read_mapping,
+        mock_save_archive,
+        mock_schema_validator,
+    ):
+        """Test adding a new resource that doesn't exist in mapping."""
+        mock_get_client.return_value = "oc"
+        mock_build_mapping.return_value = {"CustomResource": ["apis/custom.io/v1"]}
+        mock_run_command.return_value = (
+            True,
+            '{"paths": {"apis/custom.io/v1": {"serverRelativeURL": "/openapi/v3/apis/custom.io/v1"}}}',
+            "",
+        )
+        mock_build_namespacing.return_value = {"CustomResource": True}
+        mock_fetch_schemas.return_value = {
+            "apis/custom.io/v1": {
+                "components": {
+                    "schemas": {
+                        "io.custom.v1.CustomResource": {
+                            "type": "object",
+                            "description": "Custom resource description",
+                            "properties": {"spec": {"type": "object"}},
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "custom.io", "version": "v1", "kind": "CustomResource"}
+                            ],
+                        }
+                    }
+                }
+            }
+        }
+        mock_read_mapping.return_value = {"pod": [{"x-kubernetes-group-version-kind": [{"kind": "Pod"}]}]}
+
+        update_single_resource_schema(kind="CustomResource")
+
+        # Verify save was called with updated mapping containing the new resource
+        mock_save_archive.assert_called_once()
+        saved_mapping = mock_save_archive.call_args[0][0]
+        assert "customresource" in saved_mapping
+        assert len(saved_mapping["customresource"]) == 1
+        assert saved_mapping["customresource"][0]["namespaced"] is True
+
+    @patch("class_generator.core.schema.get_client_binary")
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    def test_update_single_resource_schema_kind_not_found(self, mock_build_mapping, mock_get_client):
+        """Test that ResourceNotFoundError is raised when kind is not on cluster."""
+        mock_get_client.return_value = "oc"
+        mock_build_mapping.return_value = {"Pod": ["api/v1"], "Deployment": ["apis/apps/v1"]}
+
+        with pytest.raises(ResourceNotFoundError) as exc_info:
+            update_single_resource_schema(kind="NonExistentResource")
+
+        assert "NonExistentResource" in str(exc_info.value)
+        assert "not found on the cluster" in str(exc_info.value)
+
+    @patch("class_generator.core.schema.SchemaValidator")
+    @patch("class_generator.core.schema.save_json_archive")
+    @patch("class_generator.core.schema.read_resources_mapping_file")
+    @patch("class_generator.core.schema.fetch_all_api_schemas")
+    @patch("class_generator.core.schema.build_namespacing_dict")
+    @patch("class_generator.core.schema.run_command")
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_update_single_resource_schema_updates_existing(
+        self,
+        mock_get_client,
+        mock_build_mapping,
+        mock_run_command,
+        mock_build_namespacing,
+        mock_fetch_schemas,
+        mock_read_mapping,
+        mock_save_archive,
+        mock_schema_validator,
+    ):
+        """Test updating an existing resource schema."""
+        mock_get_client.return_value = "oc"
+        mock_build_mapping.return_value = {"Pod": ["api/v1"]}
+        mock_run_command.return_value = (
+            True,
+            '{"paths": {"api/v1": {"serverRelativeURL": "/openapi/v3/api/v1"}}}',
+            "",
+        )
+        mock_build_namespacing.return_value = {"Pod": True}
+        mock_fetch_schemas.return_value = {
+            "api/v1": {
+                "components": {
+                    "schemas": {
+                        "io.k8s.api.core.v1.Pod": {
+                            "type": "object",
+                            "description": "Updated Pod description",
+                            "properties": {"spec": {"type": "object"}, "newField": {"type": "string"}},
+                            "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}],
+                        }
+                    }
+                }
+            }
+        }
+        # Existing mapping with old Pod schema
+        mock_read_mapping.return_value = {
+            "pod": [
+                {
+                    "description": "Old Pod description",
+                    "properties": {"spec": {"type": "object"}},
+                    "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}],
+                }
+            ]
+        }
+
+        update_single_resource_schema(kind="Pod")
+
+        # Verify save was called
+        mock_save_archive.assert_called_once()
+        saved_mapping = mock_save_archive.call_args[0][0]
+        assert "pod" in saved_mapping
+        # Verify the schema was updated
+        assert saved_mapping["pod"][0]["description"] == "Updated Pod description"
+        assert "newField" in saved_mapping["pod"][0]["properties"]
+
+    @patch("class_generator.core.schema.run_command")
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_update_single_resource_schema_v3_index_fetch_fails(
+        self, mock_get_client, mock_build_mapping, mock_run_command
+    ):
+        """Test that RuntimeError is raised when OpenAPI v3 index fetch fails."""
+        mock_get_client.return_value = "oc"
+        mock_build_mapping.return_value = {"Pod": ["api/v1"]}
+        mock_run_command.return_value = (False, "", "Connection refused")
+
+        with pytest.raises(RuntimeError) as exc_info:
+            update_single_resource_schema(kind="Pod")
+
+        assert "Failed to fetch OpenAPI v3 index" in str(exc_info.value)
+
+    @patch("class_generator.core.schema.fetch_all_api_schemas")
+    @patch("class_generator.core.schema.build_namespacing_dict")
+    @patch("class_generator.core.schema.run_command")
+    @patch("class_generator.core.schema.build_dynamic_resource_to_api_mapping")
+    @patch("class_generator.core.schema.get_client_binary")
+    def test_update_single_resource_schema_no_schema_definition(
+        self, mock_get_client, mock_build_mapping, mock_run_command, mock_build_namespacing, mock_fetch_schemas
+    ):
+        """Test that RuntimeError is raised when no schema definition found for kind."""
+        mock_get_client.return_value = "oc"
+        mock_build_mapping.return_value = {"Pod": ["api/v1"]}
+        mock_run_command.return_value = (
+            True,
+            '{"paths": {"api/v1": {"serverRelativeURL": "/openapi/v3/api/v1"}}}',
+            "",
+        )
+        mock_build_namespacing.return_value = {"Pod": True}
+        # Return schema without Pod definition
+        mock_fetch_schemas.return_value = {
+            "api/v1": {
+                "components": {
+                    "schemas": {
+                        "io.k8s.api.core.v1.ConfigMap": {
+                            "type": "object",
+                            "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "ConfigMap"}],
+                        }
+                    }
+                }
+            }
+        }
+
+        with pytest.raises(RuntimeError) as exc_info:
+            update_single_resource_schema(kind="Pod")
+
+        assert "No schema definition found for Pod" in str(exc_info.value)

@@ -12,6 +12,7 @@ from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
 from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_FILE, SCHEMA_DIR
+from class_generator.exceptions import ResourceNotFoundError
 from class_generator.utils import execute_parallel_tasks, execute_parallel_with_mapping
 from ocp_resources.utils.archive_utils import save_json_archive
 from ocp_resources.utils.schema_validator import SchemaValidator
@@ -503,6 +504,64 @@ def fetch_all_api_schemas(
     return schemas
 
 
+def _build_schema_data(
+    def_data: dict[str, Any],
+    gvk: dict[str, str],
+    is_namespaced: bool,
+) -> dict[str, Any]:
+    """Build schema data dictionary from definition data and GVK info.
+
+    Args:
+        def_data: The definition data from the API schema
+        gvk: The group-version-kind dictionary
+        is_namespaced: Whether the resource is namespaced
+
+    Returns:
+        Schema data dictionary in the format expected by SchemaValidator
+    """
+    return {
+        "description": def_data.get("description", ""),
+        "properties": def_data.get("properties", {}),
+        "required": def_data.get("required", []),
+        "type": def_data.get("type", "object"),
+        "x-kubernetes-group-version-kind": [gvk],
+        "namespaced": is_namespaced,
+    }
+
+
+def _merge_schema_into_mapping(
+    resources_mapping: dict[str, Any],
+    kind_lower: str,
+    group: str,
+    version: str,
+    schema_data: dict[str, Any],
+) -> tuple[bool, str]:
+    """Merge a schema into the resources mapping.
+
+    Args:
+        resources_mapping: The resources mapping dictionary to update
+        kind_lower: The lowercase kind name
+        group: The API group
+        version: The API version
+        schema_data: The schema data to merge
+
+    Returns:
+        Tuple of (was_updated, action_description) where action is 'updated', 'added_version', or 'added_new'
+    """
+    if kind_lower in resources_mapping:
+        existing_schemas = resources_mapping[kind_lower]
+        for i, existing_schema in enumerate(existing_schemas):
+            existing_gvk = existing_schema.get("x-kubernetes-group-version-kind", [{}])[0]
+            if existing_gvk.get("group") == group and existing_gvk.get("version") == version:
+                existing_schemas[i] = schema_data
+                return True, "updated"
+        existing_schemas.append(schema_data)
+        return True, "added_version"
+    else:
+        resources_mapping[kind_lower] = [schema_data]
+        return True, "added_new"
+
+
 def process_schema_definitions(
     schemas: dict[str, dict[str, Any]],
     namespacing_dict: dict[str, bool],
@@ -579,51 +638,27 @@ def process_schema_definitions(
             else:
                 schema_name = f"{version}/{kind}"
 
-            # Create schema data in the format expected by SchemaValidator
-            schema_data = {
-                "description": def_data.get("description", ""),
-                "properties": def_data.get("properties", {}),
-                "required": def_data.get("required", []),
-                "type": def_data.get("type", "object"),
-                "x-kubernetes-group-version-kind": [group_kind_version],
-                "namespaced": is_namespaced,
-            }
+            # Create schema data using helper function
+            schema_data = _build_schema_data(def_data, group_kind_version, is_namespaced)
 
             # Store in resources_mapping as an array (multiple schemas per kind)
             kind_lower = kind.lower()
             if kind_lower not in resources_mapping:
-                # NEW resource - always add
-                resources_mapping[kind_lower] = [schema_data]
+                # NEW resource - always add using merge helper
+                _merge_schema_into_mapping(resources_mapping, kind_lower, group, version, schema_data)
                 new_resources += 1
                 LOGGER.debug(f"Added new resource: {kind_lower}")
             elif allow_updates:
-                # UPDATE existing resource - replace schema with same group/version or add new one
-                existing_schemas = resources_mapping[kind_lower]
-                updated = False
-
-                for i, existing_schema in enumerate(existing_schemas):
-                    existing_gvk = existing_schema.get("x-kubernetes-group-version-kind", [{}])[0]
-                    new_gvk = group_kind_version
-
-                    # Check if this is the same group/version combination
-                    if existing_gvk.get("group") == new_gvk.get("group") and existing_gvk.get("version") == new_gvk.get(
-                        "version"
-                    ):
-                        # UPDATE: Replace existing schema with newer version
-                        existing_schemas[i] = schema_data
-                        updated = True
-                        updated_resources += 1
-                        LOGGER.debug(
-                            f"Updated existing resource schema: {kind_lower} ({new_gvk.get('group', 'core')}/{new_gvk.get('version')})"
-                        )
-                        break
-
-                if not updated:
-                    # ADD: New group/version for existing resource kind
-                    existing_schemas.append(schema_data)
-                    updated_resources += 1
+                # UPDATE existing resource using merge helper
+                _was_updated, action = _merge_schema_into_mapping(
+                    resources_mapping, kind_lower, group, version, schema_data
+                )
+                updated_resources += 1
+                if action == "updated":
+                    LOGGER.debug(f"Updated existing resource schema: {kind_lower} ({group or 'core'}/{version})")
+                else:
                     LOGGER.debug(
-                        f"Added new schema version for existing resource: {kind_lower} ({group_kind_version.get('group', 'core')}/{group_kind_version.get('version')})"
+                        f"Added new schema version for existing resource: {kind_lower} ({group or 'core'}/{version})"
                     )
             else:
                 # Don't update existing resources when cluster version is older
@@ -1458,6 +1493,31 @@ def _determine_update_strategy(client: str, resources_mapping: dict[Any, Any]) -
     return UpdateStrategy(should_update=should_update, missing_resources=missing_resources, need_v3_index=need_v3_index)
 
 
+def _fetch_openapi_v3_index(client: str) -> dict[str, Any]:
+    """Fetch OpenAPI v3 index from the cluster.
+
+    Args:
+        client: The client binary path
+
+    Returns:
+        Dictionary of API paths
+
+    Raises:
+        RuntimeError: If fetching the index fails
+    """
+    LOGGER.info("Fetching OpenAPI v3 index...")
+    success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
+    if not success:
+        error_msg = "Failed to fetch OpenAPI v3 index"
+        LOGGER.error(error_msg)
+        raise RuntimeError(error_msg)
+
+    v3_index = json.loads(v3_data)
+    paths = v3_index.get("paths", {})
+    LOGGER.info(f"Found {len(paths)} API groups to process")
+    return paths
+
+
 def _fetch_api_index_if_needed(client: str, need_v3_index: bool) -> dict[str, Any]:
     """Fetch OpenAPI v3 index if needed.
 
@@ -1474,17 +1534,7 @@ def _fetch_api_index_if_needed(client: str, need_v3_index: bool) -> dict[str, An
     if not need_v3_index:
         return {}
 
-    LOGGER.info("Fetching OpenAPI v3 index...")
-    success, v3_data, _ = run_command(command=shlex.split(f"{client} get --raw /openapi/v3"), check=False)
-    if not success:
-        error_msg = "Failed to fetch OpenAPI v3 index"
-        LOGGER.error(error_msg)
-        raise RuntimeError(error_msg)
-
-    v3_index = json.loads(v3_data)
-    paths = v3_index.get("paths", {})
-    LOGGER.info(f"Found {len(paths)} API groups to process")
-    return paths
+    return _fetch_openapi_v3_index(client)
 
 
 def _fetch_schemas_based_on_strategy(client: str, strategy: UpdateStrategy, paths: dict[str, Any]) -> dict[str, Any]:
@@ -1612,3 +1662,141 @@ def update_kind_schema(client: str | None = None) -> None:
         LOGGER.info(
             "No schema files updated - no schemas were fetched (either due to older cluster version with no missing resources, or transient fetch failures)"
         )
+
+
+def update_single_resource_schema(kind: str, client: str | None = None) -> None:
+    """Update schema for a single resource kind without affecting other resources.
+
+    This function is useful when connected to an older cluster but needing to update
+    a specific CRD (e.g., a newly installed operator's resources).
+
+    Args:
+        kind: The resource Kind to update (e.g., 'LlamaStackDistribution')
+        client: Path to kubectl/oc client binary. If None, will auto-detect.
+
+    Raises:
+        ResourceNotFoundError: If the kind is not found on the cluster
+        RuntimeError: If fetching the schema fails
+    """
+    if client is None:
+        client = get_client_binary()
+
+    LOGGER.info(f"Updating schema for single resource: {kind}")
+
+    # Get dynamic resource-to-API mapping to find the API path for this kind
+    resource_to_api_mapping = build_dynamic_resource_to_api_mapping(client=client)
+
+    if kind not in resource_to_api_mapping:
+        raise ResourceNotFoundError(
+            kind=kind,
+            message=(
+                f"Resource kind '{kind}' not found on the cluster. "
+                f"Ensure the CRD is installed and the kind name is correct (case-sensitive)."
+            ),
+        )
+
+    api_paths_for_kind = resource_to_api_mapping[kind]
+    LOGGER.info(f"Found API paths for {kind}: {api_paths_for_kind}")
+
+    # Fetch OpenAPI v3 index using shared helper function
+    paths = _fetch_openapi_v3_index(client)
+
+    # Filter to only the API paths for this specific kind
+    filter_paths = set()
+    for api_path in api_paths_for_kind:
+        if api_path in paths:
+            filter_paths.add(api_path)
+        else:
+            LOGGER.warning(f"API path {api_path} not found in cluster paths")
+
+    if not filter_paths:
+        raise RuntimeError(
+            f"None of the API paths for {kind} were found in the cluster. Expected paths: {api_paths_for_kind}"
+        )
+
+    LOGGER.info(f"Fetching schemas from {len(filter_paths)} API path(s): {filter_paths}")
+
+    # Fetch only the relevant API schemas
+    schemas = fetch_all_api_schemas(client=client, paths=paths, filter_paths=filter_paths)
+
+    if not schemas:
+        raise RuntimeError(
+            f"Failed to fetch schema for {kind} from API paths {filter_paths}. "
+            f"The API server returned no schema data. Check cluster connectivity and permissions."
+        )
+
+    # Build namespacing dictionary by reusing the existing function and filtering to just this resource
+    full_namespacing_dict = build_namespacing_dict(client=client)
+    if kind in full_namespacing_dict:
+        namespacing_dict = {kind: full_namespacing_dict[kind]}
+    else:
+        LOGGER.warning(f"Could not determine if {kind} is namespaced, defaulting to True")
+        namespacing_dict = {kind: True}
+
+    LOGGER.info(f"Resource {kind} is namespaced: {namespacing_dict[kind]}")
+
+    # Load existing resources mapping
+    resources_mapping = read_resources_mapping_file(skip_cache=True)
+    existing_count = len(resources_mapping)
+    LOGGER.info(f"Loaded {existing_count} existing resources from mapping")
+
+    # Process schema definitions for this specific kind only
+    kind_lower = kind.lower()
+    updated = False
+    new_schemas_for_kind = []
+
+    for _, schema in schemas.items():
+        for _def_name, def_data in schema.get("components", {}).get("schemas", {}).items():
+            gvk_list = def_data.get("x-kubernetes-group-version-kind", [])
+            if not gvk_list:
+                continue
+
+            # Check if this definition is for our target kind
+            for gvk in gvk_list:
+                if gvk.get("kind") == kind:
+                    group = gvk.get("group", "")
+                    version = gvk.get("version", "")
+
+                    # Create schema data using helper function
+                    is_namespaced = namespacing_dict.get(kind, True)
+                    schema_data = _build_schema_data(def_data, gvk, is_namespaced)
+
+                    new_schemas_for_kind.append((group, version, schema_data))
+                    LOGGER.debug(f"Found schema for {kind} (group={group}, version={version})")
+                    break
+
+    if not new_schemas_for_kind:
+        raise RuntimeError(
+            f"No schema definition found for {kind} in the fetched API schemas. "
+            f"The resource exists on the cluster but its schema could not be extracted. "
+            f"This may indicate an issue with the CRD definition or API server configuration."
+        )
+
+    # Update or add the resource in the mapping using the merge helper
+    updated = False
+    for group, version, new_schema_data in new_schemas_for_kind:
+        _was_updated, action = _merge_schema_into_mapping(
+            resources_mapping, kind_lower, group, version, new_schema_data
+        )
+        updated = True
+        if action == "updated":
+            LOGGER.info(f"Updated existing schema for {kind} ({group}/{version})")
+        elif action == "added_version":
+            LOGGER.info(f"Added new schema version for {kind} ({group}/{version})")
+        else:  # added_new
+            LOGGER.info(f"Added new resource {kind} ({group}/{version})")
+
+    if updated:
+        # Save the updated resources mapping
+        try:
+            save_json_archive(resources_mapping, RESOURCES_MAPPING_FILE)
+            LOGGER.info(f"Successfully updated schema for {kind}")
+            LOGGER.info(f"Total resources in mapping: {len(resources_mapping)}")
+        except (OSError, TypeError) as e:
+            raise RuntimeError(f"Failed to save resources mapping: {e}") from e
+
+        # Clear cached mapping data in SchemaValidator to force reload
+        SchemaValidator.clear_cache()
+        SchemaValidator.load_mappings_data()
+    else:
+        LOGGER.info(f"No schema updates needed for {kind} - schema is already up to date")
