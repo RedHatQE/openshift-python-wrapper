@@ -4,6 +4,7 @@ from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
 class HyperConverged(NamespacedResource):
     api_group = NamespacedResource.ApiGroup.HCO_KUBEVIRT_IO
+    api_version = NamespacedResource.ApiVersion.V1BETA1
 
     def __init__(
         self,
