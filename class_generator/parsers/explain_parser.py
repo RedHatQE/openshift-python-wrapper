@@ -6,19 +6,12 @@ from simple_logger.logger import get_logger
 
 from class_generator.constants import MISSING_DESCRIPTION_STR
 from class_generator.core.schema import extract_group_kind_version, read_resources_mapping_file
+from class_generator.exceptions import ResourceNotFoundError
 from class_generator.parsers.type_parser import get_property_schema, prepare_property_dict
 from class_generator.utils import get_latest_version
 from ocp_resources.resource import Resource
 
 LOGGER = get_logger(name=__name__)
-
-
-class ResourceNotFoundError(Exception):
-    """Raised when a resource kind is not found in the schema definition."""
-
-    def __init__(self, kind: str) -> None:
-        self.kind = kind
-        super().__init__(f"Resource kind '{kind}' not found in schema definition")
 
 
 def parse_explain(kind: str) -> list[dict[str, Any]]:
