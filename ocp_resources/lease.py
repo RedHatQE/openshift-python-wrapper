@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
@@ -12,24 +16,22 @@ class Lease(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        holder_identity=None,
-        acquire_time=None,
-        renew_time=None,
-        lease_duration_seconds=None,
-        lease_transitions=None,
-        **kwargs,
-    ):
+        name: str | None = None,
+        namespace: str | None = None,
+        teardown: bool = True,
+        yaml_file: str | None = None,
+        delete_timeout: int = TIMEOUT_4MINUTES,
+        holder_identity: str | None = None,
+        acquire_time: str | None = None,
+        renew_time: str | None = None,
+        lease_duration_seconds: int | None = None,
+        lease_transitions: int | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
             name (str): Name of the Lease resource
             namespace (str): Namespace of Lease resource
-            client: (DynamicClient): DynamicClient for api calls
             teardown (bool): Indicates if the resource should be torn down at the end
             holder_identity (str, optional): identify of the holder of the current lease
             lease_duration_seconds (int, optional): duration for which candidate of a lease needs to wait to acquire it
@@ -42,7 +44,6 @@ class Lease(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

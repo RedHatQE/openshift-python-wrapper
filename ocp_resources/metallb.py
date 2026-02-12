@@ -1,4 +1,7 @@
 # Reference Doc: https://github.com/metallb/metallb-operator/blob/main/api/v1beta1/metallb_types.go
+from __future__ import annotations
+
+from typing import Any
 
 from ocp_resources.resource import NamespacedResource
 
@@ -12,19 +15,17 @@ class MetalLB(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        log_level="info",
-        speaker_config=None,
-        speaker_tolerations=None,
-        **kwargs,
-    ):
+        name: str | None = None,
+        namespace: str | None = None,
+        log_level: str = "info",
+        speaker_config: dict[str, Any] | None = None,
+        speaker_tolerations: list[dict[str, Any]] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
             name (str): Name of the MetalLB or it's CR's.
             namespace (str): Namespace of the MetalLB
-            client: (DynamicClient): DynamicClient to use.
             log_level(str): The verbosity of the controller and the speaker logging.
                             Allowed values are: all, debug, info, warn, error, none. (default: info)
             speaker_config (dict): Additional configs to be applied on MetalLB Speaker daemonset.
@@ -33,7 +34,6 @@ class MetalLB(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.log_level = log_level

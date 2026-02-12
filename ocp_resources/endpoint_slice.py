@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
@@ -12,22 +16,21 @@ class EndpointSlice(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        address_type=None,
-        endpoints=None,
-        ports=None,
-        teardown=True,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
-    ):
+        name: str | None = None,
+        namespace: str | None = None,
+        address_type: str | None = None,
+        endpoints: list[dict[str, Any]] | None = None,
+        ports: list[dict[str, Any]] | None = None,
+        teardown: bool = True,
+        yaml_file: str | None = None,
+        delete_timeout: int = TIMEOUT_4MINUTES,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
+            client (DynamicClient): DynamicClient for api calls
             name (str): Name of the EndpointSlice resource
             namespace (str): Namespace of EndpointSlice resource
-            client: (DynamicClient): DynamicClient for api calls
             address_type (string): Type of address carried by this endpoint
             endpoints (list): List of unique endpoints in this slice
             ports (list, optional): List of port numbers available on the related ip addresses
@@ -38,7 +41,6 @@ class EndpointSlice(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             teardown=teardown,
             yaml_file=yaml_file,
             delete_timeout=delete_timeout,

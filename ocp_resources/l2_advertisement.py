@@ -1,4 +1,7 @@
 # API reference: https://metallb.universe.tf/apis/#metallb.io/v1beta1.L2Advertisement
+from __future__ import annotations
+
+from typing import Any
 
 from ocp_resources.resource import NamespacedResource
 
@@ -12,19 +15,17 @@ class L2Advertisement(NamespacedResource):
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        interfaces=None,
-        ip_address_pools=None,
-        ip_address_pools_selectors=None,
-        **kwargs,
-    ):
+        name: str | None = None,
+        namespace: str | None = None,
+        interfaces: list[str] | None = None,
+        ip_address_pools: list[str] | None = None,
+        ip_address_pools_selectors: list[dict[str, Any]] | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Args:
             name (str): Name of the MetalLB or it's CR's.
             namespace (str): Namespace of the MetalLB
-            client: (DynamicClient): DynamicClient to use.
             interfaces (list): List of interfaces.
             ip_address_pools (list): The list of IPAddressPools to advertise via this advertisement, selected by name.
             ip_address_pools_selectors (list): A selector for the IPAddressPools which would get advertised
@@ -33,7 +34,6 @@ class L2Advertisement(NamespacedResource):
         super().__init__(
             name=name,
             namespace=namespace,
-            client=client,
             **kwargs,
         )
         self.interfaces = interfaces
