@@ -155,18 +155,55 @@ class-generator --kind Pod --add-tests
 
 ## Update schema files
 
-- Dependencies
-  - Kubernetes/Openshift cluster
-  - [oc](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/) or [kubectl](https://kubernetes.io/docs/tasks/tools/) (latest version)
-  - [uv](https://github.com/astral-sh/uv)
+Schema files contain resource definitions used by the class generator. You can update these from a connected Kubernetes/OpenShift cluster.
 
-- Clone this repository
+### Dependencies
+
+- Kubernetes/OpenShift cluster
+- [oc](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/) or [kubectl](https://kubernetes.io/docs/tasks/tools/) (latest version)
+- [uv](https://github.com/astral-sh/uv)
+
+### Setup
+
+Clone this repository:
 
 ```bash
 git clone https://github.com/RedHatQE/openshift-python-wrapper.git
 cd openshift-python-wrapper
 ```
 
-- Login to the cluster use admin user and password.
+Login to the cluster using admin user and password.
 
+### Full schema update
+
+Update the entire schema from the connected cluster:
+
+```bash
+class-generator --update-schema
 ```
+
+This fetches all resource schemas from the cluster and updates the local cache.
+
+**Note:** If connected to an older cluster, existing schemas are preserved and only missing resources are added.
+
+### Single resource schema update
+
+Update the schema for a single resource without affecting others:
+
+```bash
+class-generator --update-schema-for LlamaStackDistribution
+```
+
+This is useful when:
+
+- Connected to an older cluster but need to update a specific CRD
+- A new operator was installed and you need its resource schema
+- You want to refresh just one resource without a full update
+
+After updating the schema, regenerate the class:
+
+```bash
+class-generator --kind LlamaStackDistribution --overwrite
+```
+
+**Note:** `--update-schema` and `--update-schema-for` are mutually exclusive. Use one or the other, not both.

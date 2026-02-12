@@ -6,6 +6,7 @@ from unittest.mock import patch
 from click.testing import CliRunner
 
 from class_generator.cli import main
+from class_generator.core.schema import ResourceNotFoundError
 
 
 class TestCLIFunctionality:
@@ -253,3 +254,46 @@ class TestCLIFunctionality:
         result = runner.invoke(cli=main, args=[], catch_exceptions=False)
         assert result.exit_code != 0
         # Error is printed to stderr, not stdout
+
+    def test_update_schema_for_single_resource(self):
+        """Test --update-schema-for functionality."""
+        runner = CliRunner()
+
+        with patch("class_generator.cli.update_single_resource_schema") as mock_update:
+            mock_update.return_value = None
+
+            result = runner.invoke(cli=main, args=["--update-schema-for", "LlamaStackDistribution"])
+
+            assert result.exit_code == 0
+            mock_update.assert_called_once_with(kind="LlamaStackDistribution")
+
+    def test_update_schema_for_mutual_exclusivity_with_update_schema(self):
+        """Test --update-schema-for and --update-schema are mutually exclusive."""
+        runner = CliRunner()
+
+        result = runner.invoke(cli=main, args=["--update-schema", "--update-schema-for", "Pod"])
+
+        # Should fail due to mutual exclusivity
+        assert result.exit_code != 0
+        assert "mutually exclusive" in result.output
+
+    def test_update_schema_for_cannot_combine_with_kind(self):
+        """Test that --update-schema-for cannot be combined with -k/--kind."""
+        runner = CliRunner()
+
+        result = runner.invoke(cli=main, args=["--update-schema-for", "Pod", "-k", "Pod"])
+
+        # Should fail due to constraint
+        assert result.exit_code != 0
+
+    def test_update_schema_for_resource_not_found(self):
+        """Test --update-schema-for with a non-existent resource."""
+        runner = CliRunner()
+
+        with patch("class_generator.cli.update_single_resource_schema") as mock_update:
+            mock_update.side_effect = ResourceNotFoundError(kind="FakeResource")
+
+            result = runner.invoke(cli=main, args=["--update-schema-for", "FakeResource"], catch_exceptions=False)
+
+            # Should exit with error
+            assert result.exit_code != 0

@@ -10,14 +10,19 @@ from pathlib import Path
 from typing import Any
 
 import cloup
-from cloup.constraints import If, IsSet, accept_none, require_one
+from cloup.constraints import If, IsSet, accept_none, mutually_exclusive, require_one
 from simple_logger.logger import get_logger
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
-from class_generator.core.schema import ClusterVersionError, update_kind_schema
+from class_generator.core.schema import (
+    ClusterVersionError,
+    update_kind_schema,
+    update_single_resource_schema,
+)
+from class_generator.exceptions import ResourceNotFoundError
 from class_generator.tests.test_generation import generate_class_generator_tests
 from class_generator.utils import execute_parallel_tasks
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
@@ -28,16 +33,25 @@ LOGGER = get_logger(name=__name__)
 def validate_actions(
     kind: str | None,
     update_schema: bool,
+    update_schema_for: str | None,
     discover_missing: bool,
     coverage_report: bool,
     generate_missing: bool,
     regenerate_all: bool,
 ) -> None:
     """Validate that at least one action is specified."""
-    actions = [kind, update_schema, discover_missing, coverage_report, generate_missing, regenerate_all]
+    actions = [
+        kind,
+        update_schema,
+        update_schema_for,
+        discover_missing,
+        coverage_report,
+        generate_missing,
+        regenerate_all,
+    ]
     if not any(actions):
         LOGGER.error(
-            "At least one action must be specified (--kind, --update-schema, --discover-missing, --coverage-report, --generate-missing, or --regenerate-all)"
+            "At least one action must be specified (--kind, --update-schema, --update-schema-for, --discover-missing, --coverage-report, --generate-missing, or --regenerate-all)"
         )
         sys.exit(1)
 
@@ -66,6 +80,33 @@ def handle_schema_update(update_schema: bool, generate_missing: bool) -> bool:
             return False
 
         LOGGER.info("Schema updated. Proceeding with resource generation...")
+
+    return True
+
+
+def handle_single_schema_update(update_schema_for: str | None) -> bool:
+    """
+    Handle single resource schema update operations.
+
+    Args:
+        update_schema_for: The kind name to update schema for, or None
+
+    Returns:
+        True if processing should continue, False if it should exit
+    """
+    if update_schema_for:
+        LOGGER.info(f"Updating schema for single resource: {update_schema_for}")
+        try:
+            update_single_resource_schema(kind=update_schema_for)
+        except ResourceNotFoundError as e:
+            LOGGER.error(f"Resource not found: {e}")
+            sys.exit(1)
+        except (OSError, RuntimeError) as e:
+            LOGGER.exception(f"Failed to update schema for {update_schema_for}: {e}")
+            sys.exit(1)
+
+        LOGGER.info(f"Schema updated for {update_schema_for}.")
+        return False
 
     return True
 
@@ -492,6 +533,17 @@ def handle_test_generation(add_tests: bool) -> None:
     show_default=True,
 )
 @cloup.option(
+    "--update-schema-for",
+    type=cloup.STRING,
+    help="""
+    \b
+    Update schema for a single resource kind only, without affecting other resources.
+    Useful when connected to an older cluster but needing to update a specific CRD.
+    Example: --update-schema-for LlamaStackDistribution
+    Cannot be used together with --update-schema.
+""",
+)
+@cloup.option(
     "--discover-missing",
     help="Discover resources in the cluster that don't have wrapper classes",
     is_flag=True,
@@ -556,6 +608,20 @@ def handle_test_generation(add_tests: bool) -> None:
     ],
 )
 @cloup.constraint(
+    mutually_exclusive,
+    ["update_schema", "update_schema_for"],
+)
+@cloup.constraint(
+    If(IsSet("update_schema_for"), then=accept_none),
+    [
+        "kind",
+        "discover_missing",
+        "coverage_report",
+        "generate_missing",
+        "regenerate_all",
+    ],
+)
+@cloup.constraint(
     If(IsSet("backup"), then=require_one),
     ["regenerate_all", "overwrite"],
 )
@@ -577,6 +643,7 @@ def main(
     filter: str | None,
     json_output: bool,
     update_schema: bool,
+    update_schema_for: str | None,
     verbose: bool,
 ) -> None:
     """Generate Python module for K8S resource."""
@@ -610,13 +677,18 @@ def main(
     validate_actions(
         kind=kind,
         update_schema=update_schema,
+        update_schema_for=update_schema_for,
         discover_missing=discover_missing,
         coverage_report=coverage_report,
         generate_missing=generate_missing,
         regenerate_all=regenerate_all,
     )
 
-    # Handle schema update
+    # Handle single resource schema update (if specified)
+    if not handle_single_schema_update(update_schema_for=update_schema_for):
+        return
+
+    # Handle full schema update
     if not handle_schema_update(update_schema=update_schema, generate_missing=generate_missing):
         return
 
