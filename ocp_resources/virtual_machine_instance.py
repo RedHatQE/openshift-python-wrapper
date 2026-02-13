@@ -1,11 +1,13 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 
+import json
 import shlex
 from typing import Any
 from warnings import warn
 
 import xmltodict
+from kubernetes.dynamic import DynamicClient
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
@@ -13,7 +15,14 @@ from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
-from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES, TIMEOUT_5SEC, TIMEOUT_30SEC
+from ocp_resources.utils.constants import (
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+    TIMEOUT_1SEC,
+    TIMEOUT_4MINUTES,
+    TIMEOUT_5SEC,
+    TIMEOUT_10SEC,
+    TIMEOUT_30SEC,
+)
 
 
 class VirtualMachineInstance(NamespacedResource):
@@ -171,7 +180,6 @@ class VirtualMachineInstance(NamespacedResource):
         self.volumes = volumes
 
     def to_dict(self) -> None:
-
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -245,48 +253,139 @@ class VirtualMachineInstance(NamespacedResource):
 
     # End of generated code
 
-    @property
-    def _subresource_api_url(self):
+    @staticmethod
+    def _resolve_privileged_client(
+        privileged_client: DynamicClient | None,
+        fallback_client: DynamicClient,
+        method_name: str,
+    ) -> DynamicClient:
+        """Resolve privileged_client with FutureWarning if not provided.
+
+        Args:
+            privileged_client: Client with elevated privileges, or None.
+            fallback_client: Client to use if privileged_client is None.
+            method_name: Name of the calling method (for the warning message).
+
+        Returns:
+            The resolved client (privileged_client if given, else fallback_client).
+        """
+        if privileged_client is None:
+            warn(
+                f"'{method_name}': 'privileged_client' will become a required argument in the next major future version. "
+                "Pass an admin/privileged client explicitly.",
+                category=FutureWarning,
+                stacklevel=3,
+            )
+            return fallback_client
+        return privileged_client
+
+    def _get_subresource_api_url(self, client: DynamicClient | None = None) -> str:
+        _client = client or self.client
         return (
-            f"{self.client.configuration.host}/"
+            f"{_client.configuration.host}/"
             f"apis/subresources.kubevirt.io/{self.api.api_version}/"
             f"namespaces/{self.namespace}/virtualmachineinstances/{self.name}"
         )
 
+    @property
+    def _subresource_api_url(self) -> str:
+        return self._get_subresource_api_url()
+
     def api_request(
-        self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
+        self,
+        method: str,
+        action: str,
+        url: str = "",
+        retry_params: dict[str, int] | None = None,
+        privileged_client: DynamicClient | None = None,
+        **params: Any,
     ) -> dict[str, Any]:
         default_vmi_api_request_retry_params: dict[str, int] = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
+        _retry_params = retry_params or default_vmi_api_request_retry_params
+
+        if privileged_client is not None:
+            _url = f"{url or self._get_subresource_api_url(client=privileged_client)}/{action}"
+            api_request_params: dict[str, Any] = {
+                "url": _url,
+                "method": method,
+                "headers": privileged_client.client.configuration.api_key,
+            }
+            response = self.retry_cluster_exceptions(
+                func=privileged_client.client.request,
+                timeout=_retry_params.get("timeout", TIMEOUT_10SEC),
+                sleep_time=_retry_params.get("sleep_time", TIMEOUT_1SEC),
+                **api_request_params,
+                **params,
+            )
+            try:
+                return json.loads(response.data)
+            except json.decoder.JSONDecodeError:
+                return response.data
+
         return super().api_request(
             method=method,
             action=action,
             url=url or self._subresource_api_url,
-            retry_params=retry_params or default_vmi_api_request_retry_params,
+            retry_params=_retry_params,
             **params,
         )
 
-    def pause(self, timeout=TIMEOUT_4MINUTES, wait=False):
-        self.api_request(method="PUT", action="pause")
+    def pause(
+        self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
+    ) -> None:
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="pause",
+        )
+        self.api_request(method="PUT", action="pause", privileged_client=_client)
         if wait:
-            return self.wait_for_pause_status(pause=True, timeout=timeout)
+            self.wait_for_pause_status(pause=True, timeout=timeout)
 
-    def unpause(self, timeout=TIMEOUT_4MINUTES, wait=False):
-        self.api_request(method="PUT", action="unpause")
+    def unpause(
+        self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
+    ) -> None:
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="unpause",
+        )
+        self.api_request(method="PUT", action="unpause", privileged_client=_client)
         if wait:
-            return self.wait_for_pause_status(pause=False, timeout=timeout)
+            self.wait_for_pause_status(pause=False, timeout=timeout)
 
-    def reset(self) -> dict[str, Any]:
-        return self.api_request(method="PUT", action="reset")
+    def reset(self, privileged_client: DynamicClient | None = None) -> dict[str, Any]:
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="reset",
+        )
+        return self.api_request(method="PUT", action="reset", privileged_client=_client)
 
     @property
     def interfaces(self):
         return self.instance.status.interfaces
 
-    @property
-    def virt_launcher_pod(self):
+    def get_virt_launcher_pod(self, privileged_client: DynamicClient | None = None) -> Pod:
+        """Get the virt-launcher pod for this VMI.
+
+        Args:
+            privileged_client: Client with elevated privileges for pod listing.
+
+        Returns:
+            Pod: The virt-launcher pod.
+
+        Raises:
+            ResourceNotFoundError: If no virt-launcher pod is found.
+        """
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="get_virt_launcher_pod",
+        )
         pods = list(
             Pod.get(
-                client=self.client,
+                client=_client,
                 namespace=self.namespace,
                 label_selector=f"kubevirt.io=virt-launcher,kubevirt.io/created-by={self.instance.metadata.uid}",
             )
@@ -296,19 +395,41 @@ class VirtualMachineInstance(NamespacedResource):
 
         migration_state = self.instance.status.migrationState
         if migration_state:
-            #  After VM migration there are two pods, one in Completed status and one in Running status.
-            #  We need to return the Pod that is not in Completed status.
             for pod in pods:
                 if migration_state.targetPod == pod.name:
                     return pod
-        else:
-            return pods[0]
+
+        return pods[0]
 
     @property
-    def virt_handler_pod(self):
+    def virt_launcher_pod(self) -> Pod:
+        warn(
+            "'virt_launcher_pod' property is deprecated, use 'get_virt_launcher_pod(privileged_client=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_virt_launcher_pod(privileged_client=self.client)
+
+    def get_virt_handler_pod(self, privileged_client: DynamicClient | None = None) -> Pod:
+        """Get the virt-handler pod running on the same node as this VMI.
+
+        Args:
+            privileged_client: Client with elevated privileges for pod listing.
+
+        Returns:
+            Pod: The virt-handler pod.
+
+        Raises:
+            ResourceNotFoundError: If no matching virt-handler pod is found.
+        """
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="get_virt_handler_pod",
+        )
         pods = list(
             Pod.get(
-                client=self.client,
+                client=_client,
                 label_selector="kubevirt.io=virt-handler",
             )
         )
@@ -318,7 +439,22 @@ class VirtualMachineInstance(NamespacedResource):
 
         raise ResourceNotFoundError
 
-    def wait_until_running(self, timeout=TIMEOUT_4MINUTES, logs=True, stop_status=None):
+    @property
+    def virt_handler_pod(self) -> Pod:
+        warn(
+            "'virt_handler_pod' property is deprecated, use 'get_virt_handler_pod(privileged_client=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_virt_handler_pod(privileged_client=self.client)
+
+    def wait_until_running(
+        self,
+        timeout: int = TIMEOUT_4MINUTES,
+        logs: bool = True,
+        stop_status: str | None = None,
+        privileged_client: DynamicClient | None = None,
+    ) -> None:
         """
         Wait until VMI is running
 
@@ -326,6 +462,7 @@ class VirtualMachineInstance(NamespacedResource):
             timeout (int): Time to wait for VMI.
             logs (bool): True to extract logs from the VMI pod and from the VMI.
             stop_status (str): Status which should stop the wait and failed.
+            privileged_client: Client with elevated privileges for error-path pod access.
 
         Raises:
             TimeoutExpiredError: If VMI failed to run.
@@ -336,10 +473,10 @@ class VirtualMachineInstance(NamespacedResource):
             if not logs:
                 raise
             try:
-                virt_pod = self.virt_launcher_pod
+                virt_pod = self.get_virt_launcher_pod(privileged_client=privileged_client or self.client)
                 self.logger.error(f"Status of virt-launcher pod {virt_pod.name}: {virt_pod.status}")
-                self.logger.debug(f"{virt_pod.name} *****LOGS*****")
-                self.logger.debug(virt_pod.log(container="compute"))
+                self.logger.error(f"{virt_pod.name} *****LOGS*****")
+                self.logger.error(virt_pod.log(container="compute"))
             except ResourceNotFoundError as virt_pod_ex:
                 self.logger.error(virt_pod_ex)
                 raise sampler_ex from virt_pod_ex
@@ -400,55 +537,159 @@ class VirtualMachineInstance(NamespacedResource):
             if not (pause and sample.get("reason")):
                 return
 
+    def get_node(self, privileged_client: DynamicClient | None = None) -> Node:
+        """Get the node where this VMI is running.
+
+        Args:
+            privileged_client: Client with elevated privileges for node access.
+
+        Returns:
+            Node: The node running this VMI.
+        """
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="get_node",
+        )
+        return Node(
+            client=_client,
+            name=self.instance.status.nodeName,
+        )
+
     @property
-    def node(self):
+    def node(self) -> Node:
         """
         Get the node name where the VM is running
 
         Returns:
             Node: Node
         """
-        return Node(
-            client=self.client,
-            name=self.instance.status.nodeName,
+        warn(
+            "'node' property is deprecated, use 'get_node(privileged_client=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
         )
+        return self.get_node(privileged_client=self.client)
 
-    def virsh_cmd(self, action):
-        return shlex.split(
-            f"virsh {self.virt_launcher_pod_hypervisor_connection_uri} {action} {self.namespace}_{self.name}"
+    @staticmethod
+    def _get_pod_user_uid(pod: Pod) -> int:
+        """Get the runAsUser UID from a pod's security context.
+
+        Args:
+            pod: The pod to inspect.
+
+        Returns:
+            int: The runAsUser UID value.
+        """
+        return pod.instance.spec.securityContext.runAsUser
+
+    @staticmethod
+    def _is_pod_root(pod: Pod) -> bool:
+        """Check if a pod runs as root.
+
+        Args:
+            pod: The pod to inspect.
+
+        Returns:
+            bool: True if the pod runs as root (UID 0).
+        """
+        return not bool(VirtualMachineInstance._get_pod_user_uid(pod=pod))
+
+    @staticmethod
+    def _get_hypervisor_connection_uri(pod: Pod) -> str:
+        """Get the hypervisor connection URI for a pod.
+
+        Args:
+            pod: The virt-launcher pod.
+
+        Returns:
+            str: The hypervisor connection URI string.
+        """
+        if VirtualMachineInstance._is_pod_root(pod=pod):
+            return ""
+
+        virtqemud_socket = "virtqemud"
+        socket = (
+            virtqemud_socket
+            if virtqemud_socket in pod.execute(command=["ls", "/var/run/libvirt/"], container="compute")
+            else "libvirt"
         )
+        return f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
 
-    def get_xml(self):
+    def _build_virsh_cmd(self, action: str, hypervisor_uri: str) -> list[str]:
+        """Build a virsh command list.
+
+        Args:
+            action: The virsh action to perform (e.g., 'dumpxml', 'domstate').
+            hypervisor_uri: The hypervisor connection URI.
+
+        Returns:
+            list[str]: The command as a list of strings.
+        """
+        return shlex.split(f"virsh {hypervisor_uri} {action} {self.namespace}_{self.name}")
+
+    def virsh_cmd(self, action: str) -> list[str]:
+        warn(
+            "'virsh_cmd' method is deprecated, use 'execute_virsh_command(command=..., privileged_client=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        hypervisor_uri = self._get_hypervisor_connection_uri(
+            pod=self.get_virt_launcher_pod(privileged_client=self.client)
+        )
+        return self._build_virsh_cmd(action=action, hypervisor_uri=hypervisor_uri)
+
+    def get_xml(self, privileged_client: DynamicClient | None = None) -> str:
         """
         Get virtual machine instance XML
+
+        Args:
+            privileged_client: Client with elevated privileges.
 
         Returns:
             xml_output(string): VMI XML in the multi-line string
         """
-        return self.execute_virsh_command(command="dumpxml")
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="get_xml",
+        )
+        return self.execute_virsh_command(command="dumpxml", privileged_client=_client)
 
     @property
-    def virt_launcher_pod_user_uid(self):
+    def virt_launcher_pod_user_uid(self) -> int:
         """
         Get Virt Launcher Pod User UID value
 
         Returns:
             Int: Virt Launcher Pod UID value
         """
-        return self.virt_launcher_pod.instance.spec.securityContext.runAsUser
+        warn(
+            "'virt_launcher_pod_user_uid' property is deprecated, "
+            "use 'VirtualMachineInstance._get_pod_user_uid(pod=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._get_pod_user_uid(pod=self.get_virt_launcher_pod(privileged_client=self.client))
 
     @property
-    def is_virt_launcher_pod_root(self):
+    def is_virt_launcher_pod_root(self) -> bool:
         """
         Check if Virt Launcher Pod is Root
 
         Returns:
             Bool: True if Virt Launcher Pod is Root.
         """
-        return not bool(self.virt_launcher_pod_user_uid)
+        warn(
+            "'is_virt_launcher_pod_root' property is deprecated, "
+            "use 'VirtualMachineInstance._is_pod_root(pod=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._is_pod_root(pod=self.get_virt_launcher_pod(privileged_client=self.client))
 
     @property
-    def virt_launcher_pod_hypervisor_connection_uri(self):
+    def virt_launcher_pod_hypervisor_connection_uri(self) -> str:
         """
         Get Virt Launcher Pod Hypervisor Connection URI
 
@@ -458,25 +699,23 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: Hypervisor Connection URI
         """
-        if self.is_virt_launcher_pod_root:
-            hypervisor_connection_uri = ""
-        else:
-            virtqemud_socket = "virtqemud"
-            socket = (
-                virtqemud_socket
-                if virtqemud_socket
-                in self.virt_launcher_pod.execute(command=["ls", "/var/run/libvirt/"], container="compute")
-                else "libvirt"
-            )
-            hypervisor_connection_uri = f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
-        return hypervisor_connection_uri
+        warn(
+            "'virt_launcher_pod_hypervisor_connection_uri' property is deprecated, "
+            "use 'VirtualMachineInstance._get_hypervisor_connection_uri(pod=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return self._get_hypervisor_connection_uri(pod=self.get_virt_launcher_pod(privileged_client=self.client))
 
-    def get_domstate(self):
+    def get_domstate(self, privileged_client: DynamicClient | None = None) -> str:
         """
         Get virtual machine instance Status.
 
         Current workaround, as VM/VMI shows no status/phase == Paused yet.
         Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1805178
+
+        Args:
+            privileged_client: Client with elevated privileges.
 
         Returns:
             String: VMI Status as string
@@ -486,17 +725,27 @@ class VirtualMachineInstance(NamespacedResource):
             category=DeprecationWarning,
             stacklevel=2,
         )
-        return self.execute_virsh_command(command="domstate")
+        # Intentionally bypass _resolve_privileged_client: get_domstate is already deprecated
+        # (DeprecationWarning above), so we silently fall back to self.client to avoid double-warning.
+        return self.execute_virsh_command(command="domstate", privileged_client=privileged_client or self.client)
 
-    def get_dommemstat(self):
+    def get_dommemstat(self, privileged_client: DynamicClient | None = None) -> str:
         """
         Get virtual machine domain memory stats
         link: https://libvirt.org/manpages/virsh.html#dommemstat
 
+        Args:
+            privileged_client: Client with elevated privileges.
+
         Returns:
             String: VMI domain memory stats as string
         """
-        return self.execute_virsh_command(command="dommemstat")
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="get_dommemstat",
+        )
+        return self.execute_virsh_command(command="dommemstat", privileged_client=_client)
 
     def get_vmi_active_condition(self):
         """A VMI may have multiple conditions; the active one it the one with
@@ -508,11 +757,31 @@ class VirtualMachineInstance(NamespacedResource):
             if condition["lastTransitionTime"]
         }
 
-    @property
-    def xml_dict(self):
-        """Get virtual machine instance XML as dict"""
+    def get_xml_dict(self, privileged_client: DynamicClient | None = None) -> dict[str, Any]:
+        """Get virtual machine instance XML as dict.
 
-        return xmltodict.parse(xml_input=self.get_xml(), process_namespaces=True)
+        Args:
+            privileged_client: Client with elevated privileges.
+
+        Returns:
+            dict: Parsed XML of the VMI.
+        """
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="get_xml_dict",
+        )
+        return xmltodict.parse(xml_input=self.get_xml(privileged_client=_client), process_namespaces=True)
+
+    @property
+    def xml_dict(self) -> dict[str, Any]:
+        """Get virtual machine instance XML as dict"""
+        warn(
+            "'xml_dict' property is deprecated, use 'get_xml_dict(privileged_client=...)' instead.",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.get_xml_dict(privileged_client=self.client)
 
     @property
     def guest_os_info(self):
@@ -537,8 +806,24 @@ class VirtualMachineInstance(NamespacedResource):
         iface_ip = [iface["ipAddress"] for iface in self.interfaces if iface["interfaceName"] == interface]
         return iface_ip[0] if iface_ip else None
 
-    def execute_virsh_command(self, command):
-        return self.virt_launcher_pod.execute(
-            command=self.virsh_cmd(action=command),
+    def execute_virsh_command(self, command: str, privileged_client: DynamicClient | None = None) -> str:
+        """Execute a virsh command in the virt-launcher pod.
+
+        Args:
+            command: The virsh command to execute (e.g., 'dumpxml', 'domstate').
+            privileged_client: Client with elevated privileges.
+
+        Returns:
+            str: Command output.
+        """
+        _client = self._resolve_privileged_client(
+            privileged_client=privileged_client,
+            fallback_client=self.client,
+            method_name="execute_virsh_command",
+        )
+        pod = self.get_virt_launcher_pod(privileged_client=_client)
+        hypervisor_uri = self._get_hypervisor_connection_uri(pod=pod)
+        return pod.execute(
+            command=self._build_virsh_cmd(action=command, hypervisor_uri=hypervisor_uri),
             container="compute",
         )
