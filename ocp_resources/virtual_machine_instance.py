@@ -543,9 +543,10 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             list[str]: The command as a list of strings.
         """
+        # For backward compatibility
         if pod is None:
-            _client = privileged_client or self.client
-            pod = self.get_virt_launcher_pod(privileged_client=_client)
+            pod = self.get_virt_launcher_pod(privileged_client=privileged_client or self.client)
+
         hypervisor_uri = self.get_hypervisor_connection_uri(pod=pod)
         return shlex.split(f"virsh {hypervisor_uri} {action} {self.namespace}_{self.name}")
 
@@ -688,8 +689,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             str: Command output.
         """
-        _client = privileged_client or self.client
-        pod = self.get_virt_launcher_pod(privileged_client=_client)
+        pod = self.get_virt_launcher_pod(privileged_client=privileged_client or self.client)
         return pod.execute(
             command=self.virsh_cmd(action=command, pod=pod),
             container="compute",
