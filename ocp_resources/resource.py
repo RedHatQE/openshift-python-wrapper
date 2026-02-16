@@ -1313,7 +1313,13 @@ class Resource(ResourceConstants):
                         return
 
     def api_request(
-        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
+        self,
+        method: str,
+        action: str,
+        url: str,
+        retry_params: dict[str, int] | None = None,
+        client: DynamicClient | None = None,
+        **params: Any,
     ) -> dict[str, Any]:
         """
         Handle API requests to resource.
@@ -1323,12 +1329,13 @@ class Resource(ResourceConstants):
             action (str): Action to perform (stop/start/guestosinfo etc.).
             url (str): URL of resource.
             retry_params (dict): dict of timeout and sleep_time values for retrying the api request call
+            client (DynamicClient): Optional client to use for the request. Defaults to self.client.
 
         Returns:
            data(dict): response data
 
         """
-        client: DynamicClient = self.client
+        client = client or self.client
         api_request_params = {
             "url": f"{url}/{action}",
             "method": method,

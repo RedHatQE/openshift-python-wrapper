@@ -1,5 +1,6 @@
 from typing import Any
 
+from kubernetes.dynamic import DynamicClient
 from timeout_sampler import TimeoutSampler
 
 from ocp_resources.resource import NamespacedResource
@@ -73,7 +74,13 @@ class VirtualMachine(NamespacedResource):
         )
 
     def api_request(
-        self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
+        self,
+        method: str,
+        action: str,
+        url: str = "",
+        retry_params: dict[str, int] | None = None,
+        client: DynamicClient | None = None,
+        **params: Any,
     ) -> dict[str, Any]:
         default_vm_api_request_retry_params: dict[str, int] = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
         return super().api_request(
@@ -81,6 +88,7 @@ class VirtualMachine(NamespacedResource):
             action=action,
             url=url or self._subresource_api_url,
             retry_params=retry_params or default_vm_api_request_retry_params,
+            client=client,
             **params,
         )
 
