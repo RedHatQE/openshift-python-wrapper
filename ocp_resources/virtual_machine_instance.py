@@ -1,3 +1,6 @@
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+
+
 import shlex
 from typing import Any
 from warnings import warn
@@ -6,6 +9,7 @@ import xmltodict
 from kubernetes.dynamic.exceptions import ResourceNotFoundError
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
+from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.node import Node
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResource
@@ -14,32 +18,232 @@ from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT
 
 class VirtualMachineInstance(NamespacedResource):
     """
-    Virtual Machine Instance object, inherited from Resource.
+    VirtualMachineInstance is *the* VirtualMachineInstance Definition. It represents a virtual machine in the runtime environment of kubernetes.
     """
 
-    api_group = NamespacedResource.ApiGroup.KUBEVIRT_IO
-
-    class Status(NamespacedResource.Status):
-        SCHEDULING = "Scheduling"
-        SCHEDULED = "Scheduled"
+    api_group: str = NamespacedResource.ApiGroup.KUBEVIRT_IO
 
     def __init__(
         self,
-        name=None,
-        namespace=None,
-        client=None,
-        yaml_file=None,
-        delete_timeout=TIMEOUT_4MINUTES,
-        **kwargs,
-    ):
-        super().__init__(
-            name=name,
-            namespace=namespace,
-            client=client,
-            yaml_file=yaml_file,
-            delete_timeout=delete_timeout,
-            **kwargs,
-        )
+        access_credentials: list[Any] | None = None,
+        affinity: dict[str, Any] | None = None,
+        architecture: str | None = None,
+        dns_config: dict[str, Any] | None = None,
+        dns_policy: str | None = None,
+        domain: dict[str, Any] | None = None,
+        eviction_strategy: str | None = None,
+        hostname: str | None = None,
+        liveness_probe: dict[str, Any] | None = None,
+        networks: list[Any] | None = None,
+        node_selector: dict[str, Any] | None = None,
+        priority_class_name: str | None = None,
+        readiness_probe: dict[str, Any] | None = None,
+        resource_claims: list[Any] | None = None,
+        scheduler_name: str | None = None,
+        start_strategy: str | None = None,
+        subdomain: str | None = None,
+        termination_grace_period_seconds: int | None = None,
+        tolerations: list[Any] | None = None,
+        topology_spread_constraints: list[Any] | None = None,
+        volumes: list[Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        r"""
+        Args:
+            access_credentials (list[Any]): Specifies a set of public keys to inject into the vm guest
+
+            affinity (dict[str, Any]): If affinity is specifies, obey all the affinity rules
+
+            architecture (str): Specifies the architecture of the vm guest you are attempting to run.
+              Defaults to the compiled architecture of the KubeVirt components
+
+            dns_config (dict[str, Any]): Specifies the DNS parameters of a pod. Parameters specified here will
+              be merged to the generated DNS configuration based on DNSPolicy.
+
+            dns_policy (str): Set DNS policy for the pod. Defaults to "ClusterFirst". Valid values
+              are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or
+              'None'. DNS parameters given in DNSConfig will be merged with the
+              policy selected with DNSPolicy. To have DNS options set along with
+              hostNetwork, you have to specify DNS policy explicitly to
+              'ClusterFirstWithHostNet'.
+
+            domain (dict[str, Any]): Specification of the desired behavior of the VirtualMachineInstance on
+              the host.
+
+            eviction_strategy (str): EvictionStrategy describes the strategy to follow when a node drain
+              occurs. The possible options are: - "None": No action will be
+              taken, according to the specified 'RunStrategy' the VirtualMachine
+              will be restarted or shutdown. - "LiveMigrate": the
+              VirtualMachineInstance will be migrated instead of being shutdown.
+              - "LiveMigrateIfPossible": the same as "LiveMigrate" but only if
+              the VirtualMachine is Live-Migratable, otherwise it will behave as
+              "None". - "External": the VirtualMachineInstance will be protected
+              and 'vmi.Status.EvacuationNodeName' will be set on eviction. This
+              is mainly useful for cluster-api-provider-kubevirt (capk) which
+              needs a way for VMI's to be blocked from eviction, yet signal capk
+              that eviction has been called on the VMI so the capk controller
+              can handle tearing the VMI down. Details can be found in the
+              commit description https://github.com/kubevirt/kubevirt/commit/c1d
+              77face705c8b126696bac9a3ee3825f27f1fa.
+
+            hostname (str): Specifies the hostname of the vmi If not specified, the hostname will
+              be set to the name of the vmi, if dhcp or cloud-init is configured
+              properly.
+
+            liveness_probe (dict[str, Any]): Periodic probe of VirtualMachineInstance liveness.
+              VirtualmachineInstances will be stopped if the probe fails. Cannot
+              be updated. More info:
+              https://kubernetes.io/docs/concepts/workloads/pods/pod-
+              lifecycle#container-probes
+
+            networks (list[Any]): List of networks that can be attached to a vm's virtual interface.
+
+            node_selector (dict[str, Any]): NodeSelector is a selector which must be true for the vmi to fit on a
+              node. Selector which must match a node's labels for the vmi to be
+              scheduled on that node. More info:
+              https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+
+            priority_class_name (str): If specified, indicates the pod's priority. If not specified, the pod
+              priority will be default or zero if there is no default.
+
+            readiness_probe (dict[str, Any]): Periodic probe of VirtualMachineInstance service readiness.
+              VirtualmachineInstances will be removed from service endpoints if
+              the probe fails. Cannot be updated. More info:
+              https://kubernetes.io/docs/concepts/workloads/pods/pod-
+              lifecycle#container-probes
+
+            resource_claims (list[Any]): ResourceClaims define which ResourceClaims must be allocated and
+              reserved before the VMI, hence virt-launcher pod is allowed to
+              start. The resources will be made available to the domain which
+              consumes them by name.  This is an alpha field and requires
+              enabling the DynamicResourceAllocation feature gate in kubernetes
+              https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-
+              resource-allocation/ This field should only be configured if one
+              of the feature-gates GPUsWithDRA or HostDevicesWithDRA is enabled.
+              This feature is in alpha.
+
+            scheduler_name (str): If specified, the VMI will be dispatched by specified scheduler. If
+              not specified, the VMI will be dispatched by default scheduler.
+
+            start_strategy (str): StartStrategy can be set to "Paused" if Virtual Machine should be
+              started in paused state.
+
+            subdomain (str): If specified, the fully qualified vmi hostname will be
+              "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>". If
+              not specified, the vmi will not have a domainname at all. The DNS
+              entry will resolve to the vmi, no matter if the vmi itself can
+              pick up a hostname.
+
+            termination_grace_period_seconds (int): Grace period observed after signalling a VirtualMachineInstance to
+              stop after which the VirtualMachineInstance is force terminated.
+
+            tolerations (list[Any]): If toleration is specified, obey all the toleration rules.
+
+            topology_spread_constraints (list[Any]): TopologySpreadConstraints describes how a group of VMIs will be spread
+              across a given topology domains. K8s scheduler will schedule VMI
+              pods in a way which abides by the constraints.
+
+            volumes (list[Any]): List of volumes that can be mounted by disks belonging to the vmi.
+
+        """
+        super().__init__(**kwargs)
+
+        self.access_credentials = access_credentials
+        self.affinity = affinity
+        self.architecture = architecture
+        self.dns_config = dns_config
+        self.dns_policy = dns_policy
+        self.domain = domain
+        self.eviction_strategy = eviction_strategy
+        self.hostname = hostname
+        self.liveness_probe = liveness_probe
+        self.networks = networks
+        self.node_selector = node_selector
+        self.priority_class_name = priority_class_name
+        self.readiness_probe = readiness_probe
+        self.resource_claims = resource_claims
+        self.scheduler_name = scheduler_name
+        self.start_strategy = start_strategy
+        self.subdomain = subdomain
+        self.termination_grace_period_seconds = termination_grace_period_seconds
+        self.tolerations = tolerations
+        self.topology_spread_constraints = topology_spread_constraints
+        self.volumes = volumes
+
+    def to_dict(self) -> None:
+
+        super().to_dict()
+
+        if not self.kind_dict and not self.yaml_file:
+            if self.domain is None:
+                raise MissingRequiredArgumentError(argument="self.domain")
+
+            self.res["spec"] = {}
+            _spec = self.res["spec"]
+
+            _spec["domain"] = self.domain
+
+            if self.access_credentials is not None:
+                _spec["accessCredentials"] = self.access_credentials
+
+            if self.affinity is not None:
+                _spec["affinity"] = self.affinity
+
+            if self.architecture is not None:
+                _spec["architecture"] = self.architecture
+
+            if self.dns_config is not None:
+                _spec["dnsConfig"] = self.dns_config
+
+            if self.dns_policy is not None:
+                _spec["dnsPolicy"] = self.dns_policy
+
+            if self.eviction_strategy is not None:
+                _spec["evictionStrategy"] = self.eviction_strategy
+
+            if self.hostname is not None:
+                _spec["hostname"] = self.hostname
+
+            if self.liveness_probe is not None:
+                _spec["livenessProbe"] = self.liveness_probe
+
+            if self.networks is not None:
+                _spec["networks"] = self.networks
+
+            if self.node_selector is not None:
+                _spec["nodeSelector"] = self.node_selector
+
+            if self.priority_class_name is not None:
+                _spec["priorityClassName"] = self.priority_class_name
+
+            if self.readiness_probe is not None:
+                _spec["readinessProbe"] = self.readiness_probe
+
+            if self.resource_claims is not None:
+                _spec["resourceClaims"] = self.resource_claims
+
+            if self.scheduler_name is not None:
+                _spec["schedulerName"] = self.scheduler_name
+
+            if self.start_strategy is not None:
+                _spec["startStrategy"] = self.start_strategy
+
+            if self.subdomain is not None:
+                _spec["subdomain"] = self.subdomain
+
+            if self.termination_grace_period_seconds is not None:
+                _spec["terminationGracePeriodSeconds"] = self.termination_grace_period_seconds
+
+            if self.tolerations is not None:
+                _spec["tolerations"] = self.tolerations
+
+            if self.topology_spread_constraints is not None:
+                _spec["topologySpreadConstraints"] = self.topology_spread_constraints
+
+            if self.volumes is not None:
+                _spec["volumes"] = self.volumes
+
+    # End of generated code
 
     @property
     def _subresource_api_url(self):
