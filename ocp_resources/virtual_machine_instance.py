@@ -260,13 +260,7 @@ class VirtualMachineInstance(NamespacedResource):
         )
 
     def api_request(
-        self,
-        method: str,
-        action: str,
-        url: str = "",
-        retry_params: dict[str, int] | None = None,
-        client: DynamicClient | None = None,
-        **params: Any,
+        self, method: str, action: str, url: str = "", retry_params: dict[str, int] | None = None, **params: Any
     ) -> dict[str, Any]:
         default_vmi_api_request_retry_params: dict[str, int] = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
         return super().api_request(
@@ -274,26 +268,21 @@ class VirtualMachineInstance(NamespacedResource):
             action=action,
             url=url or self._subresource_api_url,
             retry_params=retry_params or default_vmi_api_request_retry_params,
-            client=client or self.client,
             **params,
         )
 
-    def pause(
-        self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
-    ) -> None:
-        self.api_request(method="PUT", action="pause", client=privileged_client or self.client)
+    def pause(self, timeout=TIMEOUT_4MINUTES, wait=False):
+        self.api_request(method="PUT", action="pause")
         if wait:
             self.wait_for_pause_status(pause=True, timeout=timeout)
 
-    def unpause(
-        self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
-    ) -> None:
-        self.api_request(method="PUT", action="unpause", client=privileged_client or self.client)
+    def unpause(self, timeout=TIMEOUT_4MINUTES, wait=False):
+        self.api_request(method="PUT", action="unpause")
         if wait:
             self.wait_for_pause_status(pause=False, timeout=timeout)
 
-    def reset(self, client: DynamicClient | None = None) -> dict[str, Any]:
-        return self.api_request(method="PUT", action="reset", client=client or self.client)
+    def reset(self) -> dict[str, Any]:
+        return self.api_request(method="PUT", action="reset")
 
     @property
     def interfaces(self):
@@ -362,7 +351,7 @@ class VirtualMachineInstance(NamespacedResource):
             if pod.instance["spec"]["nodeName"] == self.instance.status.nodeName:
                 return pod
 
-        raise ResourceNotFoundError
+        raise ResourceNotFoundError(f"virt-handler pod not found on node {self.instance.status.nodeName}")
 
     @property
     def virt_handler_pod(self) -> Pod:
@@ -517,6 +506,7 @@ class VirtualMachineInstance(NamespacedResource):
             bool: True if the pod runs as root (UID 0 or unset).
         """
         uid = VirtualMachineInstance.get_pod_user_uid(pod=pod)
+        # In KubeVirt, virt-launcher pods without explicit runAsUser run as root (UID 0).
         return uid is None or uid == 0
 
     @staticmethod
@@ -540,18 +530,22 @@ class VirtualMachineInstance(NamespacedResource):
         )
         return f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
 
-    def virsh_cmd(self, action: str, privileged_client: DynamicClient | None = None) -> list[str]:
+    def virsh_cmd(
+        self, action: str, privileged_client: DynamicClient | None = None, pod: Pod | None = None
+    ) -> list[str]:
         """Build a virsh command list for the given action.
 
         Args:
             action: The virsh action to perform (e.g., 'dumpxml', 'domstate').
             privileged_client: Client with elevated privileges.
+            pod: Optional virt-launcher pod (avoids re-fetching if already available).
 
         Returns:
             list[str]: The command as a list of strings.
         """
-        _client = privileged_client or self.client
-        pod = self.get_virt_launcher_pod(privileged_client=_client)
+        if pod is None:
+            _client = privileged_client or self.client
+            pod = self.get_virt_launcher_pod(privileged_client=_client)
         hypervisor_uri = self.get_hypervisor_connection_uri(pod=pod)
         return shlex.split(f"virsh {hypervisor_uri} {action} {self.namespace}_{self.name}")
 
@@ -579,7 +573,7 @@ class VirtualMachineInstance(NamespacedResource):
     @property
     def is_virt_launcher_pod_root(self) -> bool:
         warn(
-            "'is_virt_launcher_pod_root' property is deprecated, use 'is_pod_root(pod=...)' instead.",
+            "'is_virt_launcher_pod_root' property is deprecated, use 'is_pod_root' instead.",
             category=DeprecationWarning,
             stacklevel=2,
         )
@@ -589,7 +583,7 @@ class VirtualMachineInstance(NamespacedResource):
     def virt_launcher_pod_hypervisor_connection_uri(self) -> str:
         warn(
             "'virt_launcher_pod_hypervisor_connection_uri' property is deprecated, "
-            "use 'get_hypervisor_connection_uri(pod=...)' instead.",
+            "use 'get_hypervisor_connection_uri' instead.",
             category=DeprecationWarning,
             stacklevel=2,
         )
@@ -697,6 +691,6 @@ class VirtualMachineInstance(NamespacedResource):
         _client = privileged_client or self.client
         pod = self.get_virt_launcher_pod(privileged_client=_client)
         return pod.execute(
-            command=self.virsh_cmd(action=command, privileged_client=_client),
+            command=self.virsh_cmd(action=command, pod=pod),
             container="compute",
         )

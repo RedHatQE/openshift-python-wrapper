@@ -1318,7 +1318,6 @@ class Resource(ResourceConstants):
         action: str,
         url: str,
         retry_params: dict[str, int] | None = None,
-        client: DynamicClient | None = None,
         **params: Any,
     ) -> dict[str, Any]:
         """
@@ -1329,13 +1328,12 @@ class Resource(ResourceConstants):
             action (str): Action to perform (stop/start/guestosinfo etc.).
             url (str): URL of resource.
             retry_params (dict): dict of timeout and sleep_time values for retrying the api request call
-            client (DynamicClient): Optional client to use for the request. Defaults to self.client.
 
         Returns:
            data(dict): response data
 
         """
-        client = client or self.client
+        client: DynamicClient = self.client
         api_request_params = {
             "url": f"{url}/{action}",
             "method": method,
