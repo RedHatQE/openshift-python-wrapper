@@ -266,7 +266,6 @@ class VirtualMachineInstance(NamespacedResource):
         url: str = "",
         retry_params: dict[str, int] | None = None,
         client: DynamicClient | None = None,
-        privileged_client: DynamicClient | None = None,
         **params: Any,
     ) -> dict[str, Any]:
         default_vmi_api_request_retry_params: dict[str, int] = {"timeout": TIMEOUT_30SEC, "sleep_time": TIMEOUT_5SEC}
@@ -275,26 +274,26 @@ class VirtualMachineInstance(NamespacedResource):
             action=action,
             url=url or self._subresource_api_url,
             retry_params=retry_params or default_vmi_api_request_retry_params,
-            client=privileged_client or client,
+            client=client or self.client,
             **params,
         )
 
     def pause(
         self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
     ) -> None:
-        self.api_request(method="PUT", action="pause", privileged_client=privileged_client or self.client)
+        self.api_request(method="PUT", action="pause", client=privileged_client or self.client)
         if wait:
             self.wait_for_pause_status(pause=True, timeout=timeout)
 
     def unpause(
         self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
     ) -> None:
-        self.api_request(method="PUT", action="unpause", privileged_client=privileged_client or self.client)
+        self.api_request(method="PUT", action="unpause", client=privileged_client or self.client)
         if wait:
             self.wait_for_pause_status(pause=False, timeout=timeout)
 
-    def reset(self, privileged_client: DynamicClient | None = None) -> dict[str, Any]:
-        return self.api_request(method="PUT", action="reset", privileged_client=privileged_client)
+    def reset(self, client: DynamicClient | None = None) -> dict[str, Any]:
+        return self.api_request(method="PUT", action="reset", client=client or self.client)
 
     @property
     def interfaces(self):
@@ -324,6 +323,8 @@ class VirtualMachineInstance(NamespacedResource):
 
         migration_state = self.instance.status.migrationState
         if migration_state:
+            #  After VM migration there are two pods, one in Completed status and one in Running status.
+            #  We need to return the Pod that is not in Completed status.
             for pod in pods:
                 if migration_state.targetPod == pod.name:
                     return pod
@@ -399,8 +400,8 @@ class VirtualMachineInstance(NamespacedResource):
             try:
                 virt_pod = self.get_virt_launcher_pod(privileged_client=privileged_client or self.client)
                 self.logger.error(f"Status of virt-launcher pod {virt_pod.name}: {virt_pod.status}")
-                self.logger.error(f"{virt_pod.name} *****LOGS*****")
-                self.logger.error(virt_pod.log(container="compute"))
+                self.logger.debug(f"{virt_pod.name} *****LOGS*****")
+                self.logger.debug(virt_pod.log(container="compute"))
             except ResourceNotFoundError as virt_pod_ex:
                 self.logger.error(virt_pod_ex)
                 raise sampler_ex from virt_pod_ex
@@ -539,28 +540,20 @@ class VirtualMachineInstance(NamespacedResource):
         )
         return f"-c qemu+unix:///session?socket=/var/run/libvirt/{socket}-sock"
 
-    def build_virsh_cmd(self, action: str, hypervisor_uri: str) -> list[str]:
-        """Build a virsh command list.
+    def virsh_cmd(self, action: str, privileged_client: DynamicClient | None = None) -> list[str]:
+        """Build a virsh command list for the given action.
 
         Args:
             action: The virsh action to perform (e.g., 'dumpxml', 'domstate').
-            hypervisor_uri: The hypervisor connection URI.
+            privileged_client: Client with elevated privileges.
 
         Returns:
             list[str]: The command as a list of strings.
         """
+        _client = privileged_client or self.client
+        pod = self.get_virt_launcher_pod(privileged_client=_client)
+        hypervisor_uri = self.get_hypervisor_connection_uri(pod=pod)
         return shlex.split(f"virsh {hypervisor_uri} {action} {self.namespace}_{self.name}")
-
-    def virsh_cmd(self, action: str) -> list[str]:
-        warn(
-            "'virsh_cmd' method is deprecated, use 'execute_virsh_command' instead.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        hypervisor_uri = self.get_hypervisor_connection_uri(
-            pod=self.get_virt_launcher_pod(privileged_client=self.client)
-        )
-        return self.build_virsh_cmd(action=action, hypervisor_uri=hypervisor_uri)
 
     def get_xml(self, privileged_client: DynamicClient | None = None) -> str:
         """
@@ -701,9 +694,9 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             str: Command output.
         """
-        pod = self.get_virt_launcher_pod(privileged_client=privileged_client or self.client)
-        hypervisor_uri = self.get_hypervisor_connection_uri(pod=pod)
+        _client = privileged_client or self.client
+        pod = self.get_virt_launcher_pod(privileged_client=_client)
         return pod.execute(
-            command=self.build_virsh_cmd(action=command, hypervisor_uri=hypervisor_uri),
+            command=self.virsh_cmd(action=command, privileged_client=_client),
             container="compute",
         )
