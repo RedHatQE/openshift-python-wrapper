@@ -333,34 +333,34 @@ class VirtualMachineInstance(NamespacedResource):
     def pause(
         self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
     ) -> None:
-        _client = self._resolve_privileged_client(
+        self._resolve_privileged_client(
             privileged_client=privileged_client,
             fallback_client=self.client,
             method_name="pause",
         )
-        self.api_request(method="PUT", action="pause", privileged_client=_client)
+        self.api_request(method="PUT", action="pause", privileged_client=privileged_client)
         if wait:
             self.wait_for_pause_status(pause=True, timeout=timeout)
 
     def unpause(
         self, timeout: int = TIMEOUT_4MINUTES, wait: bool = False, privileged_client: DynamicClient | None = None
     ) -> None:
-        _client = self._resolve_privileged_client(
+        self._resolve_privileged_client(
             privileged_client=privileged_client,
             fallback_client=self.client,
             method_name="unpause",
         )
-        self.api_request(method="PUT", action="unpause", privileged_client=_client)
+        self.api_request(method="PUT", action="unpause", privileged_client=privileged_client)
         if wait:
             self.wait_for_pause_status(pause=False, timeout=timeout)
 
     def reset(self, privileged_client: DynamicClient | None = None) -> dict[str, Any]:
-        _client = self._resolve_privileged_client(
+        self._resolve_privileged_client(
             privileged_client=privileged_client,
             fallback_client=self.client,
             method_name="reset",
         )
-        return self.api_request(method="PUT", action="reset", privileged_client=_client)
+        return self.api_request(method="PUT", action="reset", privileged_client=privileged_client)
 
     @property
     def interfaces(self):
@@ -572,16 +572,19 @@ class VirtualMachineInstance(NamespacedResource):
         return self.get_node(privileged_client=self.client)
 
     @staticmethod
-    def _get_pod_user_uid(pod: Pod) -> int:
+    def _get_pod_user_uid(pod: Pod) -> int | None:
         """Get the runAsUser UID from a pod's security context.
 
         Args:
             pod: The pod to inspect.
 
         Returns:
-            int: The runAsUser UID value.
+            int | None: The runAsUser UID value, or None if not set.
         """
-        return pod.instance.spec.securityContext.runAsUser
+        security_context = pod.instance.spec.get("securityContext", {})
+        if security_context:
+            return security_context.get("runAsUser")
+        return None
 
     @staticmethod
     def _is_pod_root(pod: Pod) -> bool:
@@ -593,7 +596,8 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             bool: True if the pod runs as root (UID 0).
         """
-        return not bool(VirtualMachineInstance._get_pod_user_uid(pod=pod))
+        uid = VirtualMachineInstance._get_pod_user_uid(pod=pod)
+        return uid == 0
 
     @staticmethod
     def _get_hypervisor_connection_uri(pod: Pod) -> str:
@@ -657,7 +661,7 @@ class VirtualMachineInstance(NamespacedResource):
         return self.execute_virsh_command(command="dumpxml", privileged_client=_client)
 
     @property
-    def virt_launcher_pod_user_uid(self) -> int:
+    def virt_launcher_pod_user_uid(self) -> int | None:
         """
         Get Virt Launcher Pod User UID value
 
