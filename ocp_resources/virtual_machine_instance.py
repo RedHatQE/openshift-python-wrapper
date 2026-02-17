@@ -513,6 +513,8 @@ class VirtualMachineInstance(NamespacedResource):
     def get_hypervisor_connection_uri(pod: Pod) -> str:
         """Get the hypervisor connection URI for a pod.
 
+        Note: This method executes a remote command on the pod to detect the libvirt socket type.
+
         Args:
             pod: The virt-launcher pod.
 
@@ -560,7 +562,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             xml_output(string): VMI XML in the multi-line string
         """
-        return self.execute_virsh_command(command="dumpxml", privileged_client=privileged_client or self.client)
+        return self.execute_virsh_command(command="dumpxml", privileged_client=privileged_client)
 
     @property
     def virt_launcher_pod_user_uid(self) -> int | None:
@@ -608,7 +610,7 @@ class VirtualMachineInstance(NamespacedResource):
             category=DeprecationWarning,
             stacklevel=2,
         )
-        return self.execute_virsh_command(command="domstate", privileged_client=privileged_client or self.client)
+        return self.execute_virsh_command(command="domstate", privileged_client=privileged_client)
 
     def get_dommemstat(self, privileged_client: DynamicClient | None = None) -> str:
         """
@@ -621,7 +623,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             String: VMI domain memory stats as string
         """
-        return self.execute_virsh_command(command="dommemstat", privileged_client=privileged_client or self.client)
+        return self.execute_virsh_command(command="dommemstat", privileged_client=privileged_client)
 
     def get_vmi_active_condition(self):
         """A VMI may have multiple conditions; the active one it the one with
@@ -642,9 +644,7 @@ class VirtualMachineInstance(NamespacedResource):
         Returns:
             dict: Parsed XML of the VMI.
         """
-        return xmltodict.parse(
-            xml_input=self.get_xml(privileged_client=privileged_client or self.client), process_namespaces=True
-        )
+        return xmltodict.parse(xml_input=self.get_xml(privileged_client=privileged_client), process_namespaces=True)
 
     @property
     def xml_dict(self) -> dict[str, Any]:
