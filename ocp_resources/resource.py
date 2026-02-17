@@ -1313,12 +1313,7 @@ class Resource(ResourceConstants):
                         return
 
     def api_request(
-        self,
-        method: str,
-        action: str,
-        url: str,
-        retry_params: dict[str, int] | None = None,
-        **params: Any,
+        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
     ) -> dict[str, Any]:
         """
         Handle API requests to resource.
