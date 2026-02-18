@@ -16,6 +16,7 @@ class Backup(NamespacedResource):
         included_namespaces: list[str] | None = None,
         excluded_resources: list[str] | None = None,
         snapshot_move_data: bool = False,
+        default_volumes_to_fs_backup: bool | None = None,
         storage_location: str = "",
         **kwargs: Any,
     ):
@@ -34,6 +35,7 @@ class Backup(NamespacedResource):
         self.excluded_resources = excluded_resources
         self.snapshot_move_data = snapshot_move_data
         self.storage_location = storage_location
+        self.default_volumes_to_fs_backup = default_volumes_to_fs_backup
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -53,3 +55,7 @@ class Backup(NamespacedResource):
 
             if self.storage_location:
                 spec_dict["storageLocation"] = self.storage_location
+
+            spec_dict["defaultVolumesToFsBackup"] = (
+                self.default_volumes_to_fs_backup if self.default_volumes_to_fs_backup is not None else False
+            )
