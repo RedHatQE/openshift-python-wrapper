@@ -1,6 +1,14 @@
 from typing import Any
+from warnings import warn
 
 from ocp_resources.resource import NamespacedResource
+
+warn(
+    "backup.py module will be removed in the next release, please import `Backup` from backup_velero.io.py "
+    "or backup_postgresql_cnpg_noobaa_io.py instead",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class Backup(NamespacedResource):

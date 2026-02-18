@@ -549,6 +549,7 @@ class Resource(ResourceConstants):
         PERFORMANCE_OPENSHIFT_IO: str = "performance.openshift.io"
         POLICY: str = "policy"
         POOL_KUBEVIRT_IO: str = "pool.kubevirt.io"
+        POSTGRESQL_CNPG_NOOBAA_IO = "postgresql.cnpg.noobaa.io"
         PROJECT_OPENSHIFT_IO: str = "project.openshift.io"
         QUOTA_OPENSHIFT_IO: str = "quota.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO: str = "rbac.authorization.k8s.io"
