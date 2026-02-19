@@ -95,7 +95,7 @@ class DataVolume(NamespacedResource):
         multus_annotation: str | None = None,
         bind_immediate_annotation: bool | None = None,
         preallocation: bool | None = None,
-        api_name: str | None = None,
+        api_name: str | None = "storage",
         checkpoints: list[Any] | None = None,
         final_checkpoint: bool | None = None,
         priority_class_name: str | None = None,
@@ -124,8 +124,7 @@ class DataVolume(NamespacedResource):
             bind_immediate_annotation (bool, default: None): when WaitForFirstConsumer is set in StorageClass and DV
                 should be bound immediately.
             preallocation (bool, default: None): preallocate disk space.
-            api_name (str | None, default: None): api used for DV (e.g., "storage", "pvc").
-                NOTE: Currently defaults to "pvc" if not specified. Default will change to "storage" in a future release.
+            api_name (str | None, default: "storage"): api used for DV (e.g., "storage", "pvc").
             checkpoints (list[Any], default: None): list of DataVolumeCheckpoints for snapshot operations.
             final_checkpoint (bool, default: None): indicates whether the current DataVolumeCheckpoint is the final one.
             priority_class_name (str, default: None): priority class name for the DataVolume pod.
@@ -148,17 +147,7 @@ class DataVolume(NamespacedResource):
         self.multus_annotation = multus_annotation
         self.bind_immediate_annotation = bind_immediate_annotation
         self.preallocation = preallocation
-        if api_name is None:
-            warn(
-                "The default 'api_name' will change from 'pvc' to 'storage' in a future release. "
-                "To maintain existing behavior and suppress this warning, "
-                "explicitly set api_name='pvc' in your constructor call.",
-                FutureWarning,
-                stacklevel=2,
-            )
-            self.api_name = "pvc"
-        else:
-            self.api_name = api_name
+        self.api_name = api_name
         self.checkpoints = checkpoints
         self.final_checkpoint = final_checkpoint
         self.priority_class_name = priority_class_name
