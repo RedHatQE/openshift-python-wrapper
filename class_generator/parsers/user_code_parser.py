@@ -62,6 +62,7 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
                 "from ocp_resources.resource import Resource",
                 "from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError",
                 "from ocp_resources.resource import Resource, MissingRequiredArgumentError",
+                "from ocp_resources.exceptions import MissingRequiredArgumentError",
             }
 
             for _import in imports:
