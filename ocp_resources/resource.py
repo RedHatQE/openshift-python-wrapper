@@ -519,6 +519,7 @@ class Resource(ResourceConstants):
         KUBEVIRT_KUBEVIRT_IO: str = "kubevirt.kubevirt.io"
         LITMUS_IO: str = "litmuschaos.io"
         LLAMASTACK_IO: str = "llamastack.io"
+        MAAS_OPENDATAHUB_IO: str = "maas.opendatahub.io"
         MACHINE_OPENSHIFT_IO: str = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO: str = "machineconfiguration.openshift.io"
         MAISTRA_IO: str = "maistra.io"
