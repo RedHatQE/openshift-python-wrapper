@@ -4963,6 +4963,512 @@
       ],
       "type": "object"
     },
+    "components.platform.opendatahub.io/v1alpha1/MLflowOperator": {
+      "description": "MLflowOperator is the Schema for the MLflowOperators API",
+      "namespaced": false,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "type": "object"
+        },
+        "status": {
+          "description": "MLflowOperatorStatus defines the observed state of MLflowOperator",
+          "properties": {
+            "conditions": {
+              "items": {
+                "properties": {
+                  "lastHeartbeatTime": {
+                    "description": "The last time we got an update on a given condition, this should not be set and is\npresent only for backward compatibility reasons",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.\nIf that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human-readable message indicating details about the transition.",
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration\nis 9, the condition is out of date with respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nThe value should be a CamelCase string.",
+                    "type": "string"
+                  },
+                  "severity": {
+                    "description": "Severity with which to treat failures of this type of condition.\nWhen this is not specified, it defaults to Error.",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-kubernetes-list-type": "atomic"
+            },
+            "observedGeneration": {
+              "description": "The generation observed by the resource controller.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "phase": {
+              "type": "string"
+            },
+            "releases": {
+              "items": {
+                "description": "ComponentRelease represents the detailed status of a component release.",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "repoUrl": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-kubernetes-list-map-keys": [
+                "name"
+              ],
+              "x-kubernetes-list-type": "map"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "components.platform.opendatahub.io",
+          "kind": "MLflowOperator",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "components.platform.opendatahub.io/v1alpha1/MLflowOperatorList": {
+      "description": "MLflowOperatorList is a list of MLflowOperator",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of mlflowoperators. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.platform.components.v1alpha1.MLflowOperator"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "components.platform.opendatahub.io",
+          "kind": "MLflowOperatorList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "components.platform.opendatahub.io/v1alpha1/ModelsAsService": {
+      "description": "ModelsAsService is the Schema for the modelsasservice API",
+      "namespaced": false,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "ModelsAsServiceSpec defines the desired state of ModelsAsService",
+          "properties": {
+            "gatewayRef": {
+              "description": "GatewayRef specifies which Gateway (Gateway API) to use for exposing model endpoints.\nIf omitted, defaults to openshift-ingress/maas-default-gateway.",
+              "properties": {
+                "name": {
+                  "default": "maas-default-gateway",
+                  "description": "Name is the name of the Gateway resource.",
+                  "maxLength": 63,
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$",
+                  "type": "string"
+                },
+                "namespace": {
+                  "default": "openshift-ingress",
+                  "description": "Namespace is the namespace where the Gateway resource is located.",
+                  "maxLength": 63,
+                  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "status": {
+          "description": "ModelsAsServiceStatus defines the observed state of ModelsAsService",
+          "properties": {
+            "conditions": {
+              "items": {
+                "properties": {
+                  "lastHeartbeatTime": {
+                    "description": "The last time we got an update on a given condition, this should not be set and is\npresent only for backward compatibility reasons",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.\nIf that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human-readable message indicating details about the transition.",
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration\nis 9, the condition is out of date with respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nThe value should be a CamelCase string.",
+                    "type": "string"
+                  },
+                  "severity": {
+                    "description": "Severity with which to treat failures of this type of condition.\nWhen this is not specified, it defaults to Error.",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-kubernetes-list-type": "atomic"
+            },
+            "observedGeneration": {
+              "description": "The generation observed by the resource controller.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "phase": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "components.platform.opendatahub.io",
+          "kind": "ModelsAsService",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "components.platform.opendatahub.io/v1alpha1/ModelsAsServiceList": {
+      "description": "ModelsAsServiceList is a list of ModelsAsService",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of modelsasservices. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.platform.components.v1alpha1.ModelsAsService"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "components.platform.opendatahub.io",
+          "kind": "ModelsAsServiceList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "components.platform.opendatahub.io/v1alpha1/SparkOperator": {
+      "description": "SparkOperator is the Schema for the sparkoperators API",
+      "namespaced": false,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "SparkOperatorSpec defines the desired state of SparkOperator",
+          "type": "object"
+        },
+        "status": {
+          "description": "SparkOperatorStatus defines the observed state",
+          "properties": {
+            "conditions": {
+              "items": {
+                "properties": {
+                  "lastHeartbeatTime": {
+                    "description": "The last time we got an update on a given condition, this should not be set and is\npresent only for backward compatibility reasons",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.\nIf that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human-readable message indicating details about the transition.",
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration\nis 9, the condition is out of date with respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nThe value should be a CamelCase string.",
+                    "type": "string"
+                  },
+                  "severity": {
+                    "description": "Severity with which to treat failures of this type of condition.\nWhen this is not specified, it defaults to Error.",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-kubernetes-list-type": "atomic"
+            },
+            "observedGeneration": {
+              "description": "The generation observed by the resource controller.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "phase": {
+              "type": "string"
+            },
+            "releases": {
+              "items": {
+                "description": "ComponentRelease represents the detailed status of a component release.",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "repoUrl": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-kubernetes-list-map-keys": [
+                "name"
+              ],
+              "x-kubernetes-list-type": "map"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "components.platform.opendatahub.io",
+          "kind": "SparkOperator",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "components.platform.opendatahub.io/v1alpha1/SparkOperatorList": {
+      "description": "SparkOperatorList is a list of SparkOperator",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of sparkoperators. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.platform.components.v1alpha1.SparkOperator"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "components.platform.opendatahub.io",
+          "kind": "SparkOperatorList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
     "io.k8s.api.admissionregistration.v1.AuditAnnotation": {
       "description": "AuditAnnotation describes how to produce an audit annotation for an API request.",
       "properties": {
@@ -20617,6 +21123,10 @@
       ],
       "type": "object"
     },
+    "io.k8s.apimachinery.pkg.apis.meta.v1.Status": {
+      "additionalProperties": true,
+      "type": "object"
+    },
     "io.k8s.apimachinery.pkg.apis.meta.v1.StatusCause": {
       "description": "StatusCause provides more information about an api.Status failure, including cases when multiple errors are encountered.",
       "properties": {
@@ -21290,6 +21800,1612 @@
       "description": "Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.",
       "format": "date-time",
       "type": "string"
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSAuthPolicy": {
+      "description": "MaaSAuthPolicy is the Schema for the maasauthpolicies API",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "MaaSAuthPolicySpec defines the desired state of MaaSAuthPolicy",
+          "properties": {
+            "meteringMetadata": {
+              "description": "MeteringMetadata contains billing and tracking information",
+              "properties": {
+                "costCenter": {
+                  "description": "CostCenter is the cost center for billing attribution",
+                  "type": "string"
+                },
+                "labels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Labels are additional labels for tracking",
+                  "type": "object"
+                },
+                "organizationId": {
+                  "description": "OrganizationID is the organization identifier for billing",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "modelRefs": {
+              "description": "ModelRefs is a list of model names that this policy grants access to",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "subjects": {
+              "description": "Subjects defines who has access (OR logic - any match grants access)",
+              "properties": {
+                "groups": {
+                  "description": "Groups is a list of Kubernetes group names",
+                  "items": {
+                    "description": "GroupReference references a Kubernetes group",
+                    "properties": {
+                      "name": {
+                        "description": "Name is the name of the group",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "users": {
+                  "description": "Users is a list of Kubernetes user names",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "modelRefs",
+            "subjects"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "MaaSAuthPolicyStatus defines the observed state of MaaSAuthPolicy",
+          "properties": {
+            "authPolicies": {
+              "description": "AuthPolicies lists the underlying Kuadrant AuthPolicies and their Accepted/Enforced state",
+              "items": {
+                "properties": {
+                  "accepted": {
+                    "type": "string"
+                  },
+                  "enforced": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "conditions": {
+              "description": "Conditions represent the latest available observations of the policy's state",
+              "items": {
+                "description": "Condition contains details for one aspect of the current state of this API Resource.",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                    "maxLength": 32768,
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lastTransitionTime",
+                  "message",
+                  "reason",
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "phase": {
+              "description": "Phase represents the current phase of the policy",
+              "enum": [
+                "Pending",
+                "Active",
+                "Failed"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSAuthPolicy",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSAuthPolicyList": {
+      "description": "MaaSAuthPolicyList is a list of MaaSAuthPolicy",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of maasauthpolicies. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.maas.v1alpha1.MaaSAuthPolicy"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSAuthPolicyList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSModel": {
+      "description": "MaaSModel is the Schema for the maasmodels API",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "MaaSModelSpec defines the desired state of MaaSModel",
+          "properties": {
+            "modelRef": {
+              "description": "ModelRef references the actual model endpoint",
+              "properties": {
+                "kind": {
+                  "description": "Kind determines which fields are available",
+                  "enum": [
+                    "LLMInferenceService",
+                    "ExternalModel"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name is the name of the model resource",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "Namespace is the namespace of the model resource\nIf not specified, defaults to the same namespace as MaaSModel",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "name"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "modelRef"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "MaaSModelStatus defines the observed state of MaaSModel",
+          "properties": {
+            "conditions": {
+              "description": "Conditions represent the latest available observations of the model's state",
+              "items": {
+                "description": "Condition contains details for one aspect of the current state of this API Resource.",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                    "maxLength": 32768,
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lastTransitionTime",
+                  "message",
+                  "reason",
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "endpoint": {
+              "description": "Endpoint is the endpoint URL for the model",
+              "type": "string"
+            },
+            "httpRouteGatewayName": {
+              "description": "HTTPRouteGatewayName is the name of the Gateway that the HTTPRoute references",
+              "type": "string"
+            },
+            "httpRouteGatewayNamespace": {
+              "description": "HTTPRouteGatewayNamespace is the namespace of the Gateway that the HTTPRoute references",
+              "type": "string"
+            },
+            "httpRouteHostnames": {
+              "description": "HTTPRouteHostnames are the hostnames configured on the HTTPRoute",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "httpRouteName": {
+              "description": "HTTPRouteName is the name of the HTTPRoute associated with this model",
+              "type": "string"
+            },
+            "httpRouteNamespace": {
+              "description": "HTTPRouteNamespace is the namespace of the HTTPRoute associated with this model",
+              "type": "string"
+            },
+            "phase": {
+              "description": "Phase represents the current phase of the model",
+              "enum": [
+                "Pending",
+                "Ready",
+                "Unhealthy",
+                "Failed"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSModel",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSModelList": {
+      "description": "MaaSModelList is a list of MaaSModel",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of maasmodels. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.maas.v1alpha1.MaaSModel"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSModelList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSSubscription": {
+      "description": "MaaSSubscription is the Schema for the maassubscriptions API",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "MaaSSubscriptionSpec defines the desired state of MaaSSubscription",
+          "properties": {
+            "billingMetadata": {
+              "description": "BillingMetadata contains billing information",
+              "properties": {
+                "costCenter": {
+                  "description": "CostCenter is the cost center for billing attribution",
+                  "type": "string"
+                },
+                "labels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Labels are additional labels for tracking",
+                  "type": "object"
+                },
+                "organizationId": {
+                  "description": "OrganizationID is the organization identifier for billing",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "modelRefs": {
+              "description": "ModelRefs defines which models are included with per-model token rate limits",
+              "items": {
+                "description": "ModelSubscriptionRef defines a model reference with rate limits",
+                "properties": {
+                  "billingRate": {
+                    "description": "BillingRate defines the cost per token",
+                    "properties": {
+                      "perToken": {
+                        "description": "PerToken is the cost per token",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "perToken"
+                    ],
+                    "type": "object"
+                  },
+                  "name": {
+                    "description": "Name is the name of the model",
+                    "type": "string"
+                  },
+                  "tokenRateLimitRef": {
+                    "description": "TokenRateLimitRef references an existing TokenRateLimit resource",
+                    "type": "string"
+                  },
+                  "tokenRateLimits": {
+                    "description": "TokenRateLimits defines token-based rate limits for this model",
+                    "items": {
+                      "description": "TokenRateLimit defines a token rate limit",
+                      "properties": {
+                        "limit": {
+                          "description": "Limit is the maximum number of tokens allowed",
+                          "format": "int64",
+                          "type": "integer"
+                        },
+                        "window": {
+                          "description": "Window is the time window (e.g., \"1m\", \"1h\", \"24h\")",
+                          "pattern": "^(\\d+)(s|m|h|d)$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "limit",
+                        "window"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "owner": {
+              "description": "Owner defines who owns this subscription",
+              "properties": {
+                "groups": {
+                  "description": "Groups is a list of Kubernetes group names that own this subscription",
+                  "items": {
+                    "description": "GroupReference references a Kubernetes group",
+                    "properties": {
+                      "name": {
+                        "description": "Name is the name of the group",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "users": {
+                  "description": "Users is a list of Kubernetes user names that own this subscription",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "priority": {
+              "default": 0,
+              "description": "Priority determines subscription priority when user has multiple subscriptions\nHigher numbers have higher priority. Defaults to 0.",
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "modelRefs",
+            "owner"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "MaaSSubscriptionStatus defines the observed state of MaaSSubscription",
+          "properties": {
+            "conditions": {
+              "description": "Conditions represent the latest available observations of the subscription's state",
+              "items": {
+                "description": "Condition contains details for one aspect of the current state of this API Resource.",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                    "maxLength": 32768,
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lastTransitionTime",
+                  "message",
+                  "reason",
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "phase": {
+              "description": "Phase represents the current phase of the subscription",
+              "enum": [
+                "Pending",
+                "Active",
+                "Failed"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSSubscription",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSSubscriptionList": {
+      "description": "MaaSSubscriptionList is a list of MaaSSubscription",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of maassubscriptions. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.maas.v1alpha1.MaaSSubscription"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSSubscriptionList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ClusterObjectDeploymentList": {
+      "description": "ClusterObjectDeploymentList is a list of ClusterObjectDeployment",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of clusterobjectdeployments. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ClusterObjectDeployment"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ClusterObjectDeploymentList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ClusterObjectSetList": {
+      "description": "ClusterObjectSetList is a list of ClusterObjectSet",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of clusterobjectsets. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ClusterObjectSet"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ClusterObjectSetList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ClusterObjectSetPhaseList": {
+      "description": "ClusterObjectSetPhaseList is a list of ClusterObjectSetPhase",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of clusterobjectsetphases. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ClusterObjectSetPhase"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ClusterObjectSetPhaseList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ClusterObjectSliceList": {
+      "description": "ClusterObjectSliceList is a list of ClusterObjectSlice",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of clusterobjectslices. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ClusterObjectSlice"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ClusterObjectSliceList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ClusterObjectTemplateList": {
+      "description": "ClusterObjectTemplateList is a list of ClusterObjectTemplate",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of clusterobjecttemplates. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ClusterObjectTemplate"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ClusterObjectTemplateList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ClusterPackageList": {
+      "description": "ClusterPackageList is a list of ClusterPackage",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of clusterpackages. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ClusterPackage"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ClusterPackageList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/HostedClusterPackage": {
+      "description": "HostedClusterPackage defines package to be rolled out on every HyperShift HostedCluster.\nExperimental: Subject to change.",
+      "namespaced": false,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "HostedClusterPackageSpec is the description of a HostedClusterPackage.",
+          "properties": {
+            "hostedClusterSelector": {
+              "description": "HostedClusterSelector is a label query matching HostedClusters that the Package should be rolled out to.",
+              "properties": {
+                "matchExpressions": {
+                  "description": "matchExpressions is a list of label selector requirements. The requirements are ANDed.",
+                  "items": {
+                    "description": "A label selector requirement is a selector that contains values, a key, and an operator that\nrelates the key and values.",
+                    "properties": {
+                      "key": {
+                        "description": "key is the label key that the selector applies to.",
+                        "type": "string"
+                      },
+                      "operator": {
+                        "description": "operator represents a key's relationship to a set of values.\nValid operators are In, NotIn, Exists and DoesNotExist.",
+                        "type": "string"
+                      },
+                      "values": {
+                        "description": "values is an array of string values. If the operator is In or NotIn,\nthe values array must be non-empty. If the operator is Exists or DoesNotExist,\nthe values array must be empty. This array is replaced during a strategic\nmerge patch.",
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array",
+                        "x-kubernetes-list-type": "atomic"
+                      }
+                    },
+                    "required": [
+                      "key",
+                      "operator"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "matchLabels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels\nmap is equivalent to an element of matchExpressions, whose key field is \"key\", the\noperator is \"In\", and the values array contains only \"value\". The requirements are ANDed.",
+                  "type": "object"
+                }
+              },
+              "type": "object",
+              "x-kubernetes-map-type": "atomic"
+            },
+            "partition": {
+              "description": "Partition HostedClusters by label value.\nAll packages in the same partition will have to be upgraded\nbefore progressing to the next partition.",
+              "properties": {
+                "labelKey": {
+                  "description": "LabelKey defines a labelKey to group objects on.",
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "order": {
+                  "description": "Controls how partitions are ordered.\nBy default items will be sorted AlphaNumeric ascending.",
+                  "properties": {
+                    "alphanumericAsc": {
+                      "description": "HostedClusterPackagePartitionOrderAlphanumericAsc describes the alphanumeric\nascending partition ordering for HostedClusterPackages.",
+                      "type": "object"
+                    },
+                    "static": {
+                      "description": "Allows to define a static partition order.\nThe special * key matches anything not explicitly part of the list.\nUnknown risk-groups or HostedClusters without label\nwill be put into an implicit \"unknown\" group and\nwill get upgraded LAST.",
+                      "items": {
+                        "maxLength": 63,
+                        "type": "string"
+                      },
+                      "maxItems": 20,
+                      "type": "array",
+                      "x-kubernetes-list-type": "set",
+                      "x-kubernetes-validations": [
+                        {
+                          "message": "must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character or '*'",
+                          "rule": "self.filter(i, i != '*' && !i.matches('^([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$')).size() == 0"
+                        },
+                        {
+                          "message": "catch all '*' group may only be used once",
+                          "rule": "self.filter(i, i == '*').size() <= 1"
+                        }
+                      ]
+                    }
+                  },
+                  "type": "object",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "either .static or .alphanumericAsc must be specified",
+                      "rule": "self.static.size() > 0 || has(self.alphanumericAsc)"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "labelKey"
+              ],
+              "type": "object"
+            },
+            "strategy": {
+              "default": {
+                "instant": {}
+              },
+              "description": "HostedClusterPackageStrategy describes the rollout strategy for a HostedClusterPackage.",
+              "properties": {
+                "instant": {
+                  "description": "Updates all matching Packages instantly.",
+                  "type": "object"
+                },
+                "rollingUpgrade": {
+                  "description": "Performs a rolling upgrade according to maxUnavailable.",
+                  "properties": {
+                    "maxUnavailable": {
+                      "default": 1,
+                      "description": "MaxUnavailable defines how many Packages may become unavailable during upgrade at the same time.\nCannot be below 1, because we cannot surge to create more instances.",
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "maxUnavailable"
+                  ],
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "template": {
+              "description": "Template describes the Package that should be created when new\nHostedClusters matching the hostedClusterSelector are detected.",
+              "properties": {
+                "metadata": {
+                  "description": "Standard object's metadata.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+                  "properties": {
+                    "annotations": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "finalizers": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "labels": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "namespace": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "spec": {
+                  "description": "Specification of the desired behavior of the package.",
+                  "properties": {
+                    "component": {
+                      "description": "Desired component to deploy from multi-component packages.",
+                      "type": "string"
+                    },
+                    "config": {
+                      "description": "Package configuration parameters.",
+                      "type": "object",
+                      "x-kubernetes-preserve-unknown-fields": true
+                    },
+                    "image": {
+                      "description": "the image containing the contents of the package\nthis image will be unpacked by the package-loader to render\nthe ObjectDeployment for propagating the installation of the package.",
+                      "type": "string"
+                    },
+                    "paused": {
+                      "description": "If Paused is true, the package and its children will not be reconciled.",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "image"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "spec"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "strategy",
+            "template"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "HostedClusterPackageStatus describes the status of a HostedClusterPackage.",
+          "properties": {
+            "availablePackages": {
+              "description": "Total number of available Packages targeted by this HostedClusterPackage.",
+              "format": "int32",
+              "type": "integer"
+            },
+            "conditions": {
+              "description": "Conditions is a list of status conditions this object is in.",
+              "items": {
+                "description": "Condition contains details for one aspect of the current state of this API Resource.",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                    "maxLength": 32768,
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lastTransitionTime",
+                  "message",
+                  "reason",
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "observedGeneration": {
+              "description": "The generation observed by the HostedClusterPackage controller.",
+              "format": "int32",
+              "type": "integer"
+            },
+            "partitions": {
+              "description": "Count of packages found by partition.",
+              "items": {
+                "description": "HostedClusterPackagePartitionStatus describes the status of a partition.",
+                "properties": {
+                  "availablePackages": {
+                    "description": "Total number of available Packages targeted by this HostedClusterPackage.",
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "name": {
+                    "description": "Name of the partition.",
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "The generation observed by the HostedClusterPackage controller.",
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "progressedPackages": {
+                    "description": "Total number of Packages with Progressing=False and Unpacked=True conditions.",
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "totalPackages": {
+                    "description": "Total number of non-terminated Packages targeted by this HostedClusterPackage.",
+                    "format": "int32",
+                    "type": "integer"
+                  },
+                  "updatedPackages": {
+                    "description": "Total number of non-terminated Packages targeted by this HostedClusterPackage that have the desired template spec.",
+                    "format": "int32",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "processing": {
+              "description": "Processing set of packages during upgrade.",
+              "items": {
+                "description": "HostedClusterPackageRefStatus holds a reference to upgrades in-flight.",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  },
+                  "uid": {
+                    "description": "UID is a type that holds unique ID values, including UUIDs.  Because we\ndon't ONLY use UUIDs, this is an alias to string.  Being a type captures\nintent and helps make sure that UIDs and names do not get conflated.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "uid"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "progressedPackages": {
+              "description": "Total number of Packages with Progressing=False and Unpacked=True conditions.",
+              "format": "int32",
+              "type": "integer"
+            },
+            "totalPackages": {
+              "description": "Total number of non-terminated Packages targeted by this HostedClusterPackage.",
+              "format": "int32",
+              "type": "integer"
+            },
+            "updatedPackages": {
+              "description": "Total number of non-terminated Packages targeted by this HostedClusterPackage that have the desired template spec.",
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "HostedClusterPackage",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/HostedClusterPackageList": {
+      "description": "HostedClusterPackageList is a list of HostedClusterPackage",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of hostedclusterpackages. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.HostedClusterPackage"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "HostedClusterPackageList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ObjectDeploymentList": {
+      "description": "ObjectDeploymentList is a list of ObjectDeployment",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of objectdeployments. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ObjectDeployment"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ObjectDeploymentList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ObjectSetList": {
+      "description": "ObjectSetList is a list of ObjectSet",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of objectsets. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ObjectSet"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ObjectSetList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ObjectSetPhaseList": {
+      "description": "ObjectSetPhaseList is a list of ObjectSetPhase",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of objectsetphases. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ObjectSetPhase"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ObjectSetPhaseList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ObjectSliceList": {
+      "description": "ObjectSliceList is a list of ObjectSlice",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of objectslices. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ObjectSlice"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ObjectSliceList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/ObjectTemplateList": {
+      "description": "ObjectTemplateList is a list of ObjectTemplate",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of objecttemplates. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.ObjectTemplate"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "ObjectTemplateList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "package-operator.run/v1alpha1/PackageList": {
+      "description": "PackageList is a list of Package",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of packages. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/run.package-operator.v1alpha1.Package"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "package-operator.run",
+          "kind": "PackageList",
+          "version": "v1alpha1"
+        }
+      ]
     },
     "v1.APIGroup": {
       "description": "APIGroup contains the name, the supported versions, and the preferred version of a group.",
