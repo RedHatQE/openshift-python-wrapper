@@ -134,7 +134,8 @@ class MyResource(Resource):
         content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 from custom_validators import validate_name
 import json
 
@@ -160,7 +161,8 @@ class MyResource(NamespacedResource):
         assert "from custom_validators import validate_name" in user_imports
         assert "import json" in user_imports
         assert "from typing import Any" not in user_imports
-        assert "from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError" not in user_imports
+        assert "from ocp_resources.exceptions import MissingRequiredArgumentError" not in user_imports
+        assert "from ocp_resources.resource import NamespacedResource" not in user_imports
 
     def test_parse_empty_file(self):
         """Test parsing an empty file."""
