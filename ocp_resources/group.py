@@ -3,7 +3,8 @@
 
 from typing import Any
 
-from ocp_resources.resource import MissingRequiredArgumentError, Resource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import Resource
 
 
 class Group(Resource):

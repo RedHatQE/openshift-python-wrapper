@@ -1,6 +1,7 @@
 # API reference: https://kubevirt.io/user-guide/operations/clone_api/
 
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.virtual_machine import VirtualMachine
 
 

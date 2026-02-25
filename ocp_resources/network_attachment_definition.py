@@ -1,6 +1,7 @@
 import json
 
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 DEFAULT_CNI_VERSION = "0.3.1"
 

@@ -2,7 +2,8 @@
 
 from typing import Any
 
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 
 class Image(NamespacedResource):
