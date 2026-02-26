@@ -6,9 +6,9 @@ from typing import Any
 import kubernetes
 from timeout_sampler import TimeoutWatch
 
-from ocp_resources.exceptions import ExecOnPodError
+from ocp_resources.exceptions import ExecOnPodError, MissingRequiredArgumentError
 from ocp_resources.node import Node
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils.constants import TIMEOUT_5SEC
 
 

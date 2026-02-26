@@ -1,5 +1,6 @@
 from ocp_resources.cluster_role import ClusterRole
-from ocp_resources.resource import MissingRequiredArgumentError, Resource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import Resource
 
 
 class ClusterRoleBinding(Resource):

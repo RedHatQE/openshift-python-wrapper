@@ -4,7 +4,8 @@ from typing import Any
 
 from timeout_sampler import TimeoutSampler, TimeoutWatch
 
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 from ocp_resources.utils.constants import PROTOCOL_ERROR_EXCEPTION_DICT, TIMEOUT_4MINUTES
 
 

@@ -1,4 +1,5 @@
-from ocp_resources.resource import MissingRequiredArgumentError, Resource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import Resource
 
 
 class ClusterRole(Resource):
