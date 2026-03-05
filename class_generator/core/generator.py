@@ -2,6 +2,8 @@
 
 import filecmp
 import os
+import re
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +57,15 @@ def generate_resource_file_from_dict(
 
     output = "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md\n\n"
     formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
+
+    if re.search(r"_[a-z]_", formatted_kind_str):
+        LOGGER.error(
+            f"'{resource_dict['kind']}' produced invalid filename '{formatted_kind_str}.py'.\n"
+            f"Add '{resource_dict['kind']}' acronym to 'normalize_acronyms' dict in:\n"
+            f"  ocp_resources/utils/utils.py -> convert_camel_case_to_snake_case()"
+        )
+        sys.exit(1)
+
     _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
     if add_tests:
@@ -94,8 +105,10 @@ def generate_resource_file_from_dict(
         output += rendered
 
     if dry_run:
+        console = Console()
+        console.print(f"\n[bold green]Would create file:[/bold green] {_output_file}")
         _code = Syntax(code=output, lexer="python", line_numbers=True)
-        Console().print(_code)
+        console.print(_code)
 
     else:
         write_and_format_rendered(filepath=_output_file, output=output)
