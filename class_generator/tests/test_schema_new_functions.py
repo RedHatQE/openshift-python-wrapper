@@ -306,16 +306,16 @@ class TestIdentifyMissingResources:
     @patch("class_generator.core.schema.run_command")
     def test_successful_missing_resources_identification(self, mock_run_command):
         """Test successful identification of missing resources."""
-        api_resources_output = """pods                          po           v1                    Pod
-services                      svc          v1                    Service
-deployments                   deploy       apps/v1               Deployment
-configmaps                    cm           v1                    ConfigMap"""
+        api_resources_output = """pods                              po           v1                             true         Pod
+services                          svc          v1                             true         Service
+deployments                       deploy       apps/v1                        true         Deployment
+configmaps                        cm           v1                             true         ConfigMap"""
 
         mock_run_command.return_value = (True, api_resources_output, "")
 
         existing_mapping = {
-            "pod": [{"x-kubernetes-group-version-kind": [{"kind": "Pod"}]}],
-            "service": [{"x-kubernetes-group-version-kind": [{"kind": "Service"}]}],
+            "pod": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}],
+            "service": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Service"}]}],
         }
 
         result = identify_missing_resources("kubectl", existing_mapping)
@@ -333,14 +333,14 @@ configmaps                    cm           v1                    ConfigMap"""
     @patch("class_generator.core.schema.run_command")
     def test_no_missing_resources(self, mock_run_command):
         """Test when no resources are missing."""
-        api_resources_output = """pods                          po           v1                    Pod
-services                      svc          v1                    Service"""
+        api_resources_output = """pods                              po           v1                             true         Pod
+services                          svc          v1                             true         Service"""
 
         mock_run_command.return_value = (True, api_resources_output, "")
 
         existing_mapping = {
-            "pod": [{"x-kubernetes-group-version-kind": [{"kind": "Pod"}]}],
-            "service": [{"x-kubernetes-group-version-kind": [{"kind": "Service"}]}],
+            "pod": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}],
+            "service": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Service"}]}],
         }
 
         result = identify_missing_resources("kubectl", existing_mapping)
@@ -349,7 +349,9 @@ services                      svc          v1                    Service"""
     @patch("class_generator.core.schema.run_command")
     def test_malformed_existing_mapping_handled(self, mock_run_command):
         """Test that malformed existing mapping is handled gracefully."""
-        api_resources_output = "pods                          po           v1                    Pod"
+        api_resources_output = (
+            "pods                              po           v1                             true         Pod"
+        )
         mock_run_command.return_value = (True, api_resources_output, "")
 
         # Malformed mapping - missing required structure
@@ -357,6 +359,136 @@ services                      svc          v1                    Service"""
 
         result = identify_missing_resources("kubectl", malformed_mapping)
         assert "Pod" in result
+
+
+class TestIdentifyMissingResourcesDuplicateKinds:
+    """Test identify_missing_resources with duplicate kinds across API groups."""
+
+    CLUSTER_OUTPUT_DUPLICATE_BACKUP = (
+        "configmaps                        cm           v1                                     true         ConfigMap\n"
+        "backups                                        velero.io/v1                           true         Backup\n"
+        "backups                                        postgresql.cnpg.noobaa.io/v1           true         Backup\n"
+        "widgets                                        example.com/v1                         true         Widget"
+    )
+
+    @pytest.mark.parametrize(
+        "test_id, existing_mapping, expected_missing",
+        [
+            pytest.param(
+                "duplicate_kind_one_group_covered",
+                {
+                    "backup": [
+                        {
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "postgresql.cnpg.noobaa.io", "version": "v1", "kind": "Backup"}
+                            ],
+                            "namespaced": True,
+                        }
+                    ],
+                    "configmap": [
+                        {
+                            "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "ConfigMap"}],
+                            "namespaced": True,
+                        }
+                    ],
+                },
+                {"Backup", "Widget"},
+                id="duplicate_kind_one_group_covered",
+            ),
+            pytest.param(
+                "duplicate_kind_all_groups_covered",
+                {
+                    "backup_velero": [
+                        {
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "velero.io", "version": "v1", "kind": "Backup"}
+                            ],
+                            "namespaced": True,
+                        }
+                    ],
+                    "backup_cnpg": [
+                        {
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "postgresql.cnpg.noobaa.io", "version": "v1", "kind": "Backup"}
+                            ],
+                            "namespaced": True,
+                        }
+                    ],
+                    "configmap": [
+                        {
+                            "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "ConfigMap"}],
+                            "namespaced": True,
+                        }
+                    ],
+                    "widget": [
+                        {
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "example.com", "version": "v1", "kind": "Widget"}
+                            ],
+                            "namespaced": True,
+                        }
+                    ],
+                },
+                set(),
+                id="duplicate_kind_all_groups_covered",
+            ),
+            pytest.param(
+                "completely_new_kind",
+                {
+                    "configmap": [
+                        {
+                            "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "ConfigMap"}],
+                            "namespaced": True,
+                        }
+                    ],
+                },
+                {"Backup", "Widget"},
+                id="completely_new_kind",
+            ),
+            pytest.param(
+                "core_api_resource_covered",
+                {
+                    "backup_velero": [
+                        {
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "velero.io", "version": "v1", "kind": "Backup"}
+                            ],
+                            "namespaced": True,
+                        }
+                    ],
+                    "backup_cnpg": [
+                        {
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "postgresql.cnpg.noobaa.io", "version": "v1", "kind": "Backup"}
+                            ],
+                            "namespaced": True,
+                        }
+                    ],
+                    "configmap": [
+                        {
+                            "x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "ConfigMap"}],
+                            "namespaced": True,
+                        }
+                    ],
+                },
+                {"Widget"},
+                id="core_api_resource_covered",
+            ),
+        ],
+    )
+    @patch("class_generator.core.schema.run_command")
+    def test_identify_missing_resources_duplicate_kinds(
+        self,
+        mock_run_command,
+        test_id,
+        existing_mapping,
+        expected_missing,
+    ):
+        """Test identify_missing_resources correctly handles duplicate kinds across API groups."""
+        mock_run_command.return_value = (True, self.CLUSTER_OUTPUT_DUPLICATE_BACKUP, "")
+
+        result = identify_missing_resources("oc", existing_mapping)
+        assert result == expected_missing, f"[{test_id}] Expected {expected_missing}, got {result}"
 
 
 class TestBuildDynamicResourceToApiMapping:
