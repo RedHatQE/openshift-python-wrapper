@@ -3,7 +3,6 @@
 import filecmp
 import os
 import re
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -59,12 +58,13 @@ def generate_resource_file_from_dict(
     formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
 
     if re.search(r"_[a-z]_", formatted_kind_str):
-        LOGGER.error(
+        msg = (
             f"'{resource_dict['kind']}' produced invalid filename '{formatted_kind_str}.py'.\n"
             f"Add '{resource_dict['kind']}' acronym to 'normalize_acronyms' dict in:\n"
             f"  ocp_resources/utils/utils.py -> convert_camel_case_to_snake_case()"
         )
-        sys.exit(1)
+        LOGGER.error(msg)
+        raise ValueError(msg)
 
     _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
 
