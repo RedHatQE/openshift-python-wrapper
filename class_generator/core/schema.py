@@ -690,9 +690,27 @@ def process_schema_definitions(
                         f"Added new schema version for existing resource: {kind_lower} ({group or 'core'}/{version})"
                     )
             else:
-                # Don't update existing resources when cluster version is older
-                LOGGER.debug(f"Skipping update for existing resource: {kind_lower}")
-                continue
+                # Older cluster: keep existing schemas untouched, but still add
+                # missing group/version variants for existing kinds.
+                existing_schemas = resources_mapping.get(kind_lower, [])
+                variant_exists = False
+                for existing_schema in existing_schemas:
+                    if not isinstance(existing_schema, dict):
+                        continue
+                    existing_gvk = (existing_schema.get("x-kubernetes-group-version-kind") or [{}])[0]
+                    if existing_gvk.get("group") == group and existing_gvk.get("version") == version:
+                        variant_exists = True
+                        break
+
+                if variant_exists:
+                    LOGGER.debug(f"Skipping update for existing resource: {kind_lower}")
+                    continue
+
+                existing_schemas.append(schema_data)
+                updated_resources += 1
+                LOGGER.debug(
+                    f"Added missing schema variant for existing resource: {kind_lower} ({group or 'core'}/{version})"
+                )
 
             # Also store in definitions for separate definitions file
             definitions[schema_name] = schema_data

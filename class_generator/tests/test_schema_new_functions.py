@@ -490,6 +490,36 @@ class TestIdentifyMissingResourcesDuplicateKinds:
         result = identify_missing_resources("oc", existing_mapping)
         assert result == expected_missing, f"[{test_id}] Expected {expected_missing}, got {result}"
 
+    def test_allow_updates_false_appends_missing_group_variant(self):
+        """Test that allow_updates=False still appends missing group variants for existing kinds."""
+        schemas = {
+            "apis/postgresql.cnpg.noobaa.io/v1": {
+                "components": {
+                    "schemas": {
+                        "io.example.Backup": {
+                            "type": "object",
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "postgresql.cnpg.noobaa.io", "version": "v1", "kind": "Backup"}
+                            ],
+                        }
+                    }
+                }
+            }
+        }
+        existing_mapping = {
+            "backup": [{"x-kubernetes-group-version-kind": [{"group": "velero.io", "version": "v1", "kind": "Backup"}]}]
+        }
+
+        resources_mapping, _ = process_schema_definitions(
+            schemas=schemas,
+            namespacing_dict={"Backup": True},
+            existing_resources_mapping=existing_mapping,
+            allow_updates=False,
+        )
+
+        groups = {item["x-kubernetes-group-version-kind"][0].get("group", "") for item in resources_mapping["backup"]}
+        assert groups == {"velero.io", "postgresql.cnpg.noobaa.io"}
+
 
 class TestBuildDynamicResourceToApiMapping:
     """Test build_dynamic_resource_to_api_mapping function."""
