@@ -242,7 +242,8 @@ def identify_missing_resources(client: str, existing_resources_mapping: dict[Any
                     continue
 
                 kind = kind.strip()
-                group = gvk_item.get("group", "").strip()
+                group_raw = gvk_item.get("group", "")
+                group = group_raw.strip() if isinstance(group_raw, str) else ""
 
                 existing_kind_groups.setdefault(kind, set()).add(group)
 
@@ -697,9 +698,14 @@ def process_schema_definitions(
                 for existing_schema in existing_schemas:
                     if not isinstance(existing_schema, dict):
                         continue
-                    existing_gvk = (existing_schema.get("x-kubernetes-group-version-kind") or [{}])[0]
-                    if existing_gvk.get("group") == group and existing_gvk.get("version") == version:
-                        variant_exists = True
+                    existing_gvk_list = existing_schema.get("x-kubernetes-group-version-kind") or []
+                    for existing_gvk in existing_gvk_list:
+                        if not isinstance(existing_gvk, dict):
+                            continue
+                        if existing_gvk.get("group") == group and existing_gvk.get("version") == version:
+                            variant_exists = True
+                            break
+                    if variant_exists:
                         break
 
                 if variant_exists:
