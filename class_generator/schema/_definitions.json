@@ -1,5 +1,583 @@
 {
   "definitions": {
+    "cert-manager.io/v1/Certificate": {
+      "description": "A Certificate resource should be created to ensure an up to date and signed\nX.509 certificate is stored in the Kubernetes Secret resource named in `spec.secretName`.\n\nThe stored certificate will be renewed before it expires (as configured by `spec.renewBefore`).",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "Specification of the desired state of the Certificate resource.\nhttps://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+          "properties": {
+            "additionalOutputFormats": {
+              "description": "Defines extra output formats of the private key and signed certificate chain\nto be written to this Certificate's target Secret.",
+              "items": {
+                "description": "CertificateAdditionalOutputFormat defines an additional output format of a\nCertificate resource. These contain supplementary data formats of the signed\ncertificate chain and paired private key.",
+                "properties": {
+                  "type": {
+                    "description": "Type is the name of the format type that should be written to the\nCertificate's target Secret.",
+                    "enum": [
+                      "DER",
+                      "CombinedPEM"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "commonName": {
+              "description": "Requested common name X509 certificate subject attribute.\nMore info: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6\nNOTE: TLS clients will ignore this value when any subject alternative name is\nset (see https://tools.ietf.org/html/rfc6125#section-6.4.4).\n\nShould have a length of 64 characters or fewer to avoid generating invalid CSRs.\nCannot be set if the `literalSubject` field is set.",
+              "type": "string"
+            },
+            "dnsNames": {
+              "description": "Requested DNS subject alternative names.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "duration": {
+              "description": "Requested 'duration' (i.e. lifetime) of the Certificate. Note that the\nissuer may choose to ignore the requested duration, just like any other\nrequested attribute.\n\nIf unset, this defaults to 90 days.\nMinimum accepted duration is 1 hour.\nValue must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration.",
+              "type": "string"
+            },
+            "emailAddresses": {
+              "description": "Requested email subject alternative names.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "encodeUsagesInRequest": {
+              "description": "Whether the KeyUsage and ExtKeyUsage extensions should be set in the encoded CSR.\n\nThis option defaults to true, and should only be disabled if the target\nissuer does not support CSRs with these X509 KeyUsage/ ExtKeyUsage extensions.",
+              "type": "boolean"
+            },
+            "ipAddresses": {
+              "description": "Requested IP address subject alternative names.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "isCA": {
+              "description": "Requested basic constraints isCA value.\nThe isCA value is used to set the `isCA` field on the created CertificateRequest\nresources. Note that the issuer may choose to ignore the requested isCA value, just\nlike any other requested attribute.\n\nIf true, this will automatically add the `cert sign` usage to the list\nof requested `usages`.",
+              "type": "boolean"
+            },
+            "issuerRef": {
+              "description": "Reference to the issuer responsible for issuing the certificate.\nIf the issuer is namespace-scoped, it must be in the same namespace\nas the Certificate. If the issuer is cluster-scoped, it can be used\nfrom any namespace.\n\nThe `name` field of the reference must always be specified.",
+              "properties": {
+                "group": {
+                  "description": "Group of the resource being referred to.",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Kind of the resource being referred to.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the resource being referred to.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "keystores": {
+              "description": "Additional keystore output formats to be stored in the Certificate's Secret.",
+              "properties": {
+                "jks": {
+                  "description": "JKS configures options for storing a JKS keystore in the\n`spec.secretName` Secret resource.",
+                  "properties": {
+                    "alias": {
+                      "description": "Alias specifies the alias of the key in the keystore, required by the JKS format.\nIf not provided, the default alias `certificate` will be used.",
+                      "type": "string"
+                    },
+                    "create": {
+                      "description": "Create enables JKS keystore creation for the Certificate.\nIf true, a file named `keystore.jks` will be created in the target\nSecret resource, encrypted using the password stored in\n`passwordSecretRef` or `password`.\nThe keystore file will be updated immediately.\nIf the issuer provided a CA certificate, a file named `truststore.jks`\nwill also be created in the target Secret resource, encrypted using the\npassword stored in `passwordSecretRef`\ncontaining the issuing Certificate Authority",
+                      "type": "boolean"
+                    },
+                    "password": {
+                      "description": "Password provides a literal password used to encrypt the JKS keystore.\nMutually exclusive with passwordSecretRef.\nOne of password or passwordSecretRef must provide a password with a non-zero length.",
+                      "type": "string"
+                    },
+                    "passwordSecretRef": {
+                      "description": "PasswordSecretRef is a reference to a non-empty key in a Secret resource\ncontaining the password used to encrypt the JKS keystore.\nMutually exclusive with password.\nOne of password or passwordSecretRef must provide a password with a non-zero length.",
+                      "properties": {
+                        "key": {
+                          "description": "The key of the entry in the Secret resource's `data` field to be used.\nSome instances of this field may be defaulted, in others it may be\nrequired.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the resource being referred to.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "create"
+                  ],
+                  "type": "object"
+                },
+                "pkcs12": {
+                  "description": "PKCS12 configures options for storing a PKCS12 keystore in the\n`spec.secretName` Secret resource.",
+                  "properties": {
+                    "create": {
+                      "description": "Create enables PKCS12 keystore creation for the Certificate.\nIf true, a file named `keystore.p12` will be created in the target\nSecret resource, encrypted using the password stored in\n`passwordSecretRef` or in `password`.\nThe keystore file will be updated immediately.\nIf the issuer provided a CA certificate, a file named `truststore.p12` will\nalso be created in the target Secret resource, encrypted using the\npassword stored in `passwordSecretRef` containing the issuing Certificate\nAuthority",
+                      "type": "boolean"
+                    },
+                    "password": {
+                      "description": "Password provides a literal password used to encrypt the PKCS#12 keystore.\nMutually exclusive with passwordSecretRef.\nOne of password or passwordSecretRef must provide a password with a non-zero length.",
+                      "type": "string"
+                    },
+                    "passwordSecretRef": {
+                      "description": "PasswordSecretRef is a reference to a non-empty key in a Secret resource\ncontaining the password used to encrypt the PKCS#12 keystore.\nMutually exclusive with password.\nOne of password or passwordSecretRef must provide a password with a non-zero length.",
+                      "properties": {
+                        "key": {
+                          "description": "The key of the entry in the Secret resource's `data` field to be used.\nSome instances of this field may be defaulted, in others it may be\nrequired.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name of the resource being referred to.\nMore info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "profile": {
+                      "description": "Profile specifies the key and certificate encryption algorithms and the HMAC algorithm\nused to create the PKCS12 keystore. Default value is `LegacyRC2` for backward compatibility.\n\nIf provided, allowed values are:\n`LegacyRC2`: Deprecated. Not supported by default in OpenSSL 3 or Java 20.\n`LegacyDES`: Less secure algorithm. Use this option for maximal compatibility.\n`Modern2023`: Secure algorithm. Use this option in case you have to always use secure algorithms\n(e.g., because of company policy). Please note that the security of the algorithm is not that important\nin reality, because the unencrypted certificate and private key are also stored in the Secret.",
+                      "enum": [
+                        "LegacyRC2",
+                        "LegacyDES",
+                        "Modern2023"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "create"
+                  ],
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "literalSubject": {
+              "description": "Requested X.509 certificate subject, represented using the LDAP \"String\nRepresentation of a Distinguished Name\" [1].\nImportant: the LDAP string format also specifies the order of the attributes\nin the subject, this is important when issuing certs for LDAP authentication.\nExample: `CN=foo,DC=corp,DC=example,DC=com`\nMore info [1]: https://datatracker.ietf.org/doc/html/rfc4514\nMore info: https://github.com/cert-manager/cert-manager/issues/3203\nMore info: https://github.com/cert-manager/cert-manager/issues/4424\n\nCannot be set if the `subject` or `commonName` field is set.",
+              "type": "string"
+            },
+            "nameConstraints": {
+              "description": "x.509 certificate NameConstraint extension which MUST NOT be used in a non-CA certificate.\nMore Info: https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.10\n\nThis is an Alpha Feature and is only enabled with the\n`--feature-gates=NameConstraints=true` option set on both\nthe controller and webhook components.",
+              "properties": {
+                "critical": {
+                  "description": "if true then the name constraints are marked critical.",
+                  "type": "boolean"
+                },
+                "excluded": {
+                  "description": "Excluded contains the constraints which must be disallowed. Any name matching a\nrestriction in the excluded field is invalid regardless\nof information appearing in the permitted",
+                  "properties": {
+                    "dnsDomains": {
+                      "description": "DNSDomains is a list of DNS domains that are permitted or excluded.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "emailAddresses": {
+                      "description": "EmailAddresses is a list of Email Addresses that are permitted or excluded.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "ipRanges": {
+                      "description": "IPRanges is a list of IP Ranges that are permitted or excluded.\nThis should be a valid CIDR notation.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "uriDomains": {
+                      "description": "URIDomains is a list of URI domains that are permitted or excluded.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "permitted": {
+                  "description": "Permitted contains the constraints in which the names must be located.",
+                  "properties": {
+                    "dnsDomains": {
+                      "description": "DNSDomains is a list of DNS domains that are permitted or excluded.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "emailAddresses": {
+                      "description": "EmailAddresses is a list of Email Addresses that are permitted or excluded.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "ipRanges": {
+                      "description": "IPRanges is a list of IP Ranges that are permitted or excluded.\nThis should be a valid CIDR notation.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "uriDomains": {
+                      "description": "URIDomains is a list of URI domains that are permitted or excluded.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "otherNames": {
+              "description": "`otherNames` is an escape hatch for SAN that allows any type. We currently restrict the support to string like otherNames, cf RFC 5280 p 37\nAny UTF8 String valued otherName can be passed with by setting the keys oid: x.x.x.x and UTF8Value: somevalue for `otherName`.\nMost commonly this would be UPN set with oid: 1.3.6.1.4.1.311.20.2.3\nYou should ensure that any OID passed is valid for the UTF8String type as we do not explicitly validate this.",
+              "items": {
+                "properties": {
+                  "oid": {
+                    "description": "OID is the object identifier for the otherName SAN.\nThe object identifier must be expressed as a dotted string, for\nexample, \"1.2.840.113556.1.4.221\".",
+                    "type": "string"
+                  },
+                  "utf8Value": {
+                    "description": "utf8Value is the string value of the otherName SAN.\nThe utf8Value accepts any valid UTF8 string to set as value for the otherName SAN.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "privateKey": {
+              "description": "Private key options. These include the key algorithm and size, the used\nencoding and the rotation policy.",
+              "properties": {
+                "algorithm": {
+                  "description": "Algorithm is the private key algorithm of the corresponding private key\nfor this certificate.\n\nIf provided, allowed values are either `RSA`, `ECDSA` or `Ed25519`.\nIf `algorithm` is specified and `size` is not provided,\nkey size of 2048 will be used for `RSA` key algorithm and\nkey size of 256 will be used for `ECDSA` key algorithm.\nkey size is ignored when using the `Ed25519` key algorithm.",
+                  "enum": [
+                    "RSA",
+                    "ECDSA",
+                    "Ed25519"
+                  ],
+                  "type": "string"
+                },
+                "encoding": {
+                  "description": "The private key cryptography standards (PKCS) encoding for this\ncertificate's private key to be encoded in.\n\nIf provided, allowed values are `PKCS1` and `PKCS8` standing for PKCS#1\nand PKCS#8, respectively.\nDefaults to `PKCS1` if not specified.",
+                  "enum": [
+                    "PKCS1",
+                    "PKCS8"
+                  ],
+                  "type": "string"
+                },
+                "rotationPolicy": {
+                  "description": "RotationPolicy controls how private keys should be regenerated when a\nre-issuance is being processed.\n\nIf set to `Never`, a private key will only be generated if one does not\nalready exist in the target `spec.secretName`. If one does exist but it\ndoes not have the correct algorithm or size, a warning will be raised\nto await user intervention.\nIf set to `Always`, a private key matching the specified requirements\nwill be generated whenever a re-issuance occurs.\nDefault is `Always`.\nThe default was changed from `Never` to `Always` in cert-manager >=v1.18.0.\nThe new default can be disabled by setting the\n`--feature-gates=DefaultPrivateKeyRotationPolicyAlways=false` option on\nthe controller component.",
+                  "enum": [
+                    "Never",
+                    "Always"
+                  ],
+                  "type": "string"
+                },
+                "size": {
+                  "description": "Size is the key bit size of the corresponding private key for this certificate.\n\nIf `algorithm` is set to `RSA`, valid values are `2048`, `4096` or `8192`,\nand will default to `2048` if not specified.\nIf `algorithm` is set to `ECDSA`, valid values are `256`, `384` or `521`,\nand will default to `256` if not specified.\nIf `algorithm` is set to `Ed25519`, Size is ignored.\nNo other values are allowed.",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "renewBefore": {
+              "description": "How long before the currently issued certificate's expiry cert-manager should\nrenew the certificate. For example, if a certificate is valid for 60 minutes,\nand `renewBefore=10m`, cert-manager will begin to attempt to renew the certificate\n50 minutes after it was issued (i.e. when there are 10 minutes remaining until\nthe certificate is no longer valid).\n\nNOTE: The actual lifetime of the issued certificate is used to determine the\nrenewal time. If an issuer returns a certificate with a different lifetime than\nthe one requested, cert-manager will use the lifetime of the issued certificate.\n\nIf unset, this defaults to 1/3 of the issued certificate's lifetime.\nMinimum accepted value is 5 minutes.\nValue must be in units accepted by Go time.ParseDuration https://golang.org/pkg/time/#ParseDuration.\nCannot be set if the `renewBeforePercentage` field is set.",
+              "type": "string"
+            },
+            "renewBeforePercentage": {
+              "description": "`renewBeforePercentage` is like `renewBefore`, except it is a relative percentage\nrather than an absolute duration. For example, if a certificate is valid for 60\nminutes, and  `renewBeforePercentage=25`, cert-manager will begin to attempt to\nrenew the certificate 45 minutes after it was issued (i.e. when there are 15\nminutes (25%) remaining until the certificate is no longer valid).\n\nNOTE: The actual lifetime of the issued certificate is used to determine the\nrenewal time. If an issuer returns a certificate with a different lifetime than\nthe one requested, cert-manager will use the lifetime of the issued certificate.\n\nValue must be an integer in the range (0,100). The minimum effective\n`renewBefore` derived from the `renewBeforePercentage` and `duration` fields is 5\nminutes.\nCannot be set if the `renewBefore` field is set.",
+              "format": "int32",
+              "type": "integer"
+            },
+            "revisionHistoryLimit": {
+              "description": "The maximum number of CertificateRequest revisions that are maintained in\nthe Certificate's history. Each revision represents a single `CertificateRequest`\ncreated by this Certificate, either when it was created, renewed, or Spec\nwas changed. Revisions will be removed by oldest first if the number of\nrevisions exceeds this number.\n\nIf set, revisionHistoryLimit must be a value of `1` or greater.\nDefault value is `1`.",
+              "format": "int32",
+              "type": "integer"
+            },
+            "secretName": {
+              "description": "Name of the Secret resource that will be automatically created and\nmanaged by this Certificate resource. It will be populated with a\nprivate key and certificate, signed by the denoted issuer. The Secret\nresource lives in the same namespace as the Certificate resource.",
+              "type": "string"
+            },
+            "secretTemplate": {
+              "description": "Defines annotations and labels to be copied to the Certificate's Secret.\nLabels and annotations on the Secret will be changed as they appear on the\nSecretTemplate when added or removed. SecretTemplate annotations are added\nin conjunction with, and cannot overwrite, the base set of annotations\ncert-manager sets on the Certificate's Secret.",
+              "properties": {
+                "annotations": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Annotations is a key value map to be copied to the target Kubernetes Secret.",
+                  "type": "object"
+                },
+                "labels": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Labels is a key value map to be copied to the target Kubernetes Secret.",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "signatureAlgorithm": {
+              "description": "Signature algorithm to use.\nAllowed values for RSA keys: SHA256WithRSA, SHA384WithRSA, SHA512WithRSA.\nAllowed values for ECDSA keys: ECDSAWithSHA256, ECDSAWithSHA384, ECDSAWithSHA512.\nAllowed values for Ed25519 keys: PureEd25519.",
+              "enum": [
+                "SHA256WithRSA",
+                "SHA384WithRSA",
+                "SHA512WithRSA",
+                "ECDSAWithSHA256",
+                "ECDSAWithSHA384",
+                "ECDSAWithSHA512",
+                "PureEd25519"
+              ],
+              "type": "string"
+            },
+            "subject": {
+              "description": "Requested set of X509 certificate subject attributes.\nMore info: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6\n\nThe common name attribute is specified separately in the `commonName` field.\nCannot be set if the `literalSubject` field is set.",
+              "properties": {
+                "countries": {
+                  "description": "Countries to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "localities": {
+                  "description": "Cities to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "organizationalUnits": {
+                  "description": "Organizational Units to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "organizations": {
+                  "description": "Organizations to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "postalCodes": {
+                  "description": "Postal codes to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "provinces": {
+                  "description": "State/Provinces to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "serialNumber": {
+                  "description": "Serial number to be used on the Certificate.",
+                  "type": "string"
+                },
+                "streetAddresses": {
+                  "description": "Street addresses to be used on the Certificate.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "uris": {
+              "description": "Requested URI subject alternative names.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "usages": {
+              "description": "Requested key usages and extended key usages.\nThese usages are used to set the `usages` field on the created CertificateRequest\nresources. If `encodeUsagesInRequest` is unset or set to `true`, the usages\nwill additionally be encoded in the `request` field which contains the CSR blob.\n\nIf unset, defaults to `digital signature` and `key encipherment`.",
+              "items": {
+                "description": "KeyUsage specifies valid usage contexts for keys.\nSee:\nhttps://tools.ietf.org/html/rfc5280#section-4.2.1.3\nhttps://tools.ietf.org/html/rfc5280#section-4.2.1.12\n\nValid KeyUsage values are as follows:\n\"signing\",\n\"digital signature\",\n\"content commitment\",\n\"key encipherment\",\n\"key agreement\",\n\"data encipherment\",\n\"cert sign\",\n\"crl sign\",\n\"encipher only\",\n\"decipher only\",\n\"any\",\n\"server auth\",\n\"client auth\",\n\"code signing\",\n\"email protection\",\n\"s/mime\",\n\"ipsec end system\",\n\"ipsec tunnel\",\n\"ipsec user\",\n\"timestamping\",\n\"ocsp signing\",\n\"microsoft sgc\",\n\"netscape sgc\"",
+                "enum": [
+                  "signing",
+                  "digital signature",
+                  "content commitment",
+                  "key encipherment",
+                  "key agreement",
+                  "data encipherment",
+                  "cert sign",
+                  "crl sign",
+                  "encipher only",
+                  "decipher only",
+                  "any",
+                  "server auth",
+                  "client auth",
+                  "code signing",
+                  "email protection",
+                  "s/mime",
+                  "ipsec end system",
+                  "ipsec tunnel",
+                  "ipsec user",
+                  "timestamping",
+                  "ocsp signing",
+                  "microsoft sgc",
+                  "netscape sgc"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "issuerRef",
+            "secretName"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "Status of the Certificate.\nThis is set and managed automatically.\nRead-only.\nMore info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+          "properties": {
+            "conditions": {
+              "description": "List of status conditions to indicate the status of certificates.\nKnown condition types are `Ready` and `Issuing`.",
+              "items": {
+                "description": "CertificateCondition contains condition information for a Certificate.",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "LastTransitionTime is the timestamp corresponding to the last status\nchange of this condition.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "Message is a human readable description of the details of the last\ntransition, complementing reason.",
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "If set, this represents the .metadata.generation that the condition was\nset based upon.\nFor instance, if .metadata.generation is currently 12, but the\n.status.condition[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the Certificate.",
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "Reason is a brief machine readable explanation for the condition's last\ntransition.",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Status of the condition, one of (`True`, `False`, `Unknown`).",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Type of the condition, known values are (`Ready`, `Issuing`).",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array",
+              "x-kubernetes-list-map-keys": [
+                "type"
+              ],
+              "x-kubernetes-list-type": "map"
+            },
+            "failedIssuanceAttempts": {
+              "description": "The number of continuous failed issuance attempts up till now. This\nfield gets removed (if set) on a successful issuance and gets set to\n1 if unset and an issuance has failed. If an issuance has failed, the\ndelay till the next issuance will be calculated using formula\ntime.Hour * 2 ^ (failedIssuanceAttempts - 1).",
+              "type": "integer"
+            },
+            "lastFailureTime": {
+              "description": "LastFailureTime is set only if the latest issuance for this\nCertificate failed and contains the time of the failure. If an\nissuance has failed, the delay till the next issuance will be\ncalculated using formula time.Hour * 2 ^ (failedIssuanceAttempts -\n1). If the latest issuance has succeeded this field will be unset.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "nextPrivateKeySecretName": {
+              "description": "The name of the Secret resource containing the private key to be used\nfor the next certificate iteration.\nThe keymanager controller will automatically set this field if the\n`Issuing` condition is set to `True`.\nIt will automatically unset this field when the Issuing condition is\nnot set or False.",
+              "type": "string"
+            },
+            "notAfter": {
+              "description": "The expiration time of the certificate stored in the secret named\nby this resource in `spec.secretName`.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "notBefore": {
+              "description": "The time after which the certificate stored in the secret named\nby this resource in `spec.secretName` is valid.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "renewalTime": {
+              "description": "RenewalTime is the time at which the certificate will be next\nrenewed.\nIf not set, no upcoming renewal is scheduled.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "revision": {
+              "description": "The current 'revision' of the certificate as issued.\n\nWhen a CertificateRequest resource is created, it will have the\n`cert-manager.io/certificate-revision` set to one greater than the\ncurrent value of this field.\n\nUpon issuance, this field will be set to the value of the annotation\non the CertificateRequest resource used to issue the certificate.\n\nPersisting the value on the CertificateRequest resource allows the\ncertificates controller to know whether a request is part of an old\nissuance or if it is part of the ongoing revision's issuance by\nchecking if the revision value in the annotation is greater than this\nfield.",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "cert-manager.io",
+          "kind": "Certificate",
+          "version": "v1"
+        }
+      ]
+    },
     "com.github.openshift.api.apps.v1.CustomDeploymentStrategyParams": {
       "description": "CustomDeploymentStrategyParams are the input to the Custom deployment strategy.",
       "properties": {
@@ -5466,6 +6044,554 @@
           "group": "components.platform.opendatahub.io",
           "kind": "SparkOperatorList",
           "version": "v1alpha1"
+        }
+      ]
+    },
+    "inference.networking.k8s.io/v1/InferencePool": {
+      "description": "InferencePool is the Schema for the InferencePools API.\n",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "Spec defines the desired state of the InferencePool.",
+          "properties": {
+            "endpointPickerRef": {
+              "description": "EndpointPickerRef is a reference to the Endpoint Picker extension and its\nassociated configuration.",
+              "properties": {
+                "failureMode": {
+                  "default": "FailClose",
+                  "description": "FailureMode configures how the parent handles the case when the Endpoint Picker extension\nis non-responsive. When unspecified, defaults to \"FailClose\".",
+                  "enum": [
+                    "FailOpen",
+                    "FailClose"
+                  ],
+                  "type": "string"
+                },
+                "group": {
+                  "default": "",
+                  "description": "Group is the group of the referent API object. When unspecified, the default value\nis \"\", representing the Core API group.",
+                  "maxLength": 253,
+                  "minLength": 0,
+                  "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+                  "type": "string"
+                },
+                "kind": {
+                  "default": "Service",
+                  "description": "Kind is the Kubernetes resource kind of the referent.\n\nRequired if the referent is ambiguous, e.g. service with multiple ports.\n\nDefaults to \"Service\" when not specified.\n\nExternalName services can refer to CNAME DNS records that may live\noutside of the cluster and as such are difficult to reason about in\nterms of conformance. They also may not be safe to forward to (see\nCVE-2021-25740 for more information). Implementations MUST NOT\nsupport ExternalName Services.",
+                  "maxLength": 63,
+                  "minLength": 1,
+                  "pattern": "^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name is the name of the referent API object.",
+                  "maxLength": 253,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "port": {
+                  "description": "Port is the port of the Endpoint Picker extension service.\n\nPort is required when the referent is a Kubernetes Service. In this\ncase, the port number is the service port number, not the target port.\nFor other resources, destination port might be derived from the referent\nresource or this field.",
+                  "properties": {
+                    "number": {
+                      "description": "Number defines the port number to access the selected model server Pods.\nThe number must be in the range 1 to 65535.",
+                      "format": "int32",
+                      "maximum": 65535,
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "number"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object",
+              "x-kubernetes-validations": [
+                {
+                  "message": "port is required when kind is 'Service' or unspecified (defaults to 'Service')",
+                  "rule": "self.kind != 'Service' || has(self.port)"
+                }
+              ]
+            },
+            "selector": {
+              "description": "Selector determines which Pods are members of this inference pool.\nIt matches Pods by their labels only within the same namespace; cross-namespace\nselection is not supported.\n\nThe structure of this LabelSelector is intentionally simple to be compatible\nwith Kubernetes Service selectors, as some implementations may translate\nthis configuration into a Service resource.",
+              "properties": {
+                "matchLabels": {
+                  "additionalProperties": {
+                    "description": "LabelValue is the value of a label. This is used for validation\nof maps. This matches the Kubernetes label validation rules:\n* must be 63 characters or less (can be empty),\n* unless empty, must begin and end with an alphanumeric character ([a-z0-9A-Z]),\n* could contain dashes (-), underscores (_), dots (.), and alphanumerics between.\n\nValid values include:\n\n* MyValue\n* my.name\n* 123-my-value",
+                    "maxLength": 63,
+                    "minLength": 0,
+                    "pattern": "^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$",
+                    "type": "string"
+                  },
+                  "description": "MatchLabels contains a set of required {key,value} pairs.\nAn object must match every label in this map to be selected.\nThe matching logic is an AND operation on all entries.",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "matchLabels"
+              ],
+              "type": "object"
+            },
+            "targetPorts": {
+              "description": "TargetPorts defines a list of ports that are exposed by this InferencePool.\nCurrently, the list may only include a single port definition.",
+              "items": {
+                "description": "Port defines the network port that will be exposed by this InferencePool.",
+                "properties": {
+                  "number": {
+                    "description": "Number defines the port number to access the selected model server Pods.\nThe number must be in the range 1 to 65535.",
+                    "format": "int32",
+                    "maximum": 65535,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "number"
+                ],
+                "type": "object"
+              },
+              "maxItems": 1,
+              "minItems": 1,
+              "type": "array",
+              "x-kubernetes-list-type": "atomic"
+            }
+          },
+          "required": [
+            "endpointPickerRef",
+            "selector",
+            "targetPorts"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "Status defines the observed state of the InferencePool.",
+          "properties": {
+            "parents": {
+              "description": "Parents is a list of parent resources, typically Gateways, that are associated with\nthe InferencePool, and the status of the InferencePool with respect to each parent.\n\nA controller that manages the InferencePool, must add an entry for each parent it manages\nand remove the parent entry when the controller no longer considers the InferencePool to\nbe associated with that parent.\n\nA maximum of 32 parents will be represented in this list. When the list is empty,\nit indicates that the InferencePool is not associated with any parents.",
+              "items": {
+                "description": "ParentStatus defines the observed state of InferencePool from a Parent, i.e. Gateway.",
+                "properties": {
+                  "conditions": {
+                    "description": "Conditions is a list of status conditions that provide information about the observed\nstate of the InferencePool. This field is required to be set by the controller that\nmanages the InferencePool.\n\nSupported condition types are:\n\n* \"Accepted\"\n* \"ResolvedRefs\"",
+                    "items": {
+                      "description": "Condition contains details for one aspect of the current state of this API Resource.",
+                      "properties": {
+                        "lastTransitionTime": {
+                          "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                          "maxLength": 32768,
+                          "type": "string"
+                        },
+                        "observedGeneration": {
+                          "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                          "format": "int64",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "reason": {
+                          "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                          "maxLength": 1024,
+                          "minLength": 1,
+                          "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "status of the condition, one of True, False, Unknown.",
+                          "enum": [
+                            "True",
+                            "False",
+                            "Unknown"
+                          ],
+                          "type": "string"
+                        },
+                        "type": {
+                          "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                          "maxLength": 316,
+                          "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "lastTransitionTime",
+                        "message",
+                        "reason",
+                        "status",
+                        "type"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 8,
+                    "type": "array",
+                    "x-kubernetes-list-map-keys": [
+                      "type"
+                    ],
+                    "x-kubernetes-list-type": "map"
+                  },
+                  "parentRef": {
+                    "description": "ParentRef is used to identify the parent resource that this status\nis associated with. It is used to match the InferencePool with the parent\nresource, such as a Gateway.",
+                    "properties": {
+                      "group": {
+                        "default": "gateway.networking.k8s.io",
+                        "description": "Group is the group of the referent API object. When unspecified, the referent is assumed\nto be in the \"gateway.networking.k8s.io\" API group.",
+                        "maxLength": 253,
+                        "minLength": 0,
+                        "pattern": "^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "Gateway",
+                        "description": "Kind is the kind of the referent API object. When unspecified, the referent is assumed\nto be a \"Gateway\" kind.",
+                        "maxLength": 63,
+                        "minLength": 1,
+                        "pattern": "^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Name is the name of the referent API object.",
+                        "maxLength": 253,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "namespace": {
+                        "description": "Namespace is the namespace of the referenced object. When unspecified, the local\nnamespace is inferred.\n\nNote that when a namespace different than the local namespace is specified,\na ReferenceGrant object is required in the referent namespace to allow that\nnamespace's owner to accept the reference. See the ReferenceGrant\ndocumentation for details: https://gateway-api.sigs.k8s.io/api-types/referencegrant/",
+                        "maxLength": 63,
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "parentRef"
+                ],
+                "type": "object"
+              },
+              "maxItems": 32,
+              "type": "array",
+              "x-kubernetes-list-type": "atomic"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "spec"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "inference.networking.k8s.io",
+          "kind": "InferencePool",
+          "version": "v1"
+        }
+      ]
+    },
+    "inference.networking.k8s.io/v1/InferencePoolList": {
+      "description": "InferencePoolList is a list of InferencePool",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of inferencepools. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.k8s.networking.inference.v1.InferencePool"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "inference.networking.k8s.io",
+          "kind": "InferencePoolList",
+          "version": "v1"
+        }
+      ]
+    },
+    "infrastructure.opendatahub.io/v1/HardwareProfile": {
+      "description": "HardwareProfile is the Schema for the hardwareprofiles API.",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "HardwareProfileSpec defines the desired state of HardwareProfile.",
+          "properties": {
+            "identifiers": {
+              "description": "The array of identifiers",
+              "items": {
+                "properties": {
+                  "defaultCount": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "The default count can be an integer or a string.",
+                    "x-kubernetes-int-or-string": true
+                  },
+                  "displayName": {
+                    "description": "The display name of identifier.",
+                    "type": "string"
+                  },
+                  "identifier": {
+                    "description": "The resource identifier of the hardware device.",
+                    "type": "string"
+                  },
+                  "maxCount": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "The maximum count can be an integer or a string.",
+                    "x-kubernetes-int-or-string": true
+                  },
+                  "minCount": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ],
+                    "description": "The minimum count can be an integer or a string.",
+                    "x-kubernetes-int-or-string": true
+                  },
+                  "resourceType": {
+                    "description": "The type of identifier. could be \"CPU\", \"Memory\", or \"Accelerator\". Leave it undefined for the other types.",
+                    "enum": [
+                      "CPU",
+                      "Memory",
+                      "Accelerator"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "defaultCount",
+                  "displayName",
+                  "identifier",
+                  "minCount"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "scheduling": {
+              "description": "SchedulingSpec specifies how workloads using this hardware profile should be scheduled.",
+              "properties": {
+                "kueue": {
+                  "description": "Kueue specifies queue-based scheduling configuration.\nThis field is only valid when schedulingType is \"Queue\".",
+                  "properties": {
+                    "localQueueName": {
+                      "description": "LocalQueueName specifies the name of the local queue to use for workload scheduling.\nWhen specified, workloads using this hardware profile will be submitted to the\nspecified queue and the queue's configuration will determine the actual node\nplacement and tolerations.",
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "priorityClass": {
+                      "description": "PriorityClass specifies the name of the WorkloadPriorityClass associated with the HardwareProfile.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "localQueueName"
+                  ],
+                  "type": "object"
+                },
+                "node": {
+                  "description": "node specifies direct node scheduling configuration.\nThis field is only valid when schedulingType is \"Node\".",
+                  "properties": {
+                    "nodeSelector": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "NodeSelector specifies the node selector to use for direct node scheduling.\nWorkloads will be scheduled only on nodes that match all the specified labels.",
+                      "type": "object"
+                    },
+                    "tolerations": {
+                      "description": "Tolerations specifies the tolerations to apply to workloads for direct node scheduling.\nThese tolerations allow workloads to be scheduled on nodes with matching taints.",
+                      "items": {
+                        "description": "The pod this Toleration is attached to tolerates any taint that matches\nthe triple <key,value,effect> using the matching operator <operator>.",
+                        "properties": {
+                          "effect": {
+                            "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.",
+                            "type": "string"
+                          },
+                          "key": {
+                            "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.",
+                            "type": "string"
+                          },
+                          "tolerationSeconds": {
+                            "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.",
+                            "format": "int64",
+                            "type": "integer"
+                          },
+                          "value": {
+                            "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.",
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": {
+                  "description": "SchedulingType is the scheduling method discriminator.\nUsers must set this value to indicate which scheduling method to use.\nThe value of this field should match exactly one configured scheduling method.\nValid values are \"Queue\" and \"Node\".",
+                  "enum": [
+                    "Queue",
+                    "Node"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "type": "object",
+              "x-kubernetes-validations": [
+                {
+                  "message": "When schedulingType is 'Queue', the 'kueue.localQueueName' field must be specified and non-empty, and the 'node' field must not be set",
+                  "rule": "self.type == 'Queue' ? (has(self.kueue) && has(self.kueue.localQueueName) && !has(self.node)) : true"
+                },
+                {
+                  "message": "When schedulingType is 'Node', the 'node' field must be set, and the 'kueue' field must not be set",
+                  "rule": "self.type == 'Node' ? (has(self.node) && !has(self.kueue)) : true"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "status": {
+          "description": "HardwareProfileStatus defines the observed state of HardwareProfile.",
+          "type": "object"
+        }
+      },
+      "required": [
+        "spec"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "infrastructure.opendatahub.io",
+          "kind": "HardwareProfile",
+          "version": "v1"
+        }
+      ]
+    },
+    "infrastructure.opendatahub.io/v1/HardwareProfileList": {
+      "description": "HardwareProfileList is a list of HardwareProfile",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of hardwareprofiles. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.infrastructure.v1.HardwareProfile"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "infrastructure.opendatahub.io",
+          "kind": "HardwareProfileList",
+          "version": "v1"
         }
       ]
     },
@@ -21801,6 +22927,643 @@
       "format": "date-time",
       "type": "string"
     },
+    "kuadrant.io/v1alpha1/DNSRecord": {
+      "description": "DNSRecord is the Schema for the dnsrecords API",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "DNSRecordSpec defines the desired state of DNSRecord",
+          "properties": {
+            "delegate": {
+              "type": "boolean",
+              "x-kubernetes-validations": [
+                {
+                  "message": "delegate is immutable",
+                  "rule": "self == oldSelf"
+                }
+              ]
+            },
+            "endpoints": {
+              "description": "endpoints is a list of endpoints that will be published into the dns provider.",
+              "items": {
+                "description": "Endpoint is a high-level way of a connection between a service and an IP",
+                "properties": {
+                  "dnsName": {
+                    "description": "The hostname of the DNS record",
+                    "type": "string"
+                  },
+                  "labels": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Labels stores labels defined for the Endpoint",
+                    "type": "object"
+                  },
+                  "providerSpecific": {
+                    "description": "ProviderSpecific stores provider specific config",
+                    "items": {
+                      "description": "ProviderSpecificProperty holds the name and value of a configuration which is specific to individual DNS providers",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "recordTTL": {
+                    "description": "TTL for the record",
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "recordType": {
+                    "description": "RecordType type of record, e.g. CNAME, A, AAAA, SRV, TXT etc",
+                    "type": "string"
+                  },
+                  "setIdentifier": {
+                    "description": "Identifier to distinguish multiple records with the same name and type (e.g. Route53 records with routing policies other than 'simple')",
+                    "type": "string"
+                  },
+                  "targets": {
+                    "description": "The targets the DNS record points to",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "minItems": 0,
+              "type": "array"
+            },
+            "healthCheck": {
+              "description": "HealthCheckSpec configures health checks in the DNS provider.\nBy default this health check will be applied to each unique DNS A Record for\nthe listeners assigned to the target gateway",
+              "properties": {
+                "additionalHeadersRef": {
+                  "description": "AdditionalHeadersRef refers to a secret that contains extra headers to send in the probe request, this is primarily useful if an authentication\ntoken is required by the endpoint.",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "failureThreshold": {
+                  "default": 5,
+                  "description": "FailureThreshold is a limit of consecutive failures that must occur for a host to be considered unhealthy\nDefaults to 5",
+                  "type": "integer",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Failure threshold must be greater than 0",
+                      "rule": "self > 0"
+                    }
+                  ]
+                },
+                "interval": {
+                  "default": "5m",
+                  "description": "Interval defines how frequently this probe should execute\nDefaults to 5 minutes",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Path is the path to append to the host to reach the expected health check.\nMust start with \"?\" or \"/\", contain only valid URL characters and end with alphanumeric char or \"/\". For example \"/\" or \"/healthz\" are common",
+                  "pattern": "^(?:\\?|\\/)[\\w\\-.~:\\/?#\\[\\]@!$&'()*+,;=]+(?:[a-zA-Z0-9]|\\/){1}$",
+                  "type": "string"
+                },
+                "port": {
+                  "default": 443,
+                  "description": "Port to connect to the host on. Must be either 80, 443 or 1024-49151\nDefaults to port 443",
+                  "type": "integer",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Only ports 80, 443, 1024-49151 are allowed",
+                      "rule": "self in [80, 443] || (self >= 1024 && self <= 49151)"
+                    }
+                  ]
+                },
+                "protocol": {
+                  "default": "HTTPS",
+                  "description": "Protocol to use when connecting to the host, valid values are \"HTTP\" or \"HTTPS\"\nDefaults to HTTPS",
+                  "type": "string",
+                  "x-kubernetes-validations": [
+                    {
+                      "message": "Only HTTP or HTTPS protocols are allowed",
+                      "rule": "self in ['HTTP','HTTPS']"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "ownerID": {
+              "description": "ownerID is a unique string used to identify the owner of this record.\nIf unset or set to an empty string the record UID will be used.",
+              "maxLength": 36,
+              "minLength": 6,
+              "type": "string",
+              "x-kubernetes-validations": [
+                {
+                  "message": "OwnerID is immutable",
+                  "rule": "self == oldSelf"
+                }
+              ]
+            },
+            "providerRef": {
+              "description": "ProviderRef is a reference to a provider secret.",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "rootHost": {
+              "description": "rootHost is the single root for all endpoints in a DNSRecord.\nit is expected all defined endpoints are children of or equal to this rootHost\nMust contain at least two groups of valid URL characters separated by a \".\"",
+              "maxLength": 255,
+              "minLength": 1,
+              "pattern": "^(?:[\\w\\-.~:\\/?#[\\]@!$&'()*+,;=]+)\\.(?:[\\w\\-.~:\\/?#[\\]@!$&'()*+,;=]+)$",
+              "type": "string",
+              "x-kubernetes-validations": [
+                {
+                  "message": "RootHost is immutable",
+                  "rule": "self == oldSelf"
+                }
+              ]
+            }
+          },
+          "required": [
+            "rootHost"
+          ],
+          "type": "object",
+          "x-kubernetes-validations": [
+            {
+              "message": "OwnerID can't be unset if it was previously set",
+              "rule": "!has(oldSelf.ownerID) || has(self.ownerID)"
+            },
+            {
+              "message": "OwnerID can't be set if it was previously unset",
+              "rule": "has(oldSelf.ownerID) || !has(self.ownerID)"
+            },
+            {
+              "message": "delegate can't be set to true if unset",
+              "rule": "has(oldSelf.delegate) || !has(self.delegate) || self.delegate == false"
+            },
+            {
+              "message": "delegate can't be unset if true",
+              "rule": "!has(oldSelf.delegate) || oldSelf.delegate == false || has(self.delegate)"
+            },
+            {
+              "message": "delegate=true and providerRef are mutually exclusive",
+              "rule": "!(has(self.providerRef) && has(self.delegate) && self.delegate == true)"
+            }
+          ]
+        },
+        "status": {
+          "description": "DNSRecordStatus defines the observed state of DNSRecord",
+          "properties": {
+            "conditions": {
+              "description": "conditions are any conditions associated with the record in the dns provider.\n\n\nIf publishing the record fails, the \"Failed\" condition will be set with a\nreason and message describing the cause of the failure.",
+              "items": {
+                "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                    "maxLength": 32768,
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lastTransitionTime",
+                  "message",
+                  "reason",
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "domainOwners": {
+              "description": "DomainOwners is a list of all the owners working against the root domain of this record",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "endpoints": {
+              "description": "endpoints are the last endpoints that were successfully published to the provider zone",
+              "items": {
+                "description": "Endpoint is a high-level way of a connection between a service and an IP",
+                "properties": {
+                  "dnsName": {
+                    "description": "The hostname of the DNS record",
+                    "type": "string"
+                  },
+                  "labels": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Labels stores labels defined for the Endpoint",
+                    "type": "object"
+                  },
+                  "providerSpecific": {
+                    "description": "ProviderSpecific stores provider specific config",
+                    "items": {
+                      "description": "ProviderSpecificProperty holds the name and value of a configuration which is specific to individual DNS providers",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "recordTTL": {
+                    "description": "TTL for the record",
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "recordType": {
+                    "description": "RecordType type of record, e.g. CNAME, A, AAAA, SRV, TXT etc",
+                    "type": "string"
+                  },
+                  "setIdentifier": {
+                    "description": "Identifier to distinguish multiple records with the same name and type (e.g. Route53 records with routing policies other than 'simple')",
+                    "type": "string"
+                  },
+                  "targets": {
+                    "description": "The targets the DNS record points to",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "healthCheck": {
+              "properties": {
+                "conditions": {
+                  "items": {
+                    "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+                    "properties": {
+                      "lastTransitionTime": {
+                        "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "message": {
+                        "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                        "maxLength": 32768,
+                        "type": "string"
+                      },
+                      "observedGeneration": {
+                        "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                        "format": "int64",
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "reason": {
+                        "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                        "maxLength": 1024,
+                        "minLength": 1,
+                        "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                        "type": "string"
+                      },
+                      "status": {
+                        "description": "status of the condition, one of True, False, Unknown.",
+                        "enum": [
+                          "True",
+                          "False",
+                          "Unknown"
+                        ],
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                        "maxLength": 316,
+                        "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "lastTransitionTime",
+                      "message",
+                      "reason",
+                      "status",
+                      "type"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "probes": {
+                  "items": {
+                    "properties": {
+                      "conditions": {
+                        "items": {
+                          "description": "Condition contains details for one aspect of the current state of this API Resource.\n---\nThis struct is intended for direct use as an array at the field path .status.conditions.  For example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the observations of a foo's current state.\n\t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    // +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t    // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t    // other fields\n\t}",
+                          "properties": {
+                            "lastTransitionTime": {
+                              "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "message": {
+                              "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                              "maxLength": 32768,
+                              "type": "string"
+                            },
+                            "observedGeneration": {
+                              "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                              "format": "int64",
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "reason": {
+                              "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                              "maxLength": 1024,
+                              "minLength": 1,
+                              "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                              "type": "string"
+                            },
+                            "status": {
+                              "description": "status of the condition, one of True, False, Unknown.",
+                              "enum": [
+                                "True",
+                                "False",
+                                "Unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "type": {
+                              "description": "type of condition in CamelCase or in foo.example.com/CamelCase.\n---\nMany .condition.type values are consistent across resources like Available, but because arbitrary conditions can be\nuseful (see .node.status.conditions), the ability to deconflict is important.\nThe regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)",
+                              "maxLength": 316,
+                              "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "lastTransitionTime",
+                            "message",
+                            "reason",
+                            "status",
+                            "type"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "host": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "ipAddress": {
+                        "type": "string"
+                      },
+                      "synced": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "host",
+                      "id",
+                      "ipAddress"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "observedGeneration": {
+              "description": "observedGeneration is the most recently observed generation of the DNSRecord.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "ownerID": {
+              "description": "ownerID is a unique string used to identify the owner of this record.",
+              "type": "string"
+            },
+            "providerRef": {
+              "description": "ProviderRef is a reference to a provider secret used to publish endpoints.",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "queuedAt": {
+              "description": "QueuedAt is a time when DNS record was received for the reconciliation",
+              "format": "date-time",
+              "type": "string"
+            },
+            "relatedEndpoints": {
+              "description": "ZoneEndpoints are all the endpoints for the DNSRecordSpec.RootHost that are present in the provider",
+              "items": {
+                "description": "Endpoint is a high-level way of a connection between a service and an IP",
+                "properties": {
+                  "dnsName": {
+                    "description": "The hostname of the DNS record",
+                    "type": "string"
+                  },
+                  "labels": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Labels stores labels defined for the Endpoint",
+                    "type": "object"
+                  },
+                  "providerSpecific": {
+                    "description": "ProviderSpecific stores provider specific config",
+                    "items": {
+                      "description": "ProviderSpecificProperty holds the name and value of a configuration which is specific to individual DNS providers",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "recordTTL": {
+                    "description": "TTL for the record",
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "recordType": {
+                    "description": "RecordType type of record, e.g. CNAME, A, AAAA, SRV, TXT etc",
+                    "type": "string"
+                  },
+                  "setIdentifier": {
+                    "description": "Identifier to distinguish multiple records with the same name and type (e.g. Route53 records with routing policies other than 'simple')",
+                    "type": "string"
+                  },
+                  "targets": {
+                    "description": "The targets the DNS record points to",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "remoteRecordStatuses": {
+              "additionalProperties": {
+                "x-kubernetes-preserve-unknown-fields": true
+              },
+              "description": "remoteRecordStatuses is a map of cluster IDs and their unique DNSRecordStatus as raw JSON.\n\n\nA CRD can't reference a type within itself so the `apiextensionsv1.JSON` type is used.\nUse GetRemoteRecordStatuses to get the converted type.",
+              "type": "object"
+            },
+            "validFor": {
+              "description": "ValidFor indicates duration since the last reconciliation we consider data in the record to be valid",
+              "type": "string"
+            },
+            "writeCounter": {
+              "description": "WriteCounter represent a number of consecutive write attempts on the same generation of the record.\nIt is being reset to 0 when the generation changes or there are no changes to write.",
+              "format": "int64",
+              "type": "integer"
+            },
+            "zoneDomainName": {
+              "description": "zoneDomainName is the domain name of the zone that the dns record is publishing endpoints",
+              "type": "string"
+            },
+            "zoneID": {
+              "description": "zoneID is the provider specific id to which this dns record is publishing endpoints",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "kuadrant.io",
+          "kind": "DNSRecord",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "kuadrant.io/v1alpha1/DNSRecordList": {
+      "description": "DNSRecordList is a list of DNSRecord",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of dnsrecords. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.kuadrant.v1alpha1.DNSRecord"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "kuadrant.io",
+          "kind": "DNSRecordList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
     "maas.opendatahub.io/v1alpha1/MaaSAuthPolicy": {
       "description": "MaaSAuthPolicy is the Schema for the maasauthpolicies API",
       "namespaced": true,
@@ -22235,6 +23998,210 @@
         {
           "group": "maas.opendatahub.io",
           "kind": "MaaSModelList",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSModelRef": {
+      "description": "MaaSModelRef is the Schema for the maasmodelrefs API",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+            }
+          ],
+          "description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+        },
+        "spec": {
+          "description": "MaaSModelSpec defines the desired state of MaaSModelRef",
+          "properties": {
+            "modelRef": {
+              "description": "ModelRef references the actual model endpoint",
+              "properties": {
+                "kind": {
+                  "description": "Kind determines which fields are available",
+                  "enum": [
+                    "LLMInferenceService",
+                    "ExternalModel"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name is the name of the model resource",
+                  "type": "string"
+                },
+                "namespace": {
+                  "description": "Namespace is the namespace of the model resource\nIf not specified, defaults to the same namespace as MaaSModelRef",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "name"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "modelRef"
+          ],
+          "type": "object"
+        },
+        "status": {
+          "description": "MaaSModelStatus defines the observed state of MaaSModelRef",
+          "properties": {
+            "conditions": {
+              "description": "Conditions represent the latest available observations of the model's state",
+              "items": {
+                "description": "Condition contains details for one aspect of the current state of this API Resource.",
+                "properties": {
+                  "lastTransitionTime": {
+                    "description": "lastTransitionTime is the last time the condition transitioned from one status to another.\nThis should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "message": {
+                    "description": "message is a human readable message indicating details about the transition.\nThis may be an empty string.",
+                    "maxLength": 32768,
+                    "type": "string"
+                  },
+                  "observedGeneration": {
+                    "description": "observedGeneration represents the .metadata.generation that the condition was set based upon.\nFor instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date\nwith respect to the current state of the instance.",
+                    "format": "int64",
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reason": {
+                    "description": "reason contains a programmatic identifier indicating the reason for the condition's last transition.\nProducers of specific condition types may define expected values and meanings for this field,\nand whether the values are considered a guaranteed API.\nThe value should be a CamelCase string.\nThis field may not be empty.",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "status of the condition, one of True, False, Unknown.",
+                    "enum": [
+                      "True",
+                      "False",
+                      "Unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "type of condition in CamelCase or in foo.example.com/CamelCase.",
+                    "maxLength": 316,
+                    "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lastTransitionTime",
+                  "message",
+                  "reason",
+                  "status",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "endpoint": {
+              "description": "Endpoint is the endpoint URL for the model",
+              "type": "string"
+            },
+            "httpRouteGatewayName": {
+              "description": "HTTPRouteGatewayName is the name of the Gateway that the HTTPRoute references",
+              "type": "string"
+            },
+            "httpRouteGatewayNamespace": {
+              "description": "HTTPRouteGatewayNamespace is the namespace of the Gateway that the HTTPRoute references",
+              "type": "string"
+            },
+            "httpRouteHostnames": {
+              "description": "HTTPRouteHostnames are the hostnames configured on the HTTPRoute",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "httpRouteName": {
+              "description": "HTTPRouteName is the name of the HTTPRoute associated with this model",
+              "type": "string"
+            },
+            "httpRouteNamespace": {
+              "description": "HTTPRouteNamespace is the namespace of the HTTPRoute associated with this model",
+              "type": "string"
+            },
+            "phase": {
+              "description": "Phase represents the current phase of the model",
+              "enum": [
+                "Pending",
+                "Ready",
+                "Unhealthy",
+                "Failed"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSModelRef",
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    "maas.opendatahub.io/v1alpha1/MaaSModelRefList": {
+      "description": "MaaSModelRefList is a list of MaaSModelRef",
+      "namespaced": true,
+      "properties": {
+        "apiVersion": {
+          "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+          "type": "string"
+        },
+        "items": {
+          "description": "List of maasmodelrefs. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md",
+          "items": {
+            "$ref": "#/components/schemas/io.opendatahub.maas.v1alpha1.MaaSModelRef"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+          "type": "string"
+        },
+        "metadata": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+            }
+          ],
+          "description": "Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "type": "object",
+      "x-kubernetes-group-version-kind": [
+        {
+          "group": "maas.opendatahub.io",
+          "kind": "MaaSModelRefList",
           "version": "v1alpha1"
         }
       ]
