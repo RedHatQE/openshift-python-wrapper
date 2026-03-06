@@ -2,22 +2,14 @@
 
 
 from typing import Any
-from warnings import warn
 
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
 
-warn(
-    "MaaSModel is deprecated and will be removed in a future release. "
-    "Please use `MaaSModelRef` from maas_model_ref.py instead.",
-    DeprecationWarning,
-    stacklevel=2,
-)
 
-
-class MaaSModel(NamespacedResource):
+class MaaSModelRef(NamespacedResource):
     """
-    MaaSModel is the Schema for the maasmodels API
+    MaaSModelRef is the Schema for the maasmodelrefs API
     """
 
     api_group: str = NamespacedResource.ApiGroup.MAAS_OPENDATAHUB_IO
