@@ -7,13 +7,6 @@ from warnings import warn
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
 
-warn(
-    "MaaSSubscription from maa_s_subscription.py is deprecated and will be removed in a future release. "
-    "Please use `MaaSSubscription` from maas_subscription.py instead.",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 
 class MaaSSubscription(NamespacedResource):
     """
@@ -74,3 +67,11 @@ class MaaSSubscription(NamespacedResource):
                 _spec["priority"] = self.priority
 
     # End of generated code
+
+
+warn(
+    "MaaSSubscription from maa_s_subscription.py is deprecated and will be removed in a future release. "
+    "Please use `MaaSSubscription` from maas_subscription.py instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
