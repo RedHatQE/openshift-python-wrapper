@@ -7,13 +7,6 @@ from warnings import warn
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
 
-warn(
-    "MaaSAuthPolicy from maa_s_auth_policy.py is deprecated and will be removed in a future release. "
-    "Please use `MaaSAuthPolicy` from maas_auth_policy.py instead.",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 
 class MaaSAuthPolicy(NamespacedResource):
     """
@@ -65,3 +58,11 @@ class MaaSAuthPolicy(NamespacedResource):
                 _spec["meteringMetadata"] = self.metering_metadata
 
     # End of generated code
+
+
+warn(
+    "MaaSAuthPolicy from maa_s_auth_policy.py is deprecated and will be removed in a future release. "
+    "Please use `MaaSAuthPolicy` from maas_auth_policy.py instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
