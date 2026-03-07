@@ -7,13 +7,6 @@ from warnings import warn
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
 
-warn(
-    "MaaSModel is deprecated and will be removed in a future release. "
-    "Please use `MaaSModelRef` from maas_model_ref.py instead.",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 
 class MaaSModel(NamespacedResource):
     """
@@ -50,3 +43,11 @@ class MaaSModel(NamespacedResource):
             _spec["modelRef"] = self.model_ref
 
     # End of generated code
+
+
+warn(
+    "MaaSModel is deprecated and will be removed in a future release. "
+    "Please use `MaaSModelRef` from maas_model_ref.py instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
