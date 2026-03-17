@@ -89,7 +89,7 @@ def parse_explain(kind: str) -> list[dict[str, Any]]:
 
         resource_dict: dict[str, Any] = {
             "base_class": "NamespacedResource" if namespaced else "Resource",
-            "description": _kind_schema.get("description", MISSING_DESCRIPTION_STR),
+            "description": _kind_schema.get("description") or MISSING_DESCRIPTION_STR,
             "fields": [],
             "spec": [],
         }
