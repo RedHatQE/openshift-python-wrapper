@@ -15,11 +15,29 @@ def save_kubeconfig(
     config_file: str | None = None,
     verify_ssl: bool | None = None,
 ) -> None:
+    """
+    Save kubeconfig to a file.
+
+    Builds a kubeconfig from the provided parameters and writes it to the specified path.
+    File is created with 0o600 permissions. Errors are logged but not raised.
+
+    Args:
+        path (str): path to save the kubeconfig file.
+        host (str): cluster API server URL.
+        token (str): bearer token for authentication.
+        config_dict (dict): existing kubeconfig dict to save as-is.
+        config_file (str): path to an existing kubeconfig file to copy.
+        verify_ssl (bool): if False, sets insecure-skip-tls-verify in the saved config.
+    """
     if config_dict:
         _config = config_dict
     elif config_file:
-        with open(config_file) as f:
-            _config = yaml.safe_load(f)
+        try:
+            with open(config_file) as f:
+                _config = yaml.safe_load(f)
+        except OSError:
+            LOGGER.error(f"Failed to read config file {config_file}", exc_info=True)
+            return
     elif host:
         cluster_config: dict[str, Any] = {"server": host}
         if verify_ssl is False:

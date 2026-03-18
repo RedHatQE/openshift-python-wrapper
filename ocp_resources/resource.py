@@ -292,7 +292,7 @@ def get_client(
     if not _resolved_token and client_configuration.api_key:
         _bearer = client_configuration.api_key.get("authorization", "")
         if _bearer.startswith("Bearer "):
-            _resolved_token = _bearer[len("Bearer ") :]
+            _resolved_token = _bearer.removeprefix("Bearer ")
 
     if kubeconfig_output_path:
         save_kubeconfig(

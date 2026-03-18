@@ -390,6 +390,14 @@ class TestSaveKubeconfig:
 
         assert config["users"][0]["user"] == {}
 
+    def test_save_kubeconfig_write_failure(self, tmp_path):
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+
+        with patch("ocp_resources.utils.kubeconfig.os.open", side_effect=OSError("Permission denied")):
+            save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token="test-token")
+
+        assert not os.path.exists(kubeconfig_path)
+
     def test_save_kubeconfig_resolved_token_empty_api_key(self, tmp_path):
         """Test that empty api_key does not resolve a token."""
         token = None
