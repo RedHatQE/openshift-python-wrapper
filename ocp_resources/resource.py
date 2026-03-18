@@ -59,6 +59,7 @@ from ocp_resources.utils.constants import (
     TIMEOUT_10SEC,
     TIMEOUT_30SEC,
 )
+from ocp_resources.utils.kubeconfig import save_kubeconfig
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
@@ -206,6 +207,7 @@ def get_client(
     verify_ssl: bool | None = None,
     token: str | None = None,
     fake: bool = False,
+    kubeconfig_output_path: str | None = None,
 ) -> DynamicClient | FakeDynamicClient:
     """
     Get a kubernetes client.
@@ -230,6 +232,7 @@ def get_client(
         host (str): host for the cluster
         verify_ssl (bool): whether to verify ssl
         token (str): Use token to login
+        kubeconfig_output_path (str): path to save the kubeconfig file. If provided, the kubeconfig will be saved to this path.
 
     Returns:
         DynamicClient: a kubernetes client.
@@ -247,6 +250,8 @@ def get_client(
     if not client_configuration.proxy and proxy:
         LOGGER.info(f"Setting proxy from environment variable: {proxy}")
         client_configuration.proxy = proxy
+
+    _original_config_file = config_file
 
     if username and password and host:
         _client = client_configuration_with_basic_auth(
@@ -281,6 +286,22 @@ def get_client(
             context=context,
             client_configuration=client_configuration,
             persist_config=persist_config,
+        )
+
+    _resolved_token = token
+    if not _resolved_token and client_configuration.api_key:
+        _bearer = client_configuration.api_key.get("authorization", "")
+        if _bearer.startswith("Bearer "):
+            _resolved_token = _bearer[len("Bearer ") :]
+
+    if kubeconfig_output_path:
+        save_kubeconfig(
+            path=kubeconfig_output_path,
+            host=host or client_configuration.host,
+            token=_resolved_token,
+            config_dict=config_dict,
+            config_file=_original_config_file,
+            verify_ssl=verify_ssl,
         )
 
     kubernetes.client.Configuration.set_default(default=client_configuration)

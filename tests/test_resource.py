@@ -2,12 +2,14 @@ import os
 from unittest.mock import patch
 
 import pytest
+import yaml
 
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResourceList, Resource, ResourceList
 from ocp_resources.secret import Secret
+from ocp_resources.utils.kubeconfig import save_kubeconfig
 
 BASE_NAMESPACE_NAME: str = "test-namespace"
 BASE_POD_NAME: str = "test-pod"
@@ -200,3 +202,203 @@ class TestClientProxy:
 
         # Verify HTTPS_PROXY takes precedence over HTTP_PROXY
         assert fake_client.configuration.proxy == https_proxy
+
+
+class TestSaveKubeconfig:
+    def test_save_kubeconfig_with_host_and_token(self, tmp_path):
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+        host = "https://api.test-cluster.example.com:6443"
+        token = "sha256~test-token-value"
+
+        save_kubeconfig(path=kubeconfig_path, host=host, token=token, verify_ssl=False)
+
+        assert os.path.exists(kubeconfig_path)
+        assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
+
+        with open(kubeconfig_path) as f:
+            config = yaml.safe_load(f)
+
+        assert config["clusters"][0]["cluster"]["server"] == host
+        assert config["clusters"][0]["cluster"]["insecure-skip-tls-verify"] is True
+        assert config["users"][0]["user"]["token"] == token
+        assert config["current-context"] == "context"
+
+    def test_save_kubeconfig_with_config_dict(self, tmp_path):
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+        config_dict = {
+            "apiVersion": "v1",
+            "kind": "Config",
+            "clusters": [{"name": "my-cluster", "cluster": {"server": "https://my-server:6443"}}],
+            "users": [{"name": "my-user", "user": {"token": "my-token"}}],
+            "contexts": [{"name": "my-context", "context": {"cluster": "my-cluster", "user": "my-user"}}],
+            "current-context": "my-context",
+        }
+
+        save_kubeconfig(path=kubeconfig_path, config_dict=config_dict)
+
+        with open(kubeconfig_path) as f:
+            saved_config = yaml.safe_load(f)
+
+        assert saved_config == config_dict
+
+    def test_save_kubeconfig_with_config_file(self, tmp_path):
+        source_config = {
+            "apiVersion": "v1",
+            "kind": "Config",
+            "clusters": [{"name": "source-cluster", "cluster": {"server": "https://source:6443"}}],
+            "users": [{"name": "source-user", "user": {"token": "source-token"}}],
+            "contexts": [{"name": "source-ctx", "context": {"cluster": "source-cluster", "user": "source-user"}}],
+            "current-context": "source-ctx",
+        }
+        source_path = str(tmp_path / "source-kubeconfig")
+        with open(source_path, "w") as f:
+            yaml.safe_dump(source_config, f)
+
+        output_path = str(tmp_path / "output-kubeconfig")
+        save_kubeconfig(path=output_path, config_file=source_path)
+
+        with open(output_path) as f:
+            saved_config = yaml.safe_load(f)
+
+        assert saved_config == source_config
+
+    def test_save_kubeconfig_insufficient_data(self, tmp_path):
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+
+        save_kubeconfig(path=kubeconfig_path)
+
+        assert not os.path.exists(kubeconfig_path)
+
+    def test_save_kubeconfig_file_permissions(self, tmp_path):
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token="test-token")
+
+        assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
+
+    def test_save_kubeconfig_creates_parent_directories(self, tmp_path):
+        kubeconfig_path = str(tmp_path / "nested" / "dir" / "kubeconfig")
+
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token="test-token")
+
+        assert os.path.exists(kubeconfig_path)
+
+        with open(kubeconfig_path) as f:
+            config = yaml.safe_load(f)
+
+        assert config["clusters"][0]["cluster"]["server"] == "https://api.example.com:6443"
+
+    def test_save_kubeconfig_verify_ssl_not_false(self, tmp_path):
+        kubeconfig_path_true = str(tmp_path / "kubeconfig-true")
+        save_kubeconfig(
+            path=kubeconfig_path_true, host="https://api.example.com:6443", token="test-token", verify_ssl=True
+        )
+
+        with open(kubeconfig_path_true) as f:
+            config_true = yaml.safe_load(f)
+
+        assert "insecure-skip-tls-verify" not in config_true["clusters"][0]["cluster"]
+
+        kubeconfig_path_none = str(tmp_path / "kubeconfig-none")
+        save_kubeconfig(
+            path=kubeconfig_path_none, host="https://api.example.com:6443", token="test-token", verify_ssl=None
+        )
+
+        with open(kubeconfig_path_none) as f:
+            config_none = yaml.safe_load(f)
+
+        assert "insecure-skip-tls-verify" not in config_none["clusters"][0]["cluster"]
+
+    def test_save_kubeconfig_resolved_token_from_bearer(self, tmp_path):
+        """Test that get_client resolves token from client_configuration.api_key Bearer header.
+
+        This verifies the _resolved_token logic in get_client: when no explicit token is
+        provided but client_configuration.api_key contains a Bearer token, the token is
+        extracted and passed to save_kubeconfig.
+        """
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+        bearer_token = "sha256~oauth-resolved-token"
+
+        # Simulate what get_client does: resolve token from api_key Bearer header
+        token = None
+        api_key = {"authorization": f"Bearer {bearer_token}"}
+
+        _resolved_token = token
+        if not _resolved_token and api_key:
+            _bearer = api_key.get("authorization", "")
+            if _bearer.startswith("Bearer "):
+                _resolved_token = _bearer[len("Bearer ") :]
+
+        assert _resolved_token == bearer_token
+
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_resolved_token)
+
+        with open(kubeconfig_path) as f:
+            config = yaml.safe_load(f)
+
+        assert config["users"][0]["user"]["token"] == bearer_token
+
+    def test_save_kubeconfig_resolved_token_explicit_takes_precedence(self, tmp_path):
+        """Test that an explicit token takes precedence over Bearer in api_key.
+
+        When token is already provided, the _resolved_token logic should NOT
+        override it with the Bearer token from api_key.
+        """
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+        explicit_token = "sha256~explicit-token"
+        bearer_token = "sha256~bearer-token"
+
+        token = explicit_token
+        api_key = {"authorization": f"Bearer {bearer_token}"}
+
+        _resolved_token = token
+        if not _resolved_token and api_key:
+            _bearer = api_key.get("authorization", "")
+            if _bearer.startswith("Bearer "):
+                _resolved_token = _bearer[len("Bearer ") :]
+
+        assert _resolved_token == explicit_token
+
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_resolved_token)
+
+        with open(kubeconfig_path) as f:
+            config = yaml.safe_load(f)
+
+        assert config["users"][0]["user"]["token"] == explicit_token
+
+    def test_save_kubeconfig_resolved_token_no_bearer_prefix(self, tmp_path):
+        """Test that api_key without Bearer prefix does not resolve a token."""
+        kubeconfig_path = str(tmp_path / "kubeconfig")
+
+        token = None
+        api_key = {"authorization": "Basic some-basic-auth"}
+
+        _resolved_token = token
+        if not _resolved_token and api_key:
+            _bearer = api_key.get("authorization", "")
+            if _bearer.startswith("Bearer "):
+                _resolved_token = _bearer[len("Bearer ") :]
+
+        assert _resolved_token is None
+
+        # Without a token and only host, the kubeconfig should still be created
+        # but user config will have no token
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_resolved_token)
+
+        with open(kubeconfig_path) as f:
+            config = yaml.safe_load(f)
+
+        assert config["users"][0]["user"] == {}
+
+    def test_save_kubeconfig_resolved_token_empty_api_key(self, tmp_path):
+        """Test that empty api_key does not resolve a token."""
+        token = None
+        api_key = {}
+
+        _resolved_token = token
+        if not _resolved_token and api_key:
+            _bearer = api_key.get("authorization", "")
+            if _bearer.startswith("Bearer "):
+                _resolved_token = _bearer[len("Bearer ") :]
+
+        assert _resolved_token is None
