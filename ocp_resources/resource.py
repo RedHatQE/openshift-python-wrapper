@@ -206,7 +206,7 @@ def _resolve_bearer_token(
         if _bearer.startswith("Bearer "):
             return _bearer.removeprefix("Bearer ")
 
-    return token
+    return None
 
 
 def get_client(
@@ -304,9 +304,8 @@ def get_client(
             persist_config=persist_config,
         )
 
-    _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
-
     if kubeconfig_output_path:
+        _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
         save_kubeconfig(
             path=kubeconfig_output_path,
             host=host or client_configuration.host,

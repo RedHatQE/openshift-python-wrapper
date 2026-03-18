@@ -266,21 +266,24 @@ class TestSaveKubeconfig:
     def test_save_kubeconfig_insufficient_data(self, tmp_path):
         kubeconfig_path = str(tmp_path / "kubeconfig")
 
-        save_kubeconfig(path=kubeconfig_path)
+        with pytest.raises(ValueError, match="Not enough data to build kubeconfig"):
+            save_kubeconfig(path=kubeconfig_path)
 
         assert not os.path.exists(kubeconfig_path)
 
     def test_save_kubeconfig_file_permissions(self, tmp_path):
         kubeconfig_path = str(tmp_path / "kubeconfig")
+        _test_token = "test-token"  # noqa: S105
 
-        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token="test-token")
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_test_token)
 
         assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
 
     def test_save_kubeconfig_creates_parent_directories(self, tmp_path):
         kubeconfig_path = str(tmp_path / "nested" / "dir" / "kubeconfig")
+        _test_token = "test-token"  # noqa: S105
 
-        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token="test-token")
+        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_test_token)
 
         assert os.path.exists(kubeconfig_path)
 
@@ -290,9 +293,11 @@ class TestSaveKubeconfig:
         assert config["clusters"][0]["cluster"]["server"] == "https://api.example.com:6443"
 
     def test_save_kubeconfig_verify_ssl_not_false(self, tmp_path):
+        _test_token = "test-token"  # noqa: S105
+
         kubeconfig_path_true = str(tmp_path / "kubeconfig-true")
         save_kubeconfig(
-            path=kubeconfig_path_true, host="https://api.example.com:6443", token="test-token", verify_ssl=True
+            path=kubeconfig_path_true, host="https://api.example.com:6443", token=_test_token, verify_ssl=True
         )
 
         with open(kubeconfig_path_true) as f:
@@ -302,7 +307,7 @@ class TestSaveKubeconfig:
 
         kubeconfig_path_none = str(tmp_path / "kubeconfig-none")
         save_kubeconfig(
-            path=kubeconfig_path_none, host="https://api.example.com:6443", token="test-token", verify_ssl=None
+            path=kubeconfig_path_none, host="https://api.example.com:6443", token=_test_token, verify_ssl=None
         )
 
         with open(kubeconfig_path_none) as f:
@@ -341,8 +346,10 @@ class TestSaveKubeconfig:
 
     def test_save_kubeconfig_write_failure(self, tmp_path):
         kubeconfig_path = str(tmp_path / "kubeconfig")
+        _test_token = "test-token"  # noqa: S105
 
-        with patch("ocp_resources.utils.kubeconfig.os.open", side_effect=OSError("Permission denied")):
-            save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token="test-token")
+        with pytest.raises(OSError, match="Permission denied"):
+            with patch("ocp_resources.utils.kubeconfig.tempfile.mkstemp", side_effect=OSError("Permission denied")):
+                save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_test_token)
 
         assert not os.path.exists(kubeconfig_path)

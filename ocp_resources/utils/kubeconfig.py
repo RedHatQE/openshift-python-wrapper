@@ -37,8 +37,8 @@ def save_kubeconfig(
             with open(config_file) as f:
                 _config = yaml.safe_load(f)
         except (OSError, yaml.YAMLError):
-            LOGGER.error(f"Failed to read config file {config_file}", exc_info=True)
-            return
+            LOGGER.error(f"Failed to read config file {config_file}")
+            raise
     elif host:
         cluster_config: dict[str, Any] = {"server": host}
         if verify_ssl is False:
@@ -57,8 +57,7 @@ def save_kubeconfig(
             "current-context": "context",
         }
     else:
-        LOGGER.warning("kubeconfig_output_path provided but not enough data to build kubeconfig")
-        return
+        raise ValueError("Not enough data to build kubeconfig: provide config_dict, config_file, or host")
 
     try:
         directory = os.path.dirname(os.path.abspath(path))
@@ -75,4 +74,5 @@ def save_kubeconfig(
                 os.unlink(tmp_path)
             raise
     except (OSError, yaml.YAMLError):
-        LOGGER.error(f"Failed to save kubeconfig to {path}", exc_info=True)
+        LOGGER.error(f"Failed to save kubeconfig to {path}")
+        raise
