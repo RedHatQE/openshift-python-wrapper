@@ -1,4 +1,5 @@
 import os
+import tempfile
 from typing import Any
 
 import yaml
@@ -29,13 +30,13 @@ def save_kubeconfig(
         config_file (str): path to an existing kubeconfig file to copy.
         verify_ssl (bool): if False, sets insecure-skip-tls-verify in the saved config.
     """
-    if config_dict:
+    if config_dict is not None:
         _config = config_dict
     elif config_file:
         try:
             with open(config_file) as f:
                 _config = yaml.safe_load(f)
-        except OSError:
+        except (OSError, yaml.YAMLError):
             LOGGER.error(f"Failed to read config file {config_file}", exc_info=True)
             return
     elif host:
@@ -60,9 +61,18 @@ def save_kubeconfig(
         return
 
     try:
-        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-        fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o600)
-        with os.fdopen(fd, "w") as f:
-            yaml.safe_dump(_config, f)
-    except OSError:
+        directory = os.path.dirname(os.path.abspath(path))
+        os.makedirs(directory, exist_ok=True)
+
+        fd, tmp_path = tempfile.mkstemp(dir=directory)
+        try:
+            os.fchmod(fd, 0o600)
+            with os.fdopen(fd, "w") as f:
+                yaml.safe_dump(_config, f)
+            os.replace(tmp_path, path)
+        except BaseException:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+            raise
+    except (OSError, yaml.YAMLError):
         LOGGER.error(f"Failed to save kubeconfig to {path}", exc_info=True)

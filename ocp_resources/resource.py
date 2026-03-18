@@ -193,6 +193,22 @@ def client_configuration_with_basic_auth(
     )
 
 
+def _resolve_bearer_token(
+    token: str | None,
+    client_configuration: "kubernetes.client.Configuration",
+) -> str | None:
+    """Extract bearer token from client configuration if not explicitly provided."""
+    if token:
+        return token
+
+    if client_configuration.api_key:
+        _bearer = client_configuration.api_key.get("authorization", "")
+        if _bearer.startswith("Bearer "):
+            return _bearer.removeprefix("Bearer ")
+
+    return token
+
+
 def get_client(
     config_file: str | None = None,
     config_dict: dict[str, Any] | None = None,
@@ -288,11 +304,7 @@ def get_client(
             persist_config=persist_config,
         )
 
-    _resolved_token = token
-    if not _resolved_token and client_configuration.api_key:
-        _bearer = client_configuration.api_key.get("authorization", "")
-        if _bearer.startswith("Bearer "):
-            _resolved_token = _bearer.removeprefix("Bearer ")
+    _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
 
     if kubeconfig_output_path:
         save_kubeconfig(
