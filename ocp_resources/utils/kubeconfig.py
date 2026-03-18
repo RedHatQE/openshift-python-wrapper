@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 from typing import Any
 
@@ -20,25 +21,28 @@ def save_kubeconfig(
     Save kubeconfig to a file.
 
     Builds a kubeconfig from the provided parameters and writes it to the specified path.
-    File is created with 0o600 permissions. Errors are logged but not raised.
+    File is created with 0o600 permissions. Errors are logged and re-raised.
 
     Args:
         path (str): path to save the kubeconfig file.
         host (str): cluster API server URL.
         token (str): bearer token for authentication.
         config_dict (dict): existing kubeconfig dict to save as-is.
-        config_file (str): path to an existing kubeconfig file to copy.
+        config_file (str): path to an existing kubeconfig file to copy as-is.
         verify_ssl (bool): if False, sets insecure-skip-tls-verify in the saved config.
     """
     if config_dict is not None:
         _config = config_dict
     elif config_file:
         try:
-            with open(config_file) as f:
-                _config = yaml.safe_load(f)
-        except (OSError, yaml.YAMLError):
-            LOGGER.error(f"Failed to read config file {config_file}")
+            directory = os.path.dirname(os.path.abspath(path))
+            os.makedirs(directory, exist_ok=True)
+            shutil.copy2(config_file, path)
+            os.chmod(path, 0o600)
+        except OSError:
+            LOGGER.error(f"Failed to copy config file {config_file} to {path}")
             raise
+        return
     elif host:
         cluster_config: dict[str, Any] = {"server": host}
         if verify_ssl is False:
