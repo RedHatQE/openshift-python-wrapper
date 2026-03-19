@@ -1,5 +1,4 @@
 import os
-import shutil
 import tempfile
 from typing import Any
 
@@ -14,7 +13,6 @@ def save_kubeconfig(
     host: str | None = None,
     token: str | None = None,
     config_dict: dict[str, Any] | None = None,
-    config_file: str | None = None,
     verify_ssl: bool | None = None,
 ) -> None:
     """
@@ -28,21 +26,10 @@ def save_kubeconfig(
         host (str): cluster API server URL.
         token (str): bearer token for authentication.
         config_dict (dict): existing kubeconfig dict to save as-is.
-        config_file (str): path to an existing kubeconfig file to copy as-is.
         verify_ssl (bool): if False, sets insecure-skip-tls-verify in the saved config.
     """
     if config_dict is not None:
         _config = config_dict
-    elif config_file:
-        try:
-            directory = os.path.dirname(os.path.abspath(path))
-            os.makedirs(directory, exist_ok=True)
-            shutil.copy2(config_file, path)
-            os.chmod(path, 0o600)
-        except OSError:
-            LOGGER.error(f"Failed to copy config file {config_file} to {path}")
-            raise
-        return
     elif host:
         cluster_config: dict[str, Any] = {"server": host}
         if verify_ssl is False:
@@ -61,7 +48,7 @@ def save_kubeconfig(
             "current-context": "context",
         }
     else:
-        raise ValueError("Not enough data to build kubeconfig: provide config_dict, config_file, or host")
+        raise ValueError("Not enough data to build kubeconfig: provide config_dict or host")
 
     try:
         directory = os.path.dirname(os.path.abspath(path))

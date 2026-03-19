@@ -242,27 +242,6 @@ class TestSaveKubeconfig:
 
         assert saved_config == config_dict
 
-    def test_save_kubeconfig_with_config_file(self, tmp_path):
-        source_config = {
-            "apiVersion": "v1",
-            "kind": "Config",
-            "clusters": [{"name": "source-cluster", "cluster": {"server": "https://source:6443"}}],
-            "users": [{"name": "source-user", "user": {"token": "source-token"}}],
-            "contexts": [{"name": "source-ctx", "context": {"cluster": "source-cluster", "user": "source-user"}}],
-            "current-context": "source-ctx",
-        }
-        source_path = str(tmp_path / "source-kubeconfig")
-        with open(source_path, "w") as f:
-            yaml.safe_dump(source_config, f)
-
-        output_path = str(tmp_path / "output-kubeconfig")
-        save_kubeconfig(path=output_path, config_file=source_path)
-
-        with open(output_path) as f:
-            saved_config = yaml.safe_load(f)
-
-        assert saved_config == source_config
-
     def test_save_kubeconfig_insufficient_data(self, tmp_path):
         kubeconfig_path = str(tmp_path / "kubeconfig")
 

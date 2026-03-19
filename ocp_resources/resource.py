@@ -267,8 +267,6 @@ def get_client(
         LOGGER.info(f"Setting proxy from environment variable: {proxy}")
         client_configuration.proxy = proxy
 
-    _original_config_file = config_file
-
     if username and password and host:
         _client = client_configuration_with_basic_auth(
             username=username, password=password, host=host, configuration=client_configuration
@@ -311,7 +309,6 @@ def get_client(
             host=host or client_configuration.host,
             token=_resolved_token,
             config_dict=config_dict,
-            config_file=_original_config_file,
             verify_ssl=verify_ssl,
         )
 
