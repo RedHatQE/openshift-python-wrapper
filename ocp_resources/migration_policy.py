@@ -9,6 +9,7 @@ class MigrationPolicy(Resource):
         name=None,
         allow_auto_converge=None,
         allow_post_copy=None,
+        allow_workload_disruption=None,
         bandwidth_per_migration=None,
         completion_timeout_per_gb=None,
         namespace_selector=None,
@@ -22,6 +23,7 @@ class MigrationPolicy(Resource):
             name (str): Migration Policy name
             allow_auto_converge (bool, optional)
             allow_post_copy (bool, optional)
+            allow_workload_disruption (bool, optional)
             bandwidth_per_migration (str, optional, i.e. "1Gi")
             completion_timeout_per_gb (int, optional)
             namespace_selector (dict, optional): Dict of Namespace labels to match (e.g. {"project-owner": "redhat"})
@@ -33,6 +35,7 @@ class MigrationPolicy(Resource):
         )
         self.allow_auto_converge = allow_auto_converge
         self.allow_post_copy = allow_post_copy
+        self.allow_workload_disruption = allow_workload_disruption
         self.bandwidth_per_migration = bandwidth_per_migration
         self.completion_timeout_per_gb = completion_timeout_per_gb
         self.namespace_selector = namespace_selector or {}
@@ -48,6 +51,8 @@ class MigrationPolicy(Resource):
                 self.res["spec"]["allowAutoConverge"] = self.allow_auto_converge
             if self.allow_post_copy is not None:
                 self.res["spec"]["allowPostCopy"] = self.allow_post_copy
+            if self.allow_workload_disruption is not None:
+                self.res["spec"]["allowWorkloadDisruption"] = self.allow_workload_disruption
             if self.bandwidth_per_migration:
                 self.res["spec"]["bandwidthPerMigration"] = self.bandwidth_per_migration
             if self.completion_timeout_per_gb:
