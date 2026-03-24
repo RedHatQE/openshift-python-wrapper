@@ -1,3 +1,4 @@
+import atexit
 import os
 import tempfile
 from typing import Any
@@ -9,24 +10,25 @@ LOGGER = get_logger(name=__name__)
 
 
 def save_kubeconfig(
-    path: str,
     host: str | None = None,
     token: str | None = None,
     config_dict: dict[str, Any] | None = None,
     verify_ssl: bool | None = None,
-) -> None:
+) -> str:
     """
-    Save kubeconfig to a file.
+    Save kubeconfig to a temporary file.
 
-    Builds a kubeconfig from the provided parameters and writes it to the specified path.
-    File is created with 0o600 permissions. Errors are logged and re-raised.
+    Builds a kubeconfig from the provided parameters and writes it to a
+    temporary file with 0o600 permissions.
 
     Args:
-        path (str): path to save the kubeconfig file.
         host (str): cluster API server URL.
         token (str): bearer token for authentication.
         config_dict (dict): existing kubeconfig dict to save as-is.
         verify_ssl (bool): if False, sets insecure-skip-tls-verify in the saved config.
+
+    Returns:
+        str: path to the temporary kubeconfig file.
     """
     if config_dict is not None:
         _config = config_dict
@@ -50,20 +52,19 @@ def save_kubeconfig(
     else:
         raise ValueError("Not enough data to build kubeconfig: provide config_dict or host")
 
+    tmp_file = None
     try:
-        directory = os.path.dirname(os.path.abspath(path))
-        os.makedirs(directory, exist_ok=True)
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".kubeconfig", mode="w")
+        os.chmod(tmp_file.name, 0o600)
+        yaml.safe_dump(_config, tmp_file)
+        tmp_file.close()
+        # Ensures the file is cleaned up when the process exits.
+        atexit.register(lambda p: os.unlink(p) if os.path.exists(p) else None, tmp_file.name)
+        LOGGER.info(f"kubeconfig saved to {tmp_file.name}")
+        return tmp_file.name
 
-        fd, tmp_path = tempfile.mkstemp(dir=directory)
-        try:
-            os.fchmod(fd, 0o600)
-            with os.fdopen(fd, "w") as f:
-                yaml.safe_dump(_config, f)
-            os.replace(tmp_path, path)
-        except BaseException:
-            if os.path.exists(tmp_path):
-                os.unlink(tmp_path)
-            raise
     except (OSError, yaml.YAMLError):
-        LOGGER.error(f"Failed to save kubeconfig to {path}")
+        if tmp_file is not None and os.path.exists(tmp_file.name):
+            os.unlink(tmp_file.name)
+        LOGGER.error("Failed to save kubeconfig")
         raise

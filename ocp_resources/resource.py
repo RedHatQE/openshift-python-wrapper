@@ -12,7 +12,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Self
+from typing import Any, Literal, Self, overload
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import jsonschema
@@ -209,6 +209,7 @@ def _resolve_bearer_token(
     return None
 
 
+@overload
 def get_client(
     config_file: str | None = None,
     config_dict: dict[str, Any] | None = None,
@@ -223,8 +224,46 @@ def get_client(
     verify_ssl: bool | None = None,
     token: str | None = None,
     fake: bool = False,
-    kubeconfig_output_path: str | None = None,
-) -> DynamicClient | FakeDynamicClient:
+    *,
+    generate_kubeconfig: Literal[True],
+) -> tuple[DynamicClient, str]: ...
+
+
+@overload
+def get_client(
+    config_file: str | None = None,
+    config_dict: dict[str, Any] | None = None,
+    context: str | None = None,
+    client_configuration: kubernetes.client.Configuration | None = None,
+    persist_config: bool = True,
+    temp_file_path: str | None = None,
+    try_refresh_token: bool = True,
+    username: str | None = None,
+    password: str | None = None,
+    host: str | None = None,
+    verify_ssl: bool | None = None,
+    token: str | None = None,
+    fake: bool = False,
+    generate_kubeconfig: Literal[False] = ...,
+) -> DynamicClient | FakeDynamicClient: ...
+
+
+def get_client(
+    config_file: str | None = None,
+    config_dict: dict[str, Any] | None = None,
+    context: str | None = None,
+    client_configuration: kubernetes.client.Configuration | None = None,
+    persist_config: bool = True,
+    temp_file_path: str | None = None,
+    try_refresh_token: bool = True,
+    username: str | None = None,
+    password: str | None = None,
+    host: str | None = None,
+    verify_ssl: bool | None = None,
+    token: str | None = None,
+    fake: bool = False,
+    generate_kubeconfig: bool = False,
+) -> DynamicClient | FakeDynamicClient | tuple[DynamicClient, str]:
     """
     Get a kubernetes client.
 
@@ -248,10 +287,11 @@ def get_client(
         host (str): host for the cluster
         verify_ssl (bool): whether to verify ssl
         token (str): Use token to login
-        kubeconfig_output_path (str): path to save the kubeconfig file. If provided, the kubeconfig will be saved to this path.
+        generate_kubeconfig (bool): if True, save the kubeconfig to a temporary file and log the path.
 
     Returns:
         DynamicClient: a kubernetes client.
+            If generate_kubeconfig is True, returns a tuple of (DynamicClient, str) where str is the path to the temporary kubeconfig file.
     """
     if fake:
         return FakeDynamicClient()
@@ -302,28 +342,31 @@ def get_client(
             persist_config=persist_config,
         )
 
-    if kubeconfig_output_path:
+    kubernetes.client.Configuration.set_default(default=client_configuration)
+
+    try:
+        _dynamic_client = kubernetes.dynamic.DynamicClient(client=_client)
+    except MaxRetryError:
+        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
+        LOGGER.info("Trying to get client via incluster_config")
+        _dynamic_client = kubernetes.dynamic.DynamicClient(
+            client=kubernetes.config.incluster_config.load_incluster_config(
+                client_configuration=client_configuration, try_refresh_token=try_refresh_token
+            ),
+        )
+
+    if generate_kubeconfig:
         _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
-        save_kubeconfig(
-            path=kubeconfig_output_path,
+        kubeconfig_path = save_kubeconfig(
             host=host or client_configuration.host,
             token=_resolved_token,
             config_dict=config_dict,
             verify_ssl=verify_ssl,
         )
 
-    kubernetes.client.Configuration.set_default(default=client_configuration)
+        return _dynamic_client, kubeconfig_path
 
-    try:
-        return kubernetes.dynamic.DynamicClient(client=_client)
-    except MaxRetryError:
-        # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
-        LOGGER.info("Trying to get client via incluster_config")
-        return kubernetes.dynamic.DynamicClient(
-            client=kubernetes.config.incluster_config.load_incluster_config(
-                client_configuration=client_configuration, try_refresh_token=try_refresh_token
-            ),
-        )
+    return _dynamic_client
 
 
 def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> str | None:

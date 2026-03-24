@@ -206,26 +206,26 @@ class TestClientProxy:
 
 
 class TestSaveKubeconfig:
-    def test_save_kubeconfig_with_host_and_token(self, tmp_path):
-        kubeconfig_path = str(tmp_path / "kubeconfig")
+    def test_save_kubeconfig_with_host_and_token(self):
         host = "https://api.test-cluster.example.com:6443"
         token = "sha256~test-token-value"  # noqa: S105
 
-        save_kubeconfig(path=kubeconfig_path, host=host, token=token, verify_ssl=False)
+        kubeconfig_path = save_kubeconfig(host=host, token=token, verify_ssl=False)
+        try:
+            assert os.path.exists(kubeconfig_path)
+            assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
 
-        assert os.path.exists(kubeconfig_path)
-        assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
+            with open(kubeconfig_path) as f:
+                config = yaml.safe_load(f)
 
-        with open(kubeconfig_path) as f:
-            config = yaml.safe_load(f)
+            assert config["clusters"][0]["cluster"]["server"] == host
+            assert config["clusters"][0]["cluster"]["insecure-skip-tls-verify"] is True
+            assert config["users"][0]["user"]["token"] == token
+            assert config["current-context"] == "context"
+        finally:
+            os.unlink(kubeconfig_path)
 
-        assert config["clusters"][0]["cluster"]["server"] == host
-        assert config["clusters"][0]["cluster"]["insecure-skip-tls-verify"] is True
-        assert config["users"][0]["user"]["token"] == token
-        assert config["current-context"] == "context"
-
-    def test_save_kubeconfig_with_config_dict(self, tmp_path):
-        kubeconfig_path = str(tmp_path / "kubeconfig")
+    def test_save_kubeconfig_with_config_dict(self):
         config_dict = {
             "apiVersion": "v1",
             "kind": "Config",
@@ -235,62 +235,46 @@ class TestSaveKubeconfig:
             "current-context": "my-context",
         }
 
-        save_kubeconfig(path=kubeconfig_path, config_dict=config_dict)
+        kubeconfig_path = save_kubeconfig(config_dict=config_dict)
+        try:
+            with open(kubeconfig_path) as f:
+                saved_config = yaml.safe_load(f)
 
-        with open(kubeconfig_path) as f:
-            saved_config = yaml.safe_load(f)
+            assert saved_config == config_dict
+        finally:
+            os.unlink(kubeconfig_path)
 
-        assert saved_config == config_dict
-
-    def test_save_kubeconfig_insufficient_data(self, tmp_path):
-        kubeconfig_path = str(tmp_path / "kubeconfig")
-
+    def test_save_kubeconfig_insufficient_data(self):
         with pytest.raises(ValueError, match="Not enough data to build kubeconfig"):
-            save_kubeconfig(path=kubeconfig_path)
+            save_kubeconfig()
 
-        assert not os.path.exists(kubeconfig_path)
-
-    def test_save_kubeconfig_file_permissions(self, tmp_path):
-        kubeconfig_path = str(tmp_path / "kubeconfig")
+    def test_save_kubeconfig_file_permissions(self):
         _test_token = "test-token"  # noqa: S105
 
-        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_test_token)
+        kubeconfig_path = save_kubeconfig(host="https://api.example.com:6443", token=_test_token)
+        try:
+            assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
+        finally:
+            os.unlink(kubeconfig_path)
 
-        assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
-
-    def test_save_kubeconfig_creates_parent_directories(self, tmp_path):
-        kubeconfig_path = str(tmp_path / "nested" / "dir" / "kubeconfig")
+    def test_save_kubeconfig_verify_ssl_not_false(self):
         _test_token = "test-token"  # noqa: S105
 
-        save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_test_token)
+        kubeconfig_path_true = save_kubeconfig(host="https://api.example.com:6443", token=_test_token, verify_ssl=True)
+        try:
+            with open(kubeconfig_path_true) as f:
+                config_true = yaml.safe_load(f)
 
-        assert os.path.exists(kubeconfig_path)
+            assert "insecure-skip-tls-verify" not in config_true["clusters"][0]["cluster"]
+        finally:
+            os.unlink(kubeconfig_path_true)
 
-        with open(kubeconfig_path) as f:
-            config = yaml.safe_load(f)
-
-        assert config["clusters"][0]["cluster"]["server"] == "https://api.example.com:6443"
-
-    def test_save_kubeconfig_verify_ssl_not_false(self, tmp_path):
-        _test_token = "test-token"  # noqa: S105
-
-        kubeconfig_path_true = str(tmp_path / "kubeconfig-true")
-        save_kubeconfig(
-            path=kubeconfig_path_true, host="https://api.example.com:6443", token=_test_token, verify_ssl=True
-        )
-
-        with open(kubeconfig_path_true) as f:
-            config_true = yaml.safe_load(f)
-
-        assert "insecure-skip-tls-verify" not in config_true["clusters"][0]["cluster"]
-
-        kubeconfig_path_none = str(tmp_path / "kubeconfig-none")
-        save_kubeconfig(
-            path=kubeconfig_path_none, host="https://api.example.com:6443", token=_test_token, verify_ssl=None
-        )
-
-        with open(kubeconfig_path_none) as f:
-            config_none = yaml.safe_load(f)
+        kubeconfig_path_none = save_kubeconfig(host="https://api.example.com:6443", token=_test_token, verify_ssl=None)
+        try:
+            with open(kubeconfig_path_none) as f:
+                config_none = yaml.safe_load(f)
+        finally:
+            os.unlink(kubeconfig_path_none)
 
         assert "insecure-skip-tls-verify" not in config_none["clusters"][0]["cluster"]
 
@@ -323,12 +307,12 @@ class TestSaveKubeconfig:
         result = _resolve_bearer_token(token=None, client_configuration=cfg)
         assert result is None
 
-    def test_save_kubeconfig_write_failure(self, tmp_path):
-        kubeconfig_path = str(tmp_path / "kubeconfig")
+    def test_save_kubeconfig_write_failure(self):
         _test_token = "test-token"  # noqa: S105
 
         with pytest.raises(OSError, match="Permission denied"):
-            with patch("ocp_resources.utils.kubeconfig.tempfile.mkstemp", side_effect=OSError("Permission denied")):
-                save_kubeconfig(path=kubeconfig_path, host="https://api.example.com:6443", token=_test_token)
-
-        assert not os.path.exists(kubeconfig_path)
+            with patch(
+                "ocp_resources.utils.kubeconfig.tempfile.NamedTemporaryFile",
+                side_effect=OSError("Permission denied"),
+            ):
+                save_kubeconfig(host="https://api.example.com:6443", token=_test_token)
