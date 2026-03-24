@@ -12,7 +12,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Literal, Self, overload
+from typing import Any, Self
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import jsonschema
@@ -207,45 +207,6 @@ def _resolve_bearer_token(
             return _bearer.removeprefix("Bearer ")
 
     return None
-
-
-@overload
-def get_client(
-    config_file: str | None = None,
-    config_dict: dict[str, Any] | None = None,
-    context: str | None = None,
-    client_configuration: kubernetes.client.Configuration | None = None,
-    persist_config: bool = True,
-    temp_file_path: str | None = None,
-    try_refresh_token: bool = True,
-    username: str | None = None,
-    password: str | None = None,
-    host: str | None = None,
-    verify_ssl: bool | None = None,
-    token: str | None = None,
-    fake: bool = False,
-    *,
-    generate_kubeconfig: Literal[True],
-) -> tuple[DynamicClient, str]: ...
-
-
-@overload
-def get_client(
-    config_file: str | None = None,
-    config_dict: dict[str, Any] | None = None,
-    context: str | None = None,
-    client_configuration: kubernetes.client.Configuration | None = None,
-    persist_config: bool = True,
-    temp_file_path: str | None = None,
-    try_refresh_token: bool = True,
-    username: str | None = None,
-    password: str | None = None,
-    host: str | None = None,
-    verify_ssl: bool | None = None,
-    token: str | None = None,
-    fake: bool = False,
-    generate_kubeconfig: Literal[False] = ...,
-) -> DynamicClient | FakeDynamicClient: ...
 
 
 def get_client(
@@ -1524,9 +1485,9 @@ class Resource(ResourceConstants):
             )
             client = get_client(config_file=config_file, config_dict=config_dict, context=context)
 
-        for _resource in client.resources.search():
+        for _resource in client.resources.search():  # type: ignore[union-attr]
             try:
-                _resources = client.get(_resource, *args, **kwargs)
+                _resources = client.get(_resource, *args, **kwargs)  # type: ignore[union-attr]
                 yield from _resources.items
 
             except (NotFoundError, TypeError, MethodNotAllowedError):
