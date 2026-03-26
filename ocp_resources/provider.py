@@ -17,6 +17,7 @@ class Provider(NamespacedResource):
         secret_name: str | None = None,
         secret_namespace: str | None = None,
         vddk_init_image: str | None = None,
+        sdk_endpoint: str | None = None,
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
@@ -25,10 +26,17 @@ class Provider(NamespacedResource):
         self.secret_name = secret_name
         self.secret_namespace = secret_namespace
         self.vddk_init_image = vddk_init_image
+        self.sdk_endpoint = sdk_endpoint
 
     def to_dict(self) -> None:
         super().to_dict()
         if not self.kind_dict and not self.yaml_file:
+            settings: dict[str, str] = {}
+            if self.vddk_init_image:
+                settings["vddkInitImage"] = self.vddk_init_image
+            if self.sdk_endpoint:
+                settings["sdkEndpoint"] = self.sdk_endpoint
+
             self.res.update({
                 "spec": {
                     "type": self.provider_type,
@@ -37,6 +45,6 @@ class Provider(NamespacedResource):
                         "name": self.secret_name,
                         "namespace": self.secret_namespace,
                     },
-                    "settings": {"vddkInitImage": self.vddk_init_image},
+                    "settings": settings,
                 }
             })
