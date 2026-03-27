@@ -16,16 +16,24 @@ class VirtualMachineStorageMigrationPlan(NamespacedResource):
 
     def __init__(
         self,
+        retention_policy: str | None = None,
         virtual_machines: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
         Args:
+            retention_policy (str): RetentionPolicy indicates whether to keep or delete the source
+              DataVolume/PVC after each VM migration completes. When
+              "keepSource" (default), the source is preserved. When
+              "deleteSource", the source DataVolume is deleted if it exists,
+              otherwise the source PVC is deleted.
+
             virtual_machines (list[Any]): The virtual machines to migrate.
 
         """
         super().__init__(**kwargs)
 
+        self.retention_policy = retention_policy
         self.virtual_machines = virtual_machines
 
     def to_dict(self) -> None:
@@ -40,5 +48,8 @@ class VirtualMachineStorageMigrationPlan(NamespacedResource):
             _spec = self.res["spec"]
 
             _spec["virtualMachines"] = self.virtual_machines
+
+            if self.retention_policy is not None:
+                _spec["retentionPolicy"] = self.retention_policy
 
     # End of generated code

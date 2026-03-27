@@ -17,16 +17,25 @@ class MultiNamespaceVirtualMachineStorageMigrationPlan(NamespacedResource):
     def __init__(
         self,
         namespaces: list[Any] | None = None,
+        retention_policy: str | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
         Args:
-            namespaces (list[Any]): The virtual machines to migrate.
+            namespaces (list[Any]): The virtual machines to migrate per namespace.
+
+            retention_policy (str): RetentionPolicy indicates whether to keep or delete the source
+              DataVolume/PVC after each VM migration completes in each created
+              namespace plan. When set to "deleteSource", every created
+              VirtualMachineStorageMigrationPlan will have retentionPolicy set
+              to deleteSource. When "keepSource" or unset, child plans keep
+              their per-namespace spec or default to keepSource.
 
         """
         super().__init__(**kwargs)
 
         self.namespaces = namespaces
+        self.retention_policy = retention_policy
 
     def to_dict(self) -> None:
 
@@ -40,5 +49,8 @@ class MultiNamespaceVirtualMachineStorageMigrationPlan(NamespacedResource):
             _spec = self.res["spec"]
 
             _spec["namespaces"] = self.namespaces
+
+            if self.retention_policy is not None:
+                _spec["retentionPolicy"] = self.retention_policy
 
     # End of generated code
