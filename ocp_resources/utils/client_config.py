@@ -76,19 +76,22 @@ def save_kubeconfig(
     else:
         raise ValueError("Not enough data to build kubeconfig: provide config_dict or host")
 
-    tmp_file = None
+    fd = None
+    tmp_path = None
     try:
-        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".kubeconfig", mode="w")
-        os.chmod(tmp_file.name, 0o600)
-        yaml.safe_dump(_config, tmp_file)
-        tmp_file.close()
-        # Ensures the file is cleaned up when the process exits.
-        atexit.register(lambda p: os.unlink(p) if os.path.exists(p) else None, tmp_file.name)
-        LOGGER.info(f"kubeconfig saved to {tmp_file.name}")
-        return tmp_file.name
+        fd, tmp_path = tempfile.mkstemp(suffix=".kubeconfig")
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w") as f:
+            fd = None
+            yaml.safe_dump(_config, f)
+        atexit.register(lambda p: os.unlink(p) if os.path.exists(p) else None, tmp_path)
+        LOGGER.info(f"kubeconfig saved to {tmp_path}")
+        return tmp_path
 
     except (OSError, yaml.YAMLError):
-        if tmp_file is not None and os.path.exists(tmp_file.name):
-            os.unlink(tmp_file.name)
+        if fd is not None:
+            os.close(fd)
+        if tmp_path is not None and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
         LOGGER.error("Failed to save kubeconfig")
         raise

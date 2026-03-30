@@ -312,7 +312,7 @@ class TestSaveKubeconfig:
 
         with pytest.raises(OSError, match="Permission denied"):
             with patch(
-                "ocp_resources.utils.client_config.tempfile.NamedTemporaryFile",
+                "ocp_resources.utils.client_config.tempfile.mkstemp",
                 side_effect=OSError("Permission denied"),
             ):
                 save_kubeconfig(host="https://api.example.com:6443", token=_test_token)
