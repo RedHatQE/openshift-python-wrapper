@@ -317,15 +317,17 @@ def get_client(
         )
 
     if generate_kubeconfig:
-        _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
-        kubeconfig_path = save_kubeconfig(
-            host=host or client_configuration.host,
-            token=_resolved_token,
-            config_dict=config_dict,
-            verify_ssl=verify_ssl,
-        )
-
-        return _dynamic_client, kubeconfig_path
+        if config_file:
+            LOGGER.info(f"`generate_kubeconfig` ignored, kubeconfig already available at {config_file}")
+        else:
+            _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
+            kubeconfig_path = save_kubeconfig(
+                host=host or client_configuration.host,
+                token=_resolved_token,
+                config_dict=config_dict,
+                verify_ssl=verify_ssl,
+            )
+            return _dynamic_client, kubeconfig_path
 
     return _dynamic_client
 
