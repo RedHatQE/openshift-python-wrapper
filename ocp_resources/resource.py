@@ -48,6 +48,7 @@ from ocp_resources.exceptions import (
     ResourceTeardownError,
     ValidationError,
 )
+from ocp_resources.utils.client_config import DynamicClientWithKubeconfig, resolve_bearer_token, save_kubeconfig
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -59,7 +60,6 @@ from ocp_resources.utils.constants import (
     TIMEOUT_10SEC,
     TIMEOUT_30SEC,
 )
-from ocp_resources.utils.kubeconfig import save_kubeconfig
 from ocp_resources.utils.resource_constants import ResourceConstants
 from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import skip_existing_resource_creation_teardown
@@ -193,22 +193,6 @@ def client_configuration_with_basic_auth(
     )
 
 
-def _resolve_bearer_token(
-    token: str | None,
-    client_configuration: "kubernetes.client.Configuration",
-) -> str | None:
-    """Extract bearer token from client configuration if not explicitly provided."""
-    if token:
-        return token
-
-    if client_configuration.api_key:
-        _bearer = client_configuration.api_key.get("authorization", "")
-        if _bearer.startswith("Bearer "):
-            return _bearer.removeprefix("Bearer ")
-
-    return None
-
-
 def get_client(
     config_file: str | None = None,
     config_dict: dict[str, Any] | None = None,
@@ -224,7 +208,7 @@ def get_client(
     token: str | None = None,
     fake: bool = False,
     generate_kubeconfig: bool = False,
-) -> DynamicClient | FakeDynamicClient | tuple[DynamicClient, str]:
+) -> DynamicClient | FakeDynamicClient:
     """
     Get a kubernetes client.
 
@@ -248,11 +232,10 @@ def get_client(
         host (str): host for the cluster
         verify_ssl (bool): whether to verify ssl
         token (str): Use token to login
-        generate_kubeconfig (bool): if True, save the kubeconfig to a temporary file and log the path.
+        generate_kubeconfig (bool): if True, save the kubeconfig to a temporary file and add path to client kubeconfig attribute.
 
     Returns:
         DynamicClient: a kubernetes client.
-            If generate_kubeconfig is True, returns a tuple of (DynamicClient, str) where str is the path to the temporary kubeconfig file.
     """
     if fake:
         return FakeDynamicClient()
@@ -319,15 +302,16 @@ def get_client(
     if generate_kubeconfig:
         if config_file:
             LOGGER.info(f"`generate_kubeconfig` ignored, kubeconfig already available at {config_file}")
+            _dynamic_client = DynamicClientWithKubeconfig(client=_dynamic_client.client, kubeconfig=config_file)
         else:
-            _resolved_token = _resolve_bearer_token(token=token, client_configuration=client_configuration)
+            _resolved_token = resolve_bearer_token(token=token, client_configuration=client_configuration)
             kubeconfig_path = save_kubeconfig(
                 host=host or client_configuration.host,
                 token=_resolved_token,
                 config_dict=config_dict,
                 verify_ssl=verify_ssl,
             )
-            return _dynamic_client, kubeconfig_path
+            _dynamic_client = DynamicClientWithKubeconfig(client=_dynamic_client.client, kubeconfig=kubeconfig_path)
 
     return _dynamic_client
 
@@ -1487,9 +1471,9 @@ class Resource(ResourceConstants):
             )
             client = get_client(config_file=config_file, config_dict=config_dict, context=context)
 
-        for _resource in client.resources.search():  # type: ignore[union-attr]
+        for _resource in client.resources.search():
             try:
-                _resources = client.get(_resource, *args, **kwargs)  # type: ignore[union-attr]
+                _resources = client.get(_resource, *args, **kwargs)
                 yield from _resources.items
 
             except (NotFoundError, TypeError, MethodNotAllowedError):

@@ -8,9 +8,9 @@ import yaml
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
-from ocp_resources.resource import NamespacedResourceList, Resource, ResourceList, _resolve_bearer_token
+from ocp_resources.resource import NamespacedResourceList, Resource, ResourceList
 from ocp_resources.secret import Secret
-from ocp_resources.utils.kubeconfig import save_kubeconfig
+from ocp_resources.utils.client_config import resolve_bearer_token, save_kubeconfig
 
 BASE_NAMESPACE_NAME: str = "test-namespace"
 BASE_POD_NAME: str = "test-pod"
@@ -278,33 +278,33 @@ class TestSaveKubeconfig:
 
         assert "insecure-skip-tls-verify" not in config_none["clusters"][0]["cluster"]
 
-    def test_resolve_bearer_token_from_api_key(self):
-        """Test that _resolve_bearer_token extracts token from Bearer api_key."""
+    def testresolve_bearer_token_from_api_key(self):
+        """Test that resolve_bearer_token extracts token from Bearer api_key."""
         cfg = kubernetes.client.Configuration()
         cfg.api_key = {"authorization": "Bearer sha256~oauth-resolved-token"}  # noqa: S105
-        result = _resolve_bearer_token(token=None, client_configuration=cfg)
+        result = resolve_bearer_token(token=None, client_configuration=cfg)
         assert result == "sha256~oauth-resolved-token"
 
-    def test_resolve_bearer_token_explicit_takes_precedence(self):
+    def testresolve_bearer_token_explicit_takes_precedence(self):
         """Test that an explicit token takes precedence over Bearer in api_key."""
         cfg = kubernetes.client.Configuration()
         cfg.api_key = {"authorization": "Bearer sha256~oauth-token"}  # noqa: S105
         explicit_token = "explicit-token"  # noqa: S105
-        result = _resolve_bearer_token(token=explicit_token, client_configuration=cfg)
+        result = resolve_bearer_token(token=explicit_token, client_configuration=cfg)
         assert result == "explicit-token"
 
-    def test_resolve_bearer_token_no_bearer_prefix(self):
+    def testresolve_bearer_token_no_bearer_prefix(self):
         """Test that api_key without Bearer prefix does not resolve a token."""
         cfg = kubernetes.client.Configuration()
         cfg.api_key = {"authorization": "Basic some-basic-auth"}
-        result = _resolve_bearer_token(token=None, client_configuration=cfg)
+        result = resolve_bearer_token(token=None, client_configuration=cfg)
         assert result is None
 
-    def test_resolve_bearer_token_empty_api_key(self):
+    def testresolve_bearer_token_empty_api_key(self):
         """Test that empty api_key does not resolve a token."""
         cfg = kubernetes.client.Configuration()
         cfg.api_key = {}
-        result = _resolve_bearer_token(token=None, client_configuration=cfg)
+        result = resolve_bearer_token(token=None, client_configuration=cfg)
         assert result is None
 
     def test_save_kubeconfig_write_failure(self):
@@ -312,7 +312,7 @@ class TestSaveKubeconfig:
 
         with pytest.raises(OSError, match="Permission denied"):
             with patch(
-                "ocp_resources.utils.kubeconfig.tempfile.NamedTemporaryFile",
+                "ocp_resources.utils.client_config.tempfile.NamedTemporaryFile",
                 side_effect=OSError("Permission denied"),
             ):
                 save_kubeconfig(host="https://api.example.com:6443", token=_test_token)

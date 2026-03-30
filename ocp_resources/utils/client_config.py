@@ -3,10 +3,34 @@ import os
 import tempfile
 from typing import Any
 
+import kubernetes
 import yaml
+from kubernetes.dynamic import DynamicClient
 from simple_logger.logger import get_logger
 
 LOGGER = get_logger(name=__name__)
+
+
+class DynamicClientWithKubeconfig(DynamicClient):
+    def __init__(self, client: kubernetes.client.ApiClient, kubeconfig: str) -> None:
+        super().__init__(client=client)
+        self.kubeconfig = kubeconfig
+
+
+def resolve_bearer_token(
+    token: str | None,
+    client_configuration: "kubernetes.client.Configuration",
+) -> str | None:
+    """Extract bearer token from client configuration if not explicitly provided."""
+    if token:
+        return token
+
+    if client_configuration.api_key:
+        _bearer = client_configuration.api_key.get("authorization", "")
+        if _bearer.startswith("Bearer "):
+            return _bearer.removeprefix("Bearer ")
+
+    return None
 
 
 def save_kubeconfig(
