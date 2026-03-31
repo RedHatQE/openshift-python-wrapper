@@ -48,6 +48,7 @@ from ocp_resources.exceptions import (
     ResourceTeardownError,
     ValidationError,
 )
+from ocp_resources.utils.client_config import DynamicClientWithKubeconfig, resolve_bearer_token, save_kubeconfig
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -206,6 +207,7 @@ def get_client(
     verify_ssl: bool | None = None,
     token: str | None = None,
     fake: bool = False,
+    generate_kubeconfig: bool = False,
 ) -> DynamicClient | FakeDynamicClient:
     """
     Get a kubernetes client.
@@ -230,6 +232,7 @@ def get_client(
         host (str): host for the cluster
         verify_ssl (bool): whether to verify ssl
         token (str): Use token to login
+        generate_kubeconfig (bool): if True, save the kubeconfig to a temporary file and add path to client kubeconfig attribute.
 
     Returns:
         DynamicClient: a kubernetes client.
@@ -286,15 +289,31 @@ def get_client(
     kubernetes.client.Configuration.set_default(default=client_configuration)
 
     try:
-        return kubernetes.dynamic.DynamicClient(client=_client)
+        _dynamic_client = kubernetes.dynamic.DynamicClient(client=_client)
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
         LOGGER.info("Trying to get client via incluster_config")
-        return kubernetes.dynamic.DynamicClient(
+        _dynamic_client = kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.incluster_config.load_incluster_config(
                 client_configuration=client_configuration, try_refresh_token=try_refresh_token
             ),
         )
+
+    if generate_kubeconfig:
+        if config_file:
+            LOGGER.info(f"`generate_kubeconfig` ignored, kubeconfig already available at {config_file}")
+            _dynamic_client = DynamicClientWithKubeconfig(client=_dynamic_client.client, kubeconfig=config_file)
+        else:
+            _resolved_token = resolve_bearer_token(token=token, client_configuration=client_configuration)
+            kubeconfig_path = save_kubeconfig(
+                host=host or client_configuration.host,
+                token=_resolved_token,
+                config_dict=config_dict,
+                verify_ssl=verify_ssl,
+            )
+            _dynamic_client = DynamicClientWithKubeconfig(client=_dynamic_client.client, kubeconfig=kubeconfig_path)
+
+    return _dynamic_client
 
 
 def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> str | None:
