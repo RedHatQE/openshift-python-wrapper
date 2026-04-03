@@ -1,5 +1,6 @@
 import warnings
 from collections.abc import Generator
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from kubernetes.dynamic import DynamicClient
@@ -89,6 +90,81 @@ class Event:
             resource_version=resource_version,
             timeout=timeout,
         )
+
+    @staticmethod
+    def _parse_timestamp(event: Any) -> datetime | None:
+        """Parse event timestamp, preferring lastTimestamp over creationTimestamp."""
+        timestamp = event.get("lastTimestamp") or event.get("metadata", {}).get("creationTimestamp")
+        if not timestamp:
+            return None
+        try:
+            return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        except (ValueError, TypeError):
+            LOGGER.debug(f"Failed to parse event timestamp: {timestamp}")
+            return None
+
+    @classmethod
+    def list(
+        cls,
+        client: DynamicClient,
+        namespace: str | None = None,
+        field_selector: str | None = None,
+        label_selector: str | None = None,
+        since_seconds: int = 300,
+    ) -> list[Any]:
+        """
+        List existing K8s events using a standard API list call (not watch).
+
+        Unlike ``Event.get()`` which uses watch and streams events in real-time,
+        this method returns already-existing events immediately.
+
+        Args:
+            client: K8s dynamic client.
+            namespace: Filter events to this namespace.
+            field_selector: Filter events by fields (e.g. ``"type==Warning"``).
+            label_selector: Filter events by labels.
+            since_seconds: Only return events from the last N seconds (default: 300 = 5 minutes).
+
+        Returns:
+            List of event resource objects, sorted by ``lastTimestamp`` descending (most recent first).
+
+        Example:
+            List Warning events from the last 5 minutes in a namespace::
+
+                events = Event.list(
+                    client=client,
+                    namespace="my-namespace",
+                    field_selector="type==Warning",
+                )
+        """
+        LOGGER.info("Listing events")
+        LOGGER.debug(
+            f"list events parameters: namespace={namespace},"
+            f" field_selector='{field_selector}', label_selector='{label_selector}',"
+            f" since_seconds={since_seconds}"
+        )
+
+        resource = client.resources.get(api_version=cls.api_version, kind=cls.__name__)
+        kwargs: dict[str, Any] = {}
+        if namespace:
+            kwargs["namespace"] = namespace
+        if field_selector:
+            kwargs["field_selector"] = field_selector
+        if label_selector:
+            kwargs["label_selector"] = label_selector
+
+        response = resource.get(**kwargs)
+        events = response.items or []
+
+        cutoff = datetime.now(tz=timezone.utc) - timedelta(seconds=since_seconds)
+        timed_events: list[tuple[datetime, Any]] = []
+        for event in events:
+            event_time = cls._parse_timestamp(event)
+            if event_time and event_time >= cutoff:
+                timed_events.append((event_time, event))
+
+        timed_events.sort(key=lambda pair: pair[0], reverse=True)
+        return [event for _, event in timed_events]
 
     @classmethod
     def delete_events(
