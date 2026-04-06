@@ -544,6 +544,8 @@ class Resource(ResourceConstants):
         MAISTRA_IO: str = "maistra.io"
         METALLB_IO: str = "metallb.io"
         METRICS_K8S_IO: str = "metrics.k8s.io"
+        MLFLOW_KUBEFLOW_ORG: str = "mlflow.kubeflow.org"
+        MLFLOW_OPENDATAHUB_IO: str = "mlflow.opendatahub.io"
         MIGRATION_OPENSHIFT_IO: str = "migration.openshift.io"
         MIGRATIONS_KUBEVIRT_IO: str = "migrations.kubevirt.io"
         MODELREGISTRY_OPENDATAHUB_IO: str = "modelregistry.opendatahub.io"
