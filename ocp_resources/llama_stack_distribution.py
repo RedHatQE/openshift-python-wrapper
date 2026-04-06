@@ -16,12 +16,15 @@ class LlamaStackDistribution(NamespacedResource):
 
     def __init__(
         self,
+        network: dict[str, Any] | None = None,
         replicas: int | None = None,
         server: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
         Args:
+            network (dict[str, Any]): Network defines network access controls for the LlamaStack service
+
             replicas (int): No field description from API
 
             server (dict[str, Any]): ServerSpec defines the desired state of llama server.
@@ -29,10 +32,12 @@ class LlamaStackDistribution(NamespacedResource):
         """
         super().__init__(**kwargs)
 
+        self.network = network
         self.replicas = replicas
         self.server = server
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -43,6 +48,9 @@ class LlamaStackDistribution(NamespacedResource):
             _spec = self.res["spec"]
 
             _spec["server"] = self.server
+
+            if self.network is not None:
+                _spec["network"] = self.network
 
             if self.replicas is not None:
                 _spec["replicas"] = self.replicas
