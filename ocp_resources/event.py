@@ -137,6 +137,9 @@ class Event:
                     field_selector="type==Warning",
                 )
         """
+        if since_seconds < 0:
+            raise ValueError("since_seconds must be >= 0")
+
         LOGGER.info("Listing events")
         LOGGER.debug(
             f"list events parameters: namespace={namespace},"
