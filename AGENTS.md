@@ -1,0 +1,1 @@
+/home/myakove/dotfiles/AGENTS.md
