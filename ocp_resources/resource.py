@@ -546,6 +546,8 @@ class Resource(ResourceConstants):
         METRICS_K8S_IO: str = "metrics.k8s.io"
         MIGRATION_OPENSHIFT_IO: str = "migration.openshift.io"
         MIGRATIONS_KUBEVIRT_IO: str = "migrations.kubevirt.io"
+        MLFLOW_KUBEFLOW_ORG: str = "mlflow.kubeflow.org"
+        MLFLOW_OPENDATAHUB_IO: str = "mlflow.opendatahub.io"
         MODELREGISTRY_OPENDATAHUB_IO: str = "modelregistry.opendatahub.io"
         MONITORING_COREOS_COM: str = "monitoring.coreos.com"
         MTQ_KUBEVIRT_IO: str = "mtq.kubevirt.io"
