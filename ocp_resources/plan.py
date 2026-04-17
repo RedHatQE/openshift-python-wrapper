@@ -31,6 +31,7 @@ class Plan(NamespacedResource):
                                           - "off": Target VM will be powered off after migration
                                           - "auto" or None (default): Target VM will match the source VM's power state
         use_compatibility_mode (bool, optional): Whether to use compatibility mode.
+        xfs_compatibility (bool, optional): Whether to use an XFS-compatible virt-v2v image.
         migrate_shared_disks (bool, optional): Whether to migrate shared disks.
         preserve_static_ips (bool, optional): Whether to preserve static IPs during migration.
         target_node_selector (dict, optional): Node selector for the target VM. Specifies which node labels
@@ -68,6 +69,7 @@ class Plan(NamespacedResource):
         skip_guest_conversion: bool | None = None,
         target_power_state: str | None = None,
         use_compatibility_mode: bool | None = None,
+        xfs_compatibility: bool | None = None,
         migrate_shared_disks: bool | None = None,
         preserve_static_ips: bool | None = None,
         target_node_selector: dict[str, str] | None = None,
@@ -100,6 +102,7 @@ class Plan(NamespacedResource):
         self.skip_guest_conversion = skip_guest_conversion
         self.target_power_state = target_power_state
         self.use_compatibility_mode = use_compatibility_mode
+        self.xfs_compatibility = xfs_compatibility
         self.migrate_shared_disks = migrate_shared_disks
         self.preserve_static_ips = preserve_static_ips
         self.target_node_selector = target_node_selector
@@ -185,6 +188,9 @@ class Plan(NamespacedResource):
 
             if self.use_compatibility_mode is not None:
                 spec["useCompatibilityMode"] = self.use_compatibility_mode
+
+            if self.xfs_compatibility is not None:
+                spec["xfsCompatibility"] = self.xfs_compatibility
 
             if self.migrate_shared_disks is not None:
                 spec["migrateSharedDisks"] = self.migrate_shared_disks
