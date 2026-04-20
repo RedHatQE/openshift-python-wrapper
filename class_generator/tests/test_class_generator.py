@@ -1,15 +1,16 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md#adding-tests
 
 import filecmp
-import traceback
 from pathlib import Path
+import pytest
+from typing import List, Tuple, Optional
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.generator import class_generator
 from class_generator.utils import execute_parallel_tasks
 
 
-def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
+def _test_single_resource(kind: str, tmp_path: Path) -> Optional[Tuple[str, str]]:
     """
     Test a single resource kind and return failure info if test fails.
 
@@ -44,9 +45,9 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
             if not filecmp.cmp(output_file, expected_file):
                 try:
                     # Read both files to show diff details
-                    with open(output_file) as f:
+                    with open(output_file, "r") as f:
                         generated_content = f.read()
-                    with open(expected_file) as f:
+                    with open(expected_file, "r") as f:
                         expected_content = f.read()
 
                     # Find first difference for debugging
@@ -59,7 +60,7 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
                     diff_info += f"\nGenerated lines: {len(generated_lines)}, Expected lines: {len(expected_lines)}"
 
                     # Find first differing line
-                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines, strict=True)):
+                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines)):
                         if gen_line != exp_line:
                             diff_info += f"\nFirst difference at line {i + 1}:"
                             diff_info += f"\nGenerated: {repr(gen_line[:100])}..."
@@ -80,6 +81,8 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
         return None
 
     except Exception as e:
+        import traceback
+
         error_details = f"Exception during generation: {str(e)}\n"
         error_details += f"Traceback:\n{traceback.format_exc()}"
         return (kind, error_details)
@@ -96,28 +99,28 @@ def test_parse_explain(tmp_path: Path) -> None:
         "Deployment",
         "ImageContentSourcePolicy",
         "Machine",
-        "Pod",
-        "Secret",
         "NMState",
-        "ServiceMeshMember",
-        "ServingRuntime",
         "OAuth",
         "Pipeline",
+        "Pod",
+        "Secret",
+        "ServiceMeshMember",
+        "ServingRuntime",
         "Ingress",
         "RouteAdvertisements",
     ]
 
-    failures: list[tuple[str, str]] = []
+    failures: List[Tuple[str, str]] = []
 
     # Process test results and collect failures
-    def process_test_result(kind: str, result: tuple[str, str] | None) -> None:
+    def process_test_result(kind: str, result: Optional[Tuple[str, str]]) -> None:
         if result is not None:
             failures.append(result)
 
     def handle_test_error(kind: str, exc: Exception) -> None:
         failures.append((kind, f"Task execution failed: {str(exc)}"))
 
-    def create_test_task(kind: str) -> tuple[str, str] | None:
+    def create_test_task(kind: str) -> Optional[Tuple[str, str]]:
         return _test_single_resource(kind, tmp_path / f"test-{kind}")
 
     # Run tests in parallel
