@@ -57,6 +57,9 @@ extra_checks = true
 warn_unused_configs = true
 warn_redundant_casts = true
 
+[tool.hatch.build.targets.sdist]
+exclude = ["AGENTS.md"]
+
 [tool.hatch.build.targets.wheel]
 packages = [
   "ocp_resources",
