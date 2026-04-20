@@ -1,6 +1,7 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md#adding-tests
 
 import filecmp
+import traceback
 from pathlib import Path
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
@@ -58,7 +59,7 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
                     diff_info += f"\nGenerated lines: {len(generated_lines)}, Expected lines: {len(expected_lines)}"
 
                     # Find first differing line
-                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines)):
+                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines, strict=True)):
                         if gen_line != exp_line:
                             diff_info += f"\nFirst difference at line {i + 1}:"
                             diff_info += f"\nGenerated: {repr(gen_line[:100])}..."
@@ -79,8 +80,6 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
         return None
 
     except Exception as e:
-        import traceback
-
         error_details = f"Exception during generation: {str(e)}\n"
         error_details += f"Traceback:\n{traceback.format_exc()}"
         return (kind, error_details)
