@@ -93,6 +93,7 @@ class Ingress(Resource):
         self.required_hsts_policies = required_hsts_policies
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
