@@ -13,9 +13,14 @@
   {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 
+
 from typing import Any
-from ocp_resources.resource import {{ base_class }}
+
+{% if all_required_args %}
 from ocp_resources.exceptions import MissingRequiredArgumentError
+{% endif %}
+from ocp_resources.resource import {{ base_class }}
+
 
 class {{ kind }}({{ base_class }}):
     """
