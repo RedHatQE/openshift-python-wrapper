@@ -557,6 +557,7 @@ class Resource(ResourceConstants):
         NMSTATE_IO: str = "nmstate.io"
         NODE_LABELLER_KUBEVIRT_IO: str = "node-labeller.kubevirt.io"
         NODEMAINTENANCE_KUBEVIRT_IO: str = "nodemaintenance.kubevirt.io"
+        OADP_OPENSHIFT_IO: str = "oadp.openshift.io"
         OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO: str = "observability.open-cluster-management.io"
         OCS_OPENSHIFT_IO: str = "ocs.openshift.io"
         OPENTELEMETRY_IO: str = "opentelemetry.io"
