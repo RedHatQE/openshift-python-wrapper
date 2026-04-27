@@ -96,15 +96,15 @@ def test_parse_explain(tmp_path: Path) -> None:
         "Deployment",
         "ImageContentSourcePolicy",
         "Machine",
+        "NMState",
         "Pod",
         "Secret",
-        "NMState",
         "ServiceMeshMember",
-        "ServingRuntime",
+        "Ingress",
         "OAuth",
         "Pipeline",
-        "Ingress",
         "RouteAdvertisements",
+        "ServingRuntime",
     ]
 
     failures: list[tuple[str, str]] = []
@@ -146,9 +146,7 @@ def test_parse_explain(tmp_path: Path) -> None:
 
         # Create a concise failure message for pytest
         failed_kinds = [kind for kind, _ in failures]
-        failure_summary = f"{len(failures)} resource(s) failed: {', '.join(failed_kinds[:5])}"
-        if len(failed_kinds) > 5:
-            failure_summary += f" and {len(failed_kinds) - 5} more"
+        failure_summary = f"{len(failures)} resource(s) failed: {','.join(failed_kinds)}"
 
         # Fail the test with summary - detailed output is already printed above
         raise AssertionError(failure_summary)
