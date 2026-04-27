@@ -489,7 +489,7 @@ def handle_test_generation(add_tests: bool) -> None:
         # Run the generated test file
         LOGGER.info("Running generated tests...")
         test_file = "class_generator/tests/test_class_generator.py"
-        exit_code = os.system(f"uv run pytest {test_file}")
+        exit_code = os.system(f"uv run --group tests pytest {test_file}")
 
         # os.system returns the exit status shifted left by 8 bits
         if exit_code != 0:

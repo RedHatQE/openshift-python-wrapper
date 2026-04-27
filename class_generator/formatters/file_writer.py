@@ -20,7 +20,7 @@ def write_and_format_rendered(filepath: str, output: str) -> None:
     # Run prek on the file
     try:
         rc, stdout, stderr = run_command(
-            command=["uvx", "prek", "run", "--files", filepath],
+            command=["uvx", "prek", "-c", ".pre-commit-config.yaml", "run", "--files", filepath],
             verify_stderr=False,
             check=False,
             log_errors=False,

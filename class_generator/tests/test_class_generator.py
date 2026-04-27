@@ -146,7 +146,7 @@ def test_parse_explain(tmp_path: Path) -> None:
 
         # Create a concise failure message for pytest
         failed_kinds = [kind for kind, _ in failures]
-        failure_summary = f"{len(failures)} resource(s) failed: {', '.join(failed_kinds)}"
+        failure_summary = f"{len(failures)} resource(s) failed: {','.join(failed_kinds)}"
 
         # Fail the test with summary - detailed output is already printed above
         raise AssertionError(failure_summary)
