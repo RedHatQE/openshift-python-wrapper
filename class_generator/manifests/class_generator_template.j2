@@ -13,7 +13,6 @@
   {% set _ = all_required_args.append(arg["name-for-class-arg"]) if arg["required"] == True %}
 {% endfor %}
 
-
 from typing import Any
 
 {% if all_required_args %}
