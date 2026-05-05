@@ -17,6 +17,7 @@ class VirtualMachineClone(NamespacedResource):
         annotation_filters=None,
         new_mac_addresses=None,
         new_smbios_serial=None,
+        volume_name_policy=None,
         **kwargs,
     ):
         """
@@ -30,6 +31,7 @@ class VirtualMachineClone(NamespacedResource):
             annotation_filters (list, optional): List of annotation filters, e.g. ["firstKey/*", "secondKey/*"]
             new_mac_addresses (dict, optional): Dict of new MAC addresses, {interface_name: mac_address}
             new_smbios_serial (str, optional): the clone's new smbios serial
+            volume_name_policy (str, optional): the clone's volume name policy
         """
         super().__init__(**kwargs)
         self.source_name = source_name
@@ -39,6 +41,7 @@ class VirtualMachineClone(NamespacedResource):
         self.annotation_filters = annotation_filters
         self.new_mac_addresses = new_mac_addresses
         self.new_smbios_serial = new_smbios_serial
+        self.volume_name_policy = volume_name_policy
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -49,7 +52,7 @@ class VirtualMachineClone(NamespacedResource):
 
             source = spec.setdefault("source", {})
             source["apiGroup"] = NamespacedResource.ApiGroup.KUBEVIRT_IO
-            source["kind"] = self.source_kind if self.source_kind else VirtualMachine.kind
+            source["kind"] = self.source_kind or VirtualMachine.kind
             source["name"] = self.source_name
 
             if self.target_name:
@@ -66,3 +69,5 @@ class VirtualMachineClone(NamespacedResource):
                 spec["newMacAddresses"] = self.new_mac_addresses
             if self.new_smbios_serial:
                 spec["newSMBiosSerial"] = self.new_smbios_serial
+            if self.volume_name_policy:
+                spec["volumeNamePolicy"] = self.volume_name_policy
