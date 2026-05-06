@@ -91,21 +91,21 @@ def test_parse_explain(tmp_path: Path) -> None:
     """Test all resource kinds in parallel and collect all failures."""
     # List of all resource kinds to test
     resource_kinds = [
-        "Pod",
-        "Pipeline",
-        "OAuth",
-        "Ingress",
-        "ClusterOperator",
-        "ImageContentSourcePolicy",
-        "ServiceMeshMember",
-        "NMState",
-        "Deployment",
-        "Machine",
         "APIServer",
-        "Secret",
+        "ClusterOperator",
         "ConfigMap",
         "DNS",
+        "Deployment",
+        "ImageContentSourcePolicy",
+        "Machine",
+        "NMState",
+        "OAuth",
+        "Pipeline",
+        "Pod",
+        "Secret",
+        "ServiceMeshMember",
         "ServingRuntime",
+        "Ingress",
         "RouteAdvertisements",
     ]
 
