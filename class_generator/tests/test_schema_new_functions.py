@@ -184,6 +184,13 @@ class TestBuildNamespacingDict:
         assert result == expected
 
 
+def _get_open_mode(call):
+    """Extract file open mode from a mock call, defaulting to 'r'."""
+    if len(call[0]) > 1:
+        return call[0][1]
+    return call[1].get("mode", "r")
+
+
 class TestCheckAndUpdateClusterVersion:
     """Test check_and_update_cluster_version function."""
 
@@ -201,14 +208,14 @@ class TestCheckAndUpdateClusterVersion:
 
         # Verify that the file was opened for writing
         assert mock_open.call_count == 2  # Once for reading, once for writing
-        write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
+        write_calls = [call for call in mock_open.call_args_list if _get_open_mode(call) == "w"]
         assert len(write_calls) == 1, "File should be opened for writing exactly once"
 
         # Verify that the correct cluster version file path is used
         from pathlib import Path
 
         expected_path = Path("class_generator/schema/__cluster_version__.txt")
-        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        read_calls = [call for call in mock_open.call_args_list if _get_open_mode(call) == "r"]
         assert len(read_calls) == 1, "File should be opened for reading exactly once"
         # Check that the file path used matches expected cluster version file
         assert str(expected_path) in str(read_calls[0][0][0]) or expected_path.name in str(read_calls[0][0][0])
@@ -230,7 +237,7 @@ class TestCheckAndUpdateClusterVersion:
 
         # Verify that the file was only opened for reading, not writing
         assert mock_open.call_count == 1  # Only once for reading
-        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        read_calls = [call for call in mock_open.call_args_list if _get_open_mode(call) == "r"]
         assert len(read_calls) == 1, "File should be opened for reading exactly once"
 
         # Verify that write() was never called
@@ -250,14 +257,14 @@ class TestCheckAndUpdateClusterVersion:
 
         # Verify that the file was opened for both reading and writing
         assert mock_open.call_count == 2  # Once for reading, once for writing
-        write_calls = [call for call in mock_open.call_args_list if call[0][1] == "w"]
+        write_calls = [call for call in mock_open.call_args_list if _get_open_mode(call) == "w"]
         assert len(write_calls) == 1, "File should be opened for writing exactly once"
 
         # Verify that the correct cluster version file path is used
         from pathlib import Path
 
         expected_path = Path("class_generator/schema/__cluster_version__.txt")
-        read_calls = [call for call in mock_open.call_args_list if call[0][1] == "r"]
+        read_calls = [call for call in mock_open.call_args_list if _get_open_mode(call) == "r"]
         assert len(read_calls) == 1, "File should be opened for reading exactly once"
         # Check that the file path used matches expected cluster version file
         assert str(expected_path) in str(read_calls[0][0][0]) or expected_path.name in str(read_calls[0][0][0])
