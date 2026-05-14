@@ -20,6 +20,8 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
         "ImageContentSourcePolicy",
         "Machine",
         "NMState",
+        "OAuth",
+        "Pipeline",
         "Pod",
         "Secret",
         "ServiceMeshMember",
