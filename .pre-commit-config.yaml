@@ -47,12 +47,12 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.24.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: v1.20.2
     hooks:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)
