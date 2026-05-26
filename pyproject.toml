@@ -1,7 +1,7 @@
 [tool.pytest.ini_options]
 markers = [
   "incremental: Mark tests as incremental",
-  "kubevirt: Mark tests as kubevirt tests"
+  "kubevirt: Mark tests as kubevirt tests",
 ]
 addopts = [
   "--pdbcls=IPython.terminal.debugger:TerminalPdb",
@@ -13,15 +13,11 @@ addopts = [
   "--cov=ocp_resources.utils.constants",
   "--cov=ocp_resources.utils.utils",
   "--cov=ocp_resources.exceptions",
-  "--cov=class_generator"
+  "--cov=class_generator",
 ]
 
 [tool.coverage.run]
-omit = [
-  "tests/*",
-  "class_generator/tests/*",
-  "class_generator/scripts/tests/*"
-]
+omit = ["tests/*", "class_generator/tests/*", "class_generator/scripts/tests/*"]
 
 [tool.coverage.report]
 fail_under = 60
@@ -36,8 +32,8 @@ line-length = 120
 fix = true
 output-format = "grouped"
 
-  [tool.ruff.format]
-  exclude = [ ".git", ".venv", ".mypy_cache", ".tox", "__pycache__" ]
+[tool.ruff.format]
+exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
 [tool.mypy]
 no_implicit_optional = true
@@ -45,29 +41,29 @@ show_error_codes = true
 warn_unused_ignores = true
 
 [tool.hatch.build.targets.wheel]
-packages = [ "ocp_resources", "class_generator", "fake_kubernetes_client" ]
+packages = ["ocp_resources", "class_generator", "fake_kubernetes_client"]
 
 [tool.uv]
-dev-dependencies = [ "ipdb>=0.13.13", "ipython>=8.12.3" ]
+dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
 
 [project]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 name = "openshift-python-wrapper"
 version = "4.19.5"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
-keywords = [ "Openshift", "Kubevirt", "Openshift Virtualization" ]
+keywords = ["Openshift", "Kubevirt", "Openshift Virtualization"]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Operating System :: OS Independent"
+  "Operating System :: OS Independent",
 ]
 dependencies = [
   "cloup>=3.0.5",
   "colorlog>=6.8.2",
   "deepdiff>=8.0.1",
   "jinja2>=3.1.4",
-  "kubernetes>=31.0.0",
+  "kubernetes>=31.0.0,!=36.0.0",  # Excluded: v36.0.0 has broken bearer-token auth (https://github.com/kubernetes-client/python/issues/2582), remove once v36.0.1+ ships with the fix
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
   "python-benedict>=0.33.2",
@@ -76,37 +72,37 @@ dependencies = [
   "rich>=13.9.2",
   "ruff>=0.6.9",
   "timeout-sampler>=0.0.46",
-  "xmltodict>=0.13.0"
+  "xmltodict>=0.13.0",
 ]
 
-  [[project.authors]]
-  name = "Meni Yakove"
-  email = "myakove@gmail.com"
+[[project.authors]]
+name = "Meni Yakove"
+email = "myakove@gmail.com"
 
-  [[project.authors]]
-  name = "Ruth Netser"
-  email = "rnetser@gmail.com"
+[[project.authors]]
+name = "Ruth Netser"
+email = "rnetser@gmail.com"
 
-  [[project.maintainers]]
-  name = "Meni Yakove"
-  email = "myakove@gmail.com"
+[[project.maintainers]]
+name = "Meni Yakove"
+email = "myakove@gmail.com"
 
-  [[project.maintainers]]
-  name = "Ruth Netser"
-  email = "rnetser@gmail.com"
+[[project.maintainers]]
+name = "Ruth Netser"
+email = "rnetser@gmail.com"
 
-  [project.urls]
-  homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
-  documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
-  Download = "https://pypi.org/project/openshift-python-wrapper/"
-  "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
+[project.urls]
+homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
+documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
+Download = "https://pypi.org/project/openshift-python-wrapper/"
+"Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
 
-  [project.scripts]
-  class-generator = "class_generator.class_generator:main"
+[project.scripts]
+class-generator = "class_generator.class_generator:main"
 
 [build-system]
-requires = [ "hatchling" ]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-tests = [ "pytest>=8.3.5", "pytest-cov>=6.1.1" ]
+tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]
