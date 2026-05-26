@@ -10,9 +10,9 @@ import pytest
 from click.testing import CliRunner
 
 import class_generator.cli
-from class_generator.utils import ResourceInfo
-from class_generator.core.discovery import discover_generated_resources
 from class_generator.cli import main
+from class_generator.core.discovery import discover_generated_resources
+from class_generator.utils import ResourceInfo
 
 
 class TestResourceDiscovery:

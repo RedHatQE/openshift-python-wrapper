@@ -1,10 +1,11 @@
 import ast
 import os
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
+from class_generator.constants import RESOURCES_MAPPING_FILE
 from ocp_resources.resource import Resource  # noqa
 from ocp_resources.utils.archive_utils import load_json_archive
-from class_generator.constants import RESOURCES_MAPPING_FILE
 
 # Cache for resources definitions to avoid reloading the large JSON file
 _RESOURCES_DEFINITIONS_CACHE: dict[str, Any] = {}
@@ -134,7 +135,7 @@ def parse_resource_file_for_errors(data) -> list[str]:
         if not resource_list:
             continue
 
-        bodies = [body_ for body_ in getattr(cls, "body") if isinstance(body_, (ast.Assign, ast.AnnAssign))]
+        bodies = [body_ for body_ in cls.body if isinstance(body_, (ast.Assign, ast.AnnAssign))]
         api_type, api_value = _get_api_group_and_version(bodies=bodies)
         errors.extend(
             validate_resource(

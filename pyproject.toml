@@ -37,6 +37,33 @@ output-format = "grouped"
 [tool.ruff.format]
 exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
+[tool.ruff.lint]
+ignore = [
+  "B026",
+  "BLE001",
+  "D419",
+  "DTZ005",
+  "DTZ007",
+  "EXE001",
+  "PERF102",
+  "PIE810",
+  "PLW1510",
+  "PYI058",
+  "RUF012",
+  "RUF015",
+  "RUF059",
+  "SIM101",
+  "SIM102",
+  "SIM117",
+  "SIM118",
+  "TRY002",
+  "TRY004",
+  "TRY201",
+  "TRY203",
+  "TRY401",
+  "UP031",
+]
+
 [tool.mypy]
 check_untyped_defs = false
 disallow_any_generics = false

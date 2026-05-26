@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.mariadb_operator import MariadbOperator
 
 

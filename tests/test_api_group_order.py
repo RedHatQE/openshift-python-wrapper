@@ -10,8 +10,8 @@ def test_api_group_order():
     try:
         with open(file_path) as fd:
             content = fd.read()
-    except IOError as exp:
-        pytest.fail(f"Failed to read {file_path}: {str(exp)}")
+    except OSError as exp:
+        pytest.fail(f"Failed to read {file_path}: {exp!s}")
 
     tree = ast.parse(source=content)
     api_group_class: list[ast.ClassDef] = [

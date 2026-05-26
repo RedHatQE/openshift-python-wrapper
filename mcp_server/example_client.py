@@ -6,6 +6,7 @@ This example demonstrates how to connect to and use the MCP server.
 """
 
 import asyncio
+
 from fastmcp import FastMCPClient
 
 

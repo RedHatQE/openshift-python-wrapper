@@ -1,13 +1,14 @@
 """FakeResourceField implementation for fake Kubernetes client"""
 
 import copy
-from typing import Any, Iterator, Union
+from collections.abc import Iterator
+from typing import Any
 
 
 class FakeResourceField:
     """Fake implementation of kubernetes.dynamic.resource.ResourceField"""
 
-    def __init__(self, data: Union[dict[str, Any], None]) -> None:
+    def __init__(self, data: dict[str, Any] | None) -> None:
         self._data = data if data is not None else {}
 
     def __getattribute__(self, name: str) -> Any:

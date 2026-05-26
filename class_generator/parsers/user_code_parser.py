@@ -39,7 +39,7 @@ def parse_user_code_from_file(file_path: str) -> tuple[str, str]:
             f"Failed to decode file {file_path} with UTF-8 encoding. The file may contain invalid characters.",
         )
     except Exception as e:
-        raise Exception(f"Unexpected error reading file {file_path}: {type(e).__name__}: {str(e)}")
+        raise Exception(f"Unexpected error reading file {file_path}: {type(e).__name__}: {e!s}")
 
     end_of_generated_code_line = "    # End of generated code"
     user_code: str = ""

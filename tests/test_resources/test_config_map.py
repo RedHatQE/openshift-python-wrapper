@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.config_map import ConfigMap
 
 

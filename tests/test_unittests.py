@@ -1,5 +1,6 @@
 import pytest
 from benedict import benedict
+
 from ocp_resources.resource import replace_key_with_hashed_value
 
 

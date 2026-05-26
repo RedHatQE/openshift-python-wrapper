@@ -12,7 +12,7 @@ from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
 from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_FILE, SCHEMA_DIR
-from class_generator.utils import execute_parallel_with_mapping, execute_parallel_tasks
+from class_generator.utils import execute_parallel_tasks, execute_parallel_with_mapping
 from ocp_resources.utils.archive_utils import save_json_archive
 from ocp_resources.utils.schema_validator import SchemaValidator
 
@@ -21,8 +21,6 @@ LOGGER = get_logger(name=__name__)
 
 class ClusterVersionError(Exception):
     """Raised when there are issues with cluster version operations."""
-
-    pass
 
 
 def get_client_binary() -> str:
@@ -138,7 +136,7 @@ def check_and_update_cluster_version(client: str) -> bool:
     try:
         with open(cluster_version_file, "r") as fd:
             last_cluster_version_generated = fd.read().strip()
-    except (FileNotFoundError, IOError):
+    except (OSError, FileNotFoundError):
         # Treat missing file as first run - use baseline version that allows updates
         last_cluster_version_generated = "v0.0.0"
         LOGGER.info("Cluster version file not found - treating as first run with baseline version v0.0.0")
@@ -1360,10 +1358,10 @@ def write_schema_files(
     # Ensure schema directory exists
     try:
         Path(SCHEMA_DIR).mkdir(parents=True, exist_ok=True)
-    except (OSError, IOError) as e:
+    except OSError as e:
         error_msg = f"Failed to create schema directory {SCHEMA_DIR}: {e}"
         LOGGER.error(error_msg)
-        raise IOError(error_msg) from e
+        raise OSError(error_msg) from e
 
     # Fetch missing core definitions if schemas are available
     if schemas:
@@ -1400,18 +1398,18 @@ def write_schema_files(
             with open(definitions_file, "w") as fd:
                 json.dump(definitions_data, fd, indent=2, sort_keys=True)
             LOGGER.info(f"Written {len(definitions)} definitions to {definitions_file}")
-        except (OSError, IOError, TypeError) as e:
+        except (OSError, TypeError) as e:
             error_msg = f"Failed to write definitions file {definitions_file}: {e}"
             LOGGER.error(error_msg)
-            raise IOError(error_msg) from e
+            raise OSError(error_msg) from e
 
     # Write and archive resources mapping
     try:
         save_json_archive(resources_mapping, RESOURCES_MAPPING_FILE)
-    except (OSError, IOError, TypeError) as e:
+    except (OSError, TypeError) as e:
         error_msg = f"Failed to save and archive resources mapping file {RESOURCES_MAPPING_FILE}: {e}"
         LOGGER.error(error_msg)
-        raise IOError(error_msg) from e
+        raise OSError(error_msg) from e
 
 
 @dataclasses.dataclass
@@ -1527,7 +1525,7 @@ def _handle_no_schemas_case() -> None:
             existing_definitions_data = json.load(fd)
             definitions = existing_definitions_data.get("definitions", {})
             LOGGER.info(f"Found {len(definitions)} existing definitions that will be preserved")
-    except (FileNotFoundError, IOError, json.JSONDecodeError):
+    except (OSError, FileNotFoundError, json.JSONDecodeError):
         LOGGER.debug("Could not load existing definitions file. No existing definitions to preserve.")
 
 

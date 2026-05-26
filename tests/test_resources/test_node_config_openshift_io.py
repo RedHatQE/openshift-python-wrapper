@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.node_config_openshift_io import Node
 
 

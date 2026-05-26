@@ -7,21 +7,21 @@ import pytest
 
 from class_generator.core.schema import (
     ClusterVersionError,
+    _convert_type_to_schema,
+    _detect_missing_refs_from_schemas,
+    _infer_oc_explain_path,
     build_dynamic_resource_to_api_mapping,
     build_namespacing_dict,
     check_and_update_cluster_version,
     extract_group_kind_version,
+    fetch_all_api_schemas,
     find_api_paths_for_missing_resources,
     get_client_binary,
     get_server_version,
     identify_missing_resources,
-    read_resources_mapping_file,
-    fetch_all_api_schemas,
     process_schema_definitions,
+    read_resources_mapping_file,
     write_schema_files,
-    _detect_missing_refs_from_schemas,
-    _infer_oc_explain_path,
-    _convert_type_to_schema,
 )
 
 

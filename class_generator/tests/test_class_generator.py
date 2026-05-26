@@ -71,7 +71,7 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
 
                     return (kind, diff_info)
 
-                except Exception as read_error:  # noqa: BLE001
+                except Exception as read_error:
                     return (
                         kind,
                         f"Generated file {Path(output_file).name} does not match expected file. Error reading files for diff: {read_error}",
@@ -79,7 +79,7 @@ def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
 
         return None
 
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         error_details = f"Exception during generation: {e!s}\n"
         error_details += f"Traceback:\n{traceback.format_exc()}"
         return (kind, error_details)

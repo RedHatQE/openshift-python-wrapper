@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.volume_snapshot_class import VolumeSnapshotClass
 
 

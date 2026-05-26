@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.image_caching_internal_knative_dev import Image
 
 

@@ -2,8 +2,8 @@ import re
 from datetime import datetime
 
 from kubernetes.dynamic.exceptions import ConflictError
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
 
-from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 from ocp_resources.exceptions import NNCPConfigurationFailed
 from ocp_resources.node import Node
 from ocp_resources.node_network_configuration_enactment import (
@@ -11,7 +11,7 @@ from ocp_resources.node_network_configuration_enactment import (
 )
 from ocp_resources.node_network_state import NodeNetworkState
 from ocp_resources.resource import Resource, ResourceEditor
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch, retry
+from ocp_resources.utils.constants import TIMEOUT_1MINUTE, TIMEOUT_4MINUTES, TIMEOUT_5SEC
 
 IPV4_STR = "ipv4"
 IPV6_STR = "ipv6"

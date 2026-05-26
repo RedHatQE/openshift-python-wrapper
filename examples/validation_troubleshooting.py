@@ -6,10 +6,10 @@ This script demonstrates common validation errors and how to fix them.
 Run this script to see examples of validation errors and their solutions.
 """
 
-from ocp_resources.pod import Pod
 from ocp_resources.deployment import Deployment
-from ocp_resources.service import Service
 from ocp_resources.exceptions import ValidationError
+from ocp_resources.pod import Pod
+from ocp_resources.service import Service
 
 
 def print_error_case(title, description):

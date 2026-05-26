@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 #  API reference:
 #       https://docs.openshift.com/container-platform/4.11/rest_api/rbac_apis/role-rbac-authorization-k8s-io-v1.html
-from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.utils.constants import TIMEOUT_4MINUTES
 
 
 class Role(NamespacedResource):

@@ -30,7 +30,7 @@ def generate_yaml_from_template(**kwargs):
     # Find all template variables
     template_vars = [i.split()[1] for i in re.findall(r"{{ .* }}", data)]
     for var in template_vars:
-        if var not in kwargs.keys():
+        if var not in kwargs:
             raise MissingTemplateVariables(var=var, template=file_)
 
     template = jinja2.Template(source=data)

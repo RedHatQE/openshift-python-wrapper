@@ -6,7 +6,7 @@ from typing import Any
 
 from simple_logger.logger import get_logger
 
-from class_generator.constants import MISSING_DESCRIPTION_STR, SPEC_STR, DEFINITIONS_FILE
+from class_generator.constants import DEFINITIONS_FILE, MISSING_DESCRIPTION_STR, SPEC_STR
 from class_generator.utils import sanitize_python_name
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from ocp_resources.resource import MissingRequiredArgumentError, Resource
 
 
