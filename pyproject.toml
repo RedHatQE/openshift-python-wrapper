@@ -37,6 +37,33 @@ output-format = "grouped"
 [tool.ruff.format]
 exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
+[tool.ruff.lint]
+ignore = [
+  "B026",
+  "BLE001",
+  "D419",
+  "DTZ005",
+  "DTZ007",
+  "EXE001",
+  "PERF102",
+  "PIE810",
+  "PLW1510",
+  "PYI058",
+  "RUF012",
+  "RUF015",
+  "RUF059",
+  "SIM101",
+  "SIM102",
+  "SIM117",
+  "SIM118",
+  "TRY002",
+  "TRY004",
+  "TRY201",
+  "TRY203",
+  "TRY401",
+  "UP031",
+]
+
 [tool.mypy]
 check_untyped_defs = false
 disallow_any_generics = false
@@ -80,7 +107,7 @@ dependencies = [
   "deepdiff>=8.0.1",
   "jinja2>=3.1.4",
   "jsonschema>=4.20.0",
-  "kubernetes>=31.0.0",
+  "kubernetes>=31.0.0,!=36.0.0",  # Excluded: v36.0.0 has broken bearer-token auth (https://github.com/kubernetes-client/python/issues/2582), remove once v36.0.1+ ships with the fix
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
   "python-benedict>=0.33.2",

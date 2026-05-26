@@ -11,7 +11,7 @@ from collections.abc import Callable, Generator
 from io import StringIO
 from signal import SIGINT, signal
 from types import TracebackType
-from typing import Any, Self, Type
+from typing import Any, Self
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import jsonschema
@@ -414,7 +414,7 @@ class KubeAPIVersion(Version):
         return self.vstring
 
     def __repr__(self):
-        return "KubeAPIVersion ('{0}')".format(str(self))
+        return f"KubeAPIVersion ('{self!s}')"
 
     def _cmp(self, other):
         if isinstance(other, str):
@@ -752,9 +752,8 @@ class Resource(ResourceConstants):
         exc_val: BaseException | None = None,
         exc_tb: TracebackType | None = None,
     ) -> None:
-        if self.teardown:
-            if not self.clean_up():
-                raise ResourceTeardownError(resource=self)
+        if self.teardown and not self.clean_up():
+            raise ResourceTeardownError(resource=self)
 
     def _sigint_handler(self, signal_received: int, frame: Any) -> None:
         self.__exit__()
@@ -1654,7 +1653,7 @@ class NamespacedResource(Resource):
             raise MissingRequiredArgumentError(argument="namespace")
 
     def to_dict(self) -> None:
-        super(NamespacedResource, self)._base_body()
+        super()._base_body()
         self._base_body()
 
 
@@ -1938,9 +1937,8 @@ class BaseResourceList(ABC):
         return all(resource.clean_up(wait=wait) for resource in reversed(self.resources))
 
     @abstractmethod
-    def _create_resources(self, resource_class: Type, **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: type, **kwargs: Any) -> None:
         """Abstract method to create resources based on specific logic."""
-        pass
 
 
 class ResourceList(BaseResourceList):
@@ -1953,7 +1951,7 @@ class ResourceList(BaseResourceList):
 
     def __init__(
         self,
-        resource_class: Type[Resource],
+        resource_class: type[Resource],
         num_resources: int,
         client: DynamicClient,
         **kwargs: Any,
@@ -1973,7 +1971,7 @@ class ResourceList(BaseResourceList):
         self.num_resources = num_resources
         self._create_resources(resource_class, **kwargs)
 
-    def _create_resources(self, resource_class: Type[Resource], **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: type[Resource], **kwargs: Any) -> None:
         """Creates N resources with indexed names."""
         base_name = kwargs["name"]
 
@@ -1996,7 +1994,7 @@ class NamespacedResourceList(BaseResourceList):
 
     def __init__(
         self,
-        resource_class: Type[NamespacedResource],
+        resource_class: type[NamespacedResource],
         namespaces: ResourceList,
         client: DynamicClient,
         **kwargs: Any,
@@ -2020,7 +2018,7 @@ class NamespacedResourceList(BaseResourceList):
         self.namespaces = namespaces
         self._create_resources(resource_class, **kwargs)
 
-    def _create_resources(self, resource_class: Type[NamespacedResource], **kwargs: Any) -> None:
+    def _create_resources(self, resource_class: type[NamespacedResource], **kwargs: Any) -> None:
         """Creates one resource per namespace."""
         for ns in self.namespaces:
             instance = resource_class(

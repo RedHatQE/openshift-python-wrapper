@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.aaq import AAQ
 
 

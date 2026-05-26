@@ -5,7 +5,7 @@ When used as a contextmanager, deployment and deletion is handled automatically 
 """
 
 from ocp_resources.namespace import Namespace
-from ocp_resources.resource import get_client, ResourceList, NamespacedResourceList
+from ocp_resources.resource import NamespacedResourceList, ResourceList, get_client
 from ocp_resources.role import Role
 
 client = get_client()

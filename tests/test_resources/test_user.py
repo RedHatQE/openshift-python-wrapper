@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.user import User
 
 

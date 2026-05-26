@@ -155,7 +155,7 @@ def class_generator(
             LOGGER.info("Updating schema")
             try:
                 update_kind_schema()
-            except (RuntimeError, IOError) as e:
+            except (OSError, RuntimeError) as e:
                 error_msg = f"Failed to update schema: {e}"
                 LOGGER.error(error_msg)
                 raise RuntimeError(error_msg) from e
@@ -188,7 +188,7 @@ def class_generator(
     unique_groups = set()
     for resource in resources:
         # Use the original group name that we stored
-        if "original_group" in resource and resource["original_group"]:
+        if resource.get("original_group"):
             unique_groups.add(resource["original_group"])
 
     use_output_file_suffix: bool = len(unique_groups) > 1

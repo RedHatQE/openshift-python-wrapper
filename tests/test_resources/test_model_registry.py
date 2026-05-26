@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.model_registry import ModelRegistry
 
 

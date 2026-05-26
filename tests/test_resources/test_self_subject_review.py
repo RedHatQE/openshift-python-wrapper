@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.self_subject_review import SelfSubjectReview
 
 

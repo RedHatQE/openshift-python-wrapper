@@ -5,14 +5,14 @@ import os
 import tempfile
 import time
 from typing import Any
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 from click.testing import CliRunner
 
 from class_generator.cli import main
-from class_generator.core.discovery import discover_cluster_resources
 from class_generator.core.coverage import analyze_coverage, generate_report
+from class_generator.core.discovery import discover_cluster_resources
 from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 
 
@@ -330,29 +330,28 @@ class TestCoverageAnalysis:
     ) -> None:
         """Test basic coverage analysis."""
         with patch("os.listdir", return_value=mock_ocp_resources_files):
-            with patch("os.path.isfile", return_value=True):
-                with patch("os.path.exists", return_value=True):
-                    # Mock reading the files to determine what resource they implement
-                    def mock_file_open(filepath, mode="r"):
-                        content = ""
-                        if "pod.py" in filepath:
-                            content = 'class Pod(NamespacedResource):\n    """Pod resource"""'
-                        elif "service.py" in filepath:
-                            content = 'class Service(NamespacedResource):\n    """Service resource"""'
-                        elif "deployment.py" in filepath:
-                            content = 'class Deployment(NamespacedResource):\n    """Deployment resource"""'
-                        elif "config_map.py" in filepath:
-                            content = 'class ConfigMap(NamespacedResource):\n    """ConfigMap resource"""'
-                        elif "route.py" in filepath:
-                            content = 'class Route(NamespacedResource):\n    """Route resource"""'
-                        elif "dns_config" in filepath:
-                            content = 'class DNS(NamespacedResource):\n    """DNS config resource"""'
-                        elif "dns_operator" in filepath:
-                            content = 'class DNS(NamespacedResource):\n    """DNS operator resource"""'
-                        return mock_open(read_data=content)()
+            with patch("os.path.isfile", return_value=True), patch("os.path.exists", return_value=True):
+                # Mock reading the files to determine what resource they implement
+                def mock_file_open(filepath, mode="r"):
+                    content = ""
+                    if "pod.py" in filepath:
+                        content = 'class Pod(NamespacedResource):\n    """Pod resource"""'
+                    elif "service.py" in filepath:
+                        content = 'class Service(NamespacedResource):\n    """Service resource"""'
+                    elif "deployment.py" in filepath:
+                        content = 'class Deployment(NamespacedResource):\n    """Deployment resource"""'
+                    elif "config_map.py" in filepath:
+                        content = 'class ConfigMap(NamespacedResource):\n    """ConfigMap resource"""'
+                    elif "route.py" in filepath:
+                        content = 'class Route(NamespacedResource):\n    """Route resource"""'
+                    elif "dns_config" in filepath:
+                        content = 'class DNS(NamespacedResource):\n    """DNS config resource"""'
+                    elif "dns_operator" in filepath:
+                        content = 'class DNS(NamespacedResource):\n    """DNS operator resource"""'
+                    return mock_open(read_data=content)()
 
-                    with patch("builtins.open", side_effect=mock_file_open):
-                        analysis = analyze_coverage()
+                with patch("builtins.open", side_effect=mock_file_open):
+                    analysis = analyze_coverage()
 
             # Verify structure
             assert "generated_resources" in analysis
@@ -383,26 +382,25 @@ class TestCoverageAnalysis:
         ]
 
         with patch("os.listdir", return_value=files_with_dns):
-            with patch("os.path.isfile", return_value=True):
-                with patch("os.path.exists", return_value=True):
+            with patch("os.path.isfile", return_value=True), patch("os.path.exists", return_value=True):
 
-                    def mock_file_open(filepath, mode="r"):
-                        # All DNS files implement the DNS resource
-                        content = ""
-                        if "dns_" in filepath:
-                            content = 'class DNS(Resource):\n    """DNS resource"""'
-                        elif "network_operator" in filepath:
-                            content = 'class Network(Resource):\n    """Network resource"""'
-                        return mock_open(read_data=content)()
+                def mock_file_open(filepath, mode="r"):
+                    # All DNS files implement the DNS resource
+                    content = ""
+                    if "dns_" in filepath:
+                        content = 'class DNS(Resource):\n    """DNS resource"""'
+                    elif "network_operator" in filepath:
+                        content = 'class Network(Resource):\n    """Network resource"""'
+                    return mock_open(read_data=content)()
 
-                    with patch("builtins.open", side_effect=mock_file_open):
-                        # Add DNS to discovered resources
-                        discovered_with_dns = sample_discovered_resources.copy()
-                        discovered_with_dns["config.openshift.io/v1"] = [
-                            {"name": "dnses", "kind": "DNS", "namespaced": False}
-                        ]
+                with patch("builtins.open", side_effect=mock_file_open):
+                    # Add DNS to discovered resources
+                    discovered_with_dns = sample_discovered_resources.copy()
+                    discovered_with_dns["config.openshift.io/v1"] = [
+                        {"name": "dnses", "kind": "DNS", "namespaced": False}
+                    ]
 
-                        analysis = analyze_coverage()
+                    analysis = analyze_coverage()
 
             # DNS should be counted as manual resource
             assert "DNS" in analysis["manual_resources"]
@@ -450,27 +448,26 @@ class TestCoverageAnalysis:
             "service.py",
         ]
 
-        with patch("os.listdir", return_value=mixed_files):
-            with patch("os.path.isfile") as mock_isfile:
-                with patch("os.path.exists", return_value=True):
-                    # Only .py files that aren't __init__.py or in utils
-                    mock_isfile.side_effect = lambda x: x.endswith(".py") and not x.endswith("__pycache__/")
+        with patch("os.listdir", return_value=mixed_files), patch("os.path.isfile") as mock_isfile:
+            with patch("os.path.exists", return_value=True):
+                # Only .py files that aren't __init__.py or in utils
+                mock_isfile.side_effect = lambda x: x.endswith(".py") and not x.endswith("__pycache__/")
 
-                    def mock_file_open(filepath, mode="r"):
-                        content = ""
-                        if "pod.py" in filepath:
-                            content = 'class Pod(NamespacedResource):\n    """Pod resource"""'
-                        elif "service.py" in filepath:
-                            content = 'class Service(NamespacedResource):\n    """Service resource"""'
-                        return mock_open(read_data=content)()
+                def mock_file_open(filepath, mode="r"):
+                    content = ""
+                    if "pod.py" in filepath:
+                        content = 'class Pod(NamespacedResource):\n    """Pod resource"""'
+                    elif "service.py" in filepath:
+                        content = 'class Service(NamespacedResource):\n    """Service resource"""'
+                    return mock_open(read_data=content)()
 
-                    with patch("builtins.open", side_effect=mock_file_open):
-                        analysis = analyze_coverage()
+                with patch("builtins.open", side_effect=mock_file_open):
+                    analysis = analyze_coverage()
 
-                # Only Pod and Service should be detected
-                assert len(analysis["manual_resources"]) == 2
-                assert "Pod" in analysis["manual_resources"]
-                assert "Service" in analysis["manual_resources"]
+            # Only Pod and Service should be detected
+            assert len(analysis["manual_resources"]) == 2
+            assert "Pod" in analysis["manual_resources"]
+            assert "Service" in analysis["manual_resources"]
 
 
 class TestReportGeneration:
@@ -636,27 +633,24 @@ class TestCLIIntegration:
         """Test --coverage-report with --json flag."""
         runner = CliRunner()
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with patch("os.path.expanduser") as mock_expanduser:
-                mock_expanduser.return_value = tmpdir
+        with tempfile.TemporaryDirectory() as tmpdir, patch("os.path.expanduser") as mock_expanduser:
+            mock_expanduser.return_value = tmpdir
 
-                with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
-                    with patch("class_generator.cli.analyze_coverage") as mock_analyze:
-                        with patch("class_generator.cli.generate_report") as mock_report:
-                            mock_discover.return_value = {"v1": []}
-                            mock_analyze.return_value = {"missing_resources": []}
-                            # Return JSON format
-                            mock_report.return_value = json.dumps(
-                                {"coverage_stats": {"coverage_percentage": 100.0}}, indent=2
-                            )
+            with patch("class_generator.core.discovery.discover_cluster_resources") as mock_discover:
+                with patch("class_generator.cli.analyze_coverage") as mock_analyze:
+                    with patch("class_generator.cli.generate_report") as mock_report:
+                        mock_discover.return_value = {"v1": []}
+                        mock_analyze.return_value = {"missing_resources": []}
+                        # Return JSON format
+                        mock_report.return_value = json.dumps(
+                            {"coverage_stats": {"coverage_percentage": 100.0}}, indent=2
+                        )
 
-                            # Test JSON format
-                            result = runner.invoke(cli=main, args=["--coverage-report", "--json"])
+                        # Test JSON format
+                        result = runner.invoke(cli=main, args=["--coverage-report", "--json"])
 
-                            assert result.exit_code == 0
-                            mock_report.assert_called_with(
-                                coverage_data=mock_analyze.return_value, output_format="json"
-                            )
+                        assert result.exit_code == 0
+                        mock_report.assert_called_with(coverage_data=mock_analyze.return_value, output_format="json")
 
     def test_discover_missing_with_caching(self) -> None:
         """Test that discovery results are cached."""

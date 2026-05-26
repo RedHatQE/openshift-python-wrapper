@@ -15,15 +15,15 @@ from fake_kubernetes_client.resource_registry import FakeResourceRegistry
 from fake_kubernetes_client.resource_storage import FakeResourceStorage
 
 __all__ = [
+    "ApiException",
+    "ConflictError",
     "FakeConfiguration",
     "FakeDynamicClient",
     "FakeKubernetesClient",
     "FakeResourceField",
     "FakeResourceInstance",
+    "FakeResourceManager",
     "FakeResourceRegistry",
     "FakeResourceStorage",
-    "FakeResourceManager",
-    "ApiException",
     "NotFoundError",
-    "ConflictError",
 ]

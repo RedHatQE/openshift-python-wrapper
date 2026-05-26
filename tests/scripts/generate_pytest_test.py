@@ -38,7 +38,7 @@ import sys
 import types
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Union, get_type_hints, get_origin, get_args
+from typing import Any, Union, get_args, get_origin, get_type_hints
 
 import cloup
 from jinja2 import DictLoader, Environment
@@ -48,7 +48,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 
 # Import ResourceScanner and ResourceInfo from class_generator.utils
-from class_generator.utils import ResourceScanner, ResourceInfo
+from class_generator.utils import ResourceInfo, ResourceScanner
 
 console = Console()
 
@@ -124,7 +124,7 @@ class TestCoverageAnalyzer:
 
         return tests
 
-    def _find_test_for_resource(self, resource_name: str, existing_tests: dict[str, str]) -> Union[str, None]:
+    def _find_test_for_resource(self, resource_name: str, existing_tests: dict[str, str]) -> str | None:
         """Find test file for a specific resource"""
         # Convert resource name to potential test file names
         potential_names = [resource_name.lower(), resource_name]

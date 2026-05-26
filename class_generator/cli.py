@@ -1,13 +1,12 @@
 """Command-line interface for the class generator."""
 
 import fnmatch
+import logging
 import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-
-import logging
 
 import cloup
 from cloup.constraints import If, IsSet, accept_none, require_one
@@ -17,7 +16,7 @@ from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
-from class_generator.core.schema import update_kind_schema, ClusterVersionError
+from class_generator.core.schema import ClusterVersionError, update_kind_schema
 from class_generator.tests.test_generation import generate_class_generator_tests
 from class_generator.utils import execute_parallel_tasks
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
@@ -57,7 +56,7 @@ def handle_schema_update(update_schema: bool, generate_missing: bool) -> bool:
         LOGGER.info("Updating resource schema...")
         try:
             update_kind_schema()
-        except (RuntimeError, IOError, ClusterVersionError) as e:
+        except (OSError, RuntimeError, ClusterVersionError) as e:
             LOGGER.exception(f"Failed to update schema: {e}")
             sys.exit(1)
 

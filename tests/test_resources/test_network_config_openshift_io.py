@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.network_config_openshift_io import Network
 
 

@@ -13,7 +13,7 @@ import os
 import tempfile
 import traceback
 from pathlib import Path
-from typing import Any, Type
+from typing import Any
 
 import yaml
 from fastmcp import FastMCP
@@ -103,7 +103,7 @@ LOGGER.info(f"Available resource types: {RESOURCE_TYPES}")
 LOGGER.info(f"Total resource types found: {len(RESOURCE_TYPES)}")
 
 
-def get_resource_class(resource_type: str) -> Type[Resource] | None:
+def get_resource_class(resource_type: str) -> type[Resource] | None:
     """Get the resource class for a given resource type"""
     # Convert resource_type to lowercase for comparison
     resource_type_lower = resource_type.lower()
@@ -119,7 +119,7 @@ def get_resource_class(resource_type: str) -> Type[Resource] | None:
     return None
 
 
-def _validate_resource_type(resource_type: str) -> tuple[Type[Resource] | None, dict[str, Any] | None]:
+def _validate_resource_type(resource_type: str) -> tuple[type[Resource] | None, dict[str, Any] | None]:
     """Validate resource type and return (resource_class, error_dict) tuple."""
     resource_class = get_resource_class(resource_type=resource_type)
     if not resource_class:
@@ -128,7 +128,7 @@ def _validate_resource_type(resource_type: str) -> tuple[Type[Resource] | None, 
 
 
 def _create_resource_instance(
-    resource_class: Type[Resource],
+    resource_class: type[Resource],
     name: str,
     namespace: str | None = None,
     client: Any | None = None,
@@ -165,7 +165,7 @@ def _format_exception_error(action: str, resource_info: str, exception: Exceptio
         resource_info: Resource description (e.g., "Pod 'my-pod'", "configmap")
         exception: The exception that occurred
     """
-    return {"error": f"{action} {resource_info}: {str(exception)}", "type": type(exception).__name__}
+    return {"error": f"{action} {resource_info}: {exception!s}", "type": type(exception).__name__}
 
 
 def format_resource_info(resource: Any) -> dict[str, Any]:

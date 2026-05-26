@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.replica_set import ReplicaSet
 
 

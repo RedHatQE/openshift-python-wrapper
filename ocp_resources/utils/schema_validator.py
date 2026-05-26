@@ -10,7 +10,7 @@ from typing import Any
 import jsonschema
 from simple_logger.logger import get_logger
 
-from class_generator.constants import RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE, DEFINITIONS_FILE
+from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE
 
 from .archive_utils import load_json_archive
 
@@ -33,15 +33,14 @@ class SchemaValidator:
         Returns:
             bool: True if loaded successfully, False otherwise
         """
-        if cls._mappings_data is not None and cls._definitions_data is not None:
-            if not skip_cache:
-                return True
+        if cls._mappings_data is not None and cls._definitions_data is not None and not skip_cache:
+            return True
 
         # Load mappings from archive
         if RESOURCES_MAPPING_ARCHIVE.exists():
             try:
                 cls._mappings_data = load_json_archive(RESOURCES_MAPPING_FILE)
-            except (json.JSONDecodeError, IOError) as e:
+            except (OSError, json.JSONDecodeError) as e:
                 LOGGER.error(f"Failed to load mappings from archive {RESOURCES_MAPPING_ARCHIVE}: {e}")
                 return False
         else:
@@ -293,9 +292,13 @@ class SchemaValidator:
             if isinstance(part, int):
                 path_parts.append(f"[{part}]")
             else:
-                if path_parts and not path_parts[-1].endswith("]"):
-                    path_parts.append(".")
-                elif path_parts and path_parts[-1].endswith("]") and i > 0:
+                if (
+                    path_parts
+                    and not path_parts[-1].endswith("]")
+                    or path_parts
+                    and path_parts[-1].endswith("]")
+                    and i > 0
+                ):
                     path_parts.append(".")
                 path_parts.append(str(part))
 

@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.project_config_openshift_io import Project
 
 

@@ -1,4 +1,5 @@
 import pytest
+
 from ocp_resources.virtual_machine_cluster_instancetype import VirtualMachineClusterInstancetype
 
 
