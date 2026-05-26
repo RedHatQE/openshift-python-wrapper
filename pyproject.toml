@@ -70,7 +70,7 @@ dependencies = [
   "kubernetes>=31.0.0,!=36.0.0",  # Excluded: v36.0.0 has broken bearer-token auth (https://github.com/kubernetes-client/python/issues/2582), remove once v36.0.1+ ships with the fix
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
-  "python-benedict>=0.33.2",
+  "python-benedict>=0.33.2,<0.34.0",  # Upper bound: 0.34.0 dropped Python 3.9 support
   "python-simple-logger>=1.0.40",
   "requests>=2.32.2",
   "rich>=13.9.2",
