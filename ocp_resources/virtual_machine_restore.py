@@ -23,7 +23,7 @@ class VirtualMachineRestore(NamespacedResource):
         teardown=True,
         yaml_file=None,
         delete_timeout=TIMEOUT_4MINUTES,
-        volume_name_policy=None,
+        volume_restore_policy=None,
         **kwargs,
     ):
         super().__init__(
@@ -37,7 +37,7 @@ class VirtualMachineRestore(NamespacedResource):
         )
         self.vm_name = vm_name
         self.snapshot_name = snapshot_name
-        self.volume_name_policy = volume_name_policy
+        self.volume_restore_policy = volume_restore_policy
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -47,8 +47,8 @@ class VirtualMachineRestore(NamespacedResource):
             spec["target"]["kind"] = VirtualMachine.kind
             spec["target"]["name"] = self.vm_name
             spec["virtualMachineSnapshotName"] = self.snapshot_name
-            if self.volume_name_policy:
-                spec["volumeNamePolicy"] = self.volume_name_policy
+            if self.volume_restore_policy:
+                spec["volumeRestorePolicy"] = self.volume_restore_policy
 
     def wait_complete(self, status=True, timeout=TIMEOUT_4MINUTES):
         """
