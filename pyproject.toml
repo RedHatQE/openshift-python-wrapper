@@ -90,7 +90,7 @@ dependencies = [
   "deepdiff>=8.0.1",
   "jinja2>=3.1.4",
   "jsonschema>=4.20.0",
-  "kubernetes>=31.0.0,!=36.0.0",  # Excluded: v36.0.0 has broken bearer-token auth (https://github.com/kubernetes-client/python/issues/2582), remove once v36.0.1+ ships with the fix
+  "kubernetes>=31.0.0,<36",  # TODO: remove <36 pin once https://github.com/kubernetes-client/python/issues/2596 is fixed upstream, set to "kubernetes>=31.0.0,!=36.0.0"
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
   "python-benedict>=0.33.2",
