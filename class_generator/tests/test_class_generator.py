@@ -95,16 +95,17 @@ def test_parse_explain(tmp_path: Path) -> None:
         "DNS",
         "Deployment",
         "ImageContentSourcePolicy",
+        "Ingress",
         "Machine",
         "NMState",
-        "Pod",
-        "Secret",
-        "ServiceMeshMember",
-        "Ingress",
         "OAuth",
         "Pipeline",
+        "Pod",
         "RouteAdvertisements",
+        "Secret",
+        "ServiceMeshMember",
         "ServingRuntime",
+        "LLMInferenceServiceConfig",
     ]
 
     failures: list[tuple[str, str]] = []
