@@ -13,7 +13,7 @@ class TestUserCodeParser:
 
     def test_parse_file_with_user_code_and_imports(self):
         """Test parsing a file with both user code and user imports."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -88,7 +88,7 @@ class MyResource(Resource):
 
     def test_parse_file_with_multiline_imports(self):
         """Test parsing a file with multi-line imports."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -131,7 +131,7 @@ class MyResource(Resource):
 
     def test_parse_file_with_different_template_imports(self):
         """Test parsing with different combinations of template imports."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.exceptions import MissingRequiredArgumentError
@@ -181,7 +181,7 @@ class MyResource(NamespacedResource):
 
     def test_parse_file_with_only_marker(self):
         """Test parsing a file with only the marker and no user code."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -207,7 +207,7 @@ class MyResource(Resource):
 
     def test_parse_file_with_exceptions_import(self):
         """Test parsing a file with import from ocp_resources.exceptions module."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -245,7 +245,7 @@ class MyResource(NamespacedResource):
 
     def test_parse_file_with_syntax_error(self):
         """Test parsing a file with syntax errors in imports section."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import Resource

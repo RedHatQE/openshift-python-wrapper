@@ -269,7 +269,7 @@ class ResourceScanner:
 
         # Only consider resources with the generated marker comment
         if (
-            "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md"
+            "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md"
             not in content
         ):
             return None
