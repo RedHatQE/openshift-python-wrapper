@@ -120,7 +120,7 @@ def parse_resource_file_for_errors(data) -> list[str]:
     _resources_definitions = resources_definitions()
 
     if data.startswith(
-        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md"
+        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md"
     ):
         return []
 

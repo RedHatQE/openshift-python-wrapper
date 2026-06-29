@@ -1,4 +1,4 @@
-# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md#adding-tests
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md#adding-tests
 
 import filecmp
 import traceback

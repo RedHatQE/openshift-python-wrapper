@@ -54,7 +54,9 @@ def generate_resource_file_from_dict(
         template_name="class_generator_template.j2",
     )
 
-    output = "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md\n\n"
+    output = (
+        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md\n\n"
+    )
     formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
 
     if re.search(r"_[a-z]_", formatted_kind_str):
