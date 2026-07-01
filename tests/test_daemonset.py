@@ -35,6 +35,8 @@ class TestRestart:
                 "resource_dict"
             )
 
+            assert resource_dict["metadata"]["name"] == "test-ds"
+
             annotations = resource_dict["spec"]["template"]["metadata"]["annotations"]
             assert "kubectl.kubernetes.io/restartedAt" in annotations
             assert isinstance(annotations["kubectl.kubernetes.io/restartedAt"], str)
