@@ -43,6 +43,10 @@ class Plan(NamespacedResource):
         enable_nested_virtualization (bool, optional): Whether to enable nested virtualization on migrated VMs.
                                                       When False, CPU features vmx/svm are disabled on the target VM.
         run_preflight_inspection (bool, optional): Whether to run preflight deep inspection on warm migrations.
+        rdm_as_lun (bool, optional): Whether to map RDM (Raw Device Mapping) disks as LUN devices
+                                     with SCSI bus on the target VM. When True, RDM disks use
+                                     lun.bus: scsi instead of the default disk.bus: virtio.
+                                     Only applies to vSphere source providers.
     """
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
@@ -80,6 +84,7 @@ class Plan(NamespacedResource):
         target_affinity: dict[str, Any] | None = None,
         enable_nested_virtualization: bool | None = None,
         run_preflight_inspection: bool | None = None,
+        rdm_as_lun: bool | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -115,6 +120,7 @@ class Plan(NamespacedResource):
         self.target_affinity = target_affinity
         self.enable_nested_virtualization = enable_nested_virtualization
         self.run_preflight_inspection = run_preflight_inspection
+        self.rdm_as_lun = rdm_as_lun
 
         if self.pre_hook_name and self.pre_hook_namespace:
             self.hooks_array.append(
@@ -219,6 +225,9 @@ class Plan(NamespacedResource):
 
             if self.run_preflight_inspection is not None:
                 spec["runPreflightInspection"] = self.run_preflight_inspection
+
+            if self.rdm_as_lun is not None:
+                spec["rdmAsLun"] = self.rdm_as_lun
 
     def _generate_hook_spec(self, hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
         return {
