@@ -65,7 +65,7 @@ class DaemonSet(NamespacedResource):
         Wait until the DaemonSet rollout is complete.
 
         Checks that the controller has observed the latest generation, all pods have been
-        updated, and all updated pods are ready.
+        updated, and all updated pods are available.
 
         Args:
             timeout (int): Time to wait for the rollout to complete.
@@ -86,12 +86,18 @@ class DaemonSet(NamespacedResource):
             if sample.items:
                 item = sample.items[0]
                 status = item.status
-                desired_number_scheduled = status.desiredNumberScheduled
+                if not status:
+                    continue
+
+                desired_number_scheduled = status.desiredNumberScheduled or 0
+                if desired_number_scheduled == 0 and status.observedGeneration == item.metadata.generation:
+                    return
+
                 if (
                     desired_number_scheduled > 0
                     and status.observedGeneration == item.metadata.generation
-                    and status.updatedNumberScheduled == desired_number_scheduled
-                    and status.numberAvailable == desired_number_scheduled
+                    and (status.updatedNumberScheduled or 0) == desired_number_scheduled
+                    and (status.numberAvailable or 0) == desired_number_scheduled
                 ):
                     return
 
