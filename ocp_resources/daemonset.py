@@ -48,6 +48,7 @@ class DaemonSet(NamespacedResource):
         self.logger.info(f"Restarting {self.kind} {self.name}")
         self.update(
             resource_dict={
+                "metadata": {"name": self.name},
                 "spec": {
                     "template": {
                         "metadata": {
@@ -56,7 +57,7 @@ class DaemonSet(NamespacedResource):
                             }
                         }
                     }
-                }
+                },
             }
         )
 
