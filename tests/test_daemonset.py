@@ -133,3 +133,37 @@ class TestWaitForRollout:
             daemonset.wait_for_rollout(timeout=10)
 
         assert len(yielded) == 2, "Expected to iterate past not-available response before completing"
+
+    def test_wait_for_rollout_continues_when_status_missing(self, daemonset):
+        no_status_response = MagicMock()
+        no_status_response.items = [MagicMock()]
+        no_status_response.items[0].status = None
+
+        complete_response = _make_api_response(
+            generation=2,
+            observed_generation=2,
+            desired=3,
+            updated=3,
+            available=3,
+        )
+
+        with patch(
+            "ocp_resources.daemonset.TimeoutSampler",
+            return_value=iter([no_status_response, complete_response]),
+        ):
+            daemonset.wait_for_rollout(timeout=10)
+
+    def test_wait_for_rollout_returns_when_zero_desired(self, daemonset):
+        zero_desired_response = _make_api_response(
+            generation=2,
+            observed_generation=2,
+            desired=0,
+            updated=0,
+            available=0,
+        )
+
+        with patch(
+            "ocp_resources.daemonset.TimeoutSampler",
+            return_value=iter([zero_desired_response]),
+        ):
+            daemonset.wait_for_rollout(timeout=10)
