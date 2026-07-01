@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import kubernetes
 from timeout_sampler import TimeoutSampler
 
@@ -37,6 +39,60 @@ class DaemonSet(NamespacedResource):
                 desired_number_scheduled = status.desiredNumberScheduled
                 number_ready = status.numberReady
                 if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
+                    return
+
+    def restart(self) -> None:
+        """
+        Restart the DaemonSet by patching the pod template with a restartedAt annotation.
+        """
+        self.logger.info(f"Restarting {self.kind} {self.name}")
+        self.update(
+            resource_dict={
+                "spec": {
+                    "template": {
+                        "metadata": {
+                            "annotations": {
+                                "kubectl.kubernetes.io/restartedAt": datetime.now(tz=timezone.utc).isoformat()
+                            }
+                        }
+                    }
+                }
+            }
+        )
+
+    def wait_for_rollout(self, timeout: int = TIMEOUT_4MINUTES) -> None:
+        """
+        Wait until the DaemonSet rollout is complete.
+
+        Checks that the controller has observed the latest generation, all pods have been
+        updated, and all updated pods are ready.
+
+        Args:
+            timeout (int): Time to wait for the rollout to complete.
+
+        Raises:
+            TimeoutExpiredError: If the rollout does not complete within the timeout.
+        """
+        self.logger.info(f"Wait for {self.kind} {self.name} rollout to complete")
+        samples = TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=1,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
+            func=self.api.get,
+            field_selector=f"metadata.name=={self.name}",
+            namespace=self.namespace,
+        )
+        for sample in samples:
+            if sample.items:
+                item = sample.items[0]
+                status = item.status
+                desired_number_scheduled = status.desiredNumberScheduled
+                if (
+                    desired_number_scheduled > 0
+                    and status.observedGeneration == item.metadata.generation
+                    and status.updatedNumberScheduled == desired_number_scheduled
+                    and status.numberAvailable == desired_number_scheduled
+                ):
                     return
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, _body=None):
