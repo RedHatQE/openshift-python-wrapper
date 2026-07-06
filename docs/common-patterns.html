@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Resource Patterns - openshift-python-wrapper</title>
+    <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
+    <link rel="stylesheet" href="assets/style.css">
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+    <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
+    <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-logo">openshift-python-wrapper</a>
+            <p class="sidebar-tagline">Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls</p>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" id="search-input" placeholder="Search... (⌘K)" autocomplete="off" readonly>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Getting Started</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="quickstart.html"
+                           class="nav-link">
+                            Installing and Creating Your First Resource
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">User Guides</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="connecting-to-clusters.html"
+                           class="nav-link">
+                            Connecting to Clusters
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="creating-and-managing-resources.html"
+                           class="nav-link">
+                            Creating and Managing Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="querying-resources.html"
+                           class="nav-link">
+                            Querying and Watching Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="waiting-for-conditions.html"
+                           class="nav-link">
+                            Waiting for Resource Conditions and Status
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="validating-resources.html"
+                           class="nav-link">
+                            Validating Resources Against OpenAPI Schemas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="managing-resource-lists.html"
+                           class="nav-link">
+                            Managing Bulk Resources with ResourceList
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="editing-resources-temporarily.html"
+                           class="nav-link">
+                            Editing Resources Temporarily with ResourceEditor
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="working-with-virtual-machines.html"
+                           class="nav-link">
+                            Working with Virtual Machines (KubeVirt)
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="testing-without-cluster.html"
+                           class="nav-link">
+                            Testing Without a Cluster Using the Fake Client
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="generating-resource-classes.html"
+                           class="nav-link">
+                            Generating New Resource Classes with class-generator
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Recipes</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="common-patterns.html"
+                           class="nav-link active" aria-current="page">
+                            Common Resource Patterns
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="mcp-server-integration.html"
+                           class="nav-link">
+                            Integrating with AI Assistants via MCP Server
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-api.html"
+                           class="nav-link">
+                            Resource and NamespacedResource API
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="environment-variables.html"
+                           class="nav-link">
+                            Environment Variables and Configuration
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Internals</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-class-hierarchy.html"
+                           class="nav-link">
+                            Understanding the Resource Class Hierarchy
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schema-validation-internals.html"
+                           class="nav-link">
+                            Schema Validation and Code Generation Architecture
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Using Resources</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="working-with-events.html"
+                           class="nav-link">
+                            Working with Kubernetes Events
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="pod-execution-and-logs.html"
+                           class="nav-link">
+                            Executing Commands in Pods and Retrieving Logs
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">API Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="error-handling.html"
+                           class="nav-link">
+                            Error Handling and Exception Reference
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <a href="index.html" class="top-bar-title">openshift-python-wrapper</a>
+            </div>
+            <div class="top-bar-spacer"></div>
+            <div class="top-bar-right">
+                <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
+                    <kbd>&#8984;K</kbd> Search
+                </button>
+                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
+                    ⚡ docs<span class="brand-accent">fy</span>
+                </a>
+
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span class="github-stars" id="github-stars" title="GitHub stars"></span>
+                </a>
+
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <article class="article">
+                <div class="article-body">
+                    <!-- SECURITY: |safe is intentional. Content is AI-generated markdown
+                         converted to HTML server-side by the markdown library, not
+                         user-supplied input. XSS risk is minimal and accepted since
+                         the AI generates the content, not end users. -->
+                    <p>Let me start by reading the knowledge graph and the pages manifest, then explore the codebase.</p>
+<p>Now let me look at more resource files for networking, RBAC, and DataVolume:</p>
+<p>Now let me look at the secret, network policy, network attachment definition, and the duplicate API groups handling:</p>
+<p>Now let me look at the duplicate API groups handling:</p>
+<p>Now let me look at some files with duplicate kinds to understand the pattern:</p>
+<p>Now let me look at how to exec in pods and also look at the user_defined_network and apply_yaml approach:</p>
+<p>Now let me look at how the <code>yaml_file</code> parameter works and look at the event-related code:</p>
+<p>Now let me check some gateway files to see the pattern for duplicate API groups:</p>
+<p>Now let me look at the <code>user_defined_network.py</code> for newer networking resources:</p>
+<p>Now I have enough information. Let me write the documentation page:</p>
+<h1 id="common-resource-patterns">Common Resource Patterns</h1>
+<p>Copy-paste recipes for the most common Kubernetes and OpenShift resource operations using openshift-python-wrapper.</p>
+<blockquote>
+<p><strong>Note:</strong> All recipes assume you already have a connected client. See <a href="connecting-to-clusters.html">Connecting to Clusters</a> for setup instructions.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="c1"># Preamble used by all recipes below</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
+</code></pre></div>
+
+<hr />
+<h2 id="create-and-run-a-pod">Create and Run a Pod</h2>
+<p>Create a pod with a single container and wait for it to start.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-nginx&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:1.25&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ports&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;containerPort&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}],</span>
+    <span class="p">}],</span>
+    <span class="n">restart_policy</span><span class="o">=</span><span class="s2">&quot;Never&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pod</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+<span class="n">pod</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>deploy()</code> method creates the pod on the cluster. <code>wait_for_status</code> polls until the pod reaches <code>Running</code>. Use <code>restart_policy="Always"</code> for long-running pods.</p>
+<hr />
+<h2 id="create-a-pod-as-a-context-manager">Create a Pod as a Context Manager</h2>
+<p>Automatically clean up a pod when the block exits — ideal for tests.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="k">with</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-curl&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;curl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;curlimages/curl:8.5.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sleep&quot;</span><span class="p">,</span> <span class="s2">&quot;3600&quot;</span><span class="p">],</span>
+    <span class="p">}],</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">pod</span><span class="p">:</span>
+    <span class="n">pod</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;curl&quot;</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;http://httpbin.org/get&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="c1"># Pod is automatically deleted here</span>
+</code></pre></div>
+
+<p>The context manager calls <code>deploy()</code> on enter and <code>clean_up()</code> on exit. Set <code>teardown=False</code> to skip automatic deletion.</p>
+<blockquote>
+<p><strong>Tip:</strong> See <a href="creating-and-managing-resources.html">Creating and Managing Resources</a> for all lifecycle management patterns.</p>
+</blockquote>
+<hr />
+<h2 id="execute-a-command-inside-a-pod">Execute a Command Inside a Pod</h2>
+<p>Run a shell command inside an already-running pod and capture the output.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-nginx&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/nginx/nginx.conf&quot;</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>execute()</code> streams output via the Kubernetes exec API. Use <code>container="sidecar"</code> to target a specific container in multi-container pods. Set <code>ignore_rc=True</code> to suppress errors from non-zero exit codes.</p>
+<hr />
+<h2 id="get-pod-logs">Get Pod Logs</h2>
+<p>Retrieve logs from a running or completed pod.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-nginx&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Full logs</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">())</span>
+
+<span class="c1"># Last 50 lines</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tail_lines</span><span class="o">=</span><span class="mi">50</span><span class="p">))</span>
+
+<span class="c1"># Logs from a specific container</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;sidecar&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<p>The <code>log()</code> method passes kwargs through to the Kubernetes <code>read_namespaced_pod_log</code> API, so all standard parameters like <code>tail_lines</code>, <code>since_seconds</code>, and <code>container</code> are supported.</p>
+<hr />
+<h2 id="create-a-deployment-and-wait-for-replicas">Create a Deployment and Wait for Replicas</h2>
+<p>Deploy an application with multiple replicas and wait until they are all ready.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
+
+<span class="n">dep</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-app&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">selector</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;matchLabels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;web-app&quot;</span><span class="p">}},</span>
+    <span class="n">template</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;web-app&quot;</span><span class="p">}},</span>
+        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;containers&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:1.25&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ports&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;containerPort&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}],</span>
+            <span class="p">}]</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>wait_for_replicas</code> polls until <code>availableReplicas == readyReplicas == updatedReplicas == spec.replicas</code>. Pass <code>deployed=False</code> to wait for all replicas to be scaled down.</p>
+<hr />
+<h2 id="scale-a-deployment">Scale a Deployment</h2>
+<p>Change the replica count of an existing deployment.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
+
+<span class="n">dep</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Scale up</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">scale_replicas</span><span class="p">(</span><span class="n">replica_count</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="c1"># Scale down</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">scale_replicas</span><span class="p">(</span><span class="n">replica_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>scale_replicas</code> patches the deployment's <code>spec.replicas</code> field. Always follow with <code>wait_for_replicas</code> to confirm the rollout completes.</p>
+<hr />
+<h2 id="create-a-service">Create a Service</h2>
+<p>Expose a deployment via a ClusterIP service.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.service</span><span class="w"> </span><span class="kn">import</span> <span class="n">Service</span>
+
+<span class="n">svc</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-app-svc&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">selector</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;web-app&quot;</span><span class="p">},</span>
+    <span class="n">ports</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;TCP&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+        <span class="s2">&quot;targetPort&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+    <span class="p">}],</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;ClusterIP&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">svc</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Change <code>type</code> to <code>"NodePort"</code> or <code>"LoadBalancer"</code> as needed. The <code>selector</code> must match labels on your target pods.</p>
+<hr />
+<h2 id="create-an-openshift-route">Create an OpenShift Route</h2>
+<p>Expose a service externally via an OpenShift Route.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.route</span><span class="w"> </span><span class="kn">import</span> <span class="n">Route</span>
+
+<span class="n">route</span> <span class="o">=</span> <span class="n">Route</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-app-route&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">service</span><span class="o">=</span><span class="s2">&quot;web-app-svc&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">route</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+
+<span class="c1"># Get the assigned hostname</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">route</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+</code></pre></div>
+
+<p>For TLS re-encrypt routes, pass <code>destination_ca_cert="&lt;PEM certificate string&gt;"</code>. Access the exposed service name with <code>route.exposed_service</code> and the TLS termination type with <code>route.termination</code>.</p>
+<hr />
+<h2 id="create-a-namespace">Create a Namespace</h2>
+<p>Create a namespace (or use as a context manager for automatic cleanup).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+
+<span class="c1"># Simple creation</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">)</span>
+<span class="n">ns</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+
+<span class="c1"># As a context manager (deleted on exit)</span>
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ephemeral-ns&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+    <span class="c1"># ... do work in the namespace ...</span>
+    <span class="k">pass</span>
+</code></pre></div>
+
+<p><code>Namespace</code> extends <code>Resource</code> (cluster-scoped), so no <code>namespace</code> parameter is needed.</p>
+<hr />
+<h2 id="create-a-configmap">Create a ConfigMap</h2>
+<p>Store configuration data for pods to consume.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
+
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">:</span> <span class="s2">&quot;postgres://db:5432/myapp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;LOG_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">cm</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Use <code>binary_data</code> for non-UTF-8 content. Set <code>immutable=True</code> to prevent changes after creation.</p>
+<hr />
+<h2 id="create-a-secret">Create a Secret</h2>
+<p>Store sensitive data such as credentials.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.secret</span><span class="w"> </span><span class="kn">import</span> <span class="n">Secret</span>
+
+<span class="n">secret</span> <span class="o">=</span> <span class="n">Secret</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;db-credentials&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">string_data</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;s3cur3-pa$$word&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Opaque&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">secret</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Use <code>data_dict</code> instead of <code>string_data</code> if your values are already base64-encoded. Secret data is automatically hashed in log output for security.</p>
+<hr />
+<h2 id="create-a-job">Create a Job</h2>
+<p>Run a one-off task to completion.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.job</span><span class="w"> </span><span class="kn">import</span> <span class="n">Job</span>
+
+<span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;db-migration&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">backoff_limit</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">restart_policy</span><span class="o">=</span><span class="s2">&quot;Never&quot;</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;migrate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;my-app:latest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;manage.py&quot;</span><span class="p">,</span> <span class="s2">&quot;migrate&quot;</span><span class="p">],</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+<span class="n">job</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+<span class="n">job</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
+    <span class="n">condition</span><span class="o">=</span><span class="n">Job</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="n">Job</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">TRUE</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Set <code>background_propagation_policy="Background"</code> to delete leftover pods when the job is cleaned up. The <code>backoff_limit</code> controls how many times the job retries on failure.</p>
+<hr />
+<h2 id="create-a-persistentvolumeclaim">Create a PersistentVolumeClaim</h2>
+<p>Request persistent storage for your workloads.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.persistent_volume_claim</span><span class="w"> </span><span class="kn">import</span> <span class="n">PersistentVolumeClaim</span>
+
+<span class="n">pvc</span> <span class="o">=</span> <span class="n">PersistentVolumeClaim</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-data&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">accessmodes</span><span class="o">=</span><span class="n">PersistentVolumeClaim</span><span class="o">.</span><span class="n">AccessMode</span><span class="o">.</span><span class="n">RWO</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="s2">&quot;10Gi&quot;</span><span class="p">,</span>
+    <span class="n">storage_class</span><span class="o">=</span><span class="s2">&quot;gp3-csi&quot;</span><span class="p">,</span>
+    <span class="n">volume_mode</span><span class="o">=</span><span class="n">PersistentVolumeClaim</span><span class="o">.</span><span class="n">VolumeMode</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pvc</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+<span class="n">pvc</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">PersistentVolumeClaim</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">BOUND</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Use the <code>AccessMode</code> and <code>VolumeMode</code> constants instead of raw strings. The <code>storage_class</code> must match an available StorageClass on your cluster.</p>
+<hr />
+<h2 id="create-a-datavolume-kubevirt-cdi">Create a DataVolume (KubeVirt / CDI)</h2>
+<p>Import a VM disk image into a PVC using the Containerized Data Importer.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.datavolume</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataVolume</span>
+
+<span class="n">dv</span> <span class="o">=</span> <span class="n">DataVolume</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fedora-disk&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">source_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;http&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-40-1.14.x86_64.qcow2&quot;</span><span class="p">}},</span>
+    <span class="n">size</span><span class="o">=</span><span class="s2">&quot;30Gi&quot;</span><span class="p">,</span>
+    <span class="n">storage_class</span><span class="o">=</span><span class="s2">&quot;ocs-storagecluster-ceph-rbd-virtualization&quot;</span><span class="p">,</span>
+    <span class="n">access_modes</span><span class="o">=</span><span class="n">DataVolume</span><span class="o">.</span><span class="n">AccessMode</span><span class="o">.</span><span class="n">RWX</span><span class="p">,</span>
+    <span class="n">volume_mode</span><span class="o">=</span><span class="n">DataVolume</span><span class="o">.</span><span class="n">VolumeMode</span><span class="o">.</span><span class="n">BLOCK</span><span class="p">,</span>
+    <span class="n">api_name</span><span class="o">=</span><span class="s2">&quot;storage&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">dv</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+<span class="n">dv</span><span class="o">.</span><span class="n">wait_for_dv_success</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Always pass <code>api_name="storage"</code> explicitly — the default will change in a future release. Use <code>source_dict={"blank": {}}</code> for empty disks, or <code>source_dict={"pvc": {"name": "source-pvc", "namespace": "default"}}</code> for cloning.</p>
+<ul>
+<li><strong>Clone a DataVolume:</strong>
+  <code>python
+  dv_clone = DataVolume(
+      client=client,
+      name="fedora-disk-clone",
+      namespace="default",
+      source_dict={"pvc": {"name": "fedora-disk", "namespace": "default"}},
+      size="30Gi",
+      storage_class="ocs-storagecluster-ceph-rbd-virtualization",
+      access_modes=DataVolume.AccessMode.RWX,
+      volume_mode=DataVolume.VolumeMode.BLOCK,
+      api_name="storage",
+  )</code></li>
+</ul>
+<blockquote>
+<p><strong>Tip:</strong> See <a href="working-with-virtual-machines.html">Working with Virtual Machines (KubeVirt)</a> for full VM lifecycle recipes.</p>
+</blockquote>
+<hr />
+<h2 id="create-a-networkpolicy">Create a NetworkPolicy</h2>
+<p>Restrict traffic to pods matching a label selector.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.network_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkPolicy</span>
+
+<span class="n">netpol</span> <span class="o">=</span> <span class="n">NetworkPolicy</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;allow-http-only&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">pod_selector</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;matchLabels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;web-app&quot;</span><span class="p">}},</span>
+    <span class="n">policy_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ingress&quot;</span><span class="p">],</span>
+    <span class="n">ingress</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;ports&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;TCP&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}],</span>
+        <span class="s2">&quot;from&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;namespaceSelector&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;matchLabels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;production&quot;</span><span class="p">}}},</span>
+        <span class="p">],</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+<span class="n">netpol</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>This allows TCP port 80 ingress only from namespaces labeled <code>env=production</code>. Omit <code>ingress</code> and set <code>policy_types=["Ingress"]</code> to deny all inbound traffic.</p>
+<hr />
+<h2 id="create-a-networkattachmentdefinition">Create a NetworkAttachmentDefinition</h2>
+<p>Attach pods to a secondary network using Multus.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.network_attachment_definition</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinuxBridgeNetworkAttachmentDefinition</span>
+
+<span class="n">nad</span> <span class="o">=</span> <span class="n">LinuxBridgeNetworkAttachmentDefinition</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;br-100&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">bridge_name</span><span class="o">=</span><span class="s2">&quot;br-100&quot;</span><span class="p">,</span>
+    <span class="n">cni_type</span><span class="o">=</span><span class="s2">&quot;cnv-bridge&quot;</span><span class="p">,</span>
+    <span class="n">vlan</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">mtu</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">nad</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Variant classes are available for different bridge types:</p>
+<ul>
+<li><code>LinuxBridgeNetworkAttachmentDefinition</code> — Linux bridge (cnv-bridge)</li>
+<li><code>OvsBridgeNetworkAttachmentDefinition</code> — OVS bridge</li>
+<li><code>OVNOverlayNetworkAttachmentDefinition</code> — OVN overlay (layer 2/3)</li>
+</ul>
+<hr />
+<h2 id="create-an-rbac-role-and-rolebinding">Create an RBAC Role and RoleBinding</h2>
+<p>Grant specific permissions to a service account within a namespace.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.role</span><span class="w"> </span><span class="kn">import</span> <span class="n">Role</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.role_binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoleBinding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.service_account</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceAccount</span>
+
+<span class="n">sa</span> <span class="o">=</span> <span class="n">ServiceAccount</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-sa&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">sa</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+
+<span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pod-reader&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">rules</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;apiGroups&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;pods&quot;</span><span class="p">,</span> <span class="s2">&quot;pods/log&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;watch&quot;</span><span class="p">],</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+<span class="n">role</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+
+<span class="n">binding</span> <span class="o">=</span> <span class="n">RoleBinding</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-sa-pod-reader&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">subjects_kind</span><span class="o">=</span><span class="s2">&quot;ServiceAccount&quot;</span><span class="p">,</span>
+    <span class="n">subjects_name</span><span class="o">=</span><span class="s2">&quot;app-sa&quot;</span><span class="p">,</span>
+    <span class="n">subjects_namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">role_ref_kind</span><span class="o">=</span><span class="s2">&quot;Role&quot;</span><span class="p">,</span>
+    <span class="n">role_ref_name</span><span class="o">=</span><span class="s2">&quot;pod-reader&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">binding</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>This grants the <code>app-sa</code> service account read-only access to pods in the <code>default</code> namespace.</p>
+<hr />
+<h2 id="create-a-clusterrole-and-clusterrolebinding">Create a ClusterRole and ClusterRoleBinding</h2>
+<p>Grant cluster-wide permissions to a service account.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.cluster_role</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterRole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.cluster_role_binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterRoleBinding</span>
+
+<span class="n">cr</span> <span class="o">=</span> <span class="n">ClusterRole</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;node-viewer&quot;</span><span class="p">,</span>
+    <span class="n">rules</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;apiGroups&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;nodes&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;watch&quot;</span><span class="p">],</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+<span class="n">cr</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+
+<span class="n">crb</span> <span class="o">=</span> <span class="n">ClusterRoleBinding</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-sa-node-viewer&quot;</span><span class="p">,</span>
+    <span class="n">cluster_role</span><span class="o">=</span><span class="s2">&quot;node-viewer&quot;</span><span class="p">,</span>
+    <span class="n">subjects</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;ServiceAccount&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app-sa&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+<span class="n">crb</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p><code>ClusterRole</code> and <code>ClusterRoleBinding</code> are cluster-scoped (<code>Resource</code> subclasses), so no <code>namespace</code> parameter is needed on the role or binding itself.</p>
+<hr />
+<h2 id="list-and-filter-resources">List and Filter Resources</h2>
+<p>Query existing resources using label and field selectors.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+
+<span class="c1"># List all pods in a namespace</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Filter by label</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=web-app&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Filter by field</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;status.phase=Running&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># List cluster-scoped resources (no namespace)</span>
+<span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">Namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;env=staging&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>get()</code> class method returns a generator of resource objects. Pass <code>raw=True</code> to get raw <code>ResourceInstance</code> objects instead.</p>
+<blockquote>
+<p><strong>Tip:</strong> See <a href="querying-resources.html">Querying and Watching Resources</a> for advanced querying patterns.</p>
+</blockquote>
+<hr />
+<h2 id="create-a-resource-from-a-yaml-file">Create a Resource from a YAML File</h2>
+<p>Load a resource definition from an existing YAML file.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">yaml_file</span><span class="o">=</span><span class="s2">&quot;manifests/my-pod.yaml&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pod</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>When using <code>yaml_file</code>, the <code>name</code> and <code>namespace</code> are read from the file automatically. You cannot combine <code>yaml_file</code> with <code>kind_dict</code>.</p>
+<hr />
+<h2 id="create-a-resource-from-a-dictionary">Create a Resource from a Dictionary</h2>
+<p>Pass a raw Kubernetes resource dict directly.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
+
+<span class="n">dep</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">kind_dict</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;apiVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;apps/v1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;Deployment&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;from-dict-app&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;selector&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;matchLabels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;from-dict&quot;</span><span class="p">}},</span>
+            <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;from-dict&quot;</span><span class="p">}},</span>
+                <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;containers&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:1.25&quot;</span><span class="p">,</span>
+                    <span class="p">}],</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Using <code>kind_dict</code> bypasses all constructor logic in <code>to_dict()</code> — the dictionary is sent as-is to the API. This is useful when migrating existing manifests.</p>
+<hr />
+<h2 id="handle-resources-with-duplicate-api-groups">Handle Resources with Duplicate API Groups</h2>
+<p>Some Kubernetes resource kinds (e.g., <code>DNS</code>, <code>Ingress</code>, <code>Gateway</code>) exist in multiple API groups. The wrapper provides separate modules for each variant.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># DNS from config.openshift.io (cluster DNS config)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.dns_config_openshift_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">DNS</span> <span class="k">as</span> <span class="n">DNSConfig</span>
+
+<span class="n">dns_config</span> <span class="o">=</span> <span class="n">DNSConfig</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cluster&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dns_config</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">baseDomain</span><span class="p">)</span>
+
+<span class="c1"># DNS from operator.openshift.io (CoreDNS operator)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.dns_operator_openshift_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">DNS</span> <span class="k">as</span> <span class="n">DNSOperator</span>
+
+<span class="n">dns_operator</span> <span class="o">=</span> <span class="n">DNSOperator</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dns_operator</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">logLevel</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1"># Ingress from config.openshift.io (cluster ingress config)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.ingress_config_openshift_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ingress</span> <span class="k">as</span> <span class="n">IngressConfig</span>
+
+<span class="n">ingress</span> <span class="o">=</span> <span class="n">IngressConfig</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cluster&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ingress</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">domain</span><span class="p">)</span>
+
+<span class="c1"># Ingress from networking.k8s.io (K8s Ingress rules)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.ingress_networking_k8s_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ingress</span> <span class="k">as</span> <span class="n">K8sIngress</span>
+
+<span class="n">k8s_ingress</span> <span class="o">=</span> <span class="n">K8sIngress</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-app-ingress&quot;</span><span class="p">,</span>
+    <span class="n">rules</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;app.example.com&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;http&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;paths&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pathType&quot;</span><span class="p">:</span> <span class="s2">&quot;Prefix&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web-app-svc&quot;</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}}},</span>
+            <span class="p">}],</span>
+        <span class="p">},</span>
+    <span class="p">}],</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>The naming convention for duplicate-kind modules is <code>&lt;kind&gt;_&lt;api_group_snake_case&gt;.py</code>. Use Python import aliases (<code>as</code>) to distinguish them in your code.</p>
+<p><strong>Common duplicate kinds and their modules:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Module</th>
+<th>API Group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DNS</code></td>
+<td><code>dns_config_openshift_io</code></td>
+<td><code>config.openshift.io</code></td>
+</tr>
+<tr>
+<td><code>DNS</code></td>
+<td><code>dns_operator_openshift_io</code></td>
+<td><code>operator.openshift.io</code></td>
+</tr>
+<tr>
+<td><code>Ingress</code></td>
+<td><code>ingress_config_openshift_io</code></td>
+<td><code>config.openshift.io</code></td>
+</tr>
+<tr>
+<td><code>Ingress</code></td>
+<td><code>ingress_networking_k8s_io</code></td>
+<td><code>networking.k8s.io</code></td>
+</tr>
+<tr>
+<td><code>Gateway</code></td>
+<td><code>gateway</code></td>
+<td><code>networking.istio.io</code></td>
+</tr>
+<tr>
+<td><code>Gateway</code></td>
+<td><code>gateway_gateway_networking_k8s_io</code></td>
+<td><code>gateway.networking.k8s.io</code></td>
+</tr>
+<tr>
+<td><code>Gateway</code></td>
+<td><code>gateway_networking_istio_io</code></td>
+<td><code>networking.istio.io</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Warning:</strong> Importing the wrong module will target the wrong API group, causing <code>NotFoundError</code> or unexpected behavior. Always verify the <code>api_group</code> attribute on your resource class.</p>
+</blockquote>
+<hr />
+<h2 id="manage-multiple-similar-resources-with-resourcelist">Manage Multiple Similar Resources with ResourceList</h2>
+<p>Create N copies of a resource with auto-numbered names.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceList</span>
+
+<span class="k">with</span> <span class="n">ResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span>
+    <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;perf-test-ns&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">namespaces</span><span class="p">:</span>
+    <span class="c1"># Creates: perf-test-ns-1, perf-test-ns-2, perf-test-ns-3</span>
+    <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="c1"># All 3 namespaces are deleted on exit</span>
+</code></pre></div>
+
+<blockquote>
+<p><strong>Tip:</strong> See <a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a> for <code>NamespacedResourceList</code> and other bulk patterns.</p>
+</blockquote>
+<hr />
+<h2 id="deploy-one-resource-per-namespace-with-namespacedresourcelist">Deploy One Resource Per Namespace with NamespacedResourceList</h2>
+<p>Create an identical namespaced resource in each of several namespaces.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceList</span><span class="p">,</span> <span class="n">NamespacedResourceList</span>
+
+<span class="k">with</span> <span class="n">ResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span>
+    <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;team-ns&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">namespaces</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">NamespacedResourceList</span><span class="p">(</span>
+        <span class="n">resource_class</span><span class="o">=</span><span class="n">ConfigMap</span><span class="p">,</span>
+        <span class="n">namespaces</span><span class="o">=</span><span class="n">namespaces</span><span class="p">,</span>
+        <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;shared-config&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;REGION&quot;</span><span class="p">:</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">},</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">configmaps</span><span class="p">:</span>
+        <span class="c1"># One ConfigMap &quot;shared-config&quot; in each of team-ns-1, team-ns-2, team-ns-3</span>
+        <span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">configmaps</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>NamespacedResourceList</code> requires a <code>ResourceList</code> of <code>Namespace</code> objects. All resources are cleaned up in reverse order on exit.</p>
+<hr />
+<h2 id="temporarily-edit-a-resource-with-resourceeditor">Temporarily Edit a Resource with ResourceEditor</h2>
+<p>Apply temporary patches during a test and automatically restore original values.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
+
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;LOG_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;debug&quot;</span><span class="p">}}},</span>
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;update&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># LOG_LEVEL is now &quot;debug&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">LOG_LEVEL</span><span class="p">)</span>
+<span class="c1"># Original LOG_LEVEL is restored here</span>
+</code></pre></div>
+
+<p><code>ResourceEditor</code> backs up original values on enter and restores them on exit. Use <code>action="replace"</code> when you need to remove fields entirely rather than patch them.</p>
+<blockquote>
+<p><strong>Tip:</strong> See <a href="editing-resources-temporarily.html">Editing Resources Temporarily with ResourceEditor</a> for complete details.</p>
+</blockquote>
+<hr />
+<h2 id="validate-a-resource-before-creating-it">Validate a Resource Before Creating It</h2>
+<p>Catch schema errors before submitting to the API server.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;validated-pod&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:1.25&quot;</span><span class="p">,</span>
+    <span class="p">}],</span>
+    <span class="n">schema_validation_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Auto-validate on create()</span>
+<span class="p">)</span>
+
+<span class="c1"># Manual validation</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">pod</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Resource is valid&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Or validate a raw dict without instantiation</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">Pod</span><span class="o">.</span><span class="n">validate_dict</span><span class="p">({</span>
+        <span class="s2">&quot;apiVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;v1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;Pod&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;containers&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}]},</span>
+    <span class="p">})</span>
+<span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dict validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>When <code>schema_validation_enabled=True</code>, <code>create()</code> and <code>update_replace()</code> automatically validate before sending to the API. Validation requires OpenAPI schemas to be available.</p>
+<blockquote>
+<p><strong>Tip:</strong> See <a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a> for schema setup and troubleshooting.</p>
+</blockquote>
+<hr />
+<h2 id="check-if-a-resource-exists">Check If a Resource Exists</h2>
+<p>Verify a resource exists before operating on it.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
+
+<span class="n">dep</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">dep</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deployment exists, status: </span><span class="si">{</span><span class="n">dep</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">availableReplicas</span><span class="si">}</span><span class="s2"> replicas available&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deployment not found&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>exists</code> returns the resource instance if found or <code>None</code> if not. For fail-fast behavior, use <code>ensure_exists=True</code> in the constructor — it raises <code>ResourceNotFoundError</code> immediately if the resource is missing.</p>
+<hr />
+<h2 id="watch-resource-events">Watch Resource Events</h2>
+<p>Stream events related to a specific resource.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-nginx&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Watch events for this pod (10 second window)</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">ev</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">ev</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">ev</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">ev</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Use <code>field_selector</code> to narrow results further, for example: <code>field_selector="type==Warning"</code>. The <code>events()</code> method automatically filters by <code>involvedObject.name</code>.</p>
+<hr />
+<h2 id="list-recent-events-in-a-namespace">List Recent Events in a Namespace</h2>
+<p>Get existing events (not a watch stream) from the last N seconds.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.event</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
+
+<span class="c1"># Warning events from the last 5 minutes</span>
+<span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning&quot;</span><span class="p">,</span>
+    <span class="n">since_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">ev</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">ev</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">ev</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>Event.list()</code> returns a sorted list (most recent first), unlike <code>Event.get()</code> which is a live watch stream.</p>
+<hr />
+<h2 id="wait-for-a-resource-condition">Wait for a Resource Condition</h2>
+<p>Block until a resource reaches a specific condition.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
+
+<span class="n">dep</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">dep</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
+    <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;Available&quot;</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>Use <code>stop_condition</code> to fail fast if an unrecoverable condition is detected:</p>
+<div class="highlight"><pre><span></span><code><span class="n">dep</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
+    <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;Available&quot;</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">stop_condition</span><span class="o">=</span><span class="s2">&quot;ReplicaFailure&quot;</span><span class="p">,</span>
+    <span class="n">stop_status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<blockquote>
+<p><strong>Tip:</strong> See <a href="waiting-for-conditions.html">Waiting for Resource Conditions and Status</a> for advanced waiting patterns.</p>
+</blockquote>
+<hr />
+<h2 id="get-a-resources-yaml-representation">Get a Resource's YAML Representation</h2>
+<p>Dump the intended resource dict as YAML (useful for debugging).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;debug-pod&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;busybox&quot;</span><span class="p">,</span> <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sleep&quot;</span><span class="p">,</span> <span class="s2">&quot;3600&quot;</span><span class="p">]}],</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">())</span>
+</code></pre></div>
+
+<p><code>to_yaml()</code> calls <code>to_dict()</code> internally and returns the YAML string. This shows what would be sent to the API, not the live state.</p>
+<hr />
+<h2 id="get-the-pods-node-and-ip">Get the Pod's Node and IP</h2>
+<p>Access commonly needed runtime properties of a pod.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-nginx&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Node where the pod is running</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Node: </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Pod IP address</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IP: </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>node</code> property returns a <code>Node</code> resource object. The <code>ip</code> property reads from <code>status.podIP</code>.</p>
+<h2 id="related-pages">Related Pages</h2>
+<ul>
+<li><a href="creating-and-managing-resources.html">Creating and Managing Resources</a></li>
+<li><a href="querying-resources.html">Querying and Watching Resources</a></li>
+<li><a href="working-with-virtual-machines.html">Working with Virtual Machines (KubeVirt)</a></li>
+<li><a href="pod-execution-and-logs.html">Executing Commands in Pods and Retrieving Logs</a></li>
+<li><a href="working-with-events.html">Working with Kubernetes Events</a></li>
+</ul>
+                </div>
+            </article>
+            <nav class="page-nav">
+
+                <a href="generating-resource-classes.html" class="page-nav-link page-nav-prev">
+                    <span class="page-nav-label">Previous</span>
+                    <span class="page-nav-title">Generating New Resource Classes with class-generator</span>
+                </a>
+
+
+                <a href="mcp-server-integration.html" class="page-nav-link page-nav-next">
+                    <span class="page-nav-label">Next</span>
+                    <span class="page-nav-title">Integrating with AI Assistants via MCP Server</span>
+                </a>
+
+            </nav>
+
+            <aside class="toc-sidebar">
+                <div class="toc-container">
+                    <h3>On this page</h3>
+                    <div class="toc">
+<ul>
+<li><a href="#create-and-run-a-pod">Create and Run a Pod</a></li>
+<li><a href="#create-a-pod-as-a-context-manager">Create a Pod as a Context Manager</a></li>
+<li><a href="#execute-a-command-inside-a-pod">Execute a Command Inside a Pod</a></li>
+<li><a href="#get-pod-logs">Get Pod Logs</a></li>
+<li><a href="#create-a-deployment-and-wait-for-replicas">Create a Deployment and Wait for Replicas</a></li>
+<li><a href="#scale-a-deployment">Scale a Deployment</a></li>
+<li><a href="#create-a-service">Create a Service</a></li>
+<li><a href="#create-an-openshift-route">Create an OpenShift Route</a></li>
+<li><a href="#create-a-namespace">Create a Namespace</a></li>
+<li><a href="#create-a-configmap">Create a ConfigMap</a></li>
+<li><a href="#create-a-secret">Create a Secret</a></li>
+<li><a href="#create-a-job">Create a Job</a></li>
+<li><a href="#create-a-persistentvolumeclaim">Create a PersistentVolumeClaim</a></li>
+<li><a href="#create-a-datavolume-kubevirt-cdi">Create a DataVolume (KubeVirt / CDI)</a></li>
+<li><a href="#create-a-networkpolicy">Create a NetworkPolicy</a></li>
+<li><a href="#create-a-networkattachmentdefinition">Create a NetworkAttachmentDefinition</a></li>
+<li><a href="#create-an-rbac-role-and-rolebinding">Create an RBAC Role and RoleBinding</a></li>
+<li><a href="#create-a-clusterrole-and-clusterrolebinding">Create a ClusterRole and ClusterRoleBinding</a></li>
+<li><a href="#list-and-filter-resources">List and Filter Resources</a></li>
+<li><a href="#create-a-resource-from-a-yaml-file">Create a Resource from a YAML File</a></li>
+<li><a href="#create-a-resource-from-a-dictionary">Create a Resource from a Dictionary</a></li>
+<li><a href="#handle-resources-with-duplicate-api-groups">Handle Resources with Duplicate API Groups</a></li>
+<li><a href="#manage-multiple-similar-resources-with-resourcelist">Manage Multiple Similar Resources with ResourceList</a></li>
+<li><a href="#deploy-one-resource-per-namespace-with-namespacedresourcelist">Deploy One Resource Per Namespace with NamespacedResourceList</a></li>
+<li><a href="#temporarily-edit-a-resource-with-resourceeditor">Temporarily Edit a Resource with ResourceEditor</a></li>
+<li><a href="#validate-a-resource-before-creating-it">Validate a Resource Before Creating It</a></li>
+<li><a href="#check-if-a-resource-exists">Check If a Resource Exists</a></li>
+<li><a href="#watch-resource-events">Watch Resource Events</a></li>
+<li><a href="#list-recent-events-in-a-namespace">List Recent Events in a Namespace</a></li>
+<li><a href="#wait-for-a-resource-condition">Wait for a Resource Condition</a></li>
+<li><a href="#get-a-resources-yaml-representation">Get a Resource's YAML Representation</a></li>
+<li><a href="#get-the-pods-node-and-ip">Get the Pod's Node and IP</a></li>
+<li><a href="#related-pages">Related Pages</a></li>
+</ul>
+</div>
+
+                </div>
+            </aside>
+
+
+        </main>
+
+        <footer class="page-footer">
+
+            <span class="footer-version">Generated from version 11.0.134</span>
+            <span class="footer-sep">&middot;</span>
+
+            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            <span class="footer-sep">&middot;</span>
+            <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
+        </footer>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="assets/theme.js"></script>
+    <script src="assets/search.js"></script>
+    <script src="assets/copy.js"></script>
+    <script src="assets/callouts.js"></script>
+    <script src="assets/scrollspy.js"></script>
+    <script src="assets/codelabels.js"></script>
+    <script src="assets/github.js"></script>
+    <script>
+(function() {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+            var expanded = sidebar.classList.contains('open');
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+})();
+</script>
+<script>
+(function() {
+    var sidebar = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Restore scroll position
+    var saved = sessionStorage.getItem('sidebar-scroll');
+    if (saved) sidebar.scrollTop = parseInt(saved, 10);
+
+    // Save scroll position before navigating
+    sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sidebar-scroll', sidebar.scrollTop.toString());
+    });
+
+    // Also scroll active link into view if no saved position
+    if (!saved) {
+        var active = sidebar.querySelector('.nav-link.active');
+        if (active) {
+            active.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+    }
+})();
+</script>
+</body>
+</html>

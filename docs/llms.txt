@@ -1,0 +1,45 @@
+# openshift-python-wrapper
+
+> Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls
+
+## Getting Started
+
+- [Installing and Creating Your First Resource](quickstart.md): Install the package, connect to a cluster, and create, query, and delete your first Kubernetes resource in under 5 minutes
+
+## User Guides
+
+- [Connecting to Clusters](connecting-to-clusters.md): Set up client connections using kubeconfig files, tokens, basic auth, environment variables, or in-cluster config
+- [Creating and Managing Resources](creating-and-managing-resources.md): Create, update, replace, and delete resources using deploy/clean_up, context managers, and YAML files
+- [Querying and Watching Resources](querying-resources.md): List resources with label/field selectors, check existence, watch for changes, and retrieve resource status and conditions
+- [Waiting for Resource Conditions and Status](waiting-for-conditions.md): Wait for resources to reach a desired status or condition using built-in polling with configurable timeouts
+- [Validating Resources Against OpenAPI Schemas](validating-resources.md): Validate resource definitions before creating them, enable auto-validation, and troubleshoot schema validation errors
+- [Managing Bulk Resources with ResourceList](managing-resource-lists.md): Create and manage multiple similar resources or deploy one resource per namespace using ResourceList and NamespacedResourceList
+- [Editing Resources Temporarily with ResourceEditor](editing-resources-temporarily.md): Apply temporary patches to resources during tests and automatically restore original values using ResourceEditor
+- [Working with Virtual Machines (KubeVirt)](working-with-virtual-machines.md): Create, start, stop, restart, and migrate VirtualMachine resources and interact with VirtualMachineInstances
+- [Testing Without a Cluster Using the Fake Client](testing-without-cluster.md): Write unit tests for Kubernetes code using FakeDynamicClient with CRUD operations, status simulation, and watch events
+- [Generating New Resource Classes with class-generator](generating-resource-classes.md): Use the class-generator CLI to scaffold Python wrapper classes for any Kubernetes or OpenShift CRD
+
+## Recipes
+
+- [Common Resource Patterns](common-patterns.md): Copy-paste recipes for pods, deployments, networking, RBAC roles, data volumes, and handling resources with duplicate API groups
+- [Integrating with AI Assistants via MCP Server](mcp-server-integration.md): Set up and use the MCP server with Cursor, Claude Desktop, or other MCP-compatible AI tools to manage cluster resources
+
+## Reference
+
+- [Resource and NamespacedResource API](resource-api.md): Complete API reference for the Resource and NamespacedResource base classes including all methods, properties, and constructor parameters
+- [class-generator CLI Reference](class-generator-cli.md): All CLI options for class-generator including kind generation, schema updates, coverage reports, batch regeneration, and test generation
+- [Environment Variables and Configuration](environment-variables.md): All supported environment variables for logging, resource reuse, teardown skipping, and hash control
+
+## Internals
+
+- [Understanding the Resource Class Hierarchy](resource-class-hierarchy.md): Learn how Resource, NamespacedResource, and generated subclasses fit together to extend the library with new resource types
+- [Schema Validation and Code Generation Architecture](schema-validation-internals.md): Understand how OpenAPI schemas are fetched, cached, and used for both resource validation and class generation
+
+## Using Resources
+
+- [Working with Kubernetes Events](working-with-events.md): How to use the standalone Event class to watch, list, and delete Kubernetes events. Covers Event.get() for streaming events in real-time, Event.list() for fetching existing events with time-based filtering, Event.delete_events() for cleanup, and the resource.events() method for getting events related to a specific resource. Includes field selectors, namespace filtering, and common debugging patterns.
+- [Executing Commands in Pods and Retrieving Logs](pod-execution-and-logs.md): How to use Pod.execute() to run commands inside pod containers with timeout handling, container selection, and error handling via ExecOnPodError. Covers Pod.log() for retrieving pod logs, accessing pod properties like node, IP address, and practical recipes for debugging running workloads.
+
+## API Reference
+
+- [Error Handling and Exception Reference](error-handling.md): Reference for all custom exceptions raised by the library including ExecOnPodError, MissingRequiredArgumentError, ResourceTeardownError, ValidationError, ConditionError, NNCPConfigurationFailed, and ClientWithBasicAuthError. Covers which operations raise each exception, how to catch and handle them, and common error-handling patterns for robust automation scripts.
