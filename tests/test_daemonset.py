@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ocp_resources.daemonset import DaemonSet
+from ocp_resources.daemon_set import DaemonSet
 
 
 @pytest.fixture()
@@ -54,7 +54,7 @@ class TestWaitForRollout:
         )
 
         with patch(
-            "ocp_resources.daemonset.TimeoutSampler",
+            "ocp_resources.daemon_set.TimeoutSampler",
             return_value=iter([complete_response]),
         ):
             daemonset.wait_for_rollout(timeout=10)
@@ -76,7 +76,7 @@ class TestWaitForRollout:
         )
 
         with patch(
-            "ocp_resources.daemonset.TimeoutSampler",
+            "ocp_resources.daemon_set.TimeoutSampler",
             return_value=iter([incomplete_response, complete_response]),
         ):
             daemonset.wait_for_rollout(timeout=10)
@@ -98,7 +98,7 @@ class TestWaitForRollout:
         )
 
         with patch(
-            "ocp_resources.daemonset.TimeoutSampler",
+            "ocp_resources.daemon_set.TimeoutSampler",
             return_value=iter([stale_response, complete_response]),
         ):
             daemonset.wait_for_rollout(timeout=10)
@@ -129,7 +129,7 @@ class TestWaitForRollout:
                 yield r
 
         with patch(
-            "ocp_resources.daemonset.TimeoutSampler",
+            "ocp_resources.daemon_set.TimeoutSampler",
             return_value=tracking_iter([not_available_response, complete_response]),
         ):
             daemonset.wait_for_rollout(timeout=10)
@@ -150,7 +150,7 @@ class TestWaitForRollout:
         )
 
         with patch(
-            "ocp_resources.daemonset.TimeoutSampler",
+            "ocp_resources.daemon_set.TimeoutSampler",
             return_value=iter([no_status_response, complete_response]),
         ):
             daemonset.wait_for_rollout(timeout=10)
@@ -165,7 +165,7 @@ class TestWaitForRollout:
         )
 
         with patch(
-            "ocp_resources.daemonset.TimeoutSampler",
+            "ocp_resources.daemon_set.TimeoutSampler",
             return_value=iter([zero_desired_response]),
         ):
             daemonset.wait_for_rollout(timeout=10)
