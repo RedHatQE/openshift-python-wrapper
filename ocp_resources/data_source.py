@@ -75,4 +75,8 @@ class DataSource(NamespacedResource):
 
     @source.setter
     def source(self, value):
-        self.instance.spec.source = value
+        source_type_mapping = {"pvc": PersistentVolumeClaim, "snapshot": VolumeSnapshot}
+        source_type = next((key for key, cls in source_type_mapping.items() if isinstance(value, cls)), None)
+        if not source_type:
+            raise ValueError(f"source must be a PersistentVolumeClaim or VolumeSnapshot, got {type(value)}")
+        self.instance.spec.source = {source_type: {"name": value.name, "namespace": value.namespace}}
