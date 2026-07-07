@@ -72,3 +72,7 @@ class DataSource(NamespacedResource):
             name=instance_source[ds_source].name,
             namespace=instance_source[ds_source].namespace,
         )
+
+    @source.setter
+    def source(self, value):
+        self.instance.spec.source = value
