@@ -299,7 +299,7 @@ class DaemonSet(NamespacedResource):
 
     # End of generated code
 
-    def wait_until_deployed(self, timeout: int = TIMEOUT_4MINUTES) -> None:
+    def wait_until_deployed(self, timeout=TIMEOUT_4MINUTES):
         """
         Wait until all Pods are deployed and ready.
 
@@ -321,13 +321,28 @@ class DaemonSet(NamespacedResource):
         for sample in samples:
             if sample.items:
                 status = sample.items[0].status
-                if not status:
-                    continue
-
-                desired_number_scheduled = status.desiredNumberScheduled or 0
-                number_ready = status.numberReady or 0
+                desired_number_scheduled = status.desiredNumberScheduled
+                number_ready = status.numberReady
                 if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
                     return
+
+    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, _body=None):
+        """
+        Delete Daemonset
+
+        Args:
+            wait (bool): True to wait for Daemonset to be deleted.
+            timeout (int): Time to wait for resource deletion
+            _body (dict): Content to send for delete()
+
+        Returns:
+            bool: True if delete succeeded, False otherwise.
+        """
+        return super().delete(
+            wait=wait,
+            timeout=timeout,
+            body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
+        )
 
     def restart(self) -> None:
         """
@@ -389,24 +404,3 @@ class DaemonSet(NamespacedResource):
                     and (status.numberAvailable or 0) == desired_number_scheduled
                 ):
                     return
-
-    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, body: dict[str, Any] | None = None) -> bool:  # noqa: ARG002
-        """
-        Delete Daemonset.
-
-        Always uses Foreground propagation policy to ensure child pods are
-        cleaned up before the DaemonSet itself is removed.
-
-        Args:
-            wait (bool): True to wait for Daemonset to be deleted.
-            timeout (int): Time to wait for resource deletion.
-            body (dict[str, Any]): Ignored — Foreground propagation is always enforced.
-
-        Returns:
-            bool: True if delete succeeded, False otherwise.
-        """
-        return super().delete(
-            wait=wait,
-            timeout=timeout,
-            body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
-        )
