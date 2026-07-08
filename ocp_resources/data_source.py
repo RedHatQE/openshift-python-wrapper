@@ -75,8 +75,11 @@ class DataSource(NamespacedResource):
 
     @source.setter
     def source(self, value):
-        source_type_mapping = {"pvc": PersistentVolumeClaim, "snapshot": VolumeSnapshot}
-        source_type = next((key for key, cls in source_type_mapping.items() if isinstance(value, cls)), None)
-        if not source_type:
-            raise ValueError(f"source must be a PersistentVolumeClaim or VolumeSnapshot, got {type(value)}")
-        self._source = {source_type: {"name": value.name, "namespace": value.namespace}}
+        if not isinstance(value, dict):
+            raise ValueError(f"source must be a dict, got {type(value)}")
+
+        source_types = {"pvc", "snapshot"}
+        if next(iter(value)) not in source_types:
+            raise ValueError(f"source must be a 'pvc' or 'snapshot', got {next(iter(value))}")
+
+        self._source = value
