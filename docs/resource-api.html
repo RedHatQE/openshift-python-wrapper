@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource and NamespacedResource API - openshift-python-wrapper</title>
+    <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
+    <link rel="stylesheet" href="assets/style.css">
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+    <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
+    <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-logo">openshift-python-wrapper</a>
+            <p class="sidebar-tagline">Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls</p>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" id="search-input" placeholder="Search... (⌘K)" autocomplete="off" readonly>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Getting Started</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="quickstart.html"
+                           class="nav-link">
+                            Installing and Creating Your First Resource
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">User Guides</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="connecting-to-clusters.html"
+                           class="nav-link">
+                            Connecting to Clusters
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="creating-and-managing-resources.html"
+                           class="nav-link">
+                            Creating and Managing Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="querying-resources.html"
+                           class="nav-link">
+                            Querying and Watching Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="waiting-for-conditions.html"
+                           class="nav-link">
+                            Waiting for Resource Conditions and Status
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="validating-resources.html"
+                           class="nav-link">
+                            Validating Resources Against OpenAPI Schemas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="managing-resource-lists.html"
+                           class="nav-link">
+                            Managing Bulk Resources with ResourceList
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="editing-resources-temporarily.html"
+                           class="nav-link">
+                            Editing Resources Temporarily with ResourceEditor
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="working-with-virtual-machines.html"
+                           class="nav-link">
+                            Working with Virtual Machines (KubeVirt)
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="testing-without-cluster.html"
+                           class="nav-link">
+                            Testing Without a Cluster Using the Fake Client
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="generating-resource-classes.html"
+                           class="nav-link">
+                            Generating New Resource Classes with class-generator
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Recipes</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="common-patterns.html"
+                           class="nav-link">
+                            Common Resource Patterns
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="mcp-server-integration.html"
+                           class="nav-link">
+                            Integrating with AI Assistants via MCP Server
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-api.html"
+                           class="nav-link active" aria-current="page">
+                            Resource and NamespacedResource API
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="environment-variables.html"
+                           class="nav-link">
+                            Environment Variables and Configuration
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Internals</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-class-hierarchy.html"
+                           class="nav-link">
+                            Understanding the Resource Class Hierarchy
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schema-validation-internals.html"
+                           class="nav-link">
+                            Schema Validation and Code Generation Architecture
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Using Resources</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="working-with-events.html"
+                           class="nav-link">
+                            Working with Kubernetes Events
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="pod-execution-and-logs.html"
+                           class="nav-link">
+                            Executing Commands in Pods and Retrieving Logs
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">API Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="error-handling.html"
+                           class="nav-link">
+                            Error Handling and Exception Reference
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <a href="index.html" class="top-bar-title">openshift-python-wrapper</a>
+            </div>
+            <div class="top-bar-spacer"></div>
+            <div class="top-bar-right">
+                <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
+                    <kbd>&#8984;K</kbd> Search
+                </button>
+                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
+                    ⚡ docs<span class="brand-accent">fy</span>
+                </a>
+
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span class="github-stars" id="github-stars" title="GitHub stars"></span>
+                </a>
+
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <article class="article">
+                <div class="article-body">
+                    <!-- SECURITY: |safe is intentional. Content is AI-generated markdown
+                         converted to HTML server-side by the markdown library, not
+                         user-supplied input. XSS risk is minimal and accepted since
+                         the AI generates the content, not end users. -->
+                    <p>Let me start by reading the knowledge graph and the pages manifest, then explore the source code.</p>
+<p>Now let me examine the constants and exceptions:</p>
+<p>Now let me check the <code>apply_yaml</code> function and the <code>get_client</code> function signature, plus see what <code>ResourceConstants</code> inherits:</p>
+<p>Let me look for key public methods in resource.py that I might have missed (the file was truncated before):</p>
+<p>Let me also check for import paths:</p>
+<p>Now let me look at the <code>NamespacedResource._base_body</code> more carefully and check for anything more:</p>
+<p>Now let me check what the <code>Event</code> class looks like for the events method reference:</p>
+<p>Let me also check for <code>generate_yaml_from_template</code>:</p>
+<p>That's a test utility. Let me check for the <code>skip_existing_resource_creation_teardown</code> function:</p>
+<p>Now I have all the information needed. Let me write the comprehensive API reference page.</p>
+<h1 id="resource-and-namespacedresource-api">Resource and NamespacedResource API</h1>
+<p>Complete API reference for the <code>Resource</code> and <code>NamespacedResource</code> base classes, the <code>get_client</code> factory function, and supporting classes (<code>ResourceEditor</code>, <code>ResourceList</code>, <code>NamespacedResourceList</code>, <code>KubeAPIVersion</code>).</p>
+<p><strong>Import path:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Resource</span><span class="p">,</span>
+    <span class="n">NamespacedResource</span><span class="p">,</span>
+    <span class="n">ResourceEditor</span><span class="p">,</span>
+    <span class="n">ResourceList</span><span class="p">,</span>
+    <span class="n">NamespacedResourceList</span><span class="p">,</span>
+    <span class="n">get_client</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="get_client"><code>get_client</code></h2>
+<p>Factory function to obtain a Kubernetes <code>DynamicClient</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;~/.kube/config&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config_file</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Path to a kubeconfig file. Falls back to <code>KUBECONFIG</code> env var or <code>~/.kube/config</code>.</td>
+</tr>
+<tr>
+<td><code>config_dict</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Dict with kubeconfig configuration. Mutually exclusive with <code>config_file</code>.</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Name of the kubeconfig context to use.</td>
+</tr>
+<tr>
+<td><code>client_configuration</code></td>
+<td><code>kubernetes.client.Configuration \| None</code></td>
+<td><code>None</code></td>
+<td>Pre-built Kubernetes client configuration object.</td>
+</tr>
+<tr>
+<td><code>persist_config</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether to persist config file changes.</td>
+</tr>
+<tr>
+<td><code>temp_file_path</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Path to a temporary kubeconfig file.</td>
+</tr>
+<tr>
+<td><code>try_refresh_token</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Try to refresh the authentication token.</td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Username for basic auth. Requires <code>password</code> and <code>host</code>.</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Password for basic auth. Requires <code>username</code> and <code>host</code>.</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Cluster host URL.</td>
+</tr>
+<tr>
+<td><code>verify_ssl</code></td>
+<td><code>bool \| None</code></td>
+<td><code>None</code></td>
+<td>Whether to verify SSL certificates.</td>
+</tr>
+<tr>
+<td><code>token</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Bearer token for authentication. Requires <code>host</code>.</td>
+</tr>
+<tr>
+<td><code>fake</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Return a <code>FakeDynamicClient</code> for testing without a cluster.</td>
+</tr>
+<tr>
+<td><code>generate_kubeconfig</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Save the resolved kubeconfig to a temp file and attach the path to the client.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>DynamicClient | FakeDynamicClient</code></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Default kubeconfig</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
+
+<span class="c1"># With explicit config file and context</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/kubeconfig&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;my-cluster&quot;</span><span class="p">)</span>
+
+<span class="c1"># Token-based auth</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.cluster.example.com:6443&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;sha256~abc123&quot;</span><span class="p">)</span>
+
+<span class="c1"># Basic auth</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.cluster.example.com:6443&quot;</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;secret&quot;</span><span class="p">)</span>
+
+<span class="c1"># Fake client for unit testing</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">fake</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<blockquote>
+<p><strong>Note:</strong> If neither <code>config_file</code> nor <code>config_dict</code> is provided, the client falls back to the <code>KUBECONFIG</code> environment variable, then <code>~/.kube/config</code>, and finally in-cluster configuration.</p>
+</blockquote>
+<p>See <a href="connecting-to-clusters.html">Connecting to Clusters</a> for connection patterns. See <a href="testing-without-cluster.html">Testing Without a Cluster Using the Fake Client</a> for <code>fake=True</code> usage.</p>
+<hr />
+<h2 id="resource"><code>Resource</code></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resource</span>
+</code></pre></div>
+
+<p>Base class for <strong>cluster-scoped</strong> Kubernetes/OpenShift resources (e.g., <code>Namespace</code>, <code>Node</code>, <code>ClusterRole</code>). Inherits from <code>ResourceConstants</code>. All concrete resource classes inherit from either <code>Resource</code> or <code>NamespacedResource</code>.</p>
+<p>See <a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a> for the inheritance model.</p>
+<h3 id="class-attributes">Class Attributes</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api_group</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>API group for the resource (e.g., <code>"apps"</code>, <code>"batch"</code>).</td>
+</tr>
+<tr>
+<td><code>api_version</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Full API version string (e.g., <code>"v1"</code>, <code>"apps/v1"</code>). Resolved automatically if <code>api_group</code> is set.</td>
+</tr>
+<tr>
+<td><code>singular_name</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Singular resource name for API calls. Used to disambiguate when multiple resources match the same kind.</td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td><code>int</code></td>
+<td><code>60</code></td>
+<td>Default timeout for API list/watch operations.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="constructor">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">Resource</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-resource&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client</code></td>
+<td><code>DynamicClient \| None</code></td>
+<td><code>None</code></td>
+<td>Kubernetes dynamic client. Will be mandatory in the next major release.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Resource name. Required unless <code>yaml_file</code> or <code>kind_dict</code> is provided.</td>
+</tr>
+<tr>
+<td><code>teardown</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether this resource should be deleted when used as a context manager.</td>
+</tr>
+<tr>
+<td><code>yaml_file</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Path to a YAML file defining the resource. Mutually exclusive with <code>kind_dict</code>.</td>
+</tr>
+<tr>
+<td><code>delete_timeout</code></td>
+<td><code>int</code></td>
+<td><code>240</code></td>
+<td>Timeout in seconds for delete operations.</td>
+</tr>
+<tr>
+<td><code>dry_run</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>If <code>True</code>, create operations use dry-run mode.</td>
+</tr>
+<tr>
+<td><code>node_selector</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Node selector for scheduling.</td>
+</tr>
+<tr>
+<td><code>node_selector_labels</code></td>
+<td><code>dict[str, str] \| None</code></td>
+<td><code>None</code></td>
+<td>Node selector labels for scheduling.</td>
+</tr>
+<tr>
+<td><code>config_file</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Path to kubeconfig. Deprecated; pass <code>client</code> instead.</td>
+</tr>
+<tr>
+<td><code>config_dict</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Kubeconfig dict.</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Kubeconfig context name. Deprecated; pass <code>client</code> instead.</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td><code>dict[str, str] \| None</code></td>
+<td><code>None</code></td>
+<td>Labels to set on the resource.</td>
+</tr>
+<tr>
+<td><code>annotations</code></td>
+<td><code>dict[str, str] \| None</code></td>
+<td><code>None</code></td>
+<td>Annotations to set on the resource.</td>
+</tr>
+<tr>
+<td><code>api_group</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Override the class-level <code>api_group</code>.</td>
+</tr>
+<tr>
+<td><code>hash_log_data</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Hash sensitive fields (defined by <code>keys_to_hash</code>) in log output.</td>
+</tr>
+<tr>
+<td><code>ensure_exists</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Check that the resource already exists on the cluster at init time. Raises <code>ResourceNotFoundError</code> if not.</td>
+</tr>
+<tr>
+<td><code>kind_dict</code></td>
+<td><code>dict[Any, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Complete resource dict. Mutually exclusive with <code>yaml_file</code>. Bypasses <code>to_dict()</code> logic.</td>
+</tr>
+<tr>
+<td><code>wait_for_resource</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>When used as a context manager, wait for the resource to exist after creation.</td>
+</tr>
+<tr>
+<td><code>schema_validation_enabled</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Enable automatic OpenAPI schema validation on <code>create()</code> and <code>update_replace()</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Exception</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ValueError</code></td>
+<td>Both <code>yaml_file</code> and <code>kind_dict</code> are provided.</td>
+</tr>
+<tr>
+<td><code>NotImplementedError</code></td>
+<td>Neither <code>api_group</code> nor <code>api_version</code> is defined on the class.</td>
+</tr>
+<tr>
+<td><code>MissingRequiredArgumentError</code></td>
+<td>None of <code>name</code>, <code>yaml_file</code>, or <code>kind_dict</code> is provided.</td>
+</tr>
+<tr>
+<td><code>ResourceNotFoundError</code></td>
+<td><code>ensure_exists=True</code> and the resource does not exist.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+
+<span class="c1"># Basic creation</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+
+<span class="c1"># From a YAML file</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">yaml_file</span><span class="o">=</span><span class="s2">&quot;namespace.yaml&quot;</span><span class="p">)</span>
+
+<span class="c1"># From a dict</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">kind_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;apiVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;v1&quot;</span><span class="p">,</span> <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;Namespace&quot;</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}})</span>
+
+<span class="c1"># With labels and annotations</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">},</span> <span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;owner&quot;</span><span class="p">:</span> <span class="s2">&quot;team-a&quot;</span><span class="p">})</span>
+
+<span class="c1"># Verify it already exists</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h3 id="context-manager-protocol">Context Manager Protocol</h3>
+<p><code>Resource</code> supports the Python context manager protocol for automatic creation and cleanup.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;temp-ns&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+    <span class="c1"># Resource is created on __enter__</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="c1"># Resource is deleted on __exit__ (if teardown=True)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__enter__()</code></td>
+<td>Calls <code>deploy(wait=self.wait_for_resource)</code>. Registers a <code>SIGINT</code> handler on the main thread to ensure cleanup on Ctrl+C. Returns <code>self</code>.</td>
+</tr>
+<tr>
+<td><code>__exit__(...)</code></td>
+<td>Calls <code>clean_up()</code> if <code>teardown=True</code>. Raises <code>ResourceTeardownError</code> if cleanup fails.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Tip:</strong> Set <code>teardown=False</code> to prevent automatic deletion on context exit.</p>
+</blockquote>
+<hr />
+<h3 id="crud-methods">CRUD Methods</h3>
+<h4 id="create"><code>create</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">exceptions_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceInstance</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Create the resource on the cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wait</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Wait for the resource to exist after creation.</td>
+</tr>
+<tr>
+<td><code>exceptions_dict</code></td>
+<td><code>dict[type[Exception], list[str]]</code></td>
+<td><code>DEFAULT_CLUSTER_RETRY_EXCEPTIONS \| PROTOCOL_ERROR_EXCEPTION_DICT</code></td>
+<td>Exceptions to retry on.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ResourceInstance | None</code></p>
+<p><strong>Raises:</strong> <code>ValidationError</code> if <code>schema_validation_enabled=True</code> and the resource dict is invalid.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">)</span>
+<span class="n">ns</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="delete"><code>delete</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+<p>Delete the resource from the cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wait</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Wait for the resource to be fully deleted.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>240</code></td>
+<td>Timeout in seconds when <code>wait=True</code>.</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Optional delete options body.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>bool</code> — <code>True</code> if deleted or not found; <code>False</code> only if wait timed out.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="update"><code>update</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Patch the resource with a merge-patch (<code>application/merge-patch+json</code>). Only updates the fields present in <code>resource_dict</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_dict</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Partial resource dictionary with fields to update.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> Schema validation is <strong>not</strong> applied on <code>update()</code> because patches are partial and would fail full-schema validation.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">resource_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;staging&quot;</span><span class="p">}}})</span>
+</code></pre></div>
+
+<h4 id="update_replace"><code>update_replace</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Replace the full resource. Use this to <strong>remove</strong> existing fields (unlike <code>update()</code>, which only adds/modifies).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_dict</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Complete resource dictionary to replace with.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>ValidationError</code> if <code>schema_validation_enabled=True</code> and the dict is invalid.</p>
+<div class="highlight"><pre><span></span><code><span class="n">full_dict</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="n">full_dict</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;new-label&quot;</span><span class="p">:</span> <span class="s2">&quot;only&quot;</span><span class="p">}</span>
+<span class="n">ns</span><span class="o">.</span><span class="n">update_replace</span><span class="p">(</span><span class="n">resource_dict</span><span class="o">=</span><span class="n">full_dict</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h3 id="deploy-clean-up">Deploy / Clean Up</h3>
+<h4 id="deploy"><code>deploy</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+</code></pre></div>
+
+<p>Create the resource (respects <code>REUSE_IF_RESOURCE_EXISTS</code> environment variable).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wait</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Wait for the resource after creation.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>Self</code></p>
+<p>See <a href="environment-variables.html">Environment Variables and Configuration</a> for <code>REUSE_IF_RESOURCE_EXISTS</code> details.</p>
+<h4 id="clean_up"><code>clean_up</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+<p>Delete the resource (respects <code>SKIP_RESOURCE_TEARDOWN</code> environment variable).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wait</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Wait for deletion to complete.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int \| None</code></td>
+<td><code>None</code></td>
+<td>Timeout in seconds. Defaults to <code>delete_timeout</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>bool</code> — <code>True</code> if deleted successfully.</p>
+<p>See <a href="environment-variables.html">Environment Variables and Configuration</a> for <code>SKIP_RESOURCE_TEARDOWN</code> details.</p>
+<hr />
+<h3 id="query-methods-and-properties">Query Methods and Properties</h3>
+<h4 id="exists"><code>exists</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceInstance</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Check if the resource exists on the cluster.</p>
+<p><strong>Returns:</strong> <code>ResourceInstance</code> if found, <code>None</code> if not.</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="n">ns</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Namespace exists&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="instance"><code>instance</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceInstance</span>
+</code></pre></div>
+
+<p>Get the live resource instance from the cluster. Retries on transient cluster errors.</p>
+<p><strong>Returns:</strong> <code>ResourceInstance</code></p>
+<p><strong>Raises:</strong> <code>NotFoundError</code> if the resource does not exist.</p>
+<div class="highlight"><pre><span></span><code><span class="n">resource_version</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">resourceVersion</span>
+</code></pre></div>
+
+<h4 id="status"><code>status</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+<p>Get <code>status.phase</code> from the resource instance.</p>
+<p><strong>Returns:</strong> <code>str</code> — The status phase string (e.g., <code>"Running"</code>, <code>"Active"</code>, <code>"Pending"</code>).</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>  <span class="c1"># &quot;Active&quot;</span>
+</code></pre></div>
+
+<h4 id="labels"><code>labels</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceField</span>
+</code></pre></div>
+
+<p>Get resource labels from <code>metadata.labels</code>.</p>
+<p><strong>Returns:</strong> <code>ResourceField</code></p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="kind"><code>kind</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@ClassProperty</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">kind</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Get the resource kind name derived from the class hierarchy. This is a <strong>class-level property</strong> — accessible on both the class and instances.</p>
+<p><strong>Returns:</strong> <code>str | None</code></p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Namespace</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span>  <span class="c1"># &quot;Namespace&quot;</span>
+</code></pre></div>
+
+<h4 id="api"><code>api</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceInstance</span>
+</code></pre></div>
+
+<p>Get the resource API object (shortcut for <code>full_api()</code> with no extra kwargs).</p>
+<p><strong>Returns:</strong> <code>ResourceInstance</code></p>
+<h4 id="full_api"><code>full_api</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">full_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceInstance</span>
+</code></pre></div>
+
+<p>Get the resource API object with optional filtering kwargs.</p>
+<table>
+<thead>
+<tr>
+<th>Keyword Argument</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pretty</code></td>
+<td>Pretty-print output.</td>
+</tr>
+<tr>
+<td><code>_continue</code></td>
+<td>Continuation token for list pagination.</td>
+</tr>
+<tr>
+<td><code>field_selector</code></td>
+<td>Filter by field.</td>
+</tr>
+<tr>
+<td><code>label_selector</code></td>
+<td>Filter by label.</td>
+</tr>
+<tr>
+<td><code>limit</code></td>
+<td>Maximum number of results.</td>
+</tr>
+<tr>
+<td><code>resource_version</code></td>
+<td>Filter by resource version.</td>
+</tr>
+<tr>
+<td><code>timeout_seconds</code></td>
+<td>Request timeout.</td>
+</tr>
+<tr>
+<td><code>watch</code></td>
+<td>Enable watch mode.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>ResourceInstance</code></p>
+<hr />
+<h3 id="class-method-get">Class Method: <code>get</code></h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">DynamicClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dyn_client</span><span class="p">:</span> <span class="n">DynamicClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">singular_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">exceptions_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+    <span class="n">raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">context</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+</code></pre></div>
+
+<p>List resources of this kind from the cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client</code></td>
+<td><code>DynamicClient \| None</code></td>
+<td><code>None</code></td>
+<td>Kubernetes client.</td>
+</tr>
+<tr>
+<td><code>dyn_client</code></td>
+<td><code>DynamicClient \| None</code></td>
+<td><code>None</code></td>
+<td>Deprecated alias for <code>client</code>.</td>
+</tr>
+<tr>
+<td><code>config_file</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Path to kubeconfig. Deprecated; pass <code>client</code>.</td>
+</tr>
+<tr>
+<td><code>singular_name</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Singular resource name for disambiguation.</td>
+</tr>
+<tr>
+<td><code>exceptions_dict</code></td>
+<td><code>dict</code></td>
+<td><code>DEFAULT_CLUSTER_RETRY_EXCEPTIONS</code></td>
+<td>Exceptions to retry.</td>
+</tr>
+<tr>
+<td><code>raw</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>If <code>True</code>, yield raw <code>ResourceInstance</code> objects instead of wrapper instances.</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Kubeconfig context. Deprecated; pass <code>client</code>.</td>
+</tr>
+<tr>
+<td><code>**kwargs</code></td>
+<td></td>
+<td></td>
+<td>Passed through to the API (e.g., <code>label_selector</code>, <code>field_selector</code>).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>Generator</code> of resource instances.</p>
+<blockquote>
+<p><strong>Note:</strong> For <code>Resource</code> (cluster-scoped), yielded objects are constructed with <code>name</code> only. For <code>NamespacedResource</code>, yielded objects include both <code>name</code> and <code>namespace</code>.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+
+<span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">Namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># With label selector</span>
+<span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">Namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;env=production&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Raw mode</span>
+<span class="k">for</span> <span class="n">raw_ns</span> <span class="ow">in</span> <span class="n">Namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">raw_ns</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">raw_ns</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
+</code></pre></div>
+
+<p>See <a href="querying-resources.html">Querying and Watching Resources</a> for advanced list/filter patterns.</p>
+<hr />
+<h3 id="static-method-get_all_cluster_resources">Static Method: <code>get_all_cluster_resources</code></h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_all_cluster_resources</span><span class="p">(</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">DynamicClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">context</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">ResourceField</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Yield all resources across <strong>all</strong> API groups in the cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client</code></td>
+<td><code>DynamicClient \| None</code></td>
+<td><code>None</code></td>
+<td>Kubernetes client.</td>
+</tr>
+<tr>
+<td><code>**kwargs</code></td>
+<td></td>
+<td></td>
+<td>Passed to the API (e.g., <code>label_selector</code>).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Yields:</strong> <code>ResourceField</code></p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">Resource</span><span class="o">.</span><span class="n">get_all_cluster_resources</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=myapp&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h3 id="wait-methods">Wait Methods</h3>
+<h4 id="wait"><code>wait</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span> <span class="n">sleep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Wait until the resource exists on the cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>240</code></td>
+<td>Maximum wait time in seconds.</td>
+</tr>
+<tr>
+<td><code>sleep</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
+<td>Sleep interval between retries.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>TimeoutExpiredError</code> if the resource does not exist within the timeout.</p>
+<h4 id="wait_deleted"><code>wait_deleted</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wait_deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+<p>Wait until the resource no longer exists.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>240</code></td>
+<td>Maximum wait time in seconds.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>bool</code> — <code>True</code> if deleted, <code>False</code> if timed out.</p>
+<h4 id="wait_for_status"><code>wait_for_status</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wait_for_status</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span>
+    <span class="n">stop_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sleep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">exceptions_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Wait for <code>status.phase</code> to reach the expected value.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Expected status phase string.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>240</code></td>
+<td>Maximum wait time in seconds.</td>
+</tr>
+<tr>
+<td><code>stop_status</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Stop and fail immediately if this status is reached. Defaults to <code>Status.FAILED</code>.</td>
+</tr>
+<tr>
+<td><code>sleep</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
+<td>Sleep interval between retries.</td>
+</tr>
+<tr>
+<td><code>exceptions_dict</code></td>
+<td><code>dict</code></td>
+<td><code>PROTOCOL_ERROR_EXCEPTION_DICT \| DEFAULT_CLUSTER_RETRY_EXCEPTIONS</code></td>
+<td>Exceptions to retry.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>TimeoutExpiredError</code> if the desired status is not reached.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="wait_for_condition"><code>wait_for_condition</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wait_for_condition</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">condition</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="n">sleep_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">stop_condition</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">stop_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Wait for a specific condition to reach the desired state.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>condition</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Condition type name (e.g., <code>"Ready"</code>, <code>"Available"</code>).</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Expected condition status (e.g., <code>"True"</code>, <code>"False"</code>).</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>300</code></td>
+<td>Maximum wait time in seconds.</td>
+</tr>
+<tr>
+<td><code>sleep_time</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
+<td>Interval between retries.</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Expected condition reason. If set, must match exactly.</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Expected substring within the condition message.</td>
+</tr>
+<tr>
+<td><code>stop_condition</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Condition type that, if matched, stops the wait and fails immediately.</td>
+</tr>
+<tr>
+<td><code>stop_status</code></td>
+<td><code>str</code></td>
+<td><code>"True"</code></td>
+<td>Status for <code>stop_condition</code> matching.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Exception</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TimeoutExpiredError</code></td>
+<td>Condition not met within timeout.</td>
+</tr>
+<tr>
+<td><code>ConditionError</code></td>
+<td><code>stop_condition</code> is detected with matching <code>stop_status</code>.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
+    <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;Ready&quot;</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>See <a href="waiting-for-conditions.html">Waiting for Resource Conditions and Status</a> for more patterns.</p>
+<h4 id="wait_for_conditions"><code>wait_for_conditions</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wait_for_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Wait for the resource to have any conditions populated in its status. Uses a 30-second timeout.</p>
+<hr />
+<h3 id="serialization">Serialization</h3>
+<h4 id="to_dict"><code>to_dict</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Populate <code>self.res</code> with the intended dict representation of the resource. Called automatically before <code>create()</code>. Override this in subclasses to add resource-specific fields.</p>
+<blockquote>
+<p><strong>Note:</strong> If <code>kind_dict</code> or <code>yaml_file</code> was provided, <code>to_dict()</code> uses those directly instead of building from individual parameters.</p>
+</blockquote>
+<h4 id="to_yaml"><code>to_yaml</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+<p><strong>Returns:</strong> <code>str</code> — YAML string representation of the resource dict.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">())</span>
+</code></pre></div>
+
+<hr />
+<h3 id="watch-events">Watch / Events</h3>
+<h4 id="watcher"><code>watcher</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">watcher</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">resource_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Watch for changes to this specific resource.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td>—</td>
+<td>Watch duration in seconds.</td>
+</tr>
+<tr>
+<td><code>resource_version</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Only return events after this version. Defaults to the version at resource creation time.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Yields:</strong> Event dicts with keys <code>type</code> (<code>"ADDED"</code>, <code>"MODIFIED"</code>, <code>"DELETED"</code>), <code>raw_object</code>, and <code>object</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">ns</span><span class="o">.</span><span class="n">watcher</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="events"><code>events</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">label_selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">resource_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Get Kubernetes events related to this resource.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Filter by event name.</td>
+</tr>
+<tr>
+<td><code>label_selector</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Comma-separated <code>key=value</code> label filters.</td>
+</tr>
+<tr>
+<td><code>field_selector</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Additional field selectors (auto-prefixed with <code>involvedObject.name==&lt;resource_name&gt;</code>).</td>
+</tr>
+<tr>
+<td><code>resource_version</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Filter events by resource version.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>240</code></td>
+<td>Timeout in seconds.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Yields:</strong> <code>Event</code> objects.</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h3 id="validation">Validation</h3>
+<h4 id="validate"><code>validate</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Validate <code>self.res</code> against the OpenAPI schema for this resource kind. Called automatically during <code>create()</code> and <code>update_replace()</code> when <code>schema_validation_enabled=True</code>.</p>
+<p><strong>Raises:</strong> <code>ValidationError</code> if the resource dict is invalid.</p>
+<div class="highlight"><pre><span></span><code><span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="n">pod</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>  <span class="c1"># Raises ValidationError on invalid spec</span>
+</code></pre></div>
+
+<h4 id="validate_dict-classmethod"><code>validate_dict</code> (classmethod)</h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">resource_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Validate an arbitrary resource dictionary against the schema without creating a resource instance.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_dict</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Complete resource dictionary.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>ValidationError</code> if validation fails.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">Pod</span><span class="o">.</span><span class="n">validate_dict</span><span class="p">({</span>
+    <span class="s2">&quot;apiVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;v1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;Pod&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;containers&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;web&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}]},</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>See <a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a> for full validation guide.</p>
+<hr />
+<h3 id="api-request">API Request</h3>
+<h4 id="api_request"><code>api_request</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">api_request</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">action</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">retry_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">params</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Send a raw HTTP request to the resource's API endpoint. Used internally for subresource actions (e.g., VirtualMachine start/stop).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>method</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>HTTP method (<code>"GET"</code>, <code>"PUT"</code>, <code>"POST"</code>, etc.).</td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Subresource action to append to the URL (e.g., <code>"start"</code>, <code>"stop"</code>).</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Base URL of the resource.</td>
+</tr>
+<tr>
+<td><code>retry_params</code></td>
+<td><code>dict[str, int] \| None</code></td>
+<td><code>None</code></td>
+<td>Dict with <code>timeout</code> and <code>sleep_time</code> keys for retry behavior.</td>
+</tr>
+<tr>
+<td><code>**params</code></td>
+<td></td>
+<td></td>
+<td>Additional params passed to the HTTP request.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>dict[str, Any]</code> — Parsed JSON response, or raw response data if not valid JSON.</p>
+<hr />
+<h3 id="utility-methods">Utility Methods</h3>
+<h4 id="retry_cluster_exceptions-static"><code>retry_cluster_exceptions</code> (static)</h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retry_cluster_exceptions</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">exceptions_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DEFAULT_CLUSTER_RETRY_EXCEPTIONS</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">sleep_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>
+
+<p>Retry a callable on transient cluster errors.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>func</code></td>
+<td><code>Callable</code></td>
+<td>—</td>
+<td>Function to call.</td>
+</tr>
+<tr>
+<td><code>exceptions_dict</code></td>
+<td><code>dict</code></td>
+<td><code>DEFAULT_CLUSTER_RETRY_EXCEPTIONS</code></td>
+<td>Map of exception types to message substrings to match.</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>int</code></td>
+<td><code>10</code></td>
+<td>Total retry timeout in seconds.</td>
+</tr>
+<tr>
+<td><code>sleep_time</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
+<td>Sleep between retries.</td>
+</tr>
+<tr>
+<td><code>**kwargs</code></td>
+<td></td>
+<td></td>
+<td>Passed to <code>func</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> The return value of <code>func</code>.</p>
+<p><strong>Raises:</strong> The last exception if timeout is reached.</p>
+<h4 id="get_condition_message"><code>get_condition_message</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_condition_message</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">condition_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">condition_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+<p>Get the message for a specific condition.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>condition_type</code></td>
+<td><code>str</code></td>
+<td>—</td>
+<td>Condition type name.</td>
+</tr>
+<tr>
+<td><code>condition_status</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>If set, only return the message when the condition status matches.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>str</code> — The condition message, or <code>""</code> if not found or status doesn't match.</p>
+<h4 id="hash_resource_dict"><code>hash_resource_dict</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hash_resource_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Replace sensitive fields (defined by <code>keys_to_hash</code>) with <code>"*******"</code> for logging.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_dict</code></td>
+<td><code>dict</code></td>
+<td>The resource dict to hash.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>dict</code> — A copy with sensitive values replaced.</p>
+<blockquote>
+<p><strong>Tip:</strong> Override the <code>keys_to_hash</code> property in subclasses to define which fields to mask.</p>
+</blockquote>
+<h4 id="keys_to_hash"><code>keys_to_hash</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">keys_to_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+<p>List of key paths to mask in logs. Uses <code>&gt;</code> as separator, <code>[]</code> for list elements.</p>
+<p><strong>Returns:</strong> <code>list[str]</code> — Default: <code>[]</code> (no hashing).</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example override in a Secret subclass:</span>
+<span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">keys_to_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;stringData&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<hr />
+<h3 id="inner-classes">Inner Classes</h3>
+<h4 id="resourcestatus"><code>Resource.Status</code></h4>
+<p>Pre-defined status phase constants (inherited from <code>ResourceConstants</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Status.SUCCEEDED</code></td>
+<td><code>"Succeeded"</code></td>
+</tr>
+<tr>
+<td><code>Status.FAILED</code></td>
+<td><code>"Failed"</code></td>
+</tr>
+<tr>
+<td><code>Status.DELETING</code></td>
+<td><code>"Deleting"</code></td>
+</tr>
+<tr>
+<td><code>Status.DEPLOYED</code></td>
+<td><code>"Deployed"</code></td>
+</tr>
+<tr>
+<td><code>Status.PENDING</code></td>
+<td><code>"Pending"</code></td>
+</tr>
+<tr>
+<td><code>Status.COMPLETED</code></td>
+<td><code>"Completed"</code></td>
+</tr>
+<tr>
+<td><code>Status.RUNNING</code></td>
+<td><code>"Running"</code></td>
+</tr>
+<tr>
+<td><code>Status.READY</code></td>
+<td><code>"Ready"</code></td>
+</tr>
+<tr>
+<td><code>Status.TERMINATING</code></td>
+<td><code>"Terminating"</code></td>
+</tr>
+<tr>
+<td><code>Status.ERROR</code></td>
+<td><code>"Error"</code></td>
+</tr>
+<tr>
+<td><code>Status.ACTIVE</code></td>
+<td><code>"Active"</code></td>
+</tr>
+<tr>
+<td><code>Status.SCHEDULING</code></td>
+<td><code>"Scheduling"</code></td>
+</tr>
+<tr>
+<td><code>Status.CRASH_LOOPBACK_OFF</code></td>
+<td><code>"CrashLoopBackOff"</code></td>
+</tr>
+<tr>
+<td><code>Status.IMAGE_PULL_BACK_OFF</code></td>
+<td><code>"ImagePullBackOff"</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="n">pod</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
+</code></pre></div>
+
+<h4 id="resourcecondition"><code>Resource.Condition</code></h4>
+<p>Pre-defined condition type and status constants.</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Condition.READY</code></td>
+<td><code>"Ready"</code></td>
+</tr>
+<tr>
+<td><code>Condition.AVAILABLE</code></td>
+<td><code>"Available"</code></td>
+</tr>
+<tr>
+<td><code>Condition.DEGRADED</code></td>
+<td><code>"Degraded"</code></td>
+</tr>
+<tr>
+<td><code>Condition.PROGRESSING</code></td>
+<td><code>"Progressing"</code></td>
+</tr>
+<tr>
+<td><code>Condition.UPGRADEABLE</code></td>
+<td><code>"Upgradeable"</code></td>
+</tr>
+<tr>
+<td><code>Condition.Status.TRUE</code></td>
+<td><code>"True"</code></td>
+</tr>
+<tr>
+<td><code>Condition.Status.FALSE</code></td>
+<td><code>"False"</code></td>
+</tr>
+<tr>
+<td><code>Condition.Status.UNKNOWN</code></td>
+<td><code>"Unknown"</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
+    <span class="n">condition</span><span class="o">=</span><span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">TRUE</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<h4 id="resourceapigroup"><code>Resource.ApiGroup</code></h4>
+<p>Pre-defined API group string constants. A selection of commonly used values:</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ApiGroup.APPS</code></td>
+<td><code>"apps"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.BATCH</code></td>
+<td><code>"batch"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.NETWORKING_K8S_IO</code></td>
+<td><code>"networking.k8s.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.RBAC_AUTHORIZATION_K8S_IO</code></td>
+<td><code>"rbac.authorization.k8s.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.STORAGE_K8S_IO</code></td>
+<td><code>"storage.k8s.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.CONFIG_OPENSHIFT_IO</code></td>
+<td><code>"config.openshift.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.KUBEVIRT_IO</code></td>
+<td><code>"kubevirt.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.CDI_KUBEVIRT_IO</code></td>
+<td><code>"cdi.kubevirt.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.ROUTE_OPENSHIFT_IO</code></td>
+<td><code>"route.openshift.io"</code></td>
+</tr>
+<tr>
+<td><code>ApiGroup.MACHINE_OPENSHIFT_IO</code></td>
+<td><code>"machine.openshift.io"</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> Over 100 API group constants are available. Use IDE auto-complete to discover all values.</p>
+</blockquote>
+<h4 id="resourceapiversion"><code>Resource.ApiVersion</code></h4>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ApiVersion.V1</code></td>
+<td><code>"v1"</code></td>
+</tr>
+<tr>
+<td><code>ApiVersion.V1BETA1</code></td>
+<td><code>"v1beta1"</code></td>
+</tr>
+<tr>
+<td><code>ApiVersion.V1ALPHA1</code></td>
+<td><code>"v1alpha1"</code></td>
+</tr>
+<tr>
+<td><code>ApiVersion.V1ALPHA3</code></td>
+<td><code>"v1alpha3"</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="namespacedresource"><code>NamespacedResource</code></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamespacedResource</span>
+</code></pre></div>
+
+<p>Base class for <strong>namespace-scoped</strong> resources (e.g., <code>Pod</code>, <code>Deployment</code>, <code>Service</code>, <code>ConfigMap</code>). Extends <code>Resource</code> with namespace awareness.</p>
+<h3 id="constructor_1">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">NamespacedResource</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>All parameters from <a href="#constructor"><code>Resource</code></a> are accepted, plus:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>namespace</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Kubernetes namespace. Required unless <code>yaml_file</code> or <code>kind_dict</code> is provided.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>MissingRequiredArgumentError</code> if neither (<code>name</code> + <code>namespace</code>) nor <code>yaml_file</code> / <code>kind_dict</code> is provided.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;web&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<h3 id="overridden-methods">Overridden Methods</h3>
+<h4 id="instance_1"><code>instance</code></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResourceInstance</span>
+</code></pre></div>
+
+<p>Get the live resource instance, scoped to <code>self.namespace</code>.</p>
+<p><strong>Returns:</strong> <code>ResourceInstance</code></p>
+<h4 id="to_dict_1"><code>to_dict</code></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>Populates <code>self.res</code> and sets <code>metadata.namespace</code>. If using <code>yaml_file</code> or <code>kind_dict</code>, reads the namespace from the YAML/dict.</p>
+<p><strong>Raises:</strong> <code>MissingRequiredArgumentError</code> if namespace is still not set after processing.</p>
+<h4 id="get-classmethod"><code>get</code> (classmethod)</h4>
+<p>Behaves like <code>Resource.get()</code>, but yields instances constructed with both <code>name</code> and <code>namespace</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># With label selector</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=web&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="resourceeditor"><code>ResourceEditor</code></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+</code></pre></div>
+
+<p>Temporarily patch resources and automatically restore original values. Designed for test scenarios.</p>
+<h3 id="constructor_2">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">action</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span>
+    <span class="n">user_backups</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>patches</code></td>
+<td><code>dict</code></td>
+<td>—</td>
+<td>Map of <code>{Resource: patch_dict}</code>.</td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td><code>str</code></td>
+<td><code>"update"</code></td>
+<td><code>"update"</code> for merge-patch, <code>"replace"</code> for full replacement.</td>
+</tr>
+<tr>
+<td><code>user_backups</code></td>
+<td><code>dict \| None</code></td>
+<td><code>None</code></td>
+<td>Pre-computed backup dicts. If provided, skips automatic backup creation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="context-manager-usage">Context Manager Usage</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">ns</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;temporary&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}}}}</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">editor</span><span class="p">:</span>
+    <span class="c1"># Labels are patched</span>
+    <span class="k">assert</span> <span class="n">ns</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">temporary</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span>
+<span class="c1"># Labels are restored to original values</span>
+</code></pre></div>
+
+<h3 id="methods">Methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>update</code></td>
+<td><code>update(backup_resources: bool = False) -&gt; None</code></td>
+<td>Apply patches. If <code>backup_resources=True</code>, back up original values first.</td>
+</tr>
+<tr>
+<td><code>restore</code></td>
+<td><code>restore() -&gt; None</code></td>
+<td>Restore all backed-up values.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="properties">Properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backups</code></td>
+<td><code>dict[Any, Any]</code></td>
+<td>Backed-up original values for each patched resource.</td>
+</tr>
+<tr>
+<td><code>patches</code></td>
+<td><code>dict[Any, Any]</code></td>
+<td>The patches dict from the constructor.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Warning:</strong> The <code>DynamicClient</code> used to obtain the resource objects must have sufficient privileges to patch and replace resources.</p>
+</blockquote>
+<p>See <a href="editing-resources-temporarily.html">Editing Resources Temporarily with ResourceEditor</a> for detailed patterns.</p>
+<hr />
+<h2 id="resourcelist"><code>ResourceList</code></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceList</span>
+</code></pre></div>
+
+<p>Create and manage N copies of a cluster-scoped resource with indexed names.</p>
+<h3 id="constructor_3">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">ResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Resource</span><span class="p">],</span>
+    <span class="n">num_resources</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">DynamicClient</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_class</code></td>
+<td><code>type[Resource]</code></td>
+<td>The resource class to instantiate.</td>
+</tr>
+<tr>
+<td><code>num_resources</code></td>
+<td><code>int</code></td>
+<td>Number of resource copies to create.</td>
+</tr>
+<tr>
+<td><code>client</code></td>
+<td><code>DynamicClient</code></td>
+<td>Kubernetes client.</td>
+</tr>
+<tr>
+<td><code>**kwargs</code></td>
+<td></td>
+<td>Passed to each resource constructor. Must include <code>name</code> (used as base name).</td>
+</tr>
+</tbody>
+</table>
+<p>Resources are named <code>{name}-1</code>, <code>{name}-2</code>, ..., <code>{name}-N</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceList</span>
+
+<span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span>
+    <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">namespaces</span><span class="p">:</span>
+    <span class="c1"># Creates test-ns-1, test-ns-2, test-ns-3</span>
+    <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="c1"># All three namespaces are deleted</span>
+</code></pre></div>
+
+<h3 id="methods-inherited-from-baseresourcelist">Methods (inherited from <code>BaseResourceList</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>deploy</code></td>
+<td><code>deploy(wait=False)</code></td>
+<td><code>list[Resource]</code></td>
+<td>Deploy all resources.</td>
+</tr>
+<tr>
+<td><code>clean_up</code></td>
+<td><code>clean_up(wait=True)</code></td>
+<td><code>bool</code></td>
+<td>Delete all resources in reverse order.</td>
+</tr>
+<tr>
+<td><code>__len__</code></td>
+<td><code>__len__()</code></td>
+<td><code>int</code></td>
+<td>Number of resources.</td>
+</tr>
+<tr>
+<td><code>__getitem__</code></td>
+<td><code>__getitem__(index)</code></td>
+<td><code>Resource</code></td>
+<td>Access by index.</td>
+</tr>
+<tr>
+<td><code>__iter__</code></td>
+<td><code>__iter__()</code></td>
+<td><code>Generator</code></td>
+<td>Iterate over resources.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="namespacedresourcelist"><code>NamespacedResourceList</code></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamespacedResourceList</span>
+</code></pre></div>
+
+<p>Create one instance of a namespaced resource in each namespace from a <code>ResourceList</code>.</p>
+<h3 id="constructor_4">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">NamespacedResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">NamespacedResource</span><span class="p">],</span>
+    <span class="n">namespaces</span><span class="p">:</span> <span class="n">ResourceList</span><span class="p">,</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">DynamicClient</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_class</code></td>
+<td><code>type[NamespacedResource]</code></td>
+<td>The namespaced resource class (e.g., <code>Pod</code>).</td>
+</tr>
+<tr>
+<td><code>namespaces</code></td>
+<td><code>ResourceList</code></td>
+<td>A <code>ResourceList</code> of <code>Namespace</code> resources.</td>
+</tr>
+<tr>
+<td><code>client</code></td>
+<td><code>DynamicClient</code></td>
+<td>Kubernetes client.</td>
+</tr>
+<tr>
+<td><code>**kwargs</code></td>
+<td></td>
+<td>Passed to each resource constructor. Must include <code>name</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>TypeError</code> if any resource in <code>namespaces</code> is not a <code>Namespace</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceList</span><span class="p">,</span> <span class="n">NamespacedResourceList</span>
+
+<span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span>
+<span class="p">)</span>
+
+<span class="n">pods</span> <span class="o">=</span> <span class="n">NamespacedResourceList</span><span class="p">(</span>
+    <span class="n">resource_class</span><span class="o">=</span><span class="n">Pod</span><span class="p">,</span>
+    <span class="n">namespaces</span><span class="o">=</span><span class="n">namespaces</span><span class="p">,</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">namespaces</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">pods</span><span class="p">:</span>
+        <span class="c1"># Creates nginx in test-ns-1 and test-ns-2</span>
+        <span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">pods</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>See <a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a> for full usage patterns.</p>
+<hr />
+<h2 id="kubeapiversion"><code>KubeAPIVersion</code></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">KubeAPIVersion</span>
+</code></pre></div>
+
+<p>Implements <a href="https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-versioning">Kubernetes API versioning</a> with comparison operators. Extends <code>packaging.version.Version</code>.</p>
+<h3 id="constructor_5">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">KubeAPIVersion</span><span class="p">(</span><span class="n">vstring</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vstring</code></td>
+<td><code>str</code></td>
+<td>Version string (e.g., <code>"v1"</code>, <code>"v1beta1"</code>, <code>"v1alpha2"</code>).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong> <code>ValueError</code> if the version string does not conform to Kubernetes versioning.</p>
+<h3 id="ordering">Ordering</h3>
+<p>Versions are ordered: <code>v1alpha1 &lt; v1alpha2 &lt; v1beta1 &lt; v1beta2 &lt; v1 &lt; v2</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">assert</span> <span class="n">KubeAPIVersion</span><span class="p">(</span><span class="s2">&quot;v1&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">KubeAPIVersion</span><span class="p">(</span><span class="s2">&quot;v1beta1&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">KubeAPIVersion</span><span class="p">(</span><span class="s2">&quot;v1beta1&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">KubeAPIVersion</span><span class="p">(</span><span class="s2">&quot;v1alpha1&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">KubeAPIVersion</span><span class="p">(</span><span class="s2">&quot;v1&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">KubeAPIVersion</span><span class="p">(</span><span class="s2">&quot;v1&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="exceptions">Exceptions</h2>
+<p>All exceptions are importable from <code>ocp_resources.exceptions</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MissingRequiredArgumentError</span><span class="p">,</span>
+    <span class="n">ResourceTeardownError</span><span class="p">,</span>
+    <span class="n">ValidationError</span><span class="p">,</span>
+    <span class="n">ConditionError</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Exception</th>
+<th>Raised By</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MissingRequiredArgumentError</code></td>
+<td><code>Resource.__init__</code>, <code>NamespacedResource.__init__</code>, <code>NamespacedResource._base_body</code></td>
+<td>Required parameters (<code>name</code>, <code>namespace</code>) not provided.</td>
+</tr>
+<tr>
+<td><code>ResourceTeardownError</code></td>
+<td><code>Resource.__exit__</code></td>
+<td><code>clean_up()</code> returned <code>False</code> during context manager exit.</td>
+</tr>
+<tr>
+<td><code>ValidationError</code></td>
+<td><code>validate()</code>, <code>validate_dict()</code>, <code>create()</code>, <code>update_replace()</code></td>
+<td>Resource dict fails OpenAPI schema validation. Has <code>message</code>, <code>path</code>, and <code>schema_error</code> attributes.</td>
+</tr>
+<tr>
+<td><code>ConditionError</code></td>
+<td><code>wait_for_condition()</code></td>
+<td>A <code>stop_condition</code> was detected during condition waiting.</td>
+</tr>
+<tr>
+<td><code>MissingResourceResError</code></td>
+<td><code>Resource._base_body</code></td>
+<td>Deprecated. <code>self.res</code> is empty after <code>_base_body()</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="timeout-constants">Timeout Constants</h2>
+<p>Available from <code>ocp_resources.utils.constants</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.utils.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TIMEOUT_1SEC</span><span class="p">,</span>      <span class="c1"># 1</span>
+    <span class="n">TIMEOUT_5SEC</span><span class="p">,</span>      <span class="c1"># 5</span>
+    <span class="n">TIMEOUT_10SEC</span><span class="p">,</span>     <span class="c1"># 10</span>
+    <span class="n">TIMEOUT_30SEC</span><span class="p">,</span>     <span class="c1"># 30</span>
+    <span class="n">TIMEOUT_1MINUTE</span><span class="p">,</span>   <span class="c1"># 60</span>
+    <span class="n">TIMEOUT_2MINUTES</span><span class="p">,</span>  <span class="c1"># 120</span>
+    <span class="n">TIMEOUT_4MINUTES</span><span class="p">,</span>  <span class="c1"># 240</span>
+    <span class="n">TIMEOUT_10MINUTES</span><span class="p">,</span> <span class="c1"># 600</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="module-level-functions">Module-Level Functions</h2>
+<h3 id="replace_key_with_hashed_value"><code>replace_key_with_hashed_value</code></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace_key_with_hashed_value</span>
+
+<span class="n">replace_key_with_hashed_value</span><span class="p">(</span><span class="n">resource_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+</code></pre></div>
+
+<p>Recursively replace the value at a key path with <code>"*******"</code>. Supports dict paths (<code>a&gt;b&gt;c</code>) and list paths (<code>a&gt;b[]&gt;c</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resource_dict</code></td>
+<td><code>dict</code></td>
+<td>The nested dictionary.</td>
+</tr>
+<tr>
+<td><code>key_name</code></td>
+<td><code>str</code></td>
+<td>Key path using <code>&gt;</code> as separator, <code>[]</code> for list elements.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>dict</code> — A deep copy with the value replaced.</p>
+<div class="highlight"><pre><span></span><code><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;secret&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;sensitive&quot;</span><span class="p">}}}</span>
+<span class="n">hashed</span> <span class="o">=</span> <span class="n">replace_key_with_hashed_value</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;spec&gt;secret&gt;token&quot;</span><span class="p">)</span>
+<span class="c1"># {&quot;spec&quot;: {&quot;secret&quot;: {&quot;token&quot;: &quot;*******&quot;}}}</span>
+
+<span class="c1"># With list path</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;containers&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">}]}]}}</span>
+<span class="n">hashed</span> <span class="o">=</span> <span class="n">replace_key_with_hashed_value</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;spec&gt;containers[]&gt;env[]&gt;value&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2 id="related-pages">Related Pages</h2>
+<ul>
+<li><a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a></li>
+<li><a href="creating-and-managing-resources.html">Creating and Managing Resources</a></li>
+<li><a href="querying-resources.html">Querying and Watching Resources</a></li>
+<li><a href="waiting-for-conditions.html">Waiting for Resource Conditions and Status</a></li>
+<li><a href="environment-variables.html">Environment Variables and Configuration</a></li>
+</ul>
+                </div>
+            </article>
+            <nav class="page-nav">
+
+                <a href="mcp-server-integration.html" class="page-nav-link page-nav-prev">
+                    <span class="page-nav-label">Previous</span>
+                    <span class="page-nav-title">Integrating with AI Assistants via MCP Server</span>
+                </a>
+
+
+                <a href="class-generator-cli.html" class="page-nav-link page-nav-next">
+                    <span class="page-nav-label">Next</span>
+                    <span class="page-nav-title">class-generator CLI Reference</span>
+                </a>
+
+            </nav>
+
+            <aside class="toc-sidebar">
+                <div class="toc-container">
+                    <h3>On this page</h3>
+                    <div class="toc">
+<ul>
+<li><a href="#get_client">get_client</a></li>
+<li><a href="#resource">Resource</a><ul>
+<li><a href="#class-attributes">Class Attributes</a></li>
+<li><a href="#constructor">Constructor</a></li>
+<li><a href="#context-manager-protocol">Context Manager Protocol</a></li>
+<li><a href="#crud-methods">CRUD Methods</a></li>
+<li><a href="#deploy-clean-up">Deploy / Clean Up</a></li>
+<li><a href="#query-methods-and-properties">Query Methods and Properties</a></li>
+<li><a href="#class-method-get">Class Method: get</a></li>
+<li><a href="#static-method-get_all_cluster_resources">Static Method: get_all_cluster_resources</a></li>
+<li><a href="#wait-methods">Wait Methods</a></li>
+<li><a href="#serialization">Serialization</a></li>
+<li><a href="#watch-events">Watch / Events</a></li>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#api-request">API Request</a></li>
+<li><a href="#utility-methods">Utility Methods</a></li>
+<li><a href="#inner-classes">Inner Classes</a></li>
+</ul>
+</li>
+<li><a href="#namespacedresource">NamespacedResource</a><ul>
+<li><a href="#constructor_1">Constructor</a></li>
+<li><a href="#overridden-methods">Overridden Methods</a></li>
+</ul>
+</li>
+<li><a href="#resourceeditor">ResourceEditor</a><ul>
+<li><a href="#constructor_2">Constructor</a></li>
+<li><a href="#context-manager-usage">Context Manager Usage</a></li>
+<li><a href="#methods">Methods</a></li>
+<li><a href="#properties">Properties</a></li>
+</ul>
+</li>
+<li><a href="#resourcelist">ResourceList</a><ul>
+<li><a href="#constructor_3">Constructor</a></li>
+<li><a href="#methods-inherited-from-baseresourcelist">Methods (inherited from BaseResourceList)</a></li>
+</ul>
+</li>
+<li><a href="#namespacedresourcelist">NamespacedResourceList</a><ul>
+<li><a href="#constructor_4">Constructor</a></li>
+</ul>
+</li>
+<li><a href="#kubeapiversion">KubeAPIVersion</a><ul>
+<li><a href="#constructor_5">Constructor</a></li>
+<li><a href="#ordering">Ordering</a></li>
+</ul>
+</li>
+<li><a href="#exceptions">Exceptions</a></li>
+<li><a href="#timeout-constants">Timeout Constants</a></li>
+<li><a href="#module-level-functions">Module-Level Functions</a><ul>
+<li><a href="#replace_key_with_hashed_value">replace_key_with_hashed_value</a></li>
+</ul>
+</li>
+<li><a href="#related-pages">Related Pages</a></li>
+</ul>
+</div>
+
+                </div>
+            </aside>
+
+
+        </main>
+
+        <footer class="page-footer">
+
+            <span class="footer-version">Generated from version 11.0.134</span>
+            <span class="footer-sep">&middot;</span>
+
+            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            <span class="footer-sep">&middot;</span>
+            <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
+        </footer>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="assets/theme.js"></script>
+    <script src="assets/search.js"></script>
+    <script src="assets/copy.js"></script>
+    <script src="assets/callouts.js"></script>
+    <script src="assets/scrollspy.js"></script>
+    <script src="assets/codelabels.js"></script>
+    <script src="assets/github.js"></script>
+    <script>
+(function() {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+            var expanded = sidebar.classList.contains('open');
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+})();
+</script>
+<script>
+(function() {
+    var sidebar = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Restore scroll position
+    var saved = sessionStorage.getItem('sidebar-scroll');
+    if (saved) sidebar.scrollTop = parseInt(saved, 10);
+
+    // Save scroll position before navigating
+    sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sidebar-scroll', sidebar.scrollTop.toString());
+    });
+
+    // Also scroll active link into view if no saved position
+    if (!saved) {
+        var active = sidebar.querySelector('.nav-link.active');
+        if (active) {
+            active.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+    }
+})();
+</script>
+</body>
+</html>
