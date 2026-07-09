@@ -42,6 +42,22 @@ class TestRestart:
             assert isinstance(annotations["kubectl.kubernetes.io/restartedAt"], str)
             assert len(annotations["kubectl.kubernetes.io/restartedAt"]) > 0
 
+    def test_restart_calls_wait_for_rollout_when_requested(self, daemonset):
+        with (
+            patch.object(DaemonSet, "update"),
+            patch.object(DaemonSet, "wait_for_rollout") as mock_wait,
+        ):
+            daemonset.restart(wait_for_rollout=True, timeout=120)
+            mock_wait.assert_called_once_with(timeout=120)
+
+    def test_restart_does_not_wait_by_default(self, daemonset):
+        with (
+            patch.object(DaemonSet, "update"),
+            patch.object(DaemonSet, "wait_for_rollout") as mock_wait,
+        ):
+            daemonset.restart()
+            mock_wait.assert_not_called()
+
 
 class TestWaitForRollout:
     def test_wait_for_rollout_returns_when_rollout_complete(self, daemonset):
