@@ -314,13 +314,11 @@ class DaemonSet(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+            func=lambda: self.instance,
         )
         for sample in samples:
-            if sample.items:
-                status = sample.items[0].status
+            if sample:
+                status = sample.status
                 desired_number_scheduled = status.desiredNumberScheduled or 0
                 number_ready = status.numberReady or 0
                 if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
@@ -388,24 +386,21 @@ class DaemonSet(NamespacedResource):
             wait_timeout=timeout,
             sleep=1,
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT,
-            func=self.api.get,
-            field_selector=f"metadata.name=={self.name}",
-            namespace=self.namespace,
+            func=lambda: self.instance,
         )
         for sample in samples:
-            if sample.items:
-                item = sample.items[0]
-                status = item.status
+            if sample:
+                status = sample.status
                 if not status:
                     continue
 
                 desired_number_scheduled = status.desiredNumberScheduled or 0
-                if desired_number_scheduled == 0 and status.observedGeneration == item.metadata.generation:
+                if desired_number_scheduled == 0 and status.observedGeneration == sample.metadata.generation:
                     return
 
                 if (
                     desired_number_scheduled > 0
-                    and status.observedGeneration == item.metadata.generation
+                    and status.observedGeneration == sample.metadata.generation
                     and (status.updatedNumberScheduled or 0) == desired_number_scheduled
                     and (status.numberAvailable or 0) == desired_number_scheduled
                 ):

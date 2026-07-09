@@ -10,24 +10,21 @@ def daemonset(fake_client):
     return DaemonSet(client=fake_client, name="test-ds", namespace="test-ns")
 
 
-def _make_api_response(*, generation, observed_generation, desired, updated, available):
-    """Build a mock object mimicking the structure returned by self.api.get."""
-    item = MagicMock()
-    item.metadata.generation = generation
-    item.status.observedGeneration = observed_generation
-    item.status.desiredNumberScheduled = desired
-    item.status.updatedNumberScheduled = updated
-    item.status.numberAvailable = available
-    item.status.numberReady = available
-
-    response = MagicMock()
-    response.items = [item]
-    return response
+def _make_instance(*, generation, observed_generation, desired, updated, available):
+    """Build a mock object mimicking the structure returned by self.instance."""
+    instance = MagicMock()
+    instance.metadata.generation = generation
+    instance.status.observedGeneration = observed_generation
+    instance.status.desiredNumberScheduled = desired
+    instance.status.updatedNumberScheduled = updated
+    instance.status.numberAvailable = available
+    instance.status.numberReady = available
+    return instance
 
 
 class TestWaitUntilDeployed:
     def test_wait_until_deployed_returns_when_all_ready(self, daemonset):
-        ready_response = _make_api_response(
+        ready = _make_instance(
             generation=1,
             observed_generation=1,
             desired=3,
@@ -37,21 +34,21 @@ class TestWaitUntilDeployed:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([ready_response]),
+            return_value=iter([ready]),
         ):
             daemonset.wait_until_deployed(timeout=10)
 
     def test_wait_until_deployed_waits_when_not_all_ready(self, daemonset):
-        not_ready = _make_api_response(
+        not_ready = _make_instance(
             generation=1,
             observed_generation=1,
             desired=3,
             updated=2,
             available=2,
         )
-        not_ready.items[0].status.numberReady = 2
+        not_ready.status.numberReady = 2
 
-        ready = _make_api_response(
+        ready = _make_instance(
             generation=1,
             observed_generation=1,
             desired=3,
@@ -125,7 +122,7 @@ class TestRestart:
 
 class TestWaitForRollout:
     def test_wait_for_rollout_returns_when_rollout_complete(self, daemonset):
-        complete_response = _make_api_response(
+        complete = _make_instance(
             generation=2,
             observed_generation=2,
             desired=3,
@@ -135,19 +132,19 @@ class TestWaitForRollout:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([complete_response]),
+            return_value=iter([complete]),
         ):
             daemonset.wait_for_rollout(timeout=10)
 
     def test_wait_for_rollout_waits_when_not_all_updated(self, daemonset):
-        incomplete_response = _make_api_response(
+        incomplete = _make_instance(
             generation=2,
             observed_generation=2,
             desired=3,
             updated=1,
             available=1,
         )
-        complete_response = _make_api_response(
+        complete = _make_instance(
             generation=2,
             observed_generation=2,
             desired=3,
@@ -157,19 +154,19 @@ class TestWaitForRollout:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([incomplete_response, complete_response]),
+            return_value=iter([incomplete, complete]),
         ):
             daemonset.wait_for_rollout(timeout=10)
 
     def test_wait_for_rollout_waits_when_generation_not_observed(self, daemonset):
-        stale_response = _make_api_response(
+        stale = _make_instance(
             generation=3,
             observed_generation=2,
             desired=3,
             updated=3,
             available=3,
         )
-        complete_response = _make_api_response(
+        complete = _make_instance(
             generation=3,
             observed_generation=3,
             desired=3,
@@ -179,21 +176,21 @@ class TestWaitForRollout:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([stale_response, complete_response]),
+            return_value=iter([stale, complete]),
         ):
             daemonset.wait_for_rollout(timeout=10)
 
     def test_wait_for_rollout_waits_when_not_all_available(self, daemonset):
-        not_available_response = _make_api_response(
+        not_available = _make_instance(
             generation=2,
             observed_generation=2,
             desired=3,
             updated=3,
             available=1,
         )
-        not_available_response.items[0].status.numberReady = 3  # ready but not available yet
+        not_available.status.numberReady = 3
 
-        complete_response = _make_api_response(
+        complete = _make_instance(
             generation=2,
             observed_generation=2,
             desired=3,
@@ -210,18 +207,17 @@ class TestWaitForRollout:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=tracking_iter([not_available_response, complete_response]),
+            return_value=tracking_iter([not_available, complete]),
         ):
             daemonset.wait_for_rollout(timeout=10)
 
         assert len(yielded) == 2, "Expected to iterate past not-available response before completing"
 
     def test_wait_for_rollout_continues_when_status_missing(self, daemonset):
-        no_status_response = MagicMock()
-        no_status_response.items = [MagicMock()]
-        no_status_response.items[0].status = None
+        no_status = MagicMock()
+        no_status.status = None
 
-        complete_response = _make_api_response(
+        complete = _make_instance(
             generation=2,
             observed_generation=2,
             desired=3,
@@ -231,12 +227,12 @@ class TestWaitForRollout:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([no_status_response, complete_response]),
+            return_value=iter([no_status, complete]),
         ):
             daemonset.wait_for_rollout(timeout=10)
 
     def test_wait_for_rollout_returns_when_zero_desired(self, daemonset):
-        zero_desired_response = _make_api_response(
+        zero_desired = _make_instance(
             generation=2,
             observed_generation=2,
             desired=0,
@@ -246,6 +242,6 @@ class TestWaitForRollout:
 
         with patch(
             "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([zero_desired_response]),
+            return_value=iter([zero_desired]),
         ):
             daemonset.wait_for_rollout(timeout=10)
