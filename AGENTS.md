@@ -8,15 +8,15 @@ Python wrapper for kubernetes-python-client providing simplified CRUD and resour
 - Build/sync: `uv sync`
 - Test all: `uv run --group tests pytest`
 - Test specific: `uv run --group tests pytest tests/test_daemonset.py`
-- Lint: `uvx pre-commit run --all-files`
+- Lint: `prek run`
 - Pre-commit setup: `prek install`
 - Generate resource: `class-generator --kind Pod --add-tests`
-- Full verify: `uvx pre-commit run --all-files && uv run --group tests pytest`
+- Full verify: `prek run && uv run --group tests pytest`
 
 ## Definition of Done
 
 A task is complete when ALL pass:
-1. `uvx pre-commit run --all-files` exits 0 (ruff, mypy, flake8, detect-secrets, gitleaks)
+1. `prek run` exits 0 (ruff, mypy, flake8, detect-secrets, gitleaks)
 2. `uv run --group tests pytest` exits 0 — coverage ≥ 65%
 3. Type hints on all new code (enforced by mypy)
 4. Committed with message: `type(scope): description`
@@ -30,7 +30,7 @@ A task is complete when ALL pass:
 
 ## Project
 
-- Stack: Python 3.12+, kubernetes-python-client, timeout-sampler, uv
+- Stack: Python 3.10+, kubernetes-python-client, timeout-sampler, uv
 - Structure: `ocp_resources/` (resource wrappers), `tests/` (pytest), `class_generator/` (code gen), `fake_kubernetes_client/` (mock client)
 - Key deps: `kubernetes` (API client), `timeout-sampler` (polling), `openshift-python-utilities` (shared utils)
 - Docs: `examples/`, inline docstrings (Google style)
@@ -38,7 +38,7 @@ A task is complete when ALL pass:
 ## When Adding a Resource
 
 - New resources MUST be generated via `class-generator --kind ResourceName --add-tests` — manual creation is not allowed
-- Reference implementations: `ocp_resources/config_map.py` (namespaced), `ocp_resources/backup.py` (cluster-scoped)
+- Reference implementations: `ocp_resources/config_map.py` (namespaced), `ocp_resources/node.py` (cluster-scoped)
 - File naming: `snake_case.py` — class naming: exact Kubernetes `kind` (PascalCase)
 - Namespaced → inherit `NamespacedResource`, cluster-scoped → inherit `Resource`
 - Must implement: `__init__()`, `to_dict()`, `api_group` (if not core v1)

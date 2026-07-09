@@ -58,7 +58,7 @@ Custom helper methods can be added below the end marker. The generated class str
   Define all the required arguments that are **required** to instantiate the new resource. Optional parameters may be added as well.
 - Implement `to_dict` function.
 
-Check [ConfigMap](ocp_resources/config_map.py) and [Backup](ocp_resources/backup.py) for reference.
+Check [ConfigMap](ocp_resources/config_map.py) and [Node](ocp_resources/node.py) for reference.
 
 ### Generated code markers
 
