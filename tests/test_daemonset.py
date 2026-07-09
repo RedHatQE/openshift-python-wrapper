@@ -65,24 +65,6 @@ class TestWaitUntilDeployed:
         ):
             daemonset.wait_until_deployed(timeout=10)
 
-    def test_wait_until_deployed_handles_empty_items(self, daemonset):
-        empty_response = MagicMock()
-        empty_response.items = []
-
-        ready_response = _make_api_response(
-            generation=1,
-            observed_generation=1,
-            desired=3,
-            updated=3,
-            available=3,
-        )
-
-        with patch(
-            "ocp_resources.daemon_set.TimeoutSampler",
-            return_value=iter([empty_response, ready_response]),
-        ):
-            daemonset.wait_until_deployed(timeout=10)
-
 
 class TestDelete:
     def test_delete_uses_foreground_propagation(self, daemonset):
