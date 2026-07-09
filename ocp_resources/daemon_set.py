@@ -299,7 +299,7 @@ class DaemonSet(NamespacedResource):
 
     # End of generated code
 
-    def wait_until_deployed(self, timeout=TIMEOUT_4MINUTES):
+    def wait_until_deployed(self, timeout: int = TIMEOUT_4MINUTES) -> None:
         """
         Wait until all Pods are deployed and ready.
 
@@ -326,7 +326,7 @@ class DaemonSet(NamespacedResource):
                 if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
                     return
 
-    def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, _body=None):
+    def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, _body: Any = None) -> bool:
         """
         Delete Daemonset
 
@@ -344,7 +344,7 @@ class DaemonSet(NamespacedResource):
             body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
         )
 
-    def restart(self, wait_for_rollout=False, timeout=TIMEOUT_4MINUTES):
+    def restart(self, wait_for_rollout: bool = False, timeout: int = TIMEOUT_4MINUTES) -> None:
         """
         Restart the DaemonSet by patching the pod template with a restartedAt annotation.
 
