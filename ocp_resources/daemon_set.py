@@ -342,7 +342,7 @@ class DaemonSet(NamespacedResource):
             body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
         )
 
-    def restart(self, wait_for_rollout: bool = False, timeout: int = TIMEOUT_4MINUTES) -> None:
+    def rollout_restart(self, wait_for_rollout: bool = False, timeout: int = TIMEOUT_4MINUTES) -> None:
         """
         Restart the DaemonSet by patching the pod template with a restartedAt annotation.
 
