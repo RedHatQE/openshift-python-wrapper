@@ -25,6 +25,88 @@ def _make_api_response(*, generation, observed_generation, desired, updated, ava
     return response
 
 
+class TestWaitUntilDeployed:
+    def test_wait_until_deployed_returns_when_all_ready(self, daemonset):
+        ready_response = _make_api_response(
+            generation=1,
+            observed_generation=1,
+            desired=3,
+            updated=3,
+            available=3,
+        )
+
+        with patch(
+            "ocp_resources.daemon_set.TimeoutSampler",
+            return_value=iter([ready_response]),
+        ):
+            daemonset.wait_until_deployed(timeout=10)
+
+    def test_wait_until_deployed_waits_when_not_all_ready(self, daemonset):
+        not_ready = _make_api_response(
+            generation=1,
+            observed_generation=1,
+            desired=3,
+            updated=2,
+            available=2,
+        )
+        not_ready.items[0].status.numberReady = 2
+
+        ready = _make_api_response(
+            generation=1,
+            observed_generation=1,
+            desired=3,
+            updated=3,
+            available=3,
+        )
+
+        with patch(
+            "ocp_resources.daemon_set.TimeoutSampler",
+            return_value=iter([not_ready, ready]),
+        ):
+            daemonset.wait_until_deployed(timeout=10)
+
+    def test_wait_until_deployed_handles_empty_items(self, daemonset):
+        empty_response = MagicMock()
+        empty_response.items = []
+
+        ready_response = _make_api_response(
+            generation=1,
+            observed_generation=1,
+            desired=3,
+            updated=3,
+            available=3,
+        )
+
+        with patch(
+            "ocp_resources.daemon_set.TimeoutSampler",
+            return_value=iter([empty_response, ready_response]),
+        ):
+            daemonset.wait_until_deployed(timeout=10)
+
+
+class TestDelete:
+    def test_delete_uses_foreground_propagation(self, daemonset):
+        with patch("ocp_resources.daemon_set.super") as mock_super:
+            mock_delete = MagicMock(return_value=True)
+            mock_super.return_value.delete = mock_delete
+            daemonset.delete(wait=True, timeout=60)
+
+            mock_delete.assert_called_once()
+            call_kwargs = mock_delete.call_args.kwargs
+            assert call_kwargs["wait"] is True
+            assert call_kwargs["timeout"] == 60
+            assert call_kwargs["body"].propagation_policy == "Foreground"
+
+    def test_delete_ignores_body_parameter(self, daemonset):
+        with patch("ocp_resources.daemon_set.super") as mock_super:
+            mock_delete = MagicMock(return_value=True)
+            mock_super.return_value.delete = mock_delete
+            daemonset.delete(_body={"custom": "options"})
+
+            call_kwargs = mock_delete.call_args.kwargs
+            assert call_kwargs["body"].propagation_policy == "Foreground"
+
+
 class TestRestart:
     def test_restart_patches_pod_template_annotation(self, daemonset):
         with patch.object(DaemonSet, "update") as mock_update:
