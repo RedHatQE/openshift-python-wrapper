@@ -321,10 +321,12 @@ class DaemonSet(NamespacedResource):
         for sample in samples:
             if sample.items:
                 status = sample.items[0].status
-                desired_number_scheduled = status.desiredNumberScheduled
-                number_ready = status.numberReady
+                desired_number_scheduled = status.desiredNumberScheduled or 0
+                number_ready = status.numberReady or 0
                 if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
                     return
+            else:
+                self.logger.warning(f"{self.kind} {self.name} not found yet, waiting...")
 
     def delete(self, wait=False, timeout=TIMEOUT_4MINUTES, _body=None):
         """
@@ -398,6 +400,9 @@ class DaemonSet(NamespacedResource):
                 status = item.status
                 if not status:
                     continue
+            else:
+                self.logger.warning(f"{self.kind} {self.name} not found yet, waiting...")
+                continue
 
                 desired_number_scheduled = status.desiredNumberScheduled or 0
                 if desired_number_scheduled == 0 and status.observedGeneration == item.metadata.generation:
