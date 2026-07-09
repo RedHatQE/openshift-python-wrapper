@@ -325,7 +325,10 @@ class DaemonSet(NamespacedResource):
 
     def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, _body: Any = None) -> bool:
         """
-        Delete Daemonset
+        Delete Daemonset.
+
+        Uses Foreground propagation to ensure all Pods are deleted before the DaemonSet
+        is removed. Without it, delete(wait=True) could return while Pods are still running.
 
         Args:
             wait (bool): True to wait for Daemonset to be deleted.
