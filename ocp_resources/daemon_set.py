@@ -319,10 +319,9 @@ class DaemonSet(NamespacedResource):
         for sample in samples:
             if sample:
                 status = sample.status
-                desired_number_scheduled = status.desiredNumberScheduled or 0
-                number_ready = status.numberReady or 0
-                if desired_number_scheduled > 0 and desired_number_scheduled == number_ready:
-                    return
+                if (desired_number_scheduled := status.desiredNumberScheduled) is not None:
+                    if desired_number_scheduled > 0 and desired_number_scheduled == status.numberReady:
+                        return
 
     def delete(self, wait: bool = False, timeout: int = TIMEOUT_4MINUTES, _body: Any = None) -> bool:
         """
@@ -342,7 +341,7 @@ class DaemonSet(NamespacedResource):
             body=kubernetes.client.V1DeleteOptions(propagation_policy="Foreground"),
         )
 
-    def rollout_restart(self, wait_for_rollout: bool = False, timeout: int = TIMEOUT_4MINUTES) -> None:
+    def rollout(self, wait_for_rollout: bool = False, timeout: int = TIMEOUT_4MINUTES) -> None:
         """
         Restart the DaemonSet by patching the pod template with a restartedAt annotation.
 
@@ -394,14 +393,16 @@ class DaemonSet(NamespacedResource):
                 if not status:
                     continue
 
-                desired_number_scheduled = status.desiredNumberScheduled or 0
+                if (desired_number_scheduled := status.desiredNumberScheduled) is None:
+                    continue
+
                 if desired_number_scheduled == 0 and status.observedGeneration == sample.metadata.generation:
                     return
 
                 if (
                     desired_number_scheduled > 0
                     and status.observedGeneration == sample.metadata.generation
-                    and (status.updatedNumberScheduled or 0) == desired_number_scheduled
-                    and (status.numberAvailable or 0) == desired_number_scheduled
+                    and status.updatedNumberScheduled == desired_number_scheduled
+                    and status.numberAvailable == desired_number_scheduled
                 ):
                     return
