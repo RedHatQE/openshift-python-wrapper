@@ -71,3 +71,8 @@ class Hook(NamespacedResource):
                 _spec["serviceAccount"] = self.service_account
 
     # End of generated code
+
+
+# TODO(hook cutover): Once the deprecated Hook shim is removed:
+# 1. Delete ocp_resources/hook.py (the shim).
+# 2. Rename ocp_resources/_hook_generated.py -> ocp_resources/hook.py.
