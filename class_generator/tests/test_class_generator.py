@@ -1,8 +1,9 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md#adding-tests
 
-import os
 import filecmp
+import os
 from pathlib import Path
+
 import pytest
 
 from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
@@ -11,21 +12,22 @@ from class_generator.class_generator import TESTS_MANIFESTS_DIR, class_generator
 @pytest.mark.parametrize(
     "kind",
     (
+        "Deployment",
+        "Pod",
         "APIServer",
         "ClusterOperator",
         "ConfigMap",
         "DNS",
-        "Deployment",
-        "Image",
         "ImageContentSourcePolicy",
         "Machine",
         "NMState",
-        "OAuth",
-        "Pipeline",
-        "Pod",
         "Secret",
         "ServiceMeshMember",
+        "OAuth",
+        "Pipeline",
         "ServingRuntime",
+        "Image",
+        "Ingress",
     ),
 )
 def test_parse_explain(tmpdir_factory, kind):
