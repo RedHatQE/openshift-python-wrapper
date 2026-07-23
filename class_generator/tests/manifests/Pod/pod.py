@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Pod(NamespacedResource):
@@ -56,7 +57,7 @@ class Pod(NamespacedResource):
         volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
+        r"""
         Args:
             active_deadline_seconds (int): Optional duration in seconds the pod may be active on the node
               relative to StartTime before the system will actively try to mark

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+
+from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
 
 
 class Deployment(NamespacedResource):
