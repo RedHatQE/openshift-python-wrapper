@@ -524,6 +524,8 @@ class Resource(ResourceConstants):
         IMAGE_OPENSHIFT_IO: str = "image.openshift.io"
         IMAGE_REGISTRY: str = "registry.redhat.io"
         IMAGEREGISTRY_OPERATOR_OPENSHIFT_IO: str = "imageregistry.operator.openshift.io"
+        INFERENCE_NETWORKING_K8S_IO: str = "inference.networking.k8s.io"
+        INFERENCE_NETWORKING_X_K8S_IO: str = "inference.networking.x-k8s.io"
         INSTANCETYPE_KUBEVIRT_IO: str = "instancetype.kubevirt.io"
         INTEGREATLY_ORG: str = "integreatly.org"
         JAEGERTRACING_IO = "jaegertracing.io"

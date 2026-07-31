@@ -6,7 +6,7 @@ from typing import Any
 from ocp_resources.resource import NamespacedResource
 
 
-class LLMInferenceService(NamespacedResource):
+class LLMInferenceServiceConfig(NamespacedResource):
     """
     No field description from API
     """
