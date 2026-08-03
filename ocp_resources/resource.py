@@ -537,6 +537,8 @@ class Resource(ResourceConstants):
         KUBERNETES_IO: str = "kubernetes.io"
         KUBEVIRT_IO: str = "kubevirt.io"
         KUBEVIRT_KUBEVIRT_IO: str = "kubevirt.kubevirt.io"
+        KUEUE_OPENSHIFT_IO: str = "kueue.openshift.io"
+        KUEUE_X_K8S_IO: str = "kueue.x-k8s.io"
         LITMUS_IO: str = "litmuschaos.io"
         LLAMASTACK_IO: str = "llamastack.io"
         MAAS_OPENDATAHUB_IO: str = "maas.opendatahub.io"
