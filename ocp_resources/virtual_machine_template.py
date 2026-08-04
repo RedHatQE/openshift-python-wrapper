@@ -64,3 +64,38 @@ class VirtualMachineTemplate(NamespacedResource):
                 _spec["parameters"] = self.parameters
 
     # End of generated code
+
+    def process(
+        self,
+        parameters: dict[str, str] | None = None,
+        client: Any = None,
+    ) -> Any:
+        """
+        Process the VirtualMachineTemplate using the KubeVirt subresources API.
+
+        Sends a POST request to the process subresource endpoint, substituting the
+        provided parameter values into the template and returning the result.
+
+        Args:
+            parameters (dict[str, str] | None): Key-value pairs of template parameters
+                to substitute, e.g. ``{"NAME": "my-vm", "INSTANCETYPE": "u1.large"}``.
+                Defaults to an empty dict (no substitutions).
+            client: Optional Kubernetes API client. Defaults to ``self.client``.
+
+        Returns:
+            Any: The raw API server response object.
+
+        """
+        _client = client or self.client
+        _subresources_api = f"subresources.{self.api_version}"
+        body: dict[str, Any] = {
+            "apiVersion": _subresources_api,
+            "kind": "ProcessOptions",
+            "parameters": parameters or {},
+        }
+        response = _client.request(
+            "POST",
+            f"/apis/{_subresources_api}/namespaces/{self.namespace}/virtualmachinetemplates/{self.name}/process",
+            body,
+        )
+        return response
