@@ -1,6 +1,6 @@
 version = 1
 revision = 3
-requires-python = ">=3.9, <3.14"
+requires-python = ">=3.9, <3.15"
 resolution-markers = [
     "python_full_version >= '3.11'",
     "python_full_version < '3.11'",
@@ -684,7 +684,6 @@ dependencies = [
     { name = "python-simple-logger" },
     { name = "requests" },
     { name = "rich" },
-    { name = "ruff" },
     { name = "testcontainers" },
     { name = "timeout-sampler" },
     { name = "xmltodict" },
@@ -694,6 +693,7 @@ dependencies = [
 dev = [
     { name = "ipdb" },
     { name = "ipython" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -712,7 +712,6 @@ requires-dist = [
     { name = "python-simple-logger", specifier = ">=1.0.40" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "rich", specifier = ">=13.9.2" },
-    { name = "ruff", specifier = ">=0.6.9" },
     { name = "testcontainers", specifier = ">=4.9.0" },
     { name = "timeout-sampler", specifier = ">=0.0.46" },
     { name = "xmltodict", specifier = ">=0.13.0" },
@@ -722,6 +721,7 @@ requires-dist = [
 dev = [
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "ipython", specifier = ">=8.12.3" },
+    { name = "ruff", specifier = ">=0.6.9" },
 ]
 
 [[package]]
