@@ -75,6 +75,7 @@ class ResourceConstants:
         RHV: str = "ovirt"
         OVA: str = "ova"
         OPENSTACK: str = "openstack"
+        HYPERV: str = "hyperv"
 
     class Backup:
         class Status:
