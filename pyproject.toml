@@ -44,7 +44,7 @@ warn_unused_ignores = true
 packages = ["ocp_resources", "class_generator"]
 
 [tool.uv]
-dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3"]
+dev-dependencies = ["ipdb>=0.13.13", "ipython>=8.12.3", "ruff>=0.6.9"]
 
 [project]
 requires-python = ">=3.9, <3.14"
@@ -73,7 +73,6 @@ dependencies = [
   "python-simple-logger>=1.0.40",
   "requests>=2.32.3",
   "rich>=13.9.2",
-  "ruff>=0.6.9",
   "testcontainers>=4.9.0",
   "timeout-sampler>=0.0.46",
   "xmltodict>=0.13.0",
