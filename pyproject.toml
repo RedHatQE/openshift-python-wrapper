@@ -114,7 +114,6 @@ dependencies = [
   "python-simple-logger>=1.0.40",
   "requests>=2.32.2",
   "rich>=13.9.2",
-  "ruff>=0.6.9",
   "timeout-sampler>=0.0.46",
   "xmltodict>=0.13.0",
   "fastmcp>=2.10.4",
@@ -152,4 +151,4 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]
-dev = ["ipdb>=0.13.13", "ipython>=8.12.3"]
+dev = ["ipdb>=0.13.13", "ipython>=8.12.3", "ruff>=0.6.9"]
