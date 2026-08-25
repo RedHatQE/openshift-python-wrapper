@@ -1,7 +1,6 @@
 import re
 
 import pytest
-
 from timeout_sampler import TimeoutExpiredError, TimeoutSampler
 
 
