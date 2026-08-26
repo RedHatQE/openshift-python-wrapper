@@ -5,6 +5,7 @@ import kubernetes
 import pytest
 import yaml
 
+from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.event import Event
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
@@ -97,7 +98,7 @@ class TestResource:
             if _resources:
                 break
 
-    def test_client_is_required(self, fake_client):
+    def test_client_is_required(self, fake_client: FakeDynamicClient) -> None:
         with pytest.raises(TypeError, match="client"):
             Pod(name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
 
@@ -120,7 +121,7 @@ class TestResource:
         pod = Pod(client=fake_client, name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
         assert pod.client is fake_client
 
-    def test_removed_client_kwargs_rejected(self, fake_client):
+    def test_removed_client_kwargs_rejected(self, fake_client: FakeDynamicClient) -> None:
         with pytest.raises(TypeError, match="Unsupported argument"):
             list(Namespace.get(client=fake_client, dyn_client=fake_client))
 
@@ -150,7 +151,7 @@ class TestResource:
                 config_file="/tmp/kubeconfig",
             )
 
-    def test_event_client_is_required(self):
+    def test_event_client_is_required(self) -> None:
         with pytest.raises(TypeError, match="client"):
             list(Event.get())
 
