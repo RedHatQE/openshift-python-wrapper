@@ -6,7 +6,6 @@ import os
 import re
 import sys
 import threading
-import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Generator
 from io import StringIO
@@ -191,6 +190,19 @@ def client_configuration_with_basic_auth(
     return _exchange_code_for_token(
         _token_endpoint=oauth_config.get("token_endpoint"), _auth_code=_code, _verify_ssl=verify_ssl
     )
+
+
+_REMOVED_CLIENT_KWARGS: frozenset[str] = frozenset({"dyn_client", "config_file", "config_dict", "context"})
+
+
+def _reject_removed_client_kwargs(kwargs: dict[str, Any]) -> None:
+    """Fail fast if deprecated client-config kwargs are passed via **kwargs."""
+    removed = _REMOVED_CLIENT_KWARGS.intersection(kwargs)
+    if removed:
+        names = ", ".join(sorted(removed))
+        raise TypeError(
+            f"Unsupported argument(s): {names}. Pass a DynamicClient via client= from get_client() instead."
+        )
 
 
 def get_client(
@@ -615,7 +627,7 @@ class Resource(ResourceConstants):
 
     def __init__(
         self,
-        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
+        client: DynamicClient,
         name: str | None = None,
         teardown: bool = True,
         yaml_file: str | None = None,
@@ -623,9 +635,6 @@ class Resource(ResourceConstants):
         dry_run: bool = False,
         node_selector: dict[str, Any] | None = None,
         node_selector_labels: dict[str, str] | None = None,
-        config_file: str | None = None,
-        config_dict: dict[str, Any] | None = None,
-        context: str | None = None,
         label: dict[str, str] | None = None,
         annotations: dict[str, str] | None = None,
         api_group: str = "",
@@ -641,16 +650,14 @@ class Resource(ResourceConstants):
         If `yaml_file` or `kind_dict` are passed, logic in `to_dict` is bypassed.
 
         Args:
-            name (str): Resource name
             client (DynamicClient): Dynamic client for connecting to a remote cluster
+            name (str): Resource name
             teardown (bool): Indicates if this resource would need to be deleted
             yaml_file (str): yaml file for the resource
             delete_timeout (int): timeout associated with delete action
             dry_run (bool): dry run
             node_selector (dict): node selector
             node_selector_labels (str): node selector labels
-            config_file (str): Path to config file for connecting to remote cluster.
-            context (str): Context name for connecting to remote cluster.
             label (dict): Resource labels
             annotations (dict[str, str] | None): Resource annotations
             api_group (str): Resource API group; will overwrite API group definition in resource class
@@ -665,6 +672,9 @@ class Resource(ResourceConstants):
         if yaml_file and kind_dict:
             raise ValueError("yaml_file and resource_dict are mutually exclusive")
 
+        if client is None:
+            raise TypeError("client is required")
+
         self.name = name
         self.teardown = teardown
         self.yaml_file = yaml_file
@@ -673,19 +683,9 @@ class Resource(ResourceConstants):
         self.dry_run = dry_run
         self.node_selector = node_selector
         self.node_selector_labels = node_selector_labels
-        self.config_file = config_file
-        self.config_dict = config_dict or {}
-        self.context = context
         self.label = label
         self.annotations = annotations
-        if not client:
-            warnings.warn(
-                "'client' arg will be mandatory in the next major release. "
-                "`config_file` and `context` args will be removed.",
-                FutureWarning,
-                stacklevel=2,
-            )
-        self.client: DynamicClient = client or get_client(config_file=self.config_file, context=self.context)
+        self.client = client
         self.api_group: str = api_group or self.api_group
         self.hash_log_data = hash_log_data
 
@@ -1181,14 +1181,11 @@ class Resource(ResourceConstants):
     @classmethod
     def get(
         cls,
-        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
-        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
-        config_file: str = "",
+        client: DynamicClient,
+        *,
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
-        context: str | None = None,
-        *args: Any,
         **kwargs: Any,
     ) -> Generator[Any, None, None]:
         """
@@ -1196,9 +1193,6 @@ class Resource(ResourceConstants):
 
         Args:
             client (DynamicClient): k8s client
-            dyn_client (DynamicClient): Open connection to remote cluster.
-            config_file (str): Path to config file for connecting to remote cluster.
-            context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
@@ -1206,31 +1200,24 @@ class Resource(ResourceConstants):
         Returns:
             generator: Generator of Resources of cls.kind.
         """
-        _client = client or dyn_client
-
-        if not _client:
-            warnings.warn(
-                "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release. "
-                "`config_file` and `context` will be removed.",
-                FutureWarning,
-                stacklevel=2,
-            )
-            _client = get_client(config_file=config_file, context=context)
+        if client is None:
+            raise TypeError("client is required")
+        _reject_removed_client_kwargs(kwargs)
 
         def _get() -> Generator["Resource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(*args, client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(client=client, singular_name=singular_name, **kwargs)
             try:
                 for resource_field in _resources.items:
                     if raw:
                         yield _resources
                     else:
-                        yield cls(client=_client, name=resource_field.metadata.name)
+                        yield cls(client=client, name=resource_field.metadata.name)
 
             except TypeError:
                 if raw:
                     yield _resources
                 else:
-                    yield cls(client=_client, name=_resources.metadata.name)
+                    yield cls(client=client, name=_resources.metadata.name)
 
         return Resource.retry_cluster_exceptions(func=_get, exceptions_dict=exceptions_dict)
 
@@ -1441,10 +1428,7 @@ class Resource(ResourceConstants):
 
     @staticmethod
     def get_all_cluster_resources(
-        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
-        config_file: str = "",
-        context: str | None = None,
-        config_dict: dict[str, Any] | None = None,
+        client: DynamicClient,
         *args: Any,
         **kwargs: Any,
     ) -> Generator[ResourceField, None, None]:
@@ -1453,31 +1437,26 @@ class Resource(ResourceConstants):
 
         Args:
             client (DynamicClient): k8s client
-            config_file (str): path to a kubeconfig file.
-            config_dict (dict): dict with kubeconfig configuration.
-            context (str): name of the context to use.
-            *args (tuple): args to pass to client.get()
             **kwargs (dict): kwargs to pass to client.get()
 
         Yields:
             kubernetes.dynamic.resource.ResourceField: Cluster resource.
 
         Example:
-            for resource in get_all_cluster_resources(label_selector="my-label=value"):
+            for resource in get_all_cluster_resources(client=client, label_selector="my-label=value"):
                 print(f"Resource: {resource}")
         """
-        if not client:
-            warnings.warn(
-                "'client' arg will be mandatory in the next major release. "
-                "`config_file`, `config_dict` and `context` will be removed.",
-                FutureWarning,
-                stacklevel=2,
+        if client is None:
+            raise TypeError("client is required")
+        if args:
+            raise TypeError(
+                "get_all_cluster_resources() takes no positional arguments after client; use keyword arguments only"
             )
-            client = get_client(config_file=config_file, config_dict=config_dict, context=context)
+        _reject_removed_client_kwargs(kwargs)
 
         for _resource in client.resources.search():
             try:
-                _resources = client.get(_resource, *args, **kwargs)
+                _resources = client.get(_resource, **kwargs)
                 yield from _resources.items
 
             except (NotFoundError, TypeError, MethodNotAllowedError):
@@ -1625,12 +1604,12 @@ class NamespacedResource(Resource):
 
     def __init__(
         self,
+        client: DynamicClient,
         name: str | None = None,
         namespace: str | None = None,
         teardown: bool = True,
         yaml_file: str | None = None,
         delete_timeout: int = TIMEOUT_4MINUTES,
-        client: DynamicClient | None = None,
         ensure_exists: bool = False,
         **kwargs: Any,
     ):
@@ -1652,14 +1631,11 @@ class NamespacedResource(Resource):
     @classmethod
     def get(
         cls,
-        client: DynamicClient | None = None,  # TODO: make mandatory in the next major release
-        dyn_client: DynamicClient | None = None,  # TODO: remove in the next major release
-        config_file: str = "",
+        client: DynamicClient,
+        *,
         singular_name: str = "",
         exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
         raw: bool = False,
-        context: str | None = None,
-        *args: Any,
         **kwargs: Any,
     ) -> Generator[Any, None, None]:
         """
@@ -1667,9 +1643,6 @@ class NamespacedResource(Resource):
 
         Args:
             client (DynamicClient): k8s client
-            dyn_client (DynamicClient): Open connection to remote cluster
-            config_file (str): Path to config file for connecting to remote cluster.
-            context (str): Context name for connecting to remote cluster.
             singular_name (str): Resource kind (in lowercase), in use where we have multiple matches for resource.
             raw (bool): If True return raw object.
             exceptions_dict (dict): Exceptions dict for TimeoutSampler
@@ -1677,26 +1650,19 @@ class NamespacedResource(Resource):
         Returns:
             generator: Generator of Resources of cls.kind
         """
-        _client = client or dyn_client
-
-        if not _client:
-            warnings.warn(
-                "`dyn_client` arg will be renamed to `client` and will be mandatory in the next major release. "
-                "`config_file` and `context` will be removed.",
-                FutureWarning,
-                stacklevel=2,
-            )
-            _client = get_client(config_file=config_file, context=context)
+        if client is None:
+            raise TypeError("client is required")
+        _reject_removed_client_kwargs(kwargs)
 
         def _get() -> Generator["NamespacedResource|ResourceInstance", None, None]:
-            _resources = cls._prepare_resources(*args, client=_client, singular_name=singular_name, **kwargs)  # type: ignore[misc]
+            _resources = cls._prepare_resources(client=client, singular_name=singular_name, **kwargs)
             try:
                 for resource_field in _resources.items:
                     if raw:
                         yield resource_field
                     else:
                         yield cls(
-                            client=_client,
+                            client=client,
                             name=resource_field.metadata.name,
                             namespace=resource_field.metadata.namespace,
                         )
@@ -1705,7 +1671,7 @@ class NamespacedResource(Resource):
                     yield _resources
                 else:
                     yield cls(
-                        client=_client,
+                        client=client,
                         name=_resources.metadata.name,
                         namespace=_resources.metadata.namespace,
                     )
