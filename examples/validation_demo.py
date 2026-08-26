@@ -15,6 +15,8 @@ from ocp_resources.pod import Pod
 from ocp_resources.resource import get_client
 from ocp_resources.service import Service
 
+FAKE_CLIENT = get_client(fake=True)
+
 
 def print_section(title):
     """Print a section header"""
@@ -30,6 +32,7 @@ def demo_basic_validation():
     # Create a valid pod
     print("1. Creating a valid pod and validating...")
     pod = Pod(
+        client=FAKE_CLIENT,
         name="nginx-pod",
         namespace="default",
         containers=[{"name": "nginx", "image": "nginx:latest", "ports": [{"containerPort": 80}]}],
@@ -44,6 +47,7 @@ def demo_basic_validation():
     # Create an invalid pod (missing required fields)
     print("\n2. Creating an invalid pod (missing image)...")
     invalid_pod = Pod(
+        client=FAKE_CLIENT,
         name="invalid-pod",
         namespace="default",
         containers=[{"name": "nginx"}],  # Missing required 'image' field
@@ -61,7 +65,7 @@ def demo_auto_validation():
     print_section(title="Auto-validation During Create")
 
     # Get a fake client for demo
-    client = get_client(fake=True)
+    client = FAKE_CLIENT
 
     # Create pod with auto-validation enabled
     print("1. Creating pod with auto-validation enabled...")
@@ -141,6 +145,7 @@ def demo_different_resources():
     # Service validation
     print("1. Validating a Service...")
     service = Service(
+        client=FAKE_CLIENT,
         name="nginx-service",
         namespace="default",
         selector={"app": "nginx"},
@@ -156,6 +161,7 @@ def demo_different_resources():
     # ConfigMap validation
     print("\n2. Validating a ConfigMap...")
     config_map = ConfigMap(
+        client=FAKE_CLIENT,
         name="app-config",
         namespace="default",
         data={"app.properties": "debug=true\nport=8080", "database.url": "postgresql://localhost:5432/mydb"},
@@ -176,7 +182,12 @@ def demo_performance():
     pods = []
     for i in range(5):
         pods.append(
-            Pod(name=f"perf-test-pod-{i}", namespace="default", containers=[{"name": "nginx", "image": "nginx:latest"}])
+            Pod(
+                client=FAKE_CLIENT,
+                name=f"perf-test-pod-{i}",
+                namespace="default",
+                containers=[{"name": "nginx", "image": "nginx:latest"}],
+            )
         )
 
     # First validation (loads and caches schema)
@@ -208,6 +219,7 @@ def demo_error_details():
     # Create pod with multiple errors
     print("Creating a pod with multiple validation errors...")
     pod = Pod(
+        client=FAKE_CLIENT,
         name="invalid-name-",  # Names must start and end with alphanumeric, can only contain lowercase alphanumeric or hyphens
         namespace="default",
         containers=[

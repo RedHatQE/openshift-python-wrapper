@@ -5,6 +5,7 @@ import kubernetes
 import pytest
 import yaml
 
+from ocp_resources.event import Event
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
@@ -95,6 +96,72 @@ class TestResource:
         for _resources in Resource.get_all_cluster_resources(client=fake_client):
             if _resources:
                 break
+
+    def test_client_is_required(self, fake_client):
+        with pytest.raises(TypeError, match="client"):
+            Pod(name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
+
+        with pytest.raises(TypeError, match="client"):
+            Pod(client=None, name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            list(Namespace.get())
+
+        with pytest.raises(TypeError, match="client"):
+            list(Namespace.get(client=None))  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            list(Resource.get_all_cluster_resources())
+
+        with pytest.raises(TypeError, match="client"):
+            list(Resource.get_all_cluster_resources(client=None))  # type: ignore[arg-type]
+
+        # Valid construction still works with an explicit client
+        pod = Pod(client=fake_client, name=BASE_POD_NAME, namespace="default", containers=POD_CONTAINERS)
+        assert pod.client is fake_client
+
+    def test_removed_client_kwargs_rejected(self, fake_client):
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            list(Namespace.get(client=fake_client, dyn_client=fake_client))
+
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            list(Namespace.get(client=fake_client, config_file="/tmp/kubeconfig"))
+
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            list(Resource.get_all_cluster_resources(client=fake_client, context="default"))
+
+        with pytest.raises(TypeError, match="Unsupported argument"):
+            list(Resource.get_all_cluster_resources(client=fake_client, config_dict={}))
+
+        # Positional args after client are rejected (keyword-only API)
+        with pytest.raises(TypeError, match="positional"):
+            list(Namespace.get(fake_client, fake_client))
+
+        with pytest.raises(TypeError, match="positional"):
+            list(Resource.get_all_cluster_resources(fake_client, "extra"))
+
+        # Resource.__init__ rejects removed kwargs as unexpected keyword arguments
+        with pytest.raises(TypeError, match="config_file"):
+            Pod(
+                client=fake_client,
+                name=BASE_POD_NAME,
+                namespace="default",
+                containers=POD_CONTAINERS,
+                config_file="/tmp/kubeconfig",
+            )
+
+    def test_event_client_is_required(self):
+        with pytest.raises(TypeError, match="client"):
+            list(Event.get())
+
+        with pytest.raises(TypeError, match="client"):
+            list(Event.get(client=None))  # type: ignore[arg-type]
+
+        with pytest.raises(TypeError, match="client"):
+            Event.delete_events()
+
+        with pytest.raises(TypeError, match="client"):
+            Event.delete_events(client=None)  # type: ignore[arg-type]
 
     def test_get_condition_message(self, pod):
         assert pod.get_condition_message(
