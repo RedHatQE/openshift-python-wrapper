@@ -203,9 +203,11 @@ cm = ConfigMap(
     ensure_exists=True,
 )
 
-cm.update(resource_dict={
-    "data": {"new_key": "new_value"},
-})
+cm.update(
+    resource_dict={
+        "data": {"new_key": "new_value"},
+    }
+)
 ```
 
 ### Replacing with `update_replace()`
@@ -397,9 +399,7 @@ from ocp_resources.resource import ResourceEditor
 
 ns = Namespace(client=client, name="my-namespace", ensure_exists=True)
 
-with ResourceEditor(
-    patches={ns: {"metadata": {"labels": {"temporary-label": "true"}}}}
-):
+with ResourceEditor(patches={ns: {"metadata": {"labels": {"temporary-label": "true"}}}}):
     # Label is applied
     assert ns.labels["temporary-label"] == "true"
 # Label is automatically removed

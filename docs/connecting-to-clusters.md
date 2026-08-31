@@ -339,6 +339,7 @@ The Kubernetes Python client reads `KUBECONFIG` at module import time. If you se
 
 ```python
 import os
+
 # Don't rely on: os.environ["KUBECONFIG"] = "/path/to/config"
 # Instead, pass it explicitly:
 client = get_client(config_file=os.environ.get("KUBECONFIG", "/path/to/config"))

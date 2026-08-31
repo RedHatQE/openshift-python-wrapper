@@ -400,6 +400,7 @@ Get the resource kind name derived from the class hierarchy. This is a **class-l
 
 ```python
 from ocp_resources.namespace import Namespace
+
 print(Namespace.kind)  # "Namespace"
 ```
 
@@ -1072,9 +1073,7 @@ from ocp_resources.namespace import Namespace
 
 ns = Namespace(client=client, name="my-ns", ensure_exists=True)
 
-with ResourceEditor(
-    patches={ns: {"metadata": {"labels": {"temporary": "true"}}}}
-) as editor:
+with ResourceEditor(patches={ns: {"metadata": {"labels": {"temporary": "true"}}}}) as editor:
     # Labels are patched
     assert ns.instance.metadata.labels.temporary == "true"
 # Labels are restored to original values
@@ -1191,9 +1190,7 @@ from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
 from ocp_resources.resource import ResourceList, NamespacedResourceList
 
-namespaces = ResourceList(
-    resource_class=Namespace, num_resources=2, client=client, name="test-ns"
-)
+namespaces = ResourceList(resource_class=Namespace, num_resources=2, client=client, name="test-ns")
 
 pods = NamespacedResourceList(
     resource_class=Pod,
@@ -1274,14 +1271,14 @@ Available from `ocp_resources.utils.constants`:
 
 ```python
 from ocp_resources.utils.constants import (
-    TIMEOUT_1SEC,      # 1
-    TIMEOUT_5SEC,      # 5
-    TIMEOUT_10SEC,     # 10
-    TIMEOUT_30SEC,     # 30
-    TIMEOUT_1MINUTE,   # 60
+    TIMEOUT_1SEC,  # 1
+    TIMEOUT_5SEC,  # 5
+    TIMEOUT_10SEC,  # 10
+    TIMEOUT_30SEC,  # 30
+    TIMEOUT_1MINUTE,  # 60
     TIMEOUT_2MINUTES,  # 120
     TIMEOUT_4MINUTES,  # 240
-    TIMEOUT_10MINUTES, # 600
+    TIMEOUT_10MINUTES,  # 600
 )
 ```
 
