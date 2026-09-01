@@ -36,9 +36,7 @@ from ocp_resources.node import Node
 
 node = Node(name="worker-0")
 
-with ResourceEditor(
-    patches={node: {"metadata": {"labels": {"test-label": "true"}}}}
-):
+with ResourceEditor(patches={node: {"metadata": {"labels": {"test-label": "true"}}}}):
     # The node now has the label "test-label": "true"
     # Run your test logic here...
     pass
@@ -113,9 +111,7 @@ from ocp_resources.config_map import ConfigMap
 
 cm = ConfigMap(name="app-config", namespace="default")
 
-editor = ResourceEditor(
-    patches={cm: {"data": {"mode": "maintenance"}}}
-)
+editor = ResourceEditor(patches={cm: {"data": {"mode": "maintenance"}}})
 
 # Apply the patch and create backups
 editor.update(backup_resources=True)
@@ -175,9 +171,7 @@ with ResourceEditor(
 Access the automatically generated backup data through the `backups` property:
 
 ```python
-editor = ResourceEditor(
-    patches={my_resource: {"metadata": {"labels": {"env": "staging"}}}}
-)
+editor = ResourceEditor(patches={my_resource: {"metadata": {"labels": {"env": "staging"}}}})
 editor.update(backup_resources=True)
 
 # See what was backed up

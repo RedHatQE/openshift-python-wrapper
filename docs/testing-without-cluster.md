@@ -42,9 +42,11 @@ import pytest
 from ocp_resources.resource import get_client
 from ocp_resources.namespace import Namespace
 
+
 @pytest.fixture(scope="class")
 def fake_client():
     return get_client(fake=True)
+
 
 class TestMyFeature:
     def test_create_namespace(self, fake_client):
@@ -77,6 +79,7 @@ Create a `conftest.py` in your test directory:
 import pytest
 from ocp_resources.resource import get_client
 
+
 @pytest.fixture(scope="class")
 def fake_client():
     """Provides a fake Kubernetes client for all tests."""
@@ -89,6 +92,7 @@ def fake_client():
 
 ```python
 from ocp_resources.pod import Pod
+
 
 def test_create_pod(fake_client):
     pod = Pod(
@@ -109,6 +113,7 @@ The fake client automatically generates metadata (`uid`, `resourceVersion`, `cre
 
 ```python
 from ocp_resources.namespace import Namespace
+
 
 def test_list_resources(fake_client):
     # Create some namespaces first
@@ -179,6 +184,7 @@ Resources support Python's `with` statement. The resource deploys on entry and i
 ```python
 from ocp_resources.secret import Secret
 
+
 def test_context_manager(fake_client):
     with Secret(name="my-secret", namespace="default", client=fake_client) as sec:
         assert sec.exists
@@ -205,6 +211,7 @@ def test_namespace_status(fake_client):
 
 ```python
 from ocp_resources.pod import Pod
+
 
 def test_wait_for_condition(fake_client):
     pod = Pod(
@@ -281,6 +288,7 @@ Deployments get a full status template including replica counts, conditions, and
 ```python
 from ocp_resources.deployment import Deployment
 
+
 def test_deployment(fake_client):
     dep = Deployment(
         client=fake_client,
@@ -308,6 +316,7 @@ Test bulk resource creation with `ResourceList` and `NamespacedResourceList`:
 
 ```python
 from ocp_resources.resource import ResourceList, NamespacedResourceList
+
 
 def test_resource_list(fake_client):
     with ResourceList(
@@ -369,17 +378,25 @@ The fake client supports filtering resources by labels and fields:
 def test_label_selector(fake_client):
     api = fake_client.resources.get(api_version="v1", kind="Pod")
 
-    api.create(body={
-        "apiVersion": "v1", "kind": "Pod",
-        "metadata": {"name": "pod-a", "namespace": "default", "labels": {"app": "web"}},
-        "spec": {"containers": [{"name": "c", "image": "nginx"}]},
-    }, namespace="default")
+    api.create(
+        body={
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {"name": "pod-a", "namespace": "default", "labels": {"app": "web"}},
+            "spec": {"containers": [{"name": "c", "image": "nginx"}]},
+        },
+        namespace="default",
+    )
 
-    api.create(body={
-        "apiVersion": "v1", "kind": "Pod",
-        "metadata": {"name": "pod-b", "namespace": "default", "labels": {"app": "api"}},
-        "spec": {"containers": [{"name": "c", "image": "nginx"}]},
-    }, namespace="default")
+    api.create(
+        body={
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {"name": "pod-b", "namespace": "default", "labels": {"app": "api"}},
+            "spec": {"containers": [{"name": "c", "image": "nginx"}]},
+        },
+        namespace="default",
+    )
 
     # Filter by label
     web_pods = api.get(namespace="default", label_selector="app=web")
@@ -403,11 +420,15 @@ The `watch()` method yields existing resources as `ADDED` events:
 def test_watch(fake_client):
     api = fake_client.resources.get(api_version="v1", kind="Pod")
 
-    api.create(body={
-        "apiVersion": "v1", "kind": "Pod",
-        "metadata": {"name": "watch-pod", "namespace": "default"},
-        "spec": {"containers": [{"name": "c", "image": "nginx"}]},
-    }, namespace="default")
+    api.create(
+        body={
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {"name": "watch-pod", "namespace": "default"},
+            "spec": {"containers": [{"name": "c", "image": "nginx"}]},
+        },
+        namespace="default",
+    )
 
     for event in api.watch(namespace="default"):
         assert event["type"] == "ADDED"
@@ -464,6 +485,7 @@ Use `@pytest.mark.incremental` to test a resource through its full lifecycle. Ea
 import pytest
 from ocp_resources.pod import Pod
 
+
 @pytest.mark.incremental
 class TestPodLifecycle:
     @pytest.fixture(scope="class")
@@ -516,6 +538,7 @@ The fake client raises errors for duplicate creates and missing resources, just 
 ```python
 from fake_kubernetes_client import NotFoundError, ConflictError
 
+
 def test_conflict_on_duplicate_create(fake_client):
     api = fake_client.resources.get(api_version="v1", kind="Namespace")
 
@@ -523,6 +546,7 @@ def test_conflict_on_duplicate_create(fake_client):
 
     with pytest.raises(ConflictError):
         api.create(body={"metadata": {"name": "unique-ns"}})
+
 
 def test_not_found_on_missing(fake_client):
     api = fake_client.resources.get(api_version="v1", kind="Pod")
@@ -541,7 +565,8 @@ def test_response_access(fake_client):
 
     created = api.create(
         body={
-            "apiVersion": "v1", "kind": "Pod",
+            "apiVersion": "v1",
+            "kind": "Pod",
             "metadata": {"name": "access-pod", "namespace": "default"},
             "spec": {"containers": [{"name": "c", "image": "nginx"}]},
         },

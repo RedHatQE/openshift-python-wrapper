@@ -138,18 +138,18 @@ Every resource inherits status constants from its base class. Resource-specific 
 # Base status constants (available on all resources)
 from ocp_resources.resource import Resource
 
-Resource.Status.SUCCEEDED    # "Succeeded"
-Resource.Status.FAILED       # "Failed"
-Resource.Status.RUNNING      # "Running"
-Resource.Status.PENDING      # "Pending"
+Resource.Status.SUCCEEDED  # "Succeeded"
+Resource.Status.FAILED  # "Failed"
+Resource.Status.RUNNING  # "Running"
+Resource.Status.PENDING  # "Pending"
 
 # Resource-specific statuses
 from ocp_resources.virtual_machine import VirtualMachine
 
-VirtualMachine.Status.MIGRATING     # "Migrating"
-VirtualMachine.Status.STOPPED       # "Stopped"
-VirtualMachine.Status.STARTING      # "Starting"
-VirtualMachine.Status.PAUSED        # "Paused"
+VirtualMachine.Status.MIGRATING  # "Migrating"
+VirtualMachine.Status.STOPPED  # "Stopped"
+VirtualMachine.Status.STARTING  # "Starting"
+VirtualMachine.Status.PAUSED  # "Paused"
 
 from ocp_resources.persistent_volume_claim import PersistentVolumeClaim
 
@@ -227,21 +227,21 @@ except ConditionError as e:
 from ocp_resources.resource import Resource
 
 # Condition types
-Resource.Condition.READY         # "Ready"
-Resource.Condition.AVAILABLE     # "Available"
-Resource.Condition.DEGRADED      # "Degraded"
-Resource.Condition.PROGRESSING   # "Progressing"
-Resource.Condition.UPGRADEABLE   # "Upgradeable"
-Resource.Condition.NETWORK_READY # "NetworkReady"
+Resource.Condition.READY  # "Ready"
+Resource.Condition.AVAILABLE  # "Available"
+Resource.Condition.DEGRADED  # "Degraded"
+Resource.Condition.PROGRESSING  # "Progressing"
+Resource.Condition.UPGRADEABLE  # "Upgradeable"
+Resource.Condition.NETWORK_READY  # "NetworkReady"
 
 # Condition statuses
-Resource.Condition.Status.TRUE    # "True"
-Resource.Condition.Status.FALSE   # "False"
-Resource.Condition.Status.UNKNOWN # "Unknown"
+Resource.Condition.Status.TRUE  # "True"
+Resource.Condition.Status.FALSE  # "False"
+Resource.Condition.Status.UNKNOWN  # "Unknown"
 
 # Condition reasons
 Resource.Condition.Reason.ALL_REQUIREMENTS_MET  # "AllRequirementsMet"
-Resource.Condition.Reason.INSTALL_SUCCEEDED     # "InstallSucceeded"
+Resource.Condition.Reason.INSTALL_SUCCEEDED  # "InstallSucceeded"
 ```
 
 ## Waiting with Context Managers
@@ -284,8 +284,8 @@ Many resource types provide specialized wait methods beyond the base `wait_for_s
 from ocp_resources.deployment import Deployment
 
 deploy = Deployment(client=client, name="my-app", namespace="default")
-deploy.wait_for_replicas(deployed=True, timeout=240)   # All replicas ready
-deploy.wait_for_replicas(deployed=False, timeout=120)   # Scale to zero complete
+deploy.wait_for_replicas(deployed=True, timeout=240)  # All replicas ready
+deploy.wait_for_replicas(deployed=False, timeout=120)  # Scale to zero complete
 ```
 
 #### DaemonSets
@@ -342,6 +342,7 @@ You can pass a `stop_status_func` callback to abort early on custom conditions:
 def dv_is_stuck(dv):
     return dv.instance.status.conditions.restartCount > 3
 
+
 dv.wait_for_dv_success(
     stop_status_func=dv_is_stuck,
     dv=dv,  # passed as keyword argument to the function
@@ -355,10 +356,10 @@ from ocp_resources.virtual_machine_snapshot import VirtualMachineSnapshot
 from ocp_resources.virtual_machine_restore import VirtualMachineRestore
 
 snapshot = VirtualMachineSnapshot(client=client, name="snap-1", namespace="default")
-snapshot.wait_snapshot_done(timeout=240)    # readyToUse + VM snapshotInProgress is None
+snapshot.wait_snapshot_done(timeout=240)  # readyToUse + VM snapshotInProgress is None
 
 restore = VirtualMachineRestore(client=client, name="restore-1", namespace="default")
-restore.wait_restore_done(timeout=240)     # complete + VM restoreInProgress is None
+restore.wait_restore_done(timeout=240)  # complete + VM restoreInProgress is None
 ```
 
 #### MachineSet
@@ -389,13 +390,13 @@ The library provides predefined timeout constants you can use with any wait meth
 
 ```python
 from ocp_resources.utils.constants import (
-    TIMEOUT_1SEC,       # 1
-    TIMEOUT_5SEC,       # 5
-    TIMEOUT_10SEC,      # 10
-    TIMEOUT_30SEC,      # 30
-    TIMEOUT_1MINUTE,    # 60
-    TIMEOUT_2MINUTES,   # 120
-    TIMEOUT_4MINUTES,   # 240
+    TIMEOUT_1SEC,  # 1
+    TIMEOUT_5SEC,  # 5
+    TIMEOUT_10SEC,  # 10
+    TIMEOUT_30SEC,  # 30
+    TIMEOUT_1MINUTE,  # 60
+    TIMEOUT_2MINUTES,  # 120
+    TIMEOUT_4MINUTES,  # 240
     TIMEOUT_10MINUTES,  # 600
 )
 
