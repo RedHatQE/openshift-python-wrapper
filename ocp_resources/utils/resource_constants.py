@@ -21,6 +21,7 @@ class ResourceConstants:
         ACTIVE: str = "Active"
         ESTABLISHED: str = "Established"
         EXECUTING: str = "Executing"
+        TARGET_READY: str = "TargetReady"
 
     class Condition:
         UPGRADEABLE: str = "Upgradeable"
