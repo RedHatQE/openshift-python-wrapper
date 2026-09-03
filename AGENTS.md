@@ -54,14 +54,16 @@ Code between markers is auto-generated — do NOT modify manually. Use `class-ge
 
 ## When Writing Code
 
+- **Always pass `client` when instantiating a resource** — `client: DynamicClient` is required on `Resource` / `NamespacedResource` (and on `.get()` / `Event` APIs). Create it with `get_client()` (or `get_client(fake=True)` in tests); do not rely on implicit kubeconfig/client creation.
 - No client-side validation in `to_dict()` — let the K8s/OCP API server return errors. Helper functions in resource classes CAN validate.
-- Context managers for auto-cleanup: `with Pod(name="test", namespace="default") as pod:`
+- Context managers for auto-cleanup: `with Pod(client=client, name="test", namespace="default") as pod:`
 - Wait utilities: `wait_for_status()`, `wait_for_condition()` via timeout-sampler
 - Sensitive data: add keys to `keys_to_hash` property for automatic log hashing
 - Fake client for tests: `get_client(fake=True)` — no cluster required
 
 ## When Reviewing Code
 
+- Verify resources are constructed with an explicit `client=` (and `.get()` / `Event` calls pass `client`)
 - Verify generated code markers are intact — no manual edits between markers
 - Check type hints on all new functions/parameters
 - Verify tests exist for new helper methods (not needed for generated `__init__`/`to_dict`)
