@@ -1,0 +1,12 @@
+[config]
+add_repo_metadata = true
+ignore_pr_title = ["^chore: bump version"]
+
+[github_app]
+handle_push_trigger = true
+pr_commands = ["/agentic_review", "/agentic_describe"]
+push_commands = ["/agentic_review"]
+
+[review_agent]
+comments_location_policy = "both"
+inline_comments_severity_threshold = 1
