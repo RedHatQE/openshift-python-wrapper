@@ -127,6 +127,7 @@ export OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL=DEBUG
 
 ```python
 import os
+
 os.environ["OPENSHIFT_PYTHON_WRAPPER_LOG_LEVEL"] = "DEBUG"
 
 from ocp_resources.pod import Pod
@@ -156,6 +157,7 @@ export OPENSHIFT_PYTHON_WRAPPER_LOG_FILE=/var/log/ocp-wrapper.log
 
 ```python
 import os
+
 os.environ["OPENSHIFT_PYTHON_WRAPPER_LOG_FILE"] = "/tmp/ocp-wrapper.log"
 
 from ocp_resources.namespace import Namespace
@@ -200,6 +202,7 @@ export OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA=false
 
 ```python
 import os
+
 os.environ["OPENSHIFT_PYTHON_WRAPPER_HASH_LOG_DATA"] = "false"
 
 from ocp_resources.secret import Secret

@@ -98,12 +98,7 @@ Prompt: "List all pods in the openshift-monitoring namespace with label app=prom
 The AI will call the `list_resources` tool, which maps to:
 
 ```python
-list_resources(
-    resource_type="pod",
-    namespace="openshift-monitoring",
-    label_selector="app=prometheus",
-    limit=20
-)
+list_resources(resource_type="pod", namespace="openshift-monitoring", label_selector="app=prometheus", limit=20)
 ```
 
 Returned data includes name, namespace, UID, creation timestamp, labels, phase, and conditions for each matched resource.
@@ -125,7 +120,7 @@ get_resource(
     resource_type="deployment",
     name="api-server",
     namespace="production",
-    output_format="yaml"    # also accepts "json" or "info"
+    output_format="yaml",  # also accepts "json" or "info"
 )
 ```
 
@@ -148,7 +143,7 @@ create_resource(
     name="app-settings",
     namespace="staging",
     spec={"data": {"database_host": "db.staging.svc", "log_level": "debug"}},
-    labels={"managed-by": "mcp-server"}
+    labels={"managed-by": "mcp-server"},
 )
 ```
 
@@ -170,7 +165,7 @@ spec:
     image: nginx:1.27
     ports:
     - containerPort: 80
-"""
+""",
 )
 ```
 
@@ -187,7 +182,8 @@ Prompt: "Apply this manifest to create a namespace, deployment, and service for 
 The AI calls:
 
 ```python
-apply_yaml(yaml_content="""
+apply_yaml(
+    yaml_content="""
 ---
 apiVersion: v1
 kind: Namespace
@@ -226,7 +222,8 @@ spec:
   ports:
   - port: 80
     targetPort: 8080
-""")
+"""
+)
 ```
 
 The response includes a summary with `total_resources`, `successful`, and `failed` counts, plus per-resource results. Each YAML document is parsed and deployed independently.
@@ -247,7 +244,7 @@ update_resource(
     name="web-frontend",
     namespace="production",
     patch={"spec": {"replicas": 5}},
-    patch_type="merge"       # or "strategic"
+    patch_type="merge",  # or "strategic"
 )
 ```
 
@@ -264,13 +261,7 @@ Prompt: "Delete the pod 'debug-pod' in namespace 'default' and wait for it to be
 The AI calls:
 
 ```python
-delete_resource(
-    resource_type="pod",
-    name="debug-pod",
-    namespace="default",
-    wait=True,
-    timeout=60
-)
+delete_resource(resource_type="pod", name="debug-pod", namespace="default", wait=True, timeout=60)
 ```
 
 If the resource doesn't exist, the server returns a success response with a warning rather than an error, making the operation idempotent.
@@ -287,12 +278,7 @@ in namespace 'production'"
 The AI calls:
 
 ```python
-get_pod_logs(
-    name="api-server-7f8b9c",
-    namespace="production",
-    container="app",
-    tail_lines=200
-)
+get_pod_logs(name="api-server-7f8b9c", namespace="production", container="app", tail_lines=200)
 ```
 
 - Use `since_seconds=3600` to get logs from the last hour
@@ -310,12 +296,7 @@ Prompt: "Check the nginx config in pod 'web-server' namespace 'production'"
 The AI calls:
 
 ```python
-exec_in_pod(
-    name="web-server",
-    namespace="production",
-    command=["nginx", "-t"],
-    container="nginx"
-)
+exec_in_pod(name="web-server", namespace="production", command=["nginx", "-t"], container="nginx")
 ```
 
 The response includes `stdout`, `stderr`, and `returncode`. If the command fails, the exit code and error output are captured rather than raising an exception.
@@ -333,12 +314,7 @@ Prompt: "Show me the events for pod 'crashloop-pod' in 'default' namespace"
 The AI calls:
 
 ```python
-get_resource_events(
-    resource_type="pod",
-    name="crashloop-pod",
-    namespace="default",
-    limit=10
-)
+get_resource_events(resource_type="pod", name="crashloop-pod", namespace="default", limit=10)
 ```
 
 Events are filtered using field selectors on `involvedObject.name`, `involvedObject.namespace`, and `involvedObject.kind`. Each event includes type (Normal/Warning), reason, message, count, timestamps, and source component.

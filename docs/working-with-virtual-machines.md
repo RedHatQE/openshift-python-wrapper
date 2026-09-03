@@ -51,7 +51,7 @@ vm = VirtualMachine(
 
 with vm:
     vm.start(wait=True)
-    print(f"VM ready: {vm.ready}")       # True
+    print(f"VM ready: {vm.ready}")  # True
     print(f"Status: {vm.printable_status}")  # "Running"
     vm.stop(wait=True)
 # VM is automatically cleaned up when the context manager exits
@@ -156,8 +156,8 @@ vm.ready  # True
 vm.printable_status  # "Running", "Stopped", "Starting", "Migrating", etc.
 
 # Wait for ready status
-vm.wait_for_ready_status(status=True, timeout=300)   # Wait for running
-vm.wait_for_ready_status(status=None, timeout=300)    # Wait for stopped
+vm.wait_for_ready_status(status=True, timeout=300)  # Wait for running
+vm.wait_for_ready_status(status=None, timeout=300)  # Wait for stopped
 
 # Wait for a specific status field to clear
 vm.wait_for_status_none(status="snapshotInProgress")
@@ -168,24 +168,24 @@ vm.wait_for_status_none(status="snapshotInProgress")
 Use built-in constants for the `runStrategy` field:
 
 ```python
-VirtualMachine.RunStrategy.ALWAYS            # "Always"
-VirtualMachine.RunStrategy.HALTED            # "Halted"
-VirtualMachine.RunStrategy.MANUAL            # "Manual"
-VirtualMachine.RunStrategy.RERUNONFAILURE    # "RerunOnFailure"
+VirtualMachine.RunStrategy.ALWAYS  # "Always"
+VirtualMachine.RunStrategy.HALTED  # "Halted"
+VirtualMachine.RunStrategy.MANUAL  # "Manual"
+VirtualMachine.RunStrategy.RERUNONFAILURE  # "RerunOnFailure"
 ```
 
 ### Status Constants
 
 ```python
-VirtualMachine.Status.STARTING       # "Starting"
-VirtualMachine.Status.RUNNING        # "Running"  (inherited)
-VirtualMachine.Status.STOPPED        # "Stopped"
-VirtualMachine.Status.STOPPING       # "Stopping"
-VirtualMachine.Status.MIGRATING      # "Migrating"
-VirtualMachine.Status.PAUSED         # "Paused"
-VirtualMachine.Status.PROVISIONING   # "Provisioning"
+VirtualMachine.Status.STARTING  # "Starting"
+VirtualMachine.Status.RUNNING  # "Running"  (inherited)
+VirtualMachine.Status.STOPPED  # "Stopped"
+VirtualMachine.Status.STOPPING  # "Stopping"
+VirtualMachine.Status.MIGRATING  # "Migrating"
+VirtualMachine.Status.PAUSED  # "Paused"
+VirtualMachine.Status.PROVISIONING  # "Provisioning"
 VirtualMachine.Status.ERROR_UNSCHEDULABLE  # "ErrorUnschedulable"
-VirtualMachine.Status.DATAVOLUME_ERROR     # "DataVolumeError"
+VirtualMachine.Status.DATAVOLUME_ERROR  # "DataVolumeError"
 ```
 
 ## Working with VirtualMachineInstances
@@ -210,9 +210,7 @@ vmi = VirtualMachineInstance(
         "devices": {"disks": [{"disk": {"bus": "virtio"}, "name": "rootdisk"}]},
         "resources": {"requests": {"memory": "1Gi"}},
     },
-    volumes=[
-        {"name": "rootdisk", "containerDisk": {"image": "quay.io/containerdisks/fedora"}}
-    ],
+    volumes=[{"name": "rootdisk", "containerDisk": {"image": "quay.io/containerdisks/fedora"}}],
 )
 vmi.deploy()
 ```
@@ -259,7 +257,7 @@ vmi.wait_until_running(timeout=300, stop_status="Failed")
 ### Pausing and Unpausing
 
 ```python
-vmi.pause(wait=True)    # Pause the VMI
+vmi.pause(wait=True)  # Pause the VMI
 vmi.unpause(wait=True)  # Resume the VMI
 ```
 
@@ -291,10 +289,10 @@ ip = vmi.interface_ip("eth0")
 When the QEMU guest agent is installed in the VM:
 
 ```python
-vmi.guest_os_info       # OS information
-vmi.guest_fs_info       # Filesystem information
-vmi.guest_user_info     # Logged-in user information
-vmi.os_version          # OS version string
+vmi.guest_os_info  # OS information
+vmi.guest_fs_info  # Filesystem information
+vmi.guest_user_info  # Logged-in user information
+vmi.os_version  # OS version string
 ```
 
 > **Note:** If no guest agent is installed, `os_version` returns an empty dict and logs a warning.
@@ -581,9 +579,7 @@ from ocp_resources.virtual_machine_storage_migration import VirtualMachineStorag
 plan = VirtualMachineStorageMigrationPlan(
     name="migrate-storage",
     namespace="my-namespace",
-    virtual_machines=[
-        {"name": "my-vm", "volumes": [{"name": "rootdisk", "target": {"storageClassName": "fast-ssd"}}]}
-    ],
+    virtual_machines=[{"name": "my-vm", "volumes": [{"name": "rootdisk", "target": {"storageClassName": "fast-ssd"}}]}],
     retention_policy="deleteSource",
 )
 plan.deploy()
@@ -617,9 +613,7 @@ template = VirtualMachineTemplate(
             }
         }
     },
-    parameters=[
-        {"name": "VM_NAME", "description": "Name of the VM", "required": True}
-    ],
+    parameters=[{"name": "VM_NAME", "description": "Name of the VM", "required": True}],
     message="Use this template to create Fedora VMs.",
 )
 template.deploy()

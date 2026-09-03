@@ -76,9 +76,7 @@ deployment_dict = {
         "template": {
             "metadata": {"labels": {"app": "nginx"}},
             "spec": {
-                "containers": [
-                    {"name": "nginx", "image": "nginx:1.21", "ports": [{"containerPort": 80}]}
-                ],
+                "containers": [{"name": "nginx", "image": "nginx:1.21", "ports": [{"containerPort": 80}]}],
             },
         },
     },
@@ -171,8 +169,8 @@ Some resource kinds (like `DNS`) exist in multiple API groups. The validator use
 ```python
 # These two resources share the kind "DNS" but use different API groups.
 # Each is validated against its own schema.
-dns_config.validate()       # Uses config.openshift.io schema
-dns_operator.validate()     # Uses operator.openshift.io schema
+dns_config.validate()  # Uses config.openshift.io schema
+dns_operator.validate()  # Uses operator.openshift.io schema
 ```
 
 See [Common Resource Patterns](common-patterns.html) for more on working with resources that share a kind name.
@@ -189,11 +187,7 @@ from ocp_resources.exceptions import ValidationError
 
 for resource_cls in [Pod, Deployment, Service]:
     try:
-        resource_cls.validate_dict({
-            "apiVersion": "v1",
-            "kind": resource_cls.kind,
-            "metadata": {"name": "warmup"}
-        })
+        resource_cls.validate_dict({"apiVersion": "v1", "kind": resource_cls.kind, "metadata": {"name": "warmup"}})
     except ValidationError:
         pass  # Expected — we just want to load the schemas
 ```
