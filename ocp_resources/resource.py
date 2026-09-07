@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import contextlib
 import copy
 import json
 import os
 import re
 import sys
+from collections.abc import Callable
 from io import StringIO
 from signal import SIGINT, signal
+from typing import Any
 
 import kubernetes
 import yaml
@@ -13,28 +17,31 @@ from benedict import benedict
 from kubernetes.dynamic import DynamicClient
 from kubernetes.dynamic.exceptions import (
     ConflictError,
+    ForbiddenError,
     MethodNotAllowedError,
     NotFoundError,
-    ForbiddenError,
 )
 from kubernetes.dynamic.resource import ResourceField
 from packaging.version import Version
 from simple_logger.logger import get_logger
+from timeout_sampler import (
+    TimeoutExpiredError,
+    TimeoutSampler,
+    TimeoutWatch,
+)
 
 from ocp_resources.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
     PROTOCOL_ERROR_EXCEPTION_DICT,
     TIMEOUT_1MINUTE,
+    TIMEOUT_1SEC,
     TIMEOUT_4MINUTES,
+    TIMEOUT_5SEC,
     TIMEOUT_10SEC,
+    TIMEOUT_30SEC,
 )
 from ocp_resources.event import Event
-from timeout_sampler import (
-    TimeoutExpiredError,
-    TimeoutSampler,
-    TimeoutWatch,
-)
 from ocp_resources.utils import skip_existing_resource_creation_teardown
 
 LOGGER = get_logger(name=__name__)
@@ -124,7 +131,7 @@ class KubeAPIVersion(Version):
             with contextlib.suppress(ValueError):
                 components[idx] = int(obj)
 
-        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning" " guidelines"
+        errmsg = f"version '{vstring}' does not conform to kubernetes api versioning guidelines"
 
         if len(components) not in (2, 4) or components[0] != "v" or not isinstance(components[1], int):
             raise ValueError(errmsg)
@@ -352,9 +359,7 @@ class Resource:
         """
         self.api_group = api_group or self.api_group
         if not self.api_group and not self.api_version:
-            raise NotImplementedError(
-                "Subclasses of Resource require self.api_group or self.api_version to" " be defined"
-            )
+            raise NotImplementedError("Subclasses of Resource require self.api_group or self.api_version to be defined")
         self.namespace = None
         self.name = name
         self.client = client
@@ -767,11 +772,17 @@ class Resource:
         self.api.replace(body=resource_dict, name=self.name, namespace=self.namespace)
 
     @staticmethod
-    def retry_cluster_exceptions(func, exceptions_dict=DEFAULT_CLUSTER_RETRY_EXCEPTIONS, **kwargs):
+    def retry_cluster_exceptions(
+        func: Callable,
+        exceptions_dict: dict[type[Exception], list[str]] = DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+        timeout: int = TIMEOUT_10SEC,
+        sleep_time: int = 1,
+        **kwargs: Any,
+    ) -> Any:
         try:
             sampler = TimeoutSampler(
-                wait_timeout=TIMEOUT_10SEC,
-                sleep=1,
+                wait_timeout=timeout,
+                sleep=sleep_time,
                 func=func,
                 print_log=False,
                 exceptions_dict=exceptions_dict,
@@ -902,26 +913,41 @@ class Resource:
                     if cond["type"] == condition and cond["status"] == status:
                         return
 
-    def api_request(self, method, action, url, **params):
-        """
-        Handle API requests to resource.
+    def api_request(
+        self, method: str, action: str, url: str, retry_params: dict[str, int] | None = None, **params: Any
+    ) -> dict[str, Any]:
+        """Handle API requests to resource.
 
         Args:
-            method (str): Request method (GET/PUT etc.).
-            action (str): Action to perform (stop/start/guestosinfo etc.).
-            url (str): URL of resource.
+            method: HTTP method (e.g. ``GET``, ``PUT``).
+            action: Subresource action to perform (e.g. ``start``, ``stop``, ``guestosinfo``).
+            url: Base URL of the resource.
+            retry_params: Optional timeout and sleep_time values for retrying the API request call.
+            **params: Additional keyword arguments forwarded to the underlying HTTP request.
 
         Returns:
-           data(dict): response data
-
+            Parsed JSON response data, or raw response data when JSON decoding fails.
         """
         client = self.privileged_client or self.client
-        response = client.client.request(
-            method=method,
-            url=f"{url}/{action}",
-            headers=self.client.configuration.api_key,
-            **params,
-        )
+
+        api_request_params = {
+            "url": f"{url}/{action}",
+            "method": method,
+            "headers": self.client.configuration.api_key,
+        }
+        if retry_params:
+            response = self.retry_cluster_exceptions(
+                func=client.client.request,
+                timeout=retry_params.get("timeout", TIMEOUT_10SEC),
+                sleep_time=retry_params.get("sleep_time", TIMEOUT_1SEC),
+                **api_request_params,
+                **params,
+            )
+        else:
+            response = client.client.request(
+                **api_request_params,
+                **params,
+            )
 
         try:
             return json.loads(response.data)
@@ -931,7 +957,7 @@ class Resource:
     def wait_for_conditions(self):
         timeout_watcher = TimeoutWatch(timeout=30)
         for sample in TimeoutSampler(
-            wait_timeout=30,
+            wait_timeout=TIMEOUT_30SEC,
             sleep=1,
             func=lambda: self.exists,
         ):
@@ -1377,4 +1403,6 @@ class ResourceEditor:
             patches=patches,
             action_text=action_text,
             action=action,
+            timeout=TIMEOUT_30SEC,
+            sleep_time=TIMEOUT_5SEC,
         )
