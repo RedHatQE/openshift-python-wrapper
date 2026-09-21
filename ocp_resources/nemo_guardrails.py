@@ -60,13 +60,10 @@ class NemoGuardrails(NamespacedResource):
             if self.nemo_configs is None:
                 raise MissingRequiredArgumentError(argument="self.nemo_configs")
 
-
             self.res["spec"] = {}
             _spec = self.res["spec"]
 
-
             _spec["nemoConfigs"] = self.nemo_configs
-
 
             if self.ca_bundle_config is not None:
                 _spec["caBundleConfig"] = self.ca_bundle_config
