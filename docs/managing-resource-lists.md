@@ -186,7 +186,7 @@ namespaces = ResourceList(resource_class=Namespace, num_resources=2, client=clie
 namespaces.deploy(wait=True)
 
 # Later...
-namespaces.clean_up(wait=True)   # wait=True is the default
+namespaces.clean_up(wait=True)  # wait=True is the default
 namespaces.clean_up(wait=False)  # Skip waiting for deletion
 ```
 

@@ -143,10 +143,10 @@ from ocp_resources.exceptions import ExecOnPodError
 try:
     pod.execute(command=["ls", "/nonexistent"])
 except ExecOnPodError as e:
-    print(f"Command: {e.cmd}")      # ['ls', '/nonexistent']
-    print(f"Return code: {e.rc}")   # Non-zero exit code (or -1 for stream errors)
-    print(f"Stdout: {e.out}")       # Standard output captured before failure
-    print(f"Stderr: {e.err}")       # Standard error or error channel details
+    print(f"Command: {e.cmd}")  # ['ls', '/nonexistent']
+    print(f"Return code: {e.rc}")  # Non-zero exit code (or -1 for stream errors)
+    print(f"Stdout: {e.out}")  # Standard output captured before failure
+    print(f"Stderr: {e.err}")  # Standard error or error channel details
 ```
 
 `ExecOnPodError` attributes:
@@ -318,11 +318,13 @@ with Pod(
     client=client,
     name="debug-pod",
     namespace="default",
-    containers=[{
-        "name": "debug",
-        "image": "registry.access.redhat.com/ubi9/ubi:latest",
-        "command": ["sleep", "3600"],
-    }],
+    containers=[
+        {
+            "name": "debug",
+            "image": "registry.access.redhat.com/ubi9/ubi:latest",
+            "command": ["sleep", "3600"],
+        }
+    ],
 ) as pod:
     pod.wait_for_status(status=Pod.Status.RUNNING, timeout=120)
     output = pod.execute(command=["cat", "/etc/os-release"])

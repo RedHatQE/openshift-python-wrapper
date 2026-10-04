@@ -35,16 +35,8 @@ api = fake_client.resources.get(api_version="v1", kind="Pod")
 pod = {
     "apiVersion": "v1",
     "kind": "Pod",
-    "metadata": {
-        "name": "test-pod",
-        "namespace": "default"
-    },
-    "spec": {
-        "containers": [{
-            "name": "nginx",
-            "image": "nginx:latest"
-        }]
-    }
+    "metadata": {"name": "test-pod", "namespace": "default"},
+    "spec": {"containers": [{"name": "nginx", "image": "nginx:latest"}]},
 }
 
 created_pod = api.create(body=pod, namespace="default")
@@ -70,11 +62,7 @@ pods = api.get(namespace="default", label_selector="app=nginx")
 # Update a pod
 pod = api.get(name="test-pod", namespace="default")
 pod.metadata.labels = {"app": "nginx"}
-updated = api.patch(
-    name="test-pod",
-    namespace="default",
-    body=pod
-)
+updated = api.patch(name="test-pod", namespace="default", body=pod)
 ```
 
 ### Deleting Resources
@@ -114,14 +102,9 @@ pod = {
         "namespace": "default",
         "annotations": {
             "fake-client.io/ready": "false"  # This makes the pod not ready
-        }
+        },
     },
-    "spec": {
-        "containers": [{
-            "name": "nginx",
-            "image": "nginx:latest"
-        }]
-    }
+    "spec": {"containers": [{"name": "nginx", "image": "nginx:latest"}]},
 }
 
 created_pod = api.create(body=pod, namespace="default")
@@ -136,24 +119,16 @@ Alternatively, you can use `readyStatus` in the spec:
 deployment = {
     "apiVersion": "apps/v1",
     "kind": "Deployment",
-    "metadata": {
-        "name": "not-ready-deployment",
-        "namespace": "default"
-    },
+    "metadata": {"name": "not-ready-deployment", "namespace": "default"},
     "spec": {
         "readyStatus": False,  # This makes the deployment not ready
         "replicas": 3,
         "selector": {"matchLabels": {"app": "nginx"}},
         "template": {
             "metadata": {"labels": {"app": "nginx"}},
-            "spec": {
-                "containers": [{
-                    "name": "nginx",
-                    "image": "nginx:latest"
-                }]
-            }
-        }
-    }
+            "spec": {"containers": [{"name": "nginx", "image": "nginx:latest"}]},
+        },
+    },
 }
 
 created = api.create(body=deployment, namespace="default")
@@ -178,17 +153,14 @@ The fake client automatically supports any Custom Resource:
 
 ```python
 # Access a custom resource
-crd_api = fake_client.resources.get(
-    api_version="example.com/v1",
-    kind="MyCustomResource"
-)
+crd_api = fake_client.resources.get(api_version="example.com/v1", kind="MyCustomResource")
 
 # Create custom resource
 custom_resource = {
     "apiVersion": "example.com/v1",
     "kind": "MyCustomResource",
     "metadata": {"name": "my-resource"},
-    "spec": {"foo": "bar"}
+    "spec": {"foo": "bar"},
 }
 
 created = crd_api.create(body=custom_resource)
@@ -225,10 +197,7 @@ The client includes OpenShift-specific resources:
 
 ```python
 # Work with OpenShift routes
-route_api = fake_client.resources.get(
-    api_version="route.openshift.io/v1",
-    kind="Route"
-)
+route_api = fake_client.resources.get(api_version="route.openshift.io/v1", kind="Route")
 
 # Create a route
 route = route_api.create(body=route_manifest, namespace="default")
@@ -248,9 +217,11 @@ route = route_api.create(body=route_manifest, namespace="default")
 import pytest
 from ocp_resources.resource import get_client
 
+
 @pytest.fixture
 def k8s_client():
     return get_client(fake=True)
+
 
 def test_pod_creation(k8s_client):
     api = k8s_client.resources.get(api_version="v1", kind="Pod")
@@ -259,12 +230,7 @@ def test_pod_creation(k8s_client):
         "apiVersion": "v1",
         "kind": "Pod",
         "metadata": {"name": "test-pod", "namespace": "default"},
-        "spec": {
-            "containers": [{
-                "name": "nginx",
-                "image": "nginx:latest"
-            }]
-        }
+        "spec": {"containers": [{"name": "nginx", "image": "nginx:latest"}]},
     }
 
     created = api.create(body=pod, namespace="default")

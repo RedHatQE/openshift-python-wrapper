@@ -289,8 +289,7 @@ Validation error: Field is required
 from ocp_resources.pod import Pod
 from ocp_resources.exceptions import ValidationError
 
-pod = Pod(client=client, name="my-pod", namespace="default",
-          containers=[{"name": "nginx", "image": "nginx:latest"}])
+pod = Pod(client=client, name="my-pod", namespace="default", containers=[{"name": "nginx", "image": "nginx:latest"}])
 
 try:
     pod.validate()
@@ -589,9 +588,13 @@ from ocp_resources.exceptions import (
 )
 
 try:
-    with Pod(client=client, name="worker", namespace="default",
-             containers=[{"name": "app", "image": "myapp:latest"}],
-             schema_validation_enabled=True) as pod:
+    with Pod(
+        client=client,
+        name="worker",
+        namespace="default",
+        containers=[{"name": "app", "image": "myapp:latest"}],
+        schema_validation_enabled=True,
+    ) as pod:
         pod.execute(command=["python", "run_task.py"])
 except ValidationError as e:
     print(f"Invalid resource spec: {e}")

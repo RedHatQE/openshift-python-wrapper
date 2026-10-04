@@ -336,7 +336,7 @@ from ocp_resources.pod import Pod
 pod = Pod(client=client, name="my-pod", namespace="default")
 
 for event in pod.watcher(timeout=60):
-    print(f"Event type: {event['type']}")       # ADDED, MODIFIED, DELETED
+    print(f"Event type: {event['type']}")  # ADDED, MODIFIED, DELETED
     print(f"Object: {event['object'].metadata.name}")
     print(f"Raw: {event['raw_object']}")
 ```

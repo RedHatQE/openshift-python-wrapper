@@ -80,6 +80,7 @@ Example generated output for `ConfigMap`:
 from typing import Any
 from ocp_resources.resource import NamespacedResource
 
+
 class ConfigMap(NamespacedResource):
     """
     ConfigMap holds configuration data for pods to consume.
@@ -93,8 +94,7 @@ class ConfigMap(NamespacedResource):
         data: dict[str, Any] | None = None,
         immutable: bool | None = None,
         **kwargs: Any,
-    ) -> None:
-        ...
+    ) -> None: ...
 ```
 
 ### 4. Generate multiple kinds at once
@@ -145,11 +145,12 @@ Both files define a class named `DNS` but with different `api_group` attributes.
 Any code you add **below** the `# End of generated code` marker is preserved when you regenerate the file with `--overwrite`. This is how built-in resources like `ConfigMap` include custom properties:
 
 ```python
-    # End of generated code
+# End of generated code
 
-    @property
-    def keys_to_hash(self):
-        return ["data", "binaryData"]
+
+@property
+def keys_to_hash(self):
+    return ["data", "binaryData"]
 ```
 
 Custom imports you add at the top of the file are also preserved during regeneration.

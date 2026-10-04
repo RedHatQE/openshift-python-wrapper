@@ -110,6 +110,7 @@ class Namespace(Resource):
     # Core resource — fixed version, no group
     api_version: str = Resource.ApiVersion.V1
 
+
 class ClusterRole(Resource):
     # Grouped resource — version discovered from cluster
     api_group = Resource.ApiGroup.RBAC_AUTHORIZATION_K8S_IO
@@ -134,8 +135,7 @@ The differences from `Resource` are focused but important:
 from ocp_resources.pod import Pod
 
 # Namespace is required for namespaced resources
-pod = Pod(client=client, name="my-pod", namespace="default",
-          containers=[{"name": "app", "image": "nginx"}])
+pod = Pod(client=client, name="my-pod", namespace="default", containers=[{"name": "app", "image": "nginx"}])
 ```
 
 ### Concrete Resource Classes: Where Specifics Live
@@ -254,6 +254,7 @@ A minimal hand-written resource class looks like this:
 
 ```python
 from ocp_resources.resource import NamespacedResource
+
 
 class MyCustomResource(NamespacedResource):
     api_group = "example.com"

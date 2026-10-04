@@ -27,6 +27,7 @@ Copy-paste recipes for the most common Kubernetes and OpenShift resource operati
 ```python
 # Preamble used by all recipes below
 from ocp_resources.resource import get_client
+
 client = get_client()
 ```
 
@@ -43,11 +44,13 @@ pod = Pod(
     client=client,
     name="my-nginx",
     namespace="default",
-    containers=[{
-        "name": "nginx",
-        "image": "nginx:1.25",
-        "ports": [{"containerPort": 80}],
-    }],
+    containers=[
+        {
+            "name": "nginx",
+            "image": "nginx:1.25",
+            "ports": [{"containerPort": 80}],
+        }
+    ],
     restart_policy="Never",
 )
 pod.deploy()
@@ -69,11 +72,13 @@ with Pod(
     client=client,
     name="test-curl",
     namespace="default",
-    containers=[{
-        "name": "curl",
-        "image": "curlimages/curl:8.5.0",
-        "command": ["sleep", "3600"],
-    }],
+    containers=[
+        {
+            "name": "curl",
+            "image": "curlimages/curl:8.5.0",
+            "command": ["sleep", "3600"],
+        }
+    ],
 ) as pod:
     pod.wait_for_status(status=Pod.Status.RUNNING, timeout=60)
     output = pod.execute(command=["curl", "-s", "http://httpbin.org/get"])
@@ -142,11 +147,13 @@ dep = Deployment(
     template={
         "metadata": {"labels": {"app": "web-app"}},
         "spec": {
-            "containers": [{
-                "name": "app",
-                "image": "nginx:1.25",
-                "ports": [{"containerPort": 80}],
-            }]
+            "containers": [
+                {
+                    "name": "app",
+                    "image": "nginx:1.25",
+                    "ports": [{"containerPort": 80}],
+                }
+            ]
         },
     },
 )
@@ -192,11 +199,13 @@ svc = Service(
     name="web-app-svc",
     namespace="default",
     selector={"app": "web-app"},
-    ports=[{
-        "protocol": "TCP",
-        "port": 80,
-        "targetPort": 80,
-    }],
+    ports=[
+        {
+            "protocol": "TCP",
+            "port": 80,
+            "targetPort": 80,
+        }
+    ],
     type="ClusterIP",
 )
 svc.deploy()
@@ -310,11 +319,13 @@ job = Job(
     namespace="default",
     backoff_limit=3,
     restart_policy="Never",
-    containers=[{
-        "name": "migrate",
-        "image": "my-app:latest",
-        "command": ["python", "manage.py", "migrate"],
-    }],
+    containers=[
+        {
+            "name": "migrate",
+            "image": "my-app:latest",
+            "command": ["python", "manage.py", "migrate"],
+        }
+    ],
 )
 job.deploy()
 job.wait_for_condition(
@@ -363,7 +374,11 @@ dv = DataVolume(
     client=client,
     name="fedora-disk",
     namespace="default",
-    source_dict={"http": {"url": "https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-40-1.14.x86_64.qcow2"}},
+    source_dict={
+        "http": {
+            "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-40-1.14.x86_64.qcow2"
+        }
+    },
     size="30Gi",
     storage_class="ocs-storagecluster-ceph-rbd-virtualization",
     access_modes=DataVolume.AccessMode.RWX,
@@ -408,12 +423,14 @@ netpol = NetworkPolicy(
     namespace="default",
     pod_selector={"matchLabels": {"app": "web-app"}},
     policy_types=["Ingress"],
-    ingress=[{
-        "ports": [{"protocol": "TCP", "port": 80}],
-        "from": [
-            {"namespaceSelector": {"matchLabels": {"env": "production"}}},
-        ],
-    }],
+    ingress=[
+        {
+            "ports": [{"protocol": "TCP", "port": 80}],
+            "from": [
+                {"namespaceSelector": {"matchLabels": {"env": "production"}}},
+            ],
+        }
+    ],
 )
 netpol.deploy()
 ```
@@ -468,11 +485,13 @@ role = Role(
     client=client,
     name="pod-reader",
     namespace="default",
-    rules=[{
-        "apiGroups": [""],
-        "resources": ["pods", "pods/log"],
-        "verbs": ["get", "list", "watch"],
-    }],
+    rules=[
+        {
+            "apiGroups": [""],
+            "resources": ["pods", "pods/log"],
+            "verbs": ["get", "list", "watch"],
+        }
+    ],
 )
 role.deploy()
 
@@ -504,11 +523,13 @@ from ocp_resources.cluster_role_binding import ClusterRoleBinding
 cr = ClusterRole(
     client=client,
     name="node-viewer",
-    rules=[{
-        "apiGroups": [""],
-        "resources": ["nodes"],
-        "verbs": ["get", "list", "watch"],
-    }],
+    rules=[
+        {
+            "apiGroups": [""],
+            "resources": ["nodes"],
+            "verbs": ["get", "list", "watch"],
+        }
+    ],
 )
 cr.deploy()
 
@@ -516,11 +537,13 @@ crb = ClusterRoleBinding(
     client=client,
     name="app-sa-node-viewer",
     cluster_role="node-viewer",
-    subjects=[{
-        "kind": "ServiceAccount",
-        "name": "app-sa",
-        "namespace": "default",
-    }],
+    subjects=[
+        {
+            "kind": "ServiceAccount",
+            "name": "app-sa",
+            "namespace": "default",
+        }
+    ],
 )
 crb.deploy()
 ```
@@ -600,10 +623,12 @@ dep = Deployment(
             "template": {
                 "metadata": {"labels": {"app": "from-dict"}},
                 "spec": {
-                    "containers": [{
-                        "name": "app",
-                        "image": "nginx:1.25",
-                    }],
+                    "containers": [
+                        {
+                            "name": "app",
+                            "image": "nginx:1.25",
+                        }
+                    ],
                 },
             },
         },
@@ -647,16 +672,20 @@ from ocp_resources.ingress_networking_k8s_io import Ingress as K8sIngress
 k8s_ingress = K8sIngress(
     client=client,
     name="my-app-ingress",
-    rules=[{
-        "host": "app.example.com",
-        "http": {
-            "paths": [{
-                "path": "/",
-                "pathType": "Prefix",
-                "backend": {"service": {"name": "web-app-svc", "port": {"number": 80}}},
-            }],
-        },
-    }],
+    rules=[
+        {
+            "host": "app.example.com",
+            "http": {
+                "paths": [
+                    {
+                        "path": "/",
+                        "pathType": "Prefix",
+                        "backend": {"service": {"name": "web-app-svc", "port": {"number": 80}}},
+                    }
+                ],
+            },
+        }
+    ],
 )
 ```
 
@@ -770,10 +799,12 @@ pod = Pod(
     client=client,
     name="validated-pod",
     namespace="default",
-    containers=[{
-        "name": "app",
-        "image": "nginx:1.25",
-    }],
+    containers=[
+        {
+            "name": "app",
+            "image": "nginx:1.25",
+        }
+    ],
     schema_validation_enabled=True,  # Auto-validate on create()
 )
 
