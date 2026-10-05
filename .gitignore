@@ -143,3 +143,6 @@ package-lock.json
 
 # Large schema files (we keep the compressed versions)
 class_generator/schema/__resources-mappings.json
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
