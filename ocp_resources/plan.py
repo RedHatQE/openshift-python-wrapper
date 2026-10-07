@@ -36,6 +36,9 @@ class Plan(NamespacedResource):
         preserve_static_ips (bool, optional): Whether to preserve static IPs during migration.
         target_node_selector (dict, optional): Node selector for the target VM. Specifies which node labels
                                              should be used for NodeSelector parameter of VMI resource.
+        convertor_node_selector (dict[str, str], optional): Node selector for virt-v2v conversion pods.
+                                                             For vSphere warm migrations using VDDK, this
+                                                             selector is also applied to CDI importer pods.
         target_labels (dict, optional): Labels to be applied to the target VM. Specifies which labels
                                       should be added to the target VM resource.
         target_affinity (dict, optional): Affinity rules for the target VM. Specifies which affinity
@@ -89,6 +92,7 @@ class Plan(NamespacedResource):
         run_preflight_inspection: bool | None = None,
         rdm_as_lun: bool | None = None,
         scsi_reservation: bool | None = None,
+        convertor_node_selector: dict[str, str] | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -120,6 +124,7 @@ class Plan(NamespacedResource):
         self.migrate_shared_disks = migrate_shared_disks
         self.preserve_static_ips = preserve_static_ips
         self.target_node_selector = target_node_selector
+        self.convertor_node_selector = convertor_node_selector
         self.target_labels = target_labels
         self.target_affinity = target_affinity
         self.enable_nested_virtualization = enable_nested_virtualization
@@ -218,6 +223,9 @@ class Plan(NamespacedResource):
 
             if self.target_node_selector is not None:
                 spec["targetNodeSelector"] = self.target_node_selector
+
+            if self.convertor_node_selector is not None:
+                spec["convertorNodeSelector"] = self.convertor_node_selector
 
             if self.target_labels is not None:
                 spec["targetLabels"] = self.target_labels
