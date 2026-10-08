@@ -236,7 +236,7 @@ class NodeNetworkConfigurationPolicy(Resource):
         if not self.nodes:
             return None
 
-        nns = NodeNetworkState(name=self.nodes[0].name)
+        nns = NodeNetworkState(name=self.nodes[0].name, client=self.client)
         _port = [_iface for _iface in nns.interfaces if _iface["name"] == port_name]
         return _port[0] if _port else None
 
