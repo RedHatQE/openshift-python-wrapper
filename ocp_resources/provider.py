@@ -19,6 +19,7 @@ class Provider(NamespacedResource):
         vddk_init_image: str | None = None,
         sdk_endpoint: str | None = None,
         management_type: str | None = None,
+        smb_max_channels: str | None = None,
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
@@ -29,6 +30,7 @@ class Provider(NamespacedResource):
         self.vddk_init_image = vddk_init_image
         self.sdk_endpoint = sdk_endpoint
         self.management_type = management_type
+        self.smb_max_channels = smb_max_channels
 
     def to_dict(self) -> None:
         super().to_dict()
@@ -40,6 +42,8 @@ class Provider(NamespacedResource):
                 settings["sdkEndpoint"] = self.sdk_endpoint
             if self.management_type:
                 settings["managementType"] = self.management_type
+            if self.smb_max_channels is not None:
+                settings["smbMaxChannels"] = self.smb_max_channels
 
             self.res.update({
                 "spec": {
