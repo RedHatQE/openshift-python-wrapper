@@ -3,10 +3,12 @@
 import ast
 import contextlib
 import difflib
+import os
 import re
 import threading
 import uuid
 from pathlib import Path
+from typing import Any
 
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
@@ -25,14 +27,31 @@ _PREK_LOCK = threading.RLock()
 
 
 def _run_prek(command: list[str], locked: bool = True) -> tuple[bool, str, str]:
-    """Run a prek command, by default under the process-wide prek lock."""
+    """
+    Run a prek command, by default under the process-wide prek lock.
+
+    Hooks share state on disk (mypy keeps a cache directory), so concurrent
+    invocations get their own cache directory even when they run lock-free.
+
+    Args:
+        command: prek command to run
+        locked: Hold the process-wide prek lock
+
+    Returns:
+        Tuple of (success, stdout, stderr)
+    """
     lock_context = _PREK_LOCK if locked else contextlib.nullcontext()
+    run_kwargs: dict[str, Any] = {}
+    if not locked:
+        per_run_scratch = _PROJECT_ROOT / ".pi" / "tmp" / f"prek-{os.getpid()}-{threading.get_ident()}"
+        run_kwargs["env"] = {**os.environ, "MYPY_CACHE_DIR": str(per_run_scratch / "mypy")}
     with lock_context:
         rc, stdout, stderr = run_command(
             command=command,
             verify_stderr=False,
             check=False,
             log_errors=False,
+            **run_kwargs,
         )
     return rc, stdout, stderr
 
@@ -116,7 +135,9 @@ DRIFT_CATEGORY_DESCRIPTIONS = {
     "code delete": "generator output removes code lines the file has",
     "signature code add": "__init__ parameters added (all generated params have defaults - non-breaking)",
     "signature code remove": "__init__ parameters removed from the generated signature",
-    "breaking change": "a parameter was removed - callers passing it now get TypeError",
+    "breaking change": "existing callers break: a parameter was removed (TypeError), a parameter "
+    "became required (MissingRequiredArgumentError), a parameter is emitted under a different API key, "
+    "the base class changed, or api_group/api_version changed",
     "schema incomplete": "rendered class has no parameters while the file has some (unresolvable schema $ref)",
     "file does not exist": "expected generated file is missing",
     "formatting failed": "rendered output could not be formatted",
@@ -171,21 +192,43 @@ def _class_base(source: str) -> str | None:
 
 
 def _api_identity(source: str) -> tuple[str, str] | None:
-    """api_group / api_version the class targets."""
+    """
+    Read the API identity the resource class targets.
+
+    Generated classes assign either a literal or a base-class constant, for example
+    `api_group: str = Resource.ApiGroup.STORAGE_K8S_IO` and
+    `api_version: str = "v1"`, so both forms are compared.
+
+    Args:
+        source: Python source of the generated file
+
+    Returns:
+        Tuple of (api_group, api_version) as written in the source, or None when the
+        class declares neither.
+    """
     try:
         tree = ast.parse(source)
     except SyntaxError:
         return None
+
+    def identity_value(node: ast.expr | None) -> str:
+        if isinstance(node, ast.Constant):
+            return str(node.value)
+        if isinstance(node, ast.Attribute):
+            # e.g. Resource.ApiGroup.STORAGE_K8S_IO -> STORAGE_K8S_IO
+            return node.attr
+        return ""
+
     group = version = ""
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
             for stmt in node.body:
                 if not isinstance(stmt, ast.AnnAssign) or not isinstance(stmt.target, ast.Name):
                     continue
-                if stmt.target.id == "api_group" and isinstance(stmt.value, ast.Constant):
-                    group = str(stmt.value.value)
-                elif stmt.target.id == "api_version" and isinstance(stmt.value, ast.Constant):
-                    version = str(stmt.value.value)
+                if stmt.target.id == "api_group":
+                    group = identity_value(stmt.value)
+                elif stmt.target.id == "api_version":
+                    version = identity_value(stmt.value)
     return (group, version) if group or version else None
 
 

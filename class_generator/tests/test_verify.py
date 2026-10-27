@@ -385,7 +385,7 @@ class TestVerifyChangedCLI:
         monkeypatch.setattr(
             class_generator.cli,
             "_changed_generated_resources",
-            MagicMock(return_value=[]),
+            MagicMock(return_value=([], [])),
         )
         mock_generator = MagicMock(return_value=[])
         monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
@@ -400,7 +400,7 @@ class TestVerifyChangedCLI:
         monkeypatch.setattr(
             class_generator.cli,
             "_changed_generated_resources",
-            MagicMock(return_value=[("Pod", str(pod_file))]),
+            MagicMock(return_value=([("Pod", str(pod_file))], [])),
         )
         mock_generator = MagicMock(return_value=[])
         monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
@@ -420,7 +420,7 @@ class TestVerifyChangedCLI:
         monkeypatch.setattr(
             class_generator.cli,
             "_changed_generated_resources",
-            MagicMock(return_value=[("Pod", str(pod_file))]),
+            MagicMock(return_value=([("Pod", str(pod_file))], [])),
         )
         mock_generator = MagicMock(return_value=[(str(pod_file), ["code add"])])
         monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
@@ -431,7 +431,7 @@ class TestVerifyChangedCLI:
 
     def test_verify_changed_custom_base_forwarded(self, monkeypatch, tmp_path):
         pod_file = tmp_path / "pod.py"
-        mock_changed = MagicMock(return_value=[("Pod", str(pod_file))])
+        mock_changed = MagicMock(return_value=([("Pod", str(pod_file))], []))
         monkeypatch.setattr(class_generator.cli, "_changed_generated_resources", mock_changed)
         monkeypatch.setattr(class_generator.cli, "class_generator", MagicMock(return_value=[]))
 
@@ -440,11 +440,23 @@ class TestVerifyChangedCLI:
         assert result.exit_code == 0
         mock_changed.assert_called_once_with(base="origin/v4.21")
 
+    def _git_mock(self, name_status: str) -> MagicMock:
+        """run_command stub answering rev-parse / merge-base / diff --name-status."""
+
+        def fake(command: list[str], **_: Any) -> tuple[bool, str, str]:
+            if "--name-status" in command:
+                return True, name_status, ""
+            if "merge-base" in command:
+                return True, "abc123\n", ""
+            return True, "refs/remotes/origin/main\n", ""
+
+        return MagicMock(side_effect=fake)
+
     def test_changed_generated_resources_maps_git_diff(self, monkeypatch, tmp_path):
         monkeypatch.setattr(
             class_generator.cli,
             "run_command",
-            MagicMock(return_value=(True, "ocp_resources/pod.py\nocp_resources/resource.py\n", "")),
+            self._git_mock("M\tocp_resources/pod.py\nM\tocp_resources/resource.py\n"),
         )
         monkeypatch.setattr(
             class_generator.cli,
@@ -457,9 +469,23 @@ class TestVerifyChangedCLI:
             ),
         )
 
-        targets = class_generator.cli._changed_generated_resources(base="origin/main")
+        changed, deleted = class_generator.cli._changed_generated_resources(base="origin/main")
 
-        assert targets == [("Pod", "ocp_resources/pod.py")]
+        assert changed == [("Pod", "ocp_resources/pod.py")]
+        assert deleted == []
+
+    def test_changed_generated_resources_reports_deleted_files(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            class_generator.cli,
+            "run_command",
+            self._git_mock("D\tocp_resources/pod.py\n"),
+        )
+        monkeypatch.setattr(class_generator.cli, "discover_generated_resources", MagicMock(return_value=[]))
+
+        changed, deleted = class_generator.cli._changed_generated_resources(base="origin/main")
+
+        assert changed == []
+        assert deleted == ["ocp_resources/pod.py"]
 
     def test_changed_generated_resources_git_failure_exits(self, monkeypatch):
         monkeypatch.setattr(
@@ -778,3 +804,57 @@ class TestCallerVisibleBreakingChanges:
 
     def test_unchanged_resource_is_not_breaking(self):
         assert classify_drift(committed=self.BASE, rendered=self.BASE) == []
+
+
+class TestQodoFollowUps:
+    """Regressions for the review findings on the verification PR."""
+
+    def test_base_ref_ignores_branch_upstream(self, monkeypatch):
+        """After git push -u the upstream is the branch's own copy, not the merge target."""
+        calls: list[list[str]] = []
+
+        def fake(command: list[str], **_: Any) -> tuple[bool, str, str]:
+            calls.append(command)
+            if "refs/remotes/origin/HEAD" in " ".join(command):
+                return True, "origin/main\n", ""
+            return True, "origin/feat/x\n", ""
+
+        monkeypatch.setattr(class_generator.cli, "run_command", MagicMock(side_effect=fake))
+
+        assert class_generator.cli._resolve_base_ref() == "origin/main"
+        assert not any("@{upstream}" in str(call) for call in calls)
+
+    def test_deleted_file_is_reported_as_drift(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            class_generator.cli,
+            "_changed_generated_resources",
+            MagicMock(return_value=([], ["ocp_resources/pod.py"])),
+        )
+        monkeypatch.setattr(
+            class_generator.cli,
+            "read_resources_mapping_file",
+            MagicMock(
+                return_value={
+                    "pod": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}]
+                }
+            ),
+        )
+
+        result = CliRunner().invoke(cli=main, args=["--verify-changed"])
+
+        assert result.exit_code == 1
+        assert "ocp_resources/pod.py (file does not exist)" in result.output
+
+    def test_filter_applies_to_verify_changed(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            class_generator.cli,
+            "_changed_generated_resources",
+            MagicMock(return_value=([("Pod", "ocp_resources/pod.py"), ("Service", "ocp_resources/service.py")], [])),
+        )
+        mock_generator = MagicMock(return_value=[])
+        monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
+
+        result = CliRunner().invoke(cli=main, args=["--verify-changed", "--filter", "Pod*"])
+
+        assert result.exit_code == 0
+        assert [call[1]["kind"] for call in mock_generator.call_args_list] == ["Pod"]

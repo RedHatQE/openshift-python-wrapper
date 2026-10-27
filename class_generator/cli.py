@@ -17,7 +17,7 @@ from simple_logger.logger import get_logger
 from class_generator.constants import TESTS_MANIFESTS_DIR, VERIFY_TEMP_FILE_PREFIX
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
-from class_generator.core.generator import class_generator, generated_file_name
+from class_generator.core.generator import class_generator, generated_file_name, group_file_suffix
 from class_generator.core.schema import (
     ClusterVersionError,
     read_resources_mapping_file,
@@ -359,12 +359,32 @@ def _filter_deprecated(resources: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [resource for resource in resources if not resource.get("deprecated")]
 
 
+def _git(*args: str) -> tuple[bool, str, str]:
+    """
+    Run a git command without raising.
+
+    Args:
+        *args: Arguments passed to git
+
+    Returns:
+        Tuple of (success, stdout, stderr)
+    """
+    return run_command(
+        command=["git", *args],
+        verify_stderr=False,
+        check=False,
+        log_errors=False,
+    )
+
+
 def _resolve_base_ref() -> str:
     """
     Comparison ref for --verify-changed, resolved from the repository itself.
 
-    No branch is hardcoded, so the same command works in any CI and on any release
-    branch: the current branch's upstream wins, then the remote HEAD of the clone.
+    The clone's remote HEAD is the ref to compare against: it is the branch this
+    checkout merges into, on a default-branch clone and on a release-branch clone
+    alike. The branch's own upstream is NOT used - after `git push -u` the upstream
+    is the branch's remote copy, whose merge base with HEAD is HEAD itself.
 
     Returns:
         Git ref to compare against
@@ -372,26 +392,48 @@ def _resolve_base_ref() -> str:
     Raises:
         SystemExit: When no ref can be resolved (caller must pass --base)
     """
-    for candidate in ("@{upstream}", "refs/remotes/origin/HEAD"):
-        success, stdout, _ = run_command(
-            command=["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", candidate],
-            verify_stderr=False,
-            check=False,
-            log_errors=False,
-        )
-        if success and (ref := stdout.strip()):
-            LOGGER.debug(f"Using {ref} as the comparison base")
-            return ref
+    success, stdout, _ = _git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "refs/remotes/origin/HEAD")
+    if not (success and (ref := stdout.strip())):
+        # Detached or minimal checkout: ask git to work out the remote default branch
+        LOGGER.debug("origin/HEAD is not set, asking git to resolve it from the remote")
+        _git("remote", "set-head", "origin", "--auto")
+        success, stdout, _ = _git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "refs/remotes/origin/HEAD")
+        ref = stdout.strip() if success else ""
+
+    if ref:
+        LOGGER.debug(f"Using {ref} as the comparison base")
+        return ref
 
     LOGGER.error(
-        "Could not determine the comparison ref: the current branch has no upstream and "
-        "the clone has no remote HEAD. Pass --base <ref> (for example the target branch "
-        "of this change)."
+        "Could not determine the comparison ref: the clone has no remote HEAD. "
+        "Pass --base <ref> (for example the target branch of this change)."
     )
     sys.exit(1)
 
 
-def _changed_generated_resources(base: str) -> list[tuple[str, str]]:
+def _kind_for_path(path: str, resources_mapping: dict[str, Any]) -> str | None:
+    """
+    Find the kind whose generated file has this path.
+
+    Args:
+        path: File path to look up
+        resources_mapping: Resources mapping (kind -> schema variants)
+
+    Returns:
+        Kind that generates this file, or None
+    """
+    file_name = Path(path).name
+    for kind_lower, schema_variants in resources_mapping.items():
+        names = {generated_file_name(kind=kind_lower)}
+        for schema_variant in schema_variants:
+            for gvk in schema_variant.get("x-kubernetes-group-version-kind", []):
+                names.add(generated_file_name(kind=kind_lower, file_suffix=group_file_suffix(gvk.get("group") or "")))
+        if file_name in names:
+            return kind_lower
+    return None
+
+
+def _changed_generated_resources(base: str) -> tuple[list[tuple[str, str]], list[str]]:
     """
     Get generated resources changed relative to a git base ref.
 
@@ -399,52 +441,77 @@ def _changed_generated_resources(base: str) -> list[tuple[str, str]]:
         base: Git ref to compare against; when empty it is resolved from the repository
 
     Returns:
-        List of (kind, path) tuples for changed generated resource files
+        Tuple of (changed (kind, path) pairs, deleted generated file paths)
     """
     base = base or _resolve_base_ref()
 
-    def git(*args: str) -> tuple[bool, str, str]:
-        return run_command(
-            command=["git", *args],
-            verify_stderr=False,
-            check=False,
-            log_errors=False,
-        )
-
-    # CI clones are often shallow and lack the base ref: try to fetch it before failing
-    ref_ok, _, _ = git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
+    # CI clones are often shallow and lack the base ref: try to fetch it first
+    ref_ok, _, _ = _git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
     if not ref_ok:
         base_branch = base.split("/", 1)[1] if "/" in base else base
         LOGGER.info(f"{base} is not available locally, fetching it from origin")
-        git("fetch", "--no-tags", "origin", base_branch)
-        ref_ok, _, _ = git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
+        _git("fetch", "--no-tags", "origin", base_branch)
+        ref_ok, _, _ = _git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
+        if not ref_ok:
+            # `--base main` in a clone that only has origin/main: use the fetched ref
+            remote_ref = f"origin/{base_branch}"
+            remote_ok, _, _ = _git("rev-parse", "--verify", "--quiet", f"{remote_ref}^{{commit}}")
+            if remote_ok:
+                LOGGER.info(f"Using fetched ref {remote_ref} instead of {base}")
+                base = remote_ref
+                ref_ok = True
     if not ref_ok:
         LOGGER.error(
-            f"Base ref '{base}' does not exist locally and could not be fetched. "
-            f"Fetch it (git fetch origin main) or pass --base <ref>."
+            f"Base ref '{base}' does not exist locally and could not be fetched. Fetch it or pass --base <ref>."
         )
         sys.exit(1)
 
-    # Compare against the merge base so only this branch's changes count, not whatever
-    # the target branch gained after branching
-    merge_base_ok, merge_base, _ = git("merge-base", base, "HEAD")
-    compare_ref = merge_base.strip() if merge_base_ok and merge_base.strip() else base
-    if compare_ref != base:
-        LOGGER.debug(f"Comparing against merge base {compare_ref} of {base}")
+    # Compare against the merge base so only this branch's changes count. When the
+    # common ancestor is missing (shallow clone) deepen the history instead of
+    # falling back to the target branch tip, which would verify unrelated changes.
+    merge_base_ok, merge_base, _ = _git("merge-base", base, "HEAD")
+    if not merge_base_ok or not merge_base.strip():
+        LOGGER.info(f"No merge base with {base} (shallow clone?), deepening the history")
+        _git("fetch", "--no-tags", "--deepen=1000", "origin")
+        merge_base_ok, merge_base, _ = _git("merge-base", base, "HEAD")
+    if not merge_base_ok or not merge_base.strip():
+        LOGGER.error(
+            f"Could not find the merge base of {base} and HEAD even after deepening the clone. "
+            f"Fetch more history (git fetch --unshallow) or pass --base <ref>."
+        )
+        sys.exit(1)
 
-    success, stdout, stderr = git("diff", "--name-only", compare_ref)
+    compare_ref = merge_base.strip()
+    LOGGER.debug(f"Comparing against merge base {compare_ref} of {base}")
+
+    # --name-status also reports deletions, which the working tree scan cannot see
+    success, stdout, stderr = _git("diff", "--name-status", compare_ref)
     if not success:
         LOGGER.error(f"Failed to get changed files against {compare_ref}: {stderr}")
         sys.exit(1)
 
-    changed_paths = {line.strip() for line in stdout.splitlines() if line.strip()}
+    changed_paths: set[str] = set()
+    deleted_paths: set[str] = set()
+    for line in stdout.splitlines():
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        status, path = parts[0], parts[-1].strip()
+        if status.startswith("D"):
+            deleted_paths.add(path)
+        else:
+            changed_paths.add(path)
+
     discovered = _filter_deprecated(discover_generated_resources())
     changed_resources = [resource for resource in discovered if resource["path"] in changed_paths]
 
     if changed_paths and not changed_resources:
         LOGGER.info("No generated resource files were changed")
 
-    return [(resource["kind"], resource["path"]) for resource in changed_resources]
+    deleted_generated = sorted(
+        path for path in deleted_paths if path.startswith("ocp_resources/") and path.endswith(".py")
+    )
+    return [(resource["kind"], resource["path"]) for resource in changed_resources], deleted_generated
 
 
 def handle_verify(
@@ -489,6 +556,9 @@ def handle_verify(
     # the final summary stays readable
     logging.getLogger("pyhelper_utils.shell").setLevel(logging.WARNING)
 
+    # Generated files deleted on this branch (only known for --verify-changed)
+    deleted_generated_paths: list[str] = []
+
     try:
         classification_filter: set[str] = set()
         if classification:
@@ -527,9 +597,19 @@ def handle_verify(
 
         elif verify_changed:
             base = base or _resolve_base_ref()
-            changed_targets = dict(_changed_generated_resources(base=base))
-            targets = sorted(changed_targets.items())
+            changed_resources, deleted_paths = _changed_generated_resources(base=base)
+            if filter_pattern:
+                changed_resources = [
+                    (changed_kind, changed_path)
+                    for changed_kind, changed_path in changed_resources
+                    if fnmatch.fnmatch(changed_kind, filter_pattern)
+                ]
+                LOGGER.info(f"Filtered to {len(changed_resources)} changed kind(s) matching '{filter_pattern}'")
+            targets = sorted(dict(changed_resources).items())
+            deleted_generated_paths = deleted_paths
             LOGGER.info(f"Verifying {len(targets)} changed generated kind(s) against {base}...")
+            if deleted_generated_paths:
+                LOGGER.info(f"Found {len(deleted_generated_paths)} deleted generated file(s)")
 
         else:
             # Only generated files can be verified: a hand-maintained resource has no
@@ -547,7 +627,7 @@ def handle_verify(
                 if not paths:
                     skipped_kinds.append(requested_kind)
                     continue
-                targets.extend((requested_kind, path) for path in paths)
+                targets.append((requested_kind, paths[0]))
 
             if skipped_kinds:
                 LOGGER.info(
@@ -626,6 +706,11 @@ def handle_verify(
                 # files with additional classifications are excluded
                 return set(categories) <= classification_filter
             return bool(classification_filter & set(categories))
+
+        # Deleted generated files cannot be verified and must be regenerated
+        for deleted_path in deleted_generated_paths:
+            deleted_kind = _kind_for_path(deleted_path, resources_mapping)
+            drift_results.append((deleted_kind or Path(deleted_path).stem, [(deleted_path, ["file does not exist"])]))
 
         drifted_files: list[tuple[str, list[str]]] = []
         drifted_entries: list[tuple[str, str, list[str]]] = []

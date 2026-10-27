@@ -583,7 +583,7 @@ class TestBackupWithKindOption:
         relative_path = custom_file.relative_to(Path.cwd())
         assert (backup_dirs[0] / relative_path).exists()
 
-    def test_discover_skips_filenames_generator_never_writes(self, tmp_path):
+    def test_discover_skips_filenames_generator_never_writes(self, tmp_path: Path) -> None:
         """Copies of generated files under foreign names are not generator output."""
         content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 

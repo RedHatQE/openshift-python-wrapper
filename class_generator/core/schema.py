@@ -1871,17 +1871,23 @@ def update_single_resource_schema(kind: str, client: str | None = None) -> None:
                 definitions = load_json_archive(DEFINITIONS_FILE).get("definitions", {})
             except (OSError, json.JSONDecodeError, EOFError) as e:
                 LOGGER.debug(f"Could not load existing definitions: {e}")
-            definitions.update(sub_schemas)
+            # Only add what is missing: this command is documented for use against an
+            # older cluster, where overwriting a newer stored definition would regress
+            # the schema. A full refresh is what --update-schema is for.
+            added_sub_schemas = {name: data for name, data in sub_schemas.items() if name not in definitions}
+            definitions.update(added_sub_schemas)
             try:
                 archive_path = save_json_archive({"definitions": definitions}, DEFINITIONS_FILE)
                 LOGGER.info(
-                    f"Written {len(sub_schemas)} sub-schema definition(s) to {archive_path} for {kind} $ref resolution"
+                    f"Added {len(added_sub_schemas)} sub-schema definition(s) to {archive_path} "
+                    f"for {kind} $ref resolution"
                 )
             except (OSError, TypeError) as e:
                 raise RuntimeError(f"Failed to write definitions file {DEFINITIONS_FILE}: {e}") from e
 
-        # Clear cached mapping data in SchemaValidator to force reload
-        SchemaValidator.clear_cache()
+        # Reload from disk: clear_cache() alone keeps the cached definitions, so the
+        # sub-schemas written above would stay invisible to $ref resolution
+        SchemaValidator.reload_from_disk()
         SchemaValidator.load_mappings_data()
     else:
         LOGGER.info(f"No schema updates needed for {kind} - schema is already up to date")

@@ -328,3 +328,15 @@ class SchemaValidator:
         loaded from files.
         """
         cls._schema_cache.clear()
+
+    @classmethod
+    def reload_from_disk(cls) -> None:
+        """Drop everything loaded from disk so the next access reads the files again.
+
+        Needed after a schema update writes new mappings or definitions: the cached
+        copies would otherwise hide the new entries, including sub-schemas required
+        to resolve `$ref`.
+        """
+        cls._schema_cache.clear()
+        cls._mappings_data = None
+        cls._definitions_data = None
