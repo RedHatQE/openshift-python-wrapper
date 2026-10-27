@@ -424,12 +424,20 @@ def _kind_for_path(path: str, resources_mapping: dict[str, Any]) -> str | None:
     """
     file_name = Path(path).name
     for kind_lower, schema_variants in resources_mapping.items():
-        names = {generated_file_name(kind=kind_lower)}
         for schema_variant in schema_variants:
-            for gvk in schema_variant.get("x-kubernetes-group-version-kind", []):
-                names.add(generated_file_name(kind=kind_lower, file_suffix=group_file_suffix(gvk.get("group") or "")))
-        if file_name in names:
-            return kind_lower
+            gvks = schema_variant.get("x-kubernetes-group-version-kind", [])
+            if not gvks:
+                continue
+            # The mapping key is lowercase, but filenames come from the real kind:
+            # imagestream -> image_stream.py
+            for gvk in gvks:
+                schema_kind = gvk.get("kind") or kind_lower
+                if file_name == generated_file_name(kind=schema_kind):
+                    return schema_kind
+                if file_name == generated_file_name(
+                    kind=schema_kind, file_suffix=group_file_suffix(gvk.get("group") or "")
+                ):
+                    return schema_kind
     return None
 
 
@@ -491,16 +499,22 @@ def _changed_generated_resources(base: str) -> tuple[list[tuple[str, str]], list
         sys.exit(1)
 
     changed_paths: set[str] = set()
-    deleted_paths: set[str] = set()
+    removed_paths: set[str] = set()
     for line in stdout.splitlines():
         parts = line.split("\t")
         if len(parts) < 2:
             continue
-        status, path = parts[0], parts[-1].strip()
-        if status.startswith("D"):
-            deleted_paths.add(path)
+        status = parts[0]
+        if status.startswith(("R", "C")):
+            # rename/copy: the old path disappears, the new one appears
+            if len(parts) < 3:
+                continue
+            removed_paths.add(parts[1].strip())
+            changed_paths.add(parts[2].strip())
+        elif status.startswith("D"):
+            removed_paths.add(parts[1].strip())
         else:
-            changed_paths.add(path)
+            changed_paths.add(parts[1].strip())
 
     discovered = _filter_deprecated(discover_generated_resources())
     changed_resources = [resource for resource in discovered if resource["path"] in changed_paths]
@@ -508,8 +522,13 @@ def _changed_generated_resources(base: str) -> tuple[list[tuple[str, str]], list
     if changed_paths and not changed_resources:
         LOGGER.info("No generated resource files were changed")
 
+    # A removed file only counts when the generator writes that name: deleting a
+    # hand-maintained resource is not drift
+    resources_mapping = read_resources_mapping_file()
     deleted_generated = sorted(
-        path for path in deleted_paths if path.startswith("ocp_resources/") and path.endswith(".py")
+        path
+        for path in removed_paths
+        if path.startswith("ocp_resources/") and path.endswith(".py") and _kind_for_path(path, resources_mapping)
     )
     return [(resource["kind"], resource["path"]) for resource in changed_resources], deleted_generated
 

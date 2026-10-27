@@ -858,3 +858,79 @@ class TestQodoFollowUps:
 
         assert result.exit_code == 0
         assert [call[1]["kind"] for call in mock_generator.call_args_list] == ["Pod"]
+
+
+class TestRenameAndDeletionHandling:
+    """Renames, hand-maintained deletions and kind resolution for removed files."""
+
+    def _git_mock(self, name_status: str) -> MagicMock:
+        def fake(command: list[str], **_: Any) -> tuple[bool, str, str]:
+            if "--name-status" in command:
+                return True, name_status, ""
+            if "merge-base" in command:
+                return True, "abc123\n", ""
+            return True, "refs/remotes/origin/main\n", ""
+
+        return MagicMock(side_effect=fake)
+
+    def test_rename_reports_old_path_as_removed(self, monkeypatch):
+        monkeypatch.setattr(
+            class_generator.cli,
+            "run_command",
+            self._git_mock("R100\tocp_resources/pod.py\tocp_resources/pod_renamed.py\n"),
+        )
+        monkeypatch.setattr(
+            class_generator.cli,
+            "read_resources_mapping_file",
+            MagicMock(
+                return_value={
+                    "pod": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}]
+                }
+            ),
+        )
+        monkeypatch.setattr(class_generator.cli, "discover_generated_resources", MagicMock(return_value=[]))
+
+        changed, deleted = class_generator.cli._changed_generated_resources(base="origin/main")
+
+        # the old path vanishes, the new one is not generator output
+        assert changed == []
+        assert deleted == ["ocp_resources/pod.py"]
+
+    def test_deleting_hand_maintained_file_is_not_drift(self, monkeypatch):
+        monkeypatch.setattr(
+            class_generator.cli,
+            "run_command",
+            self._git_mock("D\tocp_resources/node_network_configuration_policy.py\n"),
+        )
+        monkeypatch.setattr(
+            class_generator.cli,
+            "read_resources_mapping_file",
+            MagicMock(
+                return_value={
+                    "pod": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}]
+                }
+            ),
+        )
+        monkeypatch.setattr(class_generator.cli, "discover_generated_resources", MagicMock(return_value=[]))
+
+        changed, deleted = class_generator.cli._changed_generated_resources(base="origin/main")
+
+        assert changed == []
+        assert deleted == []
+
+    def test_kind_for_path_uses_real_kind_name(self):
+        resources_mapping = {
+            "imagestream": [
+                {
+                    "x-kubernetes-group-version-kind": [
+                        {"group": "image.openshift.io", "version": "v1", "kind": "ImageStream"}
+                    ]
+                }
+            ]
+        }
+
+        assert class_generator.cli._kind_for_path("ocp_resources/image_stream.py", resources_mapping) == "ImageStream"
+        assert (
+            class_generator.cli._kind_for_path("ocp_resources/image_stream_image_openshift_io.py", resources_mapping)
+            == "ImageStream"
+        )
