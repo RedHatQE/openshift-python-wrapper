@@ -81,9 +81,9 @@ class-generator --verify --kind <kind1>,<kind2>
 # Verify all generated resources (only files with the generated marker are checked)
 class-generator --verify-all
 
-# Verify only resources changed relative to a git ref (default origin/main) —
+# Verify only resources changed relative to the branch's base —
 # use this to verify that PR/branch changes were produced by class-generator
-class-generator --verify-changed [--base origin/main]
+class-generator --verify-changed [--base <ref>]
 
 # Narrow the scope with a glob filter
 class-generator --verify-all --filter 'Pod*'

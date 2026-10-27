@@ -359,27 +359,82 @@ def _filter_deprecated(resources: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [resource for resource in resources if not resource.get("deprecated")]
 
 
+def _resolve_base_ref() -> str:
+    """
+    Comparison ref for --verify-changed, resolved from the repository itself.
+
+    No branch is hardcoded, so the same command works in any CI and on any release
+    branch: the current branch's upstream wins, then the remote HEAD of the clone.
+
+    Returns:
+        Git ref to compare against
+
+    Raises:
+        SystemExit: When no ref can be resolved (caller must pass --base)
+    """
+    for candidate in ("@{upstream}", "refs/remotes/origin/HEAD"):
+        success, stdout, _ = run_command(
+            command=["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", candidate],
+            verify_stderr=False,
+            check=False,
+            log_errors=False,
+        )
+        if success and (ref := stdout.strip()):
+            LOGGER.debug(f"Using {ref} as the comparison base")
+            return ref
+
+    LOGGER.error(
+        "Could not determine the comparison ref: the current branch has no upstream and "
+        "the clone has no remote HEAD. Pass --base <ref> (for example the target branch "
+        "of this change)."
+    )
+    sys.exit(1)
+
+
 def _changed_generated_resources(base: str) -> list[tuple[str, str]]:
     """
     Get generated resources changed relative to a git base ref.
 
     Args:
-        base: Git ref to compare against (e.g. origin/main)
+        base: Git ref to compare against; when empty it is resolved from the repository
 
     Returns:
         List of (kind, path) tuples for changed generated resource files
     """
-    success, stdout, stderr = run_command(
-        command=["git", "diff", "--name-only", base],
-        verify_stderr=False,
-        check=False,
-        log_errors=False,
-    )
-    if not success:
-        LOGGER.error(
-            f"Failed to get changed files against {base}: {stderr}. "
-            f"Make sure the ref exists locally (git fetch origin main) or pass --base <ref>."
+    base = base or _resolve_base_ref()
+
+    def git(*args: str) -> tuple[bool, str, str]:
+        return run_command(
+            command=["git", *args],
+            verify_stderr=False,
+            check=False,
+            log_errors=False,
         )
+
+    # CI clones are often shallow and lack the base ref: try to fetch it before failing
+    ref_ok, _, _ = git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
+    if not ref_ok:
+        base_branch = base.split("/", 1)[1] if "/" in base else base
+        LOGGER.info(f"{base} is not available locally, fetching it from origin")
+        git("fetch", "--no-tags", "origin", base_branch)
+        ref_ok, _, _ = git("rev-parse", "--verify", "--quiet", f"{base}^{{commit}}")
+    if not ref_ok:
+        LOGGER.error(
+            f"Base ref '{base}' does not exist locally and could not be fetched. "
+            f"Fetch it (git fetch origin main) or pass --base <ref>."
+        )
+        sys.exit(1)
+
+    # Compare against the merge base so only this branch's changes count, not whatever
+    # the target branch gained after branching
+    merge_base_ok, merge_base, _ = git("merge-base", base, "HEAD")
+    compare_ref = merge_base.strip() if merge_base_ok and merge_base.strip() else base
+    if compare_ref != base:
+        LOGGER.debug(f"Comparing against merge base {compare_ref} of {base}")
+
+    success, stdout, stderr = git("diff", "--name-only", compare_ref)
+    if not success:
+        LOGGER.error(f"Failed to get changed files against {compare_ref}: {stderr}")
         sys.exit(1)
 
     changed_paths = {line.strip() for line in stdout.splitlines() if line.strip()}
@@ -471,6 +526,7 @@ def handle_verify(
             LOGGER.info(f"Verifying {len(targets)} generated kinds...")
 
         elif verify_changed:
+            base = base or _resolve_base_ref()
             changed_targets = dict(_changed_generated_resources(base=base))
             targets = sorted(changed_targets.items())
             LOGGER.info(f"Verifying {len(targets)} changed generated kind(s) against {base}...")
@@ -982,9 +1038,9 @@ Examples:
     cloup.option(
         "--base",
         type=cloup.STRING,
-        default="origin/main",
-        show_default=True,
-        help="Git ref to compare against when using --verify-changed",
+        default=None,
+        help="Git ref to compare against when using --verify-changed. "
+        "Defaults to the current branch's upstream, then to the remote HEAD of the clone",
     ),
     cloup.option(
         "--classification",
