@@ -1,7 +1,8 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
-
 from typing import Any
+
+from timeout_sampler import TimeoutSampler
 
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
@@ -73,6 +74,43 @@ class VirtualMachineFileRestore(NamespacedResource):
         CLEANUP: str = "Cleanup"
         SUCCEEDED: str = "Succeeded"
         FAILED: str = "Failed"
+
+    def wait_for_phase(self, target_phase: str, timeout: int = 300, sleep: int = 5) -> None:
+        """Wait for a restore phase, reporting an unexpected failure immediately.
+
+        Args:
+            target_phase: Phase to wait for, including Failed when failure is expected.
+            timeout: Maximum wait time in seconds.
+            sleep: Polling interval in seconds.
+
+        Raises:
+            RuntimeError: If the restore fails before reaching the requested phase.
+            TimeoutExpiredError: If the requested phase is not reached before the timeout.
+        """
+        self.logger.info(f"Waiting for {self.kind} '{self.name}' to reach phase '{target_phase}'")
+        previous_phase = None
+        for status in TimeoutSampler(
+            wait_timeout=timeout,
+            sleep=sleep,
+            func=lambda: self.instance.get("status", {}),
+        ):
+            phase = status.get("phase")
+            if phase != previous_phase:
+                self.logger.info(f"{self.kind} '{self.name}' phase: {phase}")
+                previous_phase = phase
+            if phase == target_phase:
+                return
+            if phase == self.Phase.FAILED:
+                error_message = status.get("errorMessage", "Unknown error")
+                raise RuntimeError(f"{self.kind} '{self.name}' failed: {error_message}")
+
+    @property
+    def restored_files_count(self) -> int | None:
+        """Number of restored files, or None before a transfer or in manual mode.
+
+        A count of zero means an automatic transfer ran without copying any files.
+        """
+        return self.instance.get("status", {}).get("restoredFilesCount")
 
     @classmethod
     def from_snapshot(
