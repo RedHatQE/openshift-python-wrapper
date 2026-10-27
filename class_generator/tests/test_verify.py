@@ -934,3 +934,26 @@ class TestRenameAndDeletionHandling:
             class_generator.cli._kind_for_path("ocp_resources/image_stream_image_openshift_io.py", resources_mapping)
             == "ImageStream"
         )
+
+    def test_copy_keeps_source_file(self, monkeypatch):
+        """A copied generated file leaves the original in place - not drift."""
+        monkeypatch.setattr(
+            class_generator.cli,
+            "run_command",
+            self._git_mock("C100\tocp_resources/pod.py\tocp_resources/pod_copy.py\n"),
+        )
+        monkeypatch.setattr(
+            class_generator.cli,
+            "read_resources_mapping_file",
+            MagicMock(
+                return_value={
+                    "pod": [{"x-kubernetes-group-version-kind": [{"group": "", "version": "v1", "kind": "Pod"}]}]
+                }
+            ),
+        )
+        monkeypatch.setattr(class_generator.cli, "discover_generated_resources", MagicMock(return_value=[]))
+
+        changed, deleted = class_generator.cli._changed_generated_resources(base="origin/main")
+
+        assert deleted == []
+        assert changed == []

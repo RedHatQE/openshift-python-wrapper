@@ -506,10 +506,11 @@ def _changed_generated_resources(base: str) -> tuple[list[tuple[str, str]], list
             continue
         status = parts[0]
         if status.startswith(("R", "C")):
-            # rename/copy: the old path disappears, the new one appears
+            # three-part record. A rename removes the source, a copy leaves it in place
             if len(parts) < 3:
                 continue
-            removed_paths.add(parts[1].strip())
+            if status.startswith("R"):
+                removed_paths.add(parts[1].strip())
             changed_paths.add(parts[2].strip())
         elif status.startswith("D"):
             removed_paths.add(parts[1].strip())
