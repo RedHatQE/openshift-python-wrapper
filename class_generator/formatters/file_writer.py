@@ -10,6 +10,8 @@ from pathlib import Path
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
+from class_generator.constants import VERIFY_TEMP_FILE_PREFIX
+
 LOGGER = get_logger(name=__name__)
 
 # Project root directory (contains pyproject.toml and .pre-commit-config.yaml)
@@ -261,7 +263,7 @@ def verify_rendered(filepath: str, output: str) -> list[str] | None:
     # repository context. It is NOT gitignored (prek/ruff skips gitignored
     # files); it is always removed, even on failure, and stale files from
     # interrupted runs are cleaned up at the start of every verify run.
-    tmp_file = target_file.parent / f".class_generator_verify_{target_file.stem}_{uuid.uuid4().hex[:8]}.py"
+    tmp_file = target_file.parent / f"{VERIFY_TEMP_FILE_PREFIX}_{target_file.stem}_{uuid.uuid4().hex[:8]}.py"
     format_failed = False
     try:
         # Untracked temp file: prek runs lock-free so verification stays parallel

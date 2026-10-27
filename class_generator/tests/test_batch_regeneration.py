@@ -204,7 +204,8 @@ class AnotherResource(Resource):
     """Another resource class."""
     pass
 '''
-        test_file = temp_resources_dir / "multi_class.py"
+        # filename must be one class-generator writes for the kind
+        test_file = temp_resources_dir / "main_resource.py"
         test_file.write_text(data=content)
 
         # Mock ResourceScanner - it finds the first resource class
@@ -581,3 +582,27 @@ class TestBackupWithKindOption:
         # The backup should preserve the directory structure
         relative_path = custom_file.relative_to(Path.cwd())
         assert (backup_dirs[0] / relative_path).exists()
+
+    def test_discover_skips_filenames_generator_never_writes(self, tmp_path):
+        """Copies of generated files under foreign names are not generator output."""
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
+
+from ocp_resources.resource import Resource
+
+
+class MainResource(Resource):
+    """Main resource class."""
+    pass
+'''
+        test_file = tmp_path / "main_resource_latest.py"
+        test_file.write_text(data=content)
+
+        mock_scanner = MagicMock()
+        mock_scanner.scan_resources.return_value = [
+            ResourceInfo(name="MainResource", file_path=str(test_file), base_class="Resource"),
+        ]
+
+        with patch("class_generator.core.discovery.ResourceScanner", return_value=mock_scanner):
+            resources = discover_generated_resources()
+
+        assert resources == []

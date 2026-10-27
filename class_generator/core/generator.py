@@ -10,7 +10,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 from simple_logger.logger import get_logger
 
-from class_generator.constants import RESOURCES_MAPPING_FILE, TESTS_MANIFESTS_DIR
+from class_generator.constants import GENERATED_USING_MARKER, RESOURCES_MAPPING_FILE, TESTS_MANIFESTS_DIR
 from class_generator.core.schema import read_resources_mapping_file, update_kind_schema
 from class_generator.formatters.file_writer import verify_rendered, write_and_format_rendered
 from class_generator.formatters.template_renderer import render_jinja_template
@@ -21,9 +21,31 @@ from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 LOGGER = get_logger(name=__name__)
 
 
-GENERATED_FILES_HEADER = (
-    "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md"
-)
+def group_file_suffix(group: str) -> str:
+    """
+    Filename suffix used for a kind that exists in several API groups.
+
+    Args:
+        group: API group (e.g. "config.openshift.io")
+
+    Returns:
+        Suffix without the leading underscore, or "" for the core group
+    """
+    return group.lower().replace(".", "_").replace("-", "_") if group else ""
+
+
+def generated_file_name(kind: str, file_suffix: str = "") -> str:
+    """
+    Filename class-generator writes for a kind.
+
+    Args:
+        kind: Resource kind
+        file_suffix: Optional group suffix (see `group_file_suffix`)
+
+    Returns:
+        Filename with the .py extension
+    """
+    return f"{convert_camel_case_to_snake_case(name=kind)}{'_' + file_suffix if file_suffix else ''}.py"
 
 
 def generate_resource_file_from_dict(
@@ -64,7 +86,9 @@ def generate_resource_file_from_dict(
         template_name="class_generator_template.j2",
     )
 
-    output = f"{GENERATED_FILES_HEADER}\n\n"
+    output = (
+        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md\n\n"
+    )
     formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
 
     if re.search(r"_[a-z]_", formatted_kind_str):
@@ -76,35 +100,38 @@ def generate_resource_file_from_dict(
         LOGGER.error(msg)
         raise ValueError(msg)
 
-    _file_suffix: str = f"{'_' + output_file_suffix if output_file_suffix else ''}"
+    _generated_name: str = generated_file_name(kind=resource_dict["kind"], file_suffix=output_file_suffix)
 
     if add_tests:
         overwrite = True
         tests_path = Path(TESTS_MANIFESTS_DIR) / resource_dict["kind"]
         os.makedirs(tests_path, exist_ok=True)
 
-        _output_file = os.path.join(tests_path, f"{formatted_kind_str}{_file_suffix}.py")
+        _output_file = os.path.join(tests_path, _generated_name)
 
-    elif output_file:
+    elif output_file and not verify:
+        # In verify mode the path must be the one regeneration would write for THIS
+        # variant: a kind can render several variants (one per API group) and a pinned
+        # output_file would compare every variant against the same file
         _output_file = output_file
 
     else:
-        _output_file = os.path.join(base_dir, f"{formatted_kind_str}{_file_suffix}.py")
+        _output_file = os.path.join(base_dir, _generated_name)
 
     _output_file_exists: bool = os.path.exists(_output_file)
     _user_code: str = ""
     _user_imports: str = ""
 
     if _output_file_exists and not add_tests and not verify:
-        # Only class-generator output may be overwritten: a hand-maintained resource
-        # has no generated header and no end-of-generated-code marker, so rewriting
-        # it silently deletes the hand-written implementation
+        # A file without the generated header is hand-maintained: it has no
+        # end-of-generated-code marker, so nothing can be preserved when it is
+        # converted into a generated resource. Warn instead of blocking - the
+        # conversion is the caller's decision.
         _existing_content = Path(_output_file).read_text(encoding="utf-8")
-        if GENERATED_FILES_HEADER not in _existing_content:
-            raise RuntimeError(
-                f"{_output_file} is not a class-generator generated file "
-                f"(missing the generated header). Refusing to overwrite a hand-maintained "
-                f"resource - exclude its kind from the regeneration command."
+        if GENERATED_USING_MARKER not in _existing_content:
+            LOGGER.warning(
+                f"{_output_file} is hand-maintained (no generated header); "
+                "it will be replaced with generated output and its hand-written code will be lost"
             )
 
     if _output_file_exists and not add_tests:

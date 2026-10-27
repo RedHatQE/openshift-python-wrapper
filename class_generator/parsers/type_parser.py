@@ -1,50 +1,28 @@
 """Parser for type generation and property parsing from OpenAPI schemas."""
 
-import json
 import textwrap
 from typing import Any
 
 from simple_logger.logger import get_logger
 
-from class_generator.constants import DEFINITIONS_ARCHIVE, DEFINITIONS_FILE, MISSING_DESCRIPTION_STR, SPEC_STR
+from class_generator.constants import MISSING_DESCRIPTION_STR, SPEC_STR
 from class_generator.utils import sanitize_python_name
-from ocp_resources.utils.archive_utils import load_json_archive
+from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
 
 
-_DEFINITIONS_CACHE: tuple[tuple[str, float], dict[str, Any]] | None = None
-
-
 def _load_definitions() -> dict[str, Any]:
     """
-    Load schema definitions, cached per (path, mtime).
-
-    The definitions file is large (tens of MB) and every $ref property would
-    otherwise re-read and re-parse it, dominating generation time.
+    Get the schema definitions (already loaded and cached by SchemaValidator).
 
     Returns:
         Dictionary of schema definitions keyed by definition name
     """
-    global _DEFINITIONS_CACHE
-    try:
-        stat = DEFINITIONS_ARCHIVE.stat()
-    except OSError:
+    if not SchemaValidator.load_mappings_data():
         return {}
-
-    cache_key = (str(DEFINITIONS_ARCHIVE), stat.st_mtime)
-    if _DEFINITIONS_CACHE is not None and _DEFINITIONS_CACHE[0] == cache_key:
-        return _DEFINITIONS_CACHE[1]
-
-    try:
-        definitions = load_json_archive(DEFINITIONS_FILE).get("definitions", {})
-    except (OSError, json.JSONDecodeError, EOFError) as e:
-        LOGGER.debug(f"Could not load definitions: {e}")
-        return {}
-
-    _DEFINITIONS_CACHE = (cache_key, definitions)
-    return definitions
+    return SchemaValidator.get_definitions_data() or {}
 
 
 def types_generator(key_dict: dict[str, Any]) -> dict[str, str]:

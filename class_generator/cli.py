@@ -14,10 +14,10 @@ from cloup.constraints import If, IsSet, accept_none, mutually_exclusive, requir
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
-from class_generator.constants import TESTS_MANIFESTS_DIR
+from class_generator.constants import TESTS_MANIFESTS_DIR, VERIFY_TEMP_FILE_PREFIX
 from class_generator.core.coverage import analyze_coverage, generate_report
 from class_generator.core.discovery import discover_generated_resources
-from class_generator.core.generator import class_generator
+from class_generator.core.generator import class_generator, generated_file_name
 from class_generator.core.schema import (
     ClusterVersionError,
     read_resources_mapping_file,
@@ -28,7 +28,6 @@ from class_generator.exceptions import ResourceNotFoundError
 from class_generator.formatters.file_writer import DRIFT_CATEGORIES, DRIFT_CATEGORY_DESCRIPTIONS
 from class_generator.tests.test_generation import generate_class_generator_tests
 from class_generator.utils import execute_parallel_tasks
-from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
 
@@ -435,170 +434,202 @@ def handle_verify(
     # the final summary stays readable
     logging.getLogger("pyhelper_utils.shell").setLevel(logging.WARNING)
 
-    classification_filter: set[str] = set()
-    if classification:
-        classification_filter = {entry.strip() for entry in classification.split(",") if entry.strip()}
-        unknown = classification_filter - set(DRIFT_CATEGORIES)
-        if unknown:
-            LOGGER.error(
-                f"Unknown classification(s): {', '.join(sorted(unknown))}. "
-                f"Valid classifications: {', '.join(DRIFT_CATEGORIES)}"
-            )
-            sys.exit(1)
-    elif match_within:
-        LOGGER.error("--match can only be used together with --classification")
-        sys.exit(1)
-
-    exclude_filter: set[str] = set()
-    if exclude:
-        exclude_filter = {entry.strip() for entry in exclude.split(",") if entry.strip()}
-        unknown_excluded = exclude_filter - set(DRIFT_CATEGORIES)
-        if unknown_excluded:
-            LOGGER.error(
-                f"Unknown classification(s) in --exclude: {', '.join(sorted(unknown_excluded))}. "
-                f"Valid classifications: {', '.join(DRIFT_CATEGORIES)}"
-            )
+    try:
+        classification_filter: set[str] = set()
+        if classification:
+            classification_filter = {entry.strip() for entry in classification.split(",") if entry.strip()}
+            unknown = classification_filter - set(DRIFT_CATEGORIES)
+            if unknown:
+                LOGGER.error(
+                    f"Unknown classification(s): {', '.join(sorted(unknown))}. "
+                    f"Valid classifications: {', '.join(DRIFT_CATEGORIES)}"
+                )
+                sys.exit(1)
+        elif match_within:
+            LOGGER.error("--match can only be used together with --classification")
             sys.exit(1)
 
-    # Clean up stale temp files possibly left behind by interrupted runs
-    for stale_file in Path("ocp_resources").glob(".class_generator_verify*"):
-        stale_file.unlink()
-        LOGGER.warning(f"Removed stale verify temp file: {stale_file}")
+        exclude_filter: set[str] = set()
+        if exclude:
+            exclude_filter = {entry.strip() for entry in exclude.split(",") if entry.strip()}
+            unknown_excluded = exclude_filter - set(DRIFT_CATEGORIES)
+            if unknown_excluded:
+                LOGGER.error(
+                    f"Unknown classification(s) in --exclude: {', '.join(sorted(unknown_excluded))}. "
+                    f"Valid classifications: {', '.join(DRIFT_CATEGORIES)}"
+                )
+                sys.exit(1)
 
-    if verify_all:
-        discovered = _filter_deprecated(discover_generated_resources())
-        if filter_pattern:
-            discovered = [resource for resource in discovered if fnmatch.fnmatch(resource["kind"], filter_pattern)]
-            LOGGER.info(f"Filtered to {len(discovered)} resources matching '{filter_pattern}'")
+        if verify_all:
+            discovered = _filter_deprecated(discover_generated_resources())
+            if filter_pattern:
+                discovered = [resource for resource in discovered if fnmatch.fnmatch(resource["kind"], filter_pattern)]
+                LOGGER.info(f"Filtered to {len(discovered)} resources matching '{filter_pattern}'")
 
-        targets = [(resource["kind"], resource["path"]) for resource in discovered]
-        LOGGER.info(f"Verifying {len(targets)} generated resources...")
+            targets = [(resource["kind"], resource["path"]) for resource in discovered]
+            LOGGER.info(f"Verifying {len(targets)} generated resources...")
 
-    elif verify_changed:
-        targets = _changed_generated_resources(base=base)
-        LOGGER.info(f"Verifying {len(targets)} changed generated resource(s) against {base}...")
+        elif verify_changed:
+            targets = _changed_generated_resources(base=base)
+            LOGGER.info(f"Verifying {len(targets)} changed generated resource(s) against {base}...")
 
-    else:
-        targets = [(k, None) for k in (kind or "").split(",") if k]
-        LOGGER.info(f"Verifying {len(targets)} kind(s)...")
+        else:
+            # Only generated files can be verified: a hand-maintained resource has no
+            # generated header, so there is nothing to compare against
+            generated_by_kind: dict[str, list[str]] = {}
+            for resource in discover_generated_resources():
+                generated_by_kind.setdefault(resource["kind"].lower(), []).append(resource["path"])
 
-    drift_results: list[tuple[str, list[tuple[str, list[str]]]]] = []
-    failed_kinds: list[str] = []
-    resources_mapping = read_resources_mapping_file()
+            targets = []
+            skipped_kinds = []
+            for requested_kind in (kind or "").split(","):
+                if not requested_kind:
+                    continue
+                paths = generated_by_kind.get(requested_kind.lower())
+                if not paths:
+                    skipped_kinds.append(requested_kind)
+                    continue
+                targets.extend((requested_kind, path) for path in paths)
 
-    def verify_single_resource(target: tuple[str, str | None]) -> tuple[str, list[tuple[str, list[str]]], str | None]:
-        """
-        Verify a single resource.
+            if skipped_kinds:
+                LOGGER.info(
+                    f"Skipping {len(skipped_kinds)} kind(s) that are not generated resources: {', '.join(skipped_kinds)}"
+                )
+            LOGGER.info(f"Verifying {len(targets)} kind(s)...")
 
-        Returns:
-            Tuple of (kind, drifted_files_with_categories, error_message)
-        """
-        resource_kind, resource_file = target
-        if not resources_mapping.get(resource_kind.lower()):
-            # A kind absent from the resources mapping can neither be rendered nor
-            # regenerated; report it as a classified drift entry instead of raising
-            if resource_file:
-                return resource_kind, [(resource_file, ["not in schema"])], None
+        drift_results: list[tuple[str, list[tuple[str, list[str]]]]] = []
+        failed_kinds: list[str] = []
+        resources_mapping = read_resources_mapping_file()
 
-        try:
-            return (
-                resource_kind,
-                cast(
-                    "list[tuple[str, list[str]]]",
-                    class_generator(
-                        kind=resource_kind,
-                        verify=True,
-                        output_file=resource_file or "",
-                        called_from_cli=False,
+        def verify_single_resource(
+            target: tuple[str, str | None],
+        ) -> tuple[str, list[tuple[str, list[str]]], str | None]:
+            """
+            Verify a single resource.
+
+            Returns:
+                Tuple of (kind, drifted_files_with_categories, error_message)
+            """
+            resource_kind, resource_file = target
+            if not resources_mapping.get(resource_kind.lower()):
+                # A kind absent from the resources mapping can neither be rendered nor
+                # regenerated; report it as a classified drift entry instead of raising
+                if resource_file:
+                    return resource_kind, [(resource_file, ["not in schema"])], None
+
+            try:
+                return (
+                    resource_kind,
+                    cast(
+                        "list[tuple[str, list[str]]]",
+                        class_generator(
+                            kind=resource_kind,
+                            verify=True,
+                            output_file=resource_file or "",
+                            called_from_cli=False,
+                        ),
                     ),
-                ),
-                None,
-            )
-        except Exception as e:
-            LOGGER.exception(f"Failed to verify {resource_kind}: {e}")
-            return resource_kind, [], str(e)
+                    None,
+                )
+            except Exception as e:
+                LOGGER.exception(f"Failed to verify {resource_kind}: {e}")
+                return resource_kind, [], str(e)
 
-    def process_verification_result(
-        _target: tuple[str, str | None], result: tuple[str, list[tuple[str, list[str]]], str | None]
-    ) -> None:
-        nonlocal drift_results, failed_kinds
-        _resource_kind, drifted, error = result
-        if drifted:
-            drift_results.append((_resource_kind, drifted))
-        if error:
-            failed_kinds.append(_resource_kind)
+        def process_verification_result(
+            _target: tuple[str, str | None], result: tuple[str, list[tuple[str, list[str]]], str | None]
+        ) -> None:
+            nonlocal drift_results, failed_kinds
+            _resource_kind, drifted, error = result
+            if drifted:
+                drift_results.append((_resource_kind, drifted))
+            if error:
+                failed_kinds.append(_resource_kind)
 
-    def handle_verification_error(target: tuple[str, str | None], exc: Exception) -> None:
-        nonlocal failed_kinds
-        resource_kind = target[0]
-        LOGGER.exception(f"Executor-level failure for {resource_kind}: {exc}")
-        failed_kinds.append(resource_kind)
+        def handle_verification_error(target: tuple[str, str | None], exc: Exception) -> None:
+            nonlocal failed_kinds
+            resource_kind = target[0]
+            LOGGER.exception(f"Executor-level failure for {resource_kind}: {exc}")
+            failed_kinds.append(resource_kind)
 
-    execute_parallel_tasks(
-        tasks=targets,
-        task_func=verify_single_resource,
-        max_workers=jobs,
-        task_name="verification",
-        result_processor=process_verification_result,
-        error_handler=handle_verification_error,
-    )
+        execute_parallel_tasks(
+            tasks=targets,
+            task_func=verify_single_resource,
+            max_workers=jobs,
+            task_name="verification",
+            result_processor=process_verification_result,
+            error_handler=handle_verification_error,
+        )
 
-    # Apply the classification filter: only drifted files matching the requested
-    # classifications (per match_mode) are reported and fail the run
-    def classification_matches(categories: list[str]) -> bool:
-        if match_within:
-            # --match: the file's categories must be a subset of the requested ones —
-            # files with additional classifications are excluded
-            return set(categories) <= classification_filter
-        return bool(classification_filter & set(categories))
+        # Apply the classification filter: only drifted files matching the requested
+        # classifications (per match_mode) are reported and fail the run
+        def classification_matches(categories: list[str]) -> bool:
+            if match_within:
+                # --match: the file's categories must be a subset of the requested ones —
+                # files with additional classifications are excluded
+                return set(categories) <= classification_filter
+            return bool(classification_filter & set(categories))
 
-    drifted_files: list[tuple[str, list[str]]] = []
-    drifted_kinds: set[str] = set()
-    filtered_out_count = 0
-    excluded_out_count = 0
-    for resource_kind, drifted in drift_results:
-        if classification_filter:
-            matching = [(path, categories) for path, categories in drifted if classification_matches(categories)]
-            filtered_out_count += len(drifted) - len(matching)
-            drifted = matching
-        if exclude_filter:
-            kept = [(path, categories) for path, categories in drifted if not exclude_filter & set(categories)]
-            excluded_out_count += len(drifted) - len(kept)
-            drifted = kept
-        if drifted:
-            drifted_kinds.add(resource_kind)
-            drifted_files.extend(drifted)
+        drifted_files: list[tuple[str, list[str]]] = []
+        drifted_entries: list[tuple[str, str, list[str]]] = []
+        drifted_kinds: set[str] = set()
+        filtered_out_count = 0
+        excluded_out_count = 0
+        for resource_kind, drifted in drift_results:
+            if classification_filter:
+                matching = [(path, categories) for path, categories in drifted if classification_matches(categories)]
+                filtered_out_count += len(drifted) - len(matching)
+                drifted = matching
+            if exclude_filter:
+                kept = [(path, categories) for path, categories in drifted if not exclude_filter & set(categories)]
+                excluded_out_count += len(drifted) - len(kept)
+                drifted = kept
+            if drifted:
+                drifted_kinds.add(resource_kind)
+                drifted_files.extend(drifted)
+                drifted_entries.extend((resource_kind, path, categories) for path, categories in drifted)
 
-    # Kinds absent from the schema mapping cannot be regenerated; they get their
-    # own message instead of regenerate commands
-    not_in_schema_kinds = {
-        resource_kind
-        for resource_kind, drifted in drift_results
-        if resource_kind in drifted_kinds and all(categories == ["not in schema"] for _path, categories in drifted)
-    }
+        # Kinds absent from the schema mapping cannot be regenerated; they get their
+        # own message instead of regenerate commands
+        not_in_schema_kinds = {
+            resource_kind
+            for resource_kind, drifted in drift_results
+            if resource_kind in drifted_kinds and all(categories == ["not in schema"] for _path, categories in drifted)
+        }
 
-    if drifted_files or failed_kinds:
-        if drifted_files:
-            print(f"\nVerification failed: {len(drifted_files)} file(s) do not match class-generator output:")
-            for drifted_file, categories in drifted_files:
-                print(f"  - {drifted_file} ({', '.join(categories)})")
-        regenerable_kinds = sorted(drifted_kinds - not_in_schema_kinds)
-        if regenerable_kinds:
-            print(
-                "These files do not match the current class-generator output. Regenerate them instead of editing manually:"
-            )
-            for drifted_kind in regenerable_kinds:
-                print(f"  class-generator --kind {drifted_kind} --overwrite")
-            print("Or regenerate all drifted kinds at once:")
-            print(f"  class-generator --kind {','.join(regenerable_kinds)} --overwrite")
-        if failed_kinds:
-            print(f"\nVerification failed for {len(failed_kinds)} kind(s): {', '.join(failed_kinds)}")
-        if not_in_schema_kinds:
-            print(
-                f"\nKinds not found in the schema mapping (cannot be verified or regenerated): "
-                f"{', '.join(sorted(not_in_schema_kinds))}. Run --update-schema from a cluster "
-                "that serves these kinds."
-            )
+        if drifted_files or failed_kinds:
+            if drifted_files:
+                print(f"\nVerification failed: {len(drifted_files)} file(s) do not match class-generator output:")
+                for drifted_file, categories in drifted_files:
+                    print(f"  - {drifted_file} ({', '.join(categories)})")
+            # Every reported file is produced by class-generator (filenames the generator
+            # cannot emit are excluded at collection), so the plain per-kind command
+            # regenerates it
+            regenerable_kinds = sorted(drifted_kinds - not_in_schema_kinds)
+            if regenerable_kinds:
+                print(
+                    "These files do not match the current class-generator output. Regenerate them instead of editing manually:"
+                )
+                for drifted_kind in regenerable_kinds:
+                    print(f"  class-generator --kind {drifted_kind} --overwrite")
+                print("Or regenerate all drifted kinds at once:")
+                print(f"  class-generator --kind {','.join(regenerable_kinds)} --overwrite")
+            if failed_kinds:
+                print(f"\nVerification failed for {len(failed_kinds)} kind(s): {', '.join(failed_kinds)}")
+            if not_in_schema_kinds:
+                print(
+                    f"\nKinds not found in the schema mapping (cannot be verified or regenerated): "
+                    f"{', '.join(sorted(not_in_schema_kinds))}. Run --update-schema from a cluster "
+                    "that serves these kinds."
+                )
+            if filtered_out_count:
+                print(
+                    f"{filtered_out_count} drifted file(s) did not match --classification "
+                    f"'{classification}'{' --match' if match_within else ''} and are not shown"
+                )
+            if excluded_out_count:
+                print(f"{excluded_out_count} drifted file(s) excluded by --exclude '{exclude}' and are not shown")
+            sys.exit(1)
+
         if filtered_out_count:
             print(
                 f"{filtered_out_count} drifted file(s) did not match --classification "
@@ -606,17 +637,12 @@ def handle_verify(
             )
         if excluded_out_count:
             print(f"{excluded_out_count} drifted file(s) excluded by --exclude '{exclude}' and are not shown")
-        sys.exit(1)
-
-    if filtered_out_count:
-        print(
-            f"{filtered_out_count} drifted file(s) did not match --classification "
-            f"'{classification}'{' --match' if match_within else ''} and are not shown"
-        )
-    if excluded_out_count:
-        print(f"{excluded_out_count} drifted file(s) excluded by --exclude '{exclude}' and are not shown")
-    print(f"\nVerification passed: all {len(targets)} generated resource(s) match class-generator output")
-    return True
+        print(f"\nVerification passed: all {len(targets)} generated resource(s) match class-generator output")
+        return True
+    finally:
+        # Temp files created while rendering must never survive the run
+        for leftover in Path("ocp_resources").glob(f"{VERIFY_TEMP_FILE_PREFIX}*"):
+            leftover.unlink(missing_ok=True)
 
 
 def handle_normal_kind_generation(
@@ -659,9 +685,7 @@ def handle_normal_kind_generation(
             if output_file:
                 target_file = Path(output_file)
             else:
-                # Default output path based on kind
-                formatted_kind = convert_camel_case_to_snake_case(name=kind)
-                target_file = Path("ocp_resources") / f"{formatted_kind}.py"
+                target_file = Path("ocp_resources") / generated_file_name(kind=kind)
 
             # Create backup if file exists
             create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)
@@ -694,9 +718,7 @@ def handle_normal_kind_generation(
                 Tuple of (kind, success, error_message)
             """
             if overwrite and backup_dir:
-                # Determine the output file path for this kind
-                formatted_kind = convert_camel_case_to_snake_case(name=kind_to_generate)
-                target_file = Path("ocp_resources") / f"{formatted_kind}.py"
+                target_file = Path("ocp_resources") / generated_file_name(kind=kind_to_generate)
 
                 # Create backup if file exists
                 create_backup_if_needed(target_file=target_file, backup_dir=backup_dir)

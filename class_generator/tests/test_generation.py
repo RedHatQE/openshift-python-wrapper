@@ -3,7 +3,6 @@
 import os
 from typing import Any
 
-import pytest
 from rich.console import Console
 from rich.panel import Panel
 from simple_logger.logger import get_logger
@@ -85,13 +84,12 @@ def generate_class_generator_tests() -> None:
     console.print(Panel.fit(f"[green]Generated test file:[/green] [cyan]{test_file_path}[/cyan]"))
 
 
-class TestHandWrittenFileGuard:
-    """Regeneration must never destroy a hand-maintained resource."""
+class TestHandWrittenFileConversion:
+    """A hand-maintained resource can be converted into a generated one."""
 
-    def test_refuses_to_overwrite_hand_written_file(self, tmp_path):
+    def test_hand_written_file_is_converted_not_blocked(self, tmp_path, caplog, monkeypatch):
         hand_written = tmp_path / "node_network_configuration_policy.py"
-        original = "import re\n\n\nclass NodeNetworkConfigurationPolicy:\n    pass\n"
-        hand_written.write_text(original)
+        hand_written.write_text("import re\n\n\nclass NodeNetworkConfigurationPolicy:\n    pass\n")
 
         resource_dict = {
             "kind": "NodeNetworkConfigurationPolicy",
@@ -106,12 +104,20 @@ class TestHandWrittenFileGuard:
             "spec": [],
         }
 
-        with pytest.raises(RuntimeError, match="not a class-generator generated file"):
-            generate_resource_file_from_dict(
-                resource_dict=resource_dict,
-                overwrite=True,
-                output_file=str(hand_written),
-            )
+        # keep prek out of the tmp dir (hooks are repo-scoped)
+        monkeypatch.setattr(
+            "class_generator.core.generator.write_and_format_rendered",
+            lambda filepath, output: __import__("pathlib").Path(filepath).write_text(output),
+        )
 
-        # untouched
-        assert hand_written.read_text() == original
+        _orig, generated = generate_resource_file_from_dict(
+            resource_dict=resource_dict,
+            overwrite=True,
+            output_file=str(hand_written),
+        )
+
+        # overwritten with generated output instead of being refused
+        assert generated == str(hand_written)
+        converted = hand_written.read_text()
+        assert "class NodeNetworkConfigurationPolicy" in converted
+        assert "hand-maintained" in caplog.text

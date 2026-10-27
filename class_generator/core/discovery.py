@@ -8,6 +8,8 @@ from kubernetes.dynamic import DynamicClient
 from simple_logger.logger import get_logger
 
 from class_generator.constants import END_OF_GENERATED_CODE
+from class_generator.core.generator import generated_file_name, group_file_suffix
+from class_generator.core.schema import read_resources_mapping_file
 from class_generator.utils import ResourceScanner
 from ocp_resources.resource import get_client
 
@@ -218,6 +220,15 @@ def discover_generated_resources() -> list[dict[str, Any]]:
     # Reuse existing ResourceScanner
     scanner = ResourceScanner()
     resource_infos = scanner.scan_resources()
+    resources_mapping = read_resources_mapping_file()
+
+    def files_generator_writes(kind: str) -> set[str]:
+        """Filenames class-generator writes for this kind (default and per API group)."""
+        names = {generated_file_name(kind=kind)}
+        for schema_variant in resources_mapping.get(kind.lower(), []):
+            for gvk in schema_variant.get("x-kubernetes-group-version-kind", []):
+                names.add(generated_file_name(kind=kind, file_suffix=group_file_suffix(gvk.get("group") or "")))
+        return names
 
     resources = []
     for info in resource_infos:
@@ -233,6 +244,12 @@ def discover_generated_resources() -> list[dict[str, Any]]:
             continue
         except Exception as e:
             LOGGER.error(f"Unexpected error reading file {info.file_path}: {e}, skipping...")
+            continue
+
+        if Path(info.file_path).name not in files_generator_writes(info.name):
+            # Copies of generated files under names the generator never writes (e.g.
+            # *_latest.py) cannot be verified or regenerated - there is no output for them
+            LOGGER.debug(f"Skipping {info.file_path}: class-generator never writes this filename")
             continue
 
         user_code = content.split(END_OF_GENERATED_CODE)[1] if END_OF_GENERATED_CODE in content else ""

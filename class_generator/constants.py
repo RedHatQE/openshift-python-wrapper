@@ -37,4 +37,6 @@ VERSION_PRIORITY = {
 
 # Generated code marker
 END_OF_GENERATED_CODE = "# End of generated code"
+# Prefix of the temp files used while verifying rendered output
+VERIFY_TEMP_FILE_PREFIX = ".class_generator_verify"
 GENERATED_USING_MARKER = "# Generated using"

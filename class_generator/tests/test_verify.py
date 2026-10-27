@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -9,6 +10,7 @@ from click.testing import CliRunner
 
 import class_generator.cli
 from class_generator.cli import main
+from class_generator.constants import VERIFY_TEMP_FILE_PREFIX
 from class_generator.core.generator import class_generator as generate_resource_class
 from class_generator.core.generator import generate_resource_file_from_dict
 from class_generator.formatters.file_writer import _format_file, classify_drift, verify_rendered
@@ -39,7 +41,7 @@ class TestVerifyRendered:
         target.write_text("content\n")
         with patch("class_generator.formatters.file_writer._format_file"):
             verify_rendered(filepath=str(target), output="content\n")
-        assert list(tmp_path.glob(".class_generator_verify_*.py")) == []
+        assert list(tmp_path.glob(f"{VERIFY_TEMP_FILE_PREFIX}_*.py")) == []
 
     def test_temp_file_removed_on_format_failure(self, tmp_path):
         target = tmp_path / "resource.py"
@@ -50,7 +52,7 @@ class TestVerifyRendered:
 
         with patch("class_generator.formatters.file_writer._format_file", side_effect=failing_format):
             assert verify_rendered(filepath=str(target), output="content\n") == ["formatting failed"]
-        assert list(tmp_path.glob(".class_generator_verify_*.py")) == []
+        assert list(tmp_path.glob(f"{VERIFY_TEMP_FILE_PREFIX}_*.py")) == []
 
     def test_target_file_never_modified(self, tmp_path):
         target = tmp_path / "resource.py"
@@ -235,6 +237,17 @@ class TestVerifyCLI:
     def test_verify_kind_passes(self, monkeypatch):
         mock_generator = MagicMock(return_value=[])
         monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
+        # --kind verifies only files reported by discovery as generated
+        monkeypatch.setattr(
+            class_generator.cli,
+            "discover_generated_resources",
+            MagicMock(
+                return_value=[
+                    {"kind": "Pod", "path": "ocp_resources/pod.py", "has_user_code": False},
+                    {"kind": "Service", "path": "ocp_resources/service.py", "has_user_code": False},
+                ]
+            ),
+        )
 
         result = CliRunner().invoke(cli=main, args=["--verify", "-k", "Pod,Service"])
 
@@ -242,6 +255,22 @@ class TestVerifyCLI:
         assert mock_generator.call_count == 2
         assert mock_generator.call_args_list[0][1]["kind"] == "Pod"
         assert mock_generator.call_args_list[1][1]["kind"] == "Service"
+
+    def test_verify_kind_skips_hand_written_resource(self, monkeypatch, caplog):
+        mock_generator = MagicMock(return_value=[])
+        monkeypatch.setattr(class_generator.cli, "class_generator", mock_generator)
+        # discovery never returns hand-written files, so nothing is verified for them
+        monkeypatch.setattr(
+            class_generator.cli,
+            "discover_generated_resources",
+            MagicMock(return_value=[{"kind": "Pod", "path": "ocp_resources/pod.py", "has_user_code": False}]),
+        )
+
+        result = CliRunner().invoke(cli=main, args=["--verify", "-k", "ClusterVersion"])
+
+        assert result.exit_code == 0
+        mock_generator.assert_not_called()
+        assert "not generated resources" in caplog.text
 
     def test_verify_all_passes(self, monkeypatch, tmp_path):
         pod_file = tmp_path / "pod.py"
@@ -324,7 +353,7 @@ class TestVerifyCLI:
         try:
             resources_dir = tmp_path / "ocp_resources"
             resources_dir.mkdir()
-            stale_file = resources_dir / ".class_generator_verify_pod_abcd1234.py"
+            stale_file = resources_dir / f"{VERIFY_TEMP_FILE_PREFIX}_pod_abcd1234.py"
             stale_file.write_text("stale")
 
             monkeypatch.setattr(
@@ -634,10 +663,53 @@ class TestVerifyNotInSchema:
             "        print(x)\n"
         )
         # prek needs repository context: the file must live inside the repo
-        target = Path("ocp_resources") / ".class_generator_verify_test_converge.py"
+        target = Path("ocp_resources") / f"{VERIFY_TEMP_FILE_PREFIX}_test_converge.py"
         try:
             target.write_text(raw, encoding="utf-8")
             _format_file(filepath=str(target))
             assert "x: Any = 1" in target.read_text(encoding="utf-8")
         finally:
             target.unlink(missing_ok=True)
+
+
+class TestVerifyMultiGroupKind:
+    """A kind that renders one file per API group must compare each variant to its own file."""
+
+    def test_verify_ignores_pinned_output_file(self, tmp_path, monkeypatch):
+        compared: list[str] = []
+
+        def fake_verify_rendered(filepath: str, output: str) -> list[str] | None:
+            compared.append(filepath)
+            return None
+
+        monkeypatch.setattr("class_generator.core.generator.verify_rendered", fake_verify_rendered)
+
+        base_kwargs: dict[str, Any] = {
+            "kind": "Config",
+            "base_class": "Resource",
+            "api_version": "v1",
+            "version": "v1",
+            "description": "Config is a test resource.",
+            "namespaced": False,
+            "fields": [],
+            "spec": [],
+        }
+
+        # two variants of the same kind, each with its own API group
+        for group, suffix in (
+            ("config.openshift.io", ""),
+            ("samples.operator.openshift.io", "samples_operator_openshift_io"),
+        ):
+            generate_resource_file_from_dict(
+                resource_dict={**base_kwargs, "group": group, "api_group": group},
+                output_file=str(tmp_path / "pinned_wrong_path.py"),
+                output_file_suffix=suffix,
+                output_dir=str(tmp_path),
+                verify=True,
+            )
+
+        # each variant is compared against the file regeneration would write for it
+        assert compared == [
+            str(tmp_path / "config.py"),
+            str(tmp_path / "config_samples_operator_openshift_io.py"),
+        ]
