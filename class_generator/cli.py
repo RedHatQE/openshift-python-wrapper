@@ -466,12 +466,14 @@ def handle_verify(
                 discovered = [resource for resource in discovered if fnmatch.fnmatch(resource["kind"], filter_pattern)]
                 LOGGER.info(f"Filtered to {len(discovered)} resources matching '{filter_pattern}'")
 
-            targets = [(resource["kind"], resource["path"]) for resource in discovered]
-            LOGGER.info(f"Verifying {len(targets)} generated resources...")
+            # one entry per kind: the generator resolves each variant's own path
+            targets = sorted({resource["kind"]: resource["path"] for resource in discovered}.items())
+            LOGGER.info(f"Verifying {len(targets)} generated kinds...")
 
         elif verify_changed:
-            targets = _changed_generated_resources(base=base)
-            LOGGER.info(f"Verifying {len(targets)} changed generated resource(s) against {base}...")
+            changed_targets = dict(_changed_generated_resources(base=base))
+            targets = sorted(changed_targets.items())
+            LOGGER.info(f"Verifying {len(targets)} changed generated kind(s) against {base}...")
 
         else:
             # Only generated files can be verified: a hand-maintained resource has no

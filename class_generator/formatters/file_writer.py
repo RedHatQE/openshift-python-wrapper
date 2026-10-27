@@ -3,6 +3,7 @@
 import ast
 import contextlib
 import difflib
+import re
 import threading
 import uuid
 from pathlib import Path
@@ -88,6 +89,10 @@ def write_and_format_rendered(filepath: str, output: str) -> None:
         _format_file(filepath=filepath)
 
 
+# The generator enforces required fields with
+# `raise MissingRequiredArgumentError(argument="self.<name>")`
+_REQUIRED_ARG_PATTERN = re.compile(r'MissingRequiredArgumentError\(argument="self\.([A-Za-z_][A-Za-z0-9_]*)"\)')
+
 DRIFT_CATEGORIES = (
     "blank lines",
     "docstring add",
@@ -149,6 +154,47 @@ def _docstring_spans(source: str) -> list[tuple[int, int]]:
     return spans
 
 
+def _class_base(source: str) -> str | None:
+    """Base class of the generated resource class (Resource vs NamespacedResource)."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            for base in node.bases:
+                if isinstance(base, ast.Name):
+                    return base.id
+                if isinstance(base, ast.Attribute):
+                    return base.attr
+    return None
+
+
+def _api_identity(source: str) -> tuple[str, str] | None:
+    """api_group / api_version the class targets."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return None
+    group = version = ""
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            for stmt in node.body:
+                if not isinstance(stmt, ast.AnnAssign) or not isinstance(stmt.target, ast.Name):
+                    continue
+                if stmt.target.id == "api_group" and isinstance(stmt.value, ast.Constant):
+                    group = str(stmt.value.value)
+                elif stmt.target.id == "api_version" and isinstance(stmt.value, ast.Constant):
+                    version = str(stmt.value.value)
+    return (group, version) if group or version else None
+
+
+def _emitted_keys(source: str) -> dict[str, str]:
+    """Mapping of parameter name to the API key to_dict() emits it under."""
+    pattern = re.compile(r'\[["\'](?P<key>[^"\']+)["\']\]\s*=\s*self\.(?P<param>[A-Za-z_][A-Za-z0-9_]*)')
+    return {match.group("param"): match.group("key") for match in pattern.finditer(source)}
+
+
 def classify_drift(committed: str, rendered: str) -> list[str]:
     """
     Classify the differences between committed content and class-generator rendered output.
@@ -161,7 +207,9 @@ def classify_drift(committed: str, rendered: str) -> list[str]:
     - "code add": code lines regeneration would introduce
     - "signature code add": __init__ parameters added (non-breaking)
     - "signature code remove": __init__ parameters removed
-    - "breaking change": a parameter was removed (breaking for callers)
+    - "breaking change": a parameter was removed, or a parameter that used to be
+      optional became required (callers passing nothing now get
+      MissingRequiredArgumentError)
     - "schema incomplete": rendered class lost all parameters (unresolvable schema ref)
 
     Args:
@@ -217,6 +265,10 @@ def classify_drift(committed: str, rendered: str) -> list[str]:
                 return [arg.arg for arg in node.args.args if arg.arg != "self"]
         return []
 
+    def required_params(source: str) -> set[str]:
+        """Parameters the generated to_dict() enforces with MissingRequiredArgumentError."""
+        return set(_REQUIRED_ARG_PATTERN.findall(source))
+
     old_params = set(init_params(committed))
     new_params = set(init_params(rendered))
     if new_params - old_params:
@@ -228,6 +280,33 @@ def classify_drift(committed: str, rendered: str) -> list[str]:
         # A removed param breaks callers: the kwarg flows through **kwargs into
         # Resource.__init__, which has a fixed parameter list -> TypeError
         flags.add("breaking change")
+    if newly_required := (required_params(rendered) - required_params(committed)) & new_params:
+        # A parameter that used to be optional is now enforced, so existing callers
+        # that omit it fail with MissingRequiredArgumentError
+        LOGGER.debug(f"Parameters that became required: {sorted(newly_required)}")
+        flags.add("breaking change")
+
+    # A parameter that keeps its name but is emitted under a different API key changes
+    # what the cluster receives - same call, different object
+    old_keys, new_keys = _emitted_keys(committed), _emitted_keys(rendered)
+    if rekeyed := {
+        param: (old_keys[param], new_keys[param])
+        for param in old_keys.keys() & new_keys.keys()
+        if old_keys[param] != new_keys[param]
+    }:
+        LOGGER.debug(f"Parameters emitted under a different API key: {rekeyed}")
+        flags.add("breaking change")
+
+    # Base class and API identity decide how the resource is talks to the cluster
+    if (_class_base(committed), _api_identity(committed)) != (_class_base(rendered), _api_identity(rendered)):
+        old_base, old_api = _class_base(committed), _api_identity(committed)
+        new_base, new_api = _class_base(rendered), _api_identity(rendered)
+        if old_base and new_base and old_base != new_base:
+            LOGGER.debug(f"Base class changed: {old_base} -> {new_base}")
+            flags.add("breaking change")
+        if old_api and new_api and old_api != new_api:
+            LOGGER.debug(f"API identity changed: {old_api} -> {new_api}")
+            flags.add("breaking change")
     if old_params and not new_params:
         # Every parameter vanished: the rendered class is effectively empty, so the
         # schema $ref could not be resolved - the wall of removals above is a schema

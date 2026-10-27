@@ -713,3 +713,68 @@ class TestVerifyMultiGroupKind:
             str(tmp_path / "config.py"),
             str(tmp_path / "config_samples_operator_openshift_io.py"),
         ]
+
+
+class TestRequiredParameterDrift:
+    """A parameter that becomes required breaks callers that omit it."""
+
+    def test_optional_to_required_is_breaking(self):
+        committed = (
+            "class A:\n    def __init__(self, a=None):\n        self.a = a\n    def to_dict(self):\n        pass\n"
+        )
+        rendered = (
+            "class A:\n"
+            "    def __init__(self, a=None):\n"
+            "        self.a = a\n"
+            "    def to_dict(self):\n"
+            "        if self.a is None:\n"
+            '            raise MissingRequiredArgumentError(argument="self.a")\n'
+        )
+        assert "breaking change" in classify_drift(committed=committed, rendered=rendered)
+
+    def test_required_to_optional_is_not_breaking(self):
+        committed = (
+            "class A:\n"
+            "    def __init__(self, a=None):\n"
+            "        self.a = a\n"
+            "    def to_dict(self):\n"
+            "        if self.a is None:\n"
+            '            raise MissingRequiredArgumentError(argument="self.a")\n'
+        )
+        rendered = (
+            "class A:\n    def __init__(self, a=None):\n        self.a = a\n    def to_dict(self):\n        pass\n"
+        )
+        assert "breaking change" not in classify_drift(committed=committed, rendered=rendered)
+
+
+class TestCallerVisibleBreakingChanges:
+    """Every change that makes previously working caller code fail or behave differently."""
+
+    BASE = (
+        "class A(Resource):\n"
+        '    api_group: str = "g.io"\n'
+        '    api_version: str = "v1"\n'
+        "    def __init__(self, a=None):\n"
+        "        self.a = a\n"
+        "    def to_dict(self):\n"
+        '        self.res["a"] = self.a\n'
+    )
+
+    def test_base_class_change_is_breaking(self):
+        rendered = self.BASE.replace("class A(Resource)", "class A(NamespacedResource)")
+        assert "breaking change" in classify_drift(committed=self.BASE, rendered=rendered)
+
+    def test_api_group_change_is_breaking(self):
+        rendered = self.BASE.replace('"g.io"', '"other.io"')
+        assert "breaking change" in classify_drift(committed=self.BASE, rendered=rendered)
+
+    def test_api_version_change_is_breaking(self):
+        rendered = self.BASE.replace('"v1"', '"v1beta1"')
+        assert "breaking change" in classify_drift(committed=self.BASE, rendered=rendered)
+
+    def test_emitted_api_key_change_is_breaking(self):
+        rendered = self.BASE.replace('self.res["a"]', 'self.res["b"]')
+        assert "breaking change" in classify_drift(committed=self.BASE, rendered=rendered)
+
+    def test_unchanged_resource_is_not_breaking(self):
+        assert classify_drift(committed=self.BASE, rendered=self.BASE) == []
