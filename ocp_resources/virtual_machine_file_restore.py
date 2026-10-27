@@ -61,3 +61,79 @@ class VirtualMachineFileRestore(NamespacedResource):
                 _spec["sourcePath"] = self.source_path
 
     # End of generated code
+
+    class Phase:
+        NEW: str = "New"
+        INIT: str = "Init"
+        HOTPLUGGING: str = "Hotplugging"
+        WAITING_FOR_ATTACHMENT: str = "WaitingForAttachment"
+        SSH_CONNECTING: str = "SSHConnecting"
+        RESTORING: str = "Restoring"
+        VOLUME_READY: str = "VolumeReady"
+        CLEANUP: str = "Cleanup"
+        SUCCEEDED: str = "Succeeded"
+        FAILED: str = "Failed"
+
+    @classmethod
+    def from_snapshot(
+        cls,
+        target_vm_name: str,
+        source_snapshot_name: str,
+        source_path: str | None = None,
+        source_namespace: str | None = None,
+        **kwargs: Any,
+    ) -> "VirtualMachineFileRestore":
+        """Build a file restore from a VolumeSnapshot without creating it on the cluster.
+
+        Args:
+            target_vm_name: Name of the target VirtualMachine in the restore's namespace.
+            source_snapshot_name: Name of the source VolumeSnapshot.
+            source_path: Path to restore. Omit to enable manual restore mode.
+            source_namespace: Namespace of the source snapshot. Omit to use the restore's namespace.
+            **kwargs: Additional arguments passed to the generated constructor.
+
+        Returns:
+            A VirtualMachineFileRestore configured to restore from the snapshot.
+        """
+        snapshot: dict[str, str] = {"name": source_snapshot_name}
+        if source_namespace is not None:
+            snapshot["namespace"] = source_namespace
+
+        return cls(
+            source={"snapshot": snapshot},
+            source_path=source_path,
+            target={"apiGroup": cls.ApiGroup.KUBEVIRT_IO, "kind": "VirtualMachine", "name": target_vm_name},
+            **kwargs,
+        )
+
+    @classmethod
+    def from_pvc(
+        cls,
+        target_vm_name: str,
+        source_pvc_name: str,
+        source_path: str | None = None,
+        source_namespace: str | None = None,
+        **kwargs: Any,
+    ) -> "VirtualMachineFileRestore":
+        """Build a file restore from a PVC without creating it on the cluster.
+
+        Args:
+            target_vm_name: Name of the target VirtualMachine in the restore's namespace.
+            source_pvc_name: Name of the source PersistentVolumeClaim.
+            source_path: Path to restore. Omit to enable manual restore mode.
+            source_namespace: Namespace of the source PVC. Omit to use the restore's namespace.
+            **kwargs: Additional arguments passed to the generated constructor.
+
+        Returns:
+            A VirtualMachineFileRestore configured to restore from the PVC.
+        """
+        pvc: dict[str, str] = {"name": source_pvc_name}
+        if source_namespace is not None:
+            pvc["namespace"] = source_namespace
+
+        return cls(
+            source={"pvc": pvc},
+            source_path=source_path,
+            target={"apiGroup": cls.ApiGroup.KUBEVIRT_IO, "kind": "VirtualMachine", "name": target_vm_name},
+            **kwargs,
+        )
