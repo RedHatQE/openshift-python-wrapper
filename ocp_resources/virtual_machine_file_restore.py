@@ -84,6 +84,10 @@ class VirtualMachineFileRestore(NamespacedResource):
         """Wait for a restore phase, reporting an unexpected failure immediately.
 
         Transient API read failures are retried within the same timeout.
+        Resource reads bypass instance's separate retry loop so this sampler
+        owns the phase-wait retry budget.
+        The sampler reports non-retriable read failures immediately as
+        TimeoutExpiredError, with the original exception in last_exp.
 
         Args:
             target_phase: Phase to wait for, including Failed when failure is expected.
@@ -92,7 +96,8 @@ class VirtualMachineFileRestore(NamespacedResource):
 
         Raises:
             RuntimeError: If the restore fails before reaching the requested phase.
-            TimeoutExpiredError: If the requested phase is not reached before the timeout.
+            TimeoutExpiredError: If the requested phase is not reached before the timeout,
+                or a non-retriable API read fails. Inspect last_exp for the original read error.
         """
         self.logger.info(f"Waiting for {self.kind} '{self.name}' to reach phase '{target_phase}'")
         previous_phase = None
@@ -102,7 +107,7 @@ class VirtualMachineFileRestore(NamespacedResource):
             exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT
             | NOT_FOUND_ERROR_EXCEPTION_DICT
             | DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
-            func=lambda: self.instance.get("status", {}),
+            func=lambda: self.api.get(name=self.name, namespace=self.namespace).get("status", {}),
         ):
             phase = status.get("phase")
             if phase != previous_phase:

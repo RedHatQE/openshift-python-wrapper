@@ -1,6 +1,6 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from typing import Any
-from unittest.mock import PropertyMock, patch
+from unittest.mock import MagicMock, PropertyMock, call, patch
 
 import pytest
 from kubernetes.client.rest import ApiException
@@ -97,15 +97,12 @@ def vmfr(vmfr_client: FakeDynamicClient) -> VirtualMachineFileRestore:
     "target_phase",
     [VirtualMachineFileRestore.Phase.SUCCEEDED, VirtualMachineFileRestore.Phase.VOLUME_READY],
 )
-def test_wait_for_phase_waits_through_intermediate_phases(vmfr: VirtualMachineFileRestore, target_phase: str) -> None:
-    with patch.object(
-        VirtualMachineFileRestore,
-        "instance",
-        new_callable=PropertyMock,
-        side_effect=[{}, {"status": {"phase": "Init"}}, {"status": {"phase": target_phase}}],
-    ) as instance:
-        vmfr.wait_for_phase(target_phase=target_phase, timeout=1, sleep=0)
-        assert instance.call_count == 3
+def test_wait_for_phase_waits_through_intermediate_phases(
+    vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock, target_phase: str
+) -> None:
+    vmfr_api.get.side_effect = [{}, {"status": {"phase": "Init"}}, {"status": {"phase": target_phase}}]
+    vmfr.wait_for_phase(target_phase=target_phase, timeout=1, sleep=0)
+    assert vmfr_api.get.call_count == 3
 
 
 @pytest.mark.parametrize(
@@ -120,15 +117,12 @@ def test_wait_for_phase_waits_through_intermediate_phases(vmfr: VirtualMachineFi
     ],
     ids=["protocol", "not-found", "connection-reset", "etcd-leader-change", "server-timeout", "deadline-exceeded"],
 )
-def test_wait_for_phase_retries_transient_reads(vmfr: VirtualMachineFileRestore, read_error: Exception) -> None:
-    with patch.object(
-        VirtualMachineFileRestore,
-        "instance",
-        new_callable=PropertyMock,
-        side_effect=[read_error, {"status": {"phase": "Succeeded"}}],
-    ) as instance:
-        vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
-        assert instance.call_count == 2
+def test_wait_for_phase_retries_transient_reads(
+    vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock, read_error: Exception
+) -> None:
+    vmfr_api.get.side_effect = [read_error, {"status": {"phase": "Succeeded"}}]
+    vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
+    assert vmfr_api.get.call_count == 2
 
 
 @pytest.mark.parametrize(
@@ -141,49 +135,59 @@ def test_wait_for_phase_retries_transient_reads(vmfr: VirtualMachineFileRestore,
     ids=["permission-denied", "unmatched-server-error", "invalid-response"],
 )
 def test_wait_for_phase_does_not_retry_unmatched_read_errors(
-    vmfr: VirtualMachineFileRestore, read_error: Exception
+    vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock, read_error: Exception
 ) -> None:
-    with patch.object(
-        VirtualMachineFileRestore,
-        "instance",
-        new_callable=PropertyMock,
-        side_effect=[read_error, {"status": {"phase": "Succeeded"}}],
-    ) as instance:
+    """Unmatched reads fail immediately through the sampler, preserving the original error."""
+    vmfr_api.get.side_effect = [read_error, {"status": {"phase": "Succeeded"}}]
+    with pytest.raises(TimeoutExpiredError) as error:
+        vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
+    assert error.value.last_exp is read_error
+    assert vmfr_api.get.call_count == 1
+
+
+def test_wait_for_phase_reports_failure_details(vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock) -> None:
+    vmfr_api.get.return_value = {"status": {"phase": "Failed", "errorMessage": "Backup snapshot is missing"}}
+    with pytest.raises(RuntimeError, match="test-restore.*Backup snapshot is missing"):
+        vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
+
+
+def test_wait_for_phase_allows_expected_failure(vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock) -> None:
+    vmfr_api.get.return_value = {"status": {"phase": "Failed"}}
+    vmfr.wait_for_phase(target_phase=vmfr.Phase.FAILED, timeout=1, sleep=0)
+
+
+def test_wait_for_phase_times_out(vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock) -> None:
+    vmfr_api.get.return_value = {"status": {"phase": "Restoring"}}
+    with pytest.raises(TimeoutExpiredError):
+        vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=0, sleep=0)
+    vmfr_api.get.assert_not_called()
+
+
+@pytest.fixture()
+def vmfr_api(vmfr: VirtualMachineFileRestore) -> Iterator[MagicMock]:
+    with patch.object(VirtualMachineFileRestore, "api", new_callable=PropertyMock) as api:
+        yield api.return_value
+
+
+def test_wait_for_phase_uses_one_retry_budget(vmfr: VirtualMachineFileRestore, vmfr_api: MagicMock) -> None:
+    """Repeated cluster errors consume only the phase budget, without the instance retry loop."""
+    elapsed = 0.0
+
+    def advance_time(seconds: float) -> None:
+        nonlocal elapsed
+        elapsed += seconds
+
+    read_error = InternalServerError(ApiException(status=500, reason="etcdserver: leader changed"))
+    vmfr_api.get.side_effect = read_error
+    with (
+        patch("timeout_sampler.time.time", side_effect=lambda: elapsed),
+        patch("timeout_sampler.time.sleep", side_effect=advance_time),
+    ):
         with pytest.raises(TimeoutExpiredError):
-            vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
-        assert instance.call_count == 1
+            vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=2, sleep=1)
 
-
-def test_wait_for_phase_reports_failure_details(vmfr: VirtualMachineFileRestore) -> None:
-    with patch.object(
-        VirtualMachineFileRestore,
-        "instance",
-        new_callable=PropertyMock,
-        return_value={"status": {"phase": "Failed", "errorMessage": "Backup snapshot is missing"}},
-    ):
-        with pytest.raises(RuntimeError, match="test-restore.*Backup snapshot is missing"):
-            vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
-
-
-def test_wait_for_phase_allows_expected_failure(vmfr: VirtualMachineFileRestore) -> None:
-    with patch.object(
-        VirtualMachineFileRestore,
-        "instance",
-        new_callable=PropertyMock,
-        return_value={"status": {"phase": "Failed"}},
-    ):
-        vmfr.wait_for_phase(target_phase=vmfr.Phase.FAILED, timeout=1, sleep=0)
-
-
-def test_wait_for_phase_times_out(vmfr: VirtualMachineFileRestore) -> None:
-    with patch.object(
-        VirtualMachineFileRestore,
-        "instance",
-        new_callable=PropertyMock,
-        return_value={"status": {"phase": "Restoring"}},
-    ):
-        with pytest.raises(TimeoutExpiredError):
-            vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=0, sleep=0)
+    assert elapsed == 2
+    assert vmfr_api.get.call_args_list == [call(name=vmfr.name, namespace=vmfr.namespace)] * 2
 
 
 @pytest.mark.parametrize(
