@@ -6,6 +6,11 @@ from timeout_sampler import TimeoutSampler
 
 from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import NamespacedResource
+from ocp_resources.utils.constants import (
+    DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
+    NOT_FOUND_ERROR_EXCEPTION_DICT,
+    PROTOCOL_ERROR_EXCEPTION_DICT,
+)
 
 
 class VirtualMachineFileRestore(NamespacedResource):
@@ -78,6 +83,8 @@ class VirtualMachineFileRestore(NamespacedResource):
     def wait_for_phase(self, target_phase: str, timeout: int = 300, sleep: int = 5) -> None:
         """Wait for a restore phase, reporting an unexpected failure immediately.
 
+        Transient API read failures are retried within the same timeout.
+
         Args:
             target_phase: Phase to wait for, including Failed when failure is expected.
             timeout: Maximum wait time in seconds.
@@ -92,6 +99,9 @@ class VirtualMachineFileRestore(NamespacedResource):
         for status in TimeoutSampler(
             wait_timeout=timeout,
             sleep=sleep,
+            exceptions_dict=PROTOCOL_ERROR_EXCEPTION_DICT
+            | NOT_FOUND_ERROR_EXCEPTION_DICT
+            | DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
             func=lambda: self.instance.get("status", {}),
         ):
             phase = status.get("phase")

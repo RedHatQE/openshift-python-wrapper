@@ -3,7 +3,10 @@ from typing import Any
 from unittest.mock import PropertyMock, patch
 
 import pytest
+from kubernetes.client.rest import ApiException
+from kubernetes.dynamic.exceptions import ForbiddenError, InternalServerError, NotFoundError, ServerTimeoutError
 from timeout_sampler import TimeoutExpiredError
+from urllib3.exceptions import ProtocolError
 
 from fake_kubernetes_client.dynamic_client import FakeDynamicClient
 from ocp_resources.virtual_machine_file_restore import VirtualMachineFileRestore
@@ -103,6 +106,52 @@ def test_wait_for_phase_waits_through_intermediate_phases(vmfr: VirtualMachineFi
     ) as instance:
         vmfr.wait_for_phase(target_phase=target_phase, timeout=1, sleep=0)
         assert instance.call_count == 3
+
+
+@pytest.mark.parametrize(
+    "read_error",
+    [
+        ProtocolError("Connection aborted"),
+        NotFoundError(ApiException(status=404, reason="Restore not found yet")),
+        ConnectionResetError("Connection reset"),
+        InternalServerError(ApiException(status=500, reason="etcdserver: leader changed")),
+        ServerTimeoutError(ApiException(status=504, reason="Server timed out")),
+        ForbiddenError(ApiException(status=403, reason="context deadline exceeded")),
+    ],
+    ids=["protocol", "not-found", "connection-reset", "etcd-leader-change", "server-timeout", "deadline-exceeded"],
+)
+def test_wait_for_phase_retries_transient_reads(vmfr: VirtualMachineFileRestore, read_error: Exception) -> None:
+    with patch.object(
+        VirtualMachineFileRestore,
+        "instance",
+        new_callable=PropertyMock,
+        side_effect=[read_error, {"status": {"phase": "Succeeded"}}],
+    ) as instance:
+        vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
+        assert instance.call_count == 2
+
+
+@pytest.mark.parametrize(
+    "read_error",
+    [
+        ForbiddenError(ApiException(status=403, reason="Permission denied")),
+        InternalServerError(ApiException(status=500, reason="Non-transient server error")),
+        ValueError("Invalid response"),
+    ],
+    ids=["permission-denied", "unmatched-server-error", "invalid-response"],
+)
+def test_wait_for_phase_does_not_retry_unmatched_read_errors(
+    vmfr: VirtualMachineFileRestore, read_error: Exception
+) -> None:
+    with patch.object(
+        VirtualMachineFileRestore,
+        "instance",
+        new_callable=PropertyMock,
+        side_effect=[read_error, {"status": {"phase": "Succeeded"}}],
+    ) as instance:
+        with pytest.raises(TimeoutExpiredError):
+            vmfr.wait_for_phase(target_phase=vmfr.Phase.SUCCEEDED, timeout=1, sleep=0)
+        assert instance.call_count == 1
 
 
 def test_wait_for_phase_reports_failure_details(vmfr: VirtualMachineFileRestore) -> None:
