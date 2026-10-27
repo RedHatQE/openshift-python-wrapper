@@ -7,7 +7,9 @@ from ocp_resources.resource import NamespacedResource
 
 
 class LLMInferenceService(NamespacedResource):
-    """ """
+    """
+    No field description from API
+    """
 
     api_group: str = NamespacedResource.ApiGroup.SERVING_KSERVE_IO
 
@@ -54,6 +56,7 @@ class LLMInferenceService(NamespacedResource):
         self.worker = worker
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

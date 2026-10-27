@@ -29,10 +29,10 @@ class ReplicaSet(NamespacedResource):
               considered available. Defaults to 0 (pod will be considered
               available as soon as it is ready)
 
-            replicas (int): Replicas is the number of desired replicas. This is a pointer to
+            replicas (int): Replicas is the number of desired pods. This is a pointer to
               distinguish between explicit zero and unspecified. Defaults to 1.
               More info: https://kubernetes.io/docs/concepts/workloads/controlle
-              rs/replicationcontroller/#what-is-a-replicationcontroller
+              rs/replicaset
 
             selector (dict[str, Any]): A label selector is a label query over a set of resources. The result
               of matchLabels and matchExpressions are ANDed. An empty label
@@ -51,6 +51,7 @@ class ReplicaSet(NamespacedResource):
         self.template = template
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

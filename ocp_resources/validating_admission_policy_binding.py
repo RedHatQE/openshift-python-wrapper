@@ -3,6 +3,7 @@
 
 from typing import Any
 
+from ocp_resources.exceptions import MissingRequiredArgumentError
 from ocp_resources.resource import Resource
 
 
@@ -35,7 +36,7 @@ class ValidatingAdmissionPolicyBinding(Resource):
             param_ref (dict[str, Any]): ParamRef describes how to locate the params to be used as input to
               expressions of rules applied by a policy binding.
 
-            policy_name (str): PolicyName references a ValidatingAdmissionPolicy name which the
+            policy_name (str): policyName references a ValidatingAdmissionPolicy name which the
               ValidatingAdmissionPolicyBinding binds to. If the referenced
               resource does not exist, this binding is considered invalid and
               will be ignored Required.
@@ -90,19 +91,22 @@ class ValidatingAdmissionPolicyBinding(Resource):
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
+            if self.policy_name is None:
+                raise MissingRequiredArgumentError(argument="self.policy_name")
+
+            if self.validation_actions is None:
+                raise MissingRequiredArgumentError(argument="self.validation_actions")
+
             self.res["spec"] = {}
             _spec = self.res["spec"]
+
+            _spec["policyName"] = self.policy_name
+            _spec["validationActions"] = self.validation_actions
 
             if self.match_resources is not None:
                 _spec["matchResources"] = self.match_resources
 
             if self.param_ref is not None:
                 _spec["paramRef"] = self.param_ref
-
-            if self.policy_name is not None:
-                _spec["policyName"] = self.policy_name
-
-            if self.validation_actions is not None:
-                _spec["validationActions"] = self.validation_actions
 
     # End of generated code

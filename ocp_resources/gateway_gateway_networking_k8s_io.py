@@ -18,9 +18,11 @@ class Gateway(NamespacedResource):
     def __init__(
         self,
         addresses: list[Any] | None = None,
+        allowed_listeners: dict[str, Any] | None = None,
         gateway_class_name: str | None = None,
         infrastructure: dict[str, Any] | None = None,
         listeners: list[Any] | None = None,
+        tls: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
@@ -28,18 +30,21 @@ class Gateway(NamespacedResource):
             addresses (list[Any]): Addresses requested for this Gateway. This is optional and behavior
               can depend on the implementation. If a value is set in the spec
               and the requested address is invalid or unavailable, the
-              implementation MUST indicate this in the associated entry in
-              GatewayStatus.Addresses.  The Addresses field represents a request
-              for the address(es) on the "outside of the Gateway", that traffic
-              bound for this Gateway will use. This could be the IP address or
-              hostname of an external load balancer or other networking
-              infrastructure, or some other address that traffic will be sent
-              to.  If no Addresses are specified, the implementation MAY
+              implementation MUST indicate this in an associated entry in
+              GatewayStatus.Conditions.  The Addresses field represents a
+              request for the address(es) on the "outside of the Gateway", that
+              traffic bound for this Gateway will use. This could be the IP
+              address or hostname of an external load balancer or other
+              networking infrastructure, or some other address that traffic will
+              be sent to.  If no Addresses are specified, the implementation MAY
               schedule the Gateway in an implementation-specific manner,
               assigning an appropriate set of Addresses.  The implementation
               MUST bind all Listeners to every GatewayAddress that it assigns to
               the Gateway and add a corresponding entry in
               GatewayStatus.Addresses.  Support: Extended
+
+            allowed_listeners (dict[str, Any]): AllowedListeners defines which ListenerSets can be attached to this
+              Gateway. The default value is to allow no ListenerSets.
 
             gateway_class_name (str): GatewayClassName used for this Gateway. This is the name of a
               GatewayClass resource.
@@ -155,15 +160,21 @@ class Gateway(NamespacedResource):
               Gateways are compatible.  In a future release the MinItems=1
               requirement MAY be dropped.  Support: Core
 
+            tls (dict[str, Any]): TLS specifies frontend and backend tls configuration for entire
+              gateway.  Support: Extended
+
         """
         super().__init__(**kwargs)
 
         self.addresses = addresses
+        self.allowed_listeners = allowed_listeners
         self.gateway_class_name = gateway_class_name
         self.infrastructure = infrastructure
         self.listeners = listeners
+        self.tls = tls
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -182,7 +193,13 @@ class Gateway(NamespacedResource):
             if self.addresses is not None:
                 _spec["addresses"] = self.addresses
 
+            if self.allowed_listeners is not None:
+                _spec["allowedListeners"] = self.allowed_listeners
+
             if self.infrastructure is not None:
                 _spec["infrastructure"] = self.infrastructure
+
+            if self.tls is not None:
+                _spec["tls"] = self.tls
 
     # End of generated code

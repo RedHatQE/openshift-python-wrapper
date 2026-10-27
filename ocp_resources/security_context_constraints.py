@@ -28,25 +28,26 @@ class SecurityContextConstraints(Resource):
         allow_host_network: bool | None = None,
         allow_host_pid: bool | None = None,
         allow_host_ports: bool | None = None,
-        allow_privilege_escalation: Any | None = None,
+        allow_privilege_escalation: bool | None = None,
         allow_privileged_container: bool | None = None,
-        allowed_capabilities: Any | None = None,
-        allowed_flex_volumes: Any | None = None,
-        allowed_unsafe_sysctls: Any | None = None,
-        default_add_capabilities: Any | None = None,
-        default_allow_privilege_escalation: Any | None = None,
-        forbidden_sysctls: Any | None = None,
-        fs_group: Any | None = None,
-        groups: Any | None = None,
-        priority: Any | None = None,
+        allowed_capabilities: list[Any] | None = None,
+        allowed_flex_volumes: list[Any] | None = None,
+        allowed_unsafe_sysctls: list[Any] | None = None,
+        default_add_capabilities: list[Any] | None = None,
+        default_allow_privilege_escalation: bool | None = None,
+        forbidden_sysctls: list[Any] | None = None,
+        fs_group: dict[str, Any] | None = None,
+        groups: list[Any] | None = None,
+        priority: int | None = None,
         read_only_root_filesystem: bool | None = None,
-        required_drop_capabilities: Any | None = None,
-        run_as_user: Any | None = None,
-        se_linux_context: Any | None = None,
-        seccomp_profiles: Any | None = None,
-        supplemental_groups: Any | None = None,
-        users: Any | None = None,
-        volumes: Any | None = None,
+        required_drop_capabilities: list[Any] | None = None,
+        run_as_user: dict[str, Any] | None = None,
+        se_linux_context: dict[str, Any] | None = None,
+        seccomp_profiles: list[Any] | None = None,
+        supplemental_groups: dict[str, Any] | None = None,
+        user_namespace_level: str | None = None,
+        users: list[Any] | None = None,
+        volumes: list[Any] | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
@@ -66,24 +67,24 @@ class SecurityContextConstraints(Resource):
             allow_host_ports (bool): allowHostPorts determines if the policy allows host ports in the
               containers.
 
-            allow_privilege_escalation (Any): allowPrivilegeEscalation determines if a pod can request to allow
+            allow_privilege_escalation (bool): allowPrivilegeEscalation determines if a pod can request to allow
               privilege escalation. If unspecified, defaults to true.
 
             allow_privileged_container (bool): allowPrivilegedContainer determines if a container can request to be
               run as privileged.
 
-            allowed_capabilities (Any): allowedCapabilities is a list of capabilities that can be requested to
+            allowed_capabilities (list[Any]): allowedCapabilities is a list of capabilities that can be requested to
               add to the container. Capabilities in this field maybe added at
               the pod author's discretion. You must not list a capability in
               both AllowedCapabilities and RequiredDropCapabilities. To allow
               all capabilities you may use '*'.
 
-            allowed_flex_volumes (Any): allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or
+            allowed_flex_volumes (list[Any]): allowedFlexVolumes is a whitelist of allowed Flexvolumes.  Empty or
               nil indicates that all Flexvolumes may be used.  This parameter is
               effective only when the usage of the Flexvolumes is allowed in the
               "Volumes" field.
 
-            allowed_unsafe_sysctls (Any): allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls,
+            allowed_unsafe_sysctls (list[Any]): allowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls,
               defaults to none. Each entry is either a plain sysctl name or ends
               in "*" in which case it is considered as a prefix of allowed
               sysctls. Single * means all unsafe sysctls are allowed. Kubelet
@@ -91,29 +92,29 @@ class SecurityContextConstraints(Resource):
               rejection.  Examples: e.g. "foo/*" allows "foo/bar", "foo/baz",
               etc. e.g. "foo.*" allows "foo.bar", "foo.baz", etc.
 
-            default_add_capabilities (Any): defaultAddCapabilities is the default set of capabilities that will be
+            default_add_capabilities (list[Any]): defaultAddCapabilities is the default set of capabilities that will be
               added to the container unless the pod spec specifically drops the
-              capability.  You may not list a capabiility in both
+              capability.  You may not list a capability in both
               DefaultAddCapabilities and RequiredDropCapabilities.
 
-            default_allow_privilege_escalation (Any): defaultAllowPrivilegeEscalation controls the default setting for
+            default_allow_privilege_escalation (bool): defaultAllowPrivilegeEscalation controls the default setting for
               whether a process can gain more privileges than its parent
               process.
 
-            forbidden_sysctls (Any): forbiddenSysctls is a list of explicitly forbidden sysctls, defaults
+            forbidden_sysctls (list[Any]): forbiddenSysctls is a list of explicitly forbidden sysctls, defaults
               to none. Each entry is either a plain sysctl name or ends in "*"
               in which case it is considered as a prefix of forbidden sysctls.
               Single * means all sysctls are forbidden.  Examples: e.g. "foo/*"
               forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "foo.bar",
               "foo.baz", etc.
 
-            fs_group (Any): fsGroup is the strategy that will dictate what fs group is used by the
+            fs_group (dict[str, Any]): fsGroup is the strategy that will dictate what fs group is used by the
               SecurityContext.
 
-            groups (Any): The groups that have permission to use this security context
+            groups (list[Any]): The groups that have permission to use this security context
               constraints
 
-            priority (Any): priority influences the sort order of SCCs when evaluating which SCCs
+            priority (int): priority influences the sort order of SCCs when evaluating which SCCs
               to try first for a given pod request based on access in the Users
               and Groups fields.  The higher the int, the higher priority. An
               unset value is considered a 0 priority. If scores for multiple
@@ -128,30 +129,37 @@ class SecurityContextConstraints(Resource):
               read only root file system if it wishes but it will not be forced
               to.
 
-            required_drop_capabilities (Any): requiredDropCapabilities are the capabilities that will be dropped
+            required_drop_capabilities (list[Any]): requiredDropCapabilities are the capabilities that will be dropped
               from the container.  These are required to be dropped and cannot
               be added.
 
-            run_as_user (Any): runAsUser is the strategy that will dictate what RunAsUser is used in
+            run_as_user (dict[str, Any]): runAsUser is the strategy that will dictate what RunAsUser is used in
               the SecurityContext.
 
-            se_linux_context (Any): seLinuxContext is the strategy that will dictate what labels will be
+            se_linux_context (dict[str, Any]): seLinuxContext is the strategy that will dictate what labels will be
               set in the SecurityContext.
 
-            seccomp_profiles (Any): seccompProfiles lists the allowed profiles that may be set for the pod
+            seccomp_profiles (list[Any]): seccompProfiles lists the allowed profiles that may be set for the pod
               or container's seccomp annotations.  An unset (nil) or empty value
-              means that no profiles may be specifid by the pod or container.
+              means that no profiles may be specified by the pod or container.
               The wildcard '*' may be used to allow all profiles.  When used to
               generate a value for a pod the first non-wildcard profile will be
               used as the default.
 
-            supplemental_groups (Any): supplementalGroups is the strategy that will dictate what supplemental
+            supplemental_groups (dict[str, Any]): supplementalGroups is the strategy that will dictate what supplemental
               groups are used by the SecurityContext.
 
-            users (Any): The users who have permissions to use this security context
+            user_namespace_level (str): userNamespaceLevel determines if the policy allows host users in
+              containers. Valid values are "AllowHostLevel", "RequirePodLevel",
+              and omitted. When "AllowHostLevel" is set, a pod author may set
+              `hostUsers` to either `true` or `false`. When "RequirePodLevel" is
+              set, a pod author must set `hostUsers` to `false`. When omitted,
+              the default value is "AllowHostLevel".
+
+            users (list[Any]): The users who have permissions to use this security context
               constraints
 
-            volumes (Any): volumes is a white list of allowed volume plugins.  FSType corresponds
+            volumes (list[Any]): volumes is a white list of allowed volume plugins.  FSType corresponds
               directly with the field names of a VolumeSource (azureFile,
               configMap, emptyDir).  To allow all volumes you may use "*". To
               allow no volumes, set to ["none"].
@@ -181,10 +189,12 @@ class SecurityContextConstraints(Resource):
         self.se_linux_context = se_linux_context
         self.seccomp_profiles = seccomp_profiles
         self.supplemental_groups = supplemental_groups
+        self.user_namespace_level = user_namespace_level
         self.users = users
         self.volumes = volumes
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -206,8 +216,23 @@ class SecurityContextConstraints(Resource):
             if self.allow_privileged_container is None:
                 raise MissingRequiredArgumentError(argument="self.allow_privileged_container")
 
+            if self.allowed_capabilities is None:
+                raise MissingRequiredArgumentError(argument="self.allowed_capabilities")
+
+            if self.default_add_capabilities is None:
+                raise MissingRequiredArgumentError(argument="self.default_add_capabilities")
+
+            if self.priority is None:
+                raise MissingRequiredArgumentError(argument="self.priority")
+
             if self.read_only_root_filesystem is None:
                 raise MissingRequiredArgumentError(argument="self.read_only_root_filesystem")
+
+            if self.required_drop_capabilities is None:
+                raise MissingRequiredArgumentError(argument="self.required_drop_capabilities")
+
+            if self.volumes is None:
+                raise MissingRequiredArgumentError(argument="self.volumes")
 
             self.res["allowHostDirVolumePlugin"] = self.allow_host_dir_volume_plugin
             self.res["allowHostIPC"] = self.allow_host_ipc
@@ -215,22 +240,21 @@ class SecurityContextConstraints(Resource):
             self.res["allowHostPID"] = self.allow_host_pid
             self.res["allowHostPorts"] = self.allow_host_ports
             self.res["allowPrivilegedContainer"] = self.allow_privileged_container
+            self.res["allowedCapabilities"] = self.allowed_capabilities
+            self.res["defaultAddCapabilities"] = self.default_add_capabilities
+            self.res["priority"] = self.priority
             self.res["readOnlyRootFilesystem"] = self.read_only_root_filesystem
+            self.res["requiredDropCapabilities"] = self.required_drop_capabilities
+            self.res["volumes"] = self.volumes
 
             if self.allow_privilege_escalation is not None:
                 self.res["allowPrivilegeEscalation"] = self.allow_privilege_escalation
-
-            if self.allowed_capabilities is not None:
-                self.res["allowedCapabilities"] = self.allowed_capabilities
 
             if self.allowed_flex_volumes is not None:
                 self.res["allowedFlexVolumes"] = self.allowed_flex_volumes
 
             if self.allowed_unsafe_sysctls is not None:
                 self.res["allowedUnsafeSysctls"] = self.allowed_unsafe_sysctls
-
-            if self.default_add_capabilities is not None:
-                self.res["defaultAddCapabilities"] = self.default_add_capabilities
 
             if self.default_allow_privilege_escalation is not None:
                 self.res["defaultAllowPrivilegeEscalation"] = self.default_allow_privilege_escalation
@@ -244,12 +268,6 @@ class SecurityContextConstraints(Resource):
             if self.groups is not None:
                 self.res["groups"] = self.groups
 
-            if self.priority is not None:
-                self.res["priority"] = self.priority
-
-            if self.required_drop_capabilities is not None:
-                self.res["requiredDropCapabilities"] = self.required_drop_capabilities
-
             if self.run_as_user is not None:
                 self.res["runAsUser"] = self.run_as_user
 
@@ -262,10 +280,10 @@ class SecurityContextConstraints(Resource):
             if self.supplemental_groups is not None:
                 self.res["supplementalGroups"] = self.supplemental_groups
 
+            if self.user_namespace_level is not None:
+                self.res["userNamespaceLevel"] = self.user_namespace_level
+
             if self.users is not None:
                 self.res["users"] = self.users
-
-            if self.volumes is not None:
-                self.res["volumes"] = self.volumes
 
     # End of generated code
