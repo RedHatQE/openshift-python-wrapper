@@ -3,11 +3,13 @@
 import os
 from typing import Any
 
+import pytest
 from rich.console import Console
 from rich.panel import Panel
 from simple_logger.logger import get_logger
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
+from class_generator.core.generator import generate_resource_file_from_dict
 from class_generator.formatters.template_renderer import render_jinja_template
 
 LOGGER = get_logger(name=__name__)
@@ -81,3 +83,35 @@ def generate_class_generator_tests() -> None:
     LOGGER.info(f"Generated test file: {test_file_path}")
     console = Console()
     console.print(Panel.fit(f"[green]Generated test file:[/green] [cyan]{test_file_path}[/cyan]"))
+
+
+class TestHandWrittenFileGuard:
+    """Regeneration must never destroy a hand-maintained resource."""
+
+    def test_refuses_to_overwrite_hand_written_file(self, tmp_path):
+        hand_written = tmp_path / "node_network_configuration_policy.py"
+        original = "import re\n\n\nclass NodeNetworkConfigurationPolicy:\n    pass\n"
+        hand_written.write_text(original)
+
+        resource_dict = {
+            "kind": "NodeNetworkConfigurationPolicy",
+            "base_class": "Resource",
+            "group": "nmstate.io",
+            "api_version": "v1",
+            "version": "v1",
+            "api_group": "nmstate.io",
+            "description": "NodeNetworkConfigurationPolicy is a hand-maintained resource.",
+            "namespaced": False,
+            "fields": [],
+            "spec": [],
+        }
+
+        with pytest.raises(RuntimeError, match="not a class-generator generated file"):
+            generate_resource_file_from_dict(
+                resource_dict=resource_dict,
+                overwrite=True,
+                output_file=str(hand_written),
+            )
+
+        # untouched
+        assert hand_written.read_text() == original

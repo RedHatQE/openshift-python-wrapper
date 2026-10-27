@@ -212,6 +212,8 @@ def discover_generated_resources() -> list[dict[str, Any]]:
         - kind: Resource class name
         - filename: File name without extension
         - has_user_code: Whether file contains user modifications
+        - deprecated: Whether the file carries a hand-maintained deprecation warning
+          below the generated-code marker (compat shim, intentionally diverged)
     """
     # Reuse existing ResourceScanner
     scanner = ResourceScanner()
@@ -233,13 +235,18 @@ def discover_generated_resources() -> list[dict[str, Any]]:
             LOGGER.error(f"Unexpected error reading file {info.file_path}: {e}, skipping...")
             continue
 
-        has_user_code = END_OF_GENERATED_CODE in content and len(content.split(END_OF_GENERATED_CODE)[1].strip()) > 0
+        user_code = content.split(END_OF_GENERATED_CODE)[1] if END_OF_GENERATED_CODE in content else ""
+        has_user_code = len(user_code.strip()) > 0
+        # A hand-maintained deprecation warning below the generated-code marker means
+        # the file is intentionally diverged from generator output (compat shim)
+        is_deprecated = "DeprecationWarning" in user_code
 
         resources.append({
             "path": info.file_path,
             "kind": info.name,
             "filename": Path(info.file_path).stem,
             "has_user_code": has_user_code,
+            "deprecated": is_deprecated,
         })
 
     return resources

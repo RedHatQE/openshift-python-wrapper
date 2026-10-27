@@ -7,10 +7,11 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import cloup
 from cloup.constraints import If, IsSet, accept_none, mutually_exclusive, require_one
+from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
@@ -19,15 +20,20 @@ from class_generator.core.discovery import discover_generated_resources
 from class_generator.core.generator import class_generator
 from class_generator.core.schema import (
     ClusterVersionError,
+    read_resources_mapping_file,
     update_kind_schema,
     update_single_resource_schema,
 )
 from class_generator.exceptions import ResourceNotFoundError
+from class_generator.formatters.file_writer import DRIFT_CATEGORIES, DRIFT_CATEGORY_DESCRIPTIONS
 from class_generator.tests.test_generation import generate_class_generator_tests
 from class_generator.utils import execute_parallel_tasks
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
+
+# Resources verified in parallel: each worker renders and formats one resource
+DEFAULT_VERIFY_JOBS = 10
 
 
 def validate_actions(
@@ -38,6 +44,9 @@ def validate_actions(
     coverage_report: bool,
     generate_missing: bool,
     regenerate_all: bool,
+    verify: bool,
+    verify_all: bool,
+    verify_changed: bool,
 ) -> None:
     """Validate that at least one action is specified."""
     actions = [
@@ -48,10 +57,13 @@ def validate_actions(
         coverage_report,
         generate_missing,
         regenerate_all,
+        verify,
+        verify_all,
+        verify_changed,
     ]
     if not any(actions):
         LOGGER.error(
-            "At least one action must be specified (--kind, --update-schema, --update-schema-for, --discover-missing, --coverage-report, --generate-missing, or --regenerate-all)"
+            "At least one action must be specified (--kind, --update-schema, --update-schema-for, --discover-missing, --coverage-report, --generate-missing, --regenerate-all, --verify, --verify-all, or --verify-changed)"
         )
         sys.exit(1)
 
@@ -328,6 +340,285 @@ def handle_regenerate_all(
     return True
 
 
+def _filter_deprecated(resources: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    Filter out deprecated resource files (hand-maintained deprecation shims).
+
+    Files carrying a deprecation warning below the generated-code marker are
+    intentionally diverged from generator output and cannot be verified.
+
+    Args:
+        resources: Discovered resources
+
+    Returns:
+        Resources that are not deprecated
+    """
+    deprecated = [resource for resource in resources if resource.get("deprecated")]
+    if deprecated:
+        names = ", ".join(sorted(Path(resource["path"]).name for resource in deprecated))
+        LOGGER.info(f"Skipping {len(deprecated)} deprecated resource file(s): {names}")
+    return [resource for resource in resources if not resource.get("deprecated")]
+
+
+def _changed_generated_resources(base: str) -> list[tuple[str, str]]:
+    """
+    Get generated resources changed relative to a git base ref.
+
+    Args:
+        base: Git ref to compare against (e.g. origin/main)
+
+    Returns:
+        List of (kind, path) tuples for changed generated resource files
+    """
+    success, stdout, stderr = run_command(
+        command=["git", "diff", "--name-only", base],
+        verify_stderr=False,
+        check=False,
+        log_errors=False,
+    )
+    if not success:
+        LOGGER.error(
+            f"Failed to get changed files against {base}: {stderr}. "
+            f"Make sure the ref exists locally (git fetch origin main) or pass --base <ref>."
+        )
+        sys.exit(1)
+
+    changed_paths = {line.strip() for line in stdout.splitlines() if line.strip()}
+    discovered = _filter_deprecated(discover_generated_resources())
+    changed_resources = [resource for resource in discovered if resource["path"] in changed_paths]
+
+    if changed_paths and not changed_resources:
+        LOGGER.info("No generated resource files were changed")
+
+    return [(resource["kind"], resource["path"]) for resource in changed_resources]
+
+
+def handle_verify(
+    verify: bool,
+    verify_all: bool,
+    verify_changed: bool,
+    kind: str | None,
+    filter_pattern: str | None,
+    base: str,
+    classification: str | None,
+    exclude: str | None,
+    match_within: bool,
+    jobs: int = DEFAULT_VERIFY_JOBS,
+) -> bool:
+    """
+    Handle verification of generated resource files without modifying them.
+
+    Args:
+        verify: Whether to verify specific kinds passed via --kind
+        verify_all: Whether to verify all generated resources
+        verify_changed: Whether to verify only resources changed relative to the base git ref
+        kind: Comma-separated list of kinds to verify
+        filter_pattern: Optional filter pattern for resource names
+        base: Git ref to compare against when verify_changed is set
+        classification: Optional comma-separated drift classifications; when set, only
+            drifted files matching them are reported and fail the run
+        exclude: Optional comma-separated drift classifications; files whose drift
+            contains any of them are dropped from the report, leaving only drift that
+            is safe to regenerate
+        match_within: When True, require the file's drift categories to be within the
+            given classifications (files with additional categories are excluded);
+            False means at least one of them
+        jobs: Number of resources verified in parallel
+
+    Returns:
+        True if verification was performed and main should exit, False to continue
+    """
+    if not verify and not verify_all and not verify_changed:
+        return False
+
+    # Verify runs hundreds of prek invocations; quiet the per-command shell logs so
+    # the final summary stays readable
+    logging.getLogger("pyhelper_utils.shell").setLevel(logging.WARNING)
+
+    classification_filter: set[str] = set()
+    if classification:
+        classification_filter = {entry.strip() for entry in classification.split(",") if entry.strip()}
+        unknown = classification_filter - set(DRIFT_CATEGORIES)
+        if unknown:
+            LOGGER.error(
+                f"Unknown classification(s): {', '.join(sorted(unknown))}. "
+                f"Valid classifications: {', '.join(DRIFT_CATEGORIES)}"
+            )
+            sys.exit(1)
+    elif match_within:
+        LOGGER.error("--match can only be used together with --classification")
+        sys.exit(1)
+
+    exclude_filter: set[str] = set()
+    if exclude:
+        exclude_filter = {entry.strip() for entry in exclude.split(",") if entry.strip()}
+        unknown_excluded = exclude_filter - set(DRIFT_CATEGORIES)
+        if unknown_excluded:
+            LOGGER.error(
+                f"Unknown classification(s) in --exclude: {', '.join(sorted(unknown_excluded))}. "
+                f"Valid classifications: {', '.join(DRIFT_CATEGORIES)}"
+            )
+            sys.exit(1)
+
+    # Clean up stale temp files possibly left behind by interrupted runs
+    for stale_file in Path("ocp_resources").glob(".class_generator_verify*"):
+        stale_file.unlink()
+        LOGGER.warning(f"Removed stale verify temp file: {stale_file}")
+
+    if verify_all:
+        discovered = _filter_deprecated(discover_generated_resources())
+        if filter_pattern:
+            discovered = [resource for resource in discovered if fnmatch.fnmatch(resource["kind"], filter_pattern)]
+            LOGGER.info(f"Filtered to {len(discovered)} resources matching '{filter_pattern}'")
+
+        targets = [(resource["kind"], resource["path"]) for resource in discovered]
+        LOGGER.info(f"Verifying {len(targets)} generated resources...")
+
+    elif verify_changed:
+        targets = _changed_generated_resources(base=base)
+        LOGGER.info(f"Verifying {len(targets)} changed generated resource(s) against {base}...")
+
+    else:
+        targets = [(k, None) for k in (kind or "").split(",") if k]
+        LOGGER.info(f"Verifying {len(targets)} kind(s)...")
+
+    drift_results: list[tuple[str, list[tuple[str, list[str]]]]] = []
+    failed_kinds: list[str] = []
+    resources_mapping = read_resources_mapping_file()
+
+    def verify_single_resource(target: tuple[str, str | None]) -> tuple[str, list[tuple[str, list[str]]], str | None]:
+        """
+        Verify a single resource.
+
+        Returns:
+            Tuple of (kind, drifted_files_with_categories, error_message)
+        """
+        resource_kind, resource_file = target
+        if not resources_mapping.get(resource_kind.lower()):
+            # A kind absent from the resources mapping can neither be rendered nor
+            # regenerated; report it as a classified drift entry instead of raising
+            if resource_file:
+                return resource_kind, [(resource_file, ["not in schema"])], None
+
+        try:
+            return (
+                resource_kind,
+                cast(
+                    "list[tuple[str, list[str]]]",
+                    class_generator(
+                        kind=resource_kind,
+                        verify=True,
+                        output_file=resource_file or "",
+                        called_from_cli=False,
+                    ),
+                ),
+                None,
+            )
+        except Exception as e:
+            LOGGER.exception(f"Failed to verify {resource_kind}: {e}")
+            return resource_kind, [], str(e)
+
+    def process_verification_result(
+        _target: tuple[str, str | None], result: tuple[str, list[tuple[str, list[str]]], str | None]
+    ) -> None:
+        nonlocal drift_results, failed_kinds
+        _resource_kind, drifted, error = result
+        if drifted:
+            drift_results.append((_resource_kind, drifted))
+        if error:
+            failed_kinds.append(_resource_kind)
+
+    def handle_verification_error(target: tuple[str, str | None], exc: Exception) -> None:
+        nonlocal failed_kinds
+        resource_kind = target[0]
+        LOGGER.exception(f"Executor-level failure for {resource_kind}: {exc}")
+        failed_kinds.append(resource_kind)
+
+    execute_parallel_tasks(
+        tasks=targets,
+        task_func=verify_single_resource,
+        max_workers=jobs,
+        task_name="verification",
+        result_processor=process_verification_result,
+        error_handler=handle_verification_error,
+    )
+
+    # Apply the classification filter: only drifted files matching the requested
+    # classifications (per match_mode) are reported and fail the run
+    def classification_matches(categories: list[str]) -> bool:
+        if match_within:
+            # --match: the file's categories must be a subset of the requested ones —
+            # files with additional classifications are excluded
+            return set(categories) <= classification_filter
+        return bool(classification_filter & set(categories))
+
+    drifted_files: list[tuple[str, list[str]]] = []
+    drifted_kinds: set[str] = set()
+    filtered_out_count = 0
+    excluded_out_count = 0
+    for resource_kind, drifted in drift_results:
+        if classification_filter:
+            matching = [(path, categories) for path, categories in drifted if classification_matches(categories)]
+            filtered_out_count += len(drifted) - len(matching)
+            drifted = matching
+        if exclude_filter:
+            kept = [(path, categories) for path, categories in drifted if not exclude_filter & set(categories)]
+            excluded_out_count += len(drifted) - len(kept)
+            drifted = kept
+        if drifted:
+            drifted_kinds.add(resource_kind)
+            drifted_files.extend(drifted)
+
+    # Kinds absent from the schema mapping cannot be regenerated; they get their
+    # own message instead of regenerate commands
+    not_in_schema_kinds = {
+        resource_kind
+        for resource_kind, drifted in drift_results
+        if resource_kind in drifted_kinds and all(categories == ["not in schema"] for _path, categories in drifted)
+    }
+
+    if drifted_files or failed_kinds:
+        if drifted_files:
+            print(f"\nVerification failed: {len(drifted_files)} file(s) do not match class-generator output:")
+            for drifted_file, categories in drifted_files:
+                print(f"  - {drifted_file} ({', '.join(categories)})")
+        regenerable_kinds = sorted(drifted_kinds - not_in_schema_kinds)
+        if regenerable_kinds:
+            print(
+                "These files do not match the current class-generator output. Regenerate them instead of editing manually:"
+            )
+            for drifted_kind in regenerable_kinds:
+                print(f"  class-generator --kind {drifted_kind} --overwrite")
+            print("Or regenerate all drifted kinds at once:")
+            print(f"  class-generator --kind {','.join(regenerable_kinds)} --overwrite")
+        if failed_kinds:
+            print(f"\nVerification failed for {len(failed_kinds)} kind(s): {', '.join(failed_kinds)}")
+        if not_in_schema_kinds:
+            print(
+                f"\nKinds not found in the schema mapping (cannot be verified or regenerated): "
+                f"{', '.join(sorted(not_in_schema_kinds))}. Run --update-schema from a cluster "
+                "that serves these kinds."
+            )
+        if filtered_out_count:
+            print(
+                f"{filtered_out_count} drifted file(s) did not match --classification "
+                f"'{classification}'{' --match' if match_within else ''} and are not shown"
+            )
+        if excluded_out_count:
+            print(f"{excluded_out_count} drifted file(s) excluded by --exclude '{exclude}' and are not shown")
+        sys.exit(1)
+
+    if filtered_out_count:
+        print(
+            f"{filtered_out_count} drifted file(s) did not match --classification "
+            f"'{classification}'{' --match' if match_within else ''} and are not shown"
+        )
+    if excluded_out_count:
+        print(f"{excluded_out_count} drifted file(s) excluded by --exclude '{exclude}' and are not shown")
+    print(f"\nVerification passed: all {len(targets)} generated resource(s) match class-generator output")
+    return True
+
+
 def handle_normal_kind_generation(
     kind: str,
     overwrite: bool,
@@ -496,103 +787,216 @@ def handle_test_generation(add_tests: bool) -> None:
             LOGGER.error(f"Tests failed with exit code {exit_code >> 8}")
 
 
-@cloup.command("Resource class generator", show_constraints=True)
-@cloup.option(
-    "-k",
-    "--kind",
-    type=cloup.STRING,
-    help="""
-    \b
-    The Kind to generate the class for, Needs working cluster with admin privileges.
-    multiple kinds can be sent separated by comma (without spaces)
-    Example: -k Deployment,Pod,ConfigMap
-""",
+def _build_epilog() -> str:
+    """Build the --help epilog: verification notes, drift classifications and examples."""
+    width = max(len(category) for category in DRIFT_CATEGORIES)
+    classifications = "\n".join(
+        f"  {category:<{width}}  {DRIFT_CATEGORY_DESCRIPTIONS[category]}" for category in DRIFT_CATEGORIES
+    )
+    return f"""
+\b
+Verification:
+  --verify / --verify-all / --verify-changed never modify files. On drift they
+  exit 1, list each drifted file with its classifications, and print the exact
+  regenerate command. Drift means the file no longer matches current generator
+  output - either it was hand-edited inside the generated markers, or the
+  generator/template/schema changed since it was generated.
+
+\b
+Drift classifications (--classification):
+{classifications}
+
+\b
+  Without --match a file is reported when its drift contains at least one of the
+  given classifications. With --match the drift must be within them: a file that
+  also has other classifications is excluded. --exclude is the opposite: files
+  whose drift contains any of the given classifications are dropped, leaving only
+  drift that is safe to regenerate.
+
+\b
+Examples:
+
+\b
+  class-generator --kind Deployment,Pod --add-tests
+      generate classes, adding tests and test manifests
+
+\b
+  class-generator --verify-changed --base origin/main
+      verify files changed in this branch were produced by class-generator
+
+\b
+  class-generator --verify-all --classification "blank lines,code add" --match
+      list only files whose drift is blank lines and/or code add, nothing else
+
+\b
+  class-generator --verify-all --classification "breaking change"
+      find regenerations that would break callers
+
+\b
+  class-generator --verify-all --exclude "breaking change,schema incomplete"
+      list only drift that is safe to regenerate
+"""
+
+
+@cloup.command("Resource class generator", show_constraints=False, epilog=_build_epilog())
+@cloup.option_group(
+    "Generation",
+    cloup.option(
+        "-k",
+        "--kind",
+        type=cloup.STRING,
+        help="The Kind to generate the class for. Needs a working cluster with admin privileges. "
+        "Multiple kinds can be sent separated by comma (without spaces). "
+        "Example: -k Deployment,Pod,ConfigMap",
+    ),
+    cloup.option(
+        "-o",
+        "--output-file",
+        help="The full filename path to generate a python resource file. If not sent, resource kind will be used",
+        type=cloup.Path(),
+    ),
+    cloup.option(
+        "--overwrite",
+        is_flag=True,
+        help="Output file overwrite existing file if passed",
+    ),
+    cloup.option("--dry-run", is_flag=True, help="Run the script without writing to file"),
+    cloup.option(
+        "--add-tests",
+        help=f"Add a test to `test_class_generator.py` and test files to `{TESTS_MANIFESTS_DIR}` dir",
+        is_flag=True,
+        show_default=True,
+    ),
 )
-@cloup.option(
-    "-o",
-    "--output-file",
-    help="The full filename path to generate a python resource file. If not sent, resource kind will be used",
-    type=cloup.Path(),
+@cloup.option_group(
+    "Schema",
+    cloup.option(
+        "--update-schema",
+        help="Update kind schema files",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--update-schema-for",
+        type=cloup.STRING,
+        help="Update schema for a single resource kind only, without affecting other resources. "
+        "Useful when connected to an older cluster but needing to update a specific CRD. "
+        "Example: --update-schema-for LlamaStackDistribution. "
+        "Cannot be used together with --update-schema.",
+    ),
 )
-@cloup.option(
-    "--overwrite",
-    is_flag=True,
-    help="Output file overwrite existing file if passed",
+@cloup.option_group(
+    "Discovery",
+    cloup.option(
+        "--discover-missing",
+        help="Discover resources in the cluster that don't have wrapper classes",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--coverage-report",
+        help="Generate a coverage report of implemented vs discovered resources",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--generate-missing",
+        help="Generate classes for all missing resources after discovery",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--json",
+        "json_output",
+        help="Output reports in JSON format",
+        is_flag=True,
+        default=False,
+        show_default=True,
+    ),
 )
-@cloup.option("--dry-run", is_flag=True, help="Run the script without writing to file")
-@cloup.option(
-    "--add-tests",
-    help=f"Add a test to `test_class_generator.py` and test files to `{TESTS_MANIFESTS_DIR}` dir",
-    is_flag=True,
-    show_default=True,
+@cloup.option_group(
+    "Regeneration",
+    cloup.option(
+        "--regenerate-all",
+        help="Regenerate all existing generated resource classes with latest schemas",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--backup",
+        help="Create timestamped backup before regeneration or overwriting files",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--filter",
+        help="Filter resources to regenerate using glob pattern (e.g., 'Pod*', '*Service')",
+        type=cloup.STRING,
+        default=None,
+    ),
 )
-@cloup.option(
-    "--update-schema",
-    help="Update kind schema files",
-    is_flag=True,
-    show_default=True,
+@cloup.option_group(
+    "Verification",
+    cloup.option(
+        "--verify",
+        help="Verify the files for the kinds passed via --kind; no files are modified",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--verify-all",
+        help="Verify all generated resources; combine with --filter to narrow the scope",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--verify-changed",
+        help="Verify only resources changed vs --base; untouched files are not checked",
+        is_flag=True,
+        show_default=True,
+    ),
+    cloup.option(
+        "--base",
+        type=cloup.STRING,
+        default="origin/main",
+        show_default=True,
+        help="Git ref to compare against when using --verify-changed",
+    ),
+    cloup.option(
+        "--classification",
+        type=cloup.STRING,
+        default=None,
+        help="Only report drift matching these classifications (comma-separated); see below",
+    ),
+    cloup.option(
+        "--exclude",
+        type=cloup.STRING,
+        default=None,
+        help="Drop files whose drift contains any of these classifications (comma-separated); see below",
+    ),
+    cloup.option(
+        "--match",
+        is_flag=True,
+        default=False,
+        help="Require drift to be within --classification, not merely overlap it",
+    ),
+    cloup.option(
+        "--jobs",
+        type=cloup.IntRange(min=1),
+        default=DEFAULT_VERIFY_JOBS,
+        show_default=True,
+        help="Number of resources verified in parallel",
+    ),
 )
-@cloup.option(
-    "--update-schema-for",
-    type=cloup.STRING,
-    help="""
-    \b
-    Update schema for a single resource kind only, without affecting other resources.
-    Useful when connected to an older cluster but needing to update a specific CRD.
-    Example: --update-schema-for LlamaStackDistribution
-    Cannot be used together with --update-schema.
-""",
-)
-@cloup.option(
-    "--discover-missing",
-    help="Discover resources in the cluster that don't have wrapper classes",
-    is_flag=True,
-    show_default=True,
-)
-@cloup.option(
-    "--coverage-report",
-    help="Generate a coverage report of implemented vs discovered resources",
-    is_flag=True,
-    show_default=True,
-)
-@cloup.option(
-    "--json",
-    "json_output",
-    help="Output reports in JSON format",
-    is_flag=True,
-    default=False,
-    show_default=True,
-)
-@cloup.option(
-    "--generate-missing",
-    help="Generate classes for all missing resources after discovery",
-    is_flag=True,
-    show_default=True,
-)
-@cloup.option(
-    "--regenerate-all",
-    help="Regenerate all existing generated resource classes with latest schemas",
-    is_flag=True,
-    show_default=True,
-)
-@cloup.option(
-    "--backup",
-    help="Create timestamped backup before regeneration or overwriting files",
-    is_flag=True,
-    show_default=True,
-)
-@cloup.option(
-    "--filter",
-    help="Filter resources to regenerate using glob pattern (e.g., 'Pod*', '*Service')",
-    type=cloup.STRING,
-    default=None,
-)
-@cloup.option(
-    "-v",
-    "--verbose",
-    help="Enable verbose output with debug logs",
-    is_flag=True,
-    show_default=True,
+@cloup.option_group(
+    "Logging",
+    cloup.option(
+        "-v",
+        "--verbose",
+        help="Enable verbose output with debug logs",
+        is_flag=True,
+        show_default=True,
+    ),
 )
 @cloup.constraint(
     If(IsSet("update_schema") & ~IsSet("generate_missing"), then=accept_none),
@@ -627,7 +1031,39 @@ def handle_test_generation(add_tests: bool) -> None:
 )
 @cloup.constraint(
     If(IsSet("filter"), then=require_one),
-    ["regenerate_all"],
+    ["regenerate_all", "verify_all", "verify_changed"],
+)
+@cloup.constraint(
+    mutually_exclusive,
+    ["verify", "verify_all", "verify_changed"],
+)
+@cloup.constraint(
+    mutually_exclusive,
+    ["verify", "verify_all", "verify_changed", "regenerate_all"],
+)
+@cloup.constraint(
+    mutually_exclusive,
+    ["verify", "verify_all", "verify_changed", "backup"],
+)
+@cloup.constraint(
+    mutually_exclusive,
+    ["verify", "verify_all", "verify_changed", "overwrite"],
+)
+@cloup.constraint(
+    mutually_exclusive,
+    ["verify", "verify_all", "verify_changed", "add_tests"],
+)
+@cloup.constraint(
+    mutually_exclusive,
+    ["verify", "verify_all", "verify_changed", "dry_run"],
+)
+@cloup.constraint(
+    If(IsSet("verify"), then=require_one),
+    ["kind"],
+)
+@cloup.constraint(
+    If(IsSet("classification") | IsSet("exclude"), then=require_one),
+    ["verify", "verify_all", "verify_changed"],
 )
 def main(
     kind: str | None,
@@ -645,6 +1081,14 @@ def main(
     update_schema: bool,
     update_schema_for: str | None,
     verbose: bool,
+    verify: bool,
+    verify_all: bool,
+    verify_changed: bool,
+    base: str,
+    classification: str | None,
+    exclude: str | None,
+    match: bool,
+    jobs: int,
 ) -> None:
     """Generate Python module for K8S resource."""
     # Configure logging based on verbose flag
@@ -682,6 +1126,9 @@ def main(
         coverage_report=coverage_report,
         generate_missing=generate_missing,
         regenerate_all=regenerate_all,
+        verify=verify,
+        verify_all=verify_all,
+        verify_changed=verify_changed,
     )
 
     # Handle single resource schema update (if specified)
@@ -707,6 +1154,21 @@ def main(
         overwrite=overwrite,
         dry_run=dry_run,
     )
+
+    # Handle verification of generated files (no file is modified)
+    if handle_verify(
+        verify=verify,
+        verify_all=verify_all,
+        verify_changed=verify_changed,
+        kind=kind,
+        filter_pattern=filter,
+        base=base,
+        classification=classification,
+        exclude=exclude,
+        match_within=match,
+        jobs=jobs,
+    ):
+        return
 
     # Handle regenerate-all operation
     if handle_regenerate_all(regenerate_all=regenerate_all, backup=backup, dry_run=dry_run, filter_pattern=filter):

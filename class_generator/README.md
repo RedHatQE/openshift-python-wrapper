@@ -70,6 +70,48 @@ class-generator --regenerate-all --backup
 
 All backups preserve the original directory structure, making it easy to restore specific files or entire directories if needed.
 
+### Verifying generated files
+
+To check whether existing resource files were produced by class-generator (i.e. match its current output), use the verify modes. No file is modified:
+
+```bash
+# Verify specific kinds
+class-generator --verify --kind <kind1>,<kind2>
+
+# Verify all generated resources (only files with the generated marker are checked)
+class-generator --verify-all
+
+# Verify only resources changed relative to a git ref (default origin/main) —
+# use this to verify that PR/branch changes were produced by class-generator
+class-generator --verify-changed [--base origin/main]
+
+# Narrow the scope with a glob filter
+class-generator --verify-all --filter 'Pod*'
+```
+
+The command exits with code `0` when all files match, and code `1` listing the drifted files otherwise. Each drifted file is reported with a unified diff and a drift classification: `blank lines`, `docstring add`/`docstring delete`, `code add`/`code delete` (lines regeneration would introduce/remove), `signature code add`/`signature code remove` (`__init__` parameters added/removed — additions are non-breaking because every generated parameter carries a default, removals are not), `breaking change` (a parameter was removed, so callers passing it get a `TypeError`), and `schema incomplete` (the rendered class lost every parameter, meaning a schema `$ref` could not be resolved — flagged in addition to, not instead of, `breaking change`). A drifted file was either hand-edited inside the generated markers, or the generator/template changed since it was last generated — regenerate it with `class-generator --kind <Kind> --overwrite` instead of editing it manually.
+
+#### Filtering failures by classification
+
+All verify modes accept `--classification` to report (and fail on) only drifted files matching the given classification(s), comma-separated:
+
+```bash
+# failed files whose drift includes blank-lines drift (possibly among others)
+class-generator --verify-all --classification "blank lines"
+
+# failed files whose drift is only blank lines and/or code add, nothing else
+# (e.g. "blank lines" alone, "code add" alone, or both)
+class-generator --verify-all --classification "blank lines,code add" --match
+```
+
+Without `--match`, a file matches when its drift contains **at least one** of the given classifications. With `--match`, the file's drift must be **within** the given set — every classification the file has must be one of the given ones; files with additional classifications are excluded. Drifted files hidden by the filter are counted in the summary but do not fail the run.
+
+`--verify-changed` is the mode intended for PR review: it checks only the generated files the branch actually modified, so pre-existing drift in untouched files does not produce noise. The same check is available as a tox environment:
+
+```bash
+tox -e validate-generated
+```
+
 ### Discovering missing resources
 
 The class-generator can automatically discover resources in your cluster that don't have wrapper classes yet. Resource discovery runs in parallel for improved performance, typically reducing discovery time by 3-5x compared to sequential discovery.

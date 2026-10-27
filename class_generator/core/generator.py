@@ -12,13 +12,18 @@ from simple_logger.logger import get_logger
 
 from class_generator.constants import RESOURCES_MAPPING_FILE, TESTS_MANIFESTS_DIR
 from class_generator.core.schema import read_resources_mapping_file, update_kind_schema
-from class_generator.formatters.file_writer import write_and_format_rendered
+from class_generator.formatters.file_writer import verify_rendered, write_and_format_rendered
 from class_generator.formatters.template_renderer import render_jinja_template
 from class_generator.parsers.explain_parser import parse_explain
 from class_generator.parsers.user_code_parser import parse_user_code_from_file
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
+
+
+GENERATED_FILES_HEADER = (
+    "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md"
+)
 
 
 def generate_resource_file_from_dict(
@@ -29,7 +34,8 @@ def generate_resource_file_from_dict(
     add_tests: bool = False,
     output_file_suffix: str = "",
     output_dir: str = "",
-) -> tuple[str, str]:
+    verify: bool = False,
+) -> tuple[str, str | list[str] | None]:
     """
     Generate a Python file from a resource dictionary.
 
@@ -41,9 +47,13 @@ def generate_resource_file_from_dict(
         add_tests: Whether to generate test files
         output_file_suffix: Suffix to add to the output filename
         output_dir: Output directory (defaults to "ocp_resources")
+        verify: If True, verify the existing file matches the rendered output
+            without writing anything
 
     Returns:
-        Tuple of (original_filename, generated_filename)
+        Tuple of (original_filename, generated_filename). In verify mode,
+        generated_filename is the original filename on match, or the list of
+        drift categories when a drift (or a missing file) is detected.
     """
     base_dir = output_dir or "ocp_resources"
     os.makedirs(base_dir, exist_ok=True)
@@ -54,9 +64,7 @@ def generate_resource_file_from_dict(
         template_name="class_generator_template.j2",
     )
 
-    output = (
-        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md\n\n"
-    )
+    output = f"{GENERATED_FILES_HEADER}\n\n"
     formatted_kind_str = convert_camel_case_to_snake_case(name=resource_dict["kind"])
 
     if re.search(r"_[a-z]_", formatted_kind_str):
@@ -87,11 +95,23 @@ def generate_resource_file_from_dict(
     _user_code: str = ""
     _user_imports: str = ""
 
+    if _output_file_exists and not add_tests and not verify:
+        # Only class-generator output may be overwritten: a hand-maintained resource
+        # has no generated header and no end-of-generated-code marker, so rewriting
+        # it silently deletes the hand-written implementation
+        _existing_content = Path(_output_file).read_text(encoding="utf-8")
+        if GENERATED_FILES_HEADER not in _existing_content:
+            raise RuntimeError(
+                f"{_output_file} is not a class-generator generated file "
+                f"(missing the generated header). Refusing to overwrite a hand-maintained "
+                f"resource - exclude its kind from the regeneration command."
+            )
+
     if _output_file_exists and not add_tests:
         _user_code, _user_imports = parse_user_code_from_file(file_path=_output_file)
 
     orig_filename = _output_file
-    if _output_file_exists:
+    if _output_file_exists and not verify:
         if overwrite:
             LOGGER.warning(f"Overwriting {_output_file}")
 
@@ -105,6 +125,14 @@ def generate_resource_file_from_dict(
         output += f"{_user_imports}{rendered}{_user_code}"
     else:
         output += rendered
+
+    if verify:
+        drift_categories = verify_rendered(filepath=_output_file, output=output)
+        if drift_categories is None:
+            return orig_filename, orig_filename
+
+        LOGGER.error(f"Drift detected: {_output_file} does not match class-generator output")
+        return orig_filename, drift_categories
 
     if dry_run:
         console = Console()
@@ -128,7 +156,8 @@ def class_generator(
     called_from_cli: bool = True,
     update_schema_executed: bool = False,
     called_from_test: bool = False,
-) -> list[str]:
+    verify: bool = False,
+) -> list[str] | list[tuple[str, list[str]]]:
     """
     Generates a class for a given Kind.
 
@@ -143,7 +172,9 @@ def class_generator(
         update_schema_executed: Whether schema update was already executed
 
     Returns:
-        List of generated file paths
+        List of generated file paths. When verify=True, returns a list of
+        (drifted_file_path, drift_categories) tuples, empty when all files
+        match the generator output.
     """
     LOGGER.info(f"Generating class for {kind}")
     kind = kind.lower()
@@ -194,7 +225,12 @@ def class_generator(
                 raise RuntimeError(error_msg)
 
         else:
-            LOGGER.error(f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema.")
+            error_msg = f"{kind} not found in {RESOURCES_MAPPING_FILE}, Please run --update-schema."
+            if verify:
+                # A kind that cannot be found in the schema mapping cannot be verified;
+                # failing loudly beats silently reporting it as clean
+                raise RuntimeError(error_msg)
+            LOGGER.error(error_msg)
             return []
 
     resources = parse_explain(kind=kind)
@@ -202,11 +238,13 @@ def class_generator(
     # Check if we have resources from different API groups
     unique_groups = set()
     for resource in resources:
-        # Use the original group name that we stored
-        if "original_group" in resource and resource["original_group"]:
-            unique_groups.add(resource["original_group"])
+        # Use the original group name that we stored; the core group ("") counts
+        # as a group too, so a kind existing in core and one other group gets
+        # suffix-based file separation instead of resources overwriting each other
+        unique_groups.add(resource.get("original_group") or "")
 
     use_output_file_suffix: bool = len(unique_groups) > 1
+    drifted_files: list[tuple[str, list[str]]] = []
     generated_files: list[str] = []
     for resource_dict in resources:
         # Use the lowercase version of the original group name for suffix
@@ -222,7 +260,16 @@ def class_generator(
             add_tests=add_tests,
             output_file_suffix=output_file_suffix,
             output_dir=output_dir,
+            verify=verify,
         )
+
+        if verify:
+            if isinstance(generated_py_file, list):
+                drifted_files.append((orig_filename, generated_py_file))
+            continue
+
+        # In verify mode the loop continues above, so the file is always a str here
+        assert isinstance(generated_py_file, str)
 
         if not dry_run and not called_from_test:
             if orig_filename != generated_py_file and filecmp.cmp(orig_filename, generated_py_file):
@@ -230,5 +277,8 @@ def class_generator(
                 Path.unlink(Path(generated_py_file))
 
         generated_files.append(generated_py_file)
+
+    if verify:
+        return drifted_files
 
     return generated_files

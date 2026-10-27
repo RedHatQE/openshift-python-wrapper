@@ -12,7 +12,8 @@ TESTS_MANIFESTS_DIR: Path = Path("class_generator") / "tests" / "manifests"
 SCHEMA_DIR: Path = Path("class_generator") / "schema"
 RESOURCES_MAPPING_FILE: Path = SCHEMA_DIR / "__resources-mappings.json"
 RESOURCES_MAPPING_ARCHIVE: Path = SCHEMA_DIR / "__resources-mappings.json.gz"
-DEFINITIONS_FILE: Path = SCHEMA_DIR / "_definitions.json"
+DEFINITIONS_FILE: Path = SCHEMA_DIR / "__definitions.json"
+DEFINITIONS_ARCHIVE: Path = SCHEMA_DIR / "__definitions.json.gz"
 
 # Description constants
 MISSING_DESCRIPTION_STR: str = "No field description from API"

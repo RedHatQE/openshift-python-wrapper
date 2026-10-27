@@ -11,10 +11,10 @@ from packaging.version import Version
 from pyhelper_utils.shell import run_command
 from simple_logger.logger import get_logger
 
-from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_FILE, SCHEMA_DIR
+from class_generator.constants import DEFINITIONS_ARCHIVE, DEFINITIONS_FILE, RESOURCES_MAPPING_FILE, SCHEMA_DIR
 from class_generator.exceptions import ResourceNotFoundError
 from class_generator.utils import execute_parallel_tasks, execute_parallel_with_mapping
-from ocp_resources.utils.archive_utils import save_json_archive
+from ocp_resources.utils.archive_utils import load_json_archive, save_json_archive
 from ocp_resources.utils.schema_validator import SchemaValidator
 
 LOGGER = get_logger(name=__name__)
@@ -615,17 +615,17 @@ def process_schema_definitions(
     existing_count = len(resources_mapping)
     LOGGER.info(f"Starting with {existing_count} existing resource types - preserving all")
 
-    # Load existing definitions when not allowing updates to preserve them
-    definitions = {}
-    if not allow_updates:
-        try:
-            with open(DEFINITIONS_FILE) as f:
-                existing_definitions_data = json.load(f)
-                definitions = existing_definitions_data.get("definitions", {})
-                LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve")
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            LOGGER.debug(f"Could not load existing definitions: {e}")
-            definitions = {}
+    # Definitions are updated in place, never replaced: start from what is on disk.
+    # allow_updates controls whether existing entries may be overwritten (same or
+    # newer cluster) or are preserved while only new ones are added (older cluster).
+    definitions: dict[str, Any] = {}
+    try:
+        existing_definitions_data = load_json_archive(DEFINITIONS_FILE)
+        definitions = existing_definitions_data.get("definitions", {})
+        LOGGER.info(f"Loaded {len(definitions)} existing definitions to preserve and update")
+    except (OSError, FileNotFoundError, json.JSONDecodeError, EOFError) as e:
+        LOGGER.debug(f"Could not load existing definitions: {e}")
+        definitions = {}
 
     processed_schemas = set()
     total_schemas = 0
@@ -643,6 +643,12 @@ def process_schema_definitions(
             # Extract schema info
             gvk_list = def_data.get("x-kubernetes-group-version-kind", [])
             if not gvk_list:
+                # Sub-schema referenced by $ref from a resource schema (for example
+                # io.k8s.api.storage.v1.CSIDriverSpec). It is not a resource, but it
+                # must be persisted so $ref resolution can find it - keyed by its
+                # exact components.schemas name, which is what the $ref points at.
+                if allow_updates or def_name not in definitions:
+                    definitions[def_name] = def_data
                 continue
 
             # Get the proper GVK
@@ -718,8 +724,10 @@ def process_schema_definitions(
                     f"Added missing schema variant for existing resource: {kind_lower} ({group or 'core'}/{version})"
                 )
 
-            # Also store in definitions for separate definitions file
-            definitions[schema_name] = schema_data
+            # Also store in definitions: overwrite only when updates are allowed
+            # (same or newer cluster), otherwise keep what is already on disk
+            if allow_updates or schema_name not in definitions:
+                definitions[schema_name] = schema_data
             total_schemas += 1
 
     final_count = len(resources_mapping)
@@ -1057,6 +1065,12 @@ def _infer_oc_explain_path(ref_name: str) -> str | None:
         "persistentvolume": "persistentvolume",
         "persistentvolumeclaim": "persistentvolumeclaim",
         "serviceaccount": "serviceaccount",
+        "node": "node",
+        "namespace": "namespace",
+        "limitrange": "limitrange",
+        "resourcequota": "resourcequota",
+        "event": "event",
+        "endpoints": "endpoints",
     }
 
     resource_name = resource_mapping.get(resource_base)
@@ -1477,7 +1491,7 @@ def write_schema_files(
     definitions_file = DEFINITIONS_FILE
 
     # Guard against overwriting existing definitions with empty definitions
-    if not definitions and Path(definitions_file).exists():
+    if not definitions and DEFINITIONS_ARCHIVE.exists():
         LOGGER.warning(
             "No definitions generated; preserving existing definitions file to avoid overwriting with empty definitions."
         )
@@ -1485,9 +1499,8 @@ def write_schema_files(
         try:
             # Wrap definitions in a "definitions" object for jsonschema compatibility
             definitions_data = {"definitions": definitions}
-            with open(definitions_file, "w") as fd:
-                json.dump(definitions_data, fd, indent=2, sort_keys=True)
-            LOGGER.info(f"Written {len(definitions)} definitions to {definitions_file}")
+            archive_path = save_json_archive(definitions_data, definitions_file)
+            LOGGER.info(f"Written {len(definitions)} definitions to {archive_path}")
         except (OSError, TypeError) as e:
             error_msg = f"Failed to write definitions file {definitions_file}: {e}"
             LOGGER.error(error_msg)
@@ -1626,11 +1639,10 @@ def _handle_no_schemas_case() -> None:
     """
     LOGGER.info("No schemas fetched. Preserving existing data to avoid overwriting with empty definitions.")
     try:
-        with open(DEFINITIONS_FILE) as fd:
-            existing_definitions_data = json.load(fd)
-            definitions = existing_definitions_data.get("definitions", {})
-            LOGGER.info(f"Found {len(definitions)} existing definitions that will be preserved")
-    except (OSError, FileNotFoundError, json.JSONDecodeError):
+        existing_definitions_data = load_json_archive(DEFINITIONS_FILE)
+        definitions = existing_definitions_data.get("definitions", {})
+        LOGGER.info(f"Found {len(definitions)} existing definitions that will be preserved")
+    except (OSError, FileNotFoundError, json.JSONDecodeError, EOFError):
         LOGGER.debug("Could not load existing definitions file. No existing definitions to preserve.")
 
 
@@ -1797,11 +1809,14 @@ def update_single_resource_schema(kind: str, client: str | None = None) -> None:
     kind_lower = kind.lower()
     updated = False
     new_schemas_for_kind = []
+    sub_schemas: dict[str, Any] = {}
 
     for _, schema in schemas.items():
         for _def_name, def_data in schema.get("components", {}).get("schemas", {}).items():
             gvk_list = def_data.get("x-kubernetes-group-version-kind", [])
             if not gvk_list:
+                # Sub-schema needed by $ref resolution (not a resource itself)
+                sub_schemas[_def_name] = def_data
                 continue
 
             # Check if this definition is for our target kind
@@ -1847,6 +1862,23 @@ def update_single_resource_schema(kind: str, client: str | None = None) -> None:
             LOGGER.info(f"Total resources in mapping: {len(resources_mapping)}")
         except (OSError, TypeError) as e:
             raise RuntimeError(f"Failed to save resources mapping: {e}") from e
+
+        # Persist the sub-schemas fetched alongside this kind, so $ref resolution
+        # works for its spec without a full --update-schema run
+        if sub_schemas:
+            definitions: dict[str, Any] = {}
+            try:
+                definitions = load_json_archive(DEFINITIONS_FILE).get("definitions", {})
+            except (OSError, json.JSONDecodeError, EOFError) as e:
+                LOGGER.debug(f"Could not load existing definitions: {e}")
+            definitions.update(sub_schemas)
+            try:
+                archive_path = save_json_archive({"definitions": definitions}, DEFINITIONS_FILE)
+                LOGGER.info(
+                    f"Written {len(sub_schemas)} sub-schema definition(s) to {archive_path} for {kind} $ref resolution"
+                )
+            except (OSError, TypeError) as e:
+                raise RuntimeError(f"Failed to write definitions file {DEFINITIONS_FILE}: {e}") from e
 
         # Clear cached mapping data in SchemaValidator to force reload
         SchemaValidator.clear_cache()
