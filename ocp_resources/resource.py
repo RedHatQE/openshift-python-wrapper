@@ -513,6 +513,7 @@ class Resource(ResourceConstants):
         DSCINITIALIZATION_OPENDATAHUB_IO: str = "dscinitialization.opendatahub.io"
         EVENTS_K8S_IO: str = "events.k8s.io"
         EXPORT_KUBEVIRT_IO: str = "export.kubevirt.io"
+        FILERESTORE_KUBEVIRT_IO: str = "filerestore.kubevirt.io"
         FENCE_AGENTS_REMEDIATION_MEDIK8S_IO: str = "fence-agents-remediation.medik8s.io"
         FORKLIFT_KONVEYOR_IO: str = "forklift.konveyor.io"
         FRRK8S_METALLB_IO = "frrk8s.metallb.io"
