@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waiting for Resource Conditions and Status - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,20 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by reading the knowledge graph and page manifest, then explore the relevant source code.</p>
-<p>Now let me examine the resource-specific wait methods, the <code>wait_for_condition</code> more closely, and the constants used:</p>
-<p>Now let me look at the <code>Status</code> class, <code>Condition</code> class, and how <code>create</code> integrates with <code>wait</code>:</p>
-<p>Now let me look at how Status/Condition are exposed on the base Resource class and how <code>deploy</code> / <code>create</code> uses wait:</p>
-<p>Now let me see the <code>deploy</code> method more fully and how <code>wait</code> is passed through:</p>
-<p>Now let me check the <code>sriov_network_node_state.py</code> and <code>virtual_machine_restore.py</code> for more wait patterns, and also look at the <code>TimeoutExpiredError</code> import:</p>
-<p>Now let me check the <code>cdi_config.py</code> wait method and look at the <code>wait_for_resource</code> parameter in the constructor:</p>
-<p>Now let me look at how <code>create</code> uses <code>wait</code>:</p>
-<p>Now let me look at more of the <code>status</code> property:</p>
-<p>Now I have all the information I need. Let me also check the <code>TimeoutSampler</code> import to understand the exception:</p>
-<p>Let me check if there are any virtual machine import wait patterns with more stop_status details:</p>
-<p>Now let me look at the <code>node_network_state.py</code> wait patterns:</p>
-<p>I now have comprehensive understanding of all the wait methods. Let me compile the documentation.</p>
-<h1 id="waiting-for-resource-conditions-and-status">Waiting for Resource Conditions and Status</h1>
+                    <h1 id="waiting-for-resource-conditions-and-status">Waiting for Resource Conditions and Status</h1>
 <p>Wait for Kubernetes and OpenShift resources to reach a desired status, condition, or lifecycle state using built-in polling methods with configurable timeouts and early exit on failure.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -290,10 +256,10 @@
 <h2 id="quick-example">Quick Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">pod</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Creates the pod and waits for it to exist</span>
 
-<span class="c1"># Wait for the pod to reach &quot;Running&quot; status</span>
+<span class="c1"># Wait for the pod to reach "Running" status</span>
 <span class="n">pod</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
 </code></pre></div>
 
@@ -301,12 +267,12 @@
 <p>The <code>wait()</code> method polls until a resource exists on the cluster. This is useful after creating a resource or when waiting for an external controller to produce one.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">sleep</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -329,7 +295,7 @@
 <td>Seconds between polls</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Raises:</strong> <code>TimeoutExpiredError</code> if the resource does not appear before the timeout.</p>
 <blockquote>
 <p><strong>Tip:</strong> Pass <code>wait=True</code> to <code>create()</code> or <code>deploy()</code> to combine creation and existence waiting in one call:
@@ -347,10 +313,10 @@ pod.create(wait=True)</p>
 <span class="n">pod</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
 <span class="n">success</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">wait_deleted</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Resource still exists after timeout&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Resource still exists after timeout"</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -367,7 +333,7 @@ pod.create(wait=True)</p>
 <td>Maximum seconds to wait</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>True</code> if the resource was deleted, <code>False</code> if the timeout was reached.</p>
 <blockquote>
 <p><strong>Note:</strong> Unlike most wait methods, <code>wait_deleted()</code> returns <code>False</code> on timeout rather than raising an exception.</p>
@@ -376,11 +342,11 @@ pod.create(wait=True)</p>
 <p>The <code>wait_for_status()</code> method polls <code>status.phase</code> until it matches the expected value:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.datavolume</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataVolume</span>
 
-<span class="n">dv</span> <span class="o">=</span> <span class="n">DataVolume</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-dv&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">dv</span> <span class="o">=</span> <span class="n">DataVolume</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-dv"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">dv</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">DataVolume</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">SUCCEEDED</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -421,16 +387,16 @@ pod.create(wait=True)</p>
 <td>Exceptions to catch and retry</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Raises:</strong> <code>TimeoutExpiredError</code> if the resource does not reach the desired status, or if <code>stop_status</code> is encountered.</p>
 <h3 id="using-stop_status-for-early-failure">Using <code>stop_status</code> for early failure</h3>
 <p>By default, <code>wait_for_status()</code> aborts immediately if the resource enters a <code>"Failed"</code> phase. Override this to detect a different failure phase:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineInstance</span>
 
-<span class="n">vmi</span> <span class="o">=</span> <span class="n">VirtualMachineInstance</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vmi&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">vmi</span> <span class="o">=</span> <span class="n">VirtualMachineInstance</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-vmi"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">vmi</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span>
     <span class="n">status</span><span class="o">=</span><span class="n">VirtualMachineInstance</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span>
-    <span class="n">stop_status</span><span class="o">=</span><span class="s2">&quot;ErrorUnschedulable&quot;</span><span class="p">,</span>
+    <span class="n">stop_status</span><span class="o">=</span><span class="s2">"ErrorUnschedulable"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -440,29 +406,29 @@ pod.create(wait=True)</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Base status constants (available on all resources)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resource</span>
 
-<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">SUCCEEDED</span>    <span class="c1"># &quot;Succeeded&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">FAILED</span>       <span class="c1"># &quot;Failed&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span>      <span class="c1"># &quot;Running&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PENDING</span>      <span class="c1"># &quot;Pending&quot;</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">SUCCEEDED</span>  <span class="c1"># "Succeeded"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">FAILED</span>  <span class="c1"># "Failed"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span>  <span class="c1"># "Running"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PENDING</span>  <span class="c1"># "Pending"</span>
 
 <span class="c1"># Resource-specific statuses</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachine</span>
 
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">MIGRATING</span>     <span class="c1"># &quot;Migrating&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STOPPED</span>       <span class="c1"># &quot;Stopped&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STARTING</span>      <span class="c1"># &quot;Starting&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PAUSED</span>        <span class="c1"># &quot;Paused&quot;</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">MIGRATING</span>  <span class="c1"># "Migrating"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STOPPED</span>  <span class="c1"># "Stopped"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STARTING</span>  <span class="c1"># "Starting"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PAUSED</span>  <span class="c1"># "Paused"</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.persistent_volume_claim</span><span class="w"> </span><span class="kn">import</span> <span class="n">PersistentVolumeClaim</span>
 
-<span class="n">PersistentVolumeClaim</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">BOUND</span>  <span class="c1"># &quot;Bound&quot;</span>
+<span class="n">PersistentVolumeClaim</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">BOUND</span>  <span class="c1"># "Bound"</span>
 </code></pre></div>
 
 <h2 id="waiting-for-conditions">Waiting for Conditions</h2>
 <p>The <code>wait_for_condition()</code> method waits for a specific entry in <code>status.conditions[]</code> to match a desired type, status, and optionally a reason or message:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.user_defined_network</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedNetwork</span>
 
-<span class="n">udn</span> <span class="o">=</span> <span class="n">UserDefinedNetwork</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-net&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">udn</span> <span class="o">=</span> <span class="n">UserDefinedNetwork</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-net"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">udn</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
     <span class="n">condition</span><span class="o">=</span><span class="n">UserDefinedNetwork</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">NETWORK_READY</span><span class="p">,</span>
     <span class="n">status</span><span class="o">=</span><span class="n">UserDefinedNetwork</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">TRUE</span><span class="p">,</span>
@@ -470,7 +436,7 @@ pod.create(wait=True)</p>
 <span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -529,7 +495,7 @@ pod.create(wait=True)</p>
 <td>The status of the stop condition that triggers early abort</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Raises:</strong></p>
 <ul>
 <li><code>TimeoutExpiredError</code> — if the condition is not met before the timeout</li>
@@ -537,10 +503,10 @@ pod.create(wait=True)</p>
 </ul>
 <h3 id="matching-by-reason-and-message">Matching by reason and message</h3>
 <div class="highlight"><pre><span></span><code><span class="n">pod</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
-    <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;Ready&quot;</span><span class="p">,</span>
-    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
-    <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;PodCompleted&quot;</span><span class="p">,</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;containers with&quot;</span><span class="p">,</span>
+    <span class="n">condition</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">"True"</span><span class="p">,</span>
+    <span class="n">reason</span><span class="o">=</span><span class="s2">"PodCompleted"</span><span class="p">,</span>
+    <span class="n">message</span><span class="o">=</span><span class="s2">"containers with"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -552,14 +518,14 @@ pod.create(wait=True)</p>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">resource</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span>
-        <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;Ready&quot;</span><span class="p">,</span>
-        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
-        <span class="n">stop_condition</span><span class="o">=</span><span class="s2">&quot;Failed&quot;</span><span class="p">,</span>
-        <span class="n">stop_status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
+        <span class="n">condition</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">"True"</span><span class="p">,</span>
+        <span class="n">stop_condition</span><span class="o">=</span><span class="s2">"Failed"</span><span class="p">,</span>
+        <span class="n">stop_status</span><span class="o">=</span><span class="s2">"True"</span><span class="p">,</span>
         <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="k">except</span> <span class="n">ConditionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resource hit a failure condition: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Resource hit a failure condition: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -569,21 +535,21 @@ pod.create(wait=True)</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resource</span>
 
 <span class="c1"># Condition types</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">READY</span>         <span class="c1"># &quot;Ready&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">AVAILABLE</span>     <span class="c1"># &quot;Available&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">DEGRADED</span>      <span class="c1"># &quot;Degraded&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">PROGRESSING</span>   <span class="c1"># &quot;Progressing&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">UPGRADEABLE</span>   <span class="c1"># &quot;Upgradeable&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">NETWORK_READY</span> <span class="c1"># &quot;NetworkReady&quot;</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">READY</span>  <span class="c1"># "Ready"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">AVAILABLE</span>  <span class="c1"># "Available"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">DEGRADED</span>  <span class="c1"># "Degraded"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">PROGRESSING</span>  <span class="c1"># "Progressing"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">UPGRADEABLE</span>  <span class="c1"># "Upgradeable"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">NETWORK_READY</span>  <span class="c1"># "NetworkReady"</span>
 
 <span class="c1"># Condition statuses</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">TRUE</span>    <span class="c1"># &quot;True&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">FALSE</span>   <span class="c1"># &quot;False&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">UNKNOWN</span> <span class="c1"># &quot;Unknown&quot;</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">TRUE</span>  <span class="c1"># "True"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">FALSE</span>  <span class="c1"># "False"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">UNKNOWN</span>  <span class="c1"># "Unknown"</span>
 
 <span class="c1"># Condition reasons</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Reason</span><span class="o">.</span><span class="n">ALL_REQUIREMENTS_MET</span>  <span class="c1"># &quot;AllRequirementsMet&quot;</span>
-<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Reason</span><span class="o">.</span><span class="n">INSTALL_SUCCEEDED</span>     <span class="c1"># &quot;InstallSucceeded&quot;</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Reason</span><span class="o">.</span><span class="n">ALL_REQUIREMENTS_MET</span>  <span class="c1"># "AllRequirementsMet"</span>
+<span class="n">Resource</span><span class="o">.</span><span class="n">Condition</span><span class="o">.</span><span class="n">Reason</span><span class="o">.</span><span class="n">INSTALL_SUCCEEDED</span>  <span class="c1"># "InstallSucceeded"</span>
 </code></pre></div>
 
 <h2 id="waiting-with-context-managers">Waiting with Context Managers</h2>
@@ -592,8 +558,8 @@ pod.create(wait=True)</p>
 
 <span class="k">with</span> <span class="n">Pod</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
     <span class="n">wait_for_resource</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="k">as</span> <span class="n">pod</span><span class="p">:</span>
     <span class="c1"># Pod exists when you reach this line</span>
@@ -613,15 +579,15 @@ pod.create(wait=True)</p>
 <h4 id="deployments">Deployments</h4>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
 
-<span class="n">deploy</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-app&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
-<span class="n">deploy</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>   <span class="c1"># All replicas ready</span>
-<span class="n">deploy</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>   <span class="c1"># Scale to zero complete</span>
+<span class="n">deploy</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-app"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+<span class="n">deploy</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>  <span class="c1"># All replicas ready</span>
+<span class="n">deploy</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">deployed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>  <span class="c1"># Scale to zero complete</span>
 </code></pre></div>
 
 <h4 id="daemonsets">DaemonSets</h4>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.daemonset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DaemonSet</span>
 
-<span class="n">ds</span> <span class="o">=</span> <span class="n">DaemonSet</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ds&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DaemonSet</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-ds"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">wait_until_deployed</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>  <span class="c1"># All desired pods are ready</span>
 </code></pre></div>
 
@@ -629,16 +595,16 @@ pod.create(wait=True)</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachine</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineInstance</span>
 
-<span class="n">vm</span> <span class="o">=</span> <span class="n">VirtualMachine</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">vm</span> <span class="o">=</span> <span class="n">VirtualMachine</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="c1"># Wait for VM ready status (True = running, None = stopped)</span>
 <span class="n">vm</span><span class="o">.</span><span class="n">wait_for_ready_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
 
 <span class="c1"># Wait for a specific status field to become None</span>
-<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_status_none</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;snapshotInProgress&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_status_none</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">"snapshotInProgress"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>
 
 <span class="c1"># Wait for VMI to be running</span>
-<span class="n">vmi</span> <span class="o">=</span> <span class="n">VirtualMachineInstance</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">vmi</span> <span class="o">=</span> <span class="n">VirtualMachineInstance</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">vmi</span><span class="o">.</span><span class="n">wait_until_running</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Wait for VMI pause state</span>
@@ -649,7 +615,7 @@ pod.create(wait=True)</p>
 <h4 id="datavolumes">DataVolumes</h4>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.datavolume</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataVolume</span>
 
-<span class="n">dv</span> <span class="o">=</span> <span class="n">DataVolume</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-dv&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">dv</span> <span class="o">=</span> <span class="n">DataVolume</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-dv"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="n">dv</span><span class="o">.</span><span class="n">wait_for_dv_success</span><span class="p">(</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
     <span class="n">failure_timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
@@ -662,6 +628,7 @@ pod.create(wait=True)</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dv_is_stuck</span><span class="p">(</span><span class="n">dv</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">dv</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">conditions</span><span class="o">.</span><span class="n">restartCount</span> <span class="o">&gt;</span> <span class="mi">3</span>
 
+
 <span class="n">dv</span><span class="o">.</span><span class="n">wait_for_dv_success</span><span class="p">(</span>
     <span class="n">stop_status_func</span><span class="o">=</span><span class="n">dv_is_stuck</span><span class="p">,</span>
     <span class="n">dv</span><span class="o">=</span><span class="n">dv</span><span class="p">,</span>  <span class="c1"># passed as keyword argument to the function</span>
@@ -672,17 +639,17 @@ pod.create(wait=True)</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_snapshot</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineSnapshot</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_restore</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineRestore</span>
 
-<span class="n">snapshot</span> <span class="o">=</span> <span class="n">VirtualMachineSnapshot</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;snap-1&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
-<span class="n">snapshot</span><span class="o">.</span><span class="n">wait_snapshot_done</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>    <span class="c1"># readyToUse + VM snapshotInProgress is None</span>
+<span class="n">snapshot</span> <span class="o">=</span> <span class="n">VirtualMachineSnapshot</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"snap-1"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+<span class="n">snapshot</span><span class="o">.</span><span class="n">wait_snapshot_done</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>  <span class="c1"># readyToUse + VM snapshotInProgress is None</span>
 
-<span class="n">restore</span> <span class="o">=</span> <span class="n">VirtualMachineRestore</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;restore-1&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
-<span class="n">restore</span><span class="o">.</span><span class="n">wait_restore_done</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>     <span class="c1"># complete + VM restoreInProgress is None</span>
+<span class="n">restore</span> <span class="o">=</span> <span class="n">VirtualMachineRestore</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"restore-1"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+<span class="n">restore</span><span class="o">.</span><span class="n">wait_restore_done</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">240</span><span class="p">)</span>  <span class="c1"># complete + VM restoreInProgress is None</span>
 </code></pre></div>
 
 <h4 id="machineset">MachineSet</h4>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.machine_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">MachineSet</span>
 
-<span class="n">ms</span> <span class="o">=</span> <span class="n">MachineSet</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;worker-set&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;openshift-machine-api&quot;</span><span class="p">)</span>
+<span class="n">ms</span> <span class="o">=</span> <span class="n">MachineSet</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"worker-set"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"openshift-machine-api"</span><span class="p">)</span>
 <span class="n">ms</span><span class="o">.</span><span class="n">wait_for_replicas</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">sleep</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
 
@@ -690,21 +657,21 @@ pod.create(wait=True)</p>
 <h4 id="nodenetworkconfigurationpolicy">NodeNetworkConfigurationPolicy</h4>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.node_network_configuration_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeNetworkConfigurationPolicy</span>
 
-<span class="n">nncp</span> <span class="o">=</span> <span class="n">NodeNetworkConfigurationPolicy</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;br1-policy&quot;</span><span class="p">)</span>
-<span class="n">nncp</span><span class="o">.</span><span class="n">wait_for_status_success</span><span class="p">()</span>  <span class="c1"># Uses the resource&#39;s own success_timeout</span>
+<span class="n">nncp</span> <span class="o">=</span> <span class="n">NodeNetworkConfigurationPolicy</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"br1-policy"</span><span class="p">)</span>
+<span class="n">nncp</span><span class="o">.</span><span class="n">wait_for_status_success</span><span class="p">()</span>  <span class="c1"># Uses the resource's own success_timeout</span>
 </code></pre></div>
 
 <p>Raises <code>NNCPConfigurationFailed</code> if the policy fails or finds no matching nodes.</p>
 <h3 id="timeout-constants">Timeout constants</h3>
 <p>The library provides predefined timeout constants you can use with any wait method:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.utils.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">TIMEOUT_1SEC</span><span class="p">,</span>       <span class="c1"># 1</span>
-    <span class="n">TIMEOUT_5SEC</span><span class="p">,</span>       <span class="c1"># 5</span>
-    <span class="n">TIMEOUT_10SEC</span><span class="p">,</span>      <span class="c1"># 10</span>
-    <span class="n">TIMEOUT_30SEC</span><span class="p">,</span>      <span class="c1"># 30</span>
-    <span class="n">TIMEOUT_1MINUTE</span><span class="p">,</span>    <span class="c1"># 60</span>
-    <span class="n">TIMEOUT_2MINUTES</span><span class="p">,</span>   <span class="c1"># 120</span>
-    <span class="n">TIMEOUT_4MINUTES</span><span class="p">,</span>   <span class="c1"># 240</span>
+    <span class="n">TIMEOUT_1SEC</span><span class="p">,</span>  <span class="c1"># 1</span>
+    <span class="n">TIMEOUT_5SEC</span><span class="p">,</span>  <span class="c1"># 5</span>
+    <span class="n">TIMEOUT_10SEC</span><span class="p">,</span>  <span class="c1"># 10</span>
+    <span class="n">TIMEOUT_30SEC</span><span class="p">,</span>  <span class="c1"># 30</span>
+    <span class="n">TIMEOUT_1MINUTE</span><span class="p">,</span>  <span class="c1"># 60</span>
+    <span class="n">TIMEOUT_2MINUTES</span><span class="p">,</span>  <span class="c1"># 120</span>
+    <span class="n">TIMEOUT_4MINUTES</span><span class="p">,</span>  <span class="c1"># 240</span>
     <span class="n">TIMEOUT_10MINUTES</span><span class="p">,</span>  <span class="c1"># 600</span>
 <span class="p">)</span>
 
@@ -818,10 +785,7 @@ pod.create(wait=True)</p>
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -829,13 +793,14 @@ pod.create(wait=True)</p>
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -881,5 +846,6 @@ pod.create(wait=True)</p>
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

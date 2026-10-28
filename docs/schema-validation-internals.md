@@ -1,19 +1,3 @@
-Let me start by reading the knowledge graph and the pages manifest, then explore the relevant source files.
-
-Now let me look at some more key files - the explain parser, resource base class validation, archive utils, and some test files:
-
-Now let me look at the exceptions module for validation:
-
-Now let me check the CI/CD configuration to understand how schemas are updated:
-
-Let me look at a few generated resource files to understand the output of the code generation:
-
-Let me also check the parsers for status schema generation:
-
-Now let me check what data is actually in the schema file to understand the structure:
-
-Now I have enough information. Let me write the documentation page.
-
 # Schema Validation and Code Generation Architecture
 
 The openshift-python-wrapper uses OpenAPI schemas as the single source of truth for two critical capabilities: **validating resource definitions** before they reach the cluster, and **generating Python wrapper classes** for any Kubernetes or OpenShift resource type. Understanding this architecture helps you diagnose validation errors, generate classes for custom resources, and keep your schemas up to date as clusters evolve.

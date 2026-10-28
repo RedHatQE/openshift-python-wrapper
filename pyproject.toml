@@ -121,7 +121,7 @@ email = "rnetser@gmail.com"
 
 [project.urls]
 homepage = "https://github.com/RedHatQE/openshift-python-wrapper"
-documentation = "https://openshift-python-wrapper.readthedocs.io/en/latest/"
+documentation = "https://redhatqe.github.io/openshift-python-wrapper/"
 Download = "https://pypi.org/project/openshift-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-python-wrapper/issues"
 

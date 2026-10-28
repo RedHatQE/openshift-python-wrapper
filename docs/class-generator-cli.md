@@ -1,13 +1,3 @@
-I'll start by reading the knowledge graph and page manifest, then explore the class-generator source code in detail.
-
-Now let me check the entry point configuration and any additional schema-related functions:
-
-Now let me check the test files for CLI tests and the entry point:
-
-Now let me check the parsers and any additional CLI-relevant components:
-
-Now I have all the information I need. Let me compile the comprehensive CLI reference page.
-
 # class-generator CLI Reference
 
 The `class-generator` command generates Python wrapper classes for Kubernetes and OpenShift resources. It is installed as a console script entry point from the `openshift-python-wrapper` package.

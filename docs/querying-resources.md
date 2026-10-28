@@ -1,39 +1,3 @@
-Let me start by reading the knowledge graph and understanding the codebase structure.
-
-Now let me explore the key source files related to querying, listing, watching, existence checks, and status retrieval.
-
-Now let me look at the `_prepare_resources` method and the `get` method more closely to understand the filtering parameters:
-
-Now let me look at the event module and test files for querying:
-
-Now let me look at the test files for get/list/watch operations:
-
-Now let me check the conftest to understand fake_client and look at the `Condition` attribute and `Status` attribute patterns:
-
-Now let me check how `get` is called with selectors:
-
-Let me look at how `get` passes `field_selector`, `label_selector`, and `namespace` through kwargs:
-
-Now let me look at more examples of how get() is used with various kwargs, and check what other files show:
-
-Let me check how `_build_event_field_selector` and events work:
-
-Now let me check the namespace.py to see how get() is used in a simple resource:
-
-Now let me look at the node.py for a cluster-scoped resource usage of get:
-
-Now let me check the exceptions module for ConditionError:
-
-Let me also check `ensure_exists`:
-
-Let me also look for properties that relate to querying the resource (uuid, labels):
-
-Now let me check the test for events and any resource-specific tests about querying:
-
-Let me also look at the fake_client to understand what kwargs `get` passes through:
-
-Now I have a thorough understanding of the codebase. Let me write the documentation page.
-
 # Querying and Watching Resources
 
 Find, filter, and monitor Kubernetes and OpenShift resources in your cluster — whether you need to list all pods by label, check if a resource exists, watch for real-time changes, or inspect status and conditions.
@@ -467,8 +431,13 @@ Event.delete_events(
 
 Some resource kinds exist in multiple API groups. Use `singular_name` to disambiguate:
 
+The `DNS` kind exists in two API groups, so class-generator writes one module per group:
+
+- `ocp_resources.dns_config_openshift_io` — `config.openshift.io/v1`
+- `ocp_resources.dns_operator_openshift_io` — `operator.openshift.io/v1`
+
 ```python
-from ocp_resources.dns import DNS
+from ocp_resources.dns_config_openshift_io import DNS
 
 # When a kind exists in multiple API groups, pass singular_name
 for dns in DNS.get(client=client, singular_name="dns"):
