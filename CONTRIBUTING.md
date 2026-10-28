@@ -46,13 +46,25 @@ Edit the Markdown sources, never the generated files:
 Rebuild the site with one command:
 
 ```bash
-uvx pi-docsite --docs-dir docs --project-name openshift-python-wrapper \
+uvx pi-docsite --docs-dir docs \
+  --project-name openshift-python-wrapper \
+  --repo-url https://github.com/RedHatQE/openshift-python-wrapper \
   --tagline "Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls"
 ```
 
+`--repo-url` is required in practice: pi-docsite otherwise derives it from the local
+`origin`, so building from a fork rewrites every repository link and produces a diff
+with no source changes. The tagline is the description shown in the sidebar and in
+each page's metadata.
+
 The output is deterministic: running it twice without source changes produces no diff.
-A page deleted from `docs/` loses its HTML on the next build; a page added to `docs/`
-without an entry in `docs/nav.json` is still built and reported.
+
+Adding a page: create `docs/<slug>.md` and add `<slug>` to `docs/nav.json`. A `.md`
+missing from `nav.json` is still built, placed under a fallback group, and reported.
+
+Deleting a page: remove the `.md` **and** its slug from `docs/nav.json`. A slug with no
+`.md` behind it is a build error, so the stale entry has to go first — the leftover
+`<slug>.html` is then removed by the rebuild.
 
 ## Adding a new module (resource)
 
