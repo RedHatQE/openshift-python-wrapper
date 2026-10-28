@@ -1,21 +1,3 @@
-Let me start by reading the knowledge graph and understanding the repository structure.
-
-Now let me find the ResourceEditor source code.
-
-Now let me look at how ResourceEditor is used in the NNCP file and any tests:
-
-Let me look at the import section and any related constants:
-
-Now let me look at the `update` and `update_replace` methods on the Resource class to understand the two actions:
-
-Now let me look at the imports to verify how ResourceEditor is exported:
-
-Now let me check for any additional examples or documentation:
-
-Let me look at the full ResourceEditor code once more to make sure I've captured everything, and also check the `_apply_patches` method details and what `action` values are supported:
-
-Now I have a complete picture of the ResourceEditor class. Let me write the documentation.
-
 # Editing Resources Temporarily with ResourceEditor
 
 Temporarily modify Kubernetes and OpenShift resources during tests and have their original values automatically restored when you're done. This is essential for test isolation—ensuring that changes made during a test don't leak into other tests or persist in the cluster.

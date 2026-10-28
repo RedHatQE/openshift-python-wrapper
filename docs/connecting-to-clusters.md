@@ -1,37 +1,3 @@
-Let me start by exploring the repository structure and the knowledge graph.
-
-Now let me explore the client configuration and authentication code:
-
-Now let me look at how the `client` parameter is used in the Resource class:
-
-Now let me look at how resources accept the client parameter:
-
-Now let me look at the NamespacedResource and how it handles client:
-
-Now let me look at the tests for the client configuration:
-
-Let me also check how environment variables relate to client configuration:
-
-Now let me check how `get_client` is used with `generate_kubeconfig`:
-
-Now let me look at the `conftest.py` for the tests to understand how fake_client is set up:
-
-Let me also check the test file for more patterns of client usage:
-
-Now let me check what environment variables are documented:
-
-Now let me check the `generate_kubeconfig` related tests more carefully and how `DynamicClientWithKubeconfig` is used:
-
-Now let me also look at how `get_client` is imported/used in other contexts to understand its full interface:
-
-Let me look at some example files to see real usage patterns:
-
-Now let me check the `get` classmethod for how client is used:
-
-Now let me check for the `client_configuration` parameter and how `verify_ssl` is used:
-
-Now I have all the information I need. Let me write the documentation page.
-
 # Connecting to Clusters
 
 Establish authenticated connections to Kubernetes and OpenShift clusters so you can create, query, and manage resources with openshift-python-wrapper.

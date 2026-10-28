@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schema Validation and Code Generation Architecture - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,19 +245,11 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by reading the knowledge graph and the pages manifest, then explore the relevant source files.</p>
-<p>Now let me look at some more key files - the explain parser, resource base class validation, archive utils, and some test files:</p>
-<p>Now let me look at the exceptions module for validation:</p>
-<p>Now let me check the CI/CD configuration to understand how schemas are updated:</p>
-<p>Let me look at a few generated resource files to understand the output of the code generation:</p>
-<p>Let me also check the parsers for status schema generation:</p>
-<p>Now let me check what data is actually in the schema file to understand the structure:</p>
-<p>Now I have enough information. Let me write the documentation page.</p>
-<h1 id="schema-validation-and-code-generation-architecture">Schema Validation and Code Generation Architecture</h1>
+                    <h1 id="schema-validation-and-code-generation-architecture">Schema Validation and Code Generation Architecture</h1>
 <p>The openshift-python-wrapper uses OpenAPI schemas as the single source of truth for two critical capabilities: <strong>validating resource definitions</strong> before they reach the cluster, and <strong>generating Python wrapper classes</strong> for any Kubernetes or OpenShift resource type. Understanding this architecture helps you diagnose validation errors, generate classes for custom resources, and keep your schemas up to date as clusters evolve.</p>
 <h2 id="the-big-picture">The Big Picture</h2>
 <p>OpenAPI schemas flow through the system in two directions: they are fetched from a live cluster and stored locally, then consumed by the validation engine at runtime and by the code generator at development time.</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Component</th>
@@ -323,7 +294,7 @@
 <td>Tracks the cluster version that last produced the schema, controlling update strategy</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="data-flow-schema-fetch-and-storage">Data Flow: Schema Fetch and Storage</h3>
 <ol>
 <li><strong>Detect client binary</strong> — The system finds <code>oc</code> or falls back to <code>kubectl</code> via <code>get_client_binary()</code>.</li>
@@ -358,21 +329,21 @@
 <h3 id="the-resource-mappings-file">The Resource Mappings File</h3>
 <p>The resource mappings file (<code>__resources-mappings.json.gz</code>) is the central schema store. It maps lowercase kind names to arrays of schema objects:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;pod&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"pod"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pod is a collection of containers...&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;x-kubernetes-group-version-kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pod&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod is a collection of containers..."</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"x-kubernetes-group-version-kind"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"group"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nt">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w"> </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"v1"</span><span class="w"> </span><span class="p">}</span>
 <span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;namespaced&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">      </span><span class="nt">"namespaced"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;ingress&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;x-kubernetes-group-version-kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;networking.k8s.io&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;x-kubernetes-group-version-kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;config.openshift.io&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nt">"ingress"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"x-kubernetes-group-version-kind"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"networking.k8s.io"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"x-kubernetes-group-version-kind"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"config.openshift.io"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -388,7 +359,7 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.utils.schema_validator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaValidator</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Method</th>
@@ -433,7 +404,7 @@
 <td>Clears the resolved schema cache (not the raw mappings/definitions data).</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Tip:</strong> The <code>load_schema</code> method resolves <code>$ref</code> references recursively. For core Kubernetes types like <code>ObjectMeta</code> or <code>TypeMeta</code> that may be missing from definitions, it falls back to a permissive <code>{"type": "object", "additionalProperties": true}</code> schema rather than failing outright.</p>
 </blockquote>
@@ -444,7 +415,7 @@
 <span class="c1"># Instance-level validation — validates self.res</span>
 <span class="n">resource</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
-<span class="c1"># Class-level validation — validates any dict against the class&#39;s schema</span>
+<span class="c1"># Class-level validation — validates any dict against the class's schema</span>
 <span class="n">MyResource</span><span class="o">.</span><span class="n">validate_dict</span><span class="p">(</span><span class="n">resource_dict</span><span class="p">)</span>
 </code></pre></div>
 
@@ -453,9 +424,9 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
 <span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"app"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">}],</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
     <span class="n">schema_validation_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -471,7 +442,7 @@
 </ul>
 <h3 id="schema-update-strategies">Schema Update Strategies</h3>
 <p>The <code>update_kind_schema()</code> function employs a version-aware update strategy:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Cluster Version</th>
@@ -488,7 +459,7 @@
 <td>Identifies only <strong>missing</strong> resources via <code>identify_missing_resources()</code>, fetches only relevant API paths, does <strong>not</strong> modify existing schemas</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>This strategy prevents an older cluster from overwriting schemas that contain richer data from a newer cluster.</p>
 <blockquote>
 <p><strong>Warning:</strong> If you connect to an older cluster and need to update a specific CRD's schema (for example, after installing a new operator), use <code>update_single_resource_schema(kind)</code> or the CLI flag <code>--update-schema-for &lt;Kind&gt;</code>. This bypasses the version guard for that one resource.</p>
@@ -497,10 +468,10 @@
 <p>The <code>update_single_resource_schema()</code> function fetches the schema for exactly one resource kind without affecting other resources in the mapping:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_single_resource_schema</span>
 
-<span class="n">update_single_resource_schema</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;LlamaStackDistribution&quot;</span><span class="p">)</span>
+<span class="n">update_single_resource_schema</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"LlamaStackDistribution"</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -520,7 +491,7 @@
 <td>Client binary path. Auto-detected if <code>None</code>.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Raises:</strong></p>
 <ul>
 <li><code>ResourceNotFoundError</code> — if the kind is not found on the cluster</li>
@@ -530,10 +501,10 @@
 <p>The <code>class_generator()</code> function orchestrates the full generation pipeline:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">class_generator</span>
 
-<span class="n">generated_files</span> <span class="o">=</span> <span class="n">class_generator</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Deployment&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">generated_files</span> <span class="o">=</span> <span class="n">class_generator</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"Deployment"</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -580,7 +551,7 @@
 <td>Generate test files in <code>class_generator/tests/manifests/</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>list[str]</code> — paths of generated files.</p>
 <p><strong>Raises:</strong></p>
 <ul>
@@ -596,15 +567,15 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamespacedResource</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Pod</span><span class="p">(</span><span class="n">NamespacedResource</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pod is a collection of containers that can run on a host.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Pod is a collection of containers that can run on a host."""</span>
 
     <span class="n">api_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">NamespacedResource</span><span class="o">.</span><span class="n">ApiVersion</span><span class="o">.</span><span class="n">V1</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">containers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="w">        </span><span class="sd">"""Args:</span>
 <span class="sd">            containers (list[Any]): List of containers belonging to the pod.</span>
 <span class="sd">            ...</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">containers</span> <span class="o">=</span> <span class="n">containers</span>
         <span class="o">...</span>
@@ -637,7 +608,7 @@
 </ul>
 <p>This supplementation only runs during a <strong>full update</strong> (same or newer cluster version), not when only fetching missing resources.</p>
 <h2 id="how-it-affects-you">How It Affects You</h2>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>What you do</th>
@@ -678,7 +649,7 @@
 <td>The kind exists in multiple API groups — each group gets its own file with a suffix</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="related-pages">Related Pages</h2>
 <ul>
 <li>See <a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a> for a hands-on guide to enabling and using validation.</li>
@@ -751,10 +722,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -762,13 +730,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -814,5 +783,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

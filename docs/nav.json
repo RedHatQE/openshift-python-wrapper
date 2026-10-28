@@ -1,0 +1,45 @@
+{
+  "groups": [
+    {
+      "name": "Getting Started",
+      "pages": [
+        "quickstart",
+        "connecting-to-clusters",
+        "creating-and-managing-resources",
+        "querying-resources",
+        "waiting-for-conditions",
+        "validating-resources",
+        "managing-resource-lists",
+        "editing-resources-temporarily",
+        "working-with-virtual-machines"
+      ]
+    },
+    {
+      "name": "Testing and Generation",
+      "pages": [
+        "testing-without-cluster",
+        "generating-resource-classes",
+        "class-generator-cli"
+      ]
+    },
+    {
+      "name": "Guides",
+      "pages": [
+        "common-patterns",
+        "mcp-server-integration"
+      ]
+    },
+    {
+      "name": "Reference",
+      "pages": [
+        "resource-api",
+        "environment-variables",
+        "resource-class-hierarchy",
+        "schema-validation-internals",
+        "working-with-events",
+        "pod-execution-and-logs",
+        "error-handling"
+      ]
+    }
+  ]
+}

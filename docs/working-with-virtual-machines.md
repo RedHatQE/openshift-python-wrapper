@@ -1,25 +1,3 @@
-Let me start by exploring the knowledge graph and understanding the repository structure.
-
-Now let me look at the remaining VM-related resources and check the `RunStrategy` and `Status` constants, as well as the `data_volume.py`:
-
-Now let me check how the `api_request` method works in the base `Resource` class:
-
-Now let me look at the `data_volume.py` to check any VM-related interactions:
-
-Now let me check the `RunStrategy` constants in VirtualMachineInstance:
-
-Now let me look at the `Status` class in the base `Resource` for context and the VMI's `RunStrategy`:
-
-Let me find the Status class definition:
-
-Now let me check the `ApiGroup` constants for KubeVirt:
-
-Now let me check for any tests related to VMs:
-
-Now let me check the `deploy` and `clean_up` method signatures:
-
-Now I have a thorough understanding of the VM-related API. Let me write the documentation:
-
 # Working with Virtual Machines (KubeVirt)
 
 Manage the full lifecycle of KubeVirt virtual machines on OpenShift — create VMs, start and stop them, live-migrate between nodes, take snapshots, and interact with their running instances — all from Python.

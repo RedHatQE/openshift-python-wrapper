@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Managing Bulk Resources with ResourceList - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,13 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me explore the codebase to understand ResourceList and NamespacedResourceList.</p>
-<p>Now let me check the example file more carefully and also look at how the <code>NamespacedResourceList</code> actually works in the example vs the source code — I noticed the example passes <code>namespaces=[ns.name for ns in namespaces]</code> (a list of strings) but the source code expects a <code>ResourceList</code> object. Let me verify.</p>
-<p>The example file seems to have an outdated API for <code>NamespacedResourceList</code> (passing a list of strings), but the actual source code expects a <code>ResourceList</code> object. The tests confirm it passes a <code>ResourceList</code>. Let me check if the example is outdated:</p>
-<p>The example file is inconsistent with the actual source code. The source code validates that each element in <code>namespaces</code> has <code>ns.kind == "Namespace"</code>, meaning it expects actual Namespace resource objects (from a ResourceList), not strings. The test confirms this by passing a <code>ResourceList</code> fixture. I'll document based on the actual source code, not the potentially outdated example.</p>
-<p>Let me also check what methods and properties are available:</p>
-<p>Now I have all the information I need. Let me write the documentation.</p>
-<h1 id="managing-bulk-resources-with-resourcelist">Managing Bulk Resources with ResourceList</h1>
+                    <h1 id="managing-bulk-resources-with-resourcelist">Managing Bulk Resources with ResourceList</h1>
 <p>When you need to create several copies of the same resource or deploy a resource across multiple namespaces, doing it one at a time is tedious and error-prone. <code>ResourceList</code> and <code>NamespacedResourceList</code> let you create, deploy, and clean up groups of resources in a single operation.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -286,14 +259,14 @@
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
-<span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">)</span>
+<span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-ns"</span><span class="p">)</span>
 <span class="n">namespaces</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 <span class="c1"># Creates: my-ns-1, my-ns-2, my-ns-3</span>
 </code></pre></div>
 
 <p>Or use a context manager for automatic cleanup:</p>
-<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">namespaces</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">namespaces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># &quot;my-ns-1&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-ns"</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">namespaces</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">namespaces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># "my-ns-1"</span>
 <span class="c1"># All three namespaces are deleted when the block exits</span>
 </code></pre></div>
 
@@ -308,7 +281,7 @@
     <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span>
     <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -320,7 +293,7 @@
 <p><strong>Step 3:</strong> Work with individual resources by index or iteration:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Access by index</span>
 <span class="n">first_ns</span> <span class="o">=</span> <span class="n">namespaces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">first_ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># &quot;test-ns-1&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first_ns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># "test-ns-1"</span>
 
 <span class="c1"># Iterate over all resources</span>
 <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">namespaces</span><span class="p">:</span>
@@ -346,7 +319,7 @@
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
 <span class="c1"># First, create the namespaces</span>
-<span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-ns&quot;</span><span class="p">)</span>
+<span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"app-ns"</span><span class="p">)</span>
 <span class="n">namespaces</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
 <span class="c1"># Then create one pod in each namespace</span>
@@ -354,15 +327,15 @@
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
     <span class="n">resource_class</span><span class="o">=</span><span class="n">Pod</span><span class="p">,</span>
     <span class="n">namespaces</span><span class="o">=</span><span class="n">namespaces</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-server&quot;</span><span class="p">,</span>
-    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx:latest&quot;</span><span class="p">}],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"web-server"</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx:latest"</span><span class="p">}],</span>
 <span class="p">)</span>
 <span class="n">pods</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
 
 <p>This creates three pods, all named <code>web-server</code>, one in each namespace (<code>app-ns-1</code>, <code>app-ns-2</code>, <code>app-ns-3</code>).</p>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">pods</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">namespace</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="c1"># web-server in app-ns-1</span>
 <span class="c1"># web-server in app-ns-2</span>
 <span class="c1"># web-server in app-ns-3</span>
@@ -380,12 +353,12 @@
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
     <span class="n">resource_class</span><span class="o">=</span><span class="n">Role</span><span class="p">,</span>
     <span class="n">namespaces</span><span class="o">=</span><span class="n">namespaces</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;viewer-role&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"viewer-role"</span><span class="p">,</span>
     <span class="n">rules</span><span class="o">=</span><span class="p">[</span>
         <span class="p">{</span>
-            <span class="s2">&quot;apiGroups&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;pods&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;verbs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;watch&quot;</span><span class="p">],</span>
+            <span class="s2">"apiGroups"</span><span class="p">:</span> <span class="p">[</span><span class="s2">""</span><span class="p">],</span>
+            <span class="s2">"resources"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"pods"</span><span class="p">],</span>
+            <span class="s2">"verbs"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"list"</span><span class="p">,</span> <span class="s2">"watch"</span><span class="p">],</span>
         <span class="p">}</span>
     <span class="p">],</span>
 <span class="p">)</span>
@@ -395,13 +368,13 @@
 <h2 id="advanced-usage">Advanced Usage</h2>
 <h3 id="context-managers-for-automatic-lifecycle">Context Managers for Automatic Lifecycle</h3>
 <p>Both <code>ResourceList</code> and <code>NamespacedResourceList</code> support context managers. Resources are deployed on entry and cleaned up on exit — ideal for tests:</p>
-<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">namespaces</span><span class="p">:</span>
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">namespaces</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">NamespacedResourceList</span><span class="p">(</span>
         <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
         <span class="n">resource_class</span><span class="o">=</span><span class="n">Pod</span><span class="p">,</span>
         <span class="n">namespaces</span><span class="o">=</span><span class="n">namespaces</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-pod&quot;</span><span class="p">,</span>
-        <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;busybox&quot;</span><span class="p">}],</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"test-pod"</span><span class="p">,</span>
+        <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"app"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"busybox"</span><span class="p">}],</span>
     <span class="p">)</span> <span class="k">as</span> <span class="n">pods</span><span class="p">:</span>
         <span class="c1"># All namespaces and pods are deployed</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pods</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
@@ -414,17 +387,17 @@
 </blockquote>
 <h3 id="waiting-during-deploy-and-cleanup">Waiting During Deploy and Cleanup</h3>
 <p>Pass <code>wait=True</code> to <code>deploy()</code> to wait for each resource to reach a ready state. By default, <code>clean_up()</code> already waits for deletion to complete.</p>
-<div class="highlight"><pre><span></span><code><span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">namespaces</span> <span class="o">=</span> <span class="n">ResourceList</span><span class="p">(</span><span class="n">resource_class</span><span class="o">=</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">num_resources</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ns"</span><span class="p">)</span>
 <span class="n">namespaces</span><span class="o">.</span><span class="n">deploy</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Later...</span>
-<span class="n">namespaces</span><span class="o">.</span><span class="n">clean_up</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># wait=True is the default</span>
+<span class="n">namespaces</span><span class="o">.</span><span class="n">clean_up</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># wait=True is the default</span>
 <span class="n">namespaces</span><span class="o">.</span><span class="n">clean_up</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># Skip waiting for deletion</span>
 </code></pre></div>
 
 <p>For more on waiting for specific conditions, see <a href="waiting-for-conditions.html">Waiting for Resource Conditions and Status</a>.</p>
 <h3 id="comparison-resourcelist-vs-namespacedresourcelist">Comparison: ResourceList vs NamespacedResourceList</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Feature</th>
@@ -459,7 +432,7 @@
 <td>✅</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <p><strong>TypeError: "All the resources in namespaces should be namespaces"</strong></p>
 <p>You passed a <code>ResourceList</code> that contains non-Namespace resources to <code>NamespacedResourceList</code>. Make sure the <code>namespaces</code> parameter is a <code>ResourceList</code> created with <code>resource_class=Namespace</code>.</p>
@@ -521,10 +494,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -532,13 +502,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -584,5 +555,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>
