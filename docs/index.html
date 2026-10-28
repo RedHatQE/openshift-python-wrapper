@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -276,12 +255,6 @@
 
 
 
-
-
-
-
-
-
                 <a href="quickstart.html" class="index-cta">Get Started →</a>
 
             </section>
@@ -295,7 +268,45 @@
                         <li>
                             <a href="quickstart.html">Installing and Creating Your First Resource</a>
 
-                            <p class="card-page-desc">Install the package, connect to a cluster, and create, query, and delete your first Kubernetes resource in under 5 minutes</p>
+                        </li>
+
+                        <li>
+                            <a href="connecting-to-clusters.html">Connecting to Clusters</a>
+
+                        </li>
+
+                        <li>
+                            <a href="creating-and-managing-resources.html">Creating and Managing Resources</a>
+
+                        </li>
+
+                        <li>
+                            <a href="querying-resources.html">Querying and Watching Resources</a>
+
+                        </li>
+
+                        <li>
+                            <a href="waiting-for-conditions.html">Waiting for Resource Conditions and Status</a>
+
+                        </li>
+
+                        <li>
+                            <a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a>
+
+                        </li>
+
+                        <li>
+                            <a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a>
+
+                        </li>
+
+                        <li>
+                            <a href="editing-resources-temporarily.html">Editing Resources Temporarily with ResourceEditor</a>
+
+                        </li>
+
+                        <li>
+                            <a href="working-with-virtual-machines.html">Working with Virtual Machines (KubeVirt)</a>
 
                         </li>
 
@@ -306,100 +317,41 @@
                 </div>
 
                 <div class="card">
-                    <h3 class="card-title">User Guides</h3>
+                    <h3 class="card-title">Testing and Generation</h3>
                     <ul class="card-pages">
 
                         <li>
-                            <a href="connecting-to-clusters.html">Connecting to Clusters</a>
-
-                            <p class="card-page-desc">Set up client connections using kubeconfig files, tokens, basic auth, environment variables, or in-cluster config</p>
-
-                        </li>
-
-                        <li>
-                            <a href="creating-and-managing-resources.html">Creating and Managing Resources</a>
-
-                            <p class="card-page-desc">Create, update, replace, and delete resources using deploy/clean_up, context managers, and YAML files</p>
-
-                        </li>
-
-                        <li>
-                            <a href="querying-resources.html">Querying and Watching Resources</a>
-
-                            <p class="card-page-desc">List resources with label/field selectors, check existence, watch for changes, and retrieve resource status and conditions</p>
-
-                        </li>
-
-                        <li>
-                            <a href="waiting-for-conditions.html">Waiting for Resource Conditions and Status</a>
-
-                            <p class="card-page-desc">Wait for resources to reach a desired status or condition using built-in polling with configurable timeouts</p>
-
-                        </li>
-
-                        <li>
-                            <a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a>
-
-                            <p class="card-page-desc">Validate resource definitions before creating them, enable auto-validation, and troubleshoot schema validation errors</p>
-
-                        </li>
-
-                        <li>
-                            <a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a>
-
-                            <p class="card-page-desc">Create and manage multiple similar resources or deploy one resource per namespace using ResourceList and NamespacedResourceList</p>
-
-                        </li>
-
-                        <li>
-                            <a href="editing-resources-temporarily.html">Editing Resources Temporarily with ResourceEditor</a>
-
-                            <p class="card-page-desc">Apply temporary patches to resources during tests and automatically restore original values using ResourceEditor</p>
-
-                        </li>
-
-                        <li>
-                            <a href="working-with-virtual-machines.html">Working with Virtual Machines (KubeVirt)</a>
-
-                            <p class="card-page-desc">Create, start, stop, restart, and migrate VirtualMachine resources and interact with VirtualMachineInstances</p>
-
-                        </li>
-
-                        <li>
                             <a href="testing-without-cluster.html">Testing Without a Cluster Using the Fake Client</a>
-
-                            <p class="card-page-desc">Write unit tests for Kubernetes code using FakeDynamicClient with CRUD operations, status simulation, and watch events</p>
 
                         </li>
 
                         <li>
                             <a href="generating-resource-classes.html">Generating New Resource Classes with class-generator</a>
 
-                            <p class="card-page-desc">Use the class-generator CLI to scaffold Python wrapper classes for any Kubernetes or OpenShift CRD</p>
+                        </li>
+
+                        <li>
+                            <a href="class-generator-cli.html">class-generator CLI Reference</a>
 
                         </li>
 
                     </ul>
 
-                    <a href="connecting-to-clusters.html" class="card-link">Explore →</a>
+                    <a href="testing-without-cluster.html" class="card-link">Explore →</a>
 
                 </div>
 
                 <div class="card">
-                    <h3 class="card-title">Recipes</h3>
+                    <h3 class="card-title">Guides</h3>
                     <ul class="card-pages">
 
                         <li>
                             <a href="common-patterns.html">Common Resource Patterns</a>
 
-                            <p class="card-page-desc">Copy-paste recipes for pods, deployments, networking, RBAC roles, data volumes, and handling resources with duplicate API groups</p>
-
                         </li>
 
                         <li>
                             <a href="mcp-server-integration.html">Integrating with AI Assistants via MCP Server</a>
-
-                            <p class="card-page-desc">Set up and use the MCP server with Cursor, Claude Desktop, or other MCP-compatible AI tools to manage cluster resources</p>
 
                         </li>
 
@@ -416,92 +368,41 @@
                         <li>
                             <a href="resource-api.html">Resource and NamespacedResource API</a>
 
-                            <p class="card-page-desc">Complete API reference for the Resource and NamespacedResource base classes including all methods, properties, and constructor parameters</p>
-
-                        </li>
-
-                        <li>
-                            <a href="class-generator-cli.html">class-generator CLI Reference</a>
-
-                            <p class="card-page-desc">All CLI options for class-generator including kind generation, schema updates, coverage reports, batch regeneration, and test generation</p>
-
                         </li>
 
                         <li>
                             <a href="environment-variables.html">Environment Variables and Configuration</a>
 
-                            <p class="card-page-desc">All supported environment variables for logging, resource reuse, teardown skipping, and hash control</p>
-
                         </li>
-
-                    </ul>
-
-                    <a href="resource-api.html" class="card-link">Explore →</a>
-
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">Internals</h3>
-                    <ul class="card-pages">
 
                         <li>
                             <a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a>
-
-                            <p class="card-page-desc">Learn how Resource, NamespacedResource, and generated subclasses fit together to extend the library with new resource types</p>
 
                         </li>
 
                         <li>
                             <a href="schema-validation-internals.html">Schema Validation and Code Generation Architecture</a>
 
-                            <p class="card-page-desc">Understand how OpenAPI schemas are fetched, cached, and used for both resource validation and class generation</p>
-
                         </li>
-
-                    </ul>
-
-                    <a href="resource-class-hierarchy.html" class="card-link">Explore →</a>
-
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">Using Resources</h3>
-                    <ul class="card-pages">
 
                         <li>
                             <a href="working-with-events.html">Working with Kubernetes Events</a>
-
-                            <p class="card-page-desc">How to use the standalone Event class to watch, list, and delete Kubernetes events. Covers Event.get() for streaming events in real-time, Event.list() for fetching existing events with time-based filtering, Event.delete_events() for cleanup, and the resource.events() method for getting events related to a specific resource. Includes field selectors, namespace filtering, and common debugging patterns.</p>
 
                         </li>
 
                         <li>
                             <a href="pod-execution-and-logs.html">Executing Commands in Pods and Retrieving Logs</a>
 
-                            <p class="card-page-desc">How to use Pod.execute() to run commands inside pod containers with timeout handling, container selection, and error handling via ExecOnPodError. Covers Pod.log() for retrieving pod logs, accessing pod properties like node, IP address, and practical recipes for debugging running workloads.</p>
-
                         </li>
-
-                    </ul>
-
-                    <a href="working-with-events.html" class="card-link">Explore →</a>
-
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title">API Reference</h3>
-                    <ul class="card-pages">
 
                         <li>
                             <a href="error-handling.html">Error Handling and Exception Reference</a>
 
-                            <p class="card-page-desc">Reference for all custom exceptions raised by the library including ExecOnPodError, MissingRequiredArgumentError, ResourceTeardownError, ValidationError, ConditionError, NNCPConfigurationFailed, and ClientWithBasicAuthError. Covers which operations raise each exception, how to catch and handle them, and common error-handling patterns for robust automation scripts.</p>
-
                         </li>
 
                     </ul>
 
-                    <a href="error-handling.html" class="card-link">Explore →</a>
+                    <a href="resource-api.html" class="card-link">Explore →</a>
 
                 </div>
 
@@ -524,10 +425,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -535,13 +433,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -587,5 +486,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

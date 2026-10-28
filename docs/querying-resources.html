@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Querying and Watching Resources - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,25 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by reading the knowledge graph and understanding the codebase structure.</p>
-<p>Now let me explore the key source files related to querying, listing, watching, existence checks, and status retrieval.</p>
-<p>Now let me look at the <code>_prepare_resources</code> method and the <code>get</code> method more closely to understand the filtering parameters:</p>
-<p>Now let me look at the event module and test files for querying:</p>
-<p>Now let me look at the test files for get/list/watch operations:</p>
-<p>Now let me check the conftest to understand fake_client and look at the <code>Condition</code> attribute and <code>Status</code> attribute patterns:</p>
-<p>Now let me check how <code>get</code> is called with selectors:</p>
-<p>Let me look at how <code>get</code> passes <code>field_selector</code>, <code>label_selector</code>, and <code>namespace</code> through kwargs:</p>
-<p>Now let me look at more examples of how get() is used with various kwargs, and check what other files show:</p>
-<p>Let me check how <code>_build_event_field_selector</code> and events work:</p>
-<p>Now let me check the namespace.py to see how get() is used in a simple resource:</p>
-<p>Now let me look at the node.py for a cluster-scoped resource usage of get:</p>
-<p>Now let me check the exceptions module for ConditionError:</p>
-<p>Let me also check <code>ensure_exists</code>:</p>
-<p>Let me also look for properties that relate to querying the resource (uuid, labels):</p>
-<p>Now let me check the test for events and any resource-specific tests about querying:</p>
-<p>Let me also look at the fake_client to understand what kwargs <code>get</code> passes through:</p>
-<p>Now I have a thorough understanding of the codebase. Let me write the documentation page.</p>
-<h1 id="querying-and-watching-resources">Querying and Watching Resources</h1>
+                    <h1 id="querying-and-watching-resources">Querying and Watching Resources</h1>
 <p>Find, filter, and monitor Kubernetes and OpenShift resources in your cluster — whether you need to list all pods by label, check if a resource exists, watch for real-time changes, or inspect status and conditions.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -298,8 +259,8 @@
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
 <span class="c1"># List all pods in a namespace</span>
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="listing-resources">Listing Resources</h2>
@@ -315,7 +276,7 @@
 <p>Namespaced resources (like <code>Pod</code>, <code>Service</code>, <code>ConfigMap</code>) accept a <code>namespace</code> keyword:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
@@ -324,11 +285,11 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
 <span class="c1"># Single label</span>
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-app&quot;</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=nginx&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-app"</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=nginx"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 <span class="c1"># Multiple labels (comma-separated)</span>
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=nginx,tier=frontend&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=nginx,tier=frontend"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
@@ -337,11 +298,11 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
 <span class="c1"># Find pods on a specific node</span>
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;spec.nodeName=worker-1&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">field_selector</span><span class="o">=</span><span class="s2">"spec.nodeName=worker-1"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 <span class="c1"># Find pods by status phase</span>
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;status.phase=Running&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">field_selector</span><span class="o">=</span><span class="s2">"status.phase=Running"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
@@ -349,7 +310,7 @@
 <p>By default, <code>get()</code> returns wrapper objects. Pass <code>raw=True</code> to get the underlying <code>ResourceInstance</code> or <code>ResourceField</code> objects directly:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># Returns raw ResourceField objects instead of Pod instances</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">phase</span><span class="p">)</span>
 </code></pre></div>
@@ -359,11 +320,11 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resource</span>
 
 <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">Resource</span><span class="o">.</span><span class="n">get_all_cluster_resources</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Filter with label selector</span>
-<span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">Resource</span><span class="o">.</span><span class="n">get_all_cluster_resources</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;my-label=value&quot;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">Resource</span><span class="o">.</span><span class="n">get_all_cluster_resources</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"my-label=value"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">resource</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="get-method-reference"><code>get()</code> Method Reference</h2>
@@ -371,7 +332,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span>
     <span class="bp">cls</span><span class="p">,</span>
     <span class="n">client</span><span class="p">:</span> <span class="n">DynamicClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">singular_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">singular_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="n">exceptions_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">DEFAULT_CLUSTER_RETRY_EXCEPTIONS</span><span class="p">,</span>
     <span class="n">raw</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -379,7 +340,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -414,26 +375,26 @@
 <td>Passed through to the Kubernetes API: <code>namespace</code>, <code>label_selector</code>, <code>field_selector</code>, <code>limit</code>, <code>resource_version</code>, <code>timeout_seconds</code>, etc.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> A generator yielding resource objects.</p>
 <h2 id="checking-resource-existence">Checking Resource Existence</h2>
 <p>The <code>exists</code> property queries the API server and returns the resource instance if it exists, or <code>None</code> if it does not.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">ns</span><span class="o">.</span><span class="n">exists</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Namespace exists&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Namespace exists"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Namespace not found&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Namespace not found"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="require-existence-at-initialization">Require existence at initialization</h3>
 <p>Use <code>ensure_exists=True</code> to raise <code>ResourceNotFoundError</code> immediately if the resource is not found:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="c1"># Raises ResourceNotFoundError if the pod doesn&#39;t exist</span>
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Raises ResourceNotFoundError if the pod doesn't exist</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">ensure_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -441,7 +402,7 @@
 </blockquote>
 <h2 id="getting-the-resource-instance">Getting the Resource Instance</h2>
 <p>The <code>instance</code> property fetches the full live resource from the API server:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="c1"># Get the full resource instance</span>
 <span class="n">inst</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">instance</span>
@@ -458,12 +419,12 @@
 </blockquote>
 <h2 id="retrieving-labels">Retrieving Labels</h2>
 <p>The <code>labels</code> property returns the resource's labels:</p>
-<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span>  <span class="c1"># {&#39;kubernetes.io/metadata.name&#39;: &#39;my-namespace&#39;, ...}</span>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span>  <span class="c1"># {'kubernetes.io/metadata.name': 'my-namespace', ...}</span>
 
 <span class="c1"># Check a specific label</span>
-<span class="k">if</span> <span class="s2">&quot;app&quot;</span> <span class="ow">in</span> <span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;App label: </span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="s1">&#39;app&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="s2">"app"</span> <span class="ow">in</span> <span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"App label: </span><span class="si">{</span><span class="n">ns</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="s1">'app'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="retrieving-resource-status">Retrieving Resource Status</h2>
@@ -471,20 +432,20 @@
 <p>The <code>status</code> property returns the current phase (e.g., <code>Running</code>, <code>Pending</code>, <code>Active</code>):</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>  <span class="c1"># &quot;Active&quot;</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>  <span class="c1"># "Active"</span>
 </code></pre></div>
 
 <p>Each resource class defines status constants you can compare against:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">pod</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Pod</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pod is running&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Pod is running"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Common status constants available on all resources:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Constant</th>
@@ -525,32 +486,32 @@
 <td><code>"Error"</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="condition-messages">Condition messages</h3>
 <p>Use <code>get_condition_message()</code> to retrieve the message for a specific condition type:</p>
-<div class="highlight"><pre><span></span><code><span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="c1"># Get message for a condition type</span>
-<span class="n">msg</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">get_condition_message</span><span class="p">(</span><span class="n">condition_type</span><span class="o">=</span><span class="s2">&quot;Ready&quot;</span><span class="p">)</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">get_condition_message</span><span class="p">(</span><span class="n">condition_type</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 <span class="c1"># Optionally filter by condition status</span>
 <span class="n">msg</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">get_condition_message</span><span class="p">(</span>
-    <span class="n">condition_type</span><span class="o">=</span><span class="s2">&quot;Ready&quot;</span><span class="p">,</span>
-    <span class="n">condition_status</span><span class="o">=</span><span class="s2">&quot;False&quot;</span><span class="p">,</span>
+    <span class="n">condition_type</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span>
+    <span class="n">condition_status</span><span class="o">=</span><span class="s2">"False"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># Returns empty string if status doesn&#39;t match</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># Returns empty string if status doesn't match</span>
 </code></pre></div>
 
 <p><strong>Signature:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_condition_message</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">condition_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">condition_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">condition_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -570,13 +531,13 @@
 <td>If provided, only return the message when the condition has this status</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> The condition message string, or <code>""</code> if not found or status doesn't match.</p>
 <h3 id="condition-constants">Condition constants</h3>
 <p>Resources provide built-in condition constants:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="c1"># Use condition constants</span>
 <span class="n">msg</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">get_condition_message</span><span class="p">(</span>
@@ -586,7 +547,7 @@
 </code></pre></div>
 
 <p>Common condition constants:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Constant</th>
@@ -627,29 +588,29 @@
 <td><code>"Unknown"</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="watching-for-changes">Watching for Changes</h2>
 <h3 id="watch-a-specific-resource">Watch a specific resource</h3>
 <p>The <code>watcher()</code> method streams events for a specific resource instance:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">watcher</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Event type: </span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>       <span class="c1"># ADDED, MODIFIED, DELETED</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object: </span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raw: </span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;raw_object&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Event type: </span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># ADDED, MODIFIED, DELETED</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Object: </span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">'object'</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Raw: </span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">'raw_object'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <p><strong>Signature:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">watcher</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">resource_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">resource_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -669,9 +630,9 @@
 <td>Only receive events newer than this version. Defaults to the resource version at creation time.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Each yielded event is a dict with these keys:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Key</th>
@@ -692,31 +653,31 @@
 <td>A plain dict representing the resource</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="querying-events">Querying Events</h2>
 <h3 id="stream-events-for-a-resource">Stream events for a resource</h3>
 <p>The <code>events()</code> method watches Kubernetes events associated with a resource:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reason: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Message: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Reason: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Message: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <p><strong>Signature:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">label_selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">resource_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">label_selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">resource_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -751,10 +712,10 @@
 <td>Watch timeout in seconds (default: 240)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <div class="highlight"><pre><span></span><code><span class="c1"># Example: filter for Warning events with a specific reason</span>
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning,reason==BackOff&quot;</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"type==Warning,reason==BackOff"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
@@ -767,16 +728,16 @@
 <span class="c1"># List Warning events from the last 5 minutes</span>
 <span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"type==Warning"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># List events from the last 10 minutes</span>
 <span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">since_seconds</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -800,36 +761,41 @@
 
 <span class="n">Event</span><span class="o">.</span><span class="n">delete_events</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;reason=AnEventReason&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"reason=AnEventReason"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <h2 id="advanced-usage">Advanced Usage</h2>
 <h3 id="handling-resources-with-duplicate-api-groups">Handling resources with duplicate API groups</h3>
 <p>Some resource kinds exist in multiple API groups. Use <code>singular_name</code> to disambiguate:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.dns</span><span class="w"> </span><span class="kn">import</span> <span class="n">DNS</span>
+<p>The <code>DNS</code> kind exists in two API groups, so class-generator writes one module per group:</p>
+<ul>
+<li><code>ocp_resources.dns_config_openshift_io</code> — <code>config.openshift.io/v1</code></li>
+<li><code>ocp_resources.dns_operator_openshift_io</code> — <code>operator.openshift.io/v1</code></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.dns_config_openshift_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">DNS</span>
 
 <span class="c1"># When a kind exists in multiple API groups, pass singular_name</span>
-<span class="k">for</span> <span class="n">dns</span> <span class="ow">in</span> <span class="n">DNS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">singular_name</span><span class="o">=</span><span class="s2">&quot;dns&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">dns</span> <span class="ow">in</span> <span class="n">DNS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">singular_name</span><span class="o">=</span><span class="s2">"dns"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">dns</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="using-full_api-for-low-level-access">Using <code>full_api()</code> for low-level access</h3>
 <p>The <code>full_api()</code> method returns the raw Kubernetes API resource object, giving you direct access to the API:</p>
-<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 <span class="n">api</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">full_api</span><span class="p">()</span>
 
 <span class="c1"># Use the API directly for custom queries</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-    <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=nginx&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;status.phase=Active&quot;</span><span class="p">,</span>
+    <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=nginx"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"status.phase=Active"</span><span class="p">,</span>
     <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <p><code>full_api()</code> accepts these keyword arguments:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -870,9 +836,9 @@
 <td>Enable watch mode</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="converting-resources-to-yaml">Converting resources to YAML</h3>
-<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">to_yaml</span><span class="p">())</span>
 </code></pre></div>
 
@@ -884,7 +850,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">fake</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">)</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
 <span class="c1"># All query methods work the same way</span>
@@ -996,10 +962,7 @@ Not all resources have a <code>status.phase</code> field. Access <code>instance.
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -1007,13 +970,14 @@ Not all resources have a <code>status.phase</code> field. Access <code>instance.
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -1059,5 +1023,6 @@ Not all resources have a <code>status.phase</code> field. Access <code>instance.
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

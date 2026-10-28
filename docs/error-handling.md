@@ -1,33 +1,3 @@
-Let me explore the repository structure and find all relevant exception definitions and usages.
-
-Now let me look at the `ConditionError` usage more closely and the `MissingTemplateVariables` and `MissingResourceError` exceptions:
-
-Now let me look at how the deploy method uses ValidationError:
-
-Now let me see where `validate` is called during `create`:
-
-Now let me look at the `Pod.execute` method more closely:
-
-Now let me look at how `client_with_basic_auth` works:
-
-Now let me see the NNCP methods in full context:
-
-Let me also look at `MissingTemplateVariables` usage more closely:
-
-Now let me check the `__init__` of Resource to see how `schema_validation_enabled` is handled:
-
-Now let me also check the `wait_for_condition` method signature more closely:
-
-Let me also look at `MissingResourceResError` usage:
-
-Now let me check the test for `ResourceTeardownError`:
-
-Let me see how SecretTestExit is defined:
-
-Let me check the import path for all exceptions:
-
-Now I have a thorough understanding of the codebase. Let me write the reference documentation.
-
 # Error Handling and Exception Reference
 
 All custom exceptions are defined in `ocp_resources.exceptions` and can be imported directly:

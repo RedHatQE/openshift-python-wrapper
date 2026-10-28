@@ -1,15 +1,3 @@
-Let me start by exploring the repository structure and the knowledge graph.
-
-Now let me check the generated output example and the test generation flow:
-
-Now let me look at a generated file with a spec section, and check one with duplicate kinds:
-
-Let me also check the `--help` output structure and look at a few more details:
-
-Now let me check a dry-run example and verify what shell completion setup looks like:
-
-Now I have a thorough understanding of the codebase. Let me write the documentation:
-
 # Generating New Resource Classes with class-generator
 
 Scaffold Python wrapper classes for any Kubernetes or OpenShift custom resource definition (CRD) so you can manage those resources using the same patterns as built-in resources. The `class-generator` CLI introspects your cluster's OpenAPI schemas and produces ready-to-use Python files complete with typed constructors, docstrings, and `to_dict()` serialization.
