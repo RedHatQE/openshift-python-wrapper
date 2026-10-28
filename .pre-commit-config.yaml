@@ -23,7 +23,7 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
+    rev: 7.4.1
     hooks:
       - id: flake8
         args: [--config=.flake8]
@@ -42,10 +42,11 @@ repos:
             "--exclude-files=class_generator/schema/*",
             "--exclude-files=class_generator/__k8s-openapi-.*.json",
             "--exclude-files=fake_kubernetes_client/__resources-mappings.json",
+            "--exclude-files=docs/.*",
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
+    rev: v0.17.1
     hooks:
       - id: ruff
       - id: ruff-format
@@ -56,7 +57,7 @@ repos:
       - id: gitleaks
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v2.4.0
     hooks:
       - id: mypy
         exclude: ^(tests/|examples/|docs/)

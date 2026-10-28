@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Validation and Code Generation Architecture - openshift-python-wrapper</title>
+    <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
+    <link rel="stylesheet" href="assets/style.css">
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+    <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
+    <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-logo">openshift-python-wrapper</a>
+            <p class="sidebar-tagline">Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls</p>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" id="search-input" placeholder="Search... (⌘K)" autocomplete="off" readonly>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Getting Started</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="quickstart.html"
+                           class="nav-link">
+                            Installing and Creating Your First Resource
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">User Guides</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="connecting-to-clusters.html"
+                           class="nav-link">
+                            Connecting to Clusters
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="creating-and-managing-resources.html"
+                           class="nav-link">
+                            Creating and Managing Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="querying-resources.html"
+                           class="nav-link">
+                            Querying and Watching Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="waiting-for-conditions.html"
+                           class="nav-link">
+                            Waiting for Resource Conditions and Status
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="validating-resources.html"
+                           class="nav-link">
+                            Validating Resources Against OpenAPI Schemas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="managing-resource-lists.html"
+                           class="nav-link">
+                            Managing Bulk Resources with ResourceList
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="editing-resources-temporarily.html"
+                           class="nav-link">
+                            Editing Resources Temporarily with ResourceEditor
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="working-with-virtual-machines.html"
+                           class="nav-link">
+                            Working with Virtual Machines (KubeVirt)
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="testing-without-cluster.html"
+                           class="nav-link">
+                            Testing Without a Cluster Using the Fake Client
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="generating-resource-classes.html"
+                           class="nav-link">
+                            Generating New Resource Classes with class-generator
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Recipes</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="common-patterns.html"
+                           class="nav-link">
+                            Common Resource Patterns
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="mcp-server-integration.html"
+                           class="nav-link">
+                            Integrating with AI Assistants via MCP Server
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-api.html"
+                           class="nav-link">
+                            Resource and NamespacedResource API
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="environment-variables.html"
+                           class="nav-link">
+                            Environment Variables and Configuration
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Internals</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-class-hierarchy.html"
+                           class="nav-link">
+                            Understanding the Resource Class Hierarchy
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schema-validation-internals.html"
+                           class="nav-link active" aria-current="page">
+                            Schema Validation and Code Generation Architecture
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Using Resources</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="working-with-events.html"
+                           class="nav-link">
+                            Working with Kubernetes Events
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="pod-execution-and-logs.html"
+                           class="nav-link">
+                            Executing Commands in Pods and Retrieving Logs
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">API Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="error-handling.html"
+                           class="nav-link">
+                            Error Handling and Exception Reference
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <a href="index.html" class="top-bar-title">openshift-python-wrapper</a>
+            </div>
+            <div class="top-bar-spacer"></div>
+            <div class="top-bar-right">
+                <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
+                    <kbd>&#8984;K</kbd> Search
+                </button>
+                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
+                    ⚡ docs<span class="brand-accent">fy</span>
+                </a>
+
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span class="github-stars" id="github-stars" title="GitHub stars"></span>
+                </a>
+
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <article class="article">
+                <div class="article-body">
+                    <!-- SECURITY: |safe is intentional. Content is AI-generated markdown
+                         converted to HTML server-side by the markdown library, not
+                         user-supplied input. XSS risk is minimal and accepted since
+                         the AI generates the content, not end users. -->
+                    <p>Let me start by reading the knowledge graph and the pages manifest, then explore the relevant source files.</p>
+<p>Now let me look at some more key files - the explain parser, resource base class validation, archive utils, and some test files:</p>
+<p>Now let me look at the exceptions module for validation:</p>
+<p>Now let me check the CI/CD configuration to understand how schemas are updated:</p>
+<p>Let me look at a few generated resource files to understand the output of the code generation:</p>
+<p>Let me also check the parsers for status schema generation:</p>
+<p>Now let me check what data is actually in the schema file to understand the structure:</p>
+<p>Now I have enough information. Let me write the documentation page.</p>
+<h1 id="schema-validation-and-code-generation-architecture">Schema Validation and Code Generation Architecture</h1>
+<p>The openshift-python-wrapper uses OpenAPI schemas as the single source of truth for two critical capabilities: <strong>validating resource definitions</strong> before they reach the cluster, and <strong>generating Python wrapper classes</strong> for any Kubernetes or OpenShift resource type. Understanding this architecture helps you diagnose validation errors, generate classes for custom resources, and keep your schemas up to date as clusters evolve.</p>
+<h2 id="the-big-picture">The Big Picture</h2>
+<p>OpenAPI schemas flow through the system in two directions: they are fetched from a live cluster and stored locally, then consumed by the validation engine at runtime and by the code generator at development time.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Schema Fetcher</strong></td>
+<td><code>class_generator/core/schema.py</code></td>
+<td>Connects to a cluster, downloads OpenAPI v3 schemas, and writes them to disk</td>
+</tr>
+<tr>
+<td><strong>Resource Mappings</strong></td>
+<td><code>class_generator/schema/__resources-mappings.json.gz</code></td>
+<td>Compressed archive mapping each resource kind (lowercase) to its schema(s)</td>
+</tr>
+<tr>
+<td><strong>Definitions File</strong></td>
+<td><code>class_generator/schema/_definitions.json</code></td>
+<td>JSON file containing detailed schema definitions with <code>$ref</code> targets for nested types</td>
+</tr>
+<tr>
+<td><strong>Schema Validator</strong></td>
+<td><code>ocp_resources/utils/schema_validator.py</code></td>
+<td>Runtime engine that loads schemas, resolves <code>$ref</code> references, and validates resource dicts</td>
+</tr>
+<tr>
+<td><strong>Code Generator</strong></td>
+<td><code>class_generator/core/generator.py</code></td>
+<td>Reads schemas and generates Python class files from a Jinja2 template</td>
+</tr>
+<tr>
+<td><strong>Explain Parser</strong></td>
+<td><code>class_generator/parsers/explain_parser.py</code></td>
+<td>Parses the resource mapping to extract fields, types, and group-version-kind metadata</td>
+</tr>
+<tr>
+<td><strong>Cluster Version Tracker</strong></td>
+<td><code>class_generator/schema/__cluster_version__.txt</code></td>
+<td>Tracks the cluster version that last produced the schema, controlling update strategy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-flow-schema-fetch-and-storage">Data Flow: Schema Fetch and Storage</h3>
+<ol>
+<li><strong>Detect client binary</strong> — The system finds <code>oc</code> or falls back to <code>kubectl</code> via <code>get_client_binary()</code>.</li>
+<li><strong>Check cluster version</strong> — <code>check_and_update_cluster_version()</code> compares the connected cluster's version against the stored version in <code>__cluster_version__.txt</code>.</li>
+<li><strong>Determine update strategy</strong> — If the cluster is the same version or newer, all schemas are fetched and existing entries are updated. If older, only missing resources are fetched and existing schemas are preserved.</li>
+<li><strong>Fetch OpenAPI v3 index</strong> — <code>GET /openapi/v3</code> returns an index of all API group paths (e.g., <code>api/v1</code>, <code>apis/apps/v1</code>).</li>
+<li><strong>Fetch schemas in parallel</strong> — <code>fetch_all_api_schemas()</code> downloads schemas from each API path using a thread pool (up to 10 workers).</li>
+<li><strong>Build namespacing dictionary</strong> — <code>build_namespacing_dict()</code> queries <code>api-resources</code> to determine which kinds are namespaced vs. cluster-scoped.</li>
+<li><strong>Process definitions</strong> — <code>process_schema_definitions()</code> extracts <code>x-kubernetes-group-version-kind</code> metadata, builds schema entries, and merges them into the resource mappings. Existing resources are <strong>never deleted</strong> — only added or updated.</li>
+<li><strong>Supplement with <code>oc explain</code></strong> — Missing field descriptions, required-field markers, and <code>$ref</code> definitions are filled in by running <code>oc explain</code> commands in parallel.</li>
+<li><strong>Write to disk</strong> — The resource mappings are saved as a gzip-compressed JSON archive (<code>__resources-mappings.json.gz</code>), and definitions are written to <code>_definitions.json</code>.</li>
+</ol>
+<h3 id="data-flow-validation-at-runtime">Data Flow: Validation at Runtime</h3>
+<ol>
+<li><strong>Load on first use</strong> — <code>SchemaValidator.load_mappings_data()</code> decompresses and loads the mappings archive and definitions file into class-level caches.</li>
+<li><strong>Look up by kind</strong> — <code>SchemaValidator.load_schema(kind, api_group)</code> finds the schema for a resource kind (case-insensitive). When multiple API groups define the same kind (e.g., <code>Ingress</code> in <code>networking.k8s.io</code> and <code>config.openshift.io</code>), the <code>api_group</code> parameter disambiguates.</li>
+<li><strong>Resolve <code>$ref</code> references</strong> — The validator recursively resolves all <code>$ref</code> pointers against the definitions data, producing a self-contained schema.</li>
+<li><strong>Cache resolved schemas</strong> — Resolved schemas are stored in <code>_schema_cache</code> keyed by <code>api_group:kind</code>, so subsequent validations are fast.</li>
+<li><strong>Validate with jsonschema</strong> — <code>jsonschema.validate()</code> checks the resource dictionary against the resolved schema.</li>
+<li><strong>Format errors</strong> — If validation fails, <code>format_validation_error()</code> produces a human-readable message including the field path, error details, and schema context.</li>
+</ol>
+<h3 id="data-flow-code-generation">Data Flow: Code Generation</h3>
+<ol>
+<li><strong>Read resource mappings</strong> — <code>parse_explain()</code> loads the mapping file and finds all schema entries for the requested kind.</li>
+<li><strong>Select latest API version</strong> — When multiple versions exist within an API group, the latest version is selected using a priority ranking (<code>v2 &gt; v1 &gt; v1beta2 &gt; v1beta1 &gt; v1alpha2 &gt; v1alpha1</code>).</li>
+<li><strong>Extract fields and types</strong> — The <code>type_parser</code> module converts OpenAPI types to Python type annotations and builds parameter dictionaries for the class constructor.</li>
+<li><strong>Render Jinja2 template</strong> — <code>render_jinja_template()</code> processes <code>class_generator_template.j2</code> with the extracted data, producing a complete Python class.</li>
+<li><strong>Preserve user code</strong> — If the target file already exists, <code>parse_user_code_from_file()</code> extracts any user-added code below the <code># End of generated code</code> marker and re-inserts it after regeneration.</li>
+<li><strong>Format and write</strong> — <code>write_and_format_rendered()</code> writes the file, then runs <code>prek</code> (pre-commit hooks) or falls back to <code>ruff</code> for formatting.</li>
+</ol>
+<h2 id="key-concepts">Key Concepts</h2>
+<h3 id="the-resource-mappings-file">The Resource Mappings File</h3>
+<p>The resource mappings file (<code>__resources-mappings.json.gz</code>) is the central schema store. It maps lowercase kind names to arrays of schema objects:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;pod&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pod is a collection of containers...&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;x-kubernetes-group-version-kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Pod&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;namespaced&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;ingress&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;x-kubernetes-group-version-kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;networking.k8s.io&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;x-kubernetes-group-version-kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;config.openshift.io&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Resources with the same kind but different API groups (like <code>Ingress</code> above) are stored as separate entries in the array. This structure allows the validator and generator to handle API group disambiguation correctly.</p>
+<blockquote>
+<p><strong>Note:</strong> The mappings file is compressed with gzip to reduce repository size. The <code>archive_utils</code> module handles transparent compression and decompression via <code>save_json_archive()</code> and <code>load_json_archive()</code>.</p>
+</blockquote>
+<h3 id="the-definitions-file">The Definitions File</h3>
+<p>The definitions file (<code>_definitions.json</code>) contains detailed schema definitions keyed by <code>group/version/Kind</code> paths (e.g., <code>apps/v1/Deployment</code>, <code>v1/Pod</code>). It also stores referenced sub-schemas like <code>io.k8s.api.core.v1.PodSpec</code> that are targets of <code>$ref</code> pointers. During validation, the <code>SchemaValidator</code> uses this file as the reference store for resolving nested types.</p>
+<h3 id="schemavalidator">SchemaValidator</h3>
+<p><code>SchemaValidator</code> is a class with only class-level methods and caches — you never need to instantiate it. It serves as the shared validation engine used by both <code>Resource.validate()</code> and <code>Resource.validate_dict()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.utils.schema_validator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SchemaValidator</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>load_mappings_data</code></td>
+<td><code>(skip_cache: bool = False) -&gt; bool</code></td>
+<td>Loads the mappings archive and definitions file. Returns <code>True</code> on success.</td>
+</tr>
+<tr>
+<td><code>get_mappings_data</code></td>
+<td><code>(skip_cache: bool = False) -&gt; dict[str, Any] \| None</code></td>
+<td>Returns loaded mappings data, loading first if needed.</td>
+</tr>
+<tr>
+<td><code>get_definitions_data</code></td>
+<td><code>() -&gt; dict[str, Any] \| None</code></td>
+<td>Returns loaded definitions data, loading first if needed.</td>
+</tr>
+<tr>
+<td><code>load_schema</code></td>
+<td><code>(kind: str, api_group: str \| None = None) -&gt; dict[str, Any] \| None</code></td>
+<td>Loads and resolves a complete schema for a kind. Handles API group disambiguation and caching.</td>
+</tr>
+<tr>
+<td><code>validate</code></td>
+<td><code>(resource_dict: dict[str, Any], kind: str, api_group: str \| None = None) -&gt; None</code></td>
+<td>Validates a resource dict. Raises <code>jsonschema.ValidationError</code> on failure.</td>
+</tr>
+<tr>
+<td><code>format_validation_error</code></td>
+<td><code>(error, kind, name, api_group=None) -&gt; str</code></td>
+<td>Formats a validation error into a user-friendly message with field path and context.</td>
+</tr>
+<tr>
+<td><code>clear_cache</code></td>
+<td><code>() -&gt; None</code></td>
+<td>Clears the resolved schema cache (not the raw mappings/definitions data).</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Tip:</strong> The <code>load_schema</code> method resolves <code>$ref</code> references recursively. For core Kubernetes types like <code>ObjectMeta</code> or <code>TypeMeta</code> that may be missing from definitions, it falls back to a permissive <code>{"type": "object", "additionalProperties": true}</code> schema rather than failing outright.</p>
+</blockquote>
+<h3 id="resource-validation-methods">Resource Validation Methods</h3>
+<p>The <code>Resource</code> base class exposes two validation methods that delegate to <code>SchemaValidator</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resource</span>
+
+<span class="c1"># Instance-level validation — validates self.res</span>
+<span class="n">resource</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+<span class="c1"># Class-level validation — validates any dict against the class&#39;s schema</span>
+<span class="n">MyResource</span><span class="o">.</span><span class="n">validate_dict</span><span class="p">(</span><span class="n">resource_dict</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Both raise <code>ocp_resources.exceptions.ValidationError</code> (not the raw <code>jsonschema.ValidationError</code>) with formatted error messages that include the resource identifier, field path, and details.</p>
+<p><strong>Auto-validation</strong> can be enabled per-instance by passing <code>schema_validation_enabled=True</code> to the constructor:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
+
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}],</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
+    <span class="n">schema_validation_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># validation runs automatically before create() and update_replace()</span>
+<span class="n">pod</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<p>When auto-validation is enabled:</p>
+<ul>
+<li><code>create()</code> calls <code>self.validate()</code> after <code>to_dict()</code> builds the resource dictionary</li>
+<li><code>update_replace()</code> calls <code>validate_dict()</code> on the replacement resource dictionary</li>
+<li><code>update()</code> (patch operations) does <strong>not</strong> trigger validation because patches are partial documents that may not pass full schema validation</li>
+</ul>
+<h3 id="schema-update-strategies">Schema Update Strategies</h3>
+<p>The <code>update_kind_schema()</code> function employs a version-aware update strategy:</p>
+<table>
+<thead>
+<tr>
+<th>Cluster Version</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Same or newer</strong> than last recorded</td>
+<td>Fetches <strong>all</strong> API schemas, updates existing resources, supplements with <code>oc explain</code> data</td>
+</tr>
+<tr>
+<td><strong>Older</strong> than last recorded</td>
+<td>Identifies only <strong>missing</strong> resources via <code>identify_missing_resources()</code>, fetches only relevant API paths, does <strong>not</strong> modify existing schemas</td>
+</tr>
+</tbody>
+</table>
+<p>This strategy prevents an older cluster from overwriting schemas that contain richer data from a newer cluster.</p>
+<blockquote>
+<p><strong>Warning:</strong> If you connect to an older cluster and need to update a specific CRD's schema (for example, after installing a new operator), use <code>update_single_resource_schema(kind)</code> or the CLI flag <code>--update-schema-for &lt;Kind&gt;</code>. This bypasses the version guard for that one resource.</p>
+</blockquote>
+<h3 id="single-resource-schema-updates">Single-Resource Schema Updates</h3>
+<p>The <code>update_single_resource_schema()</code> function fetches the schema for exactly one resource kind without affecting other resources in the mapping:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_single_resource_schema</span>
+
+<span class="n">update_single_resource_schema</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;LlamaStackDistribution&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind</code></td>
+<td><code>str</code></td>
+<td>The resource Kind (case-sensitive, e.g., <code>"LlamaStackDistribution"</code>)</td>
+</tr>
+<tr>
+<td><code>client</code></td>
+<td><code>str \| None</code></td>
+<td>Client binary path. Auto-detected if <code>None</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises:</strong></p>
+<ul>
+<li><code>ResourceNotFoundError</code> — if the kind is not found on the cluster</li>
+<li><code>RuntimeError</code> — if schema fetching fails</li>
+</ul>
+<h3 id="code-generation-pipeline">Code Generation Pipeline</h3>
+<p>The <code>class_generator()</code> function orchestrates the full generation pipeline:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">class_generator</span>
+
+<span class="n">generated_files</span> <span class="o">=</span> <span class="n">class_generator</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Deployment&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind</code></td>
+<td><code>str</code></td>
+<td>(required)</td>
+<td>Kubernetes resource kind</td>
+</tr>
+<tr>
+<td><code>overwrite</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Overwrite existing files</td>
+</tr>
+<tr>
+<td><code>dry_run</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Print output without writing</td>
+</tr>
+<tr>
+<td><code>output_file</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Specific output file path</td>
+</tr>
+<tr>
+<td><code>output_dir</code></td>
+<td><code>str</code></td>
+<td><code>""</code></td>
+<td>Output directory (defaults to <code>ocp_resources</code>)</td>
+</tr>
+<tr>
+<td><code>add_tests</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Generate test files in <code>class_generator/tests/manifests/</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>list[str]</code> — paths of generated files.</p>
+<p><strong>Raises:</strong></p>
+<ul>
+<li><code>RuntimeError</code> — if the kind is not found in schema mappings</li>
+<li><code>ValueError</code> — if the generated filename contains invalid patterns</li>
+</ul>
+<p>When a kind exists in multiple API groups (e.g., <code>Ingress</code> in both <code>networking.k8s.io</code> and <code>config.openshift.io</code>), the generator produces <strong>separate files</strong> with a group-based suffix (e.g., <code>ingress_networking_k8s_io.py</code>, <code>ingress_config_openshift_io.py</code>).</p>
+<h3 id="generated-class-structure">Generated Class Structure</h3>
+<p>Every generated file follows a consistent structure produced by the Jinja2 template:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamespacedResource</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Pod</span><span class="p">(</span><span class="n">NamespacedResource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pod is a collection of containers that can run on a host.&quot;&quot;&quot;</span>
+
+    <span class="n">api_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">NamespacedResource</span><span class="o">.</span><span class="n">ApiVersion</span><span class="o">.</span><span class="n">V1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">containers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Args:</span>
+<span class="sd">            containers (list[Any]): List of containers belonging to the pod.</span>
+<span class="sd">            ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">containers</span> <span class="o">=</span> <span class="n">containers</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind_dict</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaml_file</span><span class="p">:</span>
+            <span class="c1"># Required fields raise MissingRequiredArgumentError</span>
+            <span class="c1"># Optional fields added only if not None</span>
+            <span class="o">...</span>
+    <span class="c1"># End of generated code</span>
+</code></pre></div>
+
+<p>User-added code placed <strong>after</strong> the <code># End of generated code</code> marker is preserved across regenerations.</p>
+<h3 id="ref-resolution"><code>$ref</code> Resolution</h3>
+<p>OpenAPI schemas extensively use <code>$ref</code> pointers to reference shared type definitions (e.g., <code>"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"</code>). The <code>SchemaValidator._resolve_refs()</code> method handles this by:</p>
+<ol>
+<li>Parsing the reference path to extract the definition name</li>
+<li>Looking up the definition in <code>_definitions_data</code> using multiple key formats (full dotted path, short name, or <code>version/Kind</code> format)</li>
+<li>Recursively resolving any <code>$ref</code> pointers within the resolved definition</li>
+<li>Falling back to a permissive object schema for well-known core types that may be missing</li>
+</ol>
+<h3 id="schema-supplementation-via-oc-explain">Schema Supplementation via <code>oc explain</code></h3>
+<p>The raw OpenAPI v3 schemas from the cluster sometimes lack field descriptions and required-field markers. The system supplements these gaps by:</p>
+<ul>
+<li>Running <code>oc explain &lt;resource&gt;.&lt;field&gt;</code> commands <strong>in parallel</strong> for critical resource types (Pod, Deployment, Service, etc.)</li>
+<li>Parsing the explain output to extract field descriptions, types, and required-field markers</li>
+<li>Merging descriptions into existing schema properties where they are missing</li>
+<li>Detecting missing <code>$ref</code> targets and fetching their definitions via <code>oc explain --recursive</code></li>
+</ul>
+<p>This supplementation only runs during a <strong>full update</strong> (same or newer cluster version), not when only fetching missing resources.</p>
+<h2 id="how-it-affects-you">How It Affects You</h2>
+<table>
+<thead>
+<tr>
+<th>What you do</th>
+<th>What happens under the hood</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Call <code>resource.validate()</code></td>
+<td><code>SchemaValidator</code> loads schemas from the compressed archive, resolves <code>$ref</code> references, validates with jsonschema, and raises <code>ValidationError</code> with a formatted message</td>
+</tr>
+<tr>
+<td>Pass <code>schema_validation_enabled=True</code></td>
+<td><code>create()</code> and <code>update_replace()</code> automatically validate before sending to the API server</td>
+</tr>
+<tr>
+<td>Run <code>class-generator --update-schema</code></td>
+<td>Full schema fetch from cluster, version check, parallel API downloads, <code>oc explain</code> supplementation, and compressed archive write</td>
+</tr>
+<tr>
+<td>Run <code>class-generator -k Pod</code></td>
+<td>Reads the mapping for <code>pod</code>, parses fields/types, renders Jinja2 template, preserves user code, writes and formats the Python file</td>
+</tr>
+<tr>
+<td>Run <code>class-generator --update-schema-for MyResource</code></td>
+<td>Single-resource fetch that bypasses the cluster version guard</td>
+</tr>
+<tr>
+<td>Run <code>class-generator --regenerate-all</code></td>
+<td>Discovers all generated files (by marker comment), regenerates each in parallel, preserving user code</td>
+</tr>
+<tr>
+<td>Validation reports "No schema found"</td>
+<td>The resource kind is not in the mappings archive — run <code>--update-schema</code> to fetch it</td>
+</tr>
+<tr>
+<td>Multiple files generated for one kind</td>
+<td>The kind exists in multiple API groups — each group gets its own file with a suffix</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related-pages">Related Pages</h2>
+<ul>
+<li>See <a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a> for a hands-on guide to enabling and using validation.</li>
+<li>See <a href="generating-resource-classes.html">Generating New Resource Classes with class-generator</a> for step-by-step class generation instructions.</li>
+<li>See <a href="class-generator-cli.html">class-generator CLI Reference</a> for all CLI options including <code>--update-schema</code>, <code>--update-schema-for</code>, <code>--regenerate-all</code>, and <code>--coverage-report</code>.</li>
+<li>See <a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a> to learn how generated classes fit into the <code>Resource</code> / <code>NamespacedResource</code> inheritance tree.</li>
+<li>See <a href="resource-api.html">Resource and NamespacedResource API</a> for complete documentation of the <code>validate()</code> and <code>validate_dict()</code> methods.</li>
+<li>See <a href="testing-without-cluster.html">Testing Without a Cluster Using the Fake Client</a> for how the fake client uses schema-based status templates.</li>
+</ul>
+<h2 id="related-pages_1">Related Pages</h2>
+<ul>
+<li><a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a></li>
+<li><a href="generating-resource-classes.html">Generating New Resource Classes with class-generator</a></li>
+<li><a href="class-generator-cli.html">class-generator CLI Reference</a></li>
+<li><a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a></li>
+<li><a href="resource-api.html">Resource and NamespacedResource API</a></li>
+</ul>
+                </div>
+            </article>
+            <nav class="page-nav">
+
+                <a href="resource-class-hierarchy.html" class="page-nav-link page-nav-prev">
+                    <span class="page-nav-label">Previous</span>
+                    <span class="page-nav-title">Understanding the Resource Class Hierarchy</span>
+                </a>
+
+
+                <a href="working-with-events.html" class="page-nav-link page-nav-next">
+                    <span class="page-nav-label">Next</span>
+                    <span class="page-nav-title">Working with Kubernetes Events</span>
+                </a>
+
+            </nav>
+
+            <aside class="toc-sidebar">
+                <div class="toc-container">
+                    <h3>On this page</h3>
+                    <div class="toc">
+<ul>
+<li><a href="#the-big-picture">The Big Picture</a><ul>
+<li><a href="#data-flow-schema-fetch-and-storage">Data Flow: Schema Fetch and Storage</a></li>
+<li><a href="#data-flow-validation-at-runtime">Data Flow: Validation at Runtime</a></li>
+<li><a href="#data-flow-code-generation">Data Flow: Code Generation</a></li>
+</ul>
+</li>
+<li><a href="#key-concepts">Key Concepts</a><ul>
+<li><a href="#the-resource-mappings-file">The Resource Mappings File</a></li>
+<li><a href="#the-definitions-file">The Definitions File</a></li>
+<li><a href="#schemavalidator">SchemaValidator</a></li>
+<li><a href="#resource-validation-methods">Resource Validation Methods</a></li>
+<li><a href="#schema-update-strategies">Schema Update Strategies</a></li>
+<li><a href="#single-resource-schema-updates">Single-Resource Schema Updates</a></li>
+<li><a href="#code-generation-pipeline">Code Generation Pipeline</a></li>
+<li><a href="#generated-class-structure">Generated Class Structure</a></li>
+<li><a href="#ref-resolution">$ref Resolution</a></li>
+<li><a href="#schema-supplementation-via-oc-explain">Schema Supplementation via oc explain</a></li>
+</ul>
+</li>
+<li><a href="#how-it-affects-you">How It Affects You</a></li>
+<li><a href="#related-pages">Related Pages</a></li>
+<li><a href="#related-pages_1">Related Pages</a></li>
+</ul>
+</div>
+
+                </div>
+            </aside>
+
+
+        </main>
+
+        <footer class="page-footer">
+
+            <span class="footer-version">Generated from version 11.0.134</span>
+            <span class="footer-sep">&middot;</span>
+
+            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            <span class="footer-sep">&middot;</span>
+            <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
+        </footer>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="assets/theme.js"></script>
+    <script src="assets/search.js"></script>
+    <script src="assets/copy.js"></script>
+    <script src="assets/callouts.js"></script>
+    <script src="assets/scrollspy.js"></script>
+    <script src="assets/codelabels.js"></script>
+    <script src="assets/github.js"></script>
+    <script>
+(function() {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+            var expanded = sidebar.classList.contains('open');
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+})();
+</script>
+<script>
+(function() {
+    var sidebar = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Restore scroll position
+    var saved = sessionStorage.getItem('sidebar-scroll');
+    if (saved) sidebar.scrollTop = parseInt(saved, 10);
+
+    // Save scroll position before navigating
+    sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sidebar-scroll', sidebar.scrollTop.toString());
+    });
+
+    // Also scroll active link into view if no saved position
+    if (!saved) {
+        var active = sidebar.querySelector('.nav-link.active');
+        if (active) {
+            active.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+    }
+})();
+</script>
+</body>
+</html>

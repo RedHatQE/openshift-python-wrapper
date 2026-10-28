@@ -13,7 +13,7 @@ class TestUserCodeParser:
 
     def test_parse_file_with_user_code_and_imports(self):
         """Test parsing a file with both user code and user imports."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -88,7 +88,7 @@ class MyResource(Resource):
 
     def test_parse_file_with_multiline_imports(self):
         """Test parsing a file with multi-line imports."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -131,10 +131,11 @@ class MyResource(Resource):
 
     def test_parse_file_with_different_template_imports(self):
         """Test parsing with different combinations of template imports."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
-from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 from custom_validators import validate_name
 import json
 
@@ -160,7 +161,8 @@ class MyResource(NamespacedResource):
         assert "from custom_validators import validate_name" in user_imports
         assert "import json" in user_imports
         assert "from typing import Any" not in user_imports
-        assert "from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError" not in user_imports
+        assert "from ocp_resources.exceptions import MissingRequiredArgumentError" not in user_imports
+        assert "from ocp_resources.resource import NamespacedResource" not in user_imports
 
     def test_parse_empty_file(self):
         """Test parsing an empty file."""
@@ -179,7 +181,7 @@ class MyResource(NamespacedResource):
 
     def test_parse_file_with_only_marker(self):
         """Test parsing a file with only the marker and no user code."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import Resource
@@ -203,9 +205,47 @@ class MyResource(Resource):
         assert user_code.strip() == ""  # Only whitespace after marker
         assert user_imports == ""
 
+    def test_parse_file_with_exceptions_import(self):
+        """Test parsing a file with import from ocp_resources.exceptions module."""
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
+
+from typing import Any
+from ocp_resources.resource import NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+import json
+
+
+class MyResource(NamespacedResource):
+    """My resource class."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    # End of generated code
+
+    def custom_method(self):
+        return True
+'''
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(content)
+            f.flush()
+
+            _user_code, user_imports = parse_user_code_from_file(file_path=f.name)
+
+        Path(f.name).unlink()
+
+        # Template imports should be filtered out
+        assert "from ocp_resources.exceptions import MissingRequiredArgumentError" not in user_imports
+        assert "from typing import Any" not in user_imports
+        assert "from ocp_resources.resource import NamespacedResource" not in user_imports
+
+        # User imports should be preserved
+        assert "import json" in user_imports
+
     def test_parse_file_with_syntax_error(self):
         """Test parsing a file with syntax errors in imports section."""
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import Resource

@@ -131,7 +131,6 @@ package-lock.json
 
 # AI
 .cursor/
-CLAUDE.md
 .agent-os/
 .cursorrules
 .claude/
@@ -144,3 +143,6 @@ CLAUDE.md
 
 # Large schema files (we keep the compressed versions)
 class_generator/schema/__resources-mappings.json
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

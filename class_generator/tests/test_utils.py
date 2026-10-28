@@ -84,7 +84,7 @@ class TestResourceScanner:
     def test_scan_resources_with_valid_files(self, temp_ocp_resources_dir):
         """Test scanning resources with valid resource files."""
         # Create a valid resource file
-        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
@@ -145,7 +145,7 @@ class CustomResource(Resource):
 
     def test_extract_resource_info_with_base_resource(self, temp_ocp_resources_dir):
         """Test extracting info from a Resource-based class."""
-        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import Resource
 
@@ -176,7 +176,7 @@ class ClusterResource(Resource):
 
     def test_extract_resource_info_ephemeral_resource(self, temp_ocp_resources_dir):
         """Test extracting info for ephemeral resources like ProjectRequest."""
-        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import Resource
 
@@ -201,7 +201,7 @@ class ProjectRequest(Resource):
 
     def test_analyze_init_with_defaults(self, temp_ocp_resources_dir):
         """Test analyzing __init__ method with default parameters."""
-        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import NamespacedResource
 
@@ -229,7 +229,7 @@ class Deployment(NamespacedResource):
 
     def test_analyze_to_dict_required_params(self, temp_ocp_resources_dir):
         """Test analyzing to_dict method to find truly required parameters."""
-        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import NamespacedResource, MissingRequiredArgumentError
 
@@ -264,7 +264,7 @@ class Service(NamespacedResource):
 
     def test_extract_api_info_with_enum_style(self, temp_ocp_resources_dir):
         """Test extracting API info using enum-style attributes."""
-        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        resource_content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import NamespacedResource
 
@@ -300,7 +300,7 @@ class Ingress(NamespacedResource):
         """Test that resources are returned sorted by name."""
         # Create multiple resource files
         for name in ["zebra", "alpha", "beta"]:
-            content = f"""# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+            content = f"""# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import Resource
 

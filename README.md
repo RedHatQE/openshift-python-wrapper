@@ -1,5 +1,7 @@
 # openshift-python-wrapper (`wrapper`)
 
+📖 **[Full Documentation](https://redhatqe.github.io/openshift-python-wrapper/)**
+
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
 A python wrapper for [kubernetes-python-client](https://github.com/kubernetes-client/python) with support for [RedHat Container Virtualization](https://www.openshift.com/learn/topics/virtualization)  
 Docs: [openshift-python-wrapper docs](https://openshift-python-wrapper.readthedocs.io/en/latest/)

@@ -31,14 +31,31 @@ class Plan(NamespacedResource):
                                           - "off": Target VM will be powered off after migration
                                           - "auto" or None (default): Target VM will match the source VM's power state
         use_compatibility_mode (bool, optional): Whether to use compatibility mode.
+        xfs_compatibility (bool, optional): Whether to use an XFS-compatible virt-v2v image.
         migrate_shared_disks (bool, optional): Whether to migrate shared disks.
         preserve_static_ips (bool, optional): Whether to preserve static IPs during migration.
         target_node_selector (dict, optional): Node selector for the target VM. Specifies which node labels
                                              should be used for NodeSelector parameter of VMI resource.
+        convertor_node_selector (dict[str, str], optional): Node selector for virt-v2v conversion pods.
+                                                             For vSphere warm migrations using VDDK, this
+                                                             selector is also applied to CDI importer pods.
         target_labels (dict, optional): Labels to be applied to the target VM. Specifies which labels
                                       should be added to the target VM resource.
         target_affinity (dict, optional): Affinity rules for the target VM. Specifies which affinity
                                         rules should be applied to the target VM resource.
+        enable_nested_virtualization (bool, optional): Whether to enable nested virtualization on migrated VMs.
+                                                      When False, CPU features vmx/svm are disabled on the target VM.
+        run_preflight_inspection (bool, optional): Whether to run preflight deep inspection on warm migrations.
+        rdm_as_lun (bool, optional): Whether to map RDM (Raw Device Mapping) disks as LUN devices
+                                     with SCSI bus on the target VM. When True, RDM disks use
+                                     lun.bus: scsi instead of the default disk.bus: virtio.
+                                     Only applies to vSphere source providers.
+        scsi_reservation (bool, optional): Whether to enable SCSI persistent reservations on shared RDM disks.
+                                           When True, sets lun.reservation: true and errorPolicy: report
+                                           on target VM disks. Only applies to vSphere source providers.
+        pre_copy_source_disks (bool, optional): Whether to pre-copy source disks before virt-v2v conversion.
+                                                When True, an init container converts VHDX to raw via qemu-img
+                                                before virt-v2v runs in-place. Only applies to Hyper-V migrations.
     """
 
     api_group = NamespacedResource.ApiGroup.FORKLIFT_KONVEYOR_IO
@@ -68,11 +85,18 @@ class Plan(NamespacedResource):
         skip_guest_conversion: bool | None = None,
         target_power_state: str | None = None,
         use_compatibility_mode: bool | None = None,
+        xfs_compatibility: bool | None = None,
         migrate_shared_disks: bool | None = None,
         preserve_static_ips: bool | None = None,
         target_node_selector: dict[str, str] | None = None,
         target_labels: dict[str, str] | None = None,
         target_affinity: dict[str, Any] | None = None,
+        enable_nested_virtualization: bool | None = None,
+        run_preflight_inspection: bool | None = None,
+        rdm_as_lun: bool | None = None,
+        scsi_reservation: bool | None = None,
+        convertor_node_selector: dict[str, str] | None = None,
+        pre_copy_source_disks: bool | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
@@ -100,11 +124,18 @@ class Plan(NamespacedResource):
         self.skip_guest_conversion = skip_guest_conversion
         self.target_power_state = target_power_state
         self.use_compatibility_mode = use_compatibility_mode
+        self.xfs_compatibility = xfs_compatibility
         self.migrate_shared_disks = migrate_shared_disks
         self.preserve_static_ips = preserve_static_ips
         self.target_node_selector = target_node_selector
+        self.convertor_node_selector = convertor_node_selector
         self.target_labels = target_labels
         self.target_affinity = target_affinity
+        self.enable_nested_virtualization = enable_nested_virtualization
+        self.run_preflight_inspection = run_preflight_inspection
+        self.rdm_as_lun = rdm_as_lun
+        self.scsi_reservation = scsi_reservation
+        self.pre_copy_source_disks = pre_copy_source_disks
 
         if self.pre_hook_name and self.pre_hook_namespace:
             self.hooks_array.append(
@@ -186,6 +217,9 @@ class Plan(NamespacedResource):
             if self.use_compatibility_mode is not None:
                 spec["useCompatibilityMode"] = self.use_compatibility_mode
 
+            if self.xfs_compatibility is not None:
+                spec["xfsCompatibility"] = self.xfs_compatibility
+
             if self.migrate_shared_disks is not None:
                 spec["migrateSharedDisks"] = self.migrate_shared_disks
 
@@ -195,11 +229,29 @@ class Plan(NamespacedResource):
             if self.target_node_selector is not None:
                 spec["targetNodeSelector"] = self.target_node_selector
 
+            if self.convertor_node_selector is not None:
+                spec["convertorNodeSelector"] = self.convertor_node_selector
+
             if self.target_labels is not None:
                 spec["targetLabels"] = self.target_labels
 
             if self.target_affinity is not None:
                 spec["targetAffinity"] = self.target_affinity
+
+            if self.enable_nested_virtualization is not None:
+                spec["enableNestedVirtualization"] = self.enable_nested_virtualization
+
+            if self.run_preflight_inspection is not None:
+                spec["runPreflightInspection"] = self.run_preflight_inspection
+
+            if self.rdm_as_lun is not None:
+                spec["rdmAsLun"] = self.rdm_as_lun
+
+            if self.scsi_reservation is not None:
+                spec["scsiReservation"] = self.scsi_reservation
+
+            if self.pre_copy_source_disks is not None:
+                spec["preCopySourceDisks"] = self.pre_copy_source_disks
 
     def _generate_hook_spec(self, hook_name: str, hook_namespace: str, hook_type: str) -> dict[str, Any]:
         return {

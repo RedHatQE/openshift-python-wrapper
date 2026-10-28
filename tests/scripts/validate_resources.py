@@ -106,7 +106,7 @@ def validate_resource(
 
 
 def resource_file() -> Generator[str, None, None]:
-    ocp_resources_exclude_files = ["resource.py", "utils.py", "__init__.py"]
+    ocp_resources_exclude_files = ["resource.py", "utils.py", "__init__.py", "hook.py"]
     for root, _, files in os.walk("ocp_resources"):
         for _file in files:
             if _file in ocp_resources_exclude_files or not _file.endswith(".py"):
@@ -120,7 +120,7 @@ def parse_resource_file_for_errors(data) -> list[str]:
     _resources_definitions = resources_definitions()
 
     if data.startswith(
-        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md"
+        "# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md"
     ):
         return []
 

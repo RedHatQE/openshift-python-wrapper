@@ -82,11 +82,18 @@ def convert_camel_case_to_snake_case(name: str) -> str:
         - The function handles both single-word camel case strings (e.g., "Service") and multi-word camel case strings
           (e.g., "myCamelCaseString").
     """
-    do_not_process_list = ["oauth", "kubevirt"]
+    do_not_process_list = ["hyperconverged", "oauth", "kubevirt"]
 
     # If the input string is in the do_not_proccess_list, return it as it is.
     if name.lower() in do_not_process_list:
         return name.lower()
+
+    # Known mixed-case acronyms that should be treated as single words.
+    # e.g., "MaaS" (Metal-as-a-Service) should convert to "maas", not "maa_s".
+    normalize_acronyms = {"MaaS": "Maas"}
+
+    for acronym, replacement in normalize_acronyms.items():
+        name = name.replace(acronym, replacement)
 
     formatted_str: str = ""
 

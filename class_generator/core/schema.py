@@ -163,6 +163,10 @@ def identify_missing_resources(client: str, existing_resources_mapping: dict[Any
     """
     Identify resources that exist in the cluster but are missing from our mapping.
 
+    Compares using (group, kind) pairs so that resources with the same kind but
+    different API groups (e.g. velero.io/Backup vs postgresql.cnpg.noobaa.io/Backup)
+    are tracked independently.
+
     Args:
         client: Path to kubectl/oc client binary
         existing_resources_mapping: Current resources mapping
@@ -172,7 +176,7 @@ def identify_missing_resources(client: str, existing_resources_mapping: dict[Any
     """
     missing_resources: set[str] = set()
 
-    # Get all available resources from cluster
+    # Get all available resources from cluster with their API groups
     cmd = f"{client} api-resources --no-headers"
     success, output, _ = run_command(command=shlex.split(cmd), check=False, log_errors=False)
 
@@ -180,49 +184,75 @@ def identify_missing_resources(client: str, existing_resources_mapping: dict[Any
         LOGGER.debug("Failed to get api-resources from cluster")
         return missing_resources
 
-    # Extract kinds from cluster resources
-    cluster_resources = set()
+    # Build kind -> set of groups from cluster resources
+    cluster_kind_groups: dict[str, set[str]] = {}
     lines = output.strip().split("\n")
 
     for line in lines:
         parts = [p for p in line.split() if p]
-        if parts:
-            kind = parts[-1]  # KIND is the last column
-            cluster_resources.add(kind)
+        if len(parts) < 3:
+            continue
 
-    # Find missing resources by comparing with existing mapping
-    existing_kinds = set()
+        # Find APIVERSION column by looking for version patterns
+        # (same logic as build_dynamic_resource_to_api_mapping)
+        apiversion_idx = None
+        for i, part in enumerate(parts):
+            if ("/" in part and ("v" in part or "alpha" in part or "beta" in part)) or (
+                part.startswith("v") and part[1:].replace(".", "").replace("alpha", "").replace("beta", "").isdigit()
+            ):
+                apiversion_idx = i
+                break
+
+        if apiversion_idx is None:
+            continue
+
+        # KIND is 2 columns after APIVERSION (APIVERSION, NAMESPACED, KIND)
+        if len(parts) <= apiversion_idx + 2:
+            continue
+
+        apiversion = parts[apiversion_idx]
+        kind = parts[apiversion_idx + 2]
+
+        # Extract group from apiversion: "velero.io/v1" -> "velero.io", "v1" -> ""
+        group = apiversion.rsplit("/", 1)[0] if "/" in apiversion else ""
+
+        cluster_kind_groups.setdefault(kind, set()).add(group)
+
+    # Build kind -> set of groups from existing mappings
+    existing_kind_groups: dict[str, set[str]] = {}
     for _, resource_schemas in existing_resources_mapping.items():
-        # Verify resource_schemas is a non-empty list
         if not isinstance(resource_schemas, list) or not resource_schemas:
             continue
 
-        # Verify first_schema is a dict
-        first_schema = resource_schemas[0]
-        if not isinstance(first_schema, dict):
-            LOGGER.debug(f"Skipping malformed schema: first_schema is not a dict, got {type(first_schema)}")
-            continue
-
-        # Get gvk_list via .get and ensure it is a list
-        gvk_list = first_schema.get("x-kubernetes-group-version-kind")
-        if not isinstance(gvk_list, list) or not gvk_list:
-            LOGGER.debug(
-                f"Skipping malformed schema: x-kubernetes-group-version-kind is not a non-empty list, got {type(gvk_list)}"
-            )
-            continue
-
-        # Iterate gvk_list items and for each item confirm it's a dict before calling .get("kind")
-        for gvk_item in gvk_list:
-            if not isinstance(gvk_item, dict):
-                LOGGER.debug(f"Skipping malformed gvk item: not a dict, got {type(gvk_item)}")
+        # Check ALL schemas in the list, not just the first one
+        for schema in resource_schemas:
+            if not isinstance(schema, dict):
                 continue
 
-            kind = gvk_item.get("kind")
-            # Check that kind is a non-empty string before adding to existing_kinds
-            if isinstance(kind, str) and kind.strip():
-                existing_kinds.add(kind.strip())
+            gvk_list = schema.get("x-kubernetes-group-version-kind")
+            if not isinstance(gvk_list, list) or not gvk_list:
+                continue
 
-    missing_resources = cluster_resources - existing_kinds
+            for gvk_item in gvk_list:
+                if not isinstance(gvk_item, dict):
+                    continue
+
+                kind = gvk_item.get("kind")
+                if not isinstance(kind, str) or not kind.strip():
+                    continue
+
+                kind = kind.strip()
+                group_raw = gvk_item.get("group", "")
+                group = group_raw.strip() if isinstance(group_raw, str) else ""
+
+                existing_kind_groups.setdefault(kind, set()).add(group)
+
+    # Find missing resources: kind is missing if any cluster group is not in existing groups
+    for kind, cluster_groups in cluster_kind_groups.items():
+        existing_groups = existing_kind_groups.get(kind, set())
+        if not cluster_groups.issubset(existing_groups):
+            missing_resources.add(kind)
+
     LOGGER.info(f"Found {len(missing_resources)} missing resources: {sorted(list(missing_resources)[:10])}")
 
     return missing_resources
@@ -661,9 +691,32 @@ def process_schema_definitions(
                         f"Added new schema version for existing resource: {kind_lower} ({group or 'core'}/{version})"
                     )
             else:
-                # Don't update existing resources when cluster version is older
-                LOGGER.debug(f"Skipping update for existing resource: {kind_lower}")
-                continue
+                # Older cluster: keep existing schemas untouched, but still add
+                # missing group/version variants for existing kinds.
+                existing_schemas = resources_mapping.get(kind_lower, [])
+                variant_exists = False
+                for existing_schema in existing_schemas:
+                    if not isinstance(existing_schema, dict):
+                        continue
+                    existing_gvk_list = existing_schema.get("x-kubernetes-group-version-kind") or []
+                    for existing_gvk in existing_gvk_list:
+                        if not isinstance(existing_gvk, dict):
+                            continue
+                        if existing_gvk.get("group") == group and existing_gvk.get("version") == version:
+                            variant_exists = True
+                            break
+                    if variant_exists:
+                        break
+
+                if variant_exists:
+                    LOGGER.debug(f"Skipping update for existing resource: {kind_lower}")
+                    continue
+
+                existing_schemas.append(schema_data)
+                updated_resources += 1
+                LOGGER.debug(
+                    f"Added missing schema variant for existing resource: {kind_lower} ({group or 'core'}/{version})"
+                )
 
             # Also store in definitions for separate definitions file
             definitions[schema_name] = schema_data

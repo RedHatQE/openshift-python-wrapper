@@ -517,7 +517,7 @@ def run_ruff_on_files(filepaths: list[str]) -> bool:
 
         # Run ruff format and check on all files
         for op in ("format", "check"):
-            cmd_str = f"uvx ruff {op} {' '.join(filepaths)}"
+            cmd_str = f"uvx ruff --config pyproject.toml {op} {' '.join(filepaths)}"
             rc, _, _ = run_command(
                 command=shlex.split(cmd_str),
                 verify_stderr=False,

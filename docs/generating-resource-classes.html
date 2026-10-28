@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generating New Resource Classes with class-generator - openshift-python-wrapper</title>
+    <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
+    <link rel="stylesheet" href="assets/style.css">
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+    <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
+    <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-logo">openshift-python-wrapper</a>
+            <p class="sidebar-tagline">Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls</p>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" id="search-input" placeholder="Search... (⌘K)" autocomplete="off" readonly>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Getting Started</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="quickstart.html"
+                           class="nav-link">
+                            Installing and Creating Your First Resource
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">User Guides</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="connecting-to-clusters.html"
+                           class="nav-link">
+                            Connecting to Clusters
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="creating-and-managing-resources.html"
+                           class="nav-link">
+                            Creating and Managing Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="querying-resources.html"
+                           class="nav-link">
+                            Querying and Watching Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="waiting-for-conditions.html"
+                           class="nav-link">
+                            Waiting for Resource Conditions and Status
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="validating-resources.html"
+                           class="nav-link">
+                            Validating Resources Against OpenAPI Schemas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="managing-resource-lists.html"
+                           class="nav-link">
+                            Managing Bulk Resources with ResourceList
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="editing-resources-temporarily.html"
+                           class="nav-link">
+                            Editing Resources Temporarily with ResourceEditor
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="working-with-virtual-machines.html"
+                           class="nav-link">
+                            Working with Virtual Machines (KubeVirt)
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="testing-without-cluster.html"
+                           class="nav-link">
+                            Testing Without a Cluster Using the Fake Client
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="generating-resource-classes.html"
+                           class="nav-link active" aria-current="page">
+                            Generating New Resource Classes with class-generator
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Recipes</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="common-patterns.html"
+                           class="nav-link">
+                            Common Resource Patterns
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="mcp-server-integration.html"
+                           class="nav-link">
+                            Integrating with AI Assistants via MCP Server
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-api.html"
+                           class="nav-link">
+                            Resource and NamespacedResource API
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="environment-variables.html"
+                           class="nav-link">
+                            Environment Variables and Configuration
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Internals</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-class-hierarchy.html"
+                           class="nav-link">
+                            Understanding the Resource Class Hierarchy
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schema-validation-internals.html"
+                           class="nav-link">
+                            Schema Validation and Code Generation Architecture
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Using Resources</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="working-with-events.html"
+                           class="nav-link">
+                            Working with Kubernetes Events
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="pod-execution-and-logs.html"
+                           class="nav-link">
+                            Executing Commands in Pods and Retrieving Logs
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">API Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="error-handling.html"
+                           class="nav-link">
+                            Error Handling and Exception Reference
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <a href="index.html" class="top-bar-title">openshift-python-wrapper</a>
+            </div>
+            <div class="top-bar-spacer"></div>
+            <div class="top-bar-right">
+                <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
+                    <kbd>&#8984;K</kbd> Search
+                </button>
+                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
+                    ⚡ docs<span class="brand-accent">fy</span>
+                </a>
+
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span class="github-stars" id="github-stars" title="GitHub stars"></span>
+                </a>
+
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <article class="article">
+                <div class="article-body">
+                    <!-- SECURITY: |safe is intentional. Content is AI-generated markdown
+                         converted to HTML server-side by the markdown library, not
+                         user-supplied input. XSS risk is minimal and accepted since
+                         the AI generates the content, not end users. -->
+                    <p>Let me start by exploring the repository structure and the knowledge graph.</p>
+<p>Now let me check the generated output example and the test generation flow:</p>
+<p>Now let me look at a generated file with a spec section, and check one with duplicate kinds:</p>
+<p>Let me also check the <code>--help</code> output structure and look at a few more details:</p>
+<p>Now let me check a dry-run example and verify what shell completion setup looks like:</p>
+<p>Now I have a thorough understanding of the codebase. Let me write the documentation:</p>
+<h1 id="generating-new-resource-classes-with-class-generator">Generating New Resource Classes with class-generator</h1>
+<p>Scaffold Python wrapper classes for any Kubernetes or OpenShift custom resource definition (CRD) so you can manage those resources using the same patterns as built-in resources. The <code>class-generator</code> CLI introspects your cluster's OpenAPI schemas and produces ready-to-use Python files complete with typed constructors, docstrings, and <code>to_dict()</code> serialization.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li><strong>openshift-python-wrapper</strong> installed (see <a href="quickstart.html">Installing and Creating Your First Resource</a>)</li>
+<li><code>oc</code> or <code>kubectl</code> CLI available on your <code>PATH</code></li>
+<li>An active connection to a Kubernetes or OpenShift cluster with admin privileges (for <code>--kind</code> generation and schema updates)</li>
+</ul>
+<h2 id="quick-example">Quick Example</h2>
+<p>Generate a wrapper class for the <code>Deployment</code> resource:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Deployment
+</code></pre></div>
+
+<p>This creates a Python file in <code>ocp_resources/</code> with a fully typed class you can import and use immediately:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deployment</span>
+
+<span class="n">dep</span> <span class="o">=</span> <span class="n">Deployment</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-app&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+    <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">selector</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;matchLabels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;my-app&quot;</span><span class="p">}},</span>
+    <span class="n">template</span><span class="o">=</span><span class="p">{</span><span class="o">...</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">dep</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
+</code></pre></div>
+
+<h2 id="step-by-step-generating-a-resource-class">Step-by-Step: Generating a Resource Class</h2>
+<h3 id="1-generate-the-class-file">1. Generate the class file</h3>
+<p>Pass the CRD's <code>Kind</code> (case-sensitive) to <code>--kind</code> / <code>-k</code>:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>StorageCluster
+</code></pre></div>
+
+<p>The output file is automatically named using snake_case — <code>ocp_resources/storage_cluster.py</code>.</p>
+<h3 id="2-preview-without-writing-dry-run">2. Preview without writing (dry run)</h3>
+<p>See exactly what would be generated without touching the filesystem:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>StorageCluster<span class="w"> </span>--dry-run
+</code></pre></div>
+
+<p>The rendered Python code is printed to the console with syntax highlighting.</p>
+<h3 id="3-review-the-generated-file">3. Review the generated file</h3>
+<p>Every generated file contains:</p>
+<ul>
+<li>A class inheriting from <code>Resource</code> (cluster-scoped) or <code>NamespacedResource</code> (namespace-scoped)</li>
+<li>Typed <code>__init__</code> parameters extracted from the OpenAPI spec and <code>status</code> fields</li>
+<li>A <code>to_dict()</code> method that serializes required and optional fields</li>
+<li>A <code># End of generated code</code> marker — any code you add <strong>below</strong> this line is preserved on regeneration</li>
+</ul>
+<p>Example generated output for <code>ConfigMap</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamespacedResource</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigMap</span><span class="p">(</span><span class="n">NamespacedResource</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ConfigMap holds configuration data for pods to consume.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">api_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">NamespacedResource</span><span class="o">.</span><span class="n">ApiVersion</span><span class="o">.</span><span class="n">V1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">binary_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">immutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="o">...</span>
+</code></pre></div>
+
+<h3 id="4-generate-multiple-kinds-at-once">4. Generate multiple kinds at once</h3>
+<p>Pass a comma-separated list (no spaces):</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod,Service,ConfigMap
+</code></pre></div>
+
+<p>Multiple kinds are generated in parallel for speed.</p>
+<h3 id="5-overwrite-an-existing-file">5. Overwrite an existing file</h3>
+<p>By default, existing files are not overwritten. Pass <code>--overwrite</code> to replace them:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Deployment<span class="w"> </span>--overwrite
+</code></pre></div>
+
+<p>To create a timestamped backup before overwriting:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Deployment<span class="w"> </span>--overwrite<span class="w"> </span>--backup
+</code></pre></div>
+
+<p>Backups are stored in <code>.backups/backup-YYYYMMDD-HHMMSS/</code> preserving the original directory structure.</p>
+<h3 id="6-write-to-a-custom-output-path">6. Write to a custom output path</h3>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>MyCustomResource<span class="w"> </span>-o<span class="w"> </span>my_package/custom_resource.py
+</code></pre></div>
+
+<h2 id="handling-duplicate-kinds">Handling Duplicate Kinds</h2>
+<p>Some Kubernetes kinds exist in multiple API groups. For example, <code>DNS</code> exists in both <code>config.openshift.io</code> and <code>operator.openshift.io</code>. When this happens, the generator automatically creates separate files with group-based suffixes:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>API Group</th>
+<th>Generated File</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DNS</code></td>
+<td><code>config.openshift.io</code></td>
+<td><code>dns_config_openshift_io.py</code></td>
+</tr>
+<tr>
+<td><code>DNS</code></td>
+<td><code>operator.openshift.io</code></td>
+<td><code>dns_operator_openshift_io.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both files define a class named <code>DNS</code> but with different <code>api_group</code> attributes. Import the one matching the API group you need.</p>
+<h2 id="adding-user-code-to-generated-files">Adding User Code to Generated Files</h2>
+<p>Any code you add <strong>below</strong> the <code># End of generated code</code> marker is preserved when you regenerate the file with <code>--overwrite</code>. This is how built-in resources like <code>ConfigMap</code> include custom properties:</p>
+<div class="highlight"><pre><span></span><code>    <span class="c1"># End of generated code</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys_to_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;binaryData&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<p>Custom imports you add at the top of the file are also preserved during regeneration.</p>
+<h2 id="updating-schemas">Updating Schemas</h2>
+<p>The generator uses a local schema cache to resolve resource definitions. If a CRD is missing (e.g., you just installed a new operator), update the cache first.</p>
+<h3 id="full-schema-update">Full schema update</h3>
+<p>Fetch all schemas from the connected cluster:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--update-schema
+</code></pre></div>
+
+<blockquote>
+<p><strong>Note:</strong> If connected to an older cluster, existing schemas are preserved. Only new or missing resources are added.</p>
+</blockquote>
+<h3 id="single-resource-schema-update">Single-resource schema update</h3>
+<p>Update just one resource without touching the rest:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--update-schema-for<span class="w"> </span>LlamaStackDistribution
+</code></pre></div>
+
+<p>Then generate the class:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>LlamaStackDistribution<span class="w"> </span>--overwrite
+</code></pre></div>
+
+<blockquote>
+<p><strong>Warning:</strong> <code>--update-schema</code> and <code>--update-schema-for</code> are mutually exclusive. Use one or the other.</p>
+</blockquote>
+<h2 id="discovering-missing-resources">Discovering Missing Resources</h2>
+<p>Find resources on your cluster that don't have wrapper classes yet:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--discover-missing
+</code></pre></div>
+
+<h3 id="coverage-report">Coverage report</h3>
+<p>Get a summary of how many resources have wrapper classes:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--coverage-report
+</code></pre></div>
+
+<p>Output in JSON for CI/CD pipelines:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--coverage-report<span class="w"> </span>--json
+</code></pre></div>
+
+<h3 id="auto-generate-all-missing-resources">Auto-generate all missing resources</h3>
+<p>Update schemas and generate classes for every resource that's missing:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--update-schema<span class="w"> </span>--generate-missing
+</code></pre></div>
+
+<blockquote>
+<p><strong>Tip:</strong> Use <code>--dry-run</code> with <code>--generate-missing</code> to preview what would be generated without writing any files.</p>
+</blockquote>
+<h2 id="advanced-usage">Advanced Usage</h2>
+<h3 id="batch-regeneration">Batch regeneration</h3>
+<p>Regenerate all existing generated resource classes to pick up schema changes:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--regenerate-all
+</code></pre></div>
+
+<p>With backups:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--backup
+</code></pre></div>
+
+<p>Filter to a subset of resources using glob patterns:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;Pod*&quot;</span>
+class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;*Service&quot;</span>
+</code></pre></div>
+
+<h3 id="adding-tests">Adding tests</h3>
+<p>Generate test files alongside the resource class:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod<span class="w"> </span>--add-tests
+</code></pre></div>
+
+<p>This creates test manifests and runs them automatically with <code>pytest</code>. Tests are placed under the test manifests directory and validate that the generated class can be parsed correctly.</p>
+<h3 id="shell-completion">Shell completion</h3>
+<p>Add this to your <code>~/.bashrc</code> or <code>~/.zshrc</code> for tab completion:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># For zsh</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>class-generator<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nv">_CLASS_GENERATOR_COMPLETE</span><span class="o">=</span>zsh_source<span class="w"> </span>class-generator<span class="k">)</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span>
+
+<span class="c1"># For bash</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">type</span><span class="w"> </span>class-generator<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nv">_CLASS_GENERATOR_COMPLETE</span><span class="o">=</span>bash_source<span class="w"> </span>class-generator<span class="k">)</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">fi</span>
+</code></pre></div>
+
+<h3 id="verbose-output">Verbose output</h3>
+<p>Enable debug logging to see exactly what the generator is doing:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Deployment<span class="w"> </span>-v
+</code></pre></div>
+
+<h3 id="when-a-kind-is-missing-from-the-schema">When a kind is missing from the schema</h3>
+<p>If the kind you request is not in the local schema cache, the CLI prompts you:</p>
+<div class="highlight"><pre><span></span><code>deployment not found in schema mapping, Do you want to run --update-schema and retry? [Y/N]:
+</code></pre></div>
+
+<p>Answering <code>y</code> triggers a schema update and retries generation automatically.</p>
+<blockquote>
+<p><strong>Note:</strong> The prompt only appears in interactive mode. When generating multiple kinds or running in batch mode, missing kinds are skipped with a warning. Run <code>--update-schema</code> separately beforehand in CI environments.</p>
+</blockquote>
+<h3 id="api-group-and-version-warnings">API group and version warnings</h3>
+<p>If a generated resource uses an API group or version that hasn't been registered in the base <code>Resource</code> class, the generator logs a warning like:</p>
+<div class="highlight"><pre><span></span><code>Missing API Group in Resource
+Please add `Resource.ApiGroup.MY_GROUP_IO = my-group.io` manually into
+ocp_resources/resource.py under Resource class &gt; ApiGroup class.
+</code></pre></div>
+
+<p>Follow the instructions to register the API group so the resource can connect to the correct API endpoint. See <a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a> for details on how <code>ApiGroup</code> and <code>ApiVersion</code> are used.</p>
+<h2 id="cli-options-reference">CLI Options Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-k</code>, <code>--kind</code></td>
+<td>Kind(s) to generate (comma-separated)</td>
+</tr>
+<tr>
+<td><code>-o</code>, <code>--output-file</code></td>
+<td>Custom output file path</td>
+</tr>
+<tr>
+<td><code>--overwrite</code></td>
+<td>Overwrite existing files</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Preview output without writing files</td>
+</tr>
+<tr>
+<td><code>--add-tests</code></td>
+<td>Generate test files for the kind</td>
+</tr>
+<tr>
+<td><code>--update-schema</code></td>
+<td>Update all schema files from cluster</td>
+</tr>
+<tr>
+<td><code>--update-schema-for</code></td>
+<td>Update schema for a single kind</td>
+</tr>
+<tr>
+<td><code>--discover-missing</code></td>
+<td>Find resources without wrapper classes</td>
+</tr>
+<tr>
+<td><code>--coverage-report</code></td>
+<td>Show coverage statistics</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>Output reports in JSON format</td>
+</tr>
+<tr>
+<td><code>--generate-missing</code></td>
+<td>Generate classes for all missing resources</td>
+</tr>
+<tr>
+<td><code>--regenerate-all</code></td>
+<td>Regenerate all existing generated classes</td>
+</tr>
+<tr>
+<td><code>--backup</code></td>
+<td>Create backup before overwriting/regenerating</td>
+</tr>
+<tr>
+<td><code>--filter</code></td>
+<td>Glob pattern to filter <code>--regenerate-all</code></td>
+</tr>
+<tr>
+<td><code>-v</code>, <code>--verbose</code></td>
+<td>Enable debug logging</td>
+</tr>
+</tbody>
+</table>
+<p>For the full CLI reference, see <a href="class-generator-cli.html">class-generator CLI Reference</a>.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>"Neither 'oc' nor 'kubectl' binary found in PATH"</strong>
+Install <code>oc</code> from the <a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/">OpenShift mirror</a> or <code>kubectl</code> from the <a href="https://kubernetes.io/docs/tasks/tools/">Kubernetes docs</a>. Ensure the binary is on your <code>PATH</code>.</p>
+<p><strong>"Resource kind 'X' not found"</strong>
+The kind is not in the local schema cache. Run <code>class-generator --update-schema</code> while connected to a cluster that has the CRD installed, then retry.</p>
+<p><strong>Generated filename looks wrong (e.g., <code>c_d_i_config.py</code>)</strong>
+Single-letter segments in snake_case names indicate the camelCase-to-snake_case converter doesn't recognize an acronym. The generator raises an error with instructions to add the acronym to the converter.</p>
+<p><strong>"Failed to fetch OpenAPI v3 index"</strong>
+Ensure you are logged in to the cluster with sufficient privileges. The generator needs to access the <code>/openapi/v3</code> endpoint, which typically requires cluster-admin access.</p>
+<h2 id="related-pages">Related Pages</h2>
+<ul>
+<li><a href="class-generator-cli.html">class-generator CLI Reference</a></li>
+<li><a href="schema-validation-internals.html">Schema Validation and Code Generation Architecture</a></li>
+<li><a href="resource-class-hierarchy.html">Understanding the Resource Class Hierarchy</a></li>
+<li><a href="resource-api.html">Resource and NamespacedResource API</a></li>
+<li><a href="validating-resources.html">Validating Resources Against OpenAPI Schemas</a></li>
+</ul>
+                </div>
+            </article>
+            <nav class="page-nav">
+
+                <a href="testing-without-cluster.html" class="page-nav-link page-nav-prev">
+                    <span class="page-nav-label">Previous</span>
+                    <span class="page-nav-title">Testing Without a Cluster Using the Fake Client</span>
+                </a>
+
+
+                <a href="common-patterns.html" class="page-nav-link page-nav-next">
+                    <span class="page-nav-label">Next</span>
+                    <span class="page-nav-title">Common Resource Patterns</span>
+                </a>
+
+            </nav>
+
+            <aside class="toc-sidebar">
+                <div class="toc-container">
+                    <h3>On this page</h3>
+                    <div class="toc">
+<ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#quick-example">Quick Example</a></li>
+<li><a href="#step-by-step-generating-a-resource-class">Step-by-Step: Generating a Resource Class</a><ul>
+<li><a href="#1-generate-the-class-file">1. Generate the class file</a></li>
+<li><a href="#2-preview-without-writing-dry-run">2. Preview without writing (dry run)</a></li>
+<li><a href="#3-review-the-generated-file">3. Review the generated file</a></li>
+<li><a href="#4-generate-multiple-kinds-at-once">4. Generate multiple kinds at once</a></li>
+<li><a href="#5-overwrite-an-existing-file">5. Overwrite an existing file</a></li>
+<li><a href="#6-write-to-a-custom-output-path">6. Write to a custom output path</a></li>
+</ul>
+</li>
+<li><a href="#handling-duplicate-kinds">Handling Duplicate Kinds</a></li>
+<li><a href="#adding-user-code-to-generated-files">Adding User Code to Generated Files</a></li>
+<li><a href="#updating-schemas">Updating Schemas</a><ul>
+<li><a href="#full-schema-update">Full schema update</a></li>
+<li><a href="#single-resource-schema-update">Single-resource schema update</a></li>
+</ul>
+</li>
+<li><a href="#discovering-missing-resources">Discovering Missing Resources</a><ul>
+<li><a href="#coverage-report">Coverage report</a></li>
+<li><a href="#auto-generate-all-missing-resources">Auto-generate all missing resources</a></li>
+</ul>
+</li>
+<li><a href="#advanced-usage">Advanced Usage</a><ul>
+<li><a href="#batch-regeneration">Batch regeneration</a></li>
+<li><a href="#adding-tests">Adding tests</a></li>
+<li><a href="#shell-completion">Shell completion</a></li>
+<li><a href="#verbose-output">Verbose output</a></li>
+<li><a href="#when-a-kind-is-missing-from-the-schema">When a kind is missing from the schema</a></li>
+<li><a href="#api-group-and-version-warnings">API group and version warnings</a></li>
+</ul>
+</li>
+<li><a href="#cli-options-reference">CLI Options Reference</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#related-pages">Related Pages</a></li>
+</ul>
+</div>
+
+                </div>
+            </aside>
+
+
+        </main>
+
+        <footer class="page-footer">
+
+            <span class="footer-version">Generated from version 11.0.134</span>
+            <span class="footer-sep">&middot;</span>
+
+            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            <span class="footer-sep">&middot;</span>
+            <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
+        </footer>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="assets/theme.js"></script>
+    <script src="assets/search.js"></script>
+    <script src="assets/copy.js"></script>
+    <script src="assets/callouts.js"></script>
+    <script src="assets/scrollspy.js"></script>
+    <script src="assets/codelabels.js"></script>
+    <script src="assets/github.js"></script>
+    <script>
+(function() {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+            var expanded = sidebar.classList.contains('open');
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+})();
+</script>
+<script>
+(function() {
+    var sidebar = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Restore scroll position
+    var saved = sessionStorage.getItem('sidebar-scroll');
+    if (saved) sidebar.scrollTop = parseInt(saved, 10);
+
+    // Save scroll position before navigating
+    sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sidebar-scroll', sidebar.scrollTop.toString());
+    });
+
+    // Also scroll active link into view if no saved position
+    if (!saved) {
+        var active = sidebar.querySelector('.nav-link.active');
+        if (active) {
+            active.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+    }
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # API reference: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/limit-range-v1/
 
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 
 class LimitRange(NamespacedResource):

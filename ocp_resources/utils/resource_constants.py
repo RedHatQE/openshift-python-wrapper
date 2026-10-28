@@ -13,12 +13,15 @@ class ResourceConstants:
         COMPLETE: str = "Complete"
         DEPLOYING: str = "Deploying"
         SCHEDULING_DISABLED: str = "Ready,SchedulingDisabled"
+        SCHEDULING: str = "Scheduling"
+        SCHEDULED: str = "Scheduled"
         CRASH_LOOPBACK_OFF: str = "CrashLoopBackOff"
         IMAGE_PULL_BACK_OFF: str = "ImagePullBackOff"
         ERR_IMAGE_PULL: str = "ErrImagePull"
         ACTIVE: str = "Active"
         ESTABLISHED: str = "Established"
         EXECUTING: str = "Executing"
+        TARGET_READY: str = "TargetReady"
 
     class Condition:
         UPGRADEABLE: str = "Upgradeable"
@@ -73,6 +76,7 @@ class ResourceConstants:
         RHV: str = "ovirt"
         OVA: str = "ova"
         OPENSTACK: str = "openstack"
+        HYPERV: str = "hyperv"
 
     class Backup:
         class Status:

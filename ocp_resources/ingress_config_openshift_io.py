@@ -1,4 +1,4 @@
-# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 
 from typing import Any
@@ -93,6 +93,7 @@ class Ingress(Resource):
         self.required_hsts_policies = required_hsts_policies
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

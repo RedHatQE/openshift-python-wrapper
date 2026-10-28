@@ -1,9 +1,10 @@
-# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 
 from typing import Any
 
-from ocp_resources.resource import MissingRequiredArgumentError, NamespacedResource
+from ocp_resources.exceptions import MissingRequiredArgumentError
+from ocp_resources.resource import NamespacedResource
 
 
 class LMEvalJob(NamespacedResource):
@@ -97,6 +98,7 @@ class LMEvalJob(NamespacedResource):
         self.task_list = task_list
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

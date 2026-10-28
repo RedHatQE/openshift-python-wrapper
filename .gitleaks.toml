@@ -4,5 +4,5 @@ title = "Gitleaks title"
 [allowlist]
 id = "skip class_generator/schema"
 description = "ignore class_generator/schema"
-paths = ['''class_generator/schema/''']
+paths = ['''class_generator/schema/''', '''docs/''']
 regexex = ['''^.*\.(yaml|yml)$''']

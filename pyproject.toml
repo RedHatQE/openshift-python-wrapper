@@ -57,6 +57,9 @@ extra_checks = true
 warn_unused_configs = true
 warn_redundant_casts = true
 
+[tool.hatch.build.targets.sdist]
+exclude = ["AGENTS.md"]
+
 [tool.hatch.build.targets.wheel]
 packages = [
   "ocp_resources",
@@ -72,7 +75,7 @@ include = [
 [project]
 requires-python = ">=3.10"
 name = "openshift-python-wrapper"
-version = "11.0.112"
+version = "11.0.143"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 readme = "README.md"
 license = "Apache-2.0"
@@ -87,17 +90,17 @@ dependencies = [
   "deepdiff>=8.0.1",
   "jinja2>=3.1.4",
   "jsonschema>=4.20.0",
-  "kubernetes>=31.0.0",
+  "kubernetes>=31.0.0,<36",  # TODO: remove <36 pin once https://github.com/kubernetes-client/python/issues/2596 is fixed upstream, set to "kubernetes>=31.0.0,!=36.0.0"
   "packaging>=24.1",
   "pyhelper-utils>=0.0.42",
   "python-benedict>=0.33.2",
   "python-simple-logger>=1.0.40",
   "requests>=2.32.2",
   "rich>=13.9.2",
-  "ruff>=0.6.9",
   "timeout-sampler>=0.0.46",
   "xmltodict>=0.13.0",
-  "fastmcp>=2.10.4",
+  "fastmcp>=4.1.0",
+  "authlib>=1.9.0",
 ]
 
 [[project.authors]]
@@ -132,4 +135,4 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 tests = ["pytest>=8.3.5", "pytest-cov>=6.1.1"]
-dev = ["ipdb>=0.13.13", "ipython>=8.12.3"]
+dev = ["ipdb>=0.13.13", "ipython>=8.12.3", "ruff>=0.6.9"]

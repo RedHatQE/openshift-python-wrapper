@@ -47,6 +47,7 @@ from ocp_resources.exceptions import (
     ResourceTeardownError,
     ValidationError,
 )
+from ocp_resources.utils.client_config import DynamicClientWithKubeconfig, resolve_bearer_token, save_kubeconfig
 from ocp_resources.utils.constants import (
     DEFAULT_CLUSTER_RETRY_EXCEPTIONS,
     NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -205,6 +206,7 @@ def get_client(
     verify_ssl: bool | None = None,
     token: str | None = None,
     fake: bool = False,
+    generate_kubeconfig: bool = False,
 ) -> DynamicClient | FakeDynamicClient:
     """
     Get a kubernetes client.
@@ -229,6 +231,7 @@ def get_client(
         host (str): host for the cluster
         verify_ssl (bool): whether to verify ssl
         token (str): Use token to login
+        generate_kubeconfig (bool): if True, save the kubeconfig to a temporary file and add path to client kubeconfig attribute.
 
     Returns:
         DynamicClient: a kubernetes client.
@@ -285,15 +288,31 @@ def get_client(
     kubernetes.client.Configuration.set_default(default=client_configuration)
 
     try:
-        return kubernetes.dynamic.DynamicClient(client=_client)
+        _dynamic_client = kubernetes.dynamic.DynamicClient(client=_client)
     except MaxRetryError:
         # Ref: https://github.com/kubernetes-client/python/blob/v26.1.0/kubernetes/base/config/incluster_config.py
         LOGGER.info("Trying to get client via incluster_config")
-        return kubernetes.dynamic.DynamicClient(
+        _dynamic_client = kubernetes.dynamic.DynamicClient(
             client=kubernetes.config.incluster_config.load_incluster_config(
                 client_configuration=client_configuration, try_refresh_token=try_refresh_token
             ),
         )
+
+    if generate_kubeconfig:
+        if config_file:
+            LOGGER.info(f"`generate_kubeconfig` ignored, kubeconfig already available at {config_file}")
+            _dynamic_client = DynamicClientWithKubeconfig(client=_dynamic_client.client, kubeconfig=config_file)
+        else:
+            _resolved_token = resolve_bearer_token(token=token, client_configuration=client_configuration)
+            kubeconfig_path = save_kubeconfig(
+                host=host or client_configuration.host,
+                token=_resolved_token,
+                config_dict=config_dict,
+                verify_ssl=verify_ssl,
+            )
+            _dynamic_client = DynamicClientWithKubeconfig(client=_dynamic_client.client, kubeconfig=kubeconfig_path)
+
+    return _dynamic_client
 
 
 def sub_resource_level(current_class: Any, owner_class: Any, parent_class: Any) -> str | None:
@@ -474,6 +493,7 @@ class Resource(ResourceConstants):
         APPS: str = "apps"
         APPSTUDIO_REDHAT_COM: str = "appstudio.redhat.com"
         AUTHENTICATION_K8S_IO: str = "authentication.k8s.io"
+        BACKUP_KUBEVIRT_IO: str = "backup.kubevirt.io"
         BATCH: str = "batch"
         BITNAMI_COM: str = "bitnami.com"
         CACHING_INTERNAL_KNATIVE_DEV: str = "caching.internal.knative.dev"
@@ -518,13 +538,17 @@ class Resource(ResourceConstants):
         KUBEVIRT_KUBEVIRT_IO: str = "kubevirt.kubevirt.io"
         LITMUS_IO: str = "litmuschaos.io"
         LLAMASTACK_IO: str = "llamastack.io"
+        MAAS_OPENDATAHUB_IO: str = "maas.opendatahub.io"
         MACHINE_OPENSHIFT_IO: str = "machine.openshift.io"
         MACHINECONFIGURATION_OPENSHIFT_IO: str = "machineconfiguration.openshift.io"
         MAISTRA_IO: str = "maistra.io"
+        MCP_X_K8S_IO: str = "mcp.x-k8s.io"
         METALLB_IO: str = "metallb.io"
         METRICS_K8S_IO: str = "metrics.k8s.io"
         MIGRATION_OPENSHIFT_IO: str = "migration.openshift.io"
         MIGRATIONS_KUBEVIRT_IO: str = "migrations.kubevirt.io"
+        MLFLOW_KUBEFLOW_ORG: str = "mlflow.kubeflow.org"
+        MLFLOW_OPENDATAHUB_IO: str = "mlflow.opendatahub.io"
         MODELREGISTRY_OPENDATAHUB_IO: str = "modelregistry.opendatahub.io"
         MONITORING_COREOS_COM: str = "monitoring.coreos.com"
         MTQ_KUBEVIRT_IO: str = "mtq.kubevirt.io"
@@ -534,6 +558,7 @@ class Resource(ResourceConstants):
         NMSTATE_IO: str = "nmstate.io"
         NODE_LABELLER_KUBEVIRT_IO: str = "node-labeller.kubevirt.io"
         NODEMAINTENANCE_KUBEVIRT_IO: str = "nodemaintenance.kubevirt.io"
+        OADP_OPENSHIFT_IO: str = "oadp.openshift.io"
         OBSERVABILITY_OPEN_CLUSTER_MANAGEMENT_IO: str = "observability.open-cluster-management.io"
         OCS_OPENSHIFT_IO: str = "ocs.openshift.io"
         OPENTELEMETRY_IO: str = "opentelemetry.io"
@@ -551,6 +576,7 @@ class Resource(ResourceConstants):
         QUOTA_OPENSHIFT_IO: str = "quota.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO: str = "rbac.authorization.k8s.io"
         REMEDIATION_MEDIK8S_IO: str = "remediation.medik8s.io"
+        RHTAS_REDHAT_COM: str = "rhtas.redhat.com"
         RIPSAW_CLOUDBULLDOZER_IO: str = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO: str = "route.openshift.io"
         SAMPLES_OPERATOR_OPENSHIFT_IO: str = "samples.operator.openshift.io"

@@ -28,7 +28,7 @@ class TestResourceDiscovery:
 
     def create_generated_file(self, path: Path, class_name: str, with_user_code: bool = False) -> None:
         """Helper to create a generated resource file."""
-        content = f'''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = f'''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from typing import Any
 from ocp_resources.resource import NamespacedResource
@@ -63,7 +63,7 @@ class ManualResource(Resource):
 
     def create_malformed_file(self, path: Path) -> None:
         """Helper to create a malformed Python file."""
-        content = """# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = """# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 class BrokenSyntax(
     # Missing closing parenthesis
@@ -185,7 +185,7 @@ class BrokenSyntax(
     def test_discover_handles_multiple_classes(self, temp_resources_dir, monkeypatch):
         """Test discovery handles files with multiple classes correctly."""
         # Create a file with multiple classes
-        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/scripts/resource/README.md
+        content = '''# Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md
 
 from ocp_resources.resource import NamespacedResource, Resource
 

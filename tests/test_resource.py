@@ -1,13 +1,16 @@
 import os
 from unittest.mock import patch
 
+import kubernetes
 import pytest
+import yaml
 
 from ocp_resources.exceptions import ResourceTeardownError
 from ocp_resources.namespace import Namespace
 from ocp_resources.pod import Pod
 from ocp_resources.resource import NamespacedResourceList, Resource, ResourceList
 from ocp_resources.secret import Secret
+from ocp_resources.utils.client_config import resolve_bearer_token, save_kubeconfig
 
 BASE_NAMESPACE_NAME: str = "test-namespace"
 BASE_POD_NAME: str = "test-pod"
@@ -200,3 +203,116 @@ class TestClientProxy:
 
         # Verify HTTPS_PROXY takes precedence over HTTP_PROXY
         assert fake_client.configuration.proxy == https_proxy
+
+
+class TestSaveKubeconfig:
+    def test_save_kubeconfig_with_host_and_token(self):
+        host = "https://api.test-cluster.example.com:6443"
+        token = "sha256~test-token-value"  # noqa: S105
+
+        kubeconfig_path = save_kubeconfig(host=host, token=token, verify_ssl=False)
+        try:
+            assert os.path.exists(kubeconfig_path)
+            assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
+
+            with open(kubeconfig_path) as f:
+                config = yaml.safe_load(f)
+
+            assert config["clusters"][0]["cluster"]["server"] == host
+            assert config["clusters"][0]["cluster"]["insecure-skip-tls-verify"] is True
+            assert config["users"][0]["user"]["token"] == token
+            assert config["current-context"] == "context"
+        finally:
+            os.unlink(kubeconfig_path)
+
+    def test_save_kubeconfig_with_config_dict(self):
+        config_dict = {
+            "apiVersion": "v1",
+            "kind": "Config",
+            "clusters": [{"name": "my-cluster", "cluster": {"server": "https://my-server:6443"}}],
+            "users": [{"name": "my-user", "user": {"token": "my-token"}}],
+            "contexts": [{"name": "my-context", "context": {"cluster": "my-cluster", "user": "my-user"}}],
+            "current-context": "my-context",
+        }
+
+        kubeconfig_path = save_kubeconfig(config_dict=config_dict)
+        try:
+            with open(kubeconfig_path) as f:
+                saved_config = yaml.safe_load(f)
+
+            assert saved_config == config_dict
+        finally:
+            os.unlink(kubeconfig_path)
+
+    def test_save_kubeconfig_insufficient_data(self):
+        with pytest.raises(ValueError, match="Not enough data to build kubeconfig"):
+            save_kubeconfig()
+
+    def test_save_kubeconfig_file_permissions(self):
+        _test_token = "test-token"  # noqa: S105
+
+        kubeconfig_path = save_kubeconfig(host="https://api.example.com:6443", token=_test_token)
+        try:
+            assert os.stat(kubeconfig_path).st_mode & 0o777 == 0o600
+        finally:
+            os.unlink(kubeconfig_path)
+
+    def test_save_kubeconfig_verify_ssl_not_false(self):
+        _test_token = "test-token"  # noqa: S105
+
+        kubeconfig_path_true = save_kubeconfig(host="https://api.example.com:6443", token=_test_token, verify_ssl=True)
+        try:
+            with open(kubeconfig_path_true) as f:
+                config_true = yaml.safe_load(f)
+
+            assert "insecure-skip-tls-verify" not in config_true["clusters"][0]["cluster"]
+        finally:
+            os.unlink(kubeconfig_path_true)
+
+        kubeconfig_path_none = save_kubeconfig(host="https://api.example.com:6443", token=_test_token, verify_ssl=None)
+        try:
+            with open(kubeconfig_path_none) as f:
+                config_none = yaml.safe_load(f)
+        finally:
+            os.unlink(kubeconfig_path_none)
+
+        assert "insecure-skip-tls-verify" not in config_none["clusters"][0]["cluster"]
+
+    def testresolve_bearer_token_from_api_key(self):
+        """Test that resolve_bearer_token extracts token from Bearer api_key."""
+        cfg = kubernetes.client.Configuration()
+        cfg.api_key = {"authorization": "Bearer sha256~oauth-resolved-token"}  # noqa: S105
+        result = resolve_bearer_token(token=None, client_configuration=cfg)
+        assert result == "sha256~oauth-resolved-token"
+
+    def testresolve_bearer_token_explicit_takes_precedence(self):
+        """Test that an explicit token takes precedence over Bearer in api_key."""
+        cfg = kubernetes.client.Configuration()
+        cfg.api_key = {"authorization": "Bearer sha256~oauth-token"}  # noqa: S105
+        explicit_token = "explicit-token"  # noqa: S105
+        result = resolve_bearer_token(token=explicit_token, client_configuration=cfg)
+        assert result == "explicit-token"
+
+    def testresolve_bearer_token_no_bearer_prefix(self):
+        """Test that api_key without Bearer prefix does not resolve a token."""
+        cfg = kubernetes.client.Configuration()
+        cfg.api_key = {"authorization": "Basic some-basic-auth"}
+        result = resolve_bearer_token(token=None, client_configuration=cfg)
+        assert result is None
+
+    def testresolve_bearer_token_empty_api_key(self):
+        """Test that empty api_key does not resolve a token."""
+        cfg = kubernetes.client.Configuration()
+        cfg.api_key = {}
+        result = resolve_bearer_token(token=None, client_configuration=cfg)
+        assert result is None
+
+    def test_save_kubeconfig_write_failure(self):
+        _test_token = "test-token"  # noqa: S105
+
+        with pytest.raises(OSError, match="Permission denied"):
+            with patch(
+                "ocp_resources.utils.client_config.tempfile.mkstemp",
+                side_effect=OSError("Permission denied"),
+            ):
+                save_kubeconfig(host="https://api.example.com:6443", token=_test_token)

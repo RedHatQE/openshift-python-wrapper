@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editing Resources Temporarily with ResourceEditor - openshift-python-wrapper</title>
+    <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
+    <link rel="stylesheet" href="assets/style.css">
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
+    <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
+    <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-logo">openshift-python-wrapper</a>
+            <p class="sidebar-tagline">Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls</p>
+        </div>
+
+        <div class="sidebar-search">
+            <input type="text" id="search-input" placeholder="Search... (⌘K)" autocomplete="off" readonly>
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Getting Started</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="quickstart.html"
+                           class="nav-link">
+                            Installing and Creating Your First Resource
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">User Guides</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="connecting-to-clusters.html"
+                           class="nav-link">
+                            Connecting to Clusters
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="creating-and-managing-resources.html"
+                           class="nav-link">
+                            Creating and Managing Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="querying-resources.html"
+                           class="nav-link">
+                            Querying and Watching Resources
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="waiting-for-conditions.html"
+                           class="nav-link">
+                            Waiting for Resource Conditions and Status
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="validating-resources.html"
+                           class="nav-link">
+                            Validating Resources Against OpenAPI Schemas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="managing-resource-lists.html"
+                           class="nav-link">
+                            Managing Bulk Resources with ResourceList
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="editing-resources-temporarily.html"
+                           class="nav-link active" aria-current="page">
+                            Editing Resources Temporarily with ResourceEditor
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="working-with-virtual-machines.html"
+                           class="nav-link">
+                            Working with Virtual Machines (KubeVirt)
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="testing-without-cluster.html"
+                           class="nav-link">
+                            Testing Without a Cluster Using the Fake Client
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="generating-resource-classes.html"
+                           class="nav-link">
+                            Generating New Resource Classes with class-generator
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Recipes</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="common-patterns.html"
+                           class="nav-link">
+                            Common Resource Patterns
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="mcp-server-integration.html"
+                           class="nav-link">
+                            Integrating with AI Assistants via MCP Server
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-api.html"
+                           class="nav-link">
+                            Resource and NamespacedResource API
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="environment-variables.html"
+                           class="nav-link">
+                            Environment Variables and Configuration
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Internals</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="resource-class-hierarchy.html"
+                           class="nav-link">
+                            Understanding the Resource Class Hierarchy
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="schema-validation-internals.html"
+                           class="nav-link">
+                            Schema Validation and Code Generation Architecture
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Using Resources</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="working-with-events.html"
+                           class="nav-link">
+                            Working with Kubernetes Events
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="pod-execution-and-logs.html"
+                           class="nav-link">
+                            Executing Commands in Pods and Retrieving Logs
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">API Reference</h3>
+                <ul class="nav-group-pages">
+
+                    <li>
+                        <a href="error-handling.html"
+                           class="nav-link">
+                            Error Handling and Exception Reference
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <a href="index.html" class="top-bar-title">openshift-python-wrapper</a>
+            </div>
+            <div class="top-bar-spacer"></div>
+            <div class="top-bar-right">
+                <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
+                    <kbd>&#8984;K</kbd> Search
+                </button>
+                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
+                    ⚡ docs<span class="brand-accent">fy</span>
+                </a>
+
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span class="github-stars" id="github-stars" title="GitHub stars"></span>
+                </a>
+
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <article class="article">
+                <div class="article-body">
+                    <!-- SECURITY: |safe is intentional. Content is AI-generated markdown
+                         converted to HTML server-side by the markdown library, not
+                         user-supplied input. XSS risk is minimal and accepted since
+                         the AI generates the content, not end users. -->
+                    <p>Let me start by reading the knowledge graph and understanding the repository structure.</p>
+<p>Now let me find the ResourceEditor source code.</p>
+<p>Now let me look at how ResourceEditor is used in the NNCP file and any tests:</p>
+<p>Let me look at the import section and any related constants:</p>
+<p>Now let me look at the <code>update</code> and <code>update_replace</code> methods on the Resource class to understand the two actions:</p>
+<p>Now let me look at the imports to verify how ResourceEditor is exported:</p>
+<p>Now let me check for any additional examples or documentation:</p>
+<p>Let me look at the full ResourceEditor code once more to make sure I've captured everything, and also check the <code>_apply_patches</code> method details and what <code>action</code> values are supported:</p>
+<p>Now I have a complete picture of the ResourceEditor class. Let me write the documentation.</p>
+<h1 id="editing-resources-temporarily-with-resourceeditor">Editing Resources Temporarily with ResourceEditor</h1>
+<p>Temporarily modify Kubernetes and OpenShift resources during tests and have their original values automatically restored when you're done. This is essential for test isolation—ensuring that changes made during a test don't leak into other tests or persist in the cluster.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li><code>openshift-python-wrapper</code> installed in your project (see <a href="quickstart.html">Installing and Creating Your First Resource</a>)</li>
+<li>A cluster connection established with a privileged client (see <a href="connecting-to-clusters.html">Connecting to Clusters</a>)</li>
+<li>One or more existing resources on the cluster that you want to temporarily modify</li>
+</ul>
+<blockquote>
+<p><strong>Warning:</strong> The client used to retrieve resources must have sufficient privileges. Do not use an unprivileged user client with <code>ResourceEditor</code>.</p>
+</blockquote>
+<h2 id="quick-example">Quick Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+
+<span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;worker-0&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;test-label&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}}}}</span>
+<span class="p">):</span>
+    <span class="c1"># The node now has the label &quot;test-label&quot;: &quot;true&quot;</span>
+    <span class="c1"># Run your test logic here...</span>
+    <span class="k">pass</span>
+
+<span class="c1"># The label is automatically removed when the block exits</span>
+</code></pre></div>
+
+<p>That's it—when the <code>with</code> block ends (even if an exception occurs), the original resource state is restored.</p>
+<h2 id="step-by-step-using-resourceeditor-as-a-context-manager">Step-by-Step: Using ResourceEditor as a Context Manager</h2>
+<h3 id="1-import-and-identify-your-target-resource">1. Import and identify your target resource</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
+
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="2-define-your-patch">2. Define your patch</h3>
+<p>Patches are dictionaries that mirror the resource's YAML structure. Only include the fields you want to change:</p>
+<div class="highlight"><pre><span></span><code><span class="n">patch</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;feature_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;log_level&quot;</span><span class="p">:</span> <span class="s2">&quot;debug&quot;</span><span class="p">}}</span>
+</code></pre></div>
+
+<h3 id="3-wrap-your-test-logic-in-a-with-block">3. Wrap your test logic in a <code>with</code> block</h3>
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">cm</span><span class="p">:</span> <span class="n">patch</span><span class="p">}):</span>
+    <span class="c1"># ConfigMap now has updated data fields</span>
+    <span class="k">assert</span> <span class="n">cm</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">feature_flag</span> <span class="o">==</span> <span class="s2">&quot;enabled&quot;</span>
+    <span class="c1"># Run tests that depend on the modified config...</span>
+</code></pre></div>
+
+<h3 id="4-original-values-are-restored-automatically">4. Original values are restored automatically</h3>
+<p>When the <code>with</code> block exits, the original <code>data</code> values are written back to the resource. Fields that didn't exist before the patch are removed (set to <code>None</code> in the restore payload, which tells the API to delete them).</p>
+<h2 id="patching-multiple-resources-at-once">Patching Multiple Resources at Once</h2>
+<p>Pass multiple resource-patch pairs in a single <code>ResourceEditor</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
+
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">)</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">)</span>
+
+<span class="n">patches</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">ns</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}}},</span>
+    <span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;database_url&quot;</span><span class="p">:</span> <span class="s2">&quot;postgres://test-db:5432&quot;</span><span class="p">}},</span>
+<span class="p">}</span>
+
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="n">patches</span><span class="p">):</span>
+    <span class="c1"># Both resources are patched; run tests here</span>
+    <span class="k">pass</span>
+<span class="c1"># Both resources are restored to their original state</span>
+</code></pre></div>
+
+<h2 id="using-update-and-restore-without-a-context-manager">Using update() and restore() Without a Context Manager</h2>
+<p>If you need finer control over when patches are applied and reverted—for example, in <code>setup</code>/<code>teardown</code> fixtures—use the <code>update()</code> and <code>restore()</code> methods directly:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
+
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+
+<span class="n">editor</span> <span class="o">=</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;maintenance&quot;</span><span class="p">}}}</span>
+<span class="p">)</span>
+
+<span class="c1"># Apply the patch and create backups</span>
+<span class="n">editor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">backup_resources</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># ... run tests ...</span>
+
+<span class="c1"># Restore original values</span>
+<span class="n">editor</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+</code></pre></div>
+
+<blockquote>
+<p><strong>Note:</strong> When calling <code>update()</code> manually, pass <code>backup_resources=True</code> to ensure original values are captured. Without this flag, no backup is created and <code>restore()</code> will have nothing to revert.</p>
+</blockquote>
+<h2 id="advanced-usage">Advanced Usage</h2>
+<h3 id="replace-instead-of-patch">Replace Instead of Patch</h3>
+<p>By default, <code>ResourceEditor</code> uses the <code>"update"</code> action, which sends a merge-patch (<code>application/merge-patch+json</code>). This merges your changes into the existing resource. If you need to <em>replace</em> the entire resource (for example, to remove fields that merge-patch can't delete), use <code>action="replace"</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}},</span>
+    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># The resource is fully replaced, not merged</span>
+    <span class="k">pass</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Method Used</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"update"</code> (default)</td>
+<td>Merge patch</td>
+<td>Merges patch into existing resource; cannot remove fields by omission</td>
+</tr>
+<tr>
+<td><code>"replace"</code></td>
+<td>Full replacement</td>
+<td>Replaces the entire resource; fields not in the patch are removed</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Warning:</strong> With <code>action="replace"</code>, the patch must include all required fields for the resource, not just the fields you want to change. The replacement payload automatically includes <code>metadata.name</code>, <code>metadata.namespace</code>, <code>metadata.resourceVersion</code>, <code>kind</code>, and <code>apiVersion</code>.</p>
+</blockquote>
+<h3 id="providing-your-own-backups">Providing Your Own Backups</h3>
+<p>If you already know what the restore state should be (or need custom restore logic), pass <code>user_backups</code> to skip the automatic backup calculation:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
+
+<span class="n">custom_backup</span> <span class="o">=</span> <span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}}</span>
+
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}}},</span>
+    <span class="n">user_backups</span><span class="o">=</span><span class="n">custom_backup</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># Resource scaled to 5 replicas</span>
+    <span class="k">pass</span>
+<span class="c1"># Restored to 1 replica (your custom backup), regardless of what the original value was</span>
+</code></pre></div>
+
+<h3 id="inspecting-backups">Inspecting Backups</h3>
+<p>Access the automatically generated backup data through the <code>backups</code> property:</p>
+<div class="highlight"><pre><span></span><code><span class="n">editor</span> <span class="o">=</span> <span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;staging&quot;</span><span class="p">}}}}</span>
+<span class="p">)</span>
+<span class="n">editor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">backup_resources</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># See what was backed up</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">editor</span><span class="o">.</span><span class="n">backups</span><span class="p">)</span>
+<span class="c1"># {&lt;Resource&gt;: {&#39;metadata&#39;: {&#39;labels&#39;: {&#39;env&#39;: &#39;production&#39;}}}}</span>
+
+<span class="n">editor</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="no-op-detection">No-Op Detection</h3>
+<p><code>ResourceEditor</code> automatically detects when a patch produces no actual changes. If the patch values already match the resource's current state, the resource is skipped entirely and a warning is logged:</p>
+<div class="highlight"><pre><span></span><code>ResourceEdit: no diff found in patch for my-resource -- skipping
+</code></pre></div>
+
+<p>This prevents unnecessary API calls and avoids triggering watch events for no-op changes.</p>
+<h3 id="automatic-retry-on-conflicts">Automatic Retry on Conflicts</h3>
+<p>All patch and restore operations are wrapped with automatic retry logic. If a <code>ConflictError</code> occurs (for example, due to a concurrent update changing the <code>resourceVersion</code>), the operation is retried automatically with a 5-second sleep interval and a 30-second timeout.</p>
+<h2 id="api-reference">API Reference</h2>
+<h3 id="constructor">Constructor</h3>
+<div class="highlight"><pre><span></span><code><span class="n">ResourceEditor</span><span class="p">(</span>
+    <span class="n">patches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">action</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span>
+    <span class="n">user_backups</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>patches</code></td>
+<td><code>dict</code></td>
+<td><em>(required)</em></td>
+<td>Mapping of resource objects to patch dicts: <code>{resource: {yaml_patch}}</code></td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td><code>str</code></td>
+<td><code>"update"</code></td>
+<td>Either <code>"update"</code> (merge patch) or <code>"replace"</code> (full replacement)</td>
+</tr>
+<tr>
+<td><code>user_backups</code></td>
+<td><code>dict \| None</code></td>
+<td><code>None</code></td>
+<td>Custom backup dicts to use for restore instead of auto-generated ones</td>
+</tr>
+</tbody>
+</table>
+<h3 id="properties">Properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Return Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>backups</code></td>
+<td><code>dict</code></td>
+<td>The backup data captured for each patched resource: <code>{resource: backup_dict}</code></td>
+</tr>
+<tr>
+<td><code>patches</code></td>
+<td><code>dict</code></td>
+<td>The patches dict provided in the constructor</td>
+</tr>
+</tbody>
+</table>
+<h3 id="methods">Methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>update(backup_resources=False)</code></td>
+<td><code>backup_resources: bool</code></td>
+<td>Apply patches. Set <code>backup_resources=True</code> to capture original values for later restore.</td>
+</tr>
+<tr>
+<td><code>restore()</code></td>
+<td>—</td>
+<td>Re-apply the stored backup dicts to revert all patched resources.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="context-manager-protocol">Context Manager Protocol</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__enter__()</code></td>
+<td>Calls <code>update(backup_resources=True)</code> and returns the <code>ResourceEditor</code> instance</td>
+</tr>
+<tr>
+<td><code>__exit__()</code></td>
+<td>Calls <code>restore()</code> to revert all changes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Restore doesn't revert changes</td>
+<td>Called <code>update()</code> without <code>backup_resources=True</code></td>
+<td>Always pass <code>backup_resources=True</code> when calling <code>update()</code> manually, or use the context manager (<code>with</code> block) which does this automatically</td>
+</tr>
+<tr>
+<td><code>NotFoundError</code> during backup</td>
+<td>Resource cannot be found by name (known with some CRDs like <code>ServiceMonitor</code>)</td>
+<td><code>ResourceEditor</code> handles this automatically by falling back to a field-selector query</td>
+</tr>
+<tr>
+<td><code>ConflictError</code> during patch</td>
+<td>Another process modified the resource concurrently</td>
+<td>Automatic retries handle this; if it persists beyond 30 seconds, check for controllers continuously modifying the resource</td>
+</tr>
+<tr>
+<td>Patch has no effect</td>
+<td>The resource already has the values in your patch</td>
+<td>This is expected—<code>ResourceEditor</code> logs a warning and skips the resource. Check that you're patching the correct fields.</td>
+</tr>
+<tr>
+<td><code>replace</code> action fails</td>
+<td>Patch is missing required fields</td>
+<td>When using <code>action="replace"</code>, provide all required spec fields since the entire resource is replaced</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Tip:</strong> For creating and cleaning up resources (rather than editing existing ones), see <a href="creating-and-managing-resources.html">Creating and Managing Resources</a>. For managing groups of similar resources, see <a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a>.</p>
+</blockquote>
+<h2 id="related-pages">Related Pages</h2>
+<ul>
+<li><a href="creating-and-managing-resources.html">Creating and Managing Resources</a></li>
+<li><a href="resource-api.html">Resource and NamespacedResource API</a></li>
+<li><a href="common-patterns.html">Common Resource Patterns</a></li>
+<li><a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a></li>
+<li><a href="testing-without-cluster.html">Testing Without a Cluster Using the Fake Client</a></li>
+</ul>
+                </div>
+            </article>
+            <nav class="page-nav">
+
+                <a href="managing-resource-lists.html" class="page-nav-link page-nav-prev">
+                    <span class="page-nav-label">Previous</span>
+                    <span class="page-nav-title">Managing Bulk Resources with ResourceList</span>
+                </a>
+
+
+                <a href="working-with-virtual-machines.html" class="page-nav-link page-nav-next">
+                    <span class="page-nav-label">Next</span>
+                    <span class="page-nav-title">Working with Virtual Machines (KubeVirt)</span>
+                </a>
+
+            </nav>
+
+            <aside class="toc-sidebar">
+                <div class="toc-container">
+                    <h3>On this page</h3>
+                    <div class="toc">
+<ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#quick-example">Quick Example</a></li>
+<li><a href="#step-by-step-using-resourceeditor-as-a-context-manager">Step-by-Step: Using ResourceEditor as a Context Manager</a><ul>
+<li><a href="#1-import-and-identify-your-target-resource">1. Import and identify your target resource</a></li>
+<li><a href="#2-define-your-patch">2. Define your patch</a></li>
+<li><a href="#3-wrap-your-test-logic-in-a-with-block">3. Wrap your test logic in a with block</a></li>
+<li><a href="#4-original-values-are-restored-automatically">4. Original values are restored automatically</a></li>
+</ul>
+</li>
+<li><a href="#patching-multiple-resources-at-once">Patching Multiple Resources at Once</a></li>
+<li><a href="#using-update-and-restore-without-a-context-manager">Using update() and restore() Without a Context Manager</a></li>
+<li><a href="#advanced-usage">Advanced Usage</a><ul>
+<li><a href="#replace-instead-of-patch">Replace Instead of Patch</a></li>
+<li><a href="#providing-your-own-backups">Providing Your Own Backups</a></li>
+<li><a href="#inspecting-backups">Inspecting Backups</a></li>
+<li><a href="#no-op-detection">No-Op Detection</a></li>
+<li><a href="#automatic-retry-on-conflicts">Automatic Retry on Conflicts</a></li>
+</ul>
+</li>
+<li><a href="#api-reference">API Reference</a><ul>
+<li><a href="#constructor">Constructor</a></li>
+<li><a href="#properties">Properties</a></li>
+<li><a href="#methods">Methods</a></li>
+<li><a href="#context-manager-protocol">Context Manager Protocol</a></li>
+</ul>
+</li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#related-pages">Related Pages</a></li>
+</ul>
+</div>
+
+                </div>
+            </aside>
+
+
+        </main>
+
+        <footer class="page-footer">
+
+            <span class="footer-version">Generated from version 11.0.134</span>
+            <span class="footer-sep">&middot;</span>
+
+            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            <span class="footer-sep">&middot;</span>
+            <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
+        </footer>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="assets/theme.js"></script>
+    <script src="assets/search.js"></script>
+    <script src="assets/copy.js"></script>
+    <script src="assets/callouts.js"></script>
+    <script src="assets/scrollspy.js"></script>
+    <script src="assets/codelabels.js"></script>
+    <script src="assets/github.js"></script>
+    <script>
+(function() {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('open');
+            var expanded = sidebar.classList.contains('open');
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+    }
+})();
+</script>
+<script>
+(function() {
+    var sidebar = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Restore scroll position
+    var saved = sessionStorage.getItem('sidebar-scroll');
+    if (saved) sidebar.scrollTop = parseInt(saved, 10);
+
+    // Save scroll position before navigating
+    sidebar.addEventListener('scroll', function() {
+        sessionStorage.setItem('sidebar-scroll', sidebar.scrollTop.toString());
+    });
+
+    // Also scroll active link into view if no saved position
+    if (!saved) {
+        var active = sidebar.querySelector('.nav-link.active');
+        if (active) {
+            active.scrollIntoView({ block: 'center', behavior: 'instant' });
+        }
+    }
+})();
+</script>
+</body>
+</html>

@@ -32,6 +32,21 @@ from ocp_resources.utils.utils import convert_camel_case_to_snake_case
             "data_volume_ttl_seconds",
             id="combined_uppercase_word_followed_by_uppercase_word_is_last_ends_with_lowercase",
         ),
+        pytest.param(
+            "MaaSModelRef",
+            "maas_model_ref",
+            id="mixed_case_acronym_maas_with_following_words",
+        ),
+        pytest.param(
+            "MaaSAuthPolicy",
+            "maas_auth_policy",
+            id="mixed_case_acronym_maas_auth_policy",
+        ),
+        pytest.param(
+            "MaaSSubscription",
+            "maas_subscription",
+            id="mixed_case_acronym_maas_subscription",
+        ),
     ],
 )
 def test_convert_camel_case_to_snake_case(camel_case_str, expected):

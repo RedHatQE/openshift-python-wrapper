@@ -13,17 +13,16 @@ from mcp_server.server import (
 )
 from ocp_resources.config_map import ConfigMap
 
-# Get the actual function implementations from the decorated tools
-list_resources_func = mcp_server.server.list_resources.fn
-get_resource_func = mcp_server.server.get_resource.fn
-create_resource_func = mcp_server.server.create_resource.fn
-update_resource_func = mcp_server.server.update_resource.fn
-delete_resource_func = mcp_server.server.delete_resource.fn
-get_pod_logs_func = mcp_server.server.get_pod_logs.fn
-exec_in_pod_func = mcp_server.server.exec_in_pod.fn
-get_resource_events_func = mcp_server.server.get_resource_events.fn
-apply_yaml_func = mcp_server.server.apply_yaml.fn
-get_resource_types_func = mcp_server.server.get_resource_types.fn
+list_resources_func = mcp_server.server.list_resources
+get_resource_func = mcp_server.server.get_resource
+create_resource_func = mcp_server.server.create_resource
+update_resource_func = mcp_server.server.update_resource
+delete_resource_func = mcp_server.server.delete_resource
+get_pod_logs_func = mcp_server.server.get_pod_logs
+exec_in_pod_func = mcp_server.server.exec_in_pod
+get_resource_events_func = mcp_server.server.get_resource_events
+apply_yaml_func = mcp_server.server.apply_yaml
+get_resource_types_func = mcp_server.server.get_resource_types
 
 
 @pytest.fixture

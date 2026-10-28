@@ -135,12 +135,7 @@ Update an existing resource using patch operations.
 
 ```python
 # Scale a deployment
-update_resource(
-    resource_type="deployment",
-    name="my-app",
-    namespace="default",
-    patch={"spec": {"replicas": 3}}
-)
+update_resource(resource_type="deployment", name="my-app", namespace="default", patch={"spec": {"replicas": 3}})
 ```
 
 #### `delete_resource`
@@ -242,18 +237,10 @@ Execute commands inside pod containers.
 
 ```python
 # Check nginx config
-exec_in_pod(
-    name="nginx-pod",
-    namespace="default",
-    command=["nginx", "-t"]
-)
+exec_in_pod(name="nginx-pod", namespace="default", command=["nginx", "-t"])
 
 # List files
-exec_in_pod(
-    name="my-app",
-    namespace="default",
-    command=["ls", "-la", "/app"]
-)
+exec_in_pod(name="my-app", namespace="default", command=["ls", "-la", "/app"])
 ```
 
 ### Event and Discovery

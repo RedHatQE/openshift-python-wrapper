@@ -170,7 +170,9 @@ class TestCLIFunctionality:
 
             assert result.exit_code == 0
             mock_test_gen.assert_called_once()
-            mock_os_system.assert_called_once_with("uv run pytest class_generator/tests/test_class_generator.py")
+            mock_os_system.assert_called_once_with(
+                "uv run --group tests pytest class_generator/tests/test_class_generator.py"
+            )
 
     def test_add_tests_requires_kind(self):
         """Test that --add-tests cannot be used alone."""
