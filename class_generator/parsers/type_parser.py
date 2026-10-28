@@ -152,10 +152,12 @@ def prepare_property_dict(
     Returns:
         Updated resource dictionary
     """
-    keys_to_ignore: list[str] = ["kind", "apiVersion", "status", SPEC_STR.lower()]
+    keys_to_ignore: list[str] = ["kind", "apiVersion", "status"]
     keys_to_rename: set[str] = {"annotations", "labels"}
     if dict_key != SPEC_STR.lower():
-        keys_to_ignore.append("metadata")
+        keys_to_ignore.extend(["metadata", SPEC_STR.lower()])
+    else:
+        keys_to_rename |= {SPEC_STR.lower()}
 
     for key, val in schema.items():
         if key in keys_to_ignore:
