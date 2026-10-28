@@ -323,7 +323,7 @@
 <li><strong>Extract fields and types</strong> — The <code>type_parser</code> module converts OpenAPI types to Python type annotations and builds parameter dictionaries for the class constructor.</li>
 <li><strong>Render Jinja2 template</strong> — <code>render_jinja_template()</code> processes <code>class_generator_template.j2</code> with the extracted data, producing a complete Python class.</li>
 <li><strong>Preserve user code</strong> — If the target file already exists, <code>parse_user_code_from_file()</code> extracts any user-added code below the <code># End of generated code</code> marker and re-inserts it after regeneration.</li>
-<li><strong>Format and write</strong> — <code>write_and_format_rendered()</code> writes the file, then runs <code>prek</code> (pre-commit hooks) or falls back to <code>ruff</code> for formatting.</li>
+<li><strong>Format and write</strong> — <code>write_and_format_rendered()</code> writes the file, then formats it with <code>prek</code> (the repository's own pre-commit hooks, unmodified). prek runs a second time to reach a fixpoint; if it still fails, the kind fails loudly instead of leaving an unformatted file. No other formatter is invoked, so a file that passes locally also passes CI.</li>
 </ol>
 <h2 id="key-concepts">Key Concepts</h2>
 <h3 id="the-resource-mappings-file">The Resource Mappings File</h3>
