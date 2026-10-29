@@ -9,7 +9,10 @@ Run this script to see examples of validation errors and their solutions.
 from ocp_resources.deployment import Deployment
 from ocp_resources.exceptions import ValidationError
 from ocp_resources.pod import Pod
+from ocp_resources.resource import get_client
 from ocp_resources.service import Service
+
+FAKE_CLIENT = get_client(fake=True)
 
 
 def print_error_case(title, description):
@@ -35,6 +38,7 @@ def case_1_missing_required_fields():
     print("Problem code:")
     print("""
     pod = Pod(
+        client=client,
         name="my-pod",
         namespace="default",
         containers=[{"name": "nginx"}]  # Missing 'image'
@@ -42,7 +46,7 @@ def case_1_missing_required_fields():
     """)
 
     try:
-        pod = Pod(name="my-pod", namespace="default", containers=[{"name": "nginx"}])
+        pod = Pod(client=FAKE_CLIENT, name="my-pod", namespace="default", containers=[{"name": "nginx"}])
         pod.validate()
     except ValidationError as e:
         print(f"Error: {e}")
@@ -52,6 +56,7 @@ def case_1_missing_required_fields():
     print("Fixed code:")
     print("""
     pod = Pod(
+        client=client,
         name="my-pod",
         namespace="default",
         containers=[{
@@ -119,6 +124,7 @@ def case_3_invalid_field_values():
     print("Problem code:")
     print("""
     pod = Pod(
+        client=client,
         name="My-Pod-123",  # Capital letters not allowed
         namespace="default"
     )
@@ -126,6 +132,7 @@ def case_3_invalid_field_values():
 
     try:
         pod = Pod(
+            client=FAKE_CLIENT,
             name="My-Pod-123",  # Invalid DNS name
             namespace="default",
             containers=[{"name": "nginx", "image": "nginx:latest"}],
@@ -139,6 +146,7 @@ def case_3_invalid_field_values():
     print("Fixed code:")
     print("""
     pod = Pod(
+        client=client,
         name="my-pod-123",  # Valid DNS name
         namespace="default"
     )
@@ -155,6 +163,7 @@ def case_4_invalid_structure():
     print("Problem code:")
     print("""
     service = Service(
+        client=client,
         name="my-service",
         namespace="default",
         selector={"app": "nginx"},
@@ -182,6 +191,7 @@ def case_4_invalid_structure():
     print("Fixed code:")
     print("""
     service = Service(
+        client=client,
         name="my-service",
         namespace="default",
         selector={"app": "nginx"},
