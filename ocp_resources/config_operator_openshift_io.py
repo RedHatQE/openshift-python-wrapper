@@ -64,6 +64,7 @@ class Config(Resource):
         self.unsupported_config_overrides = unsupported_config_overrides
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

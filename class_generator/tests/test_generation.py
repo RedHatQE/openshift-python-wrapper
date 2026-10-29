@@ -8,6 +8,7 @@ from rich.panel import Panel
 from simple_logger.logger import get_logger
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
+from class_generator.core.generator import generate_resource_file_from_dict
 from class_generator.formatters.template_renderer import render_jinja_template
 
 LOGGER = get_logger(name=__name__)
@@ -81,3 +82,42 @@ def generate_class_generator_tests() -> None:
     LOGGER.info(f"Generated test file: {test_file_path}")
     console = Console()
     console.print(Panel.fit(f"[green]Generated test file:[/green] [cyan]{test_file_path}[/cyan]"))
+
+
+class TestHandWrittenFileConversion:
+    """A hand-maintained resource can be converted into a generated one."""
+
+    def test_hand_written_file_is_converted_not_blocked(self, tmp_path, caplog, monkeypatch):
+        hand_written = tmp_path / "node_network_configuration_policy.py"
+        hand_written.write_text("import re\n\n\nclass NodeNetworkConfigurationPolicy:\n    pass\n")
+
+        resource_dict = {
+            "kind": "NodeNetworkConfigurationPolicy",
+            "base_class": "Resource",
+            "group": "nmstate.io",
+            "api_version": "v1",
+            "version": "v1",
+            "api_group": "nmstate.io",
+            "description": "NodeNetworkConfigurationPolicy is a hand-maintained resource.",
+            "namespaced": False,
+            "fields": [],
+            "spec": [],
+        }
+
+        # keep prek out of the tmp dir (hooks are repo-scoped)
+        monkeypatch.setattr(
+            "class_generator.core.generator.write_and_format_rendered",
+            lambda filepath, output: __import__("pathlib").Path(filepath).write_text(output),
+        )
+
+        _orig, generated = generate_resource_file_from_dict(
+            resource_dict=resource_dict,
+            overwrite=True,
+            output_file=str(hand_written),
+        )
+
+        # overwritten with generated output instead of being refused
+        assert generated == str(hand_written)
+        converted = hand_written.read_text()
+        assert "class NodeNetworkConfigurationPolicy" in converted
+        assert "hand-maintained" in caplog.text

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working with Virtual Machines (KubeVirt) - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,18 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by exploring the knowledge graph and understanding the repository structure.</p>
-<p>Now let me look at the remaining VM-related resources and check the <code>RunStrategy</code> and <code>Status</code> constants, as well as the <code>data_volume.py</code>:</p>
-<p>Now let me check how the <code>api_request</code> method works in the base <code>Resource</code> class:</p>
-<p>Now let me look at the <code>data_volume.py</code> to check any VM-related interactions:</p>
-<p>Now let me check the <code>RunStrategy</code> constants in VirtualMachineInstance:</p>
-<p>Now let me look at the <code>Status</code> class in the base <code>Resource</code> for context and the VMI's <code>RunStrategy</code>:</p>
-<p>Let me find the Status class definition:</p>
-<p>Now let me check the <code>ApiGroup</code> constants for KubeVirt:</p>
-<p>Now let me check for any tests related to VMs:</p>
-<p>Now let me check the <code>deploy</code> and <code>clean_up</code> method signatures:</p>
-<p>Now I have a thorough understanding of the VM-related API. Let me write the documentation:</p>
-<h1 id="working-with-virtual-machines-kubevirt">Working with Virtual Machines (KubeVirt)</h1>
+                    <h1 id="working-with-virtual-machines-kubevirt">Working with Virtual Machines (KubeVirt)</h1>
 <p>Manage the full lifecycle of KubeVirt virtual machines on OpenShift — create VMs, start and stop them, live-migrate between nodes, take snapshots, and interact with their running instances — all from Python.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -289,23 +257,23 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachine</span>
 
 <span class="n">vm</span> <span class="o">=</span> <span class="n">VirtualMachine</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">body</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;devices&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;disks&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bus&quot;</span><span class="p">:</span> <span class="s2">&quot;virtio&quot;</span><span class="p">},</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">}]},</span>
-                <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="s2">&quot;1Gi&quot;</span><span class="p">}},</span>
+        <span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"domain"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"devices"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"disks"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"disk"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"bus"</span><span class="p">:</span> <span class="s2">"virtio"</span><span class="p">},</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">}]},</span>
+                <span class="s2">"resources"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requests"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"memory"</span><span class="p">:</span> <span class="s2">"1Gi"</span><span class="p">}},</span>
             <span class="p">},</span>
-            <span class="s2">&quot;volumes&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">,</span> <span class="s2">&quot;containerDisk&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;quay.io/containerdisks/fedora&quot;</span><span class="p">}}],</span>
+            <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">,</span> <span class="s2">"containerDisk"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"image"</span><span class="p">:</span> <span class="s2">"quay.io/containerdisks/fedora"</span><span class="p">}}],</span>
         <span class="p">}</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
 <span class="k">with</span> <span class="n">vm</span><span class="p">:</span>
     <span class="n">vm</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;VM ready: </span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">ready</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>       <span class="c1"># True</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status: </span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">printable_status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># &quot;Running&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"VM ready: </span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">ready</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># True</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Status: </span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">printable_status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># "Running"</span>
     <span class="n">vm</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1"># VM is automatically cleaned up when the context manager exits</span>
 </code></pre></div>
@@ -314,18 +282,18 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachine</span>
 
 <span class="n">vm</span> <span class="o">=</span> <span class="n">VirtualMachine</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">body</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;devices&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;disks&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bus&quot;</span><span class="p">:</span> <span class="s2">&quot;virtio&quot;</span><span class="p">},</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">}]},</span>
-                <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="s2">&quot;2Gi&quot;</span><span class="p">}},</span>
+        <span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"domain"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"devices"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"disks"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"disk"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"bus"</span><span class="p">:</span> <span class="s2">"virtio"</span><span class="p">},</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">}]},</span>
+                <span class="s2">"resources"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requests"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"memory"</span><span class="p">:</span> <span class="s2">"2Gi"</span><span class="p">}},</span>
             <span class="p">},</span>
-            <span class="s2">&quot;volumes&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">[</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;containerDisk&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;quay.io/containerdisks/fedora&quot;</span><span class="p">},</span>
+                    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">,</span>
+                    <span class="s2">"containerDisk"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"image"</span><span class="p">:</span> <span class="s2">"quay.io/containerdisks/fedora"</span><span class="p">},</span>
                 <span class="p">}</span>
             <span class="p">],</span>
         <span class="p">}</span>
@@ -337,15 +305,15 @@
 <p>The <code>body</code> parameter accepts a dictionary that maps to the KubeVirt VM <code>spec.template</code> structure. If you omit <code>body</code>, a minimal skeleton (<code>{"template": {"spec": {}}}</code>) is created automatically.</p>
 <p>You can also create a VM from a YAML file:</p>
 <div class="highlight"><pre><span></span><code><span class="n">vm</span> <span class="o">=</span> <span class="n">VirtualMachine</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">yaml_file</span><span class="o">=</span><span class="s2">&quot;vm-definition.yaml&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">yaml_file</span><span class="o">=</span><span class="s2">"vm-definition.yaml"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">vm</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
 
 <h3 id="constructor-parameters">Constructor Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -398,7 +366,7 @@
 <td>Timeout for delete operations</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Tip:</strong> Use the context manager (<code>with vm:</code>) to ensure automatic cleanup. See <a href="creating-and-managing-resources.html">Creating and Managing Resources</a> for details on <code>deploy()</code>, <code>clean_up()</code>, and context managers.</p>
 </blockquote>
@@ -435,34 +403,34 @@
 <span class="n">vm</span><span class="o">.</span><span class="n">ready</span>  <span class="c1"># True</span>
 
 <span class="c1"># Human-readable status string</span>
-<span class="n">vm</span><span class="o">.</span><span class="n">printable_status</span>  <span class="c1"># &quot;Running&quot;, &quot;Stopped&quot;, &quot;Starting&quot;, &quot;Migrating&quot;, etc.</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">printable_status</span>  <span class="c1"># "Running", "Stopped", "Starting", "Migrating", etc.</span>
 
 <span class="c1"># Wait for ready status</span>
-<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_ready_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>   <span class="c1"># Wait for running</span>
-<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_ready_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>    <span class="c1"># Wait for stopped</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_ready_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>  <span class="c1"># Wait for running</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_ready_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>  <span class="c1"># Wait for stopped</span>
 
 <span class="c1"># Wait for a specific status field to clear</span>
-<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_status_none</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;snapshotInProgress&quot;</span><span class="p">)</span>
+<span class="n">vm</span><span class="o">.</span><span class="n">wait_for_status_none</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">"snapshotInProgress"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="run-strategy-constants">Run Strategy Constants</h3>
 <p>Use built-in constants for the <code>runStrategy</code> field:</p>
-<div class="highlight"><pre><span></span><code><span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">ALWAYS</span>            <span class="c1"># &quot;Always&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">HALTED</span>            <span class="c1"># &quot;Halted&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">MANUAL</span>            <span class="c1"># &quot;Manual&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">RERUNONFAILURE</span>    <span class="c1"># &quot;RerunOnFailure&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">ALWAYS</span>  <span class="c1"># "Always"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">HALTED</span>  <span class="c1"># "Halted"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">MANUAL</span>  <span class="c1"># "Manual"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">RunStrategy</span><span class="o">.</span><span class="n">RERUNONFAILURE</span>  <span class="c1"># "RerunOnFailure"</span>
 </code></pre></div>
 
 <h3 id="status-constants">Status Constants</h3>
-<div class="highlight"><pre><span></span><code><span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STARTING</span>       <span class="c1"># &quot;Starting&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span>        <span class="c1"># &quot;Running&quot;  (inherited)</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STOPPED</span>        <span class="c1"># &quot;Stopped&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STOPPING</span>       <span class="c1"># &quot;Stopping&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">MIGRATING</span>      <span class="c1"># &quot;Migrating&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PAUSED</span>         <span class="c1"># &quot;Paused&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PROVISIONING</span>   <span class="c1"># &quot;Provisioning&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ERROR_UNSCHEDULABLE</span>  <span class="c1"># &quot;ErrorUnschedulable&quot;</span>
-<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DATAVOLUME_ERROR</span>     <span class="c1"># &quot;DataVolumeError&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STARTING</span>  <span class="c1"># "Starting"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">RUNNING</span>  <span class="c1"># "Running"  (inherited)</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STOPPED</span>  <span class="c1"># "Stopped"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">STOPPING</span>  <span class="c1"># "Stopping"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">MIGRATING</span>  <span class="c1"># "Migrating"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PAUSED</span>  <span class="c1"># "Paused"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">PROVISIONING</span>  <span class="c1"># "Provisioning"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ERROR_UNSCHEDULABLE</span>  <span class="c1"># "ErrorUnschedulable"</span>
+<span class="n">VirtualMachine</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DATAVOLUME_ERROR</span>  <span class="c1"># "DataVolumeError"</span>
 </code></pre></div>
 
 <h2 id="working-with-virtualmachineinstances">Working with VirtualMachineInstances</h2>
@@ -475,15 +443,13 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_instance</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineInstance</span>
 
 <span class="n">vmi</span> <span class="o">=</span> <span class="n">VirtualMachineInstance</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vmi&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vmi"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">domain</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;devices&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;disks&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bus&quot;</span><span class="p">:</span> <span class="s2">&quot;virtio&quot;</span><span class="p">},</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">}]},</span>
-        <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="s2">&quot;1Gi&quot;</span><span class="p">}},</span>
+        <span class="s2">"devices"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"disks"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"disk"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"bus"</span><span class="p">:</span> <span class="s2">"virtio"</span><span class="p">},</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">}]},</span>
+        <span class="s2">"resources"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requests"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"memory"</span><span class="p">:</span> <span class="s2">"1Gi"</span><span class="p">}},</span>
     <span class="p">},</span>
-    <span class="n">volumes</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">,</span> <span class="s2">&quot;containerDisk&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;quay.io/containerdisks/fedora&quot;</span><span class="p">}}</span>
-    <span class="p">],</span>
+    <span class="n">volumes</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">,</span> <span class="s2">"containerDisk"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"image"</span><span class="p">:</span> <span class="s2">"quay.io/containerdisks/fedora"</span><span class="p">}}],</span>
 <span class="p">)</span>
 <span class="n">vmi</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -492,7 +458,7 @@
 <p><strong>Note:</strong> The <code>domain</code> parameter is <strong>required</strong> when creating a VMI programmatically. Omitting it raises <code>MissingRequiredArgumentError</code>.</p>
 </blockquote>
 <h3 id="vmi-constructor-parameters">VMI Constructor Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -587,7 +553,7 @@
 <td>Topology spread rules</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="waiting-for-a-vmi-to-run">Waiting for a VMI to Run</h3>
 <div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">wait_until_running</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 </code></pre></div>
@@ -597,11 +563,11 @@
 </code></pre></div>
 
 <p>You can also specify a <code>stop_status</code> to abort early if the VMI enters a failure state:</p>
-<div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">wait_until_running</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">stop_status</span><span class="o">=</span><span class="s2">&quot;Failed&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">wait_until_running</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">stop_status</span><span class="o">=</span><span class="s2">"Failed"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="pausing-and-unpausing">Pausing and Unpausing</h3>
-<div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    <span class="c1"># Pause the VMI</span>
+<div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Pause the VMI</span>
 <span class="n">vmi</span><span class="o">.</span><span class="n">unpause</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Resume the VMI</span>
 </code></pre></div>
 
@@ -619,15 +585,15 @@
 <span class="n">interfaces</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">interfaces</span>
 
 <span class="c1"># Get IP address for a specific interface</span>
-<span class="n">ip</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">interface_ip</span><span class="p">(</span><span class="s2">&quot;eth0&quot;</span><span class="p">)</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">interface_ip</span><span class="p">(</span><span class="s2">"eth0"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="guest-agent-information">Guest Agent Information</h3>
 <p>When the QEMU guest agent is installed in the VM:</p>
-<div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">guest_os_info</span>       <span class="c1"># OS information</span>
-<span class="n">vmi</span><span class="o">.</span><span class="n">guest_fs_info</span>       <span class="c1"># Filesystem information</span>
-<span class="n">vmi</span><span class="o">.</span><span class="n">guest_user_info</span>     <span class="c1"># Logged-in user information</span>
-<span class="n">vmi</span><span class="o">.</span><span class="n">os_version</span>          <span class="c1"># OS version string</span>
+<div class="highlight"><pre><span></span><code><span class="n">vmi</span><span class="o">.</span><span class="n">guest_os_info</span>  <span class="c1"># OS information</span>
+<span class="n">vmi</span><span class="o">.</span><span class="n">guest_fs_info</span>  <span class="c1"># Filesystem information</span>
+<span class="n">vmi</span><span class="o">.</span><span class="n">guest_user_info</span>  <span class="c1"># Logged-in user information</span>
+<span class="n">vmi</span><span class="o">.</span><span class="n">os_version</span>  <span class="c1"># OS version string</span>
 </code></pre></div>
 
 <blockquote>
@@ -639,7 +605,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
 
 <span class="c1"># Access logs from the compute container</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;compute&quot;</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">"compute"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>For clusters where a privileged client is required:</p>
@@ -662,7 +628,7 @@
 <span class="n">memstats</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">get_dommemstat</span><span class="p">()</span>
 
 <span class="c1"># Run any arbitrary virsh command</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">execute_virsh_command</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s2">&quot;dominfo&quot;</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">execute_virsh_command</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s2">"dominfo"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="checking-root-status">Checking Root Status</h3>
@@ -671,7 +637,7 @@
 <span class="c1"># Check if the virt-launcher pod runs as root</span>
 <span class="n">VirtualMachineInstance</span><span class="o">.</span><span class="n">is_pod_root</span><span class="p">(</span><span class="n">pod</span><span class="o">=</span><span class="n">pod</span><span class="p">)</span>  <span class="c1"># True or False</span>
 
-<span class="c1"># Get the pod&#39;s runAsUser UID</span>
+<span class="c1"># Get the pod's runAsUser UID</span>
 <span class="n">VirtualMachineInstance</span><span class="o">.</span><span class="n">get_pod_user_uid</span><span class="p">(</span><span class="n">pod</span><span class="o">=</span><span class="n">pod</span><span class="p">)</span>  <span class="c1"># int or None</span>
 </code></pre></div>
 
@@ -680,9 +646,9 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_instance_migration</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineInstanceMigration</span>
 
 <span class="n">migration</span> <span class="o">=</span> <span class="n">VirtualMachineInstanceMigration</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;migrate-my-vm&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">vmi_name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"migrate-my-vm"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">vmi_name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">migration</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -693,12 +659,12 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_migration_resource_quota</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineMigrationResourceQuota</span>
 
 <span class="n">quota</span> <span class="o">=</span> <span class="n">VirtualMachineMigrationResourceQuota</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;migration-quota&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">requests_cpu</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
-    <span class="n">requests_memory</span><span class="o">=</span><span class="s2">&quot;4Gi&quot;</span><span class="p">,</span>
-    <span class="n">limits_cpu</span><span class="o">=</span><span class="s2">&quot;4&quot;</span><span class="p">,</span>
-    <span class="n">limits_memory</span><span class="o">=</span><span class="s2">&quot;8Gi&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"migration-quota"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">requests_cpu</span><span class="o">=</span><span class="s2">"2"</span><span class="p">,</span>
+    <span class="n">requests_memory</span><span class="o">=</span><span class="s2">"4Gi"</span><span class="p">,</span>
+    <span class="n">limits_cpu</span><span class="o">=</span><span class="s2">"4"</span><span class="p">,</span>
+    <span class="n">limits_memory</span><span class="o">=</span><span class="s2">"8Gi"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">quota</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -708,16 +674,16 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_snapshot</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineSnapshot</span>
 
 <span class="n">snapshot</span> <span class="o">=</span> <span class="n">VirtualMachineSnapshot</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm-snapshot&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">vm_name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm-snapshot"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">vm_name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">snapshot</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
 <span class="c1"># Wait for the snapshot to be ready</span>
 <span class="n">snapshot</span><span class="o">.</span><span class="n">wait_ready_to_use</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
-<span class="c1"># Wait for both snapshot readiness AND the VM&#39;s snapshotInProgress to clear</span>
+<span class="c1"># Wait for both snapshot readiness AND the VM's snapshotInProgress to clear</span>
 <span class="n">snapshot</span><span class="o">.</span><span class="n">wait_snapshot_done</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 </code></pre></div>
 
@@ -725,10 +691,10 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_restore</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineRestore</span>
 
 <span class="n">restore</span> <span class="o">=</span> <span class="n">VirtualMachineRestore</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vm-restore&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">vm_name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
-    <span class="n">snapshot_name</span><span class="o">=</span><span class="s2">&quot;my-vm-snapshot&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vm-restore"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">vm_name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
+    <span class="n">snapshot_name</span><span class="o">=</span><span class="s2">"my-vm-snapshot"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">restore</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
@@ -737,7 +703,7 @@
 </code></pre></div>
 
 <p>The <code>wait_restore_done()</code> method checks both the restore's <code>complete</code> status and that the VM's <code>restoreInProgress</code> field is cleared.</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -762,15 +728,15 @@
 <td>Optional policy for volume restoration</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="cloning-vms">Cloning VMs</h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_clone</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineClone</span>
 
 <span class="n">clone</span> <span class="o">=</span> <span class="n">VirtualMachineClone</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;clone-my-vm&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">source_name</span><span class="o">=</span><span class="s2">&quot;my-vm&quot;</span><span class="p">,</span>
-    <span class="n">target_name</span><span class="o">=</span><span class="s2">&quot;my-vm-clone&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"clone-my-vm"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">source_name</span><span class="o">=</span><span class="s2">"my-vm"</span><span class="p">,</span>
+    <span class="n">target_name</span><span class="o">=</span><span class="s2">"my-vm-clone"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">clone</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -779,7 +745,7 @@
 <p><strong>Note:</strong> <code>source_name</code> is <strong>required</strong>. If omitted, <code>MissingRequiredArgumentError</code> is raised.</p>
 </blockquote>
 <h3 id="clone-parameters">Clone Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -838,16 +804,16 @@
 <td>Volume naming policy for the clone</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="exporting-vms">Exporting VMs</h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_export</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineExport</span>
 
 <span class="n">export</span> <span class="o">=</span> <span class="n">VirtualMachineExport</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;export-my-vm&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">source</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;apiGroup&quot;</span><span class="p">:</span> <span class="s2">&quot;kubevirt.io&quot;</span><span class="p">,</span> <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;VirtualMachine&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;my-vm&quot;</span><span class="p">},</span>
-    <span class="n">token_secret_ref</span><span class="o">=</span><span class="s2">&quot;my-export-token&quot;</span><span class="p">,</span>
-    <span class="n">ttl_duration</span><span class="o">=</span><span class="s2">&quot;1h&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"export-my-vm"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="p">{</span><span class="s2">"apiGroup"</span><span class="p">:</span> <span class="s2">"kubevirt.io"</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"VirtualMachine"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"my-vm"</span><span class="p">},</span>
+    <span class="n">token_secret_ref</span><span class="o">=</span><span class="s2">"my-export-token"</span><span class="p">,</span>
+    <span class="n">ttl_duration</span><span class="o">=</span><span class="s2">"1h"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">export</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -862,10 +828,10 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_instancetype</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineInstancetype</span>
 
 <span class="n">instancetype</span> <span class="o">=</span> <span class="n">VirtualMachineInstancetype</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;small&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">cpu</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;guest&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-    <span class="n">memory</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;guest&quot;</span><span class="p">:</span> <span class="s2">&quot;4Gi&quot;</span><span class="p">},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"small"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">cpu</span><span class="o">=</span><span class="p">{</span><span class="s2">"guest"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+    <span class="n">memory</span><span class="o">=</span><span class="p">{</span><span class="s2">"guest"</span><span class="p">:</span> <span class="s2">"4Gi"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="n">instancetype</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -875,10 +841,10 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_cluster_instancetype</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineClusterInstancetype</span>
 
 <span class="n">cluster_instancetype</span> <span class="o">=</span> <span class="n">VirtualMachineClusterInstancetype</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;large&quot;</span><span class="p">,</span>
-    <span class="n">cpu</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;guest&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>
-    <span class="n">memory</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;guest&quot;</span><span class="p">:</span> <span class="s2">&quot;16Gi&quot;</span><span class="p">},</span>
-    <span class="n">gpus</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;deviceName&quot;</span><span class="p">:</span> <span class="s2">&quot;nvidia.com/A100&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gpu0&quot;</span><span class="p">}],</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"large"</span><span class="p">,</span>
+    <span class="n">cpu</span><span class="o">=</span><span class="p">{</span><span class="s2">"guest"</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>
+    <span class="n">memory</span><span class="o">=</span><span class="p">{</span><span class="s2">"guest"</span><span class="p">:</span> <span class="s2">"16Gi"</span><span class="p">},</span>
+    <span class="n">gpus</span><span class="o">=</span><span class="p">[{</span><span class="s2">"deviceName"</span><span class="p">:</span> <span class="s2">"nvidia.com/A100"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"gpu0"</span><span class="p">}],</span>
 <span class="p">)</span>
 <span class="n">cluster_instancetype</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -887,10 +853,10 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_preference</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachinePreference</span>
 
 <span class="n">preference</span> <span class="o">=</span> <span class="n">VirtualMachinePreference</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;linux-pref&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">cpu</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;preferredCPUTopology&quot;</span><span class="p">:</span> <span class="s2">&quot;preferSockets&quot;</span><span class="p">},</span>
-    <span class="n">firmware</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;preferredUseEfi&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"linux-pref"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">cpu</span><span class="o">=</span><span class="p">{</span><span class="s2">"preferredCPUTopology"</span><span class="p">:</span> <span class="s2">"preferSockets"</span><span class="p">},</span>
+    <span class="n">firmware</span><span class="o">=</span><span class="p">{</span><span class="s2">"preferredUseEfi"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="n">preference</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -899,9 +865,9 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_cluster_preference</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineClusterPreference</span>
 
 <span class="n">cluster_preference</span> <span class="o">=</span> <span class="n">VirtualMachineClusterPreference</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;windows-pref&quot;</span><span class="p">,</span>
-    <span class="n">clock</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;preferredTimer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hpet&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;present&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}},</span>
-    <span class="n">features</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;preferredHyperv&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spinlocks&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spinlocks&quot;</span><span class="p">:</span> <span class="mi">8191</span><span class="p">}}},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"windows-pref"</span><span class="p">,</span>
+    <span class="n">clock</span><span class="o">=</span><span class="p">{</span><span class="s2">"preferredTimer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"hpet"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"present"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}}},</span>
+    <span class="n">features</span><span class="o">=</span><span class="p">{</span><span class="s2">"preferredHyperv"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"spinlocks"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"spinlocks"</span><span class="p">:</span> <span class="mi">8191</span><span class="p">}}},</span>
 <span class="p">)</span>
 <span class="n">cluster_preference</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -911,16 +877,16 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_instance_replica_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineInstanceReplicaSet</span>
 
 <span class="n">replica_set</span> <span class="o">=</span> <span class="n">VirtualMachineInstanceReplicaSet</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-vmi-rs&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"my-vmi-rs"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">selector</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;matchLabels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;my-vmi&quot;</span><span class="p">}},</span>
+    <span class="n">selector</span><span class="o">=</span><span class="p">{</span><span class="s2">"matchLabels"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"app"</span><span class="p">:</span> <span class="s2">"my-vmi"</span><span class="p">}},</span>
     <span class="n">template</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="s2">&quot;my-vmi&quot;</span><span class="p">}},</span>
-        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;devices&quot;</span><span class="p">:</span> <span class="p">{},</span>
-                <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="s2">&quot;1Gi&quot;</span><span class="p">}},</span>
+        <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"labels"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"app"</span><span class="p">:</span> <span class="s2">"my-vmi"</span><span class="p">}},</span>
+        <span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"domain"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"devices"</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">"resources"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requests"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"memory"</span><span class="p">:</span> <span class="s2">"1Gi"</span><span class="p">}},</span>
             <span class="p">}</span>
         <span class="p">},</span>
     <span class="p">},</span>
@@ -936,20 +902,18 @@
 
 <span class="c1"># Create a migration plan</span>
 <span class="n">plan</span> <span class="o">=</span> <span class="n">VirtualMachineStorageMigrationPlan</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;migrate-storage&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">virtual_machines</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;my-vm&quot;</span><span class="p">,</span> <span class="s2">&quot;volumes&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rootdisk&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;storageClassName&quot;</span><span class="p">:</span> <span class="s2">&quot;fast-ssd&quot;</span><span class="p">}}]}</span>
-    <span class="p">],</span>
-    <span class="n">retention_policy</span><span class="o">=</span><span class="s2">&quot;deleteSource&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"migrate-storage"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">virtual_machines</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"my-vm"</span><span class="p">,</span> <span class="s2">"volumes"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"rootdisk"</span><span class="p">,</span> <span class="s2">"target"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"storageClassName"</span><span class="p">:</span> <span class="s2">"fast-ssd"</span><span class="p">}}]}],</span>
+    <span class="n">retention_policy</span><span class="o">=</span><span class="s2">"deleteSource"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">plan</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
 <span class="c1"># Execute the migration</span>
 <span class="n">migration</span> <span class="o">=</span> <span class="n">VirtualMachineStorageMigration</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;migrate-storage-exec&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">virtual_machine_storage_migration_plan_ref</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;migrate-storage&quot;</span><span class="p">,</span> <span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;my-namespace&quot;</span><span class="p">},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"migrate-storage-exec"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">virtual_machine_storage_migration_plan_ref</span><span class="o">=</span><span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"migrate-storage"</span><span class="p">,</span> <span class="s2">"namespace"</span><span class="p">:</span> <span class="s2">"my-namespace"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="n">migration</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
@@ -958,37 +922,35 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.virtual_machine_template</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualMachineTemplate</span>
 
 <span class="n">template</span> <span class="o">=</span> <span class="n">VirtualMachineTemplate</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fedora-template&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"fedora-template"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">virtual_machine</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="s2">&quot;devices&quot;</span><span class="p">:</span> <span class="p">{},</span>
-                        <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="s2">&quot;2Gi&quot;</span><span class="p">}},</span>
+        <span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"template"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">"domain"</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">"devices"</span><span class="p">:</span> <span class="p">{},</span>
+                        <span class="s2">"resources"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requests"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"memory"</span><span class="p">:</span> <span class="s2">"2Gi"</span><span class="p">}},</span>
                     <span class="p">}</span>
                 <span class="p">}</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">},</span>
-    <span class="n">parameters</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;VM_NAME&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Name of the VM&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-    <span class="p">],</span>
-    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use this template to create Fedora VMs.&quot;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"VM_NAME"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Name of the VM"</span><span class="p">,</span> <span class="s2">"required"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
+    <span class="n">message</span><span class="o">=</span><span class="s2">"Use this template to create Fedora VMs."</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">template</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 </code></pre></div>
 
 <h3 id="listing-vms-across-namespaces">Listing VMs Across Namespaces</h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># List all VMs in a namespace</span>
-<span class="k">for</span> <span class="n">vm</span> <span class="ow">in</span> <span class="n">VirtualMachine</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;printableStatus&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">vm</span> <span class="ow">in</span> <span class="n">VirtualMachine</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">vm</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'printableStatus'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># List with label selectors</span>
 <span class="k">for</span> <span class="n">vm</span> <span class="ow">in</span> <span class="n">VirtualMachine</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=webserver&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=webserver"</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">vm</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
@@ -997,7 +959,7 @@
 <h3 id="getting-vm-network-interfaces">Getting VM Network Interfaces</h3>
 <div class="highlight"><pre><span></span><code><span class="n">interfaces</span> <span class="o">=</span> <span class="n">vm</span><span class="o">.</span><span class="n">get_interfaces</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">iface</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name: </span><span class="si">{</span><span class="n">iface</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, Model: </span><span class="si">{</span><span class="n">iface</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Name: </span><span class="si">{</span><span class="n">iface</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">, Model: </span><span class="si">{</span><span class="n">iface</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'model'</span><span class="p">,</span><span class="w"> </span><span class="s1">'default'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="troubleshooting">Troubleshooting</h2>
@@ -1006,10 +968,10 @@
 <div class="highlight"><pre><span></span><code><span class="n">vmi</span> <span class="o">=</span> <span class="n">vm</span><span class="o">.</span><span class="n">vmi</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">pod</span> <span class="o">=</span> <span class="n">vmi</span><span class="o">.</span><span class="n">get_virt_launcher_pod</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pod status: </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">&quot;compute&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Pod status: </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="s2">"compute"</span><span class="p">))</span>
 <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Virt-launcher pod not found — VM may not have been scheduled yet&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Virt-launcher pod not found — VM may not have been scheduled yet"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="timeoutexpirederror-on-startstop">TimeoutExpiredError on start/stop</h3>
@@ -1019,7 +981,7 @@
 
 <h3 id="missingrequiredargumenterror">MissingRequiredArgumentError</h3>
 <p>This is raised when a required constructor parameter is missing. Common cases:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Resource</th>
@@ -1056,7 +1018,7 @@
 <td><code>virtual_machine</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="guest-agent-not-reporting">Guest Agent Not Reporting</h3>
 <p>If <code>vmi.os_version</code> returns an empty dict, the QEMU guest agent is not installed or not running inside the VM. Install and start <code>qemu-guest-agent</code> in the guest OS.</p>
 <h2 id="related-pages">Related Pages</h2>
@@ -1164,10 +1126,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -1175,13 +1134,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -1227,5 +1187,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

@@ -1,16 +1,28 @@
 """Parser for type generation and property parsing from OpenAPI schemas."""
 
-import json
 import textwrap
 from typing import Any
 
 from simple_logger.logger import get_logger
 
-from class_generator.constants import DEFINITIONS_FILE, MISSING_DESCRIPTION_STR, SPEC_STR
+from class_generator.constants import MISSING_DESCRIPTION_STR, SPEC_STR
 from class_generator.utils import sanitize_python_name
+from ocp_resources.utils.schema_validator import SchemaValidator
 from ocp_resources.utils.utils import convert_camel_case_to_snake_case
 
 LOGGER = get_logger(name=__name__)
+
+
+def _load_definitions() -> dict[str, Any]:
+    """
+    Get the schema definitions (already loaded and cached by SchemaValidator).
+
+    Returns:
+        Dictionary of schema definitions keyed by definition name
+    """
+    if not SchemaValidator.load_mappings_data():
+        return {}
+    return SchemaValidator.get_definitions_data() or {}
 
 
 def types_generator(key_dict: dict[str, Any]) -> dict[str, str]:
@@ -69,35 +81,31 @@ def get_property_schema(property_: dict[str, Any]) -> dict[str, Any]:
         # or "#/components/schemas/io.k8s.api.core.v1.PodSpec" -> "io.k8s.api.core.v1.PodSpec"
         ref_name = _ref.split("/")[-1]
 
-        # Load from _definitions.json instead of individual files
-        definitions_file = DEFINITIONS_FILE
-        if definitions_file.exists():
-            with open(definitions_file) as fd:
-                data = json.load(fd)
-                definitions = data.get("definitions", {})
+        # Resolve from the definitions archive (cached; the file is large)
+        definitions = _load_definitions()
 
-                # Try multiple key formats to handle schema key format mismatch
-                possible_keys = [
-                    ref_name,  # io.k8s.api.core.v1.PodSpec
-                    ref_name.split(".")[-1],  # PodSpec
-                    # Extract version/Kind format from the namespaced reference
-                    "/".join(ref_name.split(".")[-2:]) if "." in ref_name else ref_name,  # v1/PodSpec
-                ]
+        # Try multiple key formats to handle schema key format mismatch
+        possible_keys = [
+            ref_name,  # io.k8s.api.core.v1.PodSpec
+            ref_name.split(".")[-1],  # PodSpec
+            # Extract version/Kind format from the namespaced reference
+            "/".join(ref_name.split(".")[-2:]) if "." in ref_name else ref_name,  # v1/PodSpec
+        ]
 
-                for key in possible_keys:
-                    if key in definitions:
-                        resolved_schema = definitions[key]
-                        # Fix null required fields to empty lists
-                        if resolved_schema.get("required") is None:
-                            resolved_schema = resolved_schema.copy()
-                            resolved_schema["required"] = []
+        for key in possible_keys:
+            if key in definitions:
+                resolved_schema = definitions[key]
+                # Fix null required fields to empty lists
+                if resolved_schema.get("required") is None:
+                    resolved_schema = resolved_schema.copy()
+                    resolved_schema["required"] = []
 
-                        # Preserve any description from the original property that references this schema
-                        if "description" in property_ and "description" not in resolved_schema:
-                            resolved_schema = resolved_schema.copy()
-                            resolved_schema["description"] = property_["description"]
+                # Preserve any description from the original property that references this schema
+                if "description" in property_ and "description" not in resolved_schema:
+                    resolved_schema = resolved_schema.copy()
+                    resolved_schema["description"] = property_["description"]
 
-                        return resolved_schema
+                return resolved_schema
 
         # If not found in definitions, log warning and use property as-is
         LOGGER.warning(

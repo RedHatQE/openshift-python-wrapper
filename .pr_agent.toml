@@ -10,3 +10,13 @@ push_commands = ["/agentic_review"]
 [review_agent]
 comments_location_policy = "both"
 inline_comments_severity_threshold = 1
+
+[ignore]
+glob = [
+  "docs/*.html",
+  "docs/search-index.json",
+  "docs/llms.txt",
+  "docs/llms-full.txt",
+  "docs/assets/*.js",
+  "docs/assets/style.css",
+]

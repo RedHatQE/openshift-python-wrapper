@@ -1,13 +1,3 @@
-I'll start by reading the knowledge graph and page manifest, then explore the class-generator source code in detail.
-
-Now let me check the entry point configuration and any additional schema-related functions:
-
-Now let me check the test files for CLI tests and the entry point:
-
-Now let me check the parsers and any additional CLI-relevant components:
-
-Now I have all the information I need. Let me compile the comprehensive CLI reference page.
-
 # class-generator CLI Reference
 
 The `class-generator` command generates Python wrapper classes for Kubernetes and OpenShift resources. It is installed as a console script entry point from the `openshift-python-wrapper` package.
@@ -398,6 +388,66 @@ class-generator --regenerate-all --filter "VirtualMachine"
 
 ---
 
+### Verification
+
+Verify that generated files still match what class-generator would produce. No file is modified.
+
+| Option | Description |
+|--------|-------------|
+| `--verify` | Verify the kinds passed via `--kind` |
+| `--verify-all` | Verify every generated resource; combine with `--filter` to narrow the scope |
+| `--verify-changed` | Verify only resources changed relative to `--base`; untouched files are not checked |
+| `--base TEXT` | Ref compared against by `--verify-changed`. Defaults to the current branch's upstream, then to the clone's remote HEAD; the ref is fetched when the clone lacks it and the diff uses the merge base |
+| `--classification TEXT` | Comma-separated drift classifications; only files matching them are reported and fail the run |
+| `--match` | Require the drift to be *within* `--classification` (a subset) instead of merely containing one of them |
+| `--exclude TEXT` | Drop files whose drift contains any of these classifications, leaving only drift that is safe to regenerate |
+| `--jobs INTEGER` | Resources verified in parallel (default 10) |
+
+`--classification`, `--match` and `--exclude` require a verify mode; unknown
+classifications are rejected with the list of valid values.
+
+Every reported file is generator output, so the printed repair command is the plain
+per-kind form:
+
+```bash
+class-generator --kind Deployment --overwrite
+```
+
+Only files whose name class-generator writes are verified (`<kind>.py`, or
+`<kind>_<api-group>.py` for a kind in several groups). A copied file under another name
+is not generator output and is ignored.
+
+#### Drift classifications
+
+| Classification | Meaning |
+|----------------|---------|
+| `blank lines` | Only blank-line differences |
+| `docstring add` / `docstring delete` | Docstring text differs |
+| `code add` / `code delete` | Code lines differ |
+| `signature code add` | Parameters were added (all generated parameters carry defaults, so this is not breaking) |
+| `signature code remove` | Parameters were removed |
+| `breaking change` | A caller-visible break: a parameter was removed, a parameter became required, a parameter is emitted under a different API key, the base class changed, or `api_group`/`api_version` changed |
+| `schema incomplete` | The rendered class has no parameters while the file has some — an unresolvable `$ref`. Reported in addition to `breaking change` |
+| `file does not exist` | The expected generated file is missing (or was deleted on this branch) |
+| `formatting failed` | The rendered output could not be formatted |
+| `not in schema` | The kind is absent from the resources mapping |
+
+`code delete` on its own is not breaking: it also covers guard lines removed when a
+field becomes optional, rewritten statements and reflowed code.
+
+#### Exit status
+
+`0` when everything matches, `1` when any file drifted or could not be verified.
+
+#### CI
+
+`tox -e validate-generated` runs `--verify-changed` with no arguments, so tox stays
+CI-independent:
+
+```bash
+tox -e validate-generated
+```
+
 ### Logging
 
 #### `-v`, `--verbose`
@@ -433,7 +483,11 @@ The CLI enforces the following option constraints:
 | `--update-schema` (alone) | Cannot combine with `-k`, `--discover-missing`, `--coverage-report`, `--dry-run`, `--overwrite`, `-o`, `--add-tests`, `--regenerate-all` |
 | `--update-schema-for` | Cannot combine with `-k`, `--discover-missing`, `--coverage-report`, `--generate-missing`, `--regenerate-all` |
 | `--backup` | Requires `--regenerate-all` or `--overwrite` |
-| `--filter` | Requires `--regenerate-all` |
+| `--filter` | Requires `--regenerate-all`, `--verify-all` or `--verify-changed` |
+| `--verify` / `--verify-all` / `--verify-changed` | Mutually exclusive, and cannot combine with `--regenerate-all`, `--backup`, `--overwrite`, `--add-tests` or `--dry-run` |
+| `--verify` | Requires `--kind` |
+| `--classification` / `--exclude` | Require a verify mode |
+| `--match` | Requires `--classification` |
 | No options | Exits with error — at least one action required |
 
 ---
@@ -446,9 +500,10 @@ When multiple compatible options are specified together, the CLI processes them 
 2. `--update-schema` (exits unless `--generate-missing` is also set)
 3. `--coverage-report` / `--discover-missing` / `--generate-missing` (coverage analysis and reporting)
 4. `--generate-missing` (generates classes for missing resources)
-5. `--regenerate-all` (batch regeneration, exits after completion)
-6. `-k`/`--kind` (normal kind generation)
-7. `--add-tests` (test generation and execution)
+5. `--verify` / `--verify-all` / `--verify-changed` (verification, exits after completion)
+6. `--regenerate-all` (batch regeneration, exits after completion)
+7. `-k`/`--kind` (normal kind generation)
+8. `--add-tests` (test generation and execution)
 
 ---
 

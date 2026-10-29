@@ -1,27 +1,3 @@
-Let me start by exploring the repository structure and the knowledge graph.
-
-Now let me look at the YAML-related functions and some example resource files:
-
-Now let me look at some concrete resource examples and tests:
-
-Now let me look at tests for create, update, delete operations and the exceptions:
-
-Now let me look at the exceptions module and the project resource:
-
-Now let me look at how `to_yaml`, `yaml_file`, and `kind_dict` usage works, and the `dry_run` option:
-
-Now let me check how `ensure_exists` and `wait_for_resource` work:
-
-Now let me look at how the `service.py` and `route.py` look to understand namespaced resources better:
-
-Let me also look at the `node_network_configuration_policy.py` for a more complex `deploy/clean_up` example:
-
-Now let me look at the `to_yaml` method and some environment variable usage:
-
-Let me also check the `dry_run` behavior and check for how `label` and `annotations` work:
-
-Now I have a thorough understanding of the codebase. Let me write the documentation.
-
 # Creating and Managing Resources
 
 Deploy Kubernetes and OpenShift resources to your cluster, update them in place, and clean them up reliably using the openshift-python-wrapper's resource lifecycle methods.

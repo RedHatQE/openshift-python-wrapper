@@ -21,6 +21,7 @@ class AAQ(Resource):
         infra: dict[str, Any] | None = None,
         namespace_selector: dict[str, Any] | None = None,
         priority_class: str | None = None,
+        tls_security_profile: dict[str, Any] | None = None,
         workload: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
@@ -40,6 +41,9 @@ class AAQ(Resource):
 
             priority_class (str): PriorityClass of the AAQ control plane
 
+            tls_security_profile (dict[str, Any]): TLSSecurityProfile is used by operators to apply cluster-wide TLS
+              security settings to operands.
+
             workload (dict[str, Any]): Restrict on which nodes AAQ workload pods will be scheduled
 
         """
@@ -51,9 +55,11 @@ class AAQ(Resource):
         self.infra = infra
         self.namespace_selector = namespace_selector
         self.priority_class = priority_class
+        self.tls_security_profile = tls_security_profile
         self.workload = workload
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -77,6 +83,9 @@ class AAQ(Resource):
 
             if self.priority_class is not None:
                 _spec["priorityClass"] = self.priority_class
+
+            if self.tls_security_profile is not None:
+                _spec["tlsSecurityProfile"] = self.tls_security_profile
 
             if self.workload is not None:
                 _spec["workload"] = self.workload

@@ -1,91 +1,47 @@
 # Generated using https://github.com/RedHatQE/openshift-python-wrapper/blob/main/class_generator/README.md#adding-tests
 
-import filecmp
 import traceback
-from pathlib import Path
 
 from class_generator.constants import TESTS_MANIFESTS_DIR
 from class_generator.core.generator import class_generator
+from class_generator.core.schema import read_resources_mapping_file
 from class_generator.utils import execute_parallel_tasks
 
 
-def _test_single_resource(kind: str, tmp_path: Path) -> tuple[str, str] | None:
+def _test_single_resource(kind: str) -> tuple[str, str] | None:
     """
-    Test a single resource kind and return failure info if test fails.
+    Verify a single resource kind against its expected files and return failure info if test fails.
 
     Args:
         kind: The resource kind to test
-        tmp_path: pytest temporary path
 
     Returns:
         None if test passes, or (kind, error_message) tuple if test fails
     """
     try:
-        output_dir = tmp_path / f"output-dir-{kind}"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_files = class_generator(
+        if not read_resources_mapping_file().get(kind.lower()):
+            return (kind, f"{kind} not found in resources mapping")
+
+        drifted_files = class_generator(
             kind=kind,
-            output_dir=str(output_dir),
-            overwrite=True,
+            output_dir=str(TESTS_MANIFESTS_DIR / kind),
+            verify=True,
             called_from_test=True,
         )
 
-        if not output_files:
-            return (kind, "No output files generated")
-
-        for output_file in output_files:
-            expected_file = str(TESTS_MANIFESTS_DIR / kind / Path(output_file).name)
-
-            # Check if expected file exists
-            if not Path(expected_file).exists():
-                return (kind, f"Expected file does not exist: {expected_file}")
-
-            # Compare files and provide detailed diff info if they don't match
-            if not filecmp.cmp(output_file, expected_file):
-                try:
-                    # Read both files to show diff details
-                    with open(output_file) as f:
-                        generated_content = f.read()
-                    with open(expected_file) as f:
-                        expected_content = f.read()
-
-                    # Find first difference for debugging
-                    generated_lines = generated_content.splitlines()
-                    expected_lines = expected_content.splitlines()
-
-                    diff_info = f"Generated file {Path(output_file).name} differs from expected file."
-                    diff_info += f"\nGenerated file: {output_file}"
-                    diff_info += f"\nExpected file: {expected_file}"
-                    diff_info += f"\nGenerated lines: {len(generated_lines)}, Expected lines: {len(expected_lines)}"
-
-                    # Find first differing line
-                    for i, (gen_line, exp_line) in enumerate(zip(generated_lines, expected_lines, strict=True)):
-                        if gen_line != exp_line:
-                            diff_info += f"\nFirst difference at line {i + 1}:"
-                            diff_info += f"\nGenerated: {repr(gen_line[:100])}..."
-                            diff_info += f"\nExpected:  {repr(exp_line[:100])}..."
-                            break
-
-                    if len(generated_lines) != len(expected_lines):
-                        diff_info += f"\nFile length differs - generated has {len(generated_lines)} lines, expected has {len(expected_lines)} lines"
-
-                    return (kind, diff_info)
-
-                except Exception as read_error:
-                    return (
-                        kind,
-                        f"Generated file {Path(output_file).name} does not match expected file. Error reading files for diff: {read_error}",
-                    )
+        if drifted_files:
+            drifted_names = [drifted[0] if isinstance(drifted, tuple) else drifted for drifted in drifted_files]
+            return (kind, f"Generated output differs from expected files: {', '.join(drifted_names)}")
 
         return None
 
     except Exception as e:
-        error_details = f"Exception during generation: {str(e)}\n"
+        error_details = f"Exception during verification: {str(e)}\n"
         error_details += f"Traceback:\n{traceback.format_exc()}"
         return (kind, error_details)
 
 
-def test_parse_explain(tmp_path: Path) -> None:
+def test_parse_explain() -> None:
     """Test all resource kinds in parallel and collect all failures."""
     # List of all resource kinds to test
     resource_kinds = [
@@ -119,7 +75,7 @@ def test_parse_explain(tmp_path: Path) -> None:
         failures.append((kind, f"Task execution failed: {str(exc)}"))
 
     def create_test_task(kind: str) -> tuple[str, str] | None:
-        return _test_single_resource(kind, tmp_path / f"test-{kind}")
+        return _test_single_resource(kind)
 
     # Run tests in parallel
     execute_parallel_tasks(

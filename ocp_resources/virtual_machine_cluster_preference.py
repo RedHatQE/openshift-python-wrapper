@@ -23,6 +23,8 @@ class VirtualMachineClusterPreference(Resource):
         firmware: dict[str, Any] | None = None,
         machine: dict[str, Any] | None = None,
         prefer_spread_socket_to_core_ratio: int | None = None,
+        preferred_architecture: str | None = None,
+        preferred_launch_security: dict[str, Any] | None = None,
         preferred_subdomain: str | None = None,
         preferred_termination_grace_period_seconds: int | None = None,
         requirements: dict[str, Any] | None = None,
@@ -55,6 +57,11 @@ class VirtualMachineClusterPreference(Resource):
             prefer_spread_socket_to_core_ratio (int): PreferSpreadSocketToCoreRatio defines the ratio to spread vCPUs
               between cores and sockets, it defaults to 2.
 
+            preferred_architecture (str): PreferredArchitecture defines a prefeerred architecture for the
+              VirtualMachine
+
+            preferred_launch_security (dict[str, Any]): Optionally defines the preferred LaunchSecurity
+
             preferred_subdomain (str): Subdomain of the VirtualMachineInstance
 
             preferred_termination_grace_period_seconds (int): Grace period observed after signalling a VirtualMachineInstance to
@@ -77,12 +84,15 @@ class VirtualMachineClusterPreference(Resource):
         self.firmware = firmware
         self.machine = machine
         self.prefer_spread_socket_to_core_ratio = prefer_spread_socket_to_core_ratio
+        self.preferred_architecture = preferred_architecture
+        self.preferred_launch_security = preferred_launch_security
         self.preferred_subdomain = preferred_subdomain
         self.preferred_termination_grace_period_seconds = preferred_termination_grace_period_seconds
         self.requirements = requirements
         self.volumes = volumes
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -112,6 +122,12 @@ class VirtualMachineClusterPreference(Resource):
 
             if self.prefer_spread_socket_to_core_ratio is not None:
                 _spec["preferSpreadSocketToCoreRatio"] = self.prefer_spread_socket_to_core_ratio
+
+            if self.preferred_architecture is not None:
+                _spec["preferredArchitecture"] = self.preferred_architecture
+
+            if self.preferred_launch_security is not None:
+                _spec["preferredLaunchSecurity"] = self.preferred_launch_security
 
             if self.preferred_subdomain is not None:
                 _spec["preferredSubdomain"] = self.preferred_subdomain

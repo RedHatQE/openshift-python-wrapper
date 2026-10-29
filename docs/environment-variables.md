@@ -1,33 +1,3 @@
-Let me start by reading the knowledge graph and page manifest, then explore the codebase for environment variables.
-
-Now let me look at the `keys_to_hash` and hash-related functionality more closely:
-
-Now let me look at the `get_logger` import and how log levels work:
-
-Now let me check for any CI/CD or config-related environment variables:
-
-Let me also look for any validation-related environment variables and enable_validation_by_default:
-
-Now let me look at the `get_logger` usage and the `simple_logger` format:
-
-Now let me check the deploy() and clean_up() methods more carefully, and also the hash_resource_dict method:
-
-Let me also check how `replace_key_with_hashed_value` is defined:
-
-Now let me check the MCP server for environment variables:
-
-Now let me check if there are any other environment variable usages in the class_generator:
-
-Let me verify there are no other env vars in tests:
-
-Let me also check the full `get_client` function and the `save_kubeconfig` function:
-
-Now let me look for any additional environment variables in fake_kubernetes_client:
-
-Let me look at how the deploy and clean_up methods use the skip logic:
-
-Now I have all the information needed. Let me write the documentation:
-
 # Environment Variables and Configuration
 
 This page documents all environment variables recognized by `openshift-python-wrapper` at runtime. These variables control logging behavior, resource lifecycle operations, proxy configuration, cluster connectivity, and sensitive data hashing.

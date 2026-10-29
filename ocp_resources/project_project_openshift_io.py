@@ -26,7 +26,7 @@ class Project(Resource):
     ) -> None:
         r"""
         Args:
-            finalizers (list[Any]): Finalizers is an opaque list of values that must be empty to
+            finalizers (list[Any]): finalizers is an opaque list of values that must be empty to
               permanently remove object from storage
 
         """
@@ -35,6 +35,7 @@ class Project(Resource):
         self.finalizers = finalizers
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

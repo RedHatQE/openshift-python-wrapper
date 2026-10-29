@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>class-generator CLI Reference - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link active" aria-current="page">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link active" aria-current="page">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,14 +245,9 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>I'll start by reading the knowledge graph and page manifest, then explore the class-generator source code in detail.</p>
-<p>Now let me check the entry point configuration and any additional schema-related functions:</p>
-<p>Now let me check the test files for CLI tests and the entry point:</p>
-<p>Now let me check the parsers and any additional CLI-relevant components:</p>
-<p>Now I have all the information I need. Let me compile the comprehensive CLI reference page.</p>
-<h1 id="class-generator-cli-reference">class-generator CLI Reference</h1>
+                    <h1 id="class-generator-cli-reference">class-generator CLI Reference</h1>
 <p>The <code>class-generator</code> command generates Python wrapper classes for Kubernetes and OpenShift resources. It is installed as a console script entry point from the <code>openshift-python-wrapper</code> package.</p>
-<div class="highlight"><pre><span></span><code>class-generator = &quot;class_generator.cli:main&quot;
+<div class="highlight"><pre><span></span><code>class-generator = "class_generator.cli:main"
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>openshift-python-wrapper
@@ -291,11 +265,11 @@ if type class-generator &gt; /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=z
 </code></pre></div>
 
 <p>At least one action option must be specified: <code>--kind</code>, <code>--update-schema</code>, <code>--update-schema-for</code>, <code>--discover-missing</code>, <code>--coverage-report</code>, <code>--generate-missing</code>, or <code>--regenerate-all</code>.</p>
-<hr />
+<hr>
 <h2 id="options-reference">Options Reference</h2>
 <h3 id="kind-generation">Kind Generation</h3>
 <h4 id="-k-kind"><code>-k</code>, <code>--kind</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -320,7 +294,7 @@ if type class-generator &gt; /dev/null; then eval "$(_CLASS_GENERATOR_COMPLETE=z
 <td>Connected cluster with admin privileges</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Generate Python wrapper classes for the specified Kubernetes resource Kind(s). Multiple kinds can be comma-separated (no spaces).</p>
 <p>When a kind is not found in the local schema mapping file, the CLI interactively prompts to run <code>--update-schema</code> (only in interactive CLI mode).</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Single kind</span>
@@ -335,9 +309,9 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>Deployment,Pod,
 dns_operator_openshift_io.py
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-o-output-file"><code>-o</code>, <code>--output-file</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -358,7 +332,7 @@ dns_operator_openshift_io.py
 <td>No</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Override the output file path for the generated Python module. If not provided, the filename is derived from the Kind using <code>convert_camel_case_to_snake_case</code>.</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod<span class="w"> </span>-o<span class="w"> </span>my_custom_pod.py
 </code></pre></div>
@@ -366,9 +340,9 @@ dns_operator_openshift_io.py
 <blockquote>
 <p><strong>Note:</strong> When generating multiple comma-separated kinds, the <code>--output-file</code> value applies to all kinds. For independent output paths, run separate commands.</p>
 </blockquote>
-<hr />
+<hr>
 <h4 id="-overwrite"><code>--overwrite</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -385,15 +359,15 @@ dns_operator_openshift_io.py
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Overwrite an existing output file. Without this flag, if the target file already exists, a <code>_TEMP.py</code> suffixed file is created instead.</p>
 <p>When overwriting, any user-added code blocks (code after the <code># End of generated code</code> marker) and user imports are preserved in the regenerated file.</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod<span class="w"> </span>--overwrite
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-dry-run"><code>--dry-run</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -410,14 +384,14 @@ dns_operator_openshift_io.py
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Preview the generated output without writing any files. The generated Python code is printed to the console with syntax highlighting and line numbers using Rich.</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod<span class="w"> </span>--dry-run
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-backup"><code>--backup</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -438,7 +412,7 @@ dns_operator_openshift_io.py
 <td><code>--regenerate-all</code> or <code>--overwrite</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Create a timestamped backup of existing files before overwriting or regenerating. Backups are stored in <code>.backups/backup-YYYYMMDD-HHMMSS/</code> preserving the original directory structure.</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod<span class="w"> </span>--overwrite<span class="w"> </span>--backup
 </code></pre></div>
@@ -446,10 +420,10 @@ dns_operator_openshift_io.py
 <blockquote>
 <p><strong>Note:</strong> Using <code>--backup</code> without either <code>--regenerate-all</code> or <code>--overwrite</code> results in a constraint error.</p>
 </blockquote>
-<hr />
+<hr>
 <h3 id="test-generation">Test Generation</h3>
 <h4 id="-add-tests"><code>--add-tests</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -470,7 +444,7 @@ dns_operator_openshift_io.py
 <td><code>-k</code>/<code>--kind</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Generate test files for the specified Kind and run them. This performs two actions:</p>
 <ol>
 <li>Generates a test manifest in <code>class_generator/tests/manifests/&lt;Kind&gt;/</code> and regenerates <code>class_generator/tests/test_class_generator.py</code> from the Jinja2 template.</li>
@@ -482,10 +456,10 @@ dns_operator_openshift_io.py
 <blockquote>
 <p><strong>Warning:</strong> <code>--add-tests</code> cannot be used without <code>-k</code>/<code>--kind</code>. Running <code>class-generator --add-tests</code> alone exits with a non-zero status.</p>
 </blockquote>
-<hr />
+<hr>
 <h3 id="schema-management">Schema Management</h3>
 <h4 id="-update-schema"><code>--update-schema</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -510,14 +484,14 @@ dns_operator_openshift_io.py
 <td><code>--update-schema-for</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Fetch all resource schemas from the connected cluster's OpenAPI v3 endpoints and update the local schema files:</p>
 <ul>
 <li><code>class_generator/schema/__resources-mappings.json</code> (compressed as <code>.json.gz</code>)</li>
 <li><code>class_generator/schema/_definitions.json</code></li>
 </ul>
 <p>The update strategy depends on the cluster version:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Cluster Version</th>
@@ -534,7 +508,7 @@ dns_operator_openshift_io.py
 <td>Incremental — only adds missing resources, preserves existing schemas</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>When used alone, exits after updating. When combined with <code>--generate-missing</code>, continues to resource generation after the update.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Update schema only</span>
 class-generator<span class="w"> </span>--update-schema
@@ -546,9 +520,9 @@ class-generator<span class="w"> </span>--update-schema<span class="w"> </span>--
 <blockquote>
 <p><strong>Note:</strong> When <code>--update-schema</code> is used without <code>--generate-missing</code>, it cannot be combined with <code>-k</code>, <code>--discover-missing</code>, <code>--coverage-report</code>, <code>--dry-run</code>, <code>--overwrite</code>, <code>-o</code>, <code>--add-tests</code>, or <code>--regenerate-all</code>.</p>
 </blockquote>
-<hr />
+<hr>
 <h4 id="-update-schema-for"><code>--update-schema-for</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -573,7 +547,7 @@ class-generator<span class="w"> </span>--update-schema<span class="w"> </span>--
 <td><code>--update-schema</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Update the schema for a single resource Kind without affecting other resources. The Kind name is <strong>case-sensitive</strong>.</p>
 <p>This fetches only the API paths relevant to the specified Kind, updates (or adds) its schema in the mapping file, and exits.</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--update-schema-for<span class="w"> </span>LlamaStackDistribution
@@ -591,7 +565,7 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>LlamaStackDistr
 </code></pre></div>
 
 <p><strong>Errors:</strong></p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Error</th>
@@ -608,14 +582,14 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>LlamaStackDistr
 <td>API paths not found or schema extraction failed</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Note:</strong> Cannot be combined with <code>-k</code>, <code>--discover-missing</code>, <code>--coverage-report</code>, <code>--generate-missing</code>, or <code>--regenerate-all</code>.</p>
 </blockquote>
-<hr />
+<hr>
 <h3 id="coverage-and-discovery">Coverage and Discovery</h3>
 <h4 id="-discover-missing"><code>--discover-missing</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -632,14 +606,14 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>LlamaStackDistr
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Analyze resource coverage by comparing schema-mapped resources against implemented wrapper classes in <code>ocp_resources/</code>. Generates a console report showing coverage statistics and missing resources.</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--discover-missing
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-coverage-report"><code>--coverage-report</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -656,9 +630,9 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>LlamaStackDistr
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Generate a detailed coverage report showing:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Metric</th>
@@ -687,7 +661,7 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>LlamaStackDistr
 <td>Resource classes without the generated marker</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <div class="highlight"><pre><span></span><code><span class="c1"># Console output (default)</span>
 class-generator<span class="w"> </span>--coverage-report
 
@@ -695,9 +669,9 @@ class-generator<span class="w"> </span>--coverage-report
 class-generator<span class="w"> </span>--coverage-report<span class="w"> </span>--json
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-json"><code>--json</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -714,19 +688,19 @@ class-generator<span class="w"> </span>--coverage-report<span class="w"> </span>
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Output reports in JSON format instead of Rich console tables. Applies to <code>--coverage-report</code>, <code>--discover-missing</code>, and <code>--generate-missing</code>.</p>
 <p>The JSON output structure:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;generated_resources&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ConfigMap&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Deployment&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Pod&quot;</span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;manual_resources&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;VirtualMachine&quot;</span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;missing_resources&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Binding&quot;</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ComponentStatus&quot;</span><span class="p">}],</span>
-<span class="w">  </span><span class="nt">&quot;coverage_stats&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;total_in_mapping&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;total_generated&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">197</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;total_manual&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;coverage_percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">49.25</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;missing_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">203</span>
+<span class="w">  </span><span class="nt">"generated_resources"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"ConfigMap"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Deployment"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"manual_resources"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"VirtualMachine"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"missing_resources"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Binding"</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="nt">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ComponentStatus"</span><span class="p">}],</span>
+<span class="w">  </span><span class="nt">"coverage_stats"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"total_in_mapping"</span><span class="p">:</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"total_generated"</span><span class="p">:</span><span class="w"> </span><span class="mi">197</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"total_manual"</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"coverage_percentage"</span><span class="p">:</span><span class="w"> </span><span class="mf">49.25</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"missing_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">203</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -734,9 +708,9 @@ class-generator<span class="w"> </span>--coverage-report<span class="w"> </span>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--coverage-report<span class="w"> </span>--json
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-generate-missing"><code>--generate-missing</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -753,7 +727,7 @@ class-generator<span class="w"> </span>--coverage-report<span class="w"> </span>
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Generate wrapper classes for all resources found in the schema mapping that do not yet have generated files. Each missing resource Kind is passed to <code>class_generator()</code> individually.</p>
 <p>Can be combined with <code>--update-schema</code> to first refresh the schema, then generate all missing classes.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Generate missing resources</span>
@@ -766,10 +740,10 @@ class-generator<span class="w"> </span>--update-schema<span class="w"> </span>--
 class-generator<span class="w"> </span>--generate-missing<span class="w"> </span>--dry-run
 </code></pre></div>
 
-<hr />
+<hr>
 <h3 id="batch-regeneration">Batch Regeneration</h3>
 <h4 id="-regenerate-all"><code>--regenerate-all</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -786,7 +760,7 @@ class-generator<span class="w"> </span>--generate-missing<span class="w"> </span
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Regenerate all existing generated resource classes using the latest schemas. Only files containing the <code># Generated using</code> marker in <code>ocp_resources/</code> are processed.</p>
 <p>Regeneration runs in parallel (up to 10 workers). User-added code (below <code># End of generated code</code>) is preserved during regeneration.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Regenerate all resources</span>
@@ -799,7 +773,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--dry-run
 
 <span class="c1"># Filter to specific resources</span>
-class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;Pod*&quot;</span>
+class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">"Pod*"</span>
 </code></pre></div>
 
 <p>Output summary:</p>
@@ -807,9 +781,9 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 Backup files stored in: .backups/backup-20260705-143022
 </code></pre></div>
 
-<hr />
+<hr>
 <h4 id="-filter"><code>--filter</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -830,22 +804,137 @@ Backup files stored in: .backups/backup-20260705-143022
 <td><code>--regenerate-all</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Filter which resources to regenerate using a glob pattern matched against the resource Kind name. Uses <code>fnmatch</code> semantics.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Regenerate only Pod-related resources</span>
-class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;Pod*&quot;</span>
+class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">"Pod*"</span>
 
-<span class="c1"># Regenerate resources ending in &quot;Service&quot;</span>
-class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;*Service&quot;</span>
+<span class="c1"># Regenerate resources ending in "Service"</span>
+class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">"*Service"</span>
 
 <span class="c1"># Regenerate a specific resource</span>
-class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">&quot;VirtualMachine&quot;</span>
+class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--filter<span class="w"> </span><span class="s2">"VirtualMachine"</span>
 </code></pre></div>
 
-<hr />
+<hr>
+<h3 id="verification">Verification</h3>
+<p>Verify that generated files still match what class-generator would produce. No file is modified.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--verify</code></td>
+<td>Verify the kinds passed via <code>--kind</code></td>
+</tr>
+<tr>
+<td><code>--verify-all</code></td>
+<td>Verify every generated resource; combine with <code>--filter</code> to narrow the scope</td>
+</tr>
+<tr>
+<td><code>--verify-changed</code></td>
+<td>Verify only resources changed relative to <code>--base</code>; untouched files are not checked</td>
+</tr>
+<tr>
+<td><code>--base TEXT</code></td>
+<td>Ref compared against by <code>--verify-changed</code>. Defaults to the current branch's upstream, then to the clone's remote HEAD; the ref is fetched when the clone lacks it and the diff uses the merge base</td>
+</tr>
+<tr>
+<td><code>--classification TEXT</code></td>
+<td>Comma-separated drift classifications; only files matching them are reported and fail the run</td>
+</tr>
+<tr>
+<td><code>--match</code></td>
+<td>Require the drift to be <em>within</em> <code>--classification</code> (a subset) instead of merely containing one of them</td>
+</tr>
+<tr>
+<td><code>--exclude TEXT</code></td>
+<td>Drop files whose drift contains any of these classifications, leaving only drift that is safe to regenerate</td>
+</tr>
+<tr>
+<td><code>--jobs INTEGER</code></td>
+<td>Resources verified in parallel (default 10)</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>--classification</code>, <code>--match</code> and <code>--exclude</code> require a verify mode; unknown
+classifications are rejected with the list of valid values.</p>
+<p>Every reported file is generator output, so the printed repair command is the plain
+per-kind form:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--kind<span class="w"> </span>Deployment<span class="w"> </span>--overwrite
+</code></pre></div>
+
+<p>Only files whose name class-generator writes are verified (<code>&lt;kind&gt;.py</code>, or
+<code>&lt;kind&gt;_&lt;api-group&gt;.py</code> for a kind in several groups). A copied file under another name
+is not generator output and is ignored.</p>
+<h4 id="drift-classifications">Drift classifications</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Classification</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>blank lines</code></td>
+<td>Only blank-line differences</td>
+</tr>
+<tr>
+<td><code>docstring add</code> / <code>docstring delete</code></td>
+<td>Docstring text differs</td>
+</tr>
+<tr>
+<td><code>code add</code> / <code>code delete</code></td>
+<td>Code lines differ</td>
+</tr>
+<tr>
+<td><code>signature code add</code></td>
+<td>Parameters were added (all generated parameters carry defaults, so this is not breaking)</td>
+</tr>
+<tr>
+<td><code>signature code remove</code></td>
+<td>Parameters were removed</td>
+</tr>
+<tr>
+<td><code>breaking change</code></td>
+<td>A caller-visible break: a parameter was removed, a parameter became required, a parameter is emitted under a different API key, the base class changed, or <code>api_group</code>/<code>api_version</code> changed</td>
+</tr>
+<tr>
+<td><code>schema incomplete</code></td>
+<td>The rendered class has no parameters while the file has some — an unresolvable <code>$ref</code>. Reported in addition to <code>breaking change</code></td>
+</tr>
+<tr>
+<td><code>file does not exist</code></td>
+<td>The expected generated file is missing (or was deleted on this branch)</td>
+</tr>
+<tr>
+<td><code>formatting failed</code></td>
+<td>The rendered output could not be formatted</td>
+</tr>
+<tr>
+<td><code>not in schema</code></td>
+<td>The kind is absent from the resources mapping</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>code delete</code> on its own is not breaking: it also covers guard lines removed when a
+field becomes optional, rewritten statements and reflowed code.</p>
+<h4 id="exit-status">Exit status</h4>
+<p><code>0</code> when everything matches, <code>1</code> when any file drifted or could not be verified.</p>
+<h4 id="ci">CI</h4>
+<p><code>tox -e validate-generated</code> runs <code>--verify-changed</code> with no arguments, so tox stays
+CI-independent:</p>
+<div class="highlight"><pre><span></span><code>tox<span class="w"> </span>-e<span class="w"> </span>validate-generated
+</code></pre></div>
+
 <h3 id="logging">Logging</h3>
 <h4 id="-v-verbose"><code>-v</code>, <code>--verbose</code></h4>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -862,7 +951,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td><code>False</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Enable verbose output with debug-level logs. Sets <code>DEBUG</code> level on the following loggers:</p>
 <ul>
 <li><code>class_generator.core.schema</code></li>
@@ -876,10 +965,10 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>Pod<span class="w"> </span>-v
 </code></pre></div>
 
-<hr />
+<hr>
 <h2 id="constraint-rules">Constraint Rules</h2>
 <p>The CLI enforces the following option constraints:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Constraint</th>
@@ -905,15 +994,31 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 </tr>
 <tr>
 <td><code>--filter</code></td>
-<td>Requires <code>--regenerate-all</code></td>
+<td>Requires <code>--regenerate-all</code>, <code>--verify-all</code> or <code>--verify-changed</code></td>
+</tr>
+<tr>
+<td><code>--verify</code> / <code>--verify-all</code> / <code>--verify-changed</code></td>
+<td>Mutually exclusive, and cannot combine with <code>--regenerate-all</code>, <code>--backup</code>, <code>--overwrite</code>, <code>--add-tests</code> or <code>--dry-run</code></td>
+</tr>
+<tr>
+<td><code>--verify</code></td>
+<td>Requires <code>--kind</code></td>
+</tr>
+<tr>
+<td><code>--classification</code> / <code>--exclude</code></td>
+<td>Require a verify mode</td>
+</tr>
+<tr>
+<td><code>--match</code></td>
+<td>Requires <code>--classification</code></td>
 </tr>
 <tr>
 <td>No options</td>
 <td>Exits with error — at least one action required</td>
 </tr>
 </tbody>
-</table>
-<hr />
+</table></div>
+<hr>
 <h2 id="execution-order">Execution Order</h2>
 <p>When multiple compatible options are specified together, the CLI processes them in this fixed order:</p>
 <ol>
@@ -921,13 +1026,14 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <li><code>--update-schema</code> (exits unless <code>--generate-missing</code> is also set)</li>
 <li><code>--coverage-report</code> / <code>--discover-missing</code> / <code>--generate-missing</code> (coverage analysis and reporting)</li>
 <li><code>--generate-missing</code> (generates classes for missing resources)</li>
+<li><code>--verify</code> / <code>--verify-all</code> / <code>--verify-changed</code> (verification, exits after completion)</li>
 <li><code>--regenerate-all</code> (batch regeneration, exits after completion)</li>
 <li><code>-k</code>/<code>--kind</code> (normal kind generation)</li>
 <li><code>--add-tests</code> (test generation and execution)</li>
 </ol>
-<hr />
+<hr>
 <h2 id="exit-codes">Exit Codes</h2>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Code</th>
@@ -948,26 +1054,26 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Invalid CLI arguments or constraint violation</td>
 </tr>
 </tbody>
-</table>
-<hr />
+</table></div>
+<hr>
 <h2 id="programmatic-api">Programmatic API</h2>
 <p>The generation logic can be invoked directly from Python. See <a href="generating-resource-classes.html">Generating New Resource Classes with class-generator</a> for usage examples.</p>
 <h3 id="class_generatorcoregeneratorclass_generator"><code>class_generator.core.generator.class_generator()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">class_generator</span>
 
 <span class="n">generated_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_generator</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;Pod&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"Pod"</span><span class="p">,</span>
     <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">output_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">output_file</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
     <span class="n">add_tests</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">called_from_cli</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">update_schema_executed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -1026,29 +1132,29 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Whether schema update was already performed</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>list[str]</code> — List of generated file paths. Empty list if the kind is not found in the schema mapping (when <code>called_from_cli=False</code>).</p>
 <p><strong>Raises:</strong></p>
 <ul>
 <li><code>RuntimeError</code> — Kind not found after schema update, or user declined schema update</li>
 <li><code>ValueError</code> — Generated filename contains invalid patterns (single-letter segments)</li>
 </ul>
-<hr />
+<hr>
 <h3 id="class_generatorcoregeneratorgenerate_resource_file_from_dict"><code>class_generator.core.generator.generate_resource_file_from_dict()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_resource_file_from_dict</span>
 
 <span class="n">orig_filename</span><span class="p">,</span> <span class="n">generated_filename</span> <span class="o">=</span> <span class="n">generate_resource_file_from_dict</span><span class="p">(</span>
-    <span class="n">resource_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;Pod&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">},</span>
+    <span class="n">resource_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"Pod"</span><span class="p">,</span> <span class="o">...</span><span class="p">},</span>
     <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">output_file</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">output_file</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
     <span class="n">add_tests</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">output_file_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">output_file_suffix</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -1101,16 +1207,16 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Output directory (defaults to <code>ocp_resources</code>)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>tuple[str, str]</code> — <code>(original_filename, generated_filename)</code>. These differ when a <code>_TEMP.py</code> file is created.</p>
-<hr />
+<hr>
 <h3 id="class_generatorcoreschemaupdate_kind_schema"><code>class_generator.core.schema.update_kind_schema()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_kind_schema</span>
 
 <span class="n">update_kind_schema</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -1127,21 +1233,21 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Path to <code>oc</code>/<code>kubectl</code> binary. Auto-detected if <code>None</code>.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Raises:</strong></p>
 <ul>
 <li><code>ClusterVersionError</code> — Cannot determine cluster version</li>
 <li><code>RuntimeError</code> — Failed to fetch OpenAPI v3 index</li>
 <li><code>OSError</code> — Failed to write schema files</li>
 </ul>
-<hr />
+<hr>
 <h3 id="class_generatorcoreschemaupdate_single_resource_schema"><code>class_generator.core.schema.update_single_resource_schema()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_single_resource_schema</span>
 
-<span class="n">update_single_resource_schema</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;LlamaStackDistribution&quot;</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">update_single_resource_schema</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"LlamaStackDistribution"</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -1164,20 +1270,20 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Path to <code>oc</code>/<code>kubectl</code> binary. Auto-detected if <code>None</code>.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Raises:</strong></p>
 <ul>
 <li><code>ResourceNotFoundError</code> — Kind not found on the cluster</li>
 <li><code>RuntimeError</code> — Schema extraction or save failed</li>
 </ul>
-<hr />
+<hr>
 <h3 id="class_generatorcorecoverageanalyze_coverage"><code>class_generator.core.coverage.analyze_coverage()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.coverage</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze_coverage</span>
 
-<span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">analyze_coverage</span><span class="p">(</span><span class="n">resources_dir</span><span class="o">=</span><span class="s2">&quot;ocp_resources&quot;</span><span class="p">)</span>
+<span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">analyze_coverage</span><span class="p">(</span><span class="n">resources_dir</span><span class="o">=</span><span class="s2">"ocp_resources"</span><span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -1194,9 +1300,9 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Directory to scan for wrapper classes</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>dict[str, Any]</code> with keys:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Key</th>
@@ -1226,8 +1332,8 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Statistics including <code>total_in_mapping</code>, <code>total_generated</code>, <code>total_manual</code>, <code>coverage_percentage</code>, <code>missing_count</code></td>
 </tr>
 </tbody>
-</table>
-<hr />
+</table></div>
+<hr>
 <h3 id="class_generatorcorediscoverydiscover_generated_resources"><code>class_generator.core.discovery.discover_generated_resources()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.discovery</span><span class="w"> </span><span class="kn">import</span> <span class="n">discover_generated_resources</span>
 
@@ -1235,7 +1341,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 </code></pre></div>
 
 <p><strong>Returns:</strong> <code>list[dict[str, Any]]</code> — Each dict contains:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Key</th>
@@ -1265,8 +1371,8 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Whether file contains user modifications below <code># End of generated code</code></td>
 </tr>
 </tbody>
-</table>
-<hr />
+</table></div>
+<hr>
 <h3 id="class_generatorcorediscoverydiscover_cluster_resources"><code>class_generator.core.discovery.discover_cluster_resources()</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.discovery</span><span class="w"> </span><span class="kn">import</span> <span class="n">discover_cluster_resources</span>
 
@@ -1276,7 +1382,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -1299,17 +1405,17 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Filter by API group name</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>dict[str, list[dict[str, Any]]]</code> — Mapping of API version to list of resource dicts (<code>name</code>, <code>kind</code>, <code>namespaced</code>).</p>
 <p><strong>Raises:</strong> <code>ValueError</code> — If client is not a <code>DynamicClient</code> instance.</p>
-<hr />
+<hr>
 <h2 id="exceptions">Exceptions</h2>
 <h3 id="class_generatorexceptionsresourcenotfounderror"><code>class_generator.exceptions.ResourceNotFoundError</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceNotFoundError</span>
 </code></pre></div>
 
 <p>Raised when a resource Kind is not found in the schema mapping or on the cluster.</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Attribute</th>
@@ -1324,16 +1430,16 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>The Kind that was not found</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="class_generatorcoreschemaclusterversionerror"><code>class_generator.core.schema.ClusterVersionError</code></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">class_generator.core.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterVersionError</span>
 </code></pre></div>
 
 <p>Raised when the cluster version cannot be determined (client binary missing, cluster unreachable, or authentication failure).</p>
-<hr />
+<hr>
 <h2 id="schema-files">Schema Files</h2>
 <p>The CLI manages two schema files under <code>class_generator/schema/</code>:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>File</th>
@@ -1354,9 +1460,9 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <td>Last cluster version used for schema generation</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>See <a href="schema-validation-internals.html">Schema Validation and Code Generation Architecture</a> for details on how these files are structured and consumed.</p>
-<hr />
+<hr>
 <h2 id="common-workflows">Common Workflows</h2>
 <h3 id="generate-a-new-resource-class">Generate a new resource class</h3>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>-k<span class="w"> </span>MyCustomResource
@@ -1381,7 +1487,7 @@ class-generator<span class="w"> </span>-k<span class="w"> </span>MyNewCRD
 class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>--dry-run
 </code></pre></div>
 
-<hr />
+<hr>
 <h2 id="related-pages">Related Pages</h2>
 <ul>
 <li><a href="generating-resource-classes.html">Generating New Resource Classes with class-generator</a> — Step-by-step guide for scaffolding resource classes</li>
@@ -1402,15 +1508,15 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
             </article>
             <nav class="page-nav">
 
-                <a href="resource-api.html" class="page-nav-link page-nav-prev">
+                <a href="generating-resource-classes.html" class="page-nav-link page-nav-prev">
                     <span class="page-nav-label">Previous</span>
-                    <span class="page-nav-title">Resource and NamespacedResource API</span>
+                    <span class="page-nav-title">Generating New Resource Classes with class-generator</span>
                 </a>
 
 
-                <a href="environment-variables.html" class="page-nav-link page-nav-next">
+                <a href="common-patterns.html" class="page-nav-link page-nav-next">
                     <span class="page-nav-label">Next</span>
-                    <span class="page-nav-title">Environment Variables and Configuration</span>
+                    <span class="page-nav-title">Common Resource Patterns</span>
                 </a>
 
             </nav>
@@ -1427,6 +1533,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <li><a href="#schema-management">Schema Management</a></li>
 <li><a href="#coverage-and-discovery">Coverage and Discovery</a></li>
 <li><a href="#batch-regeneration">Batch Regeneration</a></li>
+<li><a href="#verification">Verification</a></li>
 <li><a href="#logging">Logging</a></li>
 </ul>
 </li>
@@ -1470,10 +1577,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -1481,13 +1585,14 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -1533,5 +1638,6 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>
