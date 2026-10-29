@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Docsfy - Documentation Theme (Warm Stone + Orange)
+   pi-docsite - Documentation Theme (Warm Stone + Orange)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -88,7 +88,11 @@
     --bg-tertiary: #44403c;
     --bg-sidebar: #292524;
     --bg-code: rgba(251, 191, 36, 0.15);
-    --bg-code-block: #1c1917;
+    /* Must differ from --bg-primary (#1c1917). It did not, so code blocks were
+     * invisible against the page in dark mode -- only the code text was legible
+     * and the block had no boundary at all. --bg-secondary is the palette's own
+     * next step up. */
+    --bg-code-block: #292524;
     --bg-card: #292524;
     --bg-search-result: #292524;
 
@@ -340,6 +344,10 @@ a:hover {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    /* Flex items default to min-width:auto, so a wide table inside made this grow
+     * past the viewport and put a scrollbar on the whole document. 0 lets it
+     * shrink so the table scrolls in its own box instead. */
+    min-width: 0;
     transition: margin-left var(--transition-normal);
 }
 
@@ -519,6 +527,33 @@ a:hover {
     overflow-x: auto;
     font-size: 0.875rem;
     line-height: 1.6;
+    /* Wrapping rather than scrolling: a clipped command is unreadable, and the
+     * horizontal scrollbar it produced also collided with the copy button in
+     * the block's top-right corner. Only 3 lines across docs/ exceed 110 chars
+     * and none of them are alignment-critical. */
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    /* Reserve room for the absolutely-positioned copy button even when the
+     * block is a single short line. A one-line block is only ~22px tall while
+     * the button plus its top offset needs ~28px, and the block is an overflow
+     * container, so without this it grew a scrollbar. */
+    min-height: 34px;
+    /* Anchors the .copy-btn and .code-label, which are appended as children by
+     * copy.js and codelabels.js and positioned with position:absolute. Without
+     * this they resolve against the page instead of the code box, so the copy
+     * button and language label drift to wherever the block happens to sit. */
+    position: relative;
+}
+
+.article-body .table-wrap {
+    /* Wide tables scroll inside their own box instead of widening the page. */
+    overflow-x: auto;
+    margin-bottom: 24px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.article-body .table-wrap > table {
+    margin-bottom: 0;
 }
 
 .article-body .highlight {
@@ -527,10 +562,15 @@ a:hover {
     padding: 16px 20px;
     overflow-x: auto;
     margin-bottom: 24px;
+    /* Same reason as .article-body pre: this wrapper is what a .code-label is
+     * attached to when the block has one. */
+    position: relative;
 }
 
 .article-body .highlight pre {
     margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
     background: transparent;
     padding: 0;
     color: var(--text-code-block);
@@ -1065,6 +1105,12 @@ details > ol:last-child {
 }
 
 @media (max-width: 480px) {
+    /* Below this the top bar cannot fit the brand and the search/badge cluster
+     * without crowding. The sidebar carries the same brand, and the hamburger
+     * opens it, so hiding the duplicate is cleaner than shrinking it. */
+    .top-bar-title {
+        display: none;
+    }
     .index-title {
         font-size: 1.5rem;
     }
@@ -1129,7 +1175,19 @@ details > ol:last-child {
     position: absolute;
     top: 8px;
     right: 8px;
-    padding: 4px 10px;
+    /* Above the code text and the block's own scrollbar, which both sit in the
+     * same corner region on a short block. */
+    z-index: 2;
+    /* Must stay shorter than one line of code (~22px at this font-size). The
+     * block is an overflow container, so a taller button makes a single-line
+     * block scroll vertically and produces a scrollbar next to the code. */
+    padding: 3px;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
     font-size: 0.75rem;
     background: var(--bg-secondary);
     color: var(--text-secondary);
@@ -1152,6 +1210,13 @@ pre:hover .copy-btn {
 }
 
 .copy-btn:hover {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
+}
+
+/* Success/failure state: the icon changes, so colour alone carries the result. */
+.copy-btn.copied {
     background: var(--accent);
     color: var(--accent-contrast);
     border-color: var(--accent);
@@ -1330,6 +1395,13 @@ pre:hover .copy-btn {
     color: var(--text-primary);
     text-decoration: none;
     letter-spacing: -0.01em;
+    /* Never break the project name across lines. It sat in a cramped flex row
+     * next to the search field and badge, and wrapped to two lines at narrow
+     * widths, which reads as a layout bug rather than a design. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .top-bar-title:hover {
@@ -1416,6 +1488,7 @@ pre:hover .copy-btn {
     position: absolute;
     top: 8px;
     right: 60px;
+    z-index: 2;
     font-size: 0.7rem;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -1424,9 +1497,9 @@ pre:hover .copy-btn {
 }
 
 /* --------------------------------------------------------------------------
-   docsfy Branding Badge
+   Generator Branding Badge
    -------------------------------------------------------------------------- */
-.docsfy-badge {
+.docsite-badge {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -1441,7 +1514,7 @@ pre:hover .copy-btn {
     white-space: nowrap;
 }
 
-.docsfy-badge:hover {
+.docsite-badge:hover {
     border-color: var(--accent);
     background: var(--accent-light);
 }

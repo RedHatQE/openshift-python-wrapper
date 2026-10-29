@@ -1,6 +1,6 @@
 """Tests for schema loading functionality."""
 
-from unittest.mock import mock_open, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -70,25 +70,26 @@ class TestSchemaLoading:
         """Test successful loading of mappings data."""
         mock_mappings_data = {"pod": [{"type": "object"}]}
 
-        # Mock the archive loading function and file operations
+        # Both the mappings and the definitions are gzipped archives
+        mock_definitions_data = {"definitions": {"SomeDefinition": {"type": "string"}}}
+
         with patch("ocp_resources.utils.schema_validator.load_json_archive") as mock_load_archive:
-            mock_load_archive.return_value = mock_mappings_data
+            mock_load_archive.side_effect = [mock_mappings_data, mock_definitions_data]
 
-            with patch("builtins.open", mock_open(read_data='{"definitions": {"SomeDefinition": {"type": "string"}}}')):
-                # Mock Path.exists() method
-                with patch("pathlib.Path.exists") as mock_exists:
-                    mock_exists.return_value = True
+            # Mock Path.exists() method
+            with patch("pathlib.Path.exists") as mock_exists:
+                mock_exists.return_value = True
 
-                    result = SchemaValidator.load_mappings_data()
+                result = SchemaValidator.load_mappings_data()
 
-                    assert result is True
-                    mappings_data = SchemaValidator.get_mappings_data()
-                    assert mappings_data is not None
-                    assert "pod" in mappings_data
+                assert result is True
+                mappings_data = SchemaValidator.get_mappings_data()
+                assert mappings_data is not None
+                assert "pod" in mappings_data
 
-                    definitions_data = SchemaValidator.get_definitions_data()
-                    assert definitions_data is not None
-                    assert "SomeDefinition" in definitions_data
+                definitions_data = SchemaValidator.get_definitions_data()
+                assert definitions_data is not None
+                assert "SomeDefinition" in definitions_data
 
     def test_load_mappings_data_already_loaded(self, monkeypatch):
         """Test that mappings data is not reloaded if already present."""

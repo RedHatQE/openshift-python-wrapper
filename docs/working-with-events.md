@@ -1,31 +1,3 @@
-Let me start by exploring the repository structure and the knowledge graph.
-
-Now let me explore the Event-related source code:
-
-Now let me look at the `_build_event_field_selector` function and related event test files:
-
-Now let me check the `events` test files in the tests directory:
-
-Now let me check the resource.py import and the `events` method more carefully, and also look at how TIMEOUT_4MINUTES is defined:
-
-Let me check where TIMEOUT_4MINUTES is defined in resource.py:
-
-Now let me check the constants value for TIMEOUT_4MINUTES:
-
-Now let me check how the Event class is used in the fake client:
-
-Now let me look at the `_extract_event_info` and the `_process_watch_events` functions to understand the event data structure better:
-
-Now let me look at the event object structure from watch events:
-
-Now let me check how to properly import and use Event:
-
-Let me also look at the test file for events in more detail:
-
-Now let me check the watch method's return structure for events:
-
-Now I have a thorough understanding. Let me write the documentation.
-
 # Working with Kubernetes Events
 
 Monitor, retrieve, and clean up Kubernetes events to debug resource behavior and automate event-driven workflows using the `Event` class and the `resource.events()` method.

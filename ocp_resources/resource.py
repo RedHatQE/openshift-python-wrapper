@@ -596,6 +596,7 @@ class Resource(ResourceConstants):
         QUOTA_OPENSHIFT_IO: str = "quota.openshift.io"
         RBAC_AUTHORIZATION_K8S_IO: str = "rbac.authorization.k8s.io"
         REMEDIATION_MEDIK8S_IO: str = "remediation.medik8s.io"
+        RESOURCE_K8S_IO: str = "resource.k8s.io"
         RHTAS_REDHAT_COM: str = "rhtas.redhat.com"
         RIPSAW_CLOUDBULLDOZER_IO: str = "ripsaw.cloudbulldozer.io"
         ROUTE_OPENSHIFT_IO: str = "route.openshift.io"

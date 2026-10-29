@@ -4,7 +4,7 @@
 
 Pypi: [openshift-python-wrapper](https://pypi.org/project/openshift-python-wrapper)  
 A python wrapper for [kubernetes-python-client](https://github.com/kubernetes-client/python) with support for [RedHat Container Virtualization](https://www.openshift.com/learn/topics/virtualization)  
-Docs: [openshift-python-wrapper docs](https://openshift-python-wrapper.readthedocs.io/en/latest/)
+Docs: [openshift-python-wrapper docs](https://redhatqe.github.io/openshift-python-wrapper/)
 
 The wrapper offers a simple and intuitive interface for interacting with the API.  
 It standardizes how to work with cluster resources and offers unified resource CRUD (Create, Read, Update, and Delete) flows.  
@@ -13,9 +13,8 @@ The wrapper makes code easier to read and maintain over time.
 
 One example of simplified usage is interacting with a container.  
 Running a command inside a container requires using Kubernetes stream, handling errors, and more.  
-The wrapper handles it all and provides simple and intuitive functionality.
-
-![Alt Text](examples/pod_example.gif)
+The wrapper handles it all and provides simple and intuitive functionality — see
+[Executing Commands in Pods and Retrieving Logs](https://redhatqe.github.io/openshift-python-wrapper/pod-execution-and-logs.html).
 
 Both developers or testers can use the wrapper. The code is modular and easy to maintain.  
 Instead of writing custom code for every API, you can use the wrapper that provides a consistent interface for interacting with APIs.  
@@ -87,7 +86,7 @@ release-it # Follow the instructions
 
 ## docs
 
-Hosted on readthedocs.io [openshift-python-wrapper](https://openshift-python-wrapper.readthedocs.io/en/latest/)
+Hosted on GitHub Pages [openshift-python-wrapper](https://redhatqe.github.io/openshift-python-wrapper/)
 
 ## PR dependency
 

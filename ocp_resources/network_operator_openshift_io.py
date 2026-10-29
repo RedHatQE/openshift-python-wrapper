@@ -30,10 +30,10 @@ class Network(Resource):
         log_level: str | None = None,
         management_state: str | None = None,
         migration: dict[str, Any] | None = None,
-        observed_config: Any | None = None,
+        observed_config: dict[str, Any] | None = None,
         operator_log_level: str | None = None,
         service_network: list[Any] | None = None,
-        unsupported_config_overrides: Any | None = None,
+        unsupported_config_overrides: dict[str, Any] | None = None,
         use_multi_network_policy: bool | None = None,
         **kwargs: Any,
     ) -> None:
@@ -103,7 +103,7 @@ class Network(Resource):
             migration (dict[str, Any]): migration enables and configures cluster network migration, for
               network changes that cannot be made instantly.
 
-            observed_config (Any): observedConfig holds a sparse config that controller has observed from
+            observed_config (dict[str, Any]): observedConfig holds a sparse config that controller has observed from
               the cluster state.  It exists in spec because it is an input to
               the level for the operator
 
@@ -117,7 +117,7 @@ class Network(Resource):
               Currently, all existing network providers only support a single
               value here, but this is an array to allow for growth.
 
-            unsupported_config_overrides (Any): unsupportedConfigOverrides overrides the final configuration that was
+            unsupported_config_overrides (dict[str, Any]): unsupportedConfigOverrides overrides the final configuration that was
               computed by the operator. Red Hat does not support the use of this
               field. Misuse of this field could lead to unexpected behavior or
               conflict with other configuration options. Seek guidance from the
@@ -157,6 +157,7 @@ class Network(Resource):
         self.use_multi_network_policy = use_multi_network_policy
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

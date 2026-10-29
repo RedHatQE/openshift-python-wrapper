@@ -25,6 +25,7 @@ class Image(Resource):
         additional_trusted_ca: dict[str, Any] | None = None,
         allowed_registries_for_import: list[Any] | None = None,
         external_registry_hostnames: list[Any] | None = None,
+        image_stream_import_mode: str | None = None,
         registry_sources: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
@@ -49,6 +50,23 @@ class Image(Resource):
               used in 'publicDockerImageRepository' field in ImageStreams. The
               value must be in "hostname[:port]" format.
 
+            image_stream_import_mode (str): imageStreamImportMode controls the import mode behaviour of
+              imagestreams. It can be set to `Legacy` or `PreserveOriginal` or
+              the empty string. If this value is specified, this setting is
+              applied to all newly created imagestreams which do not have the
+              value set. `Legacy` indicates that the legacy behaviour should be
+              used. For manifest lists, the legacy behaviour will discard the
+              manifest list and import a single sub-manifest. In this case, the
+              platform is chosen in the following order of priority: 1. tag
+              annotations; 2. control plane arch/os; 3. linux/amd64; 4. the
+              first manifest in the list. `PreserveOriginal` indicates that the
+              original manifest will be preserved. For manifest lists, the
+              manifest list and all its sub-manifests will be imported. When
+              empty, the behaviour will be decided based on the payload type
+              advertised by the ClusterVersion status, i.e single arch payload
+              implies the import mode is Legacy and multi payload implies
+              PreserveOriginal.
+
             registry_sources (dict[str, Any]): registrySources contains configuration that determines how the
               container runtime should treat individual registries when
               accessing images for builds+pods. (e.g. whether or not to allow
@@ -61,9 +79,11 @@ class Image(Resource):
         self.additional_trusted_ca = additional_trusted_ca
         self.allowed_registries_for_import = allowed_registries_for_import
         self.external_registry_hostnames = external_registry_hostnames
+        self.image_stream_import_mode = image_stream_import_mode
         self.registry_sources = registry_sources
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -78,6 +98,9 @@ class Image(Resource):
 
             if self.external_registry_hostnames is not None:
                 _spec["externalRegistryHostnames"] = self.external_registry_hostnames
+
+            if self.image_stream_import_mode is not None:
+                _spec["imageStreamImportMode"] = self.image_stream_import_mode
 
             if self.registry_sources is not None:
                 _spec["registrySources"] = self.registry_sources

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Understanding the Resource Class Hierarchy - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,23 +245,13 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by reading the exclusions file and pages manifest, then explore the codebase thoroughly.</p>
-<p>Now let me look at some generated resource subclasses to understand how they extend the base classes:</p>
-<p>Now let me look at some more examples - a cluster-scoped resource, the <code>ResourceConstants</code>, the class generator, and the <code>virtual_machine.py</code> for a more complex subclass:</p>
-<p>Now let me look at the <code>kind</code> property and how it's derived, plus some other resources for variety:</p>
-<p>Now let me look at how the <code>kind</code> property works (the <code>sub_resource_level</code> function) and the <code>conversion.py</code> for the kind name derivation:</p>
-<p>Now let me look at how resources discover their API version dynamically:</p>
-<p>Let me now look at one more important aspect - how the <code>get</code> method works differently in the two base classes, and how <code>_base_body</code> differs:</p>
-<p>Now let me check the <code>__init__.py</code> to see what's exported:</p>
-<p>Let me also check for examples:</p>
-<p>Now I have enough context to write the documentation. Let me draft it:</p>
-<h1 id="understanding-the-resource-class-hierarchy">Understanding the Resource Class Hierarchy</h1>
+                    <h1 id="understanding-the-resource-class-hierarchy">Understanding the Resource Class Hierarchy</h1>
 <p>Every Kubernetes and OpenShift object you interact with through openshift-python-wrapper — whether it's a Pod, a Namespace, or a VirtualMachine — is a Python class that inherits from a small set of base classes. Understanding how these classes relate to each other helps you know <strong>what capabilities any resource has</strong>, <strong>why some resources require a <code>namespace</code> argument and others don't</strong>, and <strong>how new resource types get added to the library</strong>.</p>
 <p>This page explains the architecture so you can use existing resources effectively and extend the library when you need to work with a new custom resource.</p>
-<hr />
+<hr>
 <h2 id="the-big-picture">The Big Picture</h2>
 <p>The class hierarchy has three conceptual layers:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Layer</th>
@@ -307,7 +276,7 @@
 <td>Represent specific Kubernetes/OpenShift resource kinds, adding kind-specific parameters and behavior</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The inheritance flows like this:</p>
 <div class="highlight"><pre><span></span><code>ResourceConstants
   └── Resource                  ← cluster-scoped resources (Node, Namespace, StorageClass, ClusterRole, …)
@@ -315,7 +284,7 @@
 </code></pre></div>
 
 <p>Every concrete resource class inherits from either <code>Resource</code> (for cluster-scoped resources) or <code>NamespacedResource</code> (for namespace-scoped resources). This single design decision controls whether the class requires a <code>namespace</code> argument and how it builds API requests.</p>
-<hr />
+<hr>
 <h2 id="key-concepts">Key Concepts</h2>
 <h3 id="resourceconstants-shared-vocabulary">ResourceConstants: Shared Vocabulary</h3>
 <p>At the root of the hierarchy sits <code>ResourceConstants</code>, which defines inner classes for common values:</p>
@@ -333,7 +302,7 @@
 <p>Concrete classes can extend these constants with kind-specific values. For example, <code>VirtualMachine</code> adds statuses like <code>MIGRATING</code>, <code>STOPPED</code>, and <code>PROVISIONING</code> to the base <code>Status</code> class.</p>
 <h3 id="resource-the-foundation-for-cluster-scoped-resources">Resource: The Foundation for Cluster-Scoped Resources</h3>
 <p><code>Resource</code> is the main base class. It provides everything needed to manage a Kubernetes resource:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Capability</th>
@@ -374,12 +343,12 @@
 <td>Automatic <code>api_version</code> resolution from the cluster when only <code>api_group</code> is set</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Resources that exist at the cluster level — not inside any namespace — inherit directly from <code>Resource</code>. Examples include <code>Namespace</code>, <code>Node</code>, <code>StorageClass</code>, <code>ClusterRole</code>, and <code>CustomResourceDefinition</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
 <span class="c1"># No namespace argument needed — Namespace is cluster-scoped</span>
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 </code></pre></div>
 
 <h4 id="automatic-kind-detection">Automatic Kind Detection</h4>
@@ -395,6 +364,7 @@
     <span class="c1"># Core resource — fixed version, no group</span>
     <span class="n">api_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Resource</span><span class="o">.</span><span class="n">ApiVersion</span><span class="o">.</span><span class="n">V1</span>
 
+
 <span class="k">class</span><span class="w"> </span><span class="nc">ClusterRole</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
     <span class="c1"># Grouped resource — version discovered from cluster</span>
     <span class="n">api_group</span> <span class="o">=</span> <span class="n">Resource</span><span class="o">.</span><span class="n">ApiGroup</span><span class="o">.</span><span class="n">RBAC_AUTHORIZATION_K8S_IO</span>
@@ -406,7 +376,7 @@
 <h3 id="namespacedresource-adding-namespace-awareness">NamespacedResource: Adding Namespace Awareness</h3>
 <p><code>NamespacedResource</code> extends <code>Resource</code> with one critical addition: <strong>namespace handling</strong>. It requires a <code>namespace</code> argument during construction and injects the namespace into all API calls.</p>
 <p>The differences from <code>Resource</code> are focused but important:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Behavior</th>
@@ -436,12 +406,11 @@
 <td>Fetches by name and namespace</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
 <span class="c1"># Namespace is required for namespaced resources</span>
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-          <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;nginx&quot;</span><span class="p">}])</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">containers</span><span class="o">=</span><span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"app"</span><span class="p">,</span> <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"nginx"</span><span class="p">}])</span>
 </code></pre></div>
 
 <h3 id="concrete-resource-classes-where-specifics-live">Concrete Resource Classes: Where Specifics Live</h3>
@@ -467,12 +436,12 @@
         <span class="c1"># 3. Build the resource dictionary</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind_dict</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaml_file</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;spec&quot;</span><span class="p">]</span>
-            <span class="n">_spec</span><span class="p">[</span><span class="s2">&quot;selector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span>
-            <span class="n">_spec</span><span class="p">[</span><span class="s2">&quot;template&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s2">"spec"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s2">"spec"</span><span class="p">]</span>
+            <span class="n">_spec</span><span class="p">[</span><span class="s2">"selector"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span>
+            <span class="n">_spec</span><span class="p">[</span><span class="s2">"template"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">replicas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">_spec</span><span class="p">[</span><span class="s2">&quot;replicas&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">replicas</span>
+                <span class="n">_spec</span><span class="p">[</span><span class="s2">"replicas"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">replicas</span>
 </code></pre></div>
 
 <blockquote>
@@ -497,20 +466,20 @@
 </ol>
 <p>This means the hierarchy is not just an architectural choice — it is <strong>enforced by the code generation pipeline</strong>. Every generated class correctly inherits from the appropriate base class based on the resource's actual scope in Kubernetes.</p>
 <p>See <a href="generating-resource-classes.html">Generating New Resource Classes with class-generator</a> for details on generating classes for new resource types.</p>
-<hr />
+<hr>
 <h2 id="how-it-affects-you">How It Affects You</h2>
 <p>Understanding the hierarchy helps you in several practical ways:</p>
 <h3 id="knowing-what-methods-are-available">Knowing What Methods Are Available</h3>
 <p>Every resource — regardless of kind — inherits the full set of CRUD, waiting, and lifecycle methods from <code>Resource</code>. You don't need to check whether a particular resource supports <code>wait_for_condition()</code> or context managers; they all do.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Works for any resource type</span>
-<span class="k">with</span> <span class="n">SomeResource</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">specific_args</span><span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>
-    <span class="n">res</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="s2">&quot;Ready&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">SomeResource</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"example"</span><span class="p">,</span> <span class="o">**</span><span class="n">specific_args</span><span class="p">)</span> <span class="k">as</span> <span class="n">res</span><span class="p">:</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">wait_for_condition</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">"True"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>See <a href="resource-api.html">Resource and NamespacedResource API</a> for the complete method reference.</p>
 <h3 id="understanding-constructor-requirements">Understanding Constructor Requirements</h3>
 <p>The base class determines what arguments are mandatory:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>If you're using...</th>
@@ -535,7 +504,7 @@
 <td><code>client</code>, <code>kind_dict</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>See <a href="creating-and-managing-resources.html">Creating and Managing Resources</a> for full examples of all creation methods.</p>
 <h3 id="using-status-and-condition-constants">Using Status and Condition Constants</h3>
 <p>The <code>Status</code> and <code>Condition</code> constants inherited from <code>ResourceConstants</code> are available on every resource class. Concrete classes may extend them:</p>
@@ -557,15 +526,16 @@
 <p>A minimal hand-written resource class looks like this:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NamespacedResource</span>
 
+
 <span class="k">class</span><span class="w"> </span><span class="nc">MyCustomResource</span><span class="p">(</span><span class="n">NamespacedResource</span><span class="p">):</span>
-    <span class="n">api_group</span> <span class="o">=</span> <span class="s2">&quot;example.com&quot;</span>
-    <span class="c1"># That&#39;s it — you get full CRUD, waiting, and lifecycle support</span>
+    <span class="n">api_group</span> <span class="o">=</span> <span class="s2">"example.com"</span>
+    <span class="c1"># That's it — you get full CRUD, waiting, and lifecycle support</span>
 </code></pre></div>
 
 <blockquote>
 <p><strong>Warning:</strong> Your class name must match the Kubernetes <code>kind</code> exactly (in PascalCase). The <code>kind</code> property is derived from the class name automatically — a class named <code>MyCustomResource</code> will have <code>kind = "MyCustomResource"</code>.</p>
 </blockquote>
-<hr />
+<hr>
 <h2 id="related-pages">Related Pages</h2>
 <ul>
 <li><a href="resource-api.html">Resource and NamespacedResource API</a> — Complete method and property reference for the base classes</li>
@@ -635,10 +605,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -646,13 +613,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -698,5 +666,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

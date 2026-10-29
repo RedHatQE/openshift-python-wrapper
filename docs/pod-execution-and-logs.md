@@ -1,15 +1,3 @@
-Let me explore the repository structure and understand the codebase first.
-
-Now let me check the `read_namespaced_pod_log` kwargs available, and look at how the MCP server uses log parameters:
-
-Now let me check the import paths and verify the `get_client` function:
-
-Now let me check test files for pod execution tests:
-
-Now let me also verify whether the Node class has a `name` property:
-
-Now I have all the information I need to write the documentation. Let me compose it:
-
 # Executing Commands in Pods and Retrieving Logs
 
 Run commands inside running pods and retrieve their logs to debug and interact with workloads on your OpenShift or Kubernetes cluster.

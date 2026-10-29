@@ -10,7 +10,7 @@ Python wrapper for kubernetes-python-client providing simplified CRUD and resour
 - Test specific: `uv run --group tests pytest tests/test_daemonset.py`
 - Lint: `prek run`
 - Pre-commit setup: `prek install`
-- Generate resource: `class-generator --kind Pod --add-tests`
+- Generate resource: `class-generator --kind Pod --overwrite`
 - Full verify: `prek run && uv run --group tests pytest`
 
 ## Definition of Done
@@ -26,7 +26,8 @@ A task is complete when ALL pass:
 - Tests fail after 3 attempts → stop, report failing test with full output
 - Missing dependency → `uv add <package>`, never `pip install`
 - Pre-commit fails → read the error, fix the specific violation
-- 🚫 NEVER: skip tests, force push to main, delete files to fix errors
+- 🚫 NEVER: skip tests, force push to main, delete files to fix errors,
+  add tests or test manifests for a generated resource
 
 ## Project
 
@@ -37,7 +38,10 @@ A task is complete when ALL pass:
 
 ## When Adding a Resource
 
-- New resources MUST be generated via `class-generator --kind ResourceName --add-tests` — manual creation is not allowed
+- New resources MUST be generated via `class-generator --kind ResourceName --overwrite` — manual creation is not allowed
+- Do NOT add tests for a generated resource: no `--add-tests`, no `tests/test_resources/test_<resource>.py`,
+  no `class_generator/tests/manifests/<Kind>/` files. Generated wrappers are covered by the generator's own
+  tests and by `class-generator --verify`.
 - Reference implementations: `ocp_resources/config_map.py` (namespaced), `ocp_resources/node.py` (cluster-scoped)
 - File naming: `snake_case.py` — class naming: exact Kubernetes `kind` (PascalCase)
 - Namespaced → inherit `NamespacedResource`, cluster-scoped → inherit `Resource`
@@ -73,7 +77,7 @@ Code between markers is auto-generated — do NOT modify manually. Use `class-ge
 
 - ✅ Always: use `uv` for Python ops, run `prek install` before first commit, add typing
 - ⚠️ Ask first: adding new dependencies, modifying base `Resource` class, changing CI
-- 🚫 Never: use `python`/`pip` directly, edit generated code between markers, edit files in `docs/` (regenerate with docsfy instead)
+- 🚫 Never: use `python`/`pip` directly, edit generated code between markers, edit generated files in `docs/` (regenerate with pi-docsite instead)
 
 ## Environment
 

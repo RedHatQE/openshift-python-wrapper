@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connecting to Clusters - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,24 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by exploring the repository structure and the knowledge graph.</p>
-<p>Now let me explore the client configuration and authentication code:</p>
-<p>Now let me look at how the <code>client</code> parameter is used in the Resource class:</p>
-<p>Now let me look at how resources accept the client parameter:</p>
-<p>Now let me look at the NamespacedResource and how it handles client:</p>
-<p>Now let me look at the tests for the client configuration:</p>
-<p>Let me also check how environment variables relate to client configuration:</p>
-<p>Now let me check how <code>get_client</code> is used with <code>generate_kubeconfig</code>:</p>
-<p>Now let me look at the <code>conftest.py</code> for the tests to understand how fake_client is set up:</p>
-<p>Let me also check the test file for more patterns of client usage:</p>
-<p>Now let me check what environment variables are documented:</p>
-<p>Now let me check the <code>generate_kubeconfig</code> related tests more carefully and how <code>DynamicClientWithKubeconfig</code> is used:</p>
-<p>Now let me also look at how <code>get_client</code> is imported/used in other contexts to understand its full interface:</p>
-<p>Let me look at some example files to see real usage patterns:</p>
-<p>Now let me check the <code>get</code> classmethod for how client is used:</p>
-<p>Now let me check for the <code>client_configuration</code> parameter and how <code>verify_ssl</code> is used:</p>
-<p>Now I have all the information I need. Let me write the documentation page.</p>
-<h1 id="connecting-to-clusters">Connecting to Clusters</h1>
+                    <h1 id="connecting-to-clusters">Connecting to Clusters</h1>
 <p>Establish authenticated connections to Kubernetes and OpenShift clusters so you can create, query, and manage resources with openshift-python-wrapper.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -318,28 +280,28 @@
 <li><code>~/.kube/config</code></li>
 </ol>
 <h3 id="using-a-specific-kubeconfig-file">Using a Specific Kubeconfig File</h3>
-<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/my/kubeconfig&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">"/path/to/my/kubeconfig"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="selecting-a-context">Selecting a Context</h3>
 <p>If your kubeconfig has multiple contexts, select one by name:</p>
-<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/kubeconfig&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;my-staging-cluster&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">"/path/to/kubeconfig"</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">"my-staging-cluster"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="authenticating-with-a-bearer-token">Authenticating with a Bearer Token</h3>
 <p>Connect to a cluster API server directly using a host URL and token:</p>
 <div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.my-cluster.example.com:6443&quot;</span><span class="p">,</span>
-    <span class="n">token</span><span class="o">=</span><span class="s2">&quot;sha256~my-bearer-token&quot;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">"https://api.my-cluster.example.com:6443"</span><span class="p">,</span>
+    <span class="n">token</span><span class="o">=</span><span class="s2">"sha256~my-bearer-token"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <h3 id="authenticating-with-username-and-password-basic-auth">Authenticating with Username and Password (Basic Auth)</h3>
 <p>For OpenShift clusters that support OAuth-based basic authentication:</p>
 <div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.my-cluster.example.com:6443&quot;</span><span class="p">,</span>
-    <span class="n">username</span><span class="o">=</span><span class="s2">&quot;my-user&quot;</span><span class="p">,</span>
-    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;my-password&quot;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">"https://api.my-cluster.example.com:6443"</span><span class="p">,</span>
+    <span class="n">username</span><span class="o">=</span><span class="s2">"my-user"</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s2">"my-password"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -349,12 +311,12 @@
 <h3 id="using-a-kubeconfig-dictionary">Using a Kubeconfig Dictionary</h3>
 <p>Pass a kubeconfig as a Python dictionary instead of a file path:</p>
 <div class="highlight"><pre><span></span><code><span class="n">config_dict</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;apiVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;v1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;Config&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;clusters&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;my-cluster&quot;</span><span class="p">,</span> <span class="s2">&quot;cluster&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;server&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.example.com:6443&quot;</span><span class="p">}}],</span>
-    <span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;my-user&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;my-token&quot;</span><span class="p">}}],</span>
-    <span class="s2">&quot;contexts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;my-context&quot;</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;cluster&quot;</span><span class="p">:</span> <span class="s2">&quot;my-cluster&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;my-user&quot;</span><span class="p">}}],</span>
-    <span class="s2">&quot;current-context&quot;</span><span class="p">:</span> <span class="s2">&quot;my-context&quot;</span><span class="p">,</span>
+    <span class="s2">"apiVersion"</span><span class="p">:</span> <span class="s2">"v1"</span><span class="p">,</span>
+    <span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"Config"</span><span class="p">,</span>
+    <span class="s2">"clusters"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"my-cluster"</span><span class="p">,</span> <span class="s2">"cluster"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"server"</span><span class="p">:</span> <span class="s2">"https://api.example.com:6443"</span><span class="p">}}],</span>
+    <span class="s2">"users"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"my-user"</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"token"</span><span class="p">:</span> <span class="s2">"my-token"</span><span class="p">}}],</span>
+    <span class="s2">"contexts"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"my-context"</span><span class="p">,</span> <span class="s2">"context"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"cluster"</span><span class="p">:</span> <span class="s2">"my-cluster"</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">:</span> <span class="s2">"my-user"</span><span class="p">}}],</span>
+    <span class="s2">"current-context"</span><span class="p">:</span> <span class="s2">"my-context"</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_dict</span><span class="o">=</span><span class="n">config_dict</span><span class="p">)</span>
@@ -369,15 +331,15 @@
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
 
 <span class="c1"># Creating a resource</span>
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 <span class="n">ns</span><span class="o">.</span><span class="n">deploy</span><span class="p">()</span>
 
 <span class="c1"># Querying resources</span>
-<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">Pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pod</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 <span class="c1"># Using context managers</span>
-<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;temp-namespace&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"temp-namespace"</span><span class="p">)</span> <span class="k">as</span> <span class="n">ns</span><span class="p">:</span>
     <span class="n">ns</span><span class="o">.</span><span class="n">wait_for_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Namespace</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 </code></pre></div>
 
@@ -386,7 +348,7 @@
 </blockquote>
 <h2 id="environment-variables">Environment Variables</h2>
 <p><code>get_client()</code> respects several environment variables automatically:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Variable</th>
@@ -411,7 +373,7 @@
 <td>None</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Tip:</strong> <code>HTTPS_PROXY</code> takes precedence over <code>HTTP_PROXY</code> when both are set.</p>
 </blockquote>
@@ -420,8 +382,8 @@
 <h3 id="disabling-tls-verification">Disabling TLS Verification</h3>
 <p>For development clusters with self-signed certificates:</p>
 <div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.dev-cluster.example.com:6443&quot;</span><span class="p">,</span>
-    <span class="n">token</span><span class="o">=</span><span class="s2">&quot;sha256~my-token&quot;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">"https://api.dev-cluster.example.com:6443"</span><span class="p">,</span>
+    <span class="n">token</span><span class="o">=</span><span class="s2">"sha256~my-token"</span><span class="p">,</span>
     <span class="n">verify_ssl</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -439,8 +401,8 @@
 <h3 id="generating-a-kubeconfig-file-from-a-token-connection">Generating a Kubeconfig File from a Token Connection</h3>
 <p>When you connect with <code>host</code> and <code>token</code>, you might need a kubeconfig file on disk (for example, to pass to external tools). Use <code>generate_kubeconfig=True</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.my-cluster.example.com:6443&quot;</span><span class="p">,</span>
-    <span class="n">token</span><span class="o">=</span><span class="s2">&quot;sha256~my-token&quot;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">"https://api.my-cluster.example.com:6443"</span><span class="p">,</span>
+    <span class="n">token</span><span class="o">=</span><span class="s2">"sha256~my-token"</span><span class="p">,</span>
     <span class="n">generate_kubeconfig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -461,11 +423,11 @@
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">kubernetes</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
 <span class="n">config</span><span class="o">.</span><span class="n">verify_ssl</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">config</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="s2">&quot;http://my-proxy:8080&quot;</span>
+<span class="n">config</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="s2">"http://my-proxy:8080"</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span>
-    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;https://api.my-cluster.example.com:6443&quot;</span><span class="p">,</span>
-    <span class="n">token</span><span class="o">=</span><span class="s2">&quot;sha256~my-token&quot;</span><span class="p">,</span>
+    <span class="n">host</span><span class="o">=</span><span class="s2">"https://api.my-cluster.example.com:6443"</span><span class="p">,</span>
+    <span class="n">token</span><span class="o">=</span><span class="s2">"sha256~my-token"</span><span class="p">,</span>
     <span class="n">client_configuration</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -475,8 +437,8 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_client</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 
-<span class="n">prod_client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/prod-kubeconfig&quot;</span><span class="p">)</span>
-<span class="n">staging_client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;/path/to/staging-kubeconfig&quot;</span><span class="p">)</span>
+<span class="n">prod_client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">"/path/to/prod-kubeconfig"</span><span class="p">)</span>
+<span class="n">staging_client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="s2">"/path/to/staging-kubeconfig"</span><span class="p">)</span>
 
 <span class="c1"># Query namespaces on both clusters</span>
 <span class="n">prod_namespaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">prod_client</span><span class="p">))</span>
@@ -510,7 +472,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DynamicClient</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -590,7 +552,7 @@
 <td>Save connection info to a temporary kubeconfig file accessible via <code>client.kubeconfig</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>DynamicClient</code> — a Kubernetes dynamic client ready for resource operations.</p>
 <p><strong>Raises:</strong></p>
 <ul>
@@ -611,7 +573,7 @@
 <p><strong>"FutureWarning: 'client' arg will be mandatory"</strong>
 You are creating a resource without passing a <code>client</code>. Always call <code>get_client()</code> first and pass the result:</p>
 <div class="highlight"><pre><span></span><code><span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">()</span>
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-ns&quot;</span><span class="p">)</span>  <span class="c1"># Pass client explicitly</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-ns"</span><span class="p">)</span>  <span class="c1"># Pass client explicitly</span>
 </code></pre></div>
 
 <p><strong>Connection refused or timeout errors</strong>
@@ -619,9 +581,10 @@ Verify your cluster is reachable and the kubeconfig or token is correct. Check t
 <p><strong>"KUBECONFIG environment variable set in code is not detected"</strong>
 The Kubernetes Python client reads <code>KUBECONFIG</code> at module import time. If you set it dynamically in your code, pass the path directly instead:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="c1"># Don&#39;t rely on: os.environ[&quot;KUBECONFIG&quot;] = &quot;/path/to/config&quot;</span>
+
+<span class="c1"># Don't rely on: os.environ["KUBECONFIG"] = "/path/to/config"</span>
 <span class="c1"># Instead, pass it explicitly:</span>
-<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;KUBECONFIG&quot;</span><span class="p">,</span> <span class="s2">&quot;/path/to/config&quot;</span><span class="p">))</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">config_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"KUBECONFIG"</span><span class="p">,</span> <span class="s2">"/path/to/config"</span><span class="p">))</span>
 </code></pre></div>
 
 <p><strong>Basic auth fails with <code>ClientWithBasicAuthError</code></strong>
@@ -693,10 +656,7 @@ Basic auth uses the OpenShift OAuth flow. Ensure your cluster has a well-known O
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -704,13 +664,14 @@ Basic auth uses the OpenShift OAuth flow. Ensure your cluster has a well-known O
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -756,5 +717,6 @@ Basic auth uses the OpenShift OAuth flow. Ensure your cluster has a well-known O
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

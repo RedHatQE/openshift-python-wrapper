@@ -18,6 +18,7 @@ class HyperConverged(NamespacedResource):
         deployment: dict[str, Any] | None = None,
         feature_gates: list[Any] | None = None,
         networking: dict[str, Any] | None = None,
+        observability: dict[str, Any] | None = None,
         security: dict[str, Any] | None = None,
         storage: dict[str, Any] | None = None,
         virtualization: dict[str, Any] | None = None,
@@ -44,25 +45,28 @@ class HyperConverged(NamespacedResource):
               the decentralized live migration   (cross-cluster migration)
               feature. This feature allows live migration of
               VirtualMachineInstances between different clusters. This feature
-              is in   Developer Preview.   Phase: beta  *
-              declarativeHotplugVolumes:   DeclarativeHotplugVolumes enables the
-              use of the declarative volume   hotplug feature in KubeVirt. When
-              set to true or nil, the   "DeclarativeHotplugVolumes" feature gate
-              is enabled and the   "HotplugVolumes" feature gate is not (default
-              behavior). When set to   false, the "HotplugVolumes" featuregate
-              is enabled in KubeVirt. This   feature is in Technical Preview.
-              Phase: beta  * template:   VirtualMachine Templates provide a
-              native, in-cluster VM templating for   KubeVirt. They allow you to
-              define reusable VM blueprints with   parameterized values that can
-              be processed to create virtual machine. the   "template" feature
-              gate enables this feature. Note: this feature is in   Tech
-              Preview.   Phase: beta  * alignCPUs:   Enable KubeVirt to request
-              up to two additional dedicated CPUs in order to   complete the
-              total CPU count to an even parity when using emulator thread
-              isolation. Note: this feature is in Developer Preview.   Phase:
-              alpha  * containerPathVolumes:   ContainerPathVolumes enables the
-              use of container paths as volumes in   KubeVirt. This allows VMs
-              to access files and directories from the   virt-launcher pod's
+              is in   Tech Preview.   Phase: beta  * declarativeHotplugVolumes:
+              DeclarativeHotplugVolumes enables the use of the declarative
+              volume   hotplug feature in KubeVirt. When set to true or nil, the
+              "DeclarativeHotplugVolumes" feature gate is enabled and the
+              "HotplugVolumes" feature gate is not (default behavior). When set
+              to   false, the "HotplugVolumes" featuregate is enabled in
+              KubeVirt. This   feature is in Technical Preview.   Phase: beta  *
+              rebootPolicy:   RebootPolicy enables virtual machines to be
+              recreated when they reboot   from within the guest operating
+              system. This feature is in Tech Preview.   Phase: beta  *
+              template:   VirtualMachine Templates provide a native, in-cluster
+              VM templating for   KubeVirt. They allow you to define reusable VM
+              blueprints with   parameterized values that can be processed to
+              create virtual machine. the   "template" feature gate enables this
+              feature. Note: this feature is in   Tech Preview.   Phase: beta  *
+              alignCPUs:   Enable KubeVirt to request up to two additional
+              dedicated CPUs in order to   complete the total CPU count to an
+              even parity when using emulator thread   isolation. Note: this
+              feature is in Developer Preview.   Phase: alpha  *
+              containerPathVolumes:   ContainerPathVolumes enables the use of
+              container paths as volumes in   KubeVirt. This allows VMs to
+              access files and directories from the   virt-launcher pod's
               filesystem via virtiofs.   Phase: alpha  * deployKubeSecondaryDNS:
               Deploy KubeSecondaryDNS by CNAO   Phase: alpha  *
               deployObservabilityController:   Deploy the virt-observability-
@@ -70,31 +74,34 @@ class HyperConverged(NamespacedResource):
               KubeVirt metrics and manages PrometheusRule resources
               independently from the KubeVirt control plane.   Phase: alpha  *
               downwardMetrics:   Allow to expose a limited set of host metrics
-              to guests.   Phase: alpha  * enableMultiArchBootImageImport:
-              EnableMultiArchBootImageImport allows the HCO to run on
-              heterogeneous   clusters with different CPU architectures. Setting
-              this field to true will   allow the HCO to create Golden Images
-              for different CPU architectures.   This feature is in Developer
-              Preview.   Phase: alpha  * incrementalBackup:   IncrementalBackup
-              enables changed block tracking backups and incremental   backups
-              using QEMU capabilities in KubeVirt. When enabled, this also
-              enables the UtilityVolumes feature gate in the KubeVirt CR. Note:
-              This   feature is in Tech Preview.   Phase: alpha  * objectGraph:
-              ObjectGraph enables the ObjectGraph VM and VMI subresource in
-              KubeVirt.   This subresource returns a structured list of k8s
-              objects that are related   to the specified VM or VMI, enabling
-              better dependency tracking. Note:   This feature is in Developer
-              Preview.   Phase: alpha  * disableMDevConfiguration:   Deprecated:
-              use spec.virtualization.mediatedDevicesConfiguration.enabled
+              to guests.   Phase: alpha  * incrementalBackup:
+              IncrementalBackup enables changed block tracking backups and
+              incremental   backups using QEMU capabilities in KubeVirt. When
+              enabled, this also   enables the UtilityVolumes feature gate in
+              the KubeVirt CR. Note: This   feature is in Developer Preview.
+              Phase: alpha  * objectGraph:   ObjectGraph enables the ObjectGraph
+              VM and VMI subresource in KubeVirt.   This subresource returns a
+              structured list of k8s objects that are related   to the specified
+              VM or VMI, enabling better dependency tracking. Note:   This
+              feature is in Developer Preview.   Phase: alpha  *
+              disableMDevConfiguration:   Deprecated: This feature gate has
+              graduated to a dedicated configuration   field; use
+              spec.virtualization.mediatedDevicesConfiguration.enabled
               instead. This feature gate is deprecated and will be removed in a
-              future   release.   Phase: deprecated  * persistentReservation:
-              This feature gate has graduated to a dedicated configuration
-              field. Use
+              future   release.   Phase: deprecated  *
+              enableMultiArchBootImageImport:   Deprecated: This feature gate
+              has graduated to a dedicated configuration   field; use
+              spec.workloadSources.enableMultiArchBootImageImport instead.
+              This feature gate is deprecated and will be removed in a future
+              release.   Phase: deprecated  * persistentReservation:   This
+              feature gate has graduated to a dedicated configuration field. Use
               spec.storage.persistentReservationConfiguration.enabled instead.
               This   feature gate is deprecated and will be removed in a future
               release.   Phase: deprecated
 
             networking (dict[str, Any]): Networking contains all the configurations for networking
+
+            observability (dict[str, Any]): Observability contains configurations for the observability controller
 
             security (dict[str, Any]): Security contains all the security configurations
 
@@ -110,6 +117,7 @@ class HyperConverged(NamespacedResource):
         self.deployment = deployment
         self.feature_gates = feature_gates
         self.networking = networking
+        self.observability = observability
         self.security = security
         self.storage = storage
         self.virtualization = virtualization
@@ -131,6 +139,9 @@ class HyperConverged(NamespacedResource):
 
             if self.networking is not None:
                 _spec["networking"] = self.networking
+
+            if self.observability is not None:
+                _spec["observability"] = self.observability
 
             if self.security is not None:
                 _spec["security"] = self.security

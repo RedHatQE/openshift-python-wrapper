@@ -41,7 +41,8 @@ class Ingress(Resource):
               status.componentRoutes list.  To determine the set of configurable
               Routes, look at namespace and name of entries in the
               .status.componentRoutes list, where participating operators write
-              the status of configurable routes.
+              the status of configurable routes. A maximum of 250 component
+              routes may be configured.
 
             domain (str): domain is used to generate a default host name for a route when the
               route's host name is empty. The generated host name will follow

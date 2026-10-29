@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Integrating with AI Assistants via MCP Server - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -272,9 +251,9 @@
 <p>Connect your Cursor IDE to your cluster so the AI assistant can list, create, update, and delete resources on your behalf.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ~/.cursor/mcp.json</span>
 <span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;openshift-python-wrapper&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;openshift-mcp-server&quot;</span>
+<span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"openshift-python-wrapper"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"openshift-mcp-server"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
@@ -290,9 +269,9 @@
 <span class="c1">// Windows: %APPDATA%\Claude\claude_desktop_config.json</span>
 <span class="c1">// Linux: ~/.config/Claude/claude_desktop_config.json</span>
 <span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;openshift-python-wrapper&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;openshift-mcp-server&quot;</span>
+<span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"openshift-python-wrapper"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"openshift-mcp-server"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
@@ -302,11 +281,11 @@
 <h2 id="configure-a-custom-kubeconfig-path">Configure a Custom Kubeconfig Path</h2>
 <p>Point the MCP server at a specific kubeconfig when your default location doesn't apply.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;openshift-python-wrapper&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;openshift-mcp-server&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;KUBECONFIG&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.kube/my-cluster-config&quot;</span>
+<span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"openshift-python-wrapper"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"openshift-mcp-server"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"KUBECONFIG"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/home/user/.kube/my-cluster-config"</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
@@ -326,11 +305,11 @@ uv<span class="w"> </span>run<span class="w"> </span>mcp_server/server.py
 
 <p>For MCP client configuration when running from source:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;openshift-python-wrapper&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uv&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;mcp_server/server.py&quot;</span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/openshift-python-wrapper&quot;</span>
+<span class="w">  </span><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"openshift-python-wrapper"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uv"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"run"</span><span class="p">,</span><span class="w"> </span><span class="s2">"mcp_server/server.py"</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"cwd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/path/to/openshift-python-wrapper"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
@@ -339,16 +318,11 @@ uv<span class="w"> </span>run<span class="w"> </span>mcp_server/server.py
 <p>This bypasses the installed entry point and runs the server module directly, which is useful when testing local changes.</p>
 <h2 id="list-cluster-resources-via-ai-chat">List Cluster Resources via AI Chat</h2>
 <p>Ask your AI assistant to list resources — the MCP server exposes a <code>list_resources</code> tool that supports type filtering, namespaces, label selectors, and limits.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;List all pods in the openshift-monitoring namespace with label app=prometheus&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "List all pods in the openshift-monitoring namespace with label app=prometheus"
 </code></pre></div>
 
 <p>The AI will call the <code>list_resources</code> tool, which maps to:</p>
-<div class="highlight"><pre><span></span><code><span class="n">list_resources</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;openshift-monitoring&quot;</span><span class="p">,</span>
-    <span class="n">label_selector</span><span class="o">=</span><span class="s2">&quot;app=prometheus&quot;</span><span class="p">,</span>
-    <span class="n">limit</span><span class="o">=</span><span class="mi">20</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">list_resources</span><span class="p">(</span><span class="n">resource_type</span><span class="o">=</span><span class="s2">"pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"openshift-monitoring"</span><span class="p">,</span> <span class="n">label_selector</span><span class="o">=</span><span class="s2">"app=prometheus"</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Returned data includes name, namespace, UID, creation timestamp, labels, phase, and conditions for each matched resource.</p>
@@ -357,40 +331,40 @@ uv<span class="w"> </span>run<span class="w"> </span>mcp_server/server.py
 </blockquote>
 <h2 id="get-detailed-resource-information">Get Detailed Resource Information</h2>
 <p>Retrieve a single resource with full metadata, status, and optionally the raw YAML or JSON.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Show me the deployment &#39;api-server&#39; in namespace &#39;production&#39; as YAML&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Show me the deployment 'api-server' in namespace 'production' as YAML"
 </code></pre></div>
 
 <p>The AI calls:</p>
 <div class="highlight"><pre><span></span><code><span class="n">get_resource</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;deployment&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;api-server&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
-    <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;yaml&quot;</span>    <span class="c1"># also accepts &quot;json&quot; or &quot;info&quot;</span>
+    <span class="n">resource_type</span><span class="o">=</span><span class="s2">"deployment"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"api-server"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"production"</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="o">=</span><span class="s2">"yaml"</span><span class="p">,</span>  <span class="c1"># also accepts "json" or "info"</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <p>The <code>info</code> format (default) returns structured metadata plus resource-specific details: for pods you get container statuses and node placement; for deployments you get replica counts; for services you get ports and cluster IP.</p>
 <h2 id="create-resources-through-natural-language">Create Resources Through Natural Language</h2>
 <p>Ask the AI to create resources — it can use either YAML content or structured spec parameters.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Create a ConfigMap called &#39;app-settings&#39; in the &#39;staging&#39; namespace with keys
-database_host=db.staging.svc and log_level=debug&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Create a ConfigMap called 'app-settings' in the 'staging' namespace with keys
+database_host=db.staging.svc and log_level=debug"
 </code></pre></div>
 
 <p>The AI calls:</p>
 <div class="highlight"><pre><span></span><code><span class="n">create_resource</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;configmap&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-settings&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;staging&quot;</span><span class="p">,</span>
-    <span class="n">spec</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;database_host&quot;</span><span class="p">:</span> <span class="s2">&quot;db.staging.svc&quot;</span><span class="p">,</span> <span class="s2">&quot;log_level&quot;</span><span class="p">:</span> <span class="s2">&quot;debug&quot;</span><span class="p">}},</span>
-    <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;managed-by&quot;</span><span class="p">:</span> <span class="s2">&quot;mcp-server&quot;</span><span class="p">}</span>
+    <span class="n">resource_type</span><span class="o">=</span><span class="s2">"configmap"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"app-settings"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"staging"</span><span class="p">,</span>
+    <span class="n">spec</span><span class="o">=</span><span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"database_host"</span><span class="p">:</span> <span class="s2">"db.staging.svc"</span><span class="p">,</span> <span class="s2">"log_level"</span><span class="p">:</span> <span class="s2">"debug"</span><span class="p">}},</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s2">"managed-by"</span><span class="p">:</span> <span class="s2">"mcp-server"</span><span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <p>You can also provide full YAML:</p>
 <div class="highlight"><pre><span></span><code><span class="n">create_resource</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;pod&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span>
-    <span class="n">yaml_content</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+    <span class="n">resource_type</span><span class="o">=</span><span class="s2">"pod"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"nginx"</span><span class="p">,</span>
+    <span class="n">yaml_content</span><span class="o">=</span><span class="s2">"""</span>
 <span class="s2">apiVersion: v1</span>
 <span class="s2">kind: Pod</span>
 <span class="s2">metadata:</span>
@@ -402,7 +376,7 @@ database_host=db.staging.svc and log_level=debug&quot;
 <span class="s2">    image: nginx:1.27</span>
 <span class="s2">    ports:</span>
 <span class="s2">    - containerPort: 80</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -411,11 +385,12 @@ database_host=db.staging.svc and log_level=debug&quot;
 </blockquote>
 <h2 id="apply-multi-document-yaml-manifests">Apply Multi-Document YAML Manifests</h2>
 <p>Deploy a complete application stack from a single YAML block containing multiple resources.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Apply this manifest to create a namespace, deployment, and service for my app&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Apply this manifest to create a namespace, deployment, and service for my app"
 </code></pre></div>
 
 <p>The AI calls:</p>
-<div class="highlight"><pre><span></span><code><span class="n">apply_yaml</span><span class="p">(</span><span class="n">yaml_content</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">apply_yaml</span><span class="p">(</span>
+    <span class="n">yaml_content</span><span class="o">=</span><span class="s2">"""</span>
 <span class="s2">---</span>
 <span class="s2">apiVersion: v1</span>
 <span class="s2">kind: Namespace</span>
@@ -454,55 +429,45 @@ database_host=db.staging.svc and log_level=debug&quot;
 <span class="s2">  ports:</span>
 <span class="s2">  - port: 80</span>
 <span class="s2">    targetPort: 8080</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span>
+<span class="p">)</span>
 </code></pre></div>
 
 <p>The response includes a summary with <code>total_resources</code>, <code>successful</code>, and <code>failed</code> counts, plus per-resource results. Each YAML document is parsed and deployed independently.</p>
 <h2 id="update-resources-with-patches">Update Resources with Patches</h2>
 <p>Modify existing resources using merge or strategic-merge patches.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Scale the &#39;web-frontend&#39; deployment in &#39;production&#39; to 5 replicas&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Scale the 'web-frontend' deployment in 'production' to 5 replicas"
 </code></pre></div>
 
 <p>The AI calls:</p>
 <div class="highlight"><pre><span></span><code><span class="n">update_resource</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;deployment&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-frontend&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
-    <span class="n">patch</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}},</span>
-    <span class="n">patch_type</span><span class="o">=</span><span class="s2">&quot;merge&quot;</span>       <span class="c1"># or &quot;strategic&quot;</span>
+    <span class="n">resource_type</span><span class="o">=</span><span class="s2">"deployment"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"web-frontend"</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"production"</span><span class="p">,</span>
+    <span class="n">patch</span><span class="o">=</span><span class="p">{</span><span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"replicas"</span><span class="p">:</span> <span class="mi">5</span><span class="p">}},</span>
+    <span class="n">patch_type</span><span class="o">=</span><span class="s2">"merge"</span><span class="p">,</span>  <span class="c1"># or "strategic"</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <p>The <code>patch_type</code> parameter controls the content type: <code>"merge"</code> uses <code>application/merge-patch+json</code>, while <code>"strategic"</code> uses <code>application/strategic-merge-patch+json</code>.</p>
 <h2 id="delete-resources">Delete Resources</h2>
 <p>Remove resources with optional wait-for-deletion behavior.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Delete the pod &#39;debug-pod&#39; in namespace &#39;default&#39; and wait for it to be gone&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Delete the pod 'debug-pod' in namespace 'default' and wait for it to be gone"
 </code></pre></div>
 
 <p>The AI calls:</p>
-<div class="highlight"><pre><span></span><code><span class="n">delete_resource</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;pod&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;debug-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">delete_resource</span><span class="p">(</span><span class="n">resource_type</span><span class="o">=</span><span class="s2">"pod"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"debug-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 </code></pre></div>
 
 <p>If the resource doesn't exist, the server returns a success response with a warning rather than an error, making the operation idempotent.</p>
 <h2 id="retrieve-pod-logs">Retrieve Pod Logs</h2>
 <p>Fetch logs from running or crashed pods with filtering options.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Show me the last 200 lines of logs from pod &#39;api-server-7f8b9c&#39; container &#39;app&#39;
-in namespace &#39;production&#39;&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Show me the last 200 lines of logs from pod 'api-server-7f8b9c' container 'app'
+in namespace 'production'"
 </code></pre></div>
 
 <p>The AI calls:</p>
-<div class="highlight"><pre><span></span><code><span class="n">get_pod_logs</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;api-server-7f8b9c&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
-    <span class="n">container</span><span class="o">=</span><span class="s2">&quot;app&quot;</span><span class="p">,</span>
-    <span class="n">tail_lines</span><span class="o">=</span><span class="mi">200</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">get_pod_logs</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"api-server-7f8b9c"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"production"</span><span class="p">,</span> <span class="n">container</span><span class="o">=</span><span class="s2">"app"</span><span class="p">,</span> <span class="n">tail_lines</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 </code></pre></div>
 
 <ul>
@@ -512,16 +477,11 @@ in namespace &#39;production&#39;&quot;
 </ul>
 <h2 id="execute-commands-in-pods">Execute Commands in Pods</h2>
 <p>Run diagnostic commands inside a running pod container.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Check the nginx config in pod &#39;web-server&#39; namespace &#39;production&#39;&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Check the nginx config in pod 'web-server' namespace 'production'"
 </code></pre></div>
 
 <p>The AI calls:</p>
-<div class="highlight"><pre><span></span><code><span class="n">exec_in_pod</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web-server&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
-    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;nginx&quot;</span><span class="p">,</span> <span class="s2">&quot;-t&quot;</span><span class="p">],</span>
-    <span class="n">container</span><span class="o">=</span><span class="s2">&quot;nginx&quot;</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">exec_in_pod</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"web-server"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"production"</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s2">"nginx"</span><span class="p">,</span> <span class="s2">"-t"</span><span class="p">],</span> <span class="n">container</span><span class="o">=</span><span class="s2">"nginx"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>The response includes <code>stdout</code>, <code>stderr</code>, and <code>returncode</code>. If the command fails, the exit code and error output are captured rather than raising an exception.</p>
@@ -530,22 +490,17 @@ in namespace &#39;production&#39;&quot;
 </blockquote>
 <h2 id="get-resource-events">Get Resource Events</h2>
 <p>Retrieve Kubernetes events related to a specific resource for troubleshooting.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Show me the events for pod &#39;crashloop-pod&#39; in &#39;default&#39; namespace&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Show me the events for pod 'crashloop-pod' in 'default' namespace"
 </code></pre></div>
 
 <p>The AI calls:</p>
-<div class="highlight"><pre><span></span><code><span class="n">get_resource_events</span><span class="p">(</span>
-    <span class="n">resource_type</span><span class="o">=</span><span class="s2">&quot;pod&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;crashloop-pod&quot;</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
-    <span class="n">limit</span><span class="o">=</span><span class="mi">10</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">get_resource_events</span><span class="p">(</span><span class="n">resource_type</span><span class="o">=</span><span class="s2">"pod"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"crashloop-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Events are filtered using field selectors on <code>involvedObject.name</code>, <code>involvedObject.namespace</code>, and <code>involvedObject.kind</code>. Each event includes type (Normal/Warning), reason, message, count, timestamps, and source component.</p>
 <h2 id="troubleshoot-a-failing-pod-end-to-end-workflow">Troubleshoot a Failing Pod (End-to-End Workflow)</h2>
 <p>Combine multiple MCP tools in sequence to diagnose pod issues — the AI assistant will chain these calls automatically.</p>
-<div class="highlight"><pre><span></span><code>Prompt: &quot;Pod &#39;payment-svc-6d4f8&#39; in namespace &#39;checkout&#39; keeps crashing. Help me figure out why.&quot;
+<div class="highlight"><pre><span></span><code>Prompt: "Pod 'payment-svc-6d4f8' in namespace 'checkout' keeps crashing. Help me figure out why."
 </code></pre></div>
 
 <p>The AI will typically execute this sequence:</p>
@@ -565,25 +520,25 @@ in namespace &#39;production&#39;&quot;
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">FastMCPClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-        <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">connect_stdio</span><span class="p">(</span><span class="n">cmd</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;openshift-mcp-server&quot;</span><span class="p">])</span>
+        <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">connect_stdio</span><span class="p">(</span><span class="n">cmd</span><span class="o">=</span><span class="p">[</span><span class="s2">"openshift-mcp-server"</span><span class="p">])</span>
 
         <span class="c1"># Discover available resource types</span>
         <span class="n">types</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;get_resource_types&quot;</span><span class="p">,</span>
-            <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;random_string&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">},</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"get_resource_types"</span><span class="p">,</span>
+            <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"random_string"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">},</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available types: </span><span class="si">{</span><span class="n">types</span><span class="p">[</span><span class="s1">&#39;total_count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Available types: </span><span class="si">{</span><span class="n">types</span><span class="p">[</span><span class="s1">'total_count'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># List pods in a namespace</span>
         <span class="n">pods</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">call_tool</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;list_resources&quot;</span><span class="p">,</span>
-            <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resource_type&quot;</span><span class="p">:</span> <span class="s2">&quot;pod&quot;</span><span class="p">,</span> <span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"list_resources"</span><span class="p">,</span>
+            <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"resource_type"</span><span class="p">:</span> <span class="s2">"pod"</span><span class="p">,</span> <span class="s2">"namespace"</span><span class="p">:</span> <span class="s2">"default"</span><span class="p">,</span> <span class="s2">"limit"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">pods</span><span class="p">[</span><span class="s2">&quot;resources&quot;</span><span class="p">]:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">pod</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;phase&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">pods</span><span class="p">[</span><span class="s2">"resources"</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">pod</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">pod</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'phase'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Unknown'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 
@@ -609,7 +564,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>/tmp/mcp_server_debug.log
 </blockquote>
 <h2 id="available-mcp-tools-reference">Available MCP Tools Reference</h2>
 <p>The MCP server exposes ten tools. All resource type names are case-insensitive (e.g., <code>"Pod"</code>, <code>"pod"</code>, and <code>"POD"</code> all work).</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Tool</th>
@@ -669,7 +624,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>/tmp/mcp_server_debug.log
 <td><code>random_string</code> (any value)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Note:</strong> Namespaced resources (pods, deployments, configmaps, etc.) require a <code>namespace</code> parameter. Cluster-scoped resources (nodes, namespaces, cluster roles) do not. The server validates this automatically and returns a clear error if a namespace is missing.</p>
 </blockquote>
@@ -732,10 +687,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>/tmp/mcp_server_debug.log
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -743,13 +695,14 @@ tail<span class="w"> </span>-f<span class="w"> </span>/tmp/mcp_server_debug.log
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -795,5 +748,6 @@ tail<span class="w"> </span>-f<span class="w"> </span>/tmp/mcp_server_debug.log
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

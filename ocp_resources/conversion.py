@@ -20,6 +20,7 @@ class Conversion(NamespacedResource):
         destination: dict[str, Any] | None = None,
         disk_encryption: dict[str, Any] | None = None,
         disks: list[Any] | None = None,
+        extra_init_containers: list[Any] | None = None,
         extra_mounts: list[Any] | None = None,
         extra_volumes: list[Any] | None = None,
         image: str | None = None,
@@ -49,6 +50,8 @@ class Conversion(NamespacedResource):
             disks (list[Any]): Disks to be converted or inspected. For InPlace/Remote: populated from
               PVCs (namespaced name + volume mode). For Inspection: populated
               with disk paths from the source inventory.
+
+            extra_init_containers (list[Any]): Extra init containers to prepend to the pod's init container list.
 
             extra_mounts (list[Any]): Extra volume mounts to add to the conversion pod container.
 
@@ -84,6 +87,7 @@ class Conversion(NamespacedResource):
         self.destination = destination
         self.disk_encryption = disk_encryption
         self.disks = disks
+        self.extra_init_containers = extra_init_containers
         self.extra_mounts = extra_mounts
         self.extra_volumes = extra_volumes
         self.image = image
@@ -125,6 +129,9 @@ class Conversion(NamespacedResource):
 
             if self.disks is not None:
                 _spec["disks"] = self.disks
+
+            if self.extra_init_containers is not None:
+                _spec["extraInitContainers"] = self.extra_init_containers
 
             if self.extra_mounts is not None:
                 _spec["extraMounts"] = self.extra_mounts

@@ -1,23 +1,3 @@
-Let me start by reading the exclusions file and pages manifest, then explore the codebase thoroughly.
-
-Now let me look at some generated resource subclasses to understand how they extend the base classes:
-
-Now let me look at some more examples - a cluster-scoped resource, the `ResourceConstants`, the class generator, and the `virtual_machine.py` for a more complex subclass:
-
-Now let me look at the `kind` property and how it's derived, plus some other resources for variety:
-
-Now let me look at how the `kind` property works (the `sub_resource_level` function) and the `conversion.py` for the kind name derivation:
-
-Now let me look at how resources discover their API version dynamically:
-
-Let me now look at one more important aspect - how the `get` method works differently in the two base classes, and how `_base_body` differs:
-
-Now let me check the `__init__.py` to see what's exported:
-
-Let me also check for examples:
-
-Now I have enough context to write the documentation. Let me draft it:
-
 # Understanding the Resource Class Hierarchy
 
 Every Kubernetes and OpenShift object you interact with through openshift-python-wrapper — whether it's a Pod, a Namespace, or a VirtualMachine — is a Python class that inherits from a small set of base classes. Understanding how these classes relate to each other helps you know **what capabilities any resource has**, **why some resources require a `namespace` argument and others don't**, and **how new resource types get added to the library**.
