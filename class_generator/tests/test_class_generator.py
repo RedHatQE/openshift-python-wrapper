@@ -61,6 +61,7 @@ def test_parse_explain() -> None:
         "Secret",
         "ServiceMeshMember",
         "ServingRuntime",
+        "VirtualMachineFileRestore",
     ]
 
     failures: list[tuple[str, str]] = []
