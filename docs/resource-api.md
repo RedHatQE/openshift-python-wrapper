@@ -1,23 +1,3 @@
-Let me start by reading the knowledge graph and the pages manifest, then explore the source code.
-
-Now let me examine the constants and exceptions:
-
-Now let me check the `apply_yaml` function and the `get_client` function signature, plus see what `ResourceConstants` inherits:
-
-Let me look for key public methods in resource.py that I might have missed (the file was truncated before):
-
-Let me also check for import paths:
-
-Now let me look at the `NamespacedResource._base_body` more carefully and check for anything more:
-
-Now let me check what the `Event` class looks like for the events method reference:
-
-Let me also check for `generate_yaml_from_template`:
-
-That's a test utility. Let me check for the `skip_existing_resource_creation_teardown` function:
-
-Now I have all the information needed. Let me write the comprehensive API reference page.
-
 # Resource and NamespacedResource API
 
 Complete API reference for the `Resource` and `NamespacedResource` base classes, the `get_client` factory function, and supporting classes (`ResourceEditor`, `ResourceList`, `NamespacedResourceList`, `KubeAPIVersion`).

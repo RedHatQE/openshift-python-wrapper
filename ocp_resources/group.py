@@ -23,7 +23,7 @@ class Group(Resource):
     ) -> None:
         r"""
         Args:
-            users (list[Any]): Users is the list of users in this group.
+            users (list[Any]): users is the list of users in this group.
 
         """
         super().__init__(**kwargs)
@@ -31,6 +31,7 @@ class Group(Resource):
         self.users = users
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

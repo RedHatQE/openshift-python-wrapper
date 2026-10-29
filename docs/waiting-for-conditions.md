@@ -1,29 +1,3 @@
-Let me start by reading the knowledge graph and page manifest, then explore the relevant source code.
-
-Now let me examine the resource-specific wait methods, the `wait_for_condition` more closely, and the constants used:
-
-Now let me look at the `Status` class, `Condition` class, and how `create` integrates with `wait`:
-
-Now let me look at how Status/Condition are exposed on the base Resource class and how `deploy` / `create` uses wait:
-
-Now let me see the `deploy` method more fully and how `wait` is passed through:
-
-Now let me check the `sriov_network_node_state.py` and `virtual_machine_restore.py` for more wait patterns, and also look at the `TimeoutExpiredError` import:
-
-Now let me check the `cdi_config.py` wait method and look at the `wait_for_resource` parameter in the constructor:
-
-Now let me look at how `create` uses `wait`:
-
-Now let me look at more of the `status` property:
-
-Now I have all the information I need. Let me also check the `TimeoutSampler` import to understand the exception:
-
-Let me check if there are any virtual machine import wait patterns with more stop_status details:
-
-Now let me look at the `node_network_state.py` wait patterns:
-
-I now have comprehensive understanding of all the wait methods. Let me compile the documentation.
-
 # Waiting for Resource Conditions and Status
 
 Wait for Kubernetes and OpenShift resources to reach a desired status, condition, or lifecycle state using built-in polling methods with configurable timeouts and early exit on failure.

@@ -1,23 +1,3 @@
-Let me start by reading the knowledge graph and the pages manifest, then explore the codebase.
-
-Now let me look at more resource files for networking, RBAC, and DataVolume:
-
-Now let me look at the secret, network policy, network attachment definition, and the duplicate API groups handling:
-
-Now let me look at the duplicate API groups handling:
-
-Now let me look at some files with duplicate kinds to understand the pattern:
-
-Now let me look at how to exec in pods and also look at the user_defined_network and apply_yaml approach:
-
-Now let me look at how the `yaml_file` parameter works and look at the event-related code:
-
-Now let me check some gateway files to see the pattern for duplicate API groups:
-
-Now let me look at the `user_defined_network.py` for newer networking resources:
-
-Now I have enough information. Let me write the documentation page:
-
 # Common Resource Patterns
 
 Copy-paste recipes for the most common Kubernetes and OpenShift resource operations using openshift-python-wrapper.

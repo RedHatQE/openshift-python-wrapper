@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Working with Kubernetes Events - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link active" aria-current="page">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,21 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by exploring the repository structure and the knowledge graph.</p>
-<p>Now let me explore the Event-related source code:</p>
-<p>Now let me look at the <code>_build_event_field_selector</code> function and related event test files:</p>
-<p>Now let me check the <code>events</code> test files in the tests directory:</p>
-<p>Now let me check the resource.py import and the <code>events</code> method more carefully, and also look at how TIMEOUT_4MINUTES is defined:</p>
-<p>Let me check where TIMEOUT_4MINUTES is defined in resource.py:</p>
-<p>Now let me check the constants value for TIMEOUT_4MINUTES:</p>
-<p>Now let me check how the Event class is used in the fake client:</p>
-<p>Now let me look at the <code>_extract_event_info</code> and the <code>_process_watch_events</code> functions to understand the event data structure better:</p>
-<p>Now let me look at the event object structure from watch events:</p>
-<p>Now let me check how to properly import and use Event:</p>
-<p>Let me also look at the test file for events in more detail:</p>
-<p>Now let me check the watch method's return structure for events:</p>
-<p>Now I have a thorough understanding. Let me write the documentation.</p>
-<h1 id="working-with-kubernetes-events">Working with Kubernetes Events</h1>
+                    <h1 id="working-with-kubernetes-events">Working with Kubernetes Events</h1>
 <p>Monitor, retrieve, and clean up Kubernetes events to debug resource behavior and automate event-driven workflows using the <code>Event</code> class and the <code>resource.events()</code> method.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -291,8 +256,8 @@
 <p>Stream events from a namespace in real-time:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.event</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
 
-<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2"> — </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="streaming-events-in-real-time-with-eventget">Streaming Events in Real-Time with <code>Event.get()</code></h2>
@@ -301,15 +266,15 @@
 
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">object</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Each yielded event is a watch event dictionary with these keys:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Key</th>
@@ -330,9 +295,9 @@
 <td>The raw dictionary representation of the event</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="eventget-parameters"><code>Event.get()</code> Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -385,22 +350,22 @@
 <td>Timeout in seconds; <code>None</code> watches indefinitely</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>Generator</code> — yields watch event dictionaries.</p>
 <h3 id="filtering-with-field-selectors">Filtering with Field Selectors</h3>
 <p>Field selectors let you narrow down events to exactly what you care about. Combine multiple selectors with commas:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Only Warning events for ClusterServiceVersion resources</span>
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;involvedObject.kind==ClusterServiceVersion,type==Warning,reason==AnEventReason&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"involvedObject.kind==ClusterServiceVersion,type==Warning,reason==AnEventReason"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Common field selector fields:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Field</th>
@@ -429,7 +394,7 @@
 <td><code>involvedObject.namespace==default</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="listing-existing-events-with-eventlist">Listing Existing Events with <code>Event.list()</code></h2>
 <p>Unlike <code>Event.get()</code>, which streams events in real-time, <code>Event.list()</code> returns existing events immediately as a list. By default it only returns events from the last 5 minutes.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.event</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
@@ -437,17 +402,17 @@
 <span class="c1"># List all Warning events from the last 5 minutes</span>
 <span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"type==Warning"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Results are sorted by <code>lastTimestamp</code> descending (most recent first).</p>
 <h3 id="eventlist-parameters"><code>Event.list()</code> Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -488,7 +453,7 @@
 <td>Only return events from the last N seconds</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>list</code> — event resource objects sorted by timestamp (most recent first).</p>
 <p><strong>Raises:</strong> <code>ValueError</code> — if <code>since_seconds</code> is negative.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Events from the last 30 minutes</span>
@@ -499,7 +464,7 @@
 </code></pre></div>
 
 <h3 id="when-to-use-eventget-vs-eventlist">When to Use <code>Event.get()</code> vs <code>Event.list()</code></h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Use case</th>
@@ -532,28 +497,28 @@
 <td><code>Event.list()</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="getting-events-for-a-specific-resource">Getting Events for a Specific Resource</h2>
 <p>Every resource instance has an <code>.events()</code> method that automatically filters events to that specific resource by setting <code>involvedObject.name</code> in the field selector.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.pod</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pod</span>
 
-<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-pod&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">pod</span> <span class="o">=</span> <span class="n">Pod</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my-pod"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <p>You can add extra filters on top of the automatic resource filter:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Only Warning events for this specific pod</span>
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning&quot;</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"type==Warning"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="resourceevents-parameters"><code>resource.events()</code> Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -594,7 +559,7 @@
 <td>Timeout in seconds (default: 4 minutes)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>Generator</code> — yields watch event dictionaries, same format as <code>Event.get()</code>.</p>
 <blockquote>
 <p><strong>Note:</strong> The <code>field_selector</code> you provide is appended to the automatic <code>involvedObject.name==&lt;resource-name&gt;</code> filter. You don't need to specify the resource name yourself.</p>
@@ -604,18 +569,18 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.event</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
 
 <span class="c1"># Delete all events in a namespace</span>
-<span class="n">Event</span><span class="o">.</span><span class="n">delete_events</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">Event</span><span class="o">.</span><span class="n">delete_events</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 
 <span class="c1"># Delete events matching a specific reason</span>
 <span class="n">Event</span><span class="o">.</span><span class="n">delete_events</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;reason==AnEventReason&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"reason==AnEventReason"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
 <h3 id="eventdelete_events-parameters"><code>Event.delete_events()</code> Parameters</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -668,7 +633,7 @@
 <td>Timeout in seconds</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Returns:</strong> <code>None</code></p>
 <h2 id="advanced-usage">Advanced Usage</h2>
 <h3 id="test-setup-clean-events-before-each-test">Test Setup: Clean Events Before Each Test</h3>
@@ -686,10 +651,10 @@
     <span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
         <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
         <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
-        <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;reason==Scheduled&quot;</span><span class="p">,</span>
+        <span class="n">field_selector</span><span class="o">=</span><span class="s2">"reason==Scheduled"</span><span class="p">,</span>
         <span class="n">since_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Pod was not scheduled&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"Pod was not scheduled"</span>
 </code></pre></div>
 
 <h3 id="collecting-events-during-an-operation">Collecting Events During an Operation</h3>
@@ -699,15 +664,15 @@
 <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;involvedObject.kind==Deployment&quot;</span><span class="p">,</span>
+    <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"involvedObject.kind==Deployment"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span> <span class="o">==</span> <span class="s2">&quot;ScalingReplicaSet&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span> <span class="o">==</span> <span class="s2">"ScalingReplicaSet"</span><span class="p">:</span>
         <span class="k">break</span>  <span class="c1"># Found what we were looking for</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Captured </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span><span class="si">}</span><span class="s2"> events&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Captured </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span><span class="si">}</span><span class="s2"> events"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="watching-cluster-wide-events">Watching Cluster-Wide Events</h3>
@@ -717,16 +682,16 @@
 <span class="c1"># Watch all Warning events cluster-wide</span>
 <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
     <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;type==Warning&quot;</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"type==Warning"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="n">ns</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">involvedObject</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;namespace&quot;</span><span class="p">,</span> <span class="s2">&quot;cluster-scoped&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">ns</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">involvedObject</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"namespace"</span><span class="p">,</span> <span class="s2">"cluster-scoped"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">ns</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="accessing-event-object-properties">Accessing Event Object Properties</h3>
 <p>The <code>event.object</code> yielded by <code>Event.get()</code> and <code>resource.events()</code> is a Kubernetes <code>ResourceInstance</code> with these commonly used attributes:</p>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Attribute</th>
@@ -767,16 +732,16 @@
 <td>Dict with <code>kind</code>, <code>name</code>, <code>namespace</code>, etc.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <p><strong><code>Event.get()</code> hangs indefinitely</strong>
 You likely omitted the <code>timeout</code> parameter. Always set a <code>timeout</code> value to avoid blocking forever:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Bad — hangs if no events arrive</span>
-<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"ns"</span><span class="p">):</span>
     <span class="o">...</span>
 
 <span class="c1"># Good — stops after 30 seconds</span>
-<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">Event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"ns"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
     <span class="o">...</span>
 </code></pre></div>
 
@@ -789,7 +754,7 @@ You likely omitted the <code>timeout</code> parameter. Always set a <code>timeou
 <p><strong><code>resource.events()</code> returns events for other resources too</strong>
 This method filters only by <code>involvedObject.name</code>. If multiple resources share the same name across different kinds, add a <code>field_selector</code> to narrow it down:</p>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pod</span><span class="o">.</span><span class="n">events</span><span class="p">(</span>
-    <span class="n">field_selector</span><span class="o">=</span><span class="s2">&quot;involvedObject.kind==Pod&quot;</span><span class="p">,</span>
+    <span class="n">field_selector</span><span class="o">=</span><span class="s2">"involvedObject.kind==Pod"</span><span class="p">,</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
@@ -868,10 +833,7 @@ This method filters only by <code>involvedObject.name</code>. If multiple resour
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -879,13 +841,14 @@ This method filters only by <code>involvedObject.name</code>. If multiple resour
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -931,5 +894,6 @@ This method filters only by <code>involvedObject.name</code>. If multiple resour
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

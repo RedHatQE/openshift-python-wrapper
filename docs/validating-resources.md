@@ -1,13 +1,3 @@
-Let me start by reading the exclusions file and pages manifest, then explore the codebase.
-
-Now let me look at how the Resource base class integrates validation:
-
-Now let me check the exceptions module:
-
-Now let me check how `deploy` and context managers interact with validation:
-
-Now I have a comprehensive understanding of the validation feature. Let me write the documentation.
-
 # Validating Resources Against OpenAPI Schemas
 
 Catch configuration mistakes before they reach the Kubernetes API by validating resource definitions against OpenAPI schemas. This saves debugging time and prevents failed deployments caused by typos, missing fields, or incorrect types.

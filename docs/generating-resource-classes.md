@@ -1,15 +1,3 @@
-Let me start by exploring the repository structure and the knowledge graph.
-
-Now let me check the generated output example and the test generation flow:
-
-Now let me look at a generated file with a spec section, and check one with duplicate kinds:
-
-Let me also check the `--help` output structure and look at a few more details:
-
-Now let me check a dry-run example and verify what shell completion setup looks like:
-
-Now I have a thorough understanding of the codebase. Let me write the documentation:
-
 # Generating New Resource Classes with class-generator
 
 Scaffold Python wrapper classes for any Kubernetes or OpenShift custom resource definition (CRD) so you can manage those resources using the same patterns as built-in resources. The `class-generator` CLI introspects your cluster's OpenAPI schemas and produces ready-to-use Python files complete with typed constructors, docstrings, and `to_dict()` serialization.
@@ -184,6 +172,41 @@ class-generator -k LlamaStackDistribution --overwrite
 ```
 
 > **Warning:** `--update-schema` and `--update-schema-for` are mutually exclusive. Use one or the other.
+
+## Verifying Generated Files
+
+A generated file is only trustworthy while it still matches what class-generator produces.
+`--verify*` checks that without modifying anything: on drift it exits `1`, lists each file
+with its drift classification, and prints the regenerate command.
+
+```bash
+# every generated resource
+class-generator --verify-all
+
+# only the files this branch changed (compares against the branch's base, merge-base aware)
+class-generator --verify-changed
+
+# what a PR touched, is what CI should check
+tox -e validate-generated
+```
+
+Narrow the report when you only care about a specific kind of drift:
+
+```bash
+# only files whose drift is blank lines and/or added parameters, nothing else
+class-generator --verify-all --classification "blank lines,signature code add" --match
+
+# everything that is safe to regenerate - drops caller-breaking drift
+class-generator --verify-all --exclude "breaking change,schema incomplete"
+```
+
+`breaking change` covers a removed parameter, a parameter that became required, a parameter
+emitted under a different API key, a changed base class, and a changed
+`api_group`/`api_version`. `schema incomplete` marks a class rendered without any
+parameters because a schema `$ref` could not be resolved — fix the schema, not the file.
+
+See the [class-generator CLI reference](class-generator-cli.html#verification) for every
+option and classification.
 
 ## Discovering Missing Resources
 

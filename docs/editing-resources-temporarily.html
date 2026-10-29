@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editing Resources Temporarily with ResourceEditor - openshift-python-wrapper</title>
     <meta name="description" content="Manage OpenShift and Kubernetes resources with clean, Pythonic code instead of raw API calls">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style.css?v=66bf87bdd9">
     <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
     <link rel="alternate" type="text/plain" title="LLM Documentation Index" href="llms.txt">
     <link rel="alternate" type="text/plain" title="LLM Full Documentation" href="llms-full.txt">
@@ -34,13 +34,6 @@
                             Installing and Creating Your First Resource
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">User Guides</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="connecting-to-clusters.html"
@@ -98,6 +91,13 @@
                         </a>
                     </li>
 
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <h3 class="nav-group-title">Testing and Generation</h3>
+                <ul class="nav-group-pages">
+
                     <li>
                         <a href="testing-without-cluster.html"
                            class="nav-link">
@@ -112,11 +112,18 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a href="class-generator-cli.html"
+                           class="nav-link">
+                            class-generator CLI Reference
+                        </a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="nav-group">
-                <h3 class="nav-group-title">Recipes</h3>
+                <h3 class="nav-group-title">Guides</h3>
                 <ul class="nav-group-pages">
 
                     <li>
@@ -148,25 +155,11 @@
                     </li>
 
                     <li>
-                        <a href="class-generator-cli.html"
-                           class="nav-link">
-                            class-generator CLI Reference
-                        </a>
-                    </li>
-
-                    <li>
                         <a href="environment-variables.html"
                            class="nav-link">
                             Environment Variables and Configuration
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Internals</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="resource-class-hierarchy.html"
@@ -182,13 +175,6 @@
                         </a>
                     </li>
 
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">Using Resources</h3>
-                <ul class="nav-group-pages">
-
                     <li>
                         <a href="working-with-events.html"
                            class="nav-link">
@@ -202,13 +188,6 @@
                             Executing Commands in Pods and Retrieving Logs
                         </a>
                     </li>
-
-                </ul>
-            </div>
-
-            <div class="nav-group">
-                <h3 class="nav-group-title">API Reference</h3>
-                <ul class="nav-group-pages">
 
                     <li>
                         <a href="error-handling.html"
@@ -238,8 +217,8 @@
                 <button class="top-bar-search-btn" id="search-trigger" aria-label="Search">
                     <kbd>&#8984;K</kbd> Search
                 </button>
-                <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener" class="docsfy-badge" title="Generated with docsfy">
-                    ⚡ docs<span class="brand-accent">fy</span>
+                <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener" class="docsite-badge" title="documentation">
+                    ⚡ pi<span class="brand-accent">-docsite</span>
                 </a>
 
                 <a href="https://github.com/RedHatQE/openshift-python-wrapper" target="_blank" rel="noopener noreferrer" class="top-bar-github" id="github-link" data-repo-url="https://github.com/RedHatQE/openshift-python-wrapper">
@@ -266,16 +245,7 @@
                          converted to HTML server-side by the markdown library, not
                          user-supplied input. XSS risk is minimal and accepted since
                          the AI generates the content, not end users. -->
-                    <p>Let me start by reading the knowledge graph and understanding the repository structure.</p>
-<p>Now let me find the ResourceEditor source code.</p>
-<p>Now let me look at how ResourceEditor is used in the NNCP file and any tests:</p>
-<p>Let me look at the import section and any related constants:</p>
-<p>Now let me look at the <code>update</code> and <code>update_replace</code> methods on the Resource class to understand the two actions:</p>
-<p>Now let me look at the imports to verify how ResourceEditor is exported:</p>
-<p>Now let me check for any additional examples or documentation:</p>
-<p>Let me look at the full ResourceEditor code once more to make sure I've captured everything, and also check the <code>_apply_patches</code> method details and what <code>action</code> values are supported:</p>
-<p>Now I have a complete picture of the ResourceEditor class. Let me write the documentation.</p>
-<h1 id="editing-resources-temporarily-with-resourceeditor">Editing Resources Temporarily with ResourceEditor</h1>
+                    <h1 id="editing-resources-temporarily-with-resourceeditor">Editing Resources Temporarily with ResourceEditor</h1>
 <p>Temporarily modify Kubernetes and OpenShift resources during tests and have their original values automatically restored when you're done. This is essential for test isolation—ensuring that changes made during a test don't leak into other tests or persist in the cluster.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
@@ -290,12 +260,10 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
 
-<span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;worker-0&quot;</span><span class="p">)</span>
+<span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"worker-0"</span><span class="p">)</span>
 
-<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
-    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;test-label&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">}}}}</span>
-<span class="p">):</span>
-    <span class="c1"># The node now has the label &quot;test-label&quot;: &quot;true&quot;</span>
+<span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">node</span><span class="p">:</span> <span class="p">{</span><span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"labels"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"test-label"</span><span class="p">:</span> <span class="s2">"true"</span><span class="p">}}}}):</span>
+    <span class="c1"># The node now has the label "test-label": "true"</span>
     <span class="c1"># Run your test logic here...</span>
     <span class="k">pass</span>
 
@@ -308,18 +276,18 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
 
-<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;my-namespace&quot;</span><span class="p">)</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"my-config"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"my-namespace"</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="2-define-your-patch">2. Define your patch</h3>
 <p>Patches are dictionaries that mirror the resource's YAML structure. Only include the fields you want to change:</p>
-<div class="highlight"><pre><span></span><code><span class="n">patch</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;feature_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;log_level&quot;</span><span class="p">:</span> <span class="s2">&quot;debug&quot;</span><span class="p">}}</span>
+<div class="highlight"><pre><span></span><code><span class="n">patch</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"feature_flag"</span><span class="p">:</span> <span class="s2">"enabled"</span><span class="p">,</span> <span class="s2">"log_level"</span><span class="p">:</span> <span class="s2">"debug"</span><span class="p">}}</span>
 </code></pre></div>
 
 <h3 id="3-wrap-your-test-logic-in-a-with-block">3. Wrap your test logic in a <code>with</code> block</h3>
 <div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">cm</span><span class="p">:</span> <span class="n">patch</span><span class="p">}):</span>
     <span class="c1"># ConfigMap now has updated data fields</span>
-    <span class="k">assert</span> <span class="n">cm</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">feature_flag</span> <span class="o">==</span> <span class="s2">&quot;enabled&quot;</span>
+    <span class="k">assert</span> <span class="n">cm</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">feature_flag</span> <span class="o">==</span> <span class="s2">"enabled"</span>
     <span class="c1"># Run tests that depend on the modified config...</span>
 </code></pre></div>
 
@@ -331,12 +299,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.namespace</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
 
-<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">)</span>
-<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;test-ns&quot;</span><span class="p">)</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">)</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"app-config"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"test-ns"</span><span class="p">)</span>
 
 <span class="n">patches</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">ns</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}}},</span>
-    <span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;database_url&quot;</span><span class="p">:</span> <span class="s2">&quot;postgres://test-db:5432&quot;</span><span class="p">}},</span>
+    <span class="n">ns</span><span class="p">:</span> <span class="p">{</span><span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"labels"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"env"</span><span class="p">:</span> <span class="s2">"test"</span><span class="p">}}},</span>
+    <span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"database_url"</span><span class="p">:</span> <span class="s2">"postgres://test-db:5432"</span><span class="p">}},</span>
 <span class="p">}</span>
 
 <span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="n">patches</span><span class="p">):</span>
@@ -350,11 +318,9 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.config_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigMap</span>
 
-<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;app-config&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">ConfigMap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"app-config"</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
 
-<span class="n">editor</span> <span class="o">=</span> <span class="n">ResourceEditor</span><span class="p">(</span>
-    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;maintenance&quot;</span><span class="p">}}}</span>
-<span class="p">)</span>
+<span class="n">editor</span> <span class="o">=</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">cm</span><span class="p">:</span> <span class="p">{</span><span class="s2">"data"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"maintenance"</span><span class="p">}}})</span>
 
 <span class="c1"># Apply the patch and create backups</span>
 <span class="n">editor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">backup_resources</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -374,14 +340,14 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
 
 <span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
-    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}},</span>
-    <span class="n">action</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"replicas"</span><span class="p">:</span> <span class="mi">3</span><span class="p">}}},</span>
+    <span class="n">action</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="c1"># The resource is fully replaced, not merged</span>
     <span class="k">pass</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Action</th>
@@ -401,7 +367,7 @@
 <td>Replaces the entire resource; fields not in the patch are removed</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Warning:</strong> With <code>action="replace"</code>, the patch must include all required fields for the resource, not just the fields you want to change. The replacement payload automatically includes <code>metadata.name</code>, <code>metadata.namespace</code>, <code>metadata.resourceVersion</code>, <code>kind</code>, and <code>apiVersion</code>.</p>
 </blockquote>
@@ -409,10 +375,10 @@
 <p>If you already know what the restore state should be (or need custom restore logic), pass <code>user_backups</code> to skip the automatic backup calculation:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ocp_resources.resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceEditor</span>
 
-<span class="n">custom_backup</span> <span class="o">=</span> <span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}}</span>
+<span class="n">custom_backup</span> <span class="o">=</span> <span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"replicas"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}}</span>
 
 <span class="k">with</span> <span class="n">ResourceEditor</span><span class="p">(</span>
-    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;replicas&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}}},</span>
+    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">"spec"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"replicas"</span><span class="p">:</span> <span class="mi">5</span><span class="p">}}},</span>
     <span class="n">user_backups</span><span class="o">=</span><span class="n">custom_backup</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="c1"># Resource scaled to 5 replicas</span>
@@ -422,14 +388,12 @@
 
 <h3 id="inspecting-backups">Inspecting Backups</h3>
 <p>Access the automatically generated backup data through the <code>backups</code> property:</p>
-<div class="highlight"><pre><span></span><code><span class="n">editor</span> <span class="o">=</span> <span class="n">ResourceEditor</span><span class="p">(</span>
-    <span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;staging&quot;</span><span class="p">}}}}</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">editor</span> <span class="o">=</span> <span class="n">ResourceEditor</span><span class="p">(</span><span class="n">patches</span><span class="o">=</span><span class="p">{</span><span class="n">my_resource</span><span class="p">:</span> <span class="p">{</span><span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"labels"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"env"</span><span class="p">:</span> <span class="s2">"staging"</span><span class="p">}}}})</span>
 <span class="n">editor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">backup_resources</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># See what was backed up</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">editor</span><span class="o">.</span><span class="n">backups</span><span class="p">)</span>
-<span class="c1"># {&lt;Resource&gt;: {&#39;metadata&#39;: {&#39;labels&#39;: {&#39;env&#39;: &#39;production&#39;}}}}</span>
+<span class="c1"># {&lt;Resource&gt;: {'metadata': {'labels': {'env': 'production'}}}}</span>
 
 <span class="n">editor</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
 </code></pre></div>
@@ -446,12 +410,12 @@
 <h3 id="constructor">Constructor</h3>
 <div class="highlight"><pre><span></span><code><span class="n">ResourceEditor</span><span class="p">(</span>
     <span class="n">patches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-    <span class="n">action</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span>
+    <span class="n">action</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"update"</span><span class="p">,</span>
     <span class="n">user_backups</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Parameter</th>
@@ -480,9 +444,9 @@
 <td>Custom backup dicts to use for restore instead of auto-generated ones</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="properties">Properties</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Property</th>
@@ -502,9 +466,9 @@
 <td>The patches dict provided in the constructor</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="methods">Methods</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Method</th>
@@ -524,9 +488,9 @@
 <td>Re-apply the stored backup dicts to revert all patched resources.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="context-manager-protocol">Context Manager Protocol</h3>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Method</th>
@@ -543,9 +507,9 @@
 <td>Calls <code>restore()</code> to revert all changes</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h2 id="troubleshooting">Troubleshooting</h2>
-<table>
+<div class="table-wrap"><table>
 <thead>
 <tr>
 <th>Problem</th>
@@ -580,7 +544,7 @@
 <td>When using <code>action="replace"</code>, provide all required spec fields since the entire resource is replaced</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <blockquote>
 <p><strong>Tip:</strong> For creating and cleaning up resources (rather than editing existing ones), see <a href="creating-and-managing-resources.html">Creating and Managing Resources</a>. For managing groups of similar resources, see <a href="managing-resource-lists.html">Managing Bulk Resources with ResourceList</a>.</p>
 </blockquote>
@@ -653,10 +617,7 @@
 
         <footer class="page-footer">
 
-            <span class="footer-version">Generated from version 11.0.134</span>
-            <span class="footer-sep">&middot;</span>
-
-            Generated with <a href="https://github.com/myk-org/docsfy" target="_blank" rel="noopener">docs<span class="brand-accent">fy</span></a>
+            Built from <code>docs/*.md</code> by <code>pi-docsite</code>
             <span class="footer-sep">&middot;</span>
             <span class="footer-llm">LLM-friendly: <a href="llms.txt">llms.txt</a> &middot; <a href="llms-full.txt">llms-full.txt</a></span>
         </footer>
@@ -664,13 +625,14 @@
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="assets/theme.js"></script>
-    <script src="assets/search.js"></script>
-    <script src="assets/copy.js"></script>
-    <script src="assets/callouts.js"></script>
-    <script src="assets/scrollspy.js"></script>
-    <script src="assets/codelabels.js"></script>
-    <script src="assets/github.js"></script>
+    <script src="assets/theme.js?v=66bf87bdd9"></script>
+
+    <script src="assets/search.js?v=66bf87bdd9"></script>
+    <script src="assets/copy.js?v=66bf87bdd9"></script>
+    <script src="assets/callouts.js?v=66bf87bdd9"></script>
+    <script src="assets/scrollspy.js?v=66bf87bdd9"></script>
+    <script src="assets/codelabels.js?v=66bf87bdd9"></script>
+    <script src="assets/github.js?v=66bf87bdd9"></script>
     <script>
 (function() {
     var toggle = document.getElementById('sidebar-toggle');
@@ -716,5 +678,6 @@
     }
 })();
 </script>
+<!-- generated by pi-docsite -->
 </body>
 </html>

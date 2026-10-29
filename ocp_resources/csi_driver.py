@@ -17,9 +17,12 @@ class CSIDriver(Resource):
         self,
         attach_required: bool | None = None,
         fs_group_policy: str | None = None,
+        node_allocatable_update_period_seconds: int | None = None,
         pod_info_on_mount: bool | None = None,
+        prevent_pod_scheduling_if_missing: bool | None = None,
         requires_republish: bool | None = None,
         se_linux_mount: bool | None = None,
+        service_account_token_in_secrets: bool | None = None,
         storage_capacity: bool | None = None,
         token_requests: list[Any] | None = None,
         volume_lifecycle_modes: list[Any] | None = None,
@@ -34,10 +37,9 @@ class CSIDriver(Resource):
               status and waits until the volume is attached before proceeding to
               mounting. The CSI external-attacher coordinates with CSI volume
               driver and updates the volumeattachment status when the attach
-              operation is complete. If the CSIDriverRegistry feature gate is
-              enabled and the value is specified to false, the attach operation
-              will be skipped. Otherwise the attach operation will be called.
-              This field is immutable.
+              operation is complete. If the value is specified to false, the
+              attach operation will be skipped. Otherwise the attach operation
+              will be called.  This field is immutable.
 
             fs_group_policy (str): fsGroupPolicy defines if the underlying volume supports changing
               ownership and permission of the volume before being mounted. Refer
@@ -48,6 +50,16 @@ class CSIDriver(Resource):
               permissions of the volume. With the default policy the defined
               fsGroup will only be applied if a fstype is defined and the
               volume's access mode contains ReadWriteOnce.
+
+            node_allocatable_update_period_seconds (int): nodeAllocatableUpdatePeriodSeconds specifies the interval between
+              periodic updates of the CSINode allocatable capacity for this
+              driver. When set, both periodic updates and updates triggered by
+              capacity-related failures are enabled. If not set, no updates
+              occur (neither periodic nor upon detecting capacity-related
+              failures), and the allocatable.count remains static. The minimum
+              allowed value for this field is 10 seconds.  This feature requires
+              the MutableCSINodeAllocatableCount feature gate to be enabled.
+              This field is mutable.
 
             pod_info_on_mount (bool): podInfoOnMount indicates this CSI volume driver requires additional
               pod information (like podName, podUID, etc.) during mount
@@ -75,6 +87,22 @@ class CSIDriver(Resource):
               command line parameter of the driver.  This field was immutable in
               Kubernetes < 1.29 and now is mutable.
 
+            prevent_pod_scheduling_if_missing (bool): PreventPodSchedulingIfMissing indicates that the CSI driver wants to
+              prevent pod scheduling if the CSI driver on the node is missing.
+              Enabling this option will prevent the scheduler (or any other
+              component which embeds default scheduler such as cluster-
+              autoscaler) from scheduling pods to nodes where CSI driver is not
+              installed.  For components(such as cluster-autoscaler) that embed
+              the scheduler and run pod placement simulations using scheduler
+              plugins, they MUST be aware of CSI driver registration information
+              via CSINode object. They must create simulated CSINode objects in
+              addition to Node objects during scheduling simulation, otherwise
+              if PreventPodSchedulingIfMissing is enabled globally for CSIDriver
+              object, any newly created node may be rejected by the scheduler
+              because of missing CSI driver information from the node.  This is
+              an alpha feature and requires the VolumeLimitScaling feature gate
+              to be enabled. Default is "false".
+
             requires_republish (bool): requiresRepublish indicates the CSI driver wants `NodePublishVolume`
               being periodically called to reflect any possible change in the
               mounted volume. This field defaults to false.  Note: After a
@@ -96,6 +124,26 @@ class CSIDriver(Resource):
               Kubernetes won't pass any special SELinux mount options to the
               driver. This is typical for volumes that represent subdirectories
               of a bigger shared filesystem.  Default is "false".
+
+            service_account_token_in_secrets (bool): serviceAccountTokenInSecrets is an opt-in for CSI drivers to indicate
+              that service account tokens should be passed via the Secrets field
+              in NodePublishVolumeRequest instead of the VolumeContext field.
+              The CSI specification provides a dedicated Secrets field for
+              sensitive information like tokens, which is the appropriate
+              mechanism for handling credentials. This addresses security
+              concerns where sensitive tokens were being logged as part of
+              volume context.  When "true", kubelet will pass the tokens only in
+              the Secrets field with the key
+              "csi.storage.k8s.io/serviceAccount.tokens". The CSI driver must be
+              updated to read tokens from the Secrets field instead of
+              VolumeContext.  When "false" or not set, kubelet will pass the
+              tokens in VolumeContext with the key
+              "csi.storage.k8s.io/serviceAccount.tokens" (existing behavior).
+              This maintains backward compatibility with existing CSI drivers.
+              This field can only be set when TokenRequests is configured. The
+              API server will reject CSIDriver specs that set this field without
+              TokenRequests.  Default behavior if unset is to pass tokens in the
+              VolumeContext field.
 
             storage_capacity (bool): storageCapacity indicates that the CSI volume driver wants pod
               scheduling to consider the storage capacity that the driver
@@ -140,14 +188,18 @@ class CSIDriver(Resource):
 
         self.attach_required = attach_required
         self.fs_group_policy = fs_group_policy
+        self.node_allocatable_update_period_seconds = node_allocatable_update_period_seconds
         self.pod_info_on_mount = pod_info_on_mount
+        self.prevent_pod_scheduling_if_missing = prevent_pod_scheduling_if_missing
         self.requires_republish = requires_republish
         self.se_linux_mount = se_linux_mount
+        self.service_account_token_in_secrets = service_account_token_in_secrets
         self.storage_capacity = storage_capacity
         self.token_requests = token_requests
         self.volume_lifecycle_modes = volume_lifecycle_modes
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -160,14 +212,23 @@ class CSIDriver(Resource):
             if self.fs_group_policy is not None:
                 _spec["fsGroupPolicy"] = self.fs_group_policy
 
+            if self.node_allocatable_update_period_seconds is not None:
+                _spec["nodeAllocatableUpdatePeriodSeconds"] = self.node_allocatable_update_period_seconds
+
             if self.pod_info_on_mount is not None:
                 _spec["podInfoOnMount"] = self.pod_info_on_mount
+
+            if self.prevent_pod_scheduling_if_missing is not None:
+                _spec["preventPodSchedulingIfMissing"] = self.prevent_pod_scheduling_if_missing
 
             if self.requires_republish is not None:
                 _spec["requiresRepublish"] = self.requires_republish
 
             if self.se_linux_mount is not None:
                 _spec["seLinuxMount"] = self.se_linux_mount
+
+            if self.service_account_token_in_secrets is not None:
+                _spec["serviceAccountTokenInSecrets"] = self.service_account_token_in_secrets
 
             if self.storage_capacity is not None:
                 _spec["storageCapacity"] = self.storage_capacity
