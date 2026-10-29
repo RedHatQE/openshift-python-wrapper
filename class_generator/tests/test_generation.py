@@ -14,8 +14,13 @@ from class_generator.formatters.template_renderer import render_jinja_template
 LOGGER = get_logger(name=__name__)
 
 
-def generate_class_generator_tests() -> None:
-    """Generate test files for class generator."""
+def render_class_generator_tests() -> str | None:
+    """
+    Render the class-generator test file from the manifests and the Jinja template.
+
+    Returns:
+        Rendered file content, or None when the template or manifests cannot be read
+    """
     tests_info: dict[str, list[dict[str, Any]]] = {"template": []}
     dirs_to_ignore: list[str] = ["__pycache__"]
 
@@ -23,7 +28,7 @@ def generate_class_generator_tests() -> None:
         dir_contents = os.listdir(str(TESTS_MANIFESTS_DIR))
     except OSError as e:
         LOGGER.error(f"Failed to list directory {TESTS_MANIFESTS_DIR}: {e}")
-        return
+        return None
 
     for _dir in dir_contents:
         dir_path = TESTS_MANIFESTS_DIR / _dir
@@ -60,12 +65,21 @@ def generate_class_generator_tests() -> None:
         )
     except FileNotFoundError as e:
         LOGGER.error(f"Template file 'test_parse_explain.j2' not found: {e}")
-        return
+        return None
     except Exception as e:
         LOGGER.error(
             f"Failed to render template 'test_parse_explain.j2': {e}. "
             f"This may be due to template syntax errors or missing variables."
         )
+        return None
+
+    return rendered
+
+
+def generate_class_generator_tests() -> None:
+    """Generate test files for class generator."""
+    rendered = render_class_generator_tests()
+    if rendered is None:
         return
 
     test_file_path = TESTS_MANIFESTS_DIR.parent / "test_class_generator.py"
@@ -121,3 +135,27 @@ class TestHandWrittenFileConversion:
         converted = hand_written.read_text()
         assert "class NodeNetworkConfigurationPolicy" in converted
         assert "hand-maintained" in caplog.text
+
+
+class TestGeneratedTestFile:
+    """The generated test file must always match its template (issue #2840)."""
+
+    def test_rendered_template_matches_committed_test(self) -> None:
+        rendered = render_class_generator_tests()
+
+        assert rendered is not None, "template could not be rendered"
+        if not rendered.endswith("\n"):
+            rendered += "\n"
+
+        committed_path = TESTS_MANIFESTS_DIR.parent / "test_class_generator.py"
+        assert rendered == committed_path.read_text(encoding="utf-8"), (
+            "test_class_generator.py does not match test_parse_explain.j2 - "
+            "regenerate it with --add-tests instead of editing the generated file"
+        )
+
+    def test_template_guards_against_str_unpack(self) -> None:
+        """A drift result is a str when clean and a tuple when drifted; never unpack blindly."""
+        template = (TESTS_MANIFESTS_DIR / "test_parse_explain.j2").read_text(encoding="utf-8")
+
+        assert "for drifted_file, _categories in drifted_files" not in template
+        assert "isinstance(drifted, tuple)" in template
