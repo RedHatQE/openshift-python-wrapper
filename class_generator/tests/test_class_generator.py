@@ -51,16 +51,16 @@ def test_parse_explain() -> None:
         "DNS",
         "Deployment",
         "ImageContentSourcePolicy",
+        "Ingress",
         "Machine",
         "NMState",
-        "Pod",
-        "Secret",
-        "ServiceMeshMember",
         "OAuth",
         "Pipeline",
-        "ServingRuntime",
-        "Ingress",
+        "Pod",
         "RouteAdvertisements",
+        "Secret",
+        "ServiceMeshMember",
+        "ServingRuntime",
     ]
 
     failures: list[tuple[str, str]] = []
