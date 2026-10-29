@@ -1,7 +1,12 @@
 skipsdist = true
-env_list = ["unittests"]
+env_list = ["unittests", "validate-generated"]
 
 [env.unittests]
 description = "Run unittests"
 deps = ["uv"]
 commands = [["uv", "run", "--group", "tests", "pytest"]]
+
+[env.validate-generated]
+description = "Verify ocp_resources generated files match class-generator output (no file is modified)"
+deps = ["uv"]
+commands = [["uv", "run", "class-generator", "--verify-changed"]]

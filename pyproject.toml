@@ -69,7 +69,7 @@ packages = [
 ]
 include = [
   "class_generator/schema/__resources-mappings.json.gz",
-  "class_generator/schema/_definitions.json",
+  "class_generator/schema/__definitions.json.gz",
 ]
 
 [project]

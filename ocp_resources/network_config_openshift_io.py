@@ -68,6 +68,7 @@ class Network(Resource):
         self.service_node_port_range = service_node_port_range
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

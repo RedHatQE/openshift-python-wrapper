@@ -56,6 +56,7 @@ class DSCInitialization(Resource):
         self.trusted_ca_bundle = trusted_ca_bundle
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

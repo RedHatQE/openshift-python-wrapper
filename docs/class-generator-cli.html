@@ -817,6 +817,121 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 </code></pre></div>
 
 <hr>
+<h3 id="verification">Verification</h3>
+<p>Verify that generated files still match what class-generator would produce. No file is modified.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--verify</code></td>
+<td>Verify the kinds passed via <code>--kind</code></td>
+</tr>
+<tr>
+<td><code>--verify-all</code></td>
+<td>Verify every generated resource; combine with <code>--filter</code> to narrow the scope</td>
+</tr>
+<tr>
+<td><code>--verify-changed</code></td>
+<td>Verify only resources changed relative to <code>--base</code>; untouched files are not checked</td>
+</tr>
+<tr>
+<td><code>--base TEXT</code></td>
+<td>Ref compared against by <code>--verify-changed</code>. Defaults to the current branch's upstream, then to the clone's remote HEAD; the ref is fetched when the clone lacks it and the diff uses the merge base</td>
+</tr>
+<tr>
+<td><code>--classification TEXT</code></td>
+<td>Comma-separated drift classifications; only files matching them are reported and fail the run</td>
+</tr>
+<tr>
+<td><code>--match</code></td>
+<td>Require the drift to be <em>within</em> <code>--classification</code> (a subset) instead of merely containing one of them</td>
+</tr>
+<tr>
+<td><code>--exclude TEXT</code></td>
+<td>Drop files whose drift contains any of these classifications, leaving only drift that is safe to regenerate</td>
+</tr>
+<tr>
+<td><code>--jobs INTEGER</code></td>
+<td>Resources verified in parallel (default 10)</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>--classification</code>, <code>--match</code> and <code>--exclude</code> require a verify mode; unknown
+classifications are rejected with the list of valid values.</p>
+<p>Every reported file is generator output, so the printed repair command is the plain
+per-kind form:</p>
+<div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--kind<span class="w"> </span>Deployment<span class="w"> </span>--overwrite
+</code></pre></div>
+
+<p>Only files whose name class-generator writes are verified (<code>&lt;kind&gt;.py</code>, or
+<code>&lt;kind&gt;_&lt;api-group&gt;.py</code> for a kind in several groups). A copied file under another name
+is not generator output and is ignored.</p>
+<h4 id="drift-classifications">Drift classifications</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Classification</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>blank lines</code></td>
+<td>Only blank-line differences</td>
+</tr>
+<tr>
+<td><code>docstring add</code> / <code>docstring delete</code></td>
+<td>Docstring text differs</td>
+</tr>
+<tr>
+<td><code>code add</code> / <code>code delete</code></td>
+<td>Code lines differ</td>
+</tr>
+<tr>
+<td><code>signature code add</code></td>
+<td>Parameters were added (all generated parameters carry defaults, so this is not breaking)</td>
+</tr>
+<tr>
+<td><code>signature code remove</code></td>
+<td>Parameters were removed</td>
+</tr>
+<tr>
+<td><code>breaking change</code></td>
+<td>A caller-visible break: a parameter was removed, a parameter became required, a parameter is emitted under a different API key, the base class changed, or <code>api_group</code>/<code>api_version</code> changed</td>
+</tr>
+<tr>
+<td><code>schema incomplete</code></td>
+<td>The rendered class has no parameters while the file has some — an unresolvable <code>$ref</code>. Reported in addition to <code>breaking change</code></td>
+</tr>
+<tr>
+<td><code>file does not exist</code></td>
+<td>The expected generated file is missing (or was deleted on this branch)</td>
+</tr>
+<tr>
+<td><code>formatting failed</code></td>
+<td>The rendered output could not be formatted</td>
+</tr>
+<tr>
+<td><code>not in schema</code></td>
+<td>The kind is absent from the resources mapping</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>code delete</code> on its own is not breaking: it also covers guard lines removed when a
+field becomes optional, rewritten statements and reflowed code.</p>
+<h4 id="exit-status">Exit status</h4>
+<p><code>0</code> when everything matches, <code>1</code> when any file drifted or could not be verified.</p>
+<h4 id="ci">CI</h4>
+<p><code>tox -e validate-generated</code> runs <code>--verify-changed</code> with no arguments, so tox stays
+CI-independent:</p>
+<div class="highlight"><pre><span></span><code>tox<span class="w"> </span>-e<span class="w"> </span>validate-generated
+</code></pre></div>
+
 <h3 id="logging">Logging</h3>
 <h4 id="-v-verbose"><code>-v</code>, <code>--verbose</code></h4>
 <div class="table-wrap"><table>
@@ -879,7 +994,23 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 </tr>
 <tr>
 <td><code>--filter</code></td>
-<td>Requires <code>--regenerate-all</code></td>
+<td>Requires <code>--regenerate-all</code>, <code>--verify-all</code> or <code>--verify-changed</code></td>
+</tr>
+<tr>
+<td><code>--verify</code> / <code>--verify-all</code> / <code>--verify-changed</code></td>
+<td>Mutually exclusive, and cannot combine with <code>--regenerate-all</code>, <code>--backup</code>, <code>--overwrite</code>, <code>--add-tests</code> or <code>--dry-run</code></td>
+</tr>
+<tr>
+<td><code>--verify</code></td>
+<td>Requires <code>--kind</code></td>
+</tr>
+<tr>
+<td><code>--classification</code> / <code>--exclude</code></td>
+<td>Require a verify mode</td>
+</tr>
+<tr>
+<td><code>--match</code></td>
+<td>Requires <code>--classification</code></td>
 </tr>
 <tr>
 <td>No options</td>
@@ -895,6 +1026,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <li><code>--update-schema</code> (exits unless <code>--generate-missing</code> is also set)</li>
 <li><code>--coverage-report</code> / <code>--discover-missing</code> / <code>--generate-missing</code> (coverage analysis and reporting)</li>
 <li><code>--generate-missing</code> (generates classes for missing resources)</li>
+<li><code>--verify</code> / <code>--verify-all</code> / <code>--verify-changed</code> (verification, exits after completion)</li>
 <li><code>--regenerate-all</code> (batch regeneration, exits after completion)</li>
 <li><code>-k</code>/<code>--kind</code> (normal kind generation)</li>
 <li><code>--add-tests</code> (test generation and execution)</li>
@@ -1401,6 +1533,7 @@ class-generator<span class="w"> </span>--regenerate-all<span class="w"> </span>-
 <li><a href="#schema-management">Schema Management</a></li>
 <li><a href="#coverage-and-discovery">Coverage and Discovery</a></li>
 <li><a href="#batch-regeneration">Batch Regeneration</a></li>
+<li><a href="#verification">Verification</a></li>
 <li><a href="#logging">Logging</a></li>
 </ul>
 </li>

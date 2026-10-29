@@ -13,10 +13,6 @@ VMT_NAME = "test-vmt"
 _API_GROUP = "template.kubevirt.io"
 _API_VERSION = "v1alpha1"
 _FULL_API_VERSION = f"{_API_GROUP}/{_API_VERSION}"
-# The process method builds: "subresources.<self.api_version>"
-_SUBRESOURCES_API = f"subresources.{_FULL_API_VERSION}"
-# Expected POST path used by process()
-VMT_PROCESS_PATH = f"/apis/{_SUBRESOURCES_API}/namespaces/{VMT_NAMESPACE}/virtualmachinetemplates/{VMT_NAME}/process"
 
 # Resource definition required to register VirtualMachineTemplate in the fake client
 _VMT_RESOURCE_DEF: dict[str, Any] = {
@@ -32,6 +28,16 @@ _VMT_RESOURCE_DEF: dict[str, Any] = {
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
+
+
+def _expected_process_path(vmt: VirtualMachineTemplate) -> str:
+    """
+    Expected POST path for process(), derived from the resource's discovered api_version.
+
+    The api_version is resolved from the client's discovery (highest version in the
+    group), so it must not be hardcoded in the test.
+    """
+    return f"/apis/subresources.{vmt.api_version}/namespaces/{VMT_NAMESPACE}/virtualmachinetemplates/{VMT_NAME}/process"
 
 
 def _make_fake_client(response_data: dict[str, Any] | None = None) -> Any:
@@ -73,7 +79,7 @@ class TestProcessPath:
 
         method, path, _ = process_client.request.call_args.args
         assert method == "POST"
-        assert path == VMT_PROCESS_PATH
+        assert path == _expected_process_path(vmt)
 
     def test_process_with_parameters_uses_correct_path(self, vmt: VirtualMachineTemplate) -> None:
         process_client = _make_fake_client()
@@ -81,7 +87,7 @@ class TestProcessPath:
 
         method, path, _ = process_client.request.call_args.args
         assert method == "POST"
-        assert path == VMT_PROCESS_PATH
+        assert path == _expected_process_path(vmt)
 
 
 class TestProcessOptionsBody:
@@ -99,7 +105,7 @@ class TestProcessOptionsBody:
         vmt.process(client=process_client)
 
         _, _, body = process_client.request.call_args.args
-        assert body["apiVersion"] == _SUBRESOURCES_API
+        assert body["apiVersion"] == f"subresources.{vmt.api_version}"
 
     def test_body_parameters_empty_when_none_supplied(self, vmt: VirtualMachineTemplate) -> None:
         """parameters=None should produce an empty dict in the request body."""

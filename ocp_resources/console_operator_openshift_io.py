@@ -21,12 +21,12 @@ class Console(Resource):
         ingress: dict[str, Any] | None = None,
         log_level: str | None = None,
         management_state: str | None = None,
-        observed_config: Any | None = None,
+        observed_config: dict[str, Any] | None = None,
         operator_log_level: str | None = None,
         plugins: list[Any] | None = None,
         providers: dict[str, Any] | None = None,
         route: dict[str, Any] | None = None,
-        unsupported_config_overrides: Any | None = None,
+        unsupported_config_overrides: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
@@ -47,7 +47,7 @@ class Console(Resource):
             management_state (str): managementState indicates whether and how the operator should manage
               the component
 
-            observed_config (Any): observedConfig holds a sparse config that controller has observed from
+            observed_config (dict[str, Any]): observedConfig holds a sparse config that controller has observed from
               the cluster state.  It exists in spec because it is an input to
               the level for the operator
 
@@ -72,7 +72,7 @@ class Console(Resource):
               the default hostname for console if the custom route is removed.
               If not specified, default route will be used. DEPRECATED
 
-            unsupported_config_overrides (Any): unsupportedConfigOverrides overrides the final configuration that was
+            unsupported_config_overrides (dict[str, Any]): unsupportedConfigOverrides overrides the final configuration that was
               computed by the operator. Red Hat does not support the use of this
               field. Misuse of this field could lead to unexpected behavior or
               conflict with other configuration options. Seek guidance from the
@@ -95,6 +95,7 @@ class Console(Resource):
         self.unsupported_config_overrides = unsupported_config_overrides
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

@@ -17,6 +17,11 @@ class TestSecurityContextConstraints:
             allow_host_ports=[{"port": 80, "target_port": 8080}],
             allow_privileged_container=True,
             read_only_root_filesystem=True,
+            allowed_capabilities=[],
+            default_add_capabilities=[],
+            required_drop_capabilities=[],
+            priority=0,
+            volumes=[],
         )
 
     def test_01_create_securitycontextconstraints(self, securitycontextconstraints):
