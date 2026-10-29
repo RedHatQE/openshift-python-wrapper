@@ -20,6 +20,7 @@ class VirtualMachineClusterInstancetype(Resource):
         cpu: dict[str, Any] | None = None,
         gpus: list[Any] | None = None,
         host_devices: list[Any] | None = None,
+        io_threads: dict[str, Any] | None = None,
         io_threads_policy: str | None = None,
         launch_security: dict[str, Any] | None = None,
         memory: dict[str, Any] | None = None,
@@ -38,9 +39,13 @@ class VirtualMachineClusterInstancetype(Resource):
 
             host_devices (list[Any]): Optionally defines any HostDevices associated with the instancetype.
 
+            io_threads (dict[str, Any]): Optionally specifies the IOThreads options to be used by the
+              instancetype.
+
             io_threads_policy (str): Optionally defines the IOThreadsPolicy to be used by the instancetype.
 
             launch_security (dict[str, Any]): Optionally defines the LaunchSecurity to be used by the instancetype.
+              Deprecated: Will be removed with v1beta2 or v1
 
             memory (dict[str, Any]): Required Memory related attributes of the instancetype.
 
@@ -63,6 +68,7 @@ class VirtualMachineClusterInstancetype(Resource):
         self.cpu = cpu
         self.gpus = gpus
         self.host_devices = host_devices
+        self.io_threads = io_threads
         self.io_threads_policy = io_threads_policy
         self.launch_security = launch_security
         self.memory = memory
@@ -70,6 +76,7 @@ class VirtualMachineClusterInstancetype(Resource):
         self.scheduler_name = scheduler_name
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -93,6 +100,9 @@ class VirtualMachineClusterInstancetype(Resource):
 
             if self.host_devices is not None:
                 _spec["hostDevices"] = self.host_devices
+
+            if self.io_threads is not None:
+                _spec["ioThreads"] = self.io_threads
 
             if self.io_threads_policy is not None:
                 _spec["ioThreadsPolicy"] = self.io_threads_policy

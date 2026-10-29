@@ -10,7 +10,12 @@ from typing import Any
 import jsonschema
 from simple_logger.logger import get_logger
 
-from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE
+from class_generator.constants import (
+    DEFINITIONS_ARCHIVE,
+    DEFINITIONS_FILE,
+    RESOURCES_MAPPING_ARCHIVE,
+    RESOURCES_MAPPING_FILE,
+)
 
 from .archive_utils import load_json_archive
 
@@ -48,18 +53,16 @@ class SchemaValidator:
             LOGGER.warning(f"Mappings archive not found: {RESOURCES_MAPPING_ARCHIVE}")
             return False
 
-        # Load definitions file (not archived)
-        if not DEFINITIONS_FILE.exists():
-            LOGGER.warning(f"Definitions file not found: {DEFINITIONS_FILE}")
+        # Load definitions archive
+        if not DEFINITIONS_ARCHIVE.exists():
+            LOGGER.warning(f"Definitions archive not found: {DEFINITIONS_ARCHIVE}")
             return False
 
         try:
-            with open(DEFINITIONS_FILE) as f:
-                definitions_data = f.read()
-            definitions_json = json.loads(definitions_data)
+            definitions_json = load_json_archive(DEFINITIONS_FILE)
             cls._definitions_data = definitions_json.get("definitions", {})
         except Exception as e:
-            LOGGER.error(f"Failed to read definitions file {DEFINITIONS_FILE}: {e}")
+            LOGGER.error(f"Failed to read definitions archive {DEFINITIONS_ARCHIVE}: {e}")
             return False
 
         return True
@@ -325,3 +328,15 @@ class SchemaValidator:
         loaded from files.
         """
         cls._schema_cache.clear()
+
+    @classmethod
+    def reload_from_disk(cls) -> None:
+        """Drop everything loaded from disk so the next access reads the files again.
+
+        Needed after a schema update writes new mappings or definitions: the cached
+        copies would otherwise hide the new entries, including sub-schemas required
+        to resolve `$ref`.
+        """
+        cls._schema_cache.clear()
+        cls._mappings_data = None
+        cls._definitions_data = None

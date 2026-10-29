@@ -18,6 +18,7 @@ class MigController(NamespacedResource):
         image_pull_policy: str | None = None,
         infra: dict[str, Any] | None = None,
         priority_class: str | None = None,
+        tls_security_profile: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
         r"""
@@ -28,12 +29,16 @@ class MigController(NamespacedResource):
 
             priority_class (str): PriorityClass of the control plane
 
+            tls_security_profile (dict[str, Any]): TLSSecurityProfile is used by operators to apply cluster-wide TLS
+              security settings to operands.
+
         """
         super().__init__(**kwargs)
 
         self.image_pull_policy = image_pull_policy
         self.infra = infra
         self.priority_class = priority_class
+        self.tls_security_profile = tls_security_profile
 
     def to_dict(self) -> None:
 
@@ -51,5 +56,8 @@ class MigController(NamespacedResource):
 
             if self.priority_class is not None:
                 _spec["priorityClass"] = self.priority_class
+
+            if self.tls_security_profile is not None:
+                _spec["tlsSecurityProfile"] = self.tls_security_profile
 
     # End of generated code

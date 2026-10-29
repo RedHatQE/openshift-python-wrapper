@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from class_generator.constants import RESOURCES_MAPPING_FILE
+from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_FILE
 from class_generator.core.schema import (
     ClusterVersionError,
     ResourceNotFoundError,
@@ -1081,8 +1081,8 @@ class TestProcessSchemaDefinitions:
         # Should preserve existing resources
         assert "pod" in resources_mapping
 
-    def test_skip_schemas_without_gvk(self):
-        """Test that schemas without group-version-kind are skipped."""
+    def test_schemas_without_gvk_are_not_resources(self):
+        """Schemas without group-version-kind are never resources, but are kept as definitions."""
         schemas = {
             "api/v1": {
                 "components": {"schemas": {"InvalidSchema": {"type": "object", "description": "Schema without GVK"}}}
@@ -1091,13 +1091,15 @@ class TestProcessSchemaDefinitions:
         namespacing_dict = {}
         existing_mapping = {}
 
-        resources_mapping, definitions = process_schema_definitions(
-            schemas, namespacing_dict, existing_mapping, allow_updates=True
-        )
+        with patch("class_generator.core.schema.load_json_archive", side_effect=FileNotFoundError("no archive")):
+            resources_mapping, definitions = process_schema_definitions(
+                schemas, namespacing_dict, existing_mapping, allow_updates=True
+            )
 
-        # Should not add invalid schemas
+        # Not a resource...
         assert len(resources_mapping) == 0
-        assert len(definitions) == 0
+        # ...but kept, because resource schemas reference such sub-schemas via $ref
+        assert definitions == {"InvalidSchema": {"type": "object", "description": "Schema without GVK"}}
 
     def test_update_existing_resources_with_new_version(self):
         """Test updating existing resources with new API versions."""
@@ -1153,7 +1155,8 @@ class TestWriteSchemaFiles:
         # No exception should be raised
         write_schema_files(resources_mapping, definitions, "kubectl")
 
-        mock_save_archive.assert_called_once()
+        # definitions + resources mapping are both written as archives
+        assert mock_save_archive.call_count == 2
 
     @patch("class_generator.core.schema.Path")
     def test_directory_creation_failure(self, mock_path):
@@ -1235,21 +1238,26 @@ class TestWriteSchemaFiles:
         resources_mapping = {"pod": [{"kind": "Pod"}]}
         empty_definitions = {}  # Empty definitions
 
-        # Call the function
-        write_schema_files(resources_mapping, empty_definitions, "kubectl", allow_supplementation=True)
+        # Call the function (no archive on disk, so empty definitions are still written)
+        with patch("class_generator.core.schema.DEFINITIONS_ARCHIVE") as mock_archive:
+            mock_archive.exists.return_value = False
+            write_schema_files(resources_mapping, empty_definitions, "kubectl", allow_supplementation=True)
 
         # Verify that missing definitions function is not called when no schemas provided
         mock_get_missing.assert_not_called()
         # Verify that supplementation is NOT called when no schemas and empty definitions
         mock_supplement.assert_not_called()
 
-        # Verify that the definitions file IS opened for writing when no existing file
-        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
-        assert len(write_calls) == 1, "Definitions file should be opened for writing when no existing file"
+        # Verify that the definitions archive IS written when no existing file
+        written_paths = [call_args[0][1] for call_args in mock_save_archive.call_args_list]
+        assert DEFINITIONS_FILE in written_paths, "Definitions archive should be written when no existing file"
+        assert RESOURCES_MAPPING_FILE in written_paths
 
-        # Verify that resources mapping is saved
-        # Assert the actual file path to ensure the correct mapping file is being saved
-        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
+        # Verify that the resources mapping is saved
+        assert any(
+            call_args[0] == (resources_mapping, RESOURCES_MAPPING_FILE)
+            for call_args in mock_save_archive.call_args_list
+        )
 
     @patch("class_generator.core.schema.Path")
     @patch("class_generator.core.schema.save_json_archive")
@@ -1280,12 +1288,15 @@ class TestWriteSchemaFiles:
         mock_supplement.assert_called_once()
 
         # Since enrichment added content, file should be written
-        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
-        assert len(write_calls) == 1, "Definitions file should be written when enrichment adds content"
+        written_paths = [call_args[0][1] for call_args in mock_save_archive.call_args_list]
+        assert DEFINITIONS_FILE in written_paths, "Definitions archive should be written when enrichment adds content"
+        assert RESOURCES_MAPPING_FILE in written_paths
 
-        # Verify that resources mapping is saved
-        # Assert the actual file path to ensure the correct mapping file is being saved
-        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
+        # Verify that the resources mapping is saved
+        assert any(
+            call_args[0] == (resources_mapping, RESOURCES_MAPPING_FILE)
+            for call_args in mock_save_archive.call_args_list
+        )
 
     @patch("class_generator.core.schema.Path")
     @patch("class_generator.core.schema.save_json_archive")
@@ -1352,34 +1363,38 @@ class TestWriteSchemaFiles:
         schemas = {"api/v1": {"components": {"schemas": {}}}}  # Provide schemas to trigger missing definitions check
 
         # Call the function
-        write_schema_files(resources_mapping, empty_definitions, "kubectl", schemas=schemas, allow_supplementation=True)
+        with patch("class_generator.core.schema.DEFINITIONS_ARCHIVE") as mock_archive:
+            mock_archive.exists.return_value = False
+            write_schema_files(
+                resources_mapping, empty_definitions, "kubectl", schemas=schemas, allow_supplementation=True
+            )
 
         # Verify enrichment functions called
         mock_get_missing.assert_called_once_with(empty_definitions, "kubectl", schemas)
         mock_supplement.assert_called_once_with(missing_definitions, "kubectl")
 
         # Since enrichment added content, definitions file should be written
-        write_calls = [call for call in mock_open.call_args_list if len(call[0]) > 1 and call[0][1] == "w"]
-        assert len(write_calls) == 1, (
-            "Definitions file should be written when enrichment adds content to initially empty definitions"
+        written_paths = [call_args[0][1] for call_args in mock_save_archive.call_args_list]
+        assert DEFINITIONS_FILE in written_paths, (
+            "Definitions archive should be written when enrichment adds content to initially empty definitions"
         )
+        assert RESOURCES_MAPPING_FILE in written_paths
 
-        # Verify correct content written
-        mock_file.write.assert_called()
-        # The content is written as JSON with the definitions wrapped in a "definitions" object
-        all_write_calls = [call[0][0] for call in mock_file.write.call_args_list]
-        written_content = "".join(all_write_calls)
+        # Verify correct content written: definitions go through the archive helper
+        written_definitions = next(
+            call_args[0][0]["definitions"]
+            for call_args in mock_save_archive.call_args_list
+            if call_args[0][1] == DEFINITIONS_FILE
+        )
+        assert "v1/CoreDef" in written_definitions
+        assert written_definitions["v1/CoreDef"]["type"] == "object"
+        assert written_definitions["v1/CoreDef"]["description"] == "Added by supplementation"
 
-        # Parse the JSON and verify structure properly
-        written_json = json.loads(written_content)
-        assert "definitions" in written_json
-        assert "v1/CoreDef" in written_json["definitions"]
-        assert written_json["definitions"]["v1/CoreDef"]["type"] == "object"
-        assert written_json["definitions"]["v1/CoreDef"]["description"] == "Added by supplementation"
-
-        # Verify that resources mapping is saved
-        # Assert the actual file path to ensure the correct mapping file is being saved
-        mock_save_archive.assert_called_once_with(resources_mapping, RESOURCES_MAPPING_FILE)
+        # Verify that the resources mapping is saved
+        assert any(
+            call_args[0] == (resources_mapping, RESOURCES_MAPPING_FILE)
+            for call_args in mock_save_archive.call_args_list
+        )
 
 
 class TestDetectMissingRefsFromSchemas:
@@ -1742,3 +1757,67 @@ class TestUpdateSingleResourceSchema:
             update_single_resource_schema(kind="Pod")
 
         assert "No schema definition found for Pod" in str(exc_info.value)
+
+
+class TestSubSchemaDefinitions:
+    """Non-GVK sub-schemas must be persisted so $ref resolution can find them."""
+
+    def test_sub_schema_stored_in_definitions(self):
+        schemas = {
+            "apis/storage.k8s.io/v1": {
+                "components": {
+                    "schemas": {
+                        "io.k8s.api.storage.v1.CSIDriver": {
+                            "type": "object",
+                            "properties": {
+                                "spec": {
+                                    "allOf": [{"$ref": "#/components/schemas/io.k8s.api.storage.v1.CSIDriverSpec"}]
+                                }
+                            },
+                            "x-kubernetes-group-version-kind": [
+                                {"group": "storage.k8s.io", "version": "v1", "kind": "CSIDriver"}
+                            ],
+                        },
+                        "io.k8s.api.storage.v1.CSIDriverSpec": {
+                            "type": "object",
+                            "description": "CSIDriverSpec is the specification of a CSIDriver.",
+                            "properties": {"attachRequired": {"type": "boolean"}},
+                            "required": ["attachRequired"],
+                        },
+                    }
+                }
+            }
+        }
+
+        resources_mapping, definitions = process_schema_definitions(
+            schemas, {"CSIDriver": False}, {}, allow_updates=True
+        )
+
+        # the resource is in the mapping, and the referenced sub-schema is stored
+        assert "csidriver" in resources_mapping
+        assert "io.k8s.api.storage.v1.CSIDriverSpec" in definitions
+        assert definitions["io.k8s.api.storage.v1.CSIDriverSpec"]["properties"] == {
+            "attachRequired": {"type": "boolean"}
+        }
+        # sub-schemas are not resources
+        assert "io.k8s.api.storage.v1.CSIDriverSpec" not in resources_mapping
+
+    def test_sub_schema_preserved_when_updates_not_allowed(self):
+        existing_sub_schema = {"type": "object", "properties": {"keep": {"type": "string"}}}
+        schemas = {
+            "apis/storage.k8s.io/v1": {
+                "components": {
+                    "schemas": {
+                        "io.k8s.api.storage.v1.CSIDriverSpec": {"type": "object", "properties": {}},
+                    }
+                }
+            }
+        }
+
+        with patch(
+            "class_generator.core.schema.load_json_archive",
+            return_value={"definitions": {"io.k8s.api.storage.v1.CSIDriverSpec": existing_sub_schema}},
+        ):
+            _, definitions = process_schema_definitions(schemas, {}, {}, allow_updates=False)
+
+        assert definitions["io.k8s.api.storage.v1.CSIDriverSpec"] == existing_sub_schema

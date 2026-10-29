@@ -390,6 +390,34 @@
 <blockquote>
 <p><strong>Warning:</strong> <code>--update-schema</code> and <code>--update-schema-for</code> are mutually exclusive. Use one or the other.</p>
 </blockquote>
+<h2 id="verifying-generated-files">Verifying Generated Files</h2>
+<p>A generated file is only trustworthy while it still matches what class-generator produces.
+<code>--verify*</code> checks that without modifying anything: on drift it exits <code>1</code>, lists each file
+with its drift classification, and prints the regenerate command.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># every generated resource</span>
+class-generator<span class="w"> </span>--verify-all
+
+<span class="c1"># only the files this branch changed (compares against the branch's base, merge-base aware)</span>
+class-generator<span class="w"> </span>--verify-changed
+
+<span class="c1"># what a PR touched, is what CI should check</span>
+tox<span class="w"> </span>-e<span class="w"> </span>validate-generated
+</code></pre></div>
+
+<p>Narrow the report when you only care about a specific kind of drift:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># only files whose drift is blank lines and/or added parameters, nothing else</span>
+class-generator<span class="w"> </span>--verify-all<span class="w"> </span>--classification<span class="w"> </span><span class="s2">"blank lines,signature code add"</span><span class="w"> </span>--match
+
+<span class="c1"># everything that is safe to regenerate - drops caller-breaking drift</span>
+class-generator<span class="w"> </span>--verify-all<span class="w"> </span>--exclude<span class="w"> </span><span class="s2">"breaking change,schema incomplete"</span>
+</code></pre></div>
+
+<p><code>breaking change</code> covers a removed parameter, a parameter that became required, a parameter
+emitted under a different API key, a changed base class, and a changed
+<code>api_group</code>/<code>api_version</code>. <code>schema incomplete</code> marks a class rendered without any
+parameters because a schema <code>$ref</code> could not be resolved — fix the schema, not the file.</p>
+<p>See the <a href="class-generator-cli.html#verification">class-generator CLI reference</a> for every
+option and classification.</p>
 <h2 id="discovering-missing-resources">Discovering Missing Resources</h2>
 <p>Find resources on your cluster that don't have wrapper classes yet:</p>
 <div class="highlight"><pre><span></span><code>class-generator<span class="w"> </span>--discover-missing
@@ -593,6 +621,7 @@ Ensure you are logged in to the cluster with sufficient privileges. The generato
 <li><a href="#single-resource-schema-update">Single-resource schema update</a></li>
 </ul>
 </li>
+<li><a href="#verifying-generated-files">Verifying Generated Files</a></li>
 <li><a href="#discovering-missing-resources">Discovering Missing Resources</a><ul>
 <li><a href="#coverage-report">Coverage report</a></li>
 <li><a href="#auto-generate-all-missing-resources">Auto-generate all missing resources</a></li>

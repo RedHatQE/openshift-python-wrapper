@@ -21,6 +21,7 @@ class DataImportCron(NamespacedResource):
         managed_data_source: str | None = None,
         retention_policy: str | None = None,
         schedule: str | None = None,
+        service_account_name: str | None = None,
         template: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
@@ -37,10 +38,13 @@ class DataImportCron(NamespacedResource):
 
             retention_policy (str): RetentionPolicy specifies whether the created DataVolumes and
               DataSources are retained when their DataImportCron is deleted.
-              Default is RatainAll.
+              Default is RetainAll.
 
             schedule (str): Schedule specifies in cron format when and how often to look for new
               imports
+
+            service_account_name (str): ServiceAccountName is the name of the ServiceAccount for creating
+              DataVolumes.
 
             template (dict[str, Any]): Template specifies template for the DVs to be created
 
@@ -52,9 +56,11 @@ class DataImportCron(NamespacedResource):
         self.managed_data_source = managed_data_source
         self.retention_policy = retention_policy
         self.schedule = schedule
+        self.service_account_name = service_account_name
         self.template = template
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -82,5 +88,8 @@ class DataImportCron(NamespacedResource):
 
             if self.retention_policy is not None:
                 _spec["retentionPolicy"] = self.retention_policy
+
+            if self.service_account_name is not None:
+                _spec["serviceAccountName"] = self.service_account_name
 
     # End of generated code

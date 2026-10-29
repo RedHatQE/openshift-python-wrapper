@@ -106,6 +106,7 @@ class DirectVolumeMigration(NamespacedResource):
         self.src_mig_cluster_ref = src_mig_cluster_ref
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:

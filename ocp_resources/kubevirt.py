@@ -29,6 +29,7 @@ class KubeVirt(NamespacedResource):
         product_name: str | None = None,
         product_version: str | None = None,
         service_monitor_namespace: str | None = None,
+        synchronization_port: str | None = None,
         uninstall_strategy: str | None = None,
         workload_update_strategy: dict[str, Any] | None = None,
         workloads: dict[str, Any] | None = None,
@@ -42,7 +43,10 @@ class KubeVirt(NamespacedResource):
 
             customize_components (dict[str, Any]): No field description from API
 
-            image_pull_policy (str): The ImagePullPolicy to use.
+            image_pull_policy (str): The ImagePullPolicy to use for KubeVirt operator-managed
+              infrastructure images (virt-api, virt-controller, virt-handler,
+              virt-exportproxy, etc.). For pull policy of user workload pods,
+              see spec.configuration.imagePullPolicy.
 
             image_pull_secrets (list[Any]): The imagePullSecrets to pull the container images from Defaults to
               none
@@ -79,6 +83,9 @@ class KubeVirt(NamespacedResource):
               monitor object in that namespace otherwise we will use the
               monitoring namespace.
 
+            synchronization_port (str): Specify the port to listen on for VMI status synchronization traffic.
+              Default is 9185
+
             uninstall_strategy (str): Specifies if kubevirt can be deleted if workloads are still present.
               This is mainly a precaution to avoid accidental data loss
 
@@ -104,11 +111,13 @@ class KubeVirt(NamespacedResource):
         self.product_name = product_name
         self.product_version = product_version
         self.service_monitor_namespace = service_monitor_namespace
+        self.synchronization_port = synchronization_port
         self.uninstall_strategy = uninstall_strategy
         self.workload_update_strategy = workload_update_strategy
         self.workloads = workloads
 
     def to_dict(self) -> None:
+
         super().to_dict()
 
         if not self.kind_dict and not self.yaml_file:
@@ -156,6 +165,9 @@ class KubeVirt(NamespacedResource):
 
             if self.service_monitor_namespace is not None:
                 _spec["serviceMonitorNamespace"] = self.service_monitor_namespace
+
+            if self.synchronization_port is not None:
+                _spec["synchronizationPort"] = self.synchronization_port
 
             if self.uninstall_strategy is not None:
                 _spec["uninstallStrategy"] = self.uninstall_strategy

@@ -1,5 +1,6 @@
 """Status schema parser for generating dynamic status from resource schemas"""
 
+import gzip
 import json
 import os
 import random
@@ -22,11 +23,11 @@ class StatusSchemaParser:
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             "class_generator",
             "schema",
-            "_definitions.json",
+            "__definitions.json.gz",
         )
 
         if os.path.exists(definitions_path):
-            with open(definitions_path) as f:
+            with gzip.open(definitions_path, "rt", encoding="utf-8") as f:
                 data = json.load(f)
                 self._definitions = data.get("definitions", {})
 

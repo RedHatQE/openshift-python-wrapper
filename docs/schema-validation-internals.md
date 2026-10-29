@@ -44,7 +44,7 @@ OpenAPI schemas flow through the system in two directions: they are fetched from
 3. **Extract fields and types** — The `type_parser` module converts OpenAPI types to Python type annotations and builds parameter dictionaries for the class constructor.
 4. **Render Jinja2 template** — `render_jinja_template()` processes `class_generator_template.j2` with the extracted data, producing a complete Python class.
 5. **Preserve user code** — If the target file already exists, `parse_user_code_from_file()` extracts any user-added code below the `# End of generated code` marker and re-inserts it after regeneration.
-6. **Format and write** — `write_and_format_rendered()` writes the file, then runs `prek` (pre-commit hooks) or falls back to `ruff` for formatting.
+6. **Format and write** — `write_and_format_rendered()` writes the file, then formats it with `prek` (the repository's own pre-commit hooks, unmodified). prek runs a second time to reach a fixpoint; if it still fails, the kind fails loudly instead of leaving an unformatted file. No other formatter is invoked, so a file that passes locally also passes CI.
 
 ## Key Concepts
 

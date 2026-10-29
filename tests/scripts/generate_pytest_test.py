@@ -32,7 +32,6 @@ License: Same as openshift-python-wrapper project
 """
 
 import importlib
-import shlex
 import subprocess
 import sys
 import types
@@ -508,28 +507,35 @@ class {{ class_name }}:
         }
 
 
-def run_ruff_on_files(filepaths: list[str]) -> bool:
-    """Run ruff format and check on files"""
+def run_prek_on_files(filepaths: list[str]) -> bool:
+    """Run prek (the project's pre-commit hooks, unmodified settings) on files"""
     try:
         file_count = len(filepaths)
         file_desc = "file" if file_count == 1 else f"{file_count} files"
-        console.print(f"[bold blue]Running ruff format and check on {file_desc}...[/bold blue]")
+        console.print(f"[bold blue]Running prek on {file_desc}...[/bold blue]")
 
-        # Run ruff format and check on all files
-        for op in ("format", "check"):
-            cmd_str = f"uvx ruff --config pyproject.toml {op} {' '.join(filepaths)}"
+        command = ["uvx", "prek", "-c", ".pre-commit-config.yaml", "run", "--files", *filepaths]
+        rc, _, _ = run_command(
+            command=command,
+            verify_stderr=False,
+            check=False,
+        )
+        if rc != 0:
+            # prek exits non-zero when hooks modified the files; run it again —
+            # the files must then pass all hooks cleanly
             rc, _, _ = run_command(
-                command=shlex.split(cmd_str),
+                command=command,
                 verify_stderr=False,
                 check=False,
             )
             if rc != 0:
-                console.print(f"[yellow]Ruff {op} returned exit code {rc}[/yellow]")
+                console.print("[yellow]prek did not pass after re-run[/yellow]")
+                return False
 
         return True
 
     except Exception as e:
-        console.print(f"[red]Error running ruff: {e}[/red]")
+        console.print(f"[red]Error running prek: {e}[/red]")
         return False
 
 
@@ -679,8 +685,8 @@ def main(kind, check_coverage, generate_missing, dry_run):
         for filepath in generated_files:
             console.print(f"  - {filepath}")
 
-        # Run ruff on all generated files
-        run_ruff_on_files(filepaths=generated_files)
+        # Run prek on all generated files
+        run_prek_on_files(filepaths=generated_files)
 
         # Run pytest on all generated files
         console.print("\n[bold blue]Running tests on generated files...[/bold blue]")
