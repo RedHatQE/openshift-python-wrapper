@@ -67,6 +67,9 @@ class VirtualMachineFileRestore(NamespacedResource):
         """Number of restored files, or None before a transfer or in manual mode.
 
         A count of zero means an automatic transfer ran without copying any files.
+
+        Returns:
+            The number of restored files, or None if the restore has not yet run or is in manual mode.
         """
         return self.instance.get("status", {}).get("restoredFilesCount")
 
