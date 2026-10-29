@@ -62,18 +62,6 @@ class VirtualMachineFileRestore(NamespacedResource):
 
     # End of generated code
 
-    class Phase:
-        NEW: str = "New"
-        INIT: str = "Init"
-        HOTPLUGGING: str = "Hotplugging"
-        WAITING_FOR_ATTACHMENT: str = "WaitingForAttachment"
-        SSH_CONNECTING: str = "SSHConnecting"
-        RESTORING: str = "Restoring"
-        VOLUME_READY: str = "VolumeReady"
-        CLEANUP: str = "Cleanup"
-        SUCCEEDED: str = "Succeeded"
-        FAILED: str = "Failed"
-
     @property
     def restored_files_count(self) -> int | None:
         """Number of restored files, or None before a transfer or in manual mode.
