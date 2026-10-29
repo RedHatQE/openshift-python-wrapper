@@ -30,7 +30,7 @@ def _test_single_resource(kind: str) -> tuple[str, str] | None:
         )
 
         if drifted_files:
-            drifted_names = [drifted_file for drifted_file, _categories in drifted_files]
+            drifted_names = [drifted[0] if isinstance(drifted, tuple) else drifted for drifted in drifted_files]
             return (kind, f"Generated output differs from expected files: {', '.join(drifted_names)}")
 
         return None
