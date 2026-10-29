@@ -91,3 +91,16 @@ class ResourceConstants:
             PARTIALLYFAILED: str = "PartiallyFailed"
             FAILED: str = "Failed"
             DELETING: str = "Deleting"
+
+    class VirtualMachineFileRestore:
+        class Phase:
+            NEW: str = "New"
+            INIT: str = "Init"
+            HOTPLUGGING: str = "Hotplugging"
+            WAITING_FOR_ATTACHMENT: str = "WaitingForAttachment"
+            SSH_CONNECTING: str = "SSHConnecting"
+            RESTORING: str = "Restoring"
+            VOLUME_READY: str = "VolumeReady"
+            CLEANUP: str = "Cleanup"
+            SUCCEEDED: str = "Succeeded"
+            FAILED: str = "Failed"
